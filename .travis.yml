@@ -1,0 +1,33 @@
+language: cpp
+
+group: stable
+
+branches:
+  only:
+    - master
+
+git:
+  depth: 1
+
+sudo: false
+
+
+before_script:
+  - mkdir Build
+  - cd Build
+  - cmake -D ENABLE_COVERAGE:BOOL=TRUE ..
+
+script:
+  - cmake --build . -- -j2
+  - ctest
+  - bash <(curl -s https://codecov.io/bash)
+
+os:
+ - linux
+
+# matrix:
+#   include:
+#     - os: osx
+#       osx_image: xcode10.1
+
+    # - os: linux

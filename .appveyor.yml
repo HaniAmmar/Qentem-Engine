@@ -1,0 +1,36 @@
+version: 1.0.{build}
+
+clone_depth: 1
+
+branches:
+  only:
+    - master
+
+platform:
+  - x64
+  # - x86
+
+configuration:
+  - Release
+
+# cache:
+  # - Build -> .appveyor.yml
+  # - x64 -> .appveyor.yml
+  # - Release -> .appveyor.yml
+
+image:
+    - Visual Studio 2019
+    # - Visual Studio 2017
+    # - Visual Studio 2015
+
+build_script:
+  - mkdir Build
+  - cd Build
+  - cmake --config "Debug" ..
+  - cmake --build .
+
+test_script:
+  - ctest -C Debug
+
+matrix:
+  fast_finish: true
