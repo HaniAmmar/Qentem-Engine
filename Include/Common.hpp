@@ -50,7 +50,7 @@
 #if QENTEM_AVX512BW_ == 1
 #define QMM_SIZE_ 64U
 #define QMM_SHIFTSIZE_ 6U
-#define QMM_Number_ unsigned long long
+#define QMM_NUMBER_TYPE_ unsigned long long
 #define QMM_MAX_NUMBER 0XFFFFFFFFFFFFFFFF
 #define QMM_VAR_ __m512i
 #define QMM_LOAD_ _mm512_loadu_si512
@@ -61,25 +61,25 @@
 #elif QENTEM_AVX2_ == 1
 #define QMM_SIZE_ 32U
 #define QMM_SHIFTSIZE_ 5U
-#define QMM_Number_ unsigned int
+#define QMM_NUMBER_TYPE_ unsigned int
 #define QMM_MAX_NUMBER 0XFFFFFFFF
 #define QMM_VAR_ __m256i
 #define QMM_LOAD_ _mm256_loadu_si256
 #define QMM_SETONE_8_ _mm256_set1_epi8
 #define QMM_COMPARE_8_MASK_(a, b)                                              \
-    static_cast<QMM_Number_>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
+    static_cast<QMM_NUMBER_TYPE_>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
 #define QMM_STOREU_ _mm256_storeu_si256
 #define QMM_SETZERO_ _mm256_setzero_si256
 #elif QENTEM_SSE2_ == 1
 #define QMM_SIZE_ 16U
 #define QMM_SHIFTSIZE_ 4U
-#define QMM_Number_ unsigned int
+#define QMM_NUMBER_TYPE_ unsigned int
 #define QMM_MAX_NUMBER 0XFFFF
 #define QMM_VAR_ __m128i
 #define QMM_LOAD_ _mm_loadu_si128
 #define QMM_SETONE_8_ _mm_set1_epi8
 #define QMM_COMPARE_8_MASK_(a, b)                                              \
-    static_cast<QMM_Number_>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
+    static_cast<QMM_NUMBER_TYPE_>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
 #define QMM_STOREU_ _mm_storeu_si128
 #define QMM_SETZERO_ _mm_setzero_si128
 #endif
@@ -152,7 +152,7 @@ inline static unsigned int Q_CLZL(unsigned long value) {
 #include <immintrin.h>
 #define QENTEM_SIMD_ENABLED_
 #else
-#define QMM_Number_ unsigned long // See JSON::FindCache_
+#define QMM_NUMBER_TYPE_ unsigned long // See JSON::FindCache_
 #endif
 
 namespace Qentem {

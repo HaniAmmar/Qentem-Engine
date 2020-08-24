@@ -50,7 +50,7 @@ class Engine {
             const QMM_VAR_ m_content_0 =
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset));
 
-            QMM_Number_ bits =
+            QMM_NUMBER_TYPE_ bits =
                 QMM_COMPARE_8_MASK_(m_content_0, m_keyword_first);
 
             if (keyword_length != 1U) {

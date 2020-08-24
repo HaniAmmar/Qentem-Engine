@@ -2028,13 +2028,13 @@ class JSONParser : Engine {
     enum class Type_ { None = 0, Curly, Square, Quote, Comma, Colon };
 
     struct FindCache_ {
-        ULong       Offset{0};
-        ULong       NextOffset{0};
-        QMM_Number_ Bits{0};
+        ULong            Offset{0};
+        ULong            NextOffset{0};
+        QMM_NUMBER_TYPE_ Bits{0};
 
-        ULong       Offset2{0};
-        ULong       NextOffset2{0};
-        QMM_Number_ Bits2{0};
+        ULong            Offset2{0};
+        ULong            NextOffset2{0};
+        QMM_NUMBER_TYPE_ Bits2{0};
     };
 
     HArray<Value> *obj_{nullptr};

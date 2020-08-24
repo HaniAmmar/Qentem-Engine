@@ -289,7 +289,7 @@ class String {
             NumberType     offset = 0;
 
             do {
-                QMM_Number_ bits = QMM_COMPARE_8_MASK_(
+                NumberType bits = QMM_COMPARE_8_MASK_(
                     QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(str + offset)),
                     m_zero);
 
