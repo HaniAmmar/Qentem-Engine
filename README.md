@@ -6,6 +6,7 @@
 # Qentem Engine
 
 -   [Introduction](#introduction)
+-   [Features](#features)
 -   [Requirements](#requirements)
 -   [Documentation](#documentation)
 -   [Components](#requirements)
@@ -19,7 +20,13 @@
 
 ## Introduction
 
-Qentem Engine is an independent and cross-platform library that uses a fast algorithm for nest-matching. It has a JSON parser, template rendering engine, and arithmetic and logic evaluation.
+Qentem Engine is an independent and cross-platform library that uses a fast algorithm for nest-matching. It has a JSON parser, template rendering engine, and just-in-time arithmetic and logic evaluation.
+
+## Features
+
+-   Header only and self-contained; no external libraries like the STL is needed.
+-   Uses SSE2, AVX2, and AVX512BW when available gain higher performance.
+-   Supports UTF-8. Also, UTF-16, UTF-32 surrogates.
 
 ## Requirements
 
