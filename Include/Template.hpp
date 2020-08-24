@@ -121,7 +121,7 @@ class Template : Engine, ALEHelper {
         If,           // <if case="...">
     };
 
-    inline constexpr bool hasTail() const noexcept final {
+    inline bool hasTail() const noexcept final {
         return true;
     }
 
