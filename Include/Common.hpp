@@ -86,9 +86,32 @@
 
 #ifdef _MSC_VER
 #include <intrin.h>
+
+#if _WIN64
+#pragma intrinsic(_BitScanForward64)
+#pragma intrinsic(__BitScanReverse64)
+inline unsigned long Q_CTZL(unsigned long long value) {
+    unsigned long index = 0;
+
+    if (_BitScanForward64(&index, value)) {
+        return index;
+    }
+
+    return 64;
+}
+
+inline unsigned long Q_CLZL(unsigned long long value) {
+    unsigned long index = 0;
+
+    if (_BitScanReverse64(&index, value)) {
+        return index;
+    }
+
+    return 0;
+}
+#else
 #pragma intrinsic(_BitScanForward)
 #pragma intrinsic(_BitScanReverse)
-
 inline unsigned long Q_CTZL(unsigned long value) {
     unsigned long index = 0;
 
@@ -96,7 +119,7 @@ inline unsigned long Q_CTZL(unsigned long value) {
         return index;
     }
 
-    return 0;
+    return 32;
 }
 
 inline unsigned long Q_CLZL(unsigned long value) {
@@ -108,6 +131,7 @@ inline unsigned long Q_CLZL(unsigned long value) {
 
     return 0;
 }
+#endif
 #elif defined(__GNUC__)
 inline unsigned long Q_CTZL(unsigned long value) {
     return static_cast<unsigned long>(__builtin_ctzl(value));
@@ -134,8 +158,13 @@ inline static unsigned int Q_CLZL(unsigned long value) {
 namespace Qentem {
 
 // Shorthand types
+#if defined(_MSC_VER) && defined(_WIN64)
+using ULong = unsigned long long;
+#else
 using ULong = unsigned long;
-using UInt  = unsigned int;
+#endif
+
+using UInt = unsigned int;
 
 } // namespace Qentem
 

@@ -122,13 +122,9 @@ inline static bool Compare(const char *left, const char *right,
             const QMM_VAR_ mm_r =
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(right + offset));
 
-            const unsigned long long bits = QMM_COMPARE_8_MASK_(mm_l, mm_r);
+            const ULong bits = QMM_COMPARE_8_MASK_(mm_l, mm_r);
 
-            // if (bits == 0) {
-            //     break; // No match
-            // }
-
-            if ((Q_CTZL(bits + 1) + offset) >= length) {
+            if ((Q_CTZL(bits + 1U) + offset) >= length) {
                 return true;
             }
 
@@ -148,7 +144,6 @@ inline static bool Compare(const char *left, const char *right,
         ++offset;
     }
 #endif
-
     return (length == offset);
 }
 
