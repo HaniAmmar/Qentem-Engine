@@ -1333,20 +1333,20 @@ class Value {
     void copyValue(const Value &src) {
         switch (type_) {
             case ValueType::Object: {
-                value_.object = HAllocator::Allocate(
-                    HArray<Value>(HArray<Value>(*(src.value_.object))));
+                value_.object =
+                    HAllocator::Allocate(HArray<Value>(*(src.value_.object)));
                 break;
             }
 
             case ValueType::Array: {
-                value_.array = HAllocator::Allocate(
-                    Array<Value>(Array<Value>(*(src.value_.array))));
+                value_.array =
+                    HAllocator::Allocate(Array<Value>(*(src.value_.array)));
                 break;
             }
 
             case ValueType::String: {
                 value_.string =
-                    HAllocator::Allocate(String(String(*(src.value_.string))));
+                    HAllocator::Allocate(String(*(src.value_.string)));
                 break;
             }
 

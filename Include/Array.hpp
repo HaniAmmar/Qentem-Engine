@@ -47,8 +47,9 @@ class Array {
             storage_ = HAllocator::Allocate<Type_>(capacity_);
 
             do {
-                HAllocator::Construct((storage_ + size_),
-                                      Type_(arr.storage_[size_]));
+                HAllocator::Construct(
+                    (storage_ + size_),
+                    static_cast<Type_ &&>(Type_(arr.storage_[size_])));
                 ++size_;
             } while (size_ < capacity_);
         }
@@ -95,8 +96,9 @@ class Array {
             SetCapacity(arr.size_);
 
             while (size_ != capacity_) {
-                HAllocator::Construct((storage_ + size_),
-                                      Type_(arr.storage_[size_]));
+                HAllocator::Construct(
+                    (storage_ + size_),
+                    static_cast<Type_ &&>(Type_(arr.storage_[size_])));
                 ++size_;
             }
         }
@@ -139,7 +141,9 @@ class Array {
         ULong n = 0;
 
         while (n != arr.size_) {
-            HAllocator::Construct((storage_ + size_), Type_(arr.storage_[n]));
+            HAllocator::Construct<Type_>(
+                (storage_ + size_),
+                static_cast<Type_ &&>(Type_(arr.storage_[n])));
             ++size_;
             ++n;
         }

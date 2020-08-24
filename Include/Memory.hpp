@@ -156,21 +156,21 @@ inline static bool Compare(const char *left_text, const char *right_text,
 
 class HAllocator {
   public:
-    template <typename Type>
-    inline static Type *Allocate(ULong size) {
-        return static_cast<Type *>(malloc(size * sizeof(Type)));
+    template <typename Type_>
+    inline static Type_ *Allocate(ULong size) {
+        return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
     }
 
-    template <typename Type>
-    inline static Type *Allocate(Type &&value) {
-        Type *ptr = Allocate<Type>(1);
-        new (ptr) Type(static_cast<Type &&>(value));
+    template <typename Type_>
+    inline static Type_ *Allocate(Type_ &&value) {
+        Type_ *ptr = Allocate<Type_>(1);
+        new (ptr) Type_(static_cast<Type_ &&>(value));
         return ptr;
     }
 
-    // template <typename Type>
-    // static Type *Allocate(ULong size, Type &&value) {
-    //     Type *ptr = Allocate<Type>(size);
+    // template <typename Type_>
+    // static Type_ *Allocate(ULong size, Type_ &&value) {
+    //     Type_ *ptr = Allocate<Type_>(size);
 
     //     ULong i = 0;
     //     while (i != size) {
@@ -181,57 +181,58 @@ class HAllocator {
     //     return ptr;
     // }
 
-    template <typename Type>
-    inline static Type *AllocateClear(ULong size) {
-        const ULong c_size = (size * sizeof(Type));
+    template <typename Type_>
+    inline static Type_ *AllocateClear(ULong size) {
+        const ULong c_size = (size * sizeof(Type_));
         void *      vptr   = malloc(c_size);
         Memory::SetToZero(vptr, c_size);
 
-        return static_cast<Type *>(vptr);
+        return static_cast<Type_ *>(vptr);
     }
 
-    // template <typename Type>
-    // inline static Type *AllocateInit() {
-    //     Type *ptr = Allocate<Type>(1);
-    //     new (ptr) Type();
+    // template <typename Type_>
+    // inline static Type_ *AllocateInit() {
+    //     Type_ *ptr = Allocate<Type_>(1);
+    //     new (ptr) Type_();
     //     return ptr;
     // }
 
-    // template <typename Type>
-    // static Type *AllocateInit(ULong size) {
-    //     Type *ptr = Allocate<Type>(size);
+    // template <typename Type_>
+    // static Type_ *AllocateInit(ULong size) {
+    //     Type_ *ptr = Allocate<Type_>(size);
 
     //     ULong i = 0;
     //     while (i != size) {
-    //         new (ptr + i) Type();
+    //         new (ptr + i) Type_();
     //         ++i;
     //     }
 
     //     return ptr;
     // }
 
-    template <typename Type>
-    inline static void Construct(Type *ptr, Type &&value) {
-        new (ptr) Type(static_cast<Type &&>(value));
+    template <typename Type_>
+    inline static void Construct(Type_ *ptr, Type_ &&value) {
+        new (ptr) Type_(static_cast<Type_ &&>(value));
     }
 
-    template <typename Type>
-    inline static void Construct(Type *start, const Type *end, Type &&value) {
+    template <typename Type_>
+    inline static void Construct(Type_ *start, const Type_ *end,
+                                 Type_ &&value) {
         while (start != end) {
-            new (start) Type(static_cast<Type &&>(value));
+            new (start) Type_(static_cast<Type_ &&>(value));
             ++start;
         }
     }
 
-    template <typename Type>
-    inline static void Destruct(Type *ptr) {
-        ptr->~Type();
+    template <typename Type_>
+    inline static void Destruct(Type_ *ptr) {
+        ptr->~Type_();
     }
 
-    template <typename Type>
-    inline static void Destruct(Type *start, const Type *end) {
+    template <typename Type_>
+    inline static void Destruct(Type_ *start, const Type_ *end) {
         while (start != end) {
-            start->~Type();
+            start->~Type_();
             ++start;
         }
     }
