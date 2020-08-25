@@ -89,7 +89,7 @@
 
 #if _WIN64
 #pragma intrinsic(_BitScanForward64)
-#pragma intrinsic(__BitScanReverse64)
+#pragma intrinsic(_BitScanReverse64)
 inline unsigned long Q_CTZL(unsigned long long value) {
     unsigned long index = 0;
 
