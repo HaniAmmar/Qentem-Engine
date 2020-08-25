@@ -305,7 +305,7 @@ static int TestALE1() {
     is_valid = ALE::Evaluate(number, equation);
     SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
 
-    // TODO: Implement power of fraction.
+    // NOTE: Implement power of fraction.
     equation = "2^0.2";
     is_valid = ALE::Evaluate(number, equation);
     SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");

@@ -55,7 +55,7 @@
  *      - <else> no case: Optional.
  */
 
-// TODO: Implement TemplateCache.
+// NOTE: Implement TemplateCache.
 
 namespace Qentem {
 

@@ -1695,7 +1695,6 @@ class JSONParser : Engine {
         return 0;
     }
 
-    // TODO: Most used function
     void Found(const char *content, ULong offset, ULong end_before,
                ULong start_offset, ULong &current_offset) final {
         switch (type_) {

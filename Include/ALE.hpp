@@ -776,7 +776,7 @@ class ALE : Engine {
             switch (op) {
                 case Operation::Exponent: { // ^
                     if (right_number != 0.0) {
-                        // TODO: Needs more work.
+                        // NOTE: Needs more work.
                         const bool neg = (right_number < 0);
 
                         if (neg) {
@@ -795,7 +795,7 @@ class ALE : Engine {
                         const double num   = left_number;
 
                         while (--times > 0) {
-                            // TODO: Optimize.
+                            // NOTE: Optimize.
                             left_number *= num;
                         }
 

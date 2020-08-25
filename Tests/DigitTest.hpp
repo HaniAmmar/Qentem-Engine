@@ -1011,7 +1011,7 @@ static int TestNumberToString3() {
     SHOULD_EQUAL_VALUE(Digit::NumberToString(number, 0, 0, 2), "5.55",
                        "return");
 
-    // number = 5.55; // TODO: Fix
+    // number = 5.55; // NOTE: Fix
     // SHOULD_EQUAL_VALUE(Digit::NumberToString(number, 0, 0, 1), "5.6",
     // "return");
 
