@@ -115,12 +115,12 @@ inline unsigned long Q_CLZL(unsigned long long value) {
     return ((_BitScanReverse64(&index, value) != 0) ? index : 0);
 }
 #else
-inline unsigned long Q_CTZL(unsigned long long value) {
+inline unsigned long Q_CTZL(unsigned long value) {
     unsigned long index = 0;
     return ((_BitScanForward(&index, value) != 0) ? index : 32);
 }
 
-inline unsigned long Q_CLZL(unsigned long long value) {
+inline unsigned long Q_CLZL(unsigned long value) {
     unsigned long index = 0;
     return ((_BitScanReverse(&index, value) != 0) ? index : 0);
 }

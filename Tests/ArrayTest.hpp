@@ -58,14 +58,11 @@ static int TestArray1() {
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 10, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
 
-    storage = numbers1.Storage();
     numbers1.Resize(18);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 18, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
 
     storage = numbers1.Storage();
     numbers1.Resize(4);
