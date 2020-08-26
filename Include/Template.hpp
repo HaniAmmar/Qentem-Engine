@@ -62,7 +62,7 @@ namespace Qentem {
 /*
  * Template randering engine.
  */
-template <typename Value_ = JSON::Value, typename KeyString_ = String>
+template <typename Value_ = Value, typename KeyString_ = String>
 class Template : Engine, ALEHelper {
     enum class Tag;
 

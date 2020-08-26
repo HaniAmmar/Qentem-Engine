@@ -8,7 +8,7 @@ using Qentem::ALEHelper;
 using Qentem::String;
 using Qentem::UInt;
 using Qentem::ULong;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 struct aleHelper : ALEHelper {
     explicit aleHelper(const Value *value) : value_(value) {

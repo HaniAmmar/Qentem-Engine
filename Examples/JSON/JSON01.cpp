@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 

@@ -29,8 +29,8 @@
 namespace Qentem {
 namespace Test {
 
-using Qentem::JSON::Value;
-using Qentem::JSON::ValueType;
+using Qentem::Value;
+using Qentem::ValueType;
 
 namespace JSON = Qentem::JSON;
 

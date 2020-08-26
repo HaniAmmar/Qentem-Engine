@@ -107,7 +107,7 @@ Mixed of both:
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -145,7 +145,7 @@ This tag passes its value to [ALE](https://github.com/HaniAmmar/Qentem-Engine/bl
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -256,7 +256,7 @@ Loops over a set and replaces the values with the string inside `value` and keys
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -294,7 +294,7 @@ loopID1: loopVAL1</loop>
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -330,7 +330,7 @@ loopID1: loopVAL1</loop>
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -366,7 +366,7 @@ int main() {
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -442,7 +442,7 @@ loop1-key: loop2-key:
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -471,7 +471,7 @@ int main() {
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -513,7 +513,7 @@ int main() {
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -592,7 +592,7 @@ Similar to `{if case="..." ...}`, but capable of branching, and nesting.
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -653,7 +653,7 @@ Not zero or one or two.
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -692,7 +692,7 @@ Zero!
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
@@ -763,7 +763,7 @@ int main() {
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 

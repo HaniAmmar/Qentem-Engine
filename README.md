@@ -39,7 +39,7 @@ Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/
 
 ### JSON
 
-JSON::Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and very strict; a single mistake in the JSON string will give an empty value. Stringify gives a UTF-8 c-string.
+Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and very strict; a single mistake in the JSON string will give an empty value. Stringify gives a UTF-8 c-string.
 
 #### JSON Example
 
@@ -48,7 +48,7 @@ JSON::Value is a first-class type in Qentem. It's being used by the template eng
 
 #include <iostream>
 
-using Qentem::JSON::Value;
+using Qentem::Value;
 namespace JSON = Qentem::JSON;
 
 int main() {
@@ -142,7 +142,7 @@ Rendering templates is the main reason for making Qentem, and it uses every part
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 

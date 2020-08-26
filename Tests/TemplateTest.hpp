@@ -29,7 +29,7 @@
 namespace Qentem {
 namespace Test {
 
-using JSON::Value;
+using Qentem::Value;
 
 static int TestVariableTag1() {
     const char *content;

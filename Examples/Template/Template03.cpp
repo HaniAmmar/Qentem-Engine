@@ -4,7 +4,7 @@
 
 using Qentem::String;
 using Qentem::Template;
-using Qentem::JSON::Value;
+using Qentem::Value;
 
 namespace JSON = Qentem::JSON;
 
