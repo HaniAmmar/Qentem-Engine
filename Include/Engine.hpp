@@ -32,11 +32,11 @@ namespace Qentem {
  */
 class Engine {
   public:
+#ifdef QENTEM_SIMD_ENABLED_
     /*
      * This function resturn an the offset of the match + the length of the
      * keyword, or zero.
      */
-#ifdef QENTEM_SIMD_ENABLED_
     static ULong Find(const char *keyword, UInt keyword_length,
                       const char *content, ULong offset, ULong end_before) {
         if (offset < end_before) {
@@ -80,8 +80,59 @@ class Engine {
                 offset += QMM_SIZE_;
             } while (offset < end_before);
         }
+
         // No match.
         return 0;
+    }
+
+    // Returns how many times a word is repeated
+    static UInt Count(const char *keyword, UInt keyword_length,
+                      const char *content, ULong offset, ULong end_before) {
+        UInt times = 0;
+
+        if (offset < end_before) {
+            const QMM_VAR_ m_keyword_first = QMM_SETONE_8_(keyword[0]);
+            QMM_VAR_       m_keyword_last;
+
+            if (keyword_length != 1U) {
+                m_keyword_last = QMM_SETONE_8_(keyword[keyword_length - 1U]);
+            }
+
+            do {
+                const QMM_VAR_ m_content_0 = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
+
+                QMM_NUMBER_TYPE_ bits =
+                    QMM_COMPARE_8_MASK_(m_content_0, m_keyword_first);
+
+                if (keyword_length != 1U) {
+                    const QMM_VAR_ m_content_1 =
+                        QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                            content + offset + (keyword_length - 1U)));
+                    bits &= QMM_COMPARE_8_MASK_(m_content_1, m_keyword_last);
+                }
+
+                while (bits != 0) {
+                    const ULong index = (Q_CTZL(bits) + offset);
+
+                    if ((index + keyword_length) > end_before) {
+                        return times;
+                    }
+
+                    if ((keyword_length < 3U) ||
+                        Memory::Compare(keyword, (content + index),
+                                        keyword_length)) {
+                        ++times;
+                    }
+
+                    bits &= (bits - 1U); // Remove the leading one
+                }
+
+                offset += QMM_SIZE_;
+            } while (offset < end_before);
+        }
+
+        return times;
     }
 #else
     // Old school
@@ -203,10 +254,13 @@ class Engine {
                                    const char *end, UInt end_length,
                                    const char *content, ULong offset,
                                    ULong end_before, ULong max_end_before) {
+
+#ifdef QENTEM_SIMD_ENABLED_
+        UInt times = Count(start, start_length, content, offset, end_before);
+#else
         UInt times = 0;
 
         do {
-            // TODO Use Count
             offset = Find(start, start_length, content, offset, end_before);
 
             if (offset == 0) {
@@ -215,7 +269,7 @@ class Engine {
 
             ++times;
         } while (true);
-
+#endif
         if (times != 0) {
             ULong last_offset = end_before;
 
