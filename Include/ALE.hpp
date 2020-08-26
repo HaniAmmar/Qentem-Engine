@@ -282,7 +282,7 @@ class ALE : Engine {
             }
 
             // Remove the current offset.
-            find_cache_->Bits &= (find_cache_->Bits - 1U);
+            find_cache_->Bits &= (find_cache_->Bits - 1);
 
             if ((find_cache_->Bits == 0) &&
                 (find_cache_->NextOffset < end_before)) {

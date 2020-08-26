@@ -294,8 +294,7 @@ class String {
                     m_zero);
 
                 if (bits != 0) {
-                    len = (static_cast<NumberType>(Q_CTZL(bits)) + offset);
-                    break;
+                    return (static_cast<NumberType>(Q_CTZL(bits)) + offset);
                 }
 
                 offset += QMM_SIZE_;

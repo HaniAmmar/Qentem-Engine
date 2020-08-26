@@ -255,29 +255,7 @@ class JSONParser : Engine {
             }
 
             default: {
-#ifdef QENTEM_SIMD_ENABLED_
-                // Maybe " is in the cache.
-                do {
-                    // Remove the current offset.
-                    find_cache_->Bits &= (find_cache_->Bits - 1U);
-
-                    if ((find_cache_->Bits == 0) &&
-                        (find_cache_->NextOffset < end_before)) {
-                        qmm_find_(content, find_cache_->NextOffset, end_before);
-                    }
-
-                    ULong index =
-                        (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
-
-                    if ((index >= offset) && (content[index] == '"')) {
-                        return (index + 1);
-                    }
-                } while (find_cache_->Bits != 0);
-
-                return 0;
-#else
                 return Find("\"", 1, content, offset, end_before);
-#endif
             }
         }
     }
@@ -326,7 +304,7 @@ class JSONParser : Engine {
             }
 
             // Remove the current offset.
-            find_cache_->Bits &= (find_cache_->Bits - 1U);
+            find_cache_->Bits &= (find_cache_->Bits - 1);
 
             if ((find_cache_->Bits == 0) &&
                 (find_cache_->NextOffset < end_before)) {
@@ -757,7 +735,61 @@ class JSONParser : Engine {
         return true;
     }
 
-    // TODO: Improve the second most used function here
+#ifdef QENTEM_SIMD_ENABLED_
+    bool checkPoint3_(const char *content, ULong offset,
+                      ULong start_offset) const noexcept {
+        if (!has_colon_) {
+            --start_offset;
+
+            while (offset < start_offset) {
+                ULong offset2;
+                ULong length = (start_offset - offset);
+
+                if (length <= QMM_SIZE_) {
+                    offset2 = offset;
+                } else {
+                    offset2 = (start_offset - QMM_SIZE_);
+                    length  = QMM_SIZE_;
+                }
+
+                const QMM_VAR_ m_content = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + offset2));
+
+                ULong bits;
+                bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('\n'));
+                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('\t'));
+                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_(' '));
+                bits ^= QMM_MAX_NUMBER; // Remove any whitespace
+
+                if (length != QMM_SIZE_) {
+                    bits &= ((ULong(1) << length) - 1U); // Droping whats beyond
+                }
+
+                while (bits != 0) {
+                    QMM_NUMBER_TYPE_ bit   = Q_CLZL(bits);
+                    ULong            index = (bit + offset2);
+
+                    switch (content[index]) {
+                        case '{':
+                        case '[':
+                        case ',':
+                            return true;
+
+                        default: {
+                            return false;
+                        }
+                    }
+
+                    bits ^= (ULong(1) << bit); // Remove the left bit
+                }
+
+                start_offset = offset2;
+            }
+        }
+
+        return true;
+    }
+#else
     bool checkPoint3_(const char *content, ULong offset,
                       ULong start_offset) const noexcept {
         if (!has_colon_) {
@@ -769,13 +801,15 @@ class JSONParser : Engine {
                 switch (content[start_offset]) {
                     case '\n':
                     case ' ':
-                    case '\t':
+                    case '\t': {
                         break;
+                    }
 
                     case '{':
                     case '[':
-                    case ',':
+                    case ',': {
                         return true;
+                    }
 
                     default: {
                         return false;
@@ -786,6 +820,7 @@ class JSONParser : Engine {
 
         return true;
     }
+#endif
 
     void failed() final {
         if (child_obj_ != nullptr) {
@@ -815,10 +850,6 @@ class JSONParser : Engine {
         ULong            Offset{0};
         ULong            NextOffset{0};
         QMM_NUMBER_TYPE_ Bits{0};
-
-        ULong            Offset2{0};
-        ULong            NextOffset2{0};
-        QMM_NUMBER_TYPE_ Bits2{0};
     };
 
     HArray<Value> *obj_{nullptr};

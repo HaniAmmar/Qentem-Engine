@@ -181,8 +181,7 @@ class StringStream {
             offset_ += len;
 
             if (capacity_ < offset_) {
-                ULong size = 1U;
-                size <<= Q_CLZL(offset_);
+                ULong size = (ULong(1) << Q_CLZL(offset_));
 
                 if (size < offset_) {
                     size <<= 1U;

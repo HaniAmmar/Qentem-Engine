@@ -50,7 +50,7 @@
 #if QENTEM_AVX512BW_ == 1
 #define QMM_SIZE_ 64U
 #define QMM_SHIFTSIZE_ 6U
-#define QMM_NUMBER_TYPE_ unsigned long long
+using QMM_NUMBER_TYPE_ = unsigned long long;
 #define QMM_MAX_NUMBER 0XFFFFFFFFFFFFFFFF
 #define QMM_VAR_ __m512i
 #define QMM_LOAD_ _mm512_loadu_si512
@@ -61,7 +61,7 @@
 #elif QENTEM_AVX2_ == 1
 #define QMM_SIZE_ 32U
 #define QMM_SHIFTSIZE_ 5U
-#define QMM_NUMBER_TYPE_ unsigned int
+using QMM_NUMBER_TYPE_ = unsigned int;
 #define QMM_MAX_NUMBER 0XFFFFFFFF
 #define QMM_VAR_ __m256i
 #define QMM_LOAD_ _mm256_loadu_si256
@@ -73,7 +73,7 @@
 #elif QENTEM_SSE2_ == 1
 #define QMM_SIZE_ 16U
 #define QMM_SHIFTSIZE_ 4U
-#define QMM_NUMBER_TYPE_ unsigned int
+using QMM_NUMBER_TYPE_ = unsigned int;
 #define QMM_MAX_NUMBER 0XFFFF
 #define QMM_VAR_ __m128i
 #define QMM_LOAD_ _mm_loadu_si128
@@ -86,50 +86,43 @@
 
 #ifdef _MSC_VER
 #include <intrin.h>
-
 #if _WIN64
 #pragma intrinsic(_BitScanForward64)
 #pragma intrinsic(_BitScanReverse64)
+#else
+#pragma intrinsic(_BitScanForward)
+#pragma intrinsic(_BitScanReverse)
+#endif
+#endif
+
+#if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1 || QENTEM_SSE2_ == 1
+#include <immintrin.h>
+#define QENTEM_SIMD_ENABLED_
+#else
+#define QMM_NUMBER_TYPE_ unsigned long // See JSON::FindCache_
+#endif
+
+namespace Qentem {
+#ifdef _MSC_VER
+#if _WIN64
 inline unsigned long Q_CTZL(unsigned long long value) {
     unsigned long index = 0;
-
-    if (_BitScanForward64(&index, value)) {
-        return index;
-    }
-
-    return 64;
+    return ((_BitScanForward64(&index, value) != 0) ? index : 64);
 }
 
 inline unsigned long Q_CLZL(unsigned long long value) {
     unsigned long index = 0;
-
-    if (_BitScanReverse64(&index, value)) {
-        return index;
-    }
-
-    return 0;
+    return ((_BitScanReverse64(&index, value) != 0) ? index : 0);
 }
 #else
-#pragma intrinsic(_BitScanForward)
-#pragma intrinsic(_BitScanReverse)
-inline unsigned long Q_CTZL(unsigned long value) {
+inline unsigned long Q_CTZL(unsigned long long value) {
     unsigned long index = 0;
-
-    if (_BitScanForward(&index, value)) {
-        return index;
-    }
-
-    return 32;
+    return ((_BitScanForward(&index, value) != 0) ? index : 32);
 }
 
-inline unsigned long Q_CLZL(unsigned long value) {
+inline unsigned long Q_CLZL(unsigned long long value) {
     unsigned long index = 0;
-
-    if (_BitScanReverse(&index, value)) {
-        return index;
-    }
-
-    return 0;
+    return ((_BitScanReverse(&index, value) != 0) ? index : 0);
 }
 #endif
 #elif defined(__GNUC__)
@@ -148,16 +141,6 @@ inline static unsigned int Q_CLZL(unsigned long value) {
 }
 #endif
 
-#if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1 || QENTEM_SSE2_ == 1
-#include <immintrin.h>
-#define QENTEM_SIMD_ENABLED_
-#else
-#define QMM_NUMBER_TYPE_ unsigned long // See JSON::FindCache_
-#endif
-
-namespace Qentem {
-
-// Shorthand types
 #if defined(_MSC_VER) && defined(_WIN64)
 using ULong = unsigned long long;
 #else

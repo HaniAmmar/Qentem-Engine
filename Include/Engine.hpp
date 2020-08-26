@@ -39,46 +39,47 @@ class Engine {
 #ifdef QENTEM_SIMD_ENABLED_
     static ULong Find(const char *keyword, UInt keyword_length,
                       const char *content, ULong offset, ULong end_before) {
-        const QMM_VAR_ m_keyword_first = QMM_SETONE_8_(keyword[0]);
-        QMM_VAR_       m_keyword_last;
-
-        if (keyword_length != 1U) {
-            m_keyword_last = QMM_SETONE_8_(keyword[keyword_length - 1U]);
-        }
-
-        while (offset < end_before) {
-            const QMM_VAR_ m_content_0 =
-                QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset));
-
-            QMM_NUMBER_TYPE_ bits =
-                QMM_COMPARE_8_MASK_(m_content_0, m_keyword_first);
+        if (offset < end_before) {
+            const QMM_VAR_ m_keyword_first = QMM_SETONE_8_(keyword[0]);
+            QMM_VAR_       m_keyword_last;
 
             if (keyword_length != 1U) {
-                const QMM_VAR_ m_content_1 =
-                    QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                        content + offset + (keyword_length - 1U)));
-                bits &= QMM_COMPARE_8_MASK_(m_content_1, m_keyword_last);
+                m_keyword_last = QMM_SETONE_8_(keyword[keyword_length - 1U]);
             }
 
-            while (bits != 0) {
-                const ULong index = (Q_CTZL(bits) + offset);
+            do {
+                const QMM_VAR_ m_content_0 = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
 
-                if ((index + keyword_length) > end_before) {
-                    return 0;
+                QMM_NUMBER_TYPE_ bits =
+                    QMM_COMPARE_8_MASK_(m_content_0, m_keyword_first);
+
+                if (keyword_length != 1U) {
+                    const QMM_VAR_ m_content_1 =
+                        QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                            content + offset + (keyword_length - 1U)));
+                    bits &= QMM_COMPARE_8_MASK_(m_content_1, m_keyword_last);
                 }
 
-                if ((keyword_length < 3U) ||
-                    Memory::Compare(keyword, (content + index),
-                                    keyword_length)) {
-                    return (index + keyword_length);
+                while (bits != 0) {
+                    const ULong index = (Q_CTZL(bits) + offset);
+
+                    if ((index + keyword_length) > end_before) {
+                        return 0;
+                    }
+
+                    if ((keyword_length < 3U) ||
+                        Memory::Compare(keyword, (content + index),
+                                        keyword_length)) {
+                        return (index + keyword_length);
+                    }
+
+                    bits &= (bits - 1U); // Remove the leading one
                 }
 
-                bits &= (bits - 1U); // Remove the leading one
-            }
-
-            offset += QMM_SIZE_;
+                offset += QMM_SIZE_;
+            } while (offset < end_before);
         }
-
         // No match.
         return 0;
     }

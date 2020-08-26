@@ -114,27 +114,33 @@ inline static bool Compare(const char *left, const char *right,
                            ULong length) noexcept {
     ULong offset = 0;
 #ifdef QENTEM_SIMD_ENABLED_
-    if ((left != nullptr) && (right != nullptr)) {
-        while (offset < length) {
+    if ((left != nullptr) && (right != nullptr) && (offset < length)) {
+#ifdef __GNUC__
+        _mm_prefetch(left, _mm_hint::_MM_HINT_ET0);
+        _mm_prefetch(right, _mm_hint::_MM_HINT_ET0);
+#endif
+
+        do {
             const QMM_VAR_ mm_l =
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(left + offset));
-
             const QMM_VAR_ mm_r =
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(right + offset));
 
-            const ULong bits = QMM_COMPARE_8_MASK_(mm_l, mm_r);
+            ULong bits = QMM_COMPARE_8_MASK_(mm_l, mm_r);
+            ++bits;
 
-            if ((Q_CTZL(bits + 1U) + offset) >= length) {
+            if ((Q_CTZL(bits) + offset) >= length) {
                 return true;
             }
 
-            offset += QMM_SIZE_;
-
-            if ((offset >= length) || (bits != QMM_MAX_NUMBER)) {
+            if ((bits & QMM_MAX_NUMBER) != 0) {
                 return false;
             }
-        }
+
+            offset += QMM_SIZE_;
+        } while (offset < length);
     }
+
 #else
     while (offset != length) {
         if (left[offset] != right[offset]) {
