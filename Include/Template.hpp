@@ -26,38 +26,153 @@
 #ifndef QENTEM_TEMPLATE_H_
 #define QENTEM_TEMPLATE_H_
 
-/*
- * Tags:
- *
- *  {...}
- *  - {var:s|n}  var: Variable, s: String, n: Number.
- *
- *  - {math:var|e|n}
- *      - var|e|n: Variable, Equation or Number.
- *
- *  - {if case="var|s" true="var|s" false="var|s"}
- *      - Inline if,  var: Variable, s: String.
- *
- *  <...>
- *  - <loop set="s"? key="s"? value="s"? times="n|var"? index="n|var"?>
- *                                                          ...</loop>
- *      - s: String, n: Number, var: Variable,
- *      - set: child name in the passed colloction: Optional.
- *      - key: the string the will be replaced with keys: Optional.
- *      - value: the current value in the colloction: Optional.
- *          Note: Choose a unique names for key and value.
- *      - times: if set, it will be used instead of the "set" size.
- *      - index: starting index.
- *
- *  - <if case="var|e|n">...<else(if)? ... >?...</if>
- *      - var|e|n: Variable, Equation or Number.
- *      - <else if ....> same as if: Optional.
- *      - <else> no case: Optional.
- */
-
 // NOTE: Implement TemplateCache.
 
 namespace Qentem {
+
+#ifndef OVERRIDE_TEMPLATE_PATTERN_
+struct TemplatePattern {
+    /*
+     * Tags:
+     *
+     *  {...}
+     *  - {var:s|n}  var: Variable, s: String, n: Number.
+     *
+     *  - {math:var|e|n}
+     *      - var|e|n: Variable, Equation or Number.
+     *
+     *  - {if case="var|s" true="var|s" false="var|s"}
+     *      - Inline if,  var: Variable, s: String.
+     *
+     *  <...>
+     *  - <loop set="s"? key="s"? value="s"? times="n|var"? index="n|var"?>
+     *                                                          ...</loop>
+     *      - s: String, n: Number, var: Variable,
+     *      - set: child name in the passed colloction: Optional.
+     *      - key: the string the will be replaced with keys: Optional.
+     *      - value: the current value in the colloction: Optional.
+     *          Note: Choose a unique names for key and value.
+     *      - times: if set, it will be used instead of the "set" size.
+     *      - index: starting index.
+     *
+     *  - <if case="var|e|n">...<else(if)? ... >?...</if>
+     *      - var|e|n: Variable, Equation or Number.
+     *      - <else if ....> same as if: Optional.
+     *      - <else> no case: Optional.
+     */
+
+    /*
+     * Variable Tag:
+     *
+     * {var:name}, {var:name[id]}
+     * {var:id}, {var:id[id2]}, {var:id[id2][id3]}
+     * {var:id[name]}, {var:id[id2][name]}, {var:id[id2][name1][id3][name2]}
+     *
+     * {var:name}, {var:name[name2]}, {var:name[name2][name3][...]}
+     * {var:name}, {var:name[id]}, {var:name[id][id2][...]}
+     * {var:id}, {var:id[id2]}, {var:id[id2][...]}
+     */
+
+    /*
+     * Math Tag:
+     *
+     * {math:1+5} {math:2^3} {math:8^-2} {math:2*4} {math:2+2*4} {math:2+2*4-1}
+     * {math:8/2} {math:8%2}
+     * {math: 1 && 1 } {math:0 || 1} {math: (1 && 1) || (3&&3) }
+     * {math: 3==3} {math: 3!=4} {math: 3>4}  {math: 3>=4}
+     * {math: 2<3} {math: 2 <= 3}
+     * {math: {var:n1} * {var:n2}}
+     * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
+     * {math: 0.2 + 0.3}
+     * See ALE::Evaluate
+     */
+
+    /*
+     * Inline If Tag:
+     *
+     * {if case="3 == 3" true="Yes" false="No"}
+     * {if case="{var:var_five} == 5" true="5" false="no"}
+     * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
+     * {if case="3 == 3" true="Yes" false="No"}
+     */
+
+    /*
+     * Loop Tag:
+     *
+     * <loop set="tree_name" key="loop1-key" value="loop1-value">
+     *     loop1-key: loop1-value
+     * </loop>
+     *
+     * <loop set="items" value="item">
+     *     item[subitem1], item[subitem2], item[subitem3]
+     * </loop>
+     *
+     * <loop set="tree_name" key="loop1-key" value="loop1-value">
+     *      loop1-key: loop1-value
+     *
+     *      <loop set="tree_name2" key="loop2-key" value="loop2-value">
+     *          loop2-key: loop2-value
+     *      </loop>
+     * </loop>
+     *
+     * <loop key="loop1-key" times="number|var">
+     *     loop1-key
+     * </loop>
+     *
+     * <loop key="loop1-key" index="number|var">
+     *     loop1-key
+     * </loop>
+     */
+
+    /*
+     * If tag:
+     *
+     * <if case="{case}">...</if>
+     * <if case="{case}">...<else />...</if>
+     * <if case="{case1}">...<elseif case="{case2}" />...</if>
+     * <if case="{case}">...<if case="{case2}" />...</if></if>
+     */
+
+    static constexpr UInt InlineSuffixLength = 1;
+
+    static constexpr UInt VariablePrefixLength = 5;
+    static constexpr UInt VariableFulllength =
+        (VariablePrefixLength + InlineSuffixLength);
+
+    static constexpr UInt MathPrefixLength = 6;
+    static constexpr UInt MathFulllength =
+        (TemplatePattern::MathPrefixLength +
+         TemplatePattern::InlineSuffixLength);
+
+    static constexpr UInt InlineIfPrefixLength = 3;
+
+    static constexpr UInt LoopPrefixLength = 5;
+    static constexpr UInt LoopSuffixLength = 7;
+
+    static constexpr UInt IfPrefixLength = 3;
+    static constexpr UInt IfSuffixLength = 5;
+
+    static constexpr UInt ElsePrefixLength = 5;
+
+    static constexpr const char *InlineSuffix = "}";
+
+    static constexpr const char *VariablePrefix      = "{var:";
+    static constexpr char        VariableIndexPrefix = '[';
+    static constexpr char        VariableIndexSuffix = ']';
+
+    static constexpr const char *MathPrefix = "{math:";
+
+    static constexpr const char *InlineIfPrefix = "{if";
+
+    static constexpr const char *LoopPrefix = "<loop";
+    static constexpr const char *LoopSuffix = "</loop>";
+
+    static constexpr const char *IfPrefix = "<if";
+    static constexpr const char *IfSuffix = "</if>";
+
+    static constexpr const char *ElsePrefix = "<else";
+};
+#endif
 
 /*
  * Template randering engine.
@@ -129,15 +244,21 @@ class Template : Engine, ALEHelper {
                 ULong end_before) noexcept final {
         switch (tag_) {
             case Tag::If: {
-                return Find("</if>", 5, content, offset, end_before);
+                return Find(TemplatePattern::IfSuffix,
+                            TemplatePattern::IfSuffixLength, content, offset,
+                            end_before);
             }
 
             case Tag::Loop: {
-                return Find("</loop>", 7, content, offset, end_before);
+                return Find(TemplatePattern::LoopSuffix,
+                            TemplatePattern::LoopSuffixLength, content, offset,
+                            end_before);
             }
 
             default: {
-                return Find("}", 1, content, offset, end_before);
+                return Find(TemplatePattern::InlineSuffix,
+                            TemplatePattern::InlineSuffixLength, content,
+                            offset, end_before);
             }
         }
     }
@@ -263,13 +384,21 @@ class Template : Engine, ALEHelper {
         switch (tag_) {
             case Tag::Math:
             case Tag::InLineIf: {
-                return SkipInnerKeywords("{var:", 5, "}", 1, content, offset,
-                                         end_before, max_end_before);
+                return SkipInnerPatterns(TemplatePattern::VariablePrefix,
+                                         TemplatePattern::VariablePrefixLength,
+                                         TemplatePattern::InlineSuffix,
+                                         TemplatePattern::InlineSuffixLength,
+                                         content, offset, end_before,
+                                         max_end_before);
             }
 
             case Tag::Loop: {
-                return SkipInnerKeywords("<loop", 5, "</loop>", 7, content,
-                                         offset, end_before, max_end_before);
+                return SkipInnerPatterns(TemplatePattern::LoopPrefix,
+                                         TemplatePattern::LoopPrefixLength,
+                                         TemplatePattern::LoopSuffix,
+                                         TemplatePattern::LoopSuffixLength,
+                                         content, offset, end_before,
+                                         max_end_before);
             }
 
             case Tag::If: {
@@ -293,38 +422,56 @@ class Template : Engine, ALEHelper {
                ULong start_offset, ULong &current_offset) override {
         switch (tag_) {
             case Tag::Variable: {
-                addPreviousContent(content, (start_offset - 5)); // {var:
+                addPreviousContent(
+                    content, (start_offset -
+                              TemplatePattern::VariablePrefixLength)); // {var:
 
                 renderVariable(
                     &(content[start_offset]),
-                    static_cast<UInt>((current_offset - 1) - start_offset));
+                    static_cast<UInt>(
+                        (current_offset - TemplatePattern::InlineSuffixLength) -
+                        start_offset));
                 break;
             }
 
             case Tag::Math: {
-                addPreviousContent(content, (start_offset - 6)); // {math:
+                addPreviousContent(
+                    content, (start_offset -
+                              TemplatePattern::MathPrefixLength)); // {math:
 
                 renderMath(
                     &(content[start_offset]),
-                    static_cast<UInt>((current_offset - 1) - start_offset));
+                    static_cast<UInt>(
+                        (current_offset - TemplatePattern::InlineSuffixLength) -
+                        start_offset));
                 break;
             }
 
             case Tag::InLineIf: {
-                addPreviousContent(content, (start_offset - 3)); // {if
+                addPreviousContent(
+                    content,
+                    (start_offset -
+                     TemplatePattern::InlineIfPrefixLength)); // {if
 
                 renderInLineIf(
                     &(content[start_offset]),
-                    static_cast<UInt>((current_offset - 1) - start_offset));
+                    static_cast<UInt>(
+                        (current_offset - TemplatePattern::InlineSuffixLength) -
+                        start_offset));
                 break;
             }
 
             case Tag::Loop: {
-                addPreviousContent(content, (start_offset - 5)); // <loop
+                addPreviousContent(
+                    content,
+                    (start_offset -
+                     TemplatePattern::LoopPrefixLength)); // <loop
 
                 renderLoop(
                     &(content[start_offset]),
-                    static_cast<UInt>((current_offset - 7) - start_offset));
+                    static_cast<UInt>(
+                        (current_offset - TemplatePattern::LoopSuffixLength) -
+                        start_offset));
                 break;
             }
 
@@ -381,20 +528,26 @@ class Template : Engine, ALEHelper {
     }
 
     bool parseNumber(ULong &number, const char *content, const UInt length) {
-        if (length > 6) {
+        if (length > TemplatePattern::VariableFulllength) {
             ULong offset = 0;
-            offset       = Find("{var:", 5, content, offset, length);
+            offset       = Find(TemplatePattern::VariablePrefix,
+                          TemplatePattern::VariablePrefixLength, content,
+                          offset, length);
 
             if (offset != 0) {
-                ULong end_offset = Find("}", 1, content, offset, length);
+                ULong end_offset = Find(TemplatePattern::InlineSuffix,
+                                        TemplatePattern::InlineSuffixLength,
+                                        content, offset, length);
 
                 if (end_offset == 0) {
                     return false;
                 }
 
-                const Value_ *value =
-                    findValue(&(content[offset]),
-                              static_cast<UInt>((end_offset - 1) - offset));
+                const Value_ *value = findValue(
+                    &(content[offset]),
+                    static_cast<UInt>(
+                        (end_offset - TemplatePattern::InlineSuffixLength) -
+                        offset));
 
                 if (value != nullptr) {
                     double num;
@@ -412,11 +565,6 @@ class Template : Engine, ALEHelper {
         return Digit::StringToNumber(number, content, length);
     }
 
-    /*
-     * {var:name}, {var:name[id]}
-     * {var:id}, {var:id[id2]}, {var:id[id2][id3]}
-     * {var:id[name]}, {var:id[id2][name]}, {var:id[id2][name1][id3][name2]}
-     */
     void parseVariables(const char *content, UInt length) {
         ULong offset = 0;
         ULong last_offset;
@@ -424,7 +572,9 @@ class Template : Engine, ALEHelper {
         do {
             last_offset = offset;
 
-            offset = Find("{var:", 5, content, offset, length);
+            offset = Find(TemplatePattern::VariablePrefix,
+                          TemplatePattern::VariablePrefixLength, content,
+                          offset, length);
 
             if (offset == 0) {
                 break;
@@ -433,18 +583,24 @@ class Template : Engine, ALEHelper {
             if (last_offset < offset) {
                 // Add any content that comes before any {var:x}
                 ss_->Add(&(content[last_offset]),
-                         static_cast<ULong>((offset - 5) - last_offset));
+                         static_cast<ULong>(
+                             (offset - TemplatePattern::VariablePrefixLength) -
+                             last_offset));
             }
 
             ULong start_offset = offset;
-            offset             = Find("}", 1, content, offset, length);
+            offset             = Find(TemplatePattern::InlineSuffix,
+                          TemplatePattern::InlineSuffixLength, content, offset,
+                          length);
 
             // if (offset == 0) {
             //     break;
             // }
 
             renderVariable(&(content[start_offset]),
-                           static_cast<UInt>((offset - 1) - start_offset));
+                           static_cast<UInt>(
+                               (offset - TemplatePattern::InlineSuffixLength) -
+                               start_offset));
         } while (true);
 
         if (last_offset < length) {
@@ -454,46 +610,26 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    /*
-     * {var:name}, {var:name[name2]}, {var:name[name2][name3][...]}
-     * {var:name}, {var:name[id]}, {var:name[id][id2][...]}
-     * {var:id}, {var:id[id2]}, {var:id[id2][...]}
-     */
     void renderVariable(const char *content, const UInt length) {
         const Value_ *value = findValue(content, length);
 
         if ((value == nullptr) || !(value->InsertString(*ss_))) {
-            ss_->Add((content - 5), (length + 6));
+            ss_->Add((content - TemplatePattern::VariablePrefixLength),
+                     (length + TemplatePattern::VariableFulllength));
         }
     }
 
-    /*
-     * {math:1+5} {math:2^3} {math:8^-2} {math:2*4} {math:2+2*4} {math:2+2*4-1}
-     * {math:8/2} {math:8%2}
-     * {math: 1 && 1 } {math:0 || 1} {math: (1 && 1) || (3&&3) }
-     * {math: 3==3} {math: 3!=4} {math: 3>4}  {math: 3>=4}
-     * {math: 2<3} {math: 2 <= 3}
-     * {math: {var:n1} * {var:n2}}
-     * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
-     * {math: 0.2 + 0.3}
-     * See ALE::Evaluate
-     */
     void renderMath(const char *content, const UInt length) {
         double number;
 
         if (ALE::Evaluate(number, content, length, this)) {
             *ss_ += Digit::NumberToString(number, 1, 0, 3);
         } else {
-            ss_->Add((content - 6), (length + 7));
+            ss_->Add((content - TemplatePattern::MathPrefixLength),
+                     (length + TemplatePattern::MathFulllength));
         }
     }
 
-    /*
-     * {if case="3 == 3" true="Yes" false="No"}
-     * {if case="{var:var_five} == 5" true="5" false="no"}
-     * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
-     * {if case="3 == 3" true="Yes" false="No"}
-     */
     void renderInLineIf(const char *content, const UInt length) {
         UInt offset      = 0;
         UInt last_offset = 0;
@@ -516,7 +652,7 @@ class Template : Engine, ALEHelper {
                 return;
             }
 
-            UInt tmp_offset   = offset - 3;
+            UInt tmp_offset   = offset - 3; // TODO: Magic number
             bool iif_not_done = true;
 
             do {
@@ -570,31 +706,6 @@ class Template : Engine, ALEHelper {
         UInt SubLength;
     };
 
-    /*
-     * <loop set="tree_name" key="loop1-key" value="loop1-value">
-     *     loop1-key: loop1-value
-     * </loop>
-     *
-     * <loop set="items" value="item">
-     *     item[subitem1], item[subitem2], item[subitem3]
-     * </loop>
-     *
-     * <loop set="tree_name" key="loop1-key" value="loop1-value">
-     *      loop1-key: loop1-value
-     *
-     *      <loop set="tree_name2" key="loop2-key" value="loop2-value">
-     *          loop2-key: loop2-value
-     *      </loop>
-     * </loop>
-     *
-     * <loop key="loop1-key" times="number|var">
-     *     loop1-key
-     * </loop>
-     *
-     * <loop key="loop1-key" index="number|var">
-     *     loop1-key
-     * </loop>
-     * */
     void renderLoop(const char *content, UInt length) {
         const Value_ *root_value = root_value_;
         const char *  key_str    = nullptr;
@@ -721,11 +832,13 @@ class Template : Engine, ALEHelper {
                 if (value_offset == 0) {
                     value = nullptr; // To stop looking for it.
                 } else {
-                    if (content[value_offset] == '[') {
+                    if (content[value_offset] ==
+                        TemplatePattern::VariableIndexPrefix) {
                         sub_offset = (value_offset + 1);
 
                         for (UInt i = sub_offset; i < length; i++) {
-                            if (content[i] == ']') {
+                            if (content[i] ==
+                                TemplatePattern::VariableIndexSuffix) {
                                 sub_length = (i - sub_offset);
                                 break;
                             }
@@ -858,15 +971,9 @@ class Template : Engine, ALEHelper {
         Render(*ss_, ss.GetString(), root_value_);
     }
 
-    /*
-     * <if case="{case}">...</if>
-     * <if case="{case}">...<else />...</if>
-     * <if case="{case1}">...<elseif case="{case2}" />...</if>
-     * <if case="{case}">...<if case="{case2}" />...</if></if>
-     */
     ULong renderIf(const char *content, ULong offset, ULong end_before,
                    const ULong max_end_before) {
-        addPreviousContent(content, (offset - 3)); // 3 is the size of <if
+        addPreviousContent(content, (offset - TemplatePattern::IfPrefixLength));
 
         if (!findIfTail(content, offset, end_before, max_end_before)) {
             //  Error: no tail.
@@ -881,8 +988,8 @@ class Template : Engine, ALEHelper {
         last_offset_ = end_before;
 
         if (getQuotaed(case_offset, case_length, content, end_before)) {
-            offset =
-                Find(">", 1, content, (case_offset + case_length), end_before);
+            offset = Find(">", 1, content, (case_offset + case_length),
+                          end_before); // TODO: Abstract
         }
 
         while (true) {
@@ -902,8 +1009,8 @@ class Template : Engine, ALEHelper {
             }
 
             // <else has no "i" after it.
-            if (content[case_offset] != 'i') {
-                result      = 1; // Mark <else as true.
+            if (content[case_offset] != 'i') { // TODO: Abstract
+                result      = 1;               // Mark <else as true.
                 case_length = 0;
             } else if (!getQuotaed(case_offset, case_length, content,
                                    end_before)) {
@@ -912,8 +1019,8 @@ class Template : Engine, ALEHelper {
             }
 
             // Find the end of else/elseif
-            offset =
-                Find("/>", 2, content, (case_offset + case_length), end_before);
+            offset = Find("/>", 2, content, (case_offset + case_length),
+                          end_before); // TODO: Abstract
         }
 
         if (result > 0) {
@@ -921,7 +1028,8 @@ class Template : Engine, ALEHelper {
                 end_before = case_offset;
             }
 
-            Render(*ss_, &(content[offset]), ((end_before - 5) - offset),
+            Render(*ss_, &(content[offset]),
+                   ((end_before - TemplatePattern::IfSuffixLength) - offset),
                    root_value_);
         }
 
@@ -934,14 +1042,18 @@ class Template : Engine, ALEHelper {
         ULong next_if;
 
         do {
-            else_offset = Find("<else", 5, content, offset, end_before);
+            else_offset = Find(TemplatePattern::ElsePrefix,
+                               TemplatePattern::ElsePrefixLength, content,
+                               offset, end_before);
 
             if (else_offset == 0) {
                 // No <else was found.
                 return 0;
             }
 
-            next_if = Find("<if", 3, content, offset, end_before);
+            next_if =
+                Find(TemplatePattern::IfPrefix, TemplatePattern::IfPrefixLength,
+                     content, offset, end_before);
 
             if ((next_if == 0) || (else_offset < next_if)) {
                 // No nesting <ifs were found, or <else comes before the child
@@ -949,7 +1061,9 @@ class Template : Engine, ALEHelper {
                 return else_offset;
             }
 
-            offset = Find("</if>", 5, content, next_if, end_before);
+            offset =
+                Find(TemplatePattern::IfSuffix, TemplatePattern::IfSuffixLength,
+                     content, next_if, end_before);
 
             if (else_offset > offset) {
                 // <else comes after the child if.
@@ -963,14 +1077,18 @@ class Template : Engine, ALEHelper {
     static bool findIfTail(const char *content, ULong offset, ULong &end_before,
                            ULong max_end_before) noexcept {
         do {
-            offset = SkipInnerKeywords("<if", 3, "</if>", 5, content, offset,
-                                       end_before, max_end_before);
+            offset = SkipInnerPatterns(
+                TemplatePattern::IfPrefix, TemplatePattern::IfPrefixLength,
+                TemplatePattern::IfSuffix, TemplatePattern::IfSuffixLength,
+                content, offset, end_before, max_end_before);
 
             if (end_before > offset) {
                 break;
             }
 
-            end_before = Find("</if>", 5, content, offset, max_end_before);
+            end_before =
+                Find(TemplatePattern::IfSuffix, TemplatePattern::IfSuffixLength,
+                     content, offset, max_end_before);
 
             if (end_before == 0) {
                 // No </if>
@@ -996,10 +1114,12 @@ class Template : Engine, ALEHelper {
             UInt          offset     = 0;
             UInt          next_offset;
 
-            if (key[(length - 1)] == ']') {
+            if (key[(length - 1)] == TemplatePattern::VariableIndexSuffix) {
                 next_offset = 0;
                 // Starting with a string followed by [...]
-                while ((next_offset < length) && (key[++next_offset] != '[')) {
+                while ((next_offset < length) &&
+                       (key[++next_offset] !=
+                        TemplatePattern::VariableIndexPrefix)) {
                 }
 
                 --length; // No use for ending bracket.
@@ -1040,13 +1160,16 @@ class Template : Engine, ALEHelper {
 
                 // Next part: starts at next_offset
                 offset = next_offset;
-                while ((offset < length) && (key[offset] != '[')) {
+                while ((offset < length) &&
+                       (key[offset] != TemplatePattern::VariableIndexPrefix)) {
                     ++offset;
                 }
 
                 // Ends at offset + 1
                 next_offset = ++offset; // ++ to the next char after [
-                while ((next_offset < length) && (key[++next_offset] != ']')) {
+                while ((next_offset < length) &&
+                       (key[++next_offset] !=
+                        TemplatePattern::VariableIndexSuffix)) {
                 }
             }
         }
@@ -1056,9 +1179,10 @@ class Template : Engine, ALEHelper {
 
     bool ALESetNumber(double &number, const char *content,
                       UInt length) const final {
-        if (length > 4) {
-            const Value_ *value =
-                findValue(&(content[5]), (length - 6)); // {var:x}
+        if (length > 4) { // TODO: Magic number
+            const Value_ *value = findValue(
+                &(content[TemplatePattern::VariablePrefixLength]),
+                (length - TemplatePattern::VariableFulllength)); // {var:x}
 
             if (value != nullptr) {
                 if (value->IsNumber()) {
@@ -1087,8 +1211,11 @@ class Template : Engine, ALEHelper {
         bool is_number{false};
 
         // If the right side is a variable
-        if ((left[0] == '{') && (left_length > 6)) {
-            value_left = findValue(&(left[5]), (left_length - 6)); // {var:x}
+        if ((left[0] == TemplatePattern::VariablePrefix[0]) &&
+            (left_length > TemplatePattern::VariableFulllength)) {
+            value_left = findValue(
+                &(left[TemplatePattern::VariablePrefixLength]),
+                (left_length - TemplatePattern::VariableFulllength)); // {var:x}
 
             if (value_left == nullptr) {
                 return false;
@@ -1098,8 +1225,12 @@ class Template : Engine, ALEHelper {
         }
 
         // If the left side is a variable
-        if ((right[0] == '{') && (right_length > 6)) {
-            value_right = findValue(&(right[5]), (right_length - 6)); // {var:x}
+        if ((right[0] == TemplatePattern::VariablePrefix[0]) &&
+            (right_length > TemplatePattern::VariableFulllength)) {
+            value_right =
+                findValue(&(right[TemplatePattern::VariablePrefixLength]),
+                          (right_length -
+                           TemplatePattern::VariableFulllength)); // {var:x}
 
             if (value_right == nullptr) {
                 return false;

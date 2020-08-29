@@ -96,7 +96,7 @@ class TestHelper {
 #define SHOULD_EQUAL(left, right, name, value)                                 \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if (left != right) {                                                   \
+        if ((left) != (right)) {                                               \
             TestHelper::PrintErrorMessage(false, name, value);                 \
             return 1;                                                          \
         }                                                                      \
@@ -105,7 +105,7 @@ class TestHelper {
 #define SHOULD_EQUAL_VALUE(left, right, name)                                  \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if (left != right) {                                                   \
+        if ((left) != (right)) {                                               \
             TestHelper::PrintErrorMessage(false, name, right);                 \
             return 1;                                                          \
         }                                                                      \
@@ -114,7 +114,7 @@ class TestHelper {
 #define SHOULD_NOT_EQUAL(left, right, name, value)                             \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if (left == right) {                                                   \
+        if ((left) == (right)) {                                               \
             TestHelper::PrintErrorMessage(true, name, value);                  \
             return 1;                                                          \
         }                                                                      \
@@ -123,7 +123,7 @@ class TestHelper {
 #define SHOULD_NOT_EQUAL_VALUE(left, right, name)                              \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if (left == right) {                                                   \
+        if ((left) == (right)) {                                               \
             TestHelper::PrintErrorMessage(true, name, right);                  \
             return 1;                                                          \
         }                                                                      \
@@ -132,7 +132,7 @@ class TestHelper {
 #define SHOULD_EQUAL_TRUE(condition, name)                                     \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if (!condition) {                                                      \
+        if (!(condition)) {                                                    \
             TestHelper::PrintErrorMessage(false, name, "true");                \
             return 1;                                                          \
         }                                                                      \

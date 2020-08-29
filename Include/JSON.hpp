@@ -32,29 +32,67 @@
 namespace Qentem {
 namespace JSON {
 
+#ifdef QENTEM_SIMD_ENABLED_
 static char *UnEscapeString(const char *content, ULong &length) {
-    UInt  offset  = 0;
-    UInt  offset2 = 0;
-    char *str     = HAllocator::Allocate<char>(length + 1);
+    static constexpr unsigned long long line       = 723401728380766730ULL;
+    static constexpr unsigned long long tab        = 651061555542690057ULL;
+    static constexpr unsigned long long carriage   = 940422246894996749ULL;
+    static constexpr unsigned long long back_slash = 6655295901103053916ULL;
 
-    while (offset < length) {
-        switch (content[offset]) {
-            case '\\': {
+    char *str      = HAllocator::Allocate<char>(length + 1);
+    ULong offset   = 0;
+    ULong offset2  = 0;
+    ULong m_offset = 0;
+    ULong length2;
+
+    if (length != 0) {
+        QMM_NUMBER_TYPE_ bits;
+
+        do {
+            const QMM_VAR_ m_content = QMM_LOAD_(
+                reinterpret_cast<const QMM_VAR_ *>(content + m_offset));
+            bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(line));
+            bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(tab));
+            bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
+
+            if (bits != 0) {
+                ULong index = (Q_CTZL(bits) + m_offset);
+
+                if (index < length) {
+                    HAllocator::Deallocate(str);
+                    return nullptr;
+                }
+            }
+
+            bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(back_slash));
+
+            while (bits != 0) {
+                ULong index = (Q_CTZL(bits) + m_offset);
+
+                if (index >= length) {
+                    break;
+                }
+
+                length2 = (index - offset);
+
+                if (length2 != 0) {
+                    Memory::Copy((str + offset2), (content + offset), length2);
+                    offset2 += length2;
+                }
+
+                offset = index;
                 ++offset;
 
                 switch (content[offset]) {
-                    case '"': {
-                        str[offset2] = '"';
-                        break;
-                    }
-
                     case '\\': {
-                        str[offset2] = '\\';
+                        str[offset2] = content[offset];
+                        bits &= (bits - 1);
                         break;
                     }
 
+                    case '"':
                     case '/': {
-                        str[offset2] = '/';
+                        str[offset2] = content[offset];
                         break;
                     }
 
@@ -82,6 +120,7 @@ static char *UnEscapeString(const char *content, ULong &length) {
                         break;
                     }
 
+                    case 'U':
                     case 'u': {
                         ++offset;
 
@@ -96,7 +135,7 @@ static char *UnEscapeString(const char *content, ULong &length) {
 
                         if ((code >> 8U) == 0xD8U) {
                             // Surrogate
-                            if ((length - offset) < 6) {
+                            if ((length - offset) < 6U) {
                                 HAllocator::Deallocate(str);
                                 return nullptr;
                             }
@@ -108,10 +147,123 @@ static char *UnEscapeString(const char *content, ULong &length) {
                                     0x3FFU;
                             code += 0x10000U;
 
-                            offset2 += String::ToUTF8(code, &(str[offset2]));
+                            offset2 += String::ToUTF8(code, (str + offset2));
+                            offset += 4;
+                            bits &= (bits - 1);
+                        } else {
+                            offset2 += String::ToUTF8(code, (str + offset2));
+                        }
+
+                        bits &= (bits - 1);
+                        continue;
+                    }
+
+                    default: {
+                        HAllocator::Deallocate(str);
+                        return nullptr;
+                    }
+                }
+
+                ++offset;
+                ++offset2;
+
+                bits &= (bits - 1);
+            }
+
+            m_offset += QMM_SIZE_;
+
+            if (m_offset < offset) {
+                m_offset = offset;
+            }
+        } while (m_offset < length);
+    }
+
+    length2 = (length - offset);
+
+    if (length2 != 0) {
+        Memory::Copy((str + offset2), (content + offset), length2);
+        offset2 += length2;
+    }
+
+    str[offset2] = '\0';
+    length       = offset2;
+
+    return str;
+}
+#else
+static char *UnEscapeString(const char *content, ULong &length) {
+    UInt  offset  = 0;
+    UInt  offset2 = 0;
+    char *str     = HAllocator::Allocate<char>(length + 1);
+
+    while (offset < length) {
+        switch (content[offset]) {
+            case '\\': {
+                ++offset;
+
+                switch (content[offset]) {
+                    case '"':
+                    case '\\':
+                    case '/': {
+                        str[offset2] = content[offset];
+                        break;
+                    }
+
+                    case 'b': {
+                        str[offset2] = '\b';
+                        break;
+                    }
+
+                    case 'f': {
+                        str[offset2] = '\f';
+                        break;
+                    }
+
+                    case 'n': {
+                        str[offset2] = '\n';
+                        break;
+                    }
+                    case 'r': {
+                        str[offset2] = '\r';
+                        break;
+                    }
+
+                    case 't': {
+                        str[offset2] = '\t';
+                        break;
+                    }
+
+                    case 'U':
+                    case 'u': {
+                        ++offset;
+
+                        if ((length - offset) < 4) {
+                            HAllocator::Deallocate(str);
+                            return nullptr;
+                        }
+
+                        UInt code =
+                            Digit::HexStringToNumber((content + offset), 4);
+                        offset += 4;
+
+                        if ((code >> 8U) == 0xD8U) {
+                            // Surrogate
+                            if ((length - offset) < 6U) {
+                                HAllocator::Deallocate(str);
+                                return nullptr;
+                            }
+
+                            code = (code ^ 0xD800U) << 10U;
+                            offset += 2;
+                            code += Digit::HexStringToNumber((content + offset),
+                                                             4) &
+                                    0x3FFU;
+                            code += 0x10000U;
+
+                            offset2 += String::ToUTF8(code, (str + offset2));
                             offset += 4;
                         } else {
-                            offset2 += String::ToUTF8(code, &(str[offset2]));
+                            offset2 += String::ToUTF8(code, (str + offset2));
                         }
 
                         continue;
@@ -127,7 +279,8 @@ static char *UnEscapeString(const char *content, ULong &length) {
             }
 
             case '\n':
-            case '\t': {
+            case '\t':
+            case '\r': {
                 HAllocator::Deallocate(str);
                 return nullptr;
             }
@@ -146,6 +299,7 @@ static char *UnEscapeString(const char *content, ULong &length) {
 
     return str;
 }
+#endif
 
 ////////////////////////////////////////////////////////////
 
@@ -272,16 +426,23 @@ class JSONParser : Engine {
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
                     content + find_cache_->Offset));
 
+            // the value of 8 characters:
+            static constexpr unsigned long long colon  = 4195730024608447034ULL;
+            static constexpr unsigned long long curly  = 8897841259083430779ULL;
+            static constexpr unsigned long long square = 6582955728264977243ULL;
+            static constexpr unsigned long long quote  = 2459565876494606882ULL;
+            static constexpr unsigned long long comma  = 3182967604875373612ULL;
+
             find_cache_->Bits =
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_(':'));
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(colon));
             find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('{'));
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(curly));
             find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('['));
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(square));
             find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('"'));
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(quote));
             find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_(','));
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(comma));
         } while ((find_cache_->Bits == 0) &&
                  (find_cache_->NextOffset < end_before));
     }
@@ -460,6 +621,10 @@ class JSONParser : Engine {
 
     void Found(const char *content, ULong offset, ULong end_before,
                ULong start_offset, ULong &current_offset) final {
+        static constexpr UInt true_len  = 4;
+        static constexpr UInt false_len = 5;
+        static constexpr UInt null_len  = 4;
+
         switch (type_) {
             case Type_::Comma: { // ,
                 if (!pass_comma_) {
@@ -507,7 +672,7 @@ class JSONParser : Engine {
 
                     switch (content[item_offset]) {
                         case 't': {
-                            if (len == 4) {
+                            if (len == true_len) {
                                 ++item_offset;
 
                                 while (tmp_offset < 3) {
@@ -533,7 +698,7 @@ class JSONParser : Engine {
                         }
 
                         case 'f': {
-                            if (len == 5) {
+                            if (len == false_len) {
                                 ++item_offset;
 
                                 while (tmp_offset < 4) {
@@ -559,7 +724,7 @@ class JSONParser : Engine {
                         }
 
                         case 'n': {
-                            if (len == 4) {
+                            if (len == null_len) {
                                 ++item_offset;
 
                                 while (tmp_offset < 3) {
@@ -755,10 +920,20 @@ class JSONParser : Engine {
                 const QMM_VAR_ m_content = QMM_LOAD_(
                     reinterpret_cast<const QMM_VAR_ *>(content + offset2));
 
+                static constexpr unsigned long long line =
+                    723401728380766730ULL;
+                static constexpr unsigned long long tab = 651061555542690057ULL;
+                static constexpr unsigned long long carriage =
+                    940422246894996749ULL;
+                static constexpr unsigned long long space =
+                    2314885530818453536ULL;
+
                 ULong bits;
-                bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('\n'));
-                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('\t'));
-                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_(' '));
+                bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(line));
+                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(tab));
+                bits |=
+                    QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
+                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(space));
                 bits ^= QMM_MAX_NUMBER; // Remove any whitespace
 
                 if (length != QMM_SIZE_) {
@@ -799,9 +974,10 @@ class JSONParser : Engine {
                 --start_offset;
 
                 switch (content[start_offset]) {
+                    case '\t':
                     case '\n':
-                    case ' ':
-                    case '\t': {
+                    case '\r':
+                    case ' ': {
                         break;
                     }
 

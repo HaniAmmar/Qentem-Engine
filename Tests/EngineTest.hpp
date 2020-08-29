@@ -738,55 +738,55 @@ static int TestEngine5() {
      * that is being searched in.
      */
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 7, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, content_len);
     SHOULD_EQUAL_VALUE(ret2, 11, "return2");
 
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 0, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 0, content_len);
     SHOULD_EQUAL_VALUE(ret2, 0, "return2");
 
     ret2 =
-        Engine::SkipInnerKeywords("x", 1, "y", 1, content, 1, 7, content_len);
+        Engine::SkipInnerPatterns("x", 1, "y", 1, content, 1, 7, content_len);
     SHOULD_EQUAL_VALUE(ret2, 0, "return2");
 
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 2, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 2, content_len);
     SHOULD_EQUAL_VALUE(ret2, 2, "return2");
 
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 3, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 3, content_len);
     SHOULD_EQUAL_VALUE(ret2, 7, "return2");
 
-    ret2 = Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 7, 7);
+    ret2 = Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, 7);
     SHOULD_EQUAL_VALUE(ret2, 7, "return2");
 
-    ret2 = Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 7, 8);
+    ret2 = Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, 8);
     SHOULD_EQUAL_VALUE(ret2, 8, "return2");
 
-    ret2 = Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 7, 9);
+    ret2 = Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, 9);
     SHOULD_EQUAL_VALUE(ret2, 9, "return2");
 
-    ret2 = Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 7, 10);
+    ret2 = Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, 10);
     SHOULD_EQUAL_VALUE(ret2, 10, "return2");
 
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 12, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 12, content_len);
     SHOULD_EQUAL_VALUE(ret2, 12, "return2");
 
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 12, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 12, content_len);
     SHOULD_EQUAL_VALUE(ret2, 12, "return2");
 
     content     = "{}";
     content_len = 2;
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 0, 2, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 0, 2, content_len);
     SHOULD_EQUAL_VALUE(ret2, 2, "return2");
 
     content     = "{   }";
     content_len = 5;
     ret2 =
-        Engine::SkipInnerKeywords("{", 1, "}", 1, content, 1, 5, content_len);
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 5, content_len);
     SHOULD_EQUAL_VALUE(ret2, 0, "return2");
 
     END_SUB_TEST;

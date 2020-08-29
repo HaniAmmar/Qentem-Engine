@@ -48,40 +48,43 @@
 #endif
 
 #if QENTEM_AVX512BW_ == 1
+using QMM_NUMBER_TYPE_ = unsigned long long;
 #define QMM_SIZE_ 64U
 #define QMM_SHIFTSIZE_ 6U
-using QMM_NUMBER_TYPE_ = unsigned long long;
 #define QMM_MAX_NUMBER 0XFFFFFFFFFFFFFFFF
 #define QMM_VAR_ __m512i
 #define QMM_LOAD_ _mm512_loadu_si512
+#define QMM_SETZERO_ _mm512_setzero_si512
 #define QMM_SETONE_8_ _mm512_set1_epi8
+#define QMM_SETONE_64_ _mm512_set1_epi64
 #define QMM_COMPARE_8_MASK_ _mm512_cmpeq_epi8_mask
 #define QMM_STOREU_ _mm512_storeu_si512
-#define QMM_SETZERO_ _mm512_setzero_si512
 #elif QENTEM_AVX2_ == 1
+using QMM_NUMBER_TYPE_ = unsigned int;
 #define QMM_SIZE_ 32U
 #define QMM_SHIFTSIZE_ 5U
-using QMM_NUMBER_TYPE_ = unsigned int;
 #define QMM_MAX_NUMBER 0XFFFFFFFF
 #define QMM_VAR_ __m256i
 #define QMM_LOAD_ _mm256_loadu_si256
+#define QMM_SETZERO_ _mm256_setzero_si256
 #define QMM_SETONE_8_ _mm256_set1_epi8
+#define QMM_SETONE_64_ _mm256_set1_epi64x
 #define QMM_COMPARE_8_MASK_(a, b)                                              \
     static_cast<QMM_NUMBER_TYPE_>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
 #define QMM_STOREU_ _mm256_storeu_si256
-#define QMM_SETZERO_ _mm256_setzero_si256
 #elif QENTEM_SSE2_ == 1
+using QMM_NUMBER_TYPE_ = unsigned int;
 #define QMM_SIZE_ 16U
 #define QMM_SHIFTSIZE_ 4U
-using QMM_NUMBER_TYPE_ = unsigned int;
 #define QMM_MAX_NUMBER 0XFFFF
 #define QMM_VAR_ __m128i
 #define QMM_LOAD_ _mm_loadu_si128
+#define QMM_SETZERO_ _mm_setzero_si128
 #define QMM_SETONE_8_ _mm_set1_epi8
+#define QMM_SETONE_64_ _mm_set1_epi64x
 #define QMM_COMPARE_8_MASK_(a, b)                                              \
     static_cast<QMM_NUMBER_TYPE_>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
 #define QMM_STOREU_ _mm_storeu_si128
-#define QMM_SETZERO_ _mm_setzero_si128
 #endif
 
 #ifdef _MSC_VER
@@ -139,6 +142,10 @@ inline static unsigned int Q_CLZL(unsigned long value) {
 
     return 0;
 }
+#endif
+
+#ifndef QENTEM_DOUBLE_PRECISION_
+#define QENTEM_DOUBLE_PRECISION_ 14
 #endif
 
 #if defined(_MSC_VER) && defined(_WIN64)

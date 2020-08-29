@@ -887,22 +887,23 @@ class Value {
             }
 
             case ValueType::Number: {
-                value = Digit::NumberToString(value_.number, 1, 0, 14);
+                value = Digit::NumberToString(value_.number, 1, 0,
+                                              QENTEM_DOUBLE_PRECISION_);
                 return true;
             }
 
             case ValueType::True: {
-                value = String("true", 4);
+                value = String("true", true_len_);
                 return true;
             }
 
             case ValueType::False: {
-                value = String("false", 5);
+                value = String("false", false_len_);
                 return true;
             }
 
             case ValueType::Null: {
-                value = String("null", 4);
+                value = String("null", null_len_);
                 return true;
             }
 
@@ -922,22 +923,23 @@ class Value {
             }
 
             case ValueType::Number: {
-                ss += Digit::NumberToString(value_.number, 1, 0, 14);
+                ss += Digit::NumberToString(value_.number, 1, 0,
+                                            QENTEM_DOUBLE_PRECISION_);
                 return true;
             }
 
             case ValueType::True: {
-                ss.Add("true", 4);
+                ss.Add("true", true_len_);
                 return true;
             }
 
             case ValueType::False: {
-                ss.Add("false", 5);
+                ss.Add("false", false_len_);
                 return true;
             }
 
             case ValueType::Null: {
-                ss.Add("null", 4);
+                ss.Add("null", null_len_);
                 return true;
             }
 
@@ -1007,12 +1009,12 @@ class Value {
             }
 
             case ValueType::String: {
-                if (value_.string->Compare("true", 4)) {
+                if (value_.string->Compare("true", true_len_)) {
                     value = true;
                     return true;
                 }
 
-                if (value_.string->Compare("false", 5)) {
+                if (value_.string->Compare("false", false_len_)) {
                     value = false;
                     return true;
                 }
@@ -1165,17 +1167,17 @@ class Value {
                     }
 
                     case ValueType::False: {
-                        ss.Add("false", 5);
+                        ss.Add("false", false_len_);
                         break;
                     }
 
                     case ValueType::True: {
-                        ss.Add("true", 4);
+                        ss.Add("true", true_len_);
                         break;
                     }
 
                     case ValueType::Null: {
-                        ss.Add("null", 4);
+                        ss.Add("null", null_len_);
                         break;
                     }
 
@@ -1243,6 +1245,10 @@ class Value {
             }
         }
     }
+
+    static constexpr UInt true_len_  = 4;
+    static constexpr UInt false_len_ = 5;
+    static constexpr UInt null_len_  = 4;
 
     ValueType type_{ValueType::Undefined};
     value_ptr value_{nullptr};

@@ -34,44 +34,61 @@ class Engine {
   public:
 #ifdef QENTEM_SIMD_ENABLED_
     /*
-     * This function resturn an the offset of the match + the length of the
-     * keyword, or zero.
+     * Returns a mask of matches, but limitedt to QMM_SIZE_
      */
-    static ULong Find(const char *keyword, UInt keyword_length,
+    static QMM_NUMBER_TYPE_ FindAll(const char      first,
+                                    const QMM_VAR_ *m_pattern_last_p,
+                                    UInt pattern_length, const char *content,
+                                    ULong offset) {
+        const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(first);
+        const QMM_VAR_ m_content_0 =
+            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset));
+
+        QMM_NUMBER_TYPE_ bits =
+            QMM_COMPARE_8_MASK_(m_content_0, m_pattern_first);
+
+        if (m_pattern_last_p == nullptr) {
+            return bits;
+        }
+
+        const QMM_VAR_ m_content_1 =
+            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                content + offset + (pattern_length - 1U)));
+
+        return (bits & QMM_COMPARE_8_MASK_(m_content_1, *m_pattern_last_p));
+    }
+
+    /*
+     * Returns an the offset of the match + the length of the
+     * pattern, or zero.
+     */
+    static ULong Find(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset, ULong end_before) {
         if (offset < end_before) {
-            const QMM_VAR_ m_keyword_first = QMM_SETONE_8_(keyword[0]);
-            QMM_VAR_       m_keyword_last;
+            QMM_VAR_ *m_pattern_last_p = nullptr;
 
-            if (keyword_length != 1U) {
-                m_keyword_last = QMM_SETONE_8_(keyword[keyword_length - 1U]);
+            if (pattern_length != 1U) {
+                QMM_VAR_ m_pattern_last =
+                    QMM_SETONE_8_(pattern[pattern_length - 1U]);
+                m_pattern_last_p = &m_pattern_last;
             }
 
             do {
-                const QMM_VAR_ m_content_0 = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
-
                 QMM_NUMBER_TYPE_ bits =
-                    QMM_COMPARE_8_MASK_(m_content_0, m_keyword_first);
-
-                if (keyword_length != 1U) {
-                    const QMM_VAR_ m_content_1 =
-                        QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                            content + offset + (keyword_length - 1U)));
-                    bits &= QMM_COMPARE_8_MASK_(m_content_1, m_keyword_last);
-                }
+                    FindAll(pattern[0], m_pattern_last_p, pattern_length,
+                            content, offset);
 
                 while (bits != 0) {
                     const ULong index = (Q_CTZL(bits) + offset);
 
-                    if ((index + keyword_length) > end_before) {
+                    if ((index + pattern_length) > end_before) {
                         return 0;
                     }
 
-                    if ((keyword_length < 3U) ||
-                        Memory::Compare(keyword, (content + index),
-                                        keyword_length)) {
-                        return (index + keyword_length);
+                    if ((pattern_length < 3U) ||
+                        Memory::Compare(pattern, (content + index),
+                                        pattern_length)) {
+                        return (index + pattern_length);
                     }
 
                     bits &= (bits - 1U); // Remove the leading one
@@ -86,42 +103,34 @@ class Engine {
     }
 
     // Returns how many times a word is repeated
-    static UInt Count(const char *keyword, UInt keyword_length,
+    static UInt Count(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset, ULong end_before) {
         UInt times = 0;
 
         if (offset < end_before) {
-            const QMM_VAR_ m_keyword_first = QMM_SETONE_8_(keyword[0]);
-            QMM_VAR_       m_keyword_last;
+            QMM_VAR_ *m_pattern_last_p = nullptr;
 
-            if (keyword_length != 1U) {
-                m_keyword_last = QMM_SETONE_8_(keyword[keyword_length - 1U]);
+            if (pattern_length != 1U) {
+                QMM_VAR_ m_pattern_last =
+                    QMM_SETONE_8_(pattern[pattern_length - 1U]);
+                m_pattern_last_p = &m_pattern_last;
             }
 
             do {
-                const QMM_VAR_ m_content_0 = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
-
                 QMM_NUMBER_TYPE_ bits =
-                    QMM_COMPARE_8_MASK_(m_content_0, m_keyword_first);
-
-                if (keyword_length != 1U) {
-                    const QMM_VAR_ m_content_1 =
-                        QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                            content + offset + (keyword_length - 1U)));
-                    bits &= QMM_COMPARE_8_MASK_(m_content_1, m_keyword_last);
-                }
+                    FindAll(pattern[0], m_pattern_last_p, pattern_length,
+                            content, offset);
 
                 while (bits != 0) {
                     const ULong index = (Q_CTZL(bits) + offset);
 
-                    if ((index + keyword_length) > end_before) {
+                    if ((index + pattern_length) > end_before) {
                         return times;
                     }
 
-                    if ((keyword_length < 3U) ||
-                        Memory::Compare(keyword, (content + index),
-                                        keyword_length)) {
+                    if ((pattern_length < 3U) ||
+                        Memory::Compare(pattern, (content + index),
+                                        pattern_length)) {
                         ++times;
                     }
 
@@ -136,29 +145,29 @@ class Engine {
     }
 #else
     // Old school
-    static ULong Find(const char *keyword, UInt keyword_length,
+    static ULong Find(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset,
                       ULong end_before) noexcept {
         ULong last_offset;
 
         while (offset < end_before) {
-            if (keyword[0] == content[offset]) {
+            if (pattern[0] == content[offset]) {
                 last_offset = offset;
 
-                if ((offset + keyword_length) > end_before) {
+                if ((offset + pattern_length) > end_before) {
                     return 0;
                 }
 
                 ++offset;
-                UInt keyword_offset = 1U;
+                UInt pattern_offset = 1U;
 
-                while ((keyword_offset < keyword_length) &&
-                       keyword[keyword_offset] == content[offset]) {
+                while ((pattern_offset < pattern_length) &&
+                       pattern[pattern_offset] == content[offset]) {
                     ++offset;
-                    ++keyword_offset;
+                    ++pattern_offset;
                 }
 
-                if (keyword_offset == keyword_length) {
+                if (pattern_offset == pattern_length) {
                     return offset;
                 }
 
@@ -174,9 +183,8 @@ class Engine {
 #endif
 
     /*
-     * This function will try to find the head and the tail of a match and
-     * search aging inside the match to see if it's Nested by itself or a
-     * custom expression.
+     * finds the head and the tail of a match and search aging inside the match
+     * to see if it's Nested by itself or a custom expression.
      */
     ULong FindNest(const char *content, ULong offset, ULong end_before,
                    ULong max_end_before) {
@@ -245,12 +253,12 @@ class Engine {
      * {.{..{...}..}.}; this function can then be called from nest(), to skip
      * inner brackets:
      *
-     * return SkipInnerKeywords("{", 1, "}", 1,
+     * return SkipInnerPatterns("{", 1, "}", 1,
      *                          content, offset, end_before, max_end_before);
      *
      * See Template::nest(...)
      */
-    static ULong SkipInnerKeywords(const char *start, UInt start_length,
+    static ULong SkipInnerPatterns(const char *start, UInt start_length,
                                    const char *end, UInt end_length,
                                    const char *content, ULong offset,
                                    ULong end_before, ULong max_end_before) {

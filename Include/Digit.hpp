@@ -25,6 +25,9 @@
 #ifndef QENTEM_DIGIT_H_
 #define QENTEM_DIGIT_H_
 
+#define QENTEM_DECIMAL_BASE_ 10
+#define QENTEM_EXPONENT_MAX_LENGTH_ 5
+
 namespace Qentem {
 
 /*
@@ -212,7 +215,7 @@ class Digit {
 
             if ((c > '/') && (c < ':')) {
                 number += ((static_cast<Type>(c) - '0') * postion);
-                postion *= 10;
+                postion *= QENTEM_DECIMAL_BASE_;
             } else {
                 return false;
             }
@@ -357,7 +360,7 @@ class Digit {
 
         if (offset != 0) {
             UInt offset2    = 0;
-            UInt MAX_LENGTH = 5; // e(-|+)xxx
+            UInt MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
             int  sign       = 0;
 
             do {
@@ -371,7 +374,7 @@ class Digit {
 
                         case 'e':
                         case 'E': {
-                            if (MAX_LENGTH == 5) {
+                            if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
                                 // No number.
                                 return false;
                             }
@@ -383,7 +386,8 @@ class Digit {
 
                         case '-':
                         case '+': {
-                            if ((MAX_LENGTH == 5) || (sign != 0)) {
+                            if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) ||
+                                (sign != 0)) {
                                 // No number, or double sign.
                                 return false;
                             }
@@ -408,7 +412,7 @@ class Digit {
                 }
 
                 while (++offset2 < length) {
-                    exponent *= 10;
+                    exponent *= QENTEM_DECIMAL_BASE_;
                     exponent += (str[offset2] - '0');
                 }
 
@@ -438,7 +442,7 @@ class Digit {
             ++offset;
 
             if ((c > '/') && (c < ':')) {
-                w_number *= 10;
+                w_number *= QENTEM_DECIMAL_BASE_;
                 w_number += (static_cast<ULong>(c) - '0');
             } else if (c == '.') {
                 if (has_dot || (offset == length)) {
@@ -460,7 +464,7 @@ class Digit {
                 c = str[offset];
 
                 if ((c > '/') && (c < ':')) {
-                    base *= 10;
+                    base *= QENTEM_DECIMAL_BASE_;
                     number += (static_cast<Type>(c) - '0') / base;
                 } else {
                     return false;
@@ -500,10 +504,10 @@ class Digit {
                 Type number2;
 
                 if (exponent > 9) {
-                    number2 = 1e10;
-                    exponent -= 10;
+                    number2 = 1E10;
+                    exponent -= QENTEM_DECIMAL_BASE_;
                 } else {
-                    number2 = 1e1;
+                    number2 = 1E1;
                     --exponent;
                 }
 
@@ -538,8 +542,8 @@ class Digit {
 
         while (number != 0) {
             --length;
-            str[length] = char((number % 10) + '0');
-            number /= 10;
+            str[length] = char((number % QENTEM_DECIMAL_BASE_) + '0');
+            number /= QENTEM_DECIMAL_BASE_;
         }
 
         min = (end_offset - min);
@@ -564,30 +568,30 @@ class Digit {
     }
 
     static void extractNumber_(double &number, int &exponent) {
-        if (number > 1e19) {
+        if (number > 1E19) {
             do {
-                if (number > 1e99) {
+                if (number > 1E99) {
                     exponent += 100;
-                    number /= 1e100;
-                } else if (number > 1e9) {
-                    exponent += 10;
-                    number /= 1e10;
+                    number /= 1E100;
+                } else if (number > 1E9) {
+                    exponent += QENTEM_DECIMAL_BASE_;
+                    number /= 1E10;
                 } else {
                     ++exponent;
-                    number /= 10;
+                    number /= QENTEM_DECIMAL_BASE_;
                 }
             } while (number > 9);
         } else {
             do {
-                if (number < 1e-99) {
+                if (number < 1E-99) {
                     exponent -= 100;
-                    number *= 1e100;
-                } else if (number < 1e-9) {
-                    exponent -= 10;
-                    number *= 1e10;
+                    number *= 1E100;
+                } else if (number < 1E-9) {
+                    exponent -= QENTEM_DECIMAL_BASE_;
+                    number *= 1E10;
                 } else {
                     --exponent;
-                    number *= 10;
+                    number *= QENTEM_DECIMAL_BASE_;
                 }
             } while (number < 0.9);
         }
@@ -616,11 +620,11 @@ class Digit {
             ++offset;
         }
 
-        if ((number > 1e19) || ((number != 0) && (number < 1e-17))) {
+        if ((number > 1E19) || ((number != 0) && (number < 1E-17))) {
             extractNumber_(number, exponent);
             r_min           = 0;
             precision       = 15;
-            exponent_length = 5;
+            exponent_length = QENTEM_EXPONENT_MAX_LENGTH_;
         }
 
         unsigned long long left_number =
@@ -630,8 +634,8 @@ class Digit {
 
         while (tmp_number != 0) {
             --end_offset;
-            tmp[end_offset] = char((tmp_number % 10) + '0');
-            tmp_number /= 10;
+            tmp[end_offset] = char((tmp_number % QENTEM_DECIMAL_BASE_) + '0');
+            tmp_number /= QENTEM_DECIMAL_BASE_;
         }
 
         left_length = (max_length - end_offset);
@@ -653,16 +657,18 @@ class Digit {
 
                 fraction = extractFraction_(number, precision);
 
-                if ((precision < 17) && ((fraction % 10) > 4)) {
-                    fraction /= 10;
+                if ((precision < 17) &&
+                    ((fraction % QENTEM_DECIMAL_BASE_) > 4)) {
+                    fraction /= QENTEM_DECIMAL_BASE_;
                     ++fraction;
                 } else {
-                    fraction /= 10;
+                    fraction /= QENTEM_DECIMAL_BASE_;
                 }
 
                 // Removing all zeros from the fraction.
-                while ((precision != 0) && ((fraction % 10) == 0)) {
-                    fraction /= 10;
+                while ((precision != 0) &&
+                       ((fraction % QENTEM_DECIMAL_BASE_) == 0)) {
+                    fraction /= QENTEM_DECIMAL_BASE_;
                     --precision;
                 }
 
@@ -673,8 +679,9 @@ class Digit {
 
                     while (left_number != 0) {
                         --end_offset;
-                        tmp[end_offset] = char((left_number % 10) + '0');
-                        left_number /= 10;
+                        tmp[end_offset] =
+                            char((left_number % QENTEM_DECIMAL_BASE_) + '0');
+                        left_number /= QENTEM_DECIMAL_BASE_;
                     }
 
                     left_length = (max_length - end_offset);
@@ -727,8 +734,8 @@ class Digit {
 
             while (fraction != 0) {
                 --end_offset;
-                tmp[end_offset] = char((fraction % 10) + '0');
-                fraction /= 10;
+                tmp[end_offset] = char((fraction % QENTEM_DECIMAL_BASE_) + '0');
+                fraction /= QENTEM_DECIMAL_BASE_;
             }
 
             if (((end_offset == 0) && (exponent == 0)) || (left_length != 0) ||
@@ -791,8 +798,8 @@ class Digit {
 
             while (exponent != 0) {
                 --end_offset;
-                tmp[end_offset] = char((exponent % 10) + '0');
-                exponent /= 10;
+                tmp[end_offset] = char((exponent % QENTEM_DECIMAL_BASE_) + '0');
+                exponent /= QENTEM_DECIMAL_BASE_;
             }
 
             while (end_offset < 4) {
@@ -809,87 +816,87 @@ class Digit {
     static unsigned long long extractFraction_(double number, UInt precision) {
         switch (precision) {
             case 1: {
-                number *= 1e2;
+                number *= 1E2;
                 break;
             }
 
             case 2: {
-                number *= 1e3;
+                number *= 1E3;
                 break;
             }
 
             case 3: {
-                number *= 1e4;
+                number *= 1E4;
                 break;
             }
 
             case 4: {
-                number *= 1e5;
+                number *= 1E5;
                 break;
             }
 
             case 5: {
-                number *= 1e6;
+                number *= 1E6;
                 break;
             }
 
             case 6: {
-                number *= 1e7;
+                number *= 1E7;
                 break;
             }
 
             case 7: {
-                number *= 1e8;
+                number *= 1E8;
                 break;
             }
 
             case 8: {
-                number *= 1e9;
+                number *= 1E9;
                 break;
             }
 
             case 9: {
-                number *= 1e10;
+                number *= 1E10;
                 break;
             }
 
             case 10: {
-                number *= 1e11;
+                number *= 1E11;
                 break;
             }
 
             case 11: {
-                number *= 1e12;
+                number *= 1E12;
                 break;
             }
 
             case 12: {
-                number *= 1e13;
+                number *= 1E13;
                 break;
             }
 
             case 13: {
-                number *= 1e14;
+                number *= 1E14;
                 break;
             }
 
             case 14: {
-                number *= 1e15;
+                number *= 1E15;
                 break;
             }
 
             case 15: {
-                number *= 1e16;
+                number *= 1E16;
                 break;
             }
 
             case 16: {
-                number *= 1e17;
+                number *= 1E17;
                 break;
             }
 
             default: {
-                number *= 1e18;
+                number *= 1E18;
             }
         }
 
