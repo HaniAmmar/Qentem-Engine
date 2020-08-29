@@ -31,6 +31,7 @@
 #include "StringTest.hpp"
 #include "TemplateTest.hpp"
 #include "TestHelper.hpp"
+#include "ValueTest.hpp"
 
 int RunTests() {
     int passed = 0;
@@ -46,6 +47,7 @@ int RunTests() {
     ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunEngineTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunALETests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
 
@@ -65,6 +67,7 @@ int RunTests() {
 int main() {
     // for (size_t i = 0; i < 100000; i++) {
     //     Qentem::Test::RunTestHelperTests();
+    //     Qentem::Test::RunMemoryTests();
     //     Qentem::Test::RunStringTests();
     //     Qentem::Test::RunMemoryTests();
     //     Qentem::Test::RunStringStreamTests();
@@ -73,6 +76,7 @@ int main() {
     //     Qentem::Test::RunHArrayTests();
     //     Qentem::Test::RunEngineTests();
     //     Qentem::Test::RunALETests();
+    //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
     //     Qentem::Test::RunTemplateTests();
     // }
