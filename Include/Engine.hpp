@@ -36,26 +36,27 @@ class Engine {
     /*
      * Returns a mask of matches, but limitedt to QMM_SIZE_
      */
-    static QMM_NUMBER_TYPE_ FindAll(const char      first,
-                                    const QMM_VAR_ *m_pattern_last_p,
-                                    UInt pattern_length, const char *content,
-                                    ULong offset) {
-        const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(first);
+    static QMM_NUMBER_TYPE_ FindAll(const char *pattern, UInt pattern_length,
+                                    const char *content, ULong offset) {
+        const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(pattern[0]);
         const QMM_VAR_ m_content_0 =
             QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset));
 
         QMM_NUMBER_TYPE_ bits =
             QMM_COMPARE_8_MASK_(m_content_0, m_pattern_first);
 
-        if (m_pattern_last_p == nullptr) {
+        if (pattern_length == 1) {
             return bits;
         }
 
+        --pattern_length;
         const QMM_VAR_ m_content_1 =
-            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                content + offset + (pattern_length - 1U)));
+            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset +
+                                                         pattern_length));
 
-        return (bits & QMM_COMPARE_8_MASK_(m_content_1, *m_pattern_last_p));
+        return (bits &
+                QMM_COMPARE_8_MASK_(m_content_1,
+                                    QMM_SETONE_8_(pattern[pattern_length])));
     }
 
     /*
@@ -65,18 +66,9 @@ class Engine {
     static ULong Find(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset, ULong end_before) {
         if (offset < end_before) {
-            QMM_VAR_ *m_pattern_last_p = nullptr;
-
-            if (pattern_length != 1U) {
-                QMM_VAR_ m_pattern_last =
-                    QMM_SETONE_8_(pattern[pattern_length - 1U]);
-                m_pattern_last_p = &m_pattern_last;
-            }
-
             do {
                 QMM_NUMBER_TYPE_ bits =
-                    FindAll(pattern[0], m_pattern_last_p, pattern_length,
-                            content, offset);
+                    FindAll(pattern, pattern_length, content, offset);
 
                 while (bits != 0) {
                     const ULong index = (Q_CTZL(bits) + offset);
@@ -108,18 +100,9 @@ class Engine {
         UInt times = 0;
 
         if (offset < end_before) {
-            QMM_VAR_ *m_pattern_last_p = nullptr;
-
-            if (pattern_length != 1U) {
-                QMM_VAR_ m_pattern_last =
-                    QMM_SETONE_8_(pattern[pattern_length - 1U]);
-                m_pattern_last_p = &m_pattern_last;
-            }
-
             do {
                 QMM_NUMBER_TYPE_ bits =
-                    FindAll(pattern[0], m_pattern_last_p, pattern_length,
-                            content, offset);
+                    FindAll(pattern, pattern_length, content, offset);
 
                 while (bits != 0) {
                     const ULong index = (Q_CTZL(bits) + offset);
