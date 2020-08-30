@@ -24,7 +24,7 @@
 #define QENTEM_COMMON_H_
 
 #ifndef QENTEM_AVX512BW_
-#define QENTEM_AVX512BW_ 0
+#define QENTEM_AVX512BW_ 1
 #endif
 
 #ifndef QENTEM_AVX2_
