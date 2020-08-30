@@ -49,7 +49,6 @@ static int TestArray1() {
     SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
 
     numbers1.SetCapacity(5);
-    storage = numbers1.Storage();
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 5, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");

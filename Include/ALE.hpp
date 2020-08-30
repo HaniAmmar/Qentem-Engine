@@ -259,7 +259,6 @@ class ALE : Engine {
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('&'));
             find_cache_->Bits |=
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('|'));
-
         } while ((find_cache_->Bits == 0) &&
                  (find_cache_->NextOffset < end_before));
     }

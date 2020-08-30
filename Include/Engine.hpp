@@ -34,90 +34,142 @@ class Engine {
   public:
 #ifdef QENTEM_SIMD_ENABLED_
     /*
-     * Returns a mask of matches, but limitedt to QMM_SIZE_
+     * Returns an the offset of a char + 1.
      */
-    static QMM_NUMBER_TYPE_ FindAll(const char *pattern, UInt pattern_length,
-                                    const char *content, ULong offset) {
-        const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(pattern[0]);
-        const QMM_VAR_ m_content_0 =
-            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset));
-
-        QMM_NUMBER_TYPE_ bits =
-            QMM_COMPARE_8_MASK_(m_content_0, m_pattern_first);
-
-        if (pattern_length == 1) {
-            return bits;
-        }
-
-        --pattern_length;
-        const QMM_VAR_ m_content_1 =
-            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content + offset +
-                                                         pattern_length));
-
-        return (bits &
-                QMM_COMPARE_8_MASK_(m_content_1,
-                                    QMM_SETONE_8_(pattern[pattern_length])));
-    }
-
-    /*
-     * Returns an the offset of the match + the length of the
-     * pattern, or zero.
-     */
-    static ULong Find(const char *pattern, UInt pattern_length,
-                      const char *content, ULong offset, ULong end_before) {
+    static ULong FindOne(const char one_char, const char *content, ULong offset,
+                         ULong end_before) {
         if (offset < end_before) {
+            const QMM_VAR_ m_pattern = QMM_SETONE_8_(one_char);
+
             do {
+                const QMM_VAR_ m_content = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
+
                 QMM_NUMBER_TYPE_ bits =
-                    FindAll(pattern, pattern_length, content, offset);
+                    QMM_COMPARE_8_MASK_(m_pattern, m_content);
 
-                while (bits != 0) {
-                    const ULong index = (Q_CTZL(bits) + offset);
+                if (bits != 0) {
+                    const ULong index = (Q_CTZL(bits) + offset + 1);
 
-                    if ((index + pattern_length) > end_before) {
+                    if (index > end_before) {
                         return 0;
                     }
 
-                    if ((pattern_length < 3U) ||
-                        Memory::Compare(pattern, (content + index),
-                                        pattern_length)) {
-                        return (index + pattern_length);
-                    }
-
-                    bits &= (bits - 1U); // Remove the leading one
+                    return index;
                 }
 
                 offset += QMM_SIZE_;
             } while (offset < end_before);
         }
 
-        // No match.
         return 0;
     }
 
-    // Returns how many times a word is repeated
+    /*
+     * Returns an the offset of a pattern + the length of it.
+     */
+    static ULong Find(const char *pattern, UInt pattern_length,
+                      const char *content, ULong offset, ULong end_before) {
+        if (pattern_length == 1U) {
+            return FindOne(*pattern, content, offset, end_before);
+        }
+
+        if (offset < end_before) {
+            const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(*pattern);
+            const UInt     len_less_one    = (pattern_length - 1);
+            const QMM_VAR_ m_pattern_last =
+                QMM_SETONE_8_(pattern[len_less_one]);
+
+            do {
+                QMM_VAR_ m_content = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
+                QMM_NUMBER_TYPE_ bits =
+                    QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
+
+                m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                    content + offset + len_less_one));
+                bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
+
+                while (bits != 0) {
+                    const ULong index         = (Q_CTZL(bits) + offset);
+                    const ULong pattern_index = (index + pattern_length);
+
+                    if (pattern_index > end_before) {
+                        return 0;
+                    }
+
+                    if ((len_less_one == 1U) ||
+                        Memory::Compare(pattern, (content + index),
+                                        len_less_one)) {
+                        return pattern_index;
+                    }
+
+                    bits &= (bits - 1U);
+                }
+
+                offset += QMM_SIZE_;
+            } while (offset < end_before);
+        }
+
+        return 0;
+    }
+
+    // Returns how many times a pattern is repeated
     static UInt Count(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset, ULong end_before) {
         UInt times = 0;
 
         if (offset < end_before) {
+            const UInt     len_less_one = (pattern_length - 1);
+            const QMM_VAR_ m_pattern_last =
+                QMM_SETONE_8_(pattern[len_less_one]);
+            const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(*pattern);
+
             do {
+                QMM_VAR_ m_content = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
                 QMM_NUMBER_TYPE_ bits =
-                    FindAll(pattern, pattern_length, content, offset);
+                    QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
 
-                while (bits != 0) {
-                    const ULong index = (Q_CTZL(bits) + offset);
+                if (bits != 0) {
+                    if (len_less_one == 0) {
+                        do {
+                            const ULong index = (Q_CTZL(bits) + offset);
+                            const ULong pattern_index =
+                                (index + pattern_length);
 
-                    if ((index + pattern_length) > end_before) {
-                        return times;
+                            if (pattern_index > end_before) {
+                                return times;
+                            }
+
+                            ++times;
+
+                            bits &= (bits - 1U);
+                        } while (bits != 0);
+                    } else {
+                        m_content =
+                            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                                content + offset + len_less_one));
+                        bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
+
+                        while (bits != 0) {
+                            const ULong index = (Q_CTZL(bits) + offset);
+                            const ULong pattern_index =
+                                (index + pattern_length);
+
+                            if (pattern_index > end_before) {
+                                return times;
+                            }
+
+                            if ((len_less_one < 2U) ||
+                                Memory::Compare(pattern, (content + index),
+                                                len_less_one)) {
+                                ++times;
+                            }
+
+                            bits &= (bits - 1U);
+                        }
                     }
-
-                    if ((pattern_length < 3U) ||
-                        Memory::Compare(pattern, (content + index),
-                                        pattern_length)) {
-                        ++times;
-                    }
-
-                    bits &= (bits - 1U); // Remove the leading one
                 }
 
                 offset += QMM_SIZE_;
@@ -232,8 +284,8 @@ class Engine {
     }
 
     /*
-     * Assume that match is about { ... }, but can nest itself like:
-     * {.{..{...}..}.}; this function can then be called from nest(), to skip
+     * If a search is about { ... }, and nest itself like:
+     * {.{..{...}..}.}; then this function can be called from nest() to skip
      * inner brackets:
      *
      * return SkipInnerPatterns("{", 1, "}", 1,
@@ -263,8 +315,9 @@ class Engine {
 #endif
         if (times != 0) {
             ULong last_offset = end_before;
+            --times;
 
-            while (--times != 0) {
+            while (times != 0) {
                 end_before =
                     Find(end, end_length, content, last_offset, max_end_before);
 
@@ -273,6 +326,7 @@ class Engine {
                 }
 
                 last_offset = end_before;
+                --times;
             }
 
             return last_offset;

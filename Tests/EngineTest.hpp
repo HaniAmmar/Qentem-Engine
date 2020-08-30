@@ -209,6 +209,38 @@ static int TestEngine1() {
         Engine::Find(find_, find_len, content, (content_len - 1), content_len);
     SHOULD_EQUAL_VALUE(ret, 0, "return");
 
+    find_       = "ABC";
+    find_len    = 3;
+    content     = "CBA";
+    content_len = 3;
+
+    ret = Engine::Find(find_, find_len, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 0, "return");
+
+    content     = "BCBA";
+    content_len = 4;
+
+    ret = Engine::Find(find_, find_len, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 0, "return");
+
+    content     = "123456789123456CBA";
+    content_len = 18;
+
+    ret = Engine::Find(find_, find_len, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 0, "return");
+
+    content     = "ADC";
+    content_len = 3;
+
+    ret = Engine::Find(find_, find_len, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 0, "return");
+
+    content     = "123456789123456ADC";
+    content_len = 18;
+
+    ret = Engine::Find(find_, find_len, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 0, "return");
+
     END_SUB_TEST;
 }
 
@@ -252,6 +284,42 @@ static int TestEngine2() {
     ret = Engine::Find(find_, find_len, content, 0, content_len);
     SHOULD_EQUAL_VALUE(ret, 3, "return");
 
+#ifdef QENTEM_SIMD_ENABLED_
+    ret = Engine::Count("(", 1, "123(", 0, 4);
+    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
+
+    ret = Engine::Count("(", 1, "123(", 3, 4);
+    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
+
+    ret = Engine::Count("(", 1, "(123(", 0, 5);
+    SHOULD_EQUAL_VALUE(ret, 2, "Count()");
+
+    ret = Engine::Count("(", 1, "(123(", 1, 5);
+    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
+
+    ret = Engine::Count(
+        "(", 1, "123123123(1231231231231(23123123123(123123123123123(123", 0,
+        55);
+    SHOULD_EQUAL_VALUE(ret, 4, "Count()");
+
+    ret = Engine::Count("((", 2, "12((", 0, 4);
+    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
+
+    ret = Engine::Count("((", 2, "12((", 2, 4);
+    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
+
+    ret = Engine::Count("((", 2, "((1((", 0, 5);
+    SHOULD_EQUAL_VALUE(ret, 2, "Count()");
+
+    ret = Engine::Count("((", 2, "((1((", 1, 5);
+    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
+
+    ret = Engine::Count(
+        "((", 2, "123123123((1231231231231((23123123123((123123123123123((123",
+        0, 59);
+    SHOULD_EQUAL_VALUE(ret, 4, "Count()");
+#endif
+
     END_SUB_TEST;
 }
 
@@ -274,18 +342,14 @@ static int TestEngine3() {
             // No match.
             return 0;
         }
-
-        inline bool hasTail() const noexcept override {
-            return true;
-        }
     };
 
-    // Checking for weirdness.
+    // Checking for any weirdness.
     ret = test1().FindNest("1", 0, 1, 1);
     SHOULD_EQUAL_VALUE(ret, 1, "return");
 
     ret = test1().FindNest("1   ", 0, 4, 4);
-    SHOULD_EQUAL_VALUE(ret, 1, "return");
+    SHOULD_EQUAL_VALUE(ret, 0, "return");
 
     struct test2 : Engine {
         ULong find(const char *content, ULong offset,

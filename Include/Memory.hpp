@@ -113,8 +113,8 @@ static void Copy(void *to, const void *form, ULong size) {
 inline static bool Compare(const void *left, const void *right,
                            ULong length) noexcept {
     ULong offset = 0;
-#ifdef QENTEM_SIMD_ENABLED_
     if ((left != nullptr) && (right != nullptr) && (offset < length)) {
+#ifdef QENTEM_SIMD_ENABLED_
         const QMM_VAR_ *m_left  = static_cast<const QMM_VAR_ *>(left);
         const QMM_VAR_ *m_right = static_cast<const QMM_VAR_ *>(right);
 
@@ -135,16 +135,19 @@ inline static bool Compare(const void *left, const void *right,
             ++m_left;
             ++m_right;
         } while (offset < length);
-    }
 #else
-    while (offset != length) {
-        if (left[offset] != right[offset]) {
-            break;
-        }
+        const char *c_left  = static_cast<const char *>(left);
+        const char *c_right = static_cast<const char *>(right);
 
-        ++offset;
-    }
+        do {
+            if (c_left[offset] != c_right[offset]) {
+                break;
+            }
+
+            ++offset;
+        } while (offset != length);
 #endif
+    }
     return (length == offset);
 }
 

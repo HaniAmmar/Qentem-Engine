@@ -595,7 +595,7 @@ class JSONParser : Engine {
             }
 
             case Type_::Quote: {
-                // TODO: Use Engine::Find
+                // TODO: Use Improve
 
                 UInt  times      = 0;
                 ULong tmp_offset = (end_before - 1);
