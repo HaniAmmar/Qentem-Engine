@@ -110,18 +110,17 @@ static void Copy(void *to, const void *form, ULong size) {
 #endif
 }
 
-inline static bool Compare(const char *left, const char *right,
+inline static bool Compare(const void *left, const void *right,
                            ULong length) noexcept {
     ULong offset = 0;
 #ifdef QENTEM_SIMD_ENABLED_
     if ((left != nullptr) && (right != nullptr) && (offset < length)) {
-        do {
-            const QMM_VAR_ mm_l =
-                QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(left + offset));
-            const QMM_VAR_ mm_r =
-                QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(right + offset));
+        const QMM_VAR_ *m_left  = static_cast<const QMM_VAR_ *>(left);
+        const QMM_VAR_ *m_right = static_cast<const QMM_VAR_ *>(right);
 
-            QMM_NUMBER_TYPE_ bits = QMM_COMPARE_8_MASK_(mm_l, mm_r);
+        do {
+            QMM_NUMBER_TYPE_ bits =
+                QMM_COMPARE_8_MASK_(QMM_LOAD_(m_left), QMM_LOAD_(m_right));
 
             if (bits == QMM_MAX_NUMBER) {
                 offset += QMM_SIZE_;
@@ -132,6 +131,9 @@ inline static bool Compare(const char *left, const char *right,
             } else {
                 return ((Q_CTZL(bits + 1) + offset) >= length);
             }
+
+            ++m_left;
+            ++m_right;
         } while (offset < length);
     }
 #else
