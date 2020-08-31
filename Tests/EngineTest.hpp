@@ -47,6 +47,9 @@ static int TestEngine1() {
     find_       = "A";
     find_len    = 1;
 
+    ret = Engine::FindOne(*find_, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 1, "return");
+
     ret = Engine::Find(find_, find_len, content, 0, content_len);
     SHOULD_EQUAL_VALUE(ret, 1, "return");
 

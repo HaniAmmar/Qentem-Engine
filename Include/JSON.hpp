@@ -401,15 +401,15 @@ class JSONParser : Engine {
                 ULong end_before) noexcept final {
         switch (type_) {
             case Type_::Square: {
-                return Find("]", 1, content, offset, end_before);
+                return FindOne(']', content, offset, end_before);
             }
 
             case Type_::Curly: {
-                return Find("}", 1, content, offset, end_before);
+                return FindOne('}', content, offset, end_before);
             }
 
             default: {
-                return Find("\"", 1, content, offset, end_before);
+                return FindOne('"', content, offset, end_before);
             }
         }
     }

@@ -497,10 +497,10 @@ class Template : Engine, ALEHelper {
      */
     bool getQuotaed(UInt &offset, UInt &length, const char *content,
                     const UInt end_before) const noexcept {
-        offset = static_cast<UInt>(Find("\"", 1, content, offset, end_before));
+        offset = static_cast<UInt>(FindOne('"', content, offset, end_before));
 
         if (offset != 0) {
-            ULong start_offset = Find("\"", 1, content, offset, end_before);
+            ULong start_offset = FindOne('"', content, offset, end_before);
 
             if (start_offset != 0) {
                 length = static_cast<UInt>((start_offset - 1) - offset);
@@ -513,10 +513,10 @@ class Template : Engine, ALEHelper {
 
     bool getQuotaed(ULong &offset, UInt &length, const char *content,
                     const ULong end_before) const noexcept {
-        offset = Find("\"", 1, content, offset, end_before);
+        offset = FindOne('"', content, offset, end_before);
 
         if (offset != 0) {
-            ULong start_offset = Find("\"", 1, content, offset, end_before);
+            ULong start_offset = FindOne('"', content, offset, end_before);
 
             if (start_offset != 0) {
                 length = static_cast<UInt>((start_offset - 1) - offset);

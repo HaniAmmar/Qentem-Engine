@@ -179,10 +179,28 @@ class Engine {
         return times;
     }
 #else
+    static ULong FindOne(const char one_char, const char *content, ULong offset,
+                         ULong end_before) {
+        while (offset < end_before) {
+            if (one_char == content[offset]) {
+                return (offset + 1);
+            }
+
+            ++offset;
+        }
+
+        // No match.
+        return 0;
+    }
+
     // Old school
     static ULong Find(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset,
                       ULong end_before) noexcept {
+        if (pattern_length == 1U) {
+            return FindOne(*pattern, content, offset, end_before);
+        }
+
         ULong last_offset;
 
         while (offset < end_before) {

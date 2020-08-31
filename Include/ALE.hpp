@@ -213,10 +213,10 @@ class ALE : Engine {
     ULong find2(const char *content, ULong offset,
                 ULong end_before) noexcept final {
         if (item_.Op == Operation::Parentheses) {
-            return Find(")", 1, content, offset, end_before);
+            return FindOne(')', content, offset, end_before);
         }
 
-        return Find("}", 1, content, offset, end_before);
+        return FindOne('}', content, offset, end_before);
     }
 
 #ifdef QENTEM_SIMD_ENABLED_
