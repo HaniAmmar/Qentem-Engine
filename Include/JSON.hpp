@@ -34,10 +34,10 @@ namespace JSON {
 
 #ifdef QENTEM_SIMD_ENABLED_
 static char *UnEscapeString(const char *content, ULong &length) {
-    static constexpr unsigned long long line       = 723401728380766730ULL;
-    static constexpr unsigned long long tab        = 651061555542690057ULL;
-    static constexpr unsigned long long carriage   = 940422246894996749ULL;
-    static constexpr unsigned long long back_slash = 6655295901103053916ULL;
+    constexpr unsigned long long line       = 723401728380766730ULL;
+    constexpr unsigned long long tab        = 651061555542690057ULL;
+    constexpr unsigned long long carriage   = 940422246894996749ULL;
+    constexpr unsigned long long back_slash = 6655295901103053916ULL;
 
     char *str      = HAllocator::Allocate<char>(length + 1);
     ULong offset   = 0;
@@ -427,11 +427,11 @@ class JSONParser : Engine {
                     content + find_cache_->Offset));
 
             // the value of 8 characters:
-            static constexpr unsigned long long colon  = 4195730024608447034ULL;
-            static constexpr unsigned long long curly  = 8897841259083430779ULL;
-            static constexpr unsigned long long square = 6582955728264977243ULL;
-            static constexpr unsigned long long quote  = 2459565876494606882ULL;
-            static constexpr unsigned long long comma  = 3182967604875373612ULL;
+            constexpr unsigned long long colon  = 4195730024608447034ULL;
+            constexpr unsigned long long curly  = 8897841259083430779ULL;
+            constexpr unsigned long long square = 6582955728264977243ULL;
+            constexpr unsigned long long quote  = 2459565876494606882ULL;
+            constexpr unsigned long long comma  = 3182967604875373612ULL;
 
             find_cache_->Bits =
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(colon));
@@ -621,9 +621,9 @@ class JSONParser : Engine {
 
     void Found(const char *content, ULong offset, ULong end_before,
                ULong start_offset, ULong &current_offset) final {
-        static constexpr UInt true_len  = 4;
-        static constexpr UInt false_len = 5;
-        static constexpr UInt null_len  = 4;
+        constexpr UInt true_len  = 4;
+        constexpr UInt false_len = 5;
+        constexpr UInt null_len  = 4;
 
         switch (type_) {
             case Type_::Comma: { // ,
@@ -920,13 +920,10 @@ class JSONParser : Engine {
                 const QMM_VAR_ m_content = QMM_LOAD_(
                     reinterpret_cast<const QMM_VAR_ *>(content + offset2));
 
-                static constexpr unsigned long long line =
-                    723401728380766730ULL;
-                static constexpr unsigned long long tab = 651061555542690057ULL;
-                static constexpr unsigned long long carriage =
-                    940422246894996749ULL;
-                static constexpr unsigned long long space =
-                    2314885530818453536ULL;
+                constexpr unsigned long long line     = 723401728380766730ULL;
+                constexpr unsigned long long tab      = 651061555542690057ULL;
+                constexpr unsigned long long carriage = 940422246894996749ULL;
+                constexpr unsigned long long space    = 2314885530818453536ULL;
 
                 ULong bits;
                 bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(line));

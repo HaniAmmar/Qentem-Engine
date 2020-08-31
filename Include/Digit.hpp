@@ -524,8 +524,8 @@ class Digit {
 
     template <typename Type>
     static String intToString_(Type number, UInt min, bool negative) {
-        static constexpr UInt end_offset = 20;
-        UInt                  length     = end_offset;
+        constexpr UInt end_offset = 20;
+        UInt           length     = end_offset;
 
         char *str = HAllocator::Allocate<char>(end_offset + 1);
 
@@ -599,7 +599,7 @@ class Digit {
 
     static String doubleToString_(double number, UInt min, UInt r_min,
                                   UInt precision) {
-        static constexpr UInt max_length = 19;
+        constexpr UInt max_length = 19;
         // 1844674407370955161 == 19
         // 0.18446744073709551 == 19
 

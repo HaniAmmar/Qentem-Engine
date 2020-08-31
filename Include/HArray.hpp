@@ -473,8 +473,8 @@ class HArray {
         ULong hash = 0;
 
         if (key != nullptr) {
-            static constexpr ULong hash_start = 7;
-            static constexpr ULong base_start = 33;
+            constexpr ULong hash_start = 7;
+            constexpr ULong base_start = 33;
 
             hash         = hash_start;
             ULong base   = base_start;

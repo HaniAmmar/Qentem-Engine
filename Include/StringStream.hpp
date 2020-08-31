@@ -25,14 +25,16 @@
 #ifndef QENTEM_STRINGSTREAM_H_
 #define QENTEM_STRINGSTREAM_H_
 
+#ifndef QENTEM_STRINGSTREAM_INITIALSIZE_
+#define QENTEM_STRINGSTREAM_INITIALSIZE_ 8U
+#endif
+
 namespace Qentem {
 
 /*
  * Resizable string container with null terminator.
  */
 class StringStream {
-    static constexpr ULong InitialSize = 8U;
-
   public:
     StringStream() = default;
 
@@ -94,7 +96,7 @@ class StringStream {
             ULong n_size = capacity_;
 
             if (n_size == 0) {
-                n_size = InitialSize;
+                n_size = QENTEM_STRINGSTREAM_INITIALSIZE_;
             }
 
             expand_(n_size << 1U);
