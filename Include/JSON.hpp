@@ -426,7 +426,7 @@ class JSONParser : Engine {
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
                     content + find_cache_->Offset));
 
-            // the value of 8 characters:
+            // The value of 8 characters:
             constexpr unsigned long long colon  = 4195730024608447034ULL;
             constexpr unsigned long long curly  = 8897841259083430779ULL;
             constexpr unsigned long long square = 6582955728264977243ULL;
@@ -573,7 +573,7 @@ class JSONParser : Engine {
                 ULong ret =
                     jp.FindNest(content, offset, end_before, max_end_before);
 
-                pass_comma_ = (ret != 0); // if it has found a value, then the
+                pass_comma_ = (ret != 0); // If it has found a value, then the
                                           // next comma needs to be passed.
 
                 if (!(jp.has_error_) && !(pass_comma_) &&
@@ -587,7 +587,7 @@ class JSONParser : Engine {
                     return max_end_before;
                 }
 
-                next_offset_ = jp.next_offset_; // set the current offset.
+                next_offset_ = jp.next_offset_; // Set the current offset.
                 child_obj_value_ =
                     jp.obj_value_; // Preserve the child value pointer.
 
@@ -595,7 +595,7 @@ class JSONParser : Engine {
             }
 
             case Type_::Quote: {
-                // TODO: Use Improve
+                // TODO: Improve
 
                 UInt  times      = 0;
                 ULong tmp_offset = (end_before - 1);
