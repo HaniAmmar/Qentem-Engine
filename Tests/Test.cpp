@@ -61,7 +61,7 @@ int RunTests() {
     std::cout << "\x1B[31mNot good\x1B[0m: " << failed << " out of " << total
               << " failed.\n";
 
-    return 0;
+    return 1;
 }
 
 int main() {
