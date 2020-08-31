@@ -55,7 +55,7 @@ class HArray {
 
     explicit HArray(ULong size) : capacity_(size) {
         set_base_(size);
-        hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+        hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
         storage_    = HAllocator::Allocate<HAItem_T>(size);
     }
 
@@ -117,7 +117,7 @@ class HArray {
         if (n_size > capacity_) {
             HAllocator::Deallocate(hash_table_);
             set_base_(n_size);
-            hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+            hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
             resize_(n_size);
         }
 
@@ -159,7 +159,7 @@ class HArray {
         if (n_size > capacity_) {
             HAllocator::Deallocate(hash_table_);
             set_base_(n_size);
-            hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+            hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
             resize_(n_size);
         }
 
@@ -390,7 +390,7 @@ class HArray {
 
         if (size != 0) {
             set_base_(size);
-            hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+            hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
 
             capacity_ = size;
             storage_  = HAllocator::Allocate<HAItem_T>(size);
@@ -424,7 +424,7 @@ class HArray {
 
         HAllocator::Deallocate(hash_table_);
         set_base_(new_size);
-        hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+        hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
         resize_(new_size);
     }
 
@@ -454,7 +454,7 @@ class HArray {
                 if (old_base != base_) {
                     HAllocator::Deallocate(hash_table_);
                     hash_table_ =
-                        HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+                        HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
                 } else {
                     /*
                      * Clear the hash table if there is no need to reallocate
@@ -520,7 +520,7 @@ class HArray {
         --base_;
 
         HAllocator::Deallocate(hash_table_);
-        hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+        hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
         resize_(capacity_ << 1U);
     }
 
@@ -531,7 +531,7 @@ class HArray {
         base_ = 0;
 #endif
         capacity_   = 1;
-        hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+        hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
         storage_    = HAllocator::Allocate<HAItem_T>(capacity_);
     }
 
@@ -671,7 +671,7 @@ class HArray {
             size_ = static_cast<ULong>(des_item - storage_);
 
             set_base_(capacity_);
-            hash_table_ = HAllocator::AllocateClear<HAItem_T *>(base_ + 1U);
+            hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
             generate_hash_();
         }
     }

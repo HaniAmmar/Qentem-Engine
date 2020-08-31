@@ -190,6 +190,15 @@ class HAllocator {
         return static_cast<Type_ *>(vptr);
     }
 
+    template <typename Type_>
+    inline static Type_ *AllocatePointers(ULong size) noexcept {
+        const ULong c_size = (size * sizeof(void *));
+        void *      vptr   = malloc(c_size);
+        Memory::SetToZero(vptr, c_size);
+
+        return static_cast<Type_ *>(vptr);
+    }
+
     // template <typename Type_>
     // inline static Type_ *AllocateInit() {
     //     Type_ *ptr = Allocate<Type_>(1);
