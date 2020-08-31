@@ -118,11 +118,17 @@ class StringStream {
         add_(str, length);
     }
 
-    void Clear() {
+    void Clear() noexcept {
         offset_   = 0;
         capacity_ = 0;
         HAllocator::Deallocate(str_);
         str_ = nullptr;
+    }
+
+    inline void StepBack(ULong length) noexcept {
+        if (length <= offset_) {
+            offset_ -= length;
+        }
     }
 
     inline const char *Char() const noexcept {
@@ -142,12 +148,6 @@ class StringStream {
         return capacity_;
     }
 
-    inline void StepBack(ULong length) {
-        if (length <= offset_) {
-            offset_ -= length;
-        }
-    }
-
     char *Eject() noexcept {
         str_[offset_] = '\0';
 
@@ -161,12 +161,12 @@ class StringStream {
 
     String GetString() {
         if (offset_ != 0) {
-            ULong len     = offset_;
-            str_[offset_] = '\0';
-            offset_       = 0;
-            capacity_     = 0;
-            char *tmp     = str_;
-            str_          = nullptr;
+            const ULong len = offset_;
+            str_[offset_]   = '\0';
+            offset_         = 0;
+            capacity_       = 0;
+            char *tmp       = str_;
+            str_            = nullptr;
             return String(tmp, len);
         }
 
@@ -182,7 +182,7 @@ class StringStream {
             offset_ += len;
 
             if (capacity_ < offset_) {
-                ULong size = (ULong(1) << Q_CLZL(offset_));
+                ULong size = (ULong{1} << Q_CLZL(offset_));
 
                 if (size < offset_) {
                     size <<= 1U;

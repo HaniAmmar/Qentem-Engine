@@ -35,7 +35,7 @@ namespace Qentem {
  */
 class Digit {
   public:
-    static UInt HexStringToNumber(const char *str, UInt length) {
+    static UInt HexStringToNumber(const char *str, UInt length) noexcept {
         UInt value = 0;
 
         if (str != nullptr) {
@@ -61,7 +61,7 @@ class Digit {
         return value;
     }
 
-    static UInt HexStringToNumber(const char *str) {
+    static UInt HexStringToNumber(const char *str) noexcept {
         return HexStringToNumber(str, String::Count<UInt>(str));
     }
 
@@ -130,75 +130,79 @@ class Digit {
     /////////////////////////////////////////////////////////////////
 
     inline static bool StringToNumber(double &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToSignedFloat_(number, str, length);
     }
 
-    inline static bool StringToNumber(double &number, const char *str) {
+    inline static bool StringToNumber(double &    number,
+                                      const char *str) noexcept {
         return stringToSignedFloat_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(float &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToSignedFloat_(number, str, length);
     }
 
-    inline static bool StringToNumber(float &number, const char *str) {
+    inline static bool StringToNumber(float &number, const char *str) noexcept {
         return stringToSignedFloat_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(unsigned long long &number,
-                                      const char *str, UInt length) {
+                                      const char *str, UInt length) noexcept {
         return stringToUnsignedInt_(number, str, length);
     }
 
     inline static bool StringToNumber(unsigned long long &number,
-                                      const char *        str) {
+                                      const char *        str) noexcept {
         return stringToUnsignedInt_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(long long &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToSignedInt_(number, str, length);
     }
 
-    inline static bool StringToNumber(long long &number, const char *str) {
+    inline static bool StringToNumber(long long & number,
+                                      const char *str) noexcept {
         return stringToSignedInt_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(unsigned long &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToUnsignedInt_(number, str, length);
     }
 
-    inline static bool StringToNumber(unsigned long &number, const char *str) {
+    inline static bool StringToNumber(unsigned long &number,
+                                      const char *   str) noexcept {
         return stringToUnsignedInt_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(long &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToSignedInt_(number, str, length);
     }
 
-    inline static bool StringToNumber(long &number, const char *str) {
+    inline static bool StringToNumber(long &number, const char *str) noexcept {
         return stringToSignedInt_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(unsigned int &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToUnsignedInt_(number, str, length);
     }
 
-    inline static bool StringToNumber(unsigned int &number, const char *str) {
+    inline static bool StringToNumber(unsigned int &number,
+                                      const char *  str) noexcept {
         return stringToUnsignedInt_(number, str, String::Count<UInt>(str));
     }
 
     inline static bool StringToNumber(int &number, const char *str,
-                                      UInt length) {
+                                      UInt length) noexcept {
         return stringToSignedInt_(number, str, length);
     }
 
-    inline static bool StringToNumber(int &number, const char *str) {
+    inline static bool StringToNumber(int &number, const char *str) noexcept {
         return stringToSignedInt_(number, str, String::Count<UInt>(str));
     }
 
@@ -206,7 +210,8 @@ class Digit {
 
   private:
     template <typename Type>
-    static bool stringToInt_(Type &number, const char *str, UInt length) {
+    static bool stringToInt_(Type &number, const char *str,
+                             UInt length) noexcept {
         Type postion = 1;
 
         do {
@@ -226,7 +231,7 @@ class Digit {
 
     template <typename Type>
     static bool stringToUnsignedInt_(Type &number, const char *str,
-                                     UInt length) {
+                                     UInt length) noexcept {
         number = 0;
 
         if ((str != nullptr) && (length != 0)) {
@@ -253,7 +258,7 @@ class Digit {
 
     template <typename Type>
     static bool stringToSignedInt_(Type &number, const char *s_str,
-                                   UInt length) {
+                                   UInt length) noexcept {
         number = 0;
 
         if ((s_str != nullptr) && (length != 0)) {
@@ -303,7 +308,7 @@ class Digit {
 
     template <typename Type>
     static bool stringToSignedFloat_(Type &number, const char *str,
-                                     UInt length) {
+                                     UInt length) noexcept {
         number = 0;
 
         if ((str != nullptr) && (length != 0)) {
@@ -355,7 +360,8 @@ class Digit {
         return false;
     }
 
-    static bool parseExponent_(int &exponent, const char *str, UInt &length) {
+    static bool parseExponent_(int &exponent, const char *str,
+                               UInt &length) noexcept {
         UInt offset = (length - 1);
 
         if (offset != 0) {
@@ -429,13 +435,12 @@ class Digit {
 
     template <typename Type>
     static bool stringToFloat_(Type &number, int exponent, const char *str,
-                               UInt length) {
-        UInt len     = ((length < 18) ? length : 17);
-        UInt offset  = 0;
-        bool has_dot = false;
-        char c;
-
+                               UInt length) noexcept {
         unsigned long long w_number = 0;
+        UInt               len      = ((length < 18) ? length : 17);
+        UInt               offset   = 0;
+        char               c;
+        bool               has_dot = false;
 
         do {
             c = str[offset];
@@ -491,13 +496,11 @@ class Digit {
         number += static_cast<Type>(w_number);
 
         if (exponent != 0) {
-            bool negative;
+            bool negative = false;
 
             if (exponent < 0) {
                 negative = true;
                 exponent *= -1;
-            } else {
-                negative = false;
             }
 
             do {
@@ -567,7 +570,7 @@ class Digit {
         return String(str, min);
     }
 
-    static void extractNumber_(double &number, int &exponent) {
+    static void extractNumber_(double &number, int &exponent) noexcept {
         if (number > 1E19) {
             do {
                 if (number > 1E99) {
@@ -604,8 +607,6 @@ class Digit {
         // 0.18446744073709551 == 19
 
         char               tmp[max_length];
-        char *             str;
-        UInt               left_length;
         unsigned long long fraction        = 0;
         UInt               fraction_length = 0;
         UInt               end_offset      = max_length;
@@ -638,7 +639,7 @@ class Digit {
             tmp_number /= QENTEM_DECIMAL_BASE_;
         }
 
-        left_length = (max_length - end_offset);
+        UInt left_length = (max_length - end_offset);
 
         if (end_offset != 0) { // Full
             number -= static_cast<double>(left_number);
@@ -701,17 +702,18 @@ class Digit {
             ++fraction_length; // One for '.'
         }
 
+        UInt str_len = fraction_length + r_min + offset + exponent_length + 1U;
+
+        char *str;
         if (min < left_length) {
             // Using "offset" for the (-) sign
-            str = HAllocator::Allocate<char>(left_length + fraction_length +
-                                             r_min + offset + exponent_length +
-                                             1U);
+            str_len += left_length;
+            str = HAllocator::Allocate<char>(str_len);
         } else {
-            min -= left_length;
-            str = HAllocator::Allocate<char>(left_length + min +
-                                             fraction_length + r_min + offset +
-                                             exponent_length + 1U);
+            str_len += min;
+            str = HAllocator::Allocate<char>(str_len);
 
+            min -= left_length;
             while (min != 0) {
                 str[offset] = '0';
                 ++offset;
@@ -764,8 +766,8 @@ class Digit {
                 }
             } else {
                 offset = (negative) ? 1 : 0;
-
-                exponent -= (static_cast<int>(end_offset) + 1);
+                --exponent;
+                exponent -= static_cast<int>(end_offset);
 
                 str[offset] = tmp[end_offset];
                 ++offset;
@@ -813,7 +815,8 @@ class Digit {
         return String(str, offset);
     }
 
-    static unsigned long long extractFraction_(double number, UInt precision) {
+    static unsigned long long extractFraction_(double number,
+                                               UInt   precision) noexcept {
         switch (precision) {
             case 1: {
                 number *= 1E2;

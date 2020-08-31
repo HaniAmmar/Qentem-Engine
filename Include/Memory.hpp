@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Memory {
 
-inline static void SetToZero(void *ptr, ULong size) {
+inline static void SetToZero(void *ptr, ULong size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED_
     const ULong m_size    = (size >> QMM_SHIFTSIZE_);
     const ULong remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
@@ -67,7 +67,7 @@ inline static void SetToZero(void *ptr, ULong size) {
 #endif
 }
 
-static void Copy(void *to, const void *form, ULong size) {
+static void Copy(void *to, const void *form, ULong size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED_
     const ULong m_size    = (size >> QMM_SHIFTSIZE_);
     const ULong remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
@@ -129,7 +129,8 @@ inline static bool Compare(const void *left, const void *right,
                     return true;
                 }
             } else {
-                return ((Q_CTZL(bits + 1) + offset) >= length);
+                ++bits;
+                return ((Q_CTZL(bits) + offset) >= length);
             }
 
             ++m_left;
@@ -181,7 +182,7 @@ class HAllocator {
     // }
 
     template <typename Type_>
-    inline static Type_ *AllocateClear(ULong size) {
+    inline static Type_ *AllocateClear(ULong size) noexcept {
         const ULong c_size = (size * sizeof(Type_));
         void *      vptr   = malloc(c_size);
         Memory::SetToZero(vptr, c_size);
@@ -210,13 +211,13 @@ class HAllocator {
     // }
 
     template <typename Type_>
-    inline static void Construct(Type_ *ptr, Type_ &&value) {
+    inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
         new (ptr) Type_(static_cast<Type_ &&>(value));
     }
 
     template <typename Type_>
     inline static void Construct(Type_ *start, const Type_ *end,
-                                 Type_ &&value) {
+                                 Type_ &&value) noexcept {
         while (start != end) {
             new (start) Type_(static_cast<Type_ &&>(value));
             ++start;
@@ -224,19 +225,19 @@ class HAllocator {
     }
 
     template <typename Type_>
-    inline static void Destruct(Type_ *ptr) {
+    inline static void Destruct(Type_ *ptr) noexcept {
         ptr->~Type_();
     }
 
     template <typename Type_>
-    inline static void Destruct(Type_ *start, const Type_ *end) {
+    inline static void Destruct(Type_ *start, const Type_ *end) noexcept {
         while (start != end) {
             start->~Type_();
             ++start;
         }
     }
 
-    inline static void Deallocate(void *ptr) {
+    inline static void Deallocate(void *ptr) noexcept {
         if (ptr != nullptr) {
             free(ptr);
         }

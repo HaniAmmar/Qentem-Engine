@@ -259,17 +259,6 @@ static int TestArray2() {
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
 
-    bool did_throw;
-
-    try {
-        did_throw = false;
-        numbers1.SoftResize(160);
-    } catch (...) {
-        did_throw = true;
-    }
-
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
-
     END_SUB_TEST;
 }
 

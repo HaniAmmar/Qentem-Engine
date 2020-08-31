@@ -108,22 +108,22 @@ using QMM_NUMBER_TYPE_ = unsigned int;
 namespace Qentem {
 #ifdef _MSC_VER
 #if _WIN64
-inline unsigned long Q_CTZL(unsigned long long value) {
+inline unsigned long Q_CTZL(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanForward64(&index, value) != 0) ? index : 64);
 }
 
-inline unsigned long Q_CLZL(unsigned long long value) {
+inline unsigned long Q_CLZL(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse64(&index, value) != 0) ? index : 0);
 }
 #else
-inline unsigned long Q_CTZL(unsigned long value) {
+inline unsigned long Q_CTZL(unsigned long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanForward(&index, value) != 0) ? index : 32);
 }
 
-inline unsigned long Q_CLZL(unsigned long value) {
+inline unsigned long Q_CLZL(unsigned long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse(&index, value) != 0) ? index : 0);
 }

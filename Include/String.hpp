@@ -34,7 +34,7 @@ class String {
   public:
     String() = default;
 
-    explicit String(ULong len) noexcept : length_(len) {
+    explicit String(ULong len) : length_(len) {
         ++len;
         storage_          = HAllocator::Allocate<char>(len);
         storage_[length_] = '\0';
@@ -157,8 +157,8 @@ class String {
     }
 
     String operator+(const char *str) const {
-        ULong  len = Count(str);
-        String ns(length_ + len);
+        const ULong len = Count(str);
+        String      ns(length_ + len);
         Memory::Copy(ns.storage_, storage_, length_);
         Memory::Copy((ns.storage_ + length_), str, len);
         ns.storage_[ns.length_] = '\0';
@@ -175,7 +175,7 @@ class String {
     }
 
     inline bool operator==(const char *str) const noexcept {
-        ULong len = Count(str);
+        const ULong len = Count(str);
 
         if (length_ != len) {
             return false;
@@ -200,7 +200,7 @@ class String {
         return Memory::Compare(storage_, str, length);
     }
 
-    void Clear() {
+    void Clear() noexcept {
         HAllocator::Deallocate(storage_);
         storage_ = nullptr;
         length_  = 0;
@@ -275,8 +275,8 @@ class String {
 
         SoftTrim(str.storage_, offset, length);
 
-        return String(static_cast<const char *>((&str.storage_[offset])),
-                      length);
+        const char *n_str = (str.storage_ + offset);
+        return String(n_str, length);
     }
 
     template <typename NumberType = ULong>
@@ -322,28 +322,27 @@ class String {
      * str[len] = '\0';
      */
     static UInt ToUTF8(UInt unicode, char *str) noexcept {
-        UInt length;
-
         if (unicode < 0x80U) {
             str[0] = char(unicode);
-            length = 1;
-            return length;
+            return 1;
         }
 
+        UInt length;
+
         if (unicode < 0x800U) {
-            length = 2;
             str[0] = char(0xC0U | (unicode >> 6U));
+            length = 2;
         } else if (unicode < 0x10000U) {
-            length = 3;
             str[0] = char(0xE0U | (unicode >> 12U));
             str[1] = char(0x80U | ((unicode >> 6U) & 0x3FU));
             ++str;
+            length = 3;
         } else {
-            length = 4;
             str[0] = char(0xF0U | (unicode >> 18U));
             str[1] = char(0x80U | ((unicode >> 12U) & 0x3FU));
             str[2] = char(0x80U | ((unicode >> 6U) & 0x3FU));
             str += 2;
+            length = 4;
         }
 
         *(++str) = char(0x80U | (unicode & 0x3FU));

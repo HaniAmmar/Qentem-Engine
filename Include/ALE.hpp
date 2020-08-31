@@ -201,7 +201,7 @@ class ALE : Engine {
         (void)end_before;
     }
 
-    void failed() final {
+    void failed() noexcept final {
         items_->Clear();
     }
 
@@ -406,6 +406,9 @@ class ALE : Engine {
                         return 0;
                     }
                 }
+
+                default: {
+                }
             }
 
             ++index;
@@ -548,6 +551,9 @@ class ALE : Engine {
                         item_.Length = 2;
                     }
                 }
+
+                default: {
+                }
             }
 
             ++offset;
@@ -588,7 +594,7 @@ class ALE : Engine {
                 Item_ *item2 = items.First();
 
                 if (item2->Op == Operation::Parentheses) {
-                    const ULong len = (item2->Length + 2U);
+                    const UInt len = (item2->Length + 2U);
 
                     if (length != len) {
                         // Cheking for anything extra.
@@ -660,12 +666,12 @@ class ALE : Engine {
             }
         }
 
-        ULong       id        = 0;
-        const ULong size      = items.Size();
-        Item_ *     match     = (items.First() - 1);
-        Item_ *     n_match   = items.First();
-        UInt        endOffset = (offset + length);
+        ULong       id      = 0;
+        const ULong size    = items.Size();
+        Item_ *     match   = (items.First() - 1);
+        Item_ *     n_match = items.First();
         Item_       n_item;
+        const UInt  endOffset = (offset + length);
 
         for (ULong i = 0; i <= size; i++) {
             if (i < size) {

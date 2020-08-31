@@ -538,7 +538,7 @@ static int TestEngine4() {
     SHOULD_EQUAL_VALUE(ret, content_len, "return");
 
     struct test5 : test4 {
-        void failed() override {
+        void failed() noexcept override {
             has_error = true;
         }
 

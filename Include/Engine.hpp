@@ -32,12 +32,15 @@ namespace Qentem {
  */
 class Engine {
   public:
+    Engine()          = default;
+    virtual ~Engine() = default;
+
 #ifdef QENTEM_SIMD_ENABLED_
     /*
      * Returns an the offset of a char + 1.
      */
     static ULong FindOne(const char one_char, const char *content, ULong offset,
-                         ULong end_before) {
+                         ULong end_before) noexcept {
         if (offset < end_before) {
             const QMM_VAR_ m_pattern = QMM_SETONE_8_(one_char);
 
@@ -45,7 +48,7 @@ class Engine {
                 const QMM_VAR_ m_content = QMM_LOAD_(
                     reinterpret_cast<const QMM_VAR_ *>(content + offset));
 
-                QMM_NUMBER_TYPE_ bits =
+                const QMM_NUMBER_TYPE_ bits =
                     QMM_COMPARE_8_MASK_(m_pattern, m_content);
 
                 if (bits != 0) {
@@ -69,7 +72,8 @@ class Engine {
      * Returns an the offset of a pattern + the length of it.
      */
     static ULong Find(const char *pattern, UInt pattern_length,
-                      const char *content, ULong offset, ULong end_before) {
+                      const char *content, ULong offset,
+                      ULong end_before) noexcept {
         if (pattern_length == 1U) {
             return FindOne(*pattern, content, offset, end_before);
         }
@@ -116,7 +120,8 @@ class Engine {
 
     // Returns how many times a pattern is repeated
     static UInt Count(const char *pattern, UInt pattern_length,
-                      const char *content, ULong offset, ULong end_before) {
+                      const char *content, ULong offset,
+                      ULong end_before) noexcept {
         UInt times = 0;
 
         if (offset < end_before) {
@@ -180,7 +185,7 @@ class Engine {
     }
 #else
     static ULong FindOne(const char one_char, const char *content, ULong offset,
-                         ULong end_before) {
+                         ULong end_before) noexcept {
         while (offset < end_before) {
             if (one_char == content[offset]) {
                 return (offset + 1);
@@ -252,7 +257,7 @@ class Engine {
             }
 
             // Save the starting point to be passed to Found().
-            ULong start_offset = current_offset;
+            const ULong start_offset = current_offset;
             // Makes sub-matching possible.
             ULong sub_offset = current_offset;
 
@@ -314,7 +319,8 @@ class Engine {
     static ULong SkipInnerPatterns(const char *start, UInt start_length,
                                    const char *end, UInt end_length,
                                    const char *content, ULong offset,
-                                   ULong end_before, ULong max_end_before) {
+                                   ULong end_before,
+                                   ULong max_end_before) noexcept {
 
 #ifdef QENTEM_SIMD_ENABLED_
         UInt times = Count(start, start_length, content, offset, end_before);
@@ -372,10 +378,12 @@ class Engine {
     //////////// Private ////////////
 
   private:
-    virtual ULong find(const char *content, ULong offset, ULong end_before) = 0;
+    virtual ULong find(const char *content, ULong offset,
+                       ULong end_before) noexcept = 0;
 
     // For finding the tail
-    virtual ULong find2(const char *content, ULong offset, ULong end_before) {
+    virtual ULong find2(const char *content, ULong offset,
+                        ULong end_before) noexcept {
         // OVERRIDE IS NEEDED WHEN USING FindNest().
 
         (void)content;

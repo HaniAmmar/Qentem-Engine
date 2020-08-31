@@ -186,7 +186,7 @@ class Array {
         return (*this);
     }
 
-    void Clear() {
+    void Clear() noexcept {
         HAllocator::Destruct(storage_, (storage_ + size_));
         HAllocator::Deallocate(storage_);
 
@@ -196,7 +196,7 @@ class Array {
     }
 
     // Reset just the size
-    void SoftClear() {
+    void SoftClear() noexcept {
         HAllocator::Destruct(storage_, (storage_ + size_));
         size_ = 0;
     }
@@ -235,7 +235,7 @@ class Array {
         }
     }
 
-    void SoftResize(ULong new_size) {
+    void SoftResize(ULong new_size) noexcept {
         if (new_size <= capacity_) {
             if (new_size > size_) {
                 HAllocator::Construct((storage_ + size_), (storage_ + new_size),
@@ -245,10 +245,7 @@ class Array {
             }
 
             size_ = new_size;
-            return;
         }
-
-        throw 1; // Size too large for soft resizing.
     }
 
     void ResizeAndInitialize(ULong size) {

@@ -55,19 +55,15 @@ static char *UnEscapeString(const char *content, ULong &length) {
             bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(tab));
             bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
 
-            if (bits != 0) {
-                ULong index = (Q_CTZL(bits) + m_offset);
-
-                if (index < length) {
-                    HAllocator::Deallocate(str);
-                    return nullptr;
-                }
+            if ((bits != 0) && ((Q_CTZL(bits) + m_offset) < length)) {
+                HAllocator::Deallocate(str);
+                return nullptr;
             }
 
             bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(back_slash));
 
             while (bits != 0) {
-                ULong index = (Q_CTZL(bits) + m_offset);
+                const ULong index = (Q_CTZL(bits) + m_offset);
 
                 if (index >= length) {
                     break;
@@ -371,8 +367,14 @@ class JSONParser : Engine {
 
                                 return;
                             }
+
+                            default: {
+                            }
                         }
                     }
+                }
+
+                default: {
                 }
             }
 
@@ -499,6 +501,9 @@ class JSONParser : Engine {
                     type_      = Type_::Square;
                     child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
                 }
+
+                default: {
+                }
             }
 
             return (index + 1);
@@ -543,6 +548,9 @@ class JSONParser : Engine {
                     type_      = Type_::Square;
                     child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
                 }
+
+                default: {
+                }
             }
 
             ++offset;
@@ -570,7 +578,7 @@ class JSONParser : Engine {
                     jp.next_offset_ = next_offset_;
                 }
 
-                ULong ret =
+                const ULong ret =
                     jp.FindNest(content, offset, end_before, max_end_before);
 
                 pass_comma_ = (ret != 0); // If it has found a value, then the
@@ -871,7 +879,7 @@ class JSONParser : Engine {
         }
     }
 
-    void add_(Value &&val) noexcept {
+    void add_(Value &&val) {
         if (obj_ != nullptr) {
             *obj_value_ = static_cast<Value &&>(val);
             obj_value_  = nullptr;
@@ -934,12 +942,12 @@ class JSONParser : Engine {
                 bits ^= QMM_MAX_NUMBER; // Remove any whitespace
 
                 if (length != QMM_SIZE_) {
-                    bits &= ((ULong(1) << length) - 1U); // Droping whats beyond
+                    bits &= ((ULong{1} << length) - 1U); // Droping whats beyond
                 }
 
                 while (bits != 0) {
-                    QMM_NUMBER_TYPE_ bit   = Q_CLZL(bits);
-                    ULong            index = (bit + offset2);
+                    const QMM_NUMBER_TYPE_ bit   = Q_CLZL(bits);
+                    const ULong            index = (bit + offset2);
 
                     switch (content[index]) {
                         case '{':
@@ -952,7 +960,7 @@ class JSONParser : Engine {
                         }
                     }
 
-                    bits ^= (ULong(1) << bit); // Remove the left bit
+                    bits ^= (ULong{1} << bit); // Remove the left bit
                 }
 
                 start_offset = offset2;
@@ -995,7 +1003,7 @@ class JSONParser : Engine {
     }
 #endif
 
-    void failed() final {
+    void failed() noexcept final {
         if (child_obj_ != nullptr) {
             HAllocator::Destruct(child_obj_);
             HAllocator::Deallocate(child_obj_);

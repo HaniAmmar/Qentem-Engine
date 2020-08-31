@@ -325,6 +325,9 @@ class Template : Engine, ALEHelper {
                                 found = true;
                             }
                         }
+
+                        default: {
+                        }
                     }
 
                     break;
@@ -364,7 +367,13 @@ class Template : Engine, ALEHelper {
                                 found = true;
                             }
                         }
+
+                        default: {
+                        }
                     }
+                }
+
+                default: {
                 }
             }
 
@@ -380,7 +389,7 @@ class Template : Engine, ALEHelper {
     }
 
     ULong nest(const char *content, ULong offset, ULong end_before,
-               ULong max_end_before) override {
+               ULong max_end_before) final {
         switch (tag_) {
             case Tag::Math:
             case Tag::InLineIf: {
@@ -419,7 +428,7 @@ class Template : Engine, ALEHelper {
     }
 
     void Found(const char *content, ULong offset, ULong end_before,
-               ULong start_offset, ULong &current_offset) override {
+               ULong start_offset, ULong &current_offset) final {
         switch (tag_) {
             case Tag::Variable: {
                 addPreviousContent(
@@ -516,7 +525,8 @@ class Template : Engine, ALEHelper {
         offset = FindOne('"', content, offset, end_before);
 
         if (offset != 0) {
-            ULong start_offset = FindOne('"', content, offset, end_before);
+            const ULong start_offset =
+                FindOne('"', content, offset, end_before);
 
             if (start_offset != 0) {
                 length = static_cast<UInt>((start_offset - 1) - offset);
@@ -527,7 +537,8 @@ class Template : Engine, ALEHelper {
         return false;
     }
 
-    bool parseNumber(ULong &number, const char *content, const UInt length) {
+    bool parseNumber(ULong &number, const char *content,
+                     const UInt length) noexcept {
         if (length > TemplatePattern::VariableFulllength) {
             ULong offset = 0;
             offset       = Find(TemplatePattern::VariablePrefix,
@@ -535,9 +546,10 @@ class Template : Engine, ALEHelper {
                           offset, length);
 
             if (offset != 0) {
-                ULong end_offset = Find(TemplatePattern::InlineSuffix,
-                                        TemplatePattern::InlineSuffixLength,
-                                        content, offset, length);
+                const ULong end_offset =
+                    Find(TemplatePattern::InlineSuffix,
+                         TemplatePattern::InlineSuffixLength, content, offset,
+                         length);
 
                 if (end_offset == 0) {
                     return false;
@@ -588,8 +600,8 @@ class Template : Engine, ALEHelper {
                              last_offset));
             }
 
-            ULong start_offset = offset;
-            offset             = Find(TemplatePattern::InlineSuffix,
+            const ULong start_offset = offset;
+            offset                   = Find(TemplatePattern::InlineSuffix,
                           TemplatePattern::InlineSuffixLength, content, offset,
                           length);
 
@@ -610,23 +622,23 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    void renderVariable(const char *content, const UInt length) {
+    void renderVariable(const char *content, UInt length) {
         const Value_ *value = findValue(content, length);
 
         if ((value == nullptr) || !(value->InsertString(*ss_))) {
-            ss_->Add((content - TemplatePattern::VariablePrefixLength),
-                     (length + TemplatePattern::VariableFulllength));
+            length += TemplatePattern::VariableFulllength;
+            ss_->Add((content - TemplatePattern::VariablePrefixLength), length);
         }
     }
 
-    void renderMath(const char *content, const UInt length) {
+    void renderMath(const char *content, UInt length) {
         double number;
 
         if (ALE::Evaluate(number, content, length, this)) {
             *ss_ += Digit::NumberToString(number, 1, 0, 3);
         } else {
-            ss_->Add((content - TemplatePattern::MathPrefixLength),
-                     (length + TemplatePattern::MathFulllength));
+            length += TemplatePattern::MathFulllength;
+            ss_->Add((content - TemplatePattern::MathPrefixLength), length);
         }
     }
 
@@ -692,6 +704,9 @@ class Template : Engine, ALEHelper {
 
                         break;
                     }
+
+                    default: {
+                    }
                 }
             } while (iif_not_done && (--tmp_offset > last_offset));
 
@@ -723,7 +738,8 @@ class Template : Engine, ALEHelper {
 
         UInt times = 3;
 
-        UInt start_offset = static_cast<UInt>(Find(">", 1, content, 0, length));
+        const UInt start_offset =
+            static_cast<UInt>(Find(">", 1, content, 0, length));
         if (start_offset == 0) {
             // The syntax is wrong.
             return;
@@ -792,6 +808,9 @@ class Template : Engine, ALEHelper {
 
                         last_offset = tmp_offset; // Break loop.
                         break;
+                    }
+
+                    default: {
                     }
                 }
             } while (--tmp_offset > last_offset);
@@ -916,13 +935,15 @@ class Template : Engine, ALEHelper {
                 }
 
                 if (item->Type == 2) {
-                    last_offset = (item->Offset + value_length);
+                    last_offset = item->Offset;
+                    last_offset += value_length;
 
                     value = root_value->GetValue(index);
 
                     if (value != nullptr) {
                         if (item->SubLength != 0) {
-                            last_offset += item->SubLength + 2;
+                            last_offset += item->SubLength;
+                            last_offset += 2U;
 
                             if (value->IsObject()) {
                                 value =
@@ -944,7 +965,8 @@ class Template : Engine, ALEHelper {
                         }
                     }
                 } else {
-                    last_offset = (item->Offset + key_length);
+                    last_offset = item->Offset;
+                    last_offset += key_length;
 
                     if (!is_array) {
                         key = root_value->GetKey(index);
@@ -1100,7 +1122,7 @@ class Template : Engine, ALEHelper {
         return true;
     }
 
-    void failed() noexcept override {
+    void failed() noexcept final {
         not_done_ = true;
     }
 
@@ -1108,7 +1130,7 @@ class Template : Engine, ALEHelper {
     // name/id[name/id][sub-name/id][sub-sub-name/id]... "name": a string that's
     // stored in "keys_". "id" is the index that starts with 0:
     // values_[id]
-    const Value_ *findValue(const char *key, UInt length) const {
+    const Value_ *findValue(const char *key, UInt length) const noexcept {
         if ((key != nullptr) && (length != 0)) {
             const Value_ *root_value = root_value_;
             UInt          offset     = 0;

@@ -1264,7 +1264,7 @@ static int TestNumberValue3() {
     double num_var;
     bool   bool_var;
 
-    value1 = ULong(13);
+    value1 = ULong{13};
     Value value2(static_cast<Value &&>(value1));
     SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
     SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
@@ -1328,15 +1328,15 @@ static int TestNumberValue3() {
     bool b_var = static_cast<bool>(value2);
     SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
-    value2 = UInt(0);
+    value2 = UInt{0};
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
 
-    value2 = int(-8);
+    value2 = int{-8};
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
 
-    value2 = Value{double(3.75)};
+    value2 = Value{double{3.75}};
     SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 3.75, "GetNumber()");
 
@@ -4654,9 +4654,9 @@ static int TestIndexOperator1() {
     value[0]        = 50;
     value[1]        = 100;
     value[2]        = 200;
-    value[int(3)]   = 300;
-    value[ULong(4)] = 400;
-    value[UInt(5)]  = 500;
+    value[int{3}]   = 300;
+    value[ULong{4}] = 400;
+    value[UInt{5}]  = 500;
 
     SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
     SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
@@ -4885,10 +4885,10 @@ static int TestAddition1() {
 
     value[0] = 50;
     value[1] = 100;
-    value += int(200);
-    value += UInt(300);
-    value += ULong(400);
-    value += double(500);
+    value += int{200};
+    value += UInt{300};
+    value += ULong{400};
+    value += double{500};
 
     SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
     SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
@@ -6899,17 +6899,17 @@ static int TestDeleteValue() {
     Value value;
 
     value[0] = 1;
-    value.Delete(int(0));
+    value.Delete(int{0});
     SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "c";
-    value.Delete(UInt(0));
+    value.Delete(UInt{0});
     SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = Array<Value>();
-    value.Delete(ULong(0));
+    value.Delete(ULong{0});
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;

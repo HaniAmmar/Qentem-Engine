@@ -91,9 +91,15 @@ static void EscapeString(const char *content, ULong length, StringStream &ss) {
                         ss.Add("\\t", 2);
                         break;
                     }
+
+                    default: {
+                    }
                 }
 
                 break;
+            }
+
+            default: {
             }
         }
 
@@ -442,7 +448,7 @@ class Value {
         return *this;
     }
 
-    Value &operator=(double num) {
+    Value &operator=(double num) noexcept {
         switch (type_) {
             case ValueType::Number: {
                 break;
@@ -466,22 +472,22 @@ class Value {
         return *this;
     }
 
-    inline Value &operator=(ULong num) {
+    inline Value &operator=(ULong num) noexcept {
         *this = static_cast<double>(num);
         return *this;
     }
 
-    inline Value &operator=(int num) {
+    inline Value &operator=(int num) noexcept {
         *this = static_cast<double>(num);
         return *this;
     }
 
-    inline Value &operator=(UInt num) {
+    inline Value &operator=(UInt num) noexcept {
         *this = static_cast<double>(num);
         return *this;
     }
 
-    Value &operator=(bool is_true) {
+    Value &operator=(bool is_true) noexcept {
         switch (type_) {
             case ValueType::Undefined:
             case ValueType::True:
@@ -508,8 +514,8 @@ class Value {
         switch (type_) {
             case ValueType::Array: {
                 if (src.type_ == ValueType::Array) {
-                    Array<Value> &src_arr = *(src.value_.array);
-                    Array<Value> &des_arr = *(value_.array);
+                    const Array<Value> &src_arr = *(src.value_.array);
+                    Array<Value> &      des_arr = *(value_.array);
 
                     Value *      src_val = src_arr.First();
                     const Value *src_end = (src_arr.Storage() + src_arr.Size());
@@ -553,8 +559,8 @@ class Value {
         switch (type_) {
             case ValueType::Array: {
                 if (src.type_ == ValueType::Array) {
-                    Array<Value> &src_arr = *(src.value_.array);
-                    Array<Value> &des_arr = *(value_.array);
+                    const Array<Value> &src_arr = *(src.value_.array);
+                    Array<Value> &      des_arr = *(value_.array);
 
                     const Value *src_val = src_arr.Storage();
                     const Value *src_end = (src_arr.Storage() + src_arr.Size());
@@ -690,19 +696,19 @@ class Value {
         }
     }
 
-    void operator-=(double num) {
+    void operator-=(double num) noexcept {
         if (type_ == ValueType::Number) {
             value_.number -= num;
         }
     }
 
-    void operator*=(double num) {
+    void operator*=(double num) noexcept {
         if (type_ == ValueType::Number) {
             value_.number *= num;
         }
     }
 
-    void operator/=(double num) {
+    void operator/=(double num) noexcept {
         if (type_ == ValueType::Number) {
             value_.number /= num;
         }
@@ -734,15 +740,15 @@ class Value {
         }
     }
 
-    explicit operator double() const {
+    explicit operator double() const noexcept {
         return GetNumber();
     }
 
-    explicit operator const char *() const {
+    explicit operator const char *() const noexcept {
         return Char();
     }
 
-    explicit operator bool() const {
+    explicit operator bool() const noexcept {
         return IsTrue();
     }
 
@@ -799,7 +805,7 @@ class Value {
         return 0;
     }
 
-    Value *GetValue(ULong index) const {
+    Value *GetValue(ULong index) const noexcept {
         if (type_ == ValueType::Array) {
             if (index < value_.array->Size()) {
                 Value *val = (value_.array->First() + index);
@@ -819,7 +825,7 @@ class Value {
         return nullptr;
     }
 
-    Value *GetValue(const char *key, ULong length) const {
+    Value *GetValue(const char *key, ULong length) const noexcept {
         if (type_ == ValueType::Object) {
             Value *val = (value_.object->Find(key, length));
 
@@ -831,7 +837,7 @@ class Value {
         return nullptr;
     }
 
-    const String *GetKey(ULong index) const {
+    const String *GetKey(ULong index) const noexcept {
         if (type_ == ValueType::Object) {
             return value_.object->GetKey(index);
         }
@@ -1029,7 +1035,7 @@ class Value {
         return false;
     }
 
-    void Delete(ULong index) {
+    void Delete(ULong index) noexcept {
         if (type_ == ValueType::Object) {
             value_.object->DeleteIndex(index);
         } else if ((type_ == ValueType::Array) &&
@@ -1038,13 +1044,13 @@ class Value {
         }
     }
 
-    inline void Delete(const char *key, ULong length) {
+    inline void Delete(const char *key, ULong length) noexcept {
         if (type_ == ValueType::Object) {
             value_.object->Delete(key, length);
         }
     }
 
-    void Clear() {
+    void Clear() noexcept {
         switch (type_) {
             case ValueType::Object: {
                 type_ = ValueType::Undefined;
@@ -1103,7 +1109,7 @@ class Value {
 
     void Stringify(StringStream &ss) const {
         const ULong size   = Size();
-        bool        is_obj = (type_ == ValueType::Object);
+        const bool  is_obj = (type_ == ValueType::Object);
 
         const HAItem<Value> *ha_item = nullptr;
         const Value *        item    = nullptr;
