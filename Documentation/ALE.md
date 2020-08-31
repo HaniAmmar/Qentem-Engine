@@ -13,6 +13,7 @@ ALE made to evaluate `if case="..."` for [Template](https://github.com/HaniAmmar
     -   \>= `Bigger than or equal`
     -   <   `Less than`
     -   <=  `Less than or equal`
+
 -   Arithmetic operations:
     -   ^   `Exponent`
     -   %   `Remainder`
