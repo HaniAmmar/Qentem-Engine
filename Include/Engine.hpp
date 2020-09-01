@@ -194,7 +194,6 @@ class Engine {
             ++offset;
         }
 
-        // No match.
         return 0;
     }
 
@@ -206,36 +205,39 @@ class Engine {
             return FindOne(*pattern, content, offset, end_before);
         }
 
-        ULong last_offset;
+        --pattern_length;
 
         while (offset < end_before) {
             if (pattern[0] == content[offset]) {
-                last_offset = offset;
 
-                if ((offset + pattern_length) > end_before) {
+                if ((offset + pattern_length) >= end_before) {
                     return 0;
                 }
 
-                ++offset;
-                UInt pattern_offset = 1U;
+                if (pattern[pattern_length] ==
+                    content[offset + pattern_length]) {
+                    ULong last_offset    = offset;
+                    UInt  pattern_offset = 1U;
 
-                while ((pattern_offset < pattern_length) &&
-                       pattern[pattern_offset] == content[offset]) {
                     ++offset;
-                    ++pattern_offset;
-                }
 
-                if (pattern_offset == pattern_length) {
-                    return offset;
-                }
+                    while ((pattern_offset < pattern_length) &&
+                           pattern[pattern_offset] == content[offset]) {
+                        ++offset;
+                        ++pattern_offset;
+                    }
 
-                offset = last_offset;
+                    if (pattern_offset == pattern_length) {
+                        return (offset + 1U);
+                    }
+
+                    offset = last_offset;
+                }
             }
 
             ++offset;
         }
 
-        // No match.
         return 0;
     }
 #endif
