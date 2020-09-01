@@ -901,9 +901,9 @@ class ALE : Engine {
     }
 
     struct FindCache_ {
-        ULong            Offset{0};
-        ULong            NextOffset{0};
-        QMM_NUMBER_TYPE_ Bits{0};
+        ULong        Offset{0};
+        ULong        NextOffset{0};
+        QMM_Number_T Bits{0};
     };
 
     Item_            item_;

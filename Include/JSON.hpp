@@ -46,7 +46,7 @@ static char *UnEscapeString(const char *content, ULong &length) {
     ULong length2;
 
     if (length != 0) {
-        QMM_NUMBER_TYPE_ bits;
+        QMM_Number_T bits;
 
         do {
             const QMM_VAR_ m_content = QMM_LOAD_(
@@ -939,15 +939,15 @@ class JSONParser : Engine {
                 bits |=
                     QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
                 bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(space));
-                bits ^= QMM_MAX_NUMBER; // Remove any whitespace
+                bits ^= QMM_MAX_NUMBER_; // Remove any whitespace
 
                 if (length != QMM_SIZE_) {
                     bits &= ((ULong{1} << length) - 1U); // Droping whats beyond
                 }
 
                 while (bits != 0) {
-                    const QMM_NUMBER_TYPE_ bit   = Q_CLZL(bits);
-                    const ULong            index = (bit + offset2);
+                    const QMM_Number_T bit   = Q_CLZL(bits);
+                    const ULong        index = (bit + offset2);
 
                     switch (content[index]) {
                         case '{':
@@ -1028,9 +1028,9 @@ class JSONParser : Engine {
     enum class Type_ { None = 0, Curly, Square, Quote, Comma, Colon };
 
     struct FindCache_ {
-        ULong            Offset{0};
-        ULong            NextOffset{0};
-        QMM_NUMBER_TYPE_ Bits{0};
+        ULong        Offset{0};
+        ULong        NextOffset{0};
+        QMM_Number_T Bits{0};
     };
 
     HArray<Value> *obj_{nullptr};

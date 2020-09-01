@@ -48,7 +48,7 @@ class Engine {
                 const QMM_VAR_ m_content = QMM_LOAD_(
                     reinterpret_cast<const QMM_VAR_ *>(content + offset));
 
-                const QMM_NUMBER_TYPE_ bits =
+                const QMM_Number_T bits =
                     QMM_COMPARE_8_MASK_(m_pattern, m_content);
 
                 if (bits != 0) {
@@ -87,7 +87,7 @@ class Engine {
             do {
                 QMM_VAR_ m_content = QMM_LOAD_(
                     reinterpret_cast<const QMM_VAR_ *>(content + offset));
-                QMM_NUMBER_TYPE_ bits =
+                QMM_Number_T bits =
                     QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
 
                 m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
@@ -133,7 +133,7 @@ class Engine {
             do {
                 QMM_VAR_ m_content = QMM_LOAD_(
                     reinterpret_cast<const QMM_VAR_ *>(content + offset));
-                QMM_NUMBER_TYPE_ bits =
+                QMM_Number_T bits =
                     QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
 
                 if (bits != 0) {

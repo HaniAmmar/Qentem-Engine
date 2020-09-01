@@ -133,18 +133,18 @@ struct TemplatePattern {
      * <if case="{case}">...<if case="{case2}" />...</if></if>
      */
 
-    static constexpr UInt InlineSuffixLength = 1;
+    // static constexpr UInt InLineSuffixLength = 1;
+    // static constexpr UInt InLinePrefixLength = 1;
 
     static constexpr UInt VariablePrefixLength = 5;
     static constexpr UInt VariableFulllength =
-        (VariablePrefixLength + InlineSuffixLength);
+        (VariablePrefixLength + 1); // + InLineSuffixLength
 
     static constexpr UInt MathPrefixLength = 6;
     static constexpr UInt MathFulllength =
-        (TemplatePattern::MathPrefixLength +
-         TemplatePattern::InlineSuffixLength);
+        (MathPrefixLength + 1); // + InLineSuffixLength
 
-    static constexpr UInt InlineIfPrefixLength = 3;
+    static constexpr UInt InLineIfPrefixLength = 3;
 
     static constexpr UInt LoopPrefixLength = 5;
     static constexpr UInt LoopSuffixLength = 7;
@@ -153,8 +153,14 @@ struct TemplatePattern {
     static constexpr UInt IfSuffixLength = 5;
 
     static constexpr UInt ElsePrefixLength = 5;
+    static constexpr UInt ElseSuffixLength = 2;
 
-    static constexpr const char *InlineSuffix = "}";
+    static constexpr const char  InLinePrefix  = '{';
+    static constexpr const char *InLineSuffix2 = "{";
+    static constexpr const char  InLineSuffix  = '}';
+
+    static constexpr const char MultiLinePrefix = '<';
+    static constexpr const char MultiLineSuffix = '>';
 
     static constexpr const char *VariablePrefix      = "{var:";
     static constexpr char        VariableIndexPrefix = '[';
@@ -162,7 +168,7 @@ struct TemplatePattern {
 
     static constexpr const char *MathPrefix = "{math:";
 
-    static constexpr const char *InlineIfPrefix = "{if";
+    static constexpr const char *InLineIfPrefix = "{if";
 
     static constexpr const char *LoopPrefix = "<loop";
     static constexpr const char *LoopSuffix = "</loop>";
@@ -171,6 +177,7 @@ struct TemplatePattern {
     static constexpr const char *IfSuffix = "</if>";
 
     static constexpr const char *ElsePrefix = "<else";
+    static constexpr const char *ElseSuffix = "/>";
 };
 #endif
 
@@ -180,18 +187,14 @@ struct TemplatePattern {
 template <typename Value_ = Value, typename KeyString_ = String>
 class Template : Engine, ALEHelper {
     enum class Tag;
+    struct FindCache_;
 
   public:
-    Template(StringStream *ss, const Value_ *root_value) noexcept
-        : ss_(ss), root_value_(root_value) {
-    }
-
     static void Render(StringStream &ss, const char *content,
                        const ULong length, const Value_ *root_value) {
-        ULong tmp_offset = 0;
-
-        Template temp(&ss, root_value);
-
+        FindCache_ fc = FindCache_();
+        Template   temp(&ss, root_value, &fc);
+        ULong      tmp_offset = 0;
         // To render all remaining tags if there were errors.
         while (temp.not_done_ && ((tmp_offset + 1) < length)) {
             temp.not_done_ = false;
@@ -256,73 +259,386 @@ class Template : Engine, ALEHelper {
             }
 
             default: {
-                return Find(TemplatePattern::InlineSuffix,
-                            TemplatePattern::InlineSuffixLength, content,
-                            offset, end_before);
+                return FindOne(TemplatePattern::InLineSuffix, content, offset,
+                               end_before);
             }
         }
     }
 
+#ifdef QENTEM_SIMD_ENABLED_
+#if QENTEM_AVX512BW_ == 1
+    void qmm_find_(const char *content, ULong offset,
+                   ULong end_before) noexcept {
+        constexpr short var_2 = (TemplatePattern::VariablePrefix[1] << 8U) |
+                                TemplatePattern::VariablePrefix[0];
+        constexpr short math_2 = (TemplatePattern::MathPrefix[1] << 8U) |
+                                 TemplatePattern::MathPrefix[0];
+        constexpr short iif_2 = (TemplatePattern::InLineIfPrefix[1] << 8U) |
+                                TemplatePattern::InLineIfPrefix[0];
+        constexpr short loop_2 = (TemplatePattern::LoopPrefix[1] << 8U) |
+                                 TemplatePattern::LoopPrefix[0];
+        constexpr short if_2 =
+            (TemplatePattern::IfPrefix[1] << 8U) | TemplatePattern::IfPrefix[0];
+
+        do {
+            find_cache_->Offset     = offset;
+            find_cache_->NextOffset = (find_cache_->Offset + 32U);
+            offset                  = find_cache_->NextOffset;
+
+            __m256i m_content =
+                _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
+                    content + find_cache_->Offset));
+
+            find_cache_->Bits =
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(var_2), m_content))) &
+                0x55555555U;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(math_2), m_content))) &
+                0x55555555U;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(iif_2), m_content))) &
+                0x55555555U;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(loop_2), m_content))) &
+                0x55555555U;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(if_2), m_content))) &
+                0x55555555U;
+
+            m_content = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
+                content + find_cache_->Offset + 1));
+
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(var_2), m_content))) &
+                0xAAAAAAAAU;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(math_2), m_content))) &
+                0xAAAAAAAAU;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(iif_2), m_content))) &
+                0xAAAAAAAAU;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(loop_2), m_content))) &
+                0xAAAAAAAAU;
+            find_cache_->Bits |=
+                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                    _mm256_cmpeq_epi16(_mm256_set1_epi16(if_2), m_content))) &
+                0xAAAAAAAAU;
+        } while ((find_cache_->Bits == 0) &&
+                 (find_cache_->NextOffset < end_before));
+    }
+#else
+    void qmm_find_(const char *content, ULong offset,
+                   ULong end_before) noexcept {
+        constexpr short var_2 = (TemplatePattern::VariablePrefix[1] << 8U) |
+                                TemplatePattern::VariablePrefix[0];
+        constexpr short math_2 = (TemplatePattern::MathPrefix[1] << 8U) |
+                                 TemplatePattern::MathPrefix[0];
+        constexpr short iif_2 = (TemplatePattern::InLineIfPrefix[1] << 8U) |
+                                TemplatePattern::InLineIfPrefix[0];
+        constexpr short loop_2 = (TemplatePattern::LoopPrefix[1] << 8U) |
+                                 TemplatePattern::LoopPrefix[0];
+        constexpr short if_2 =
+            (TemplatePattern::IfPrefix[1] << 8U) | TemplatePattern::IfPrefix[0];
+
+        do {
+            find_cache_->Offset     = offset;
+            find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
+            offset                  = find_cache_->NextOffset;
+
+            QMM_VAR_ m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                content + find_cache_->Offset));
+
+            find_cache_->Bits =
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(var_2), m_content) &
+                QMM_BIT_ONE_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(math_2), m_content) &
+                QMM_BIT_ONE_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(iif_2), m_content) &
+                QMM_BIT_ONE_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(loop_2), m_content) &
+                QMM_BIT_ONE_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(if_2), m_content) &
+                QMM_BIT_ONE_;
+
+            m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
+                content + find_cache_->Offset + 1));
+
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(var_2), m_content) &
+                QMM_BIT_TWO_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(math_2), m_content) &
+                QMM_BIT_TWO_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(iif_2), m_content) &
+                QMM_BIT_TWO_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(loop_2), m_content) &
+                QMM_BIT_TWO_;
+            find_cache_->Bits |=
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(if_2), m_content) &
+                QMM_BIT_TWO_;
+        } while ((find_cache_->Bits == 0) &&
+                 (find_cache_->NextOffset < end_before));
+    }
+#endif
     ULong find(const char *content, ULong offset,
                ULong end_before) noexcept final {
-        bool  found          = false;
+        UInt tmp_offset;
+
+        do {
+            if ((find_cache_->Bits == 0) &&
+                (find_cache_->NextOffset < end_before)) {
+                qmm_find_(content, find_cache_->NextOffset, end_before);
+            }
+
+            if (find_cache_->Bits == 0) {
+                break;
+            }
+
+            ULong index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
+
+            if (index >= end_before) {
+                return 0;
+            }
+
+            if (index >= offset) {
+                switch (content[index]) {
+                    case TemplatePattern::InLinePrefix: {
+                        ++index;
+
+                        switch (content[index]) {
+                            case TemplatePattern::VariablePrefix[1]: {
+                                ++index;
+                                tmp_offset = 2;
+
+                                while (
+                                    (tmp_offset <
+                                     TemplatePattern::VariablePrefixLength) &&
+                                    (index < end_before) &&
+                                    (content[index] ==
+                                     TemplatePattern::VariablePrefix
+                                         [tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::VariablePrefixLength) {
+                                    tag_ = Tag::Variable;
+                                    return index;
+                                }
+
+                                break;
+                            }
+
+                            case TemplatePattern::MathPrefix[1]: {
+                                ++index;
+                                tmp_offset = 2;
+
+                                while (
+                                    (tmp_offset <
+                                     TemplatePattern::MathPrefixLength) &&
+                                    (index < end_before) &&
+                                    (content[index] ==
+                                     TemplatePattern::MathPrefix[tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::MathPrefixLength) {
+                                    tag_ = Tag::Math;
+                                    return index;
+                                }
+
+                                break;
+                            }
+
+                            case TemplatePattern::InLineIfPrefix[1]: {
+                                ++index;
+                                tmp_offset = 2;
+
+                                while (
+                                    (tmp_offset <
+                                     TemplatePattern::InLineIfPrefixLength) &&
+                                    (index < end_before) &&
+                                    (content[index] ==
+                                     TemplatePattern::InLineIfPrefix
+                                         [tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::InLineIfPrefixLength) {
+                                    tag_ = Tag::InLineIf;
+                                    return index;
+                                }
+                            }
+
+                            default: {
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TemplatePattern::MultiLinePrefix: {
+                        ++index;
+
+                        switch (content[index]) {
+                            case TemplatePattern::LoopPrefix[1]: { // <loop
+                                ++index;
+                                tmp_offset = 2;
+
+                                while (
+                                    (tmp_offset <
+                                     TemplatePattern::LoopPrefixLength) &&
+                                    (index < end_before) &&
+                                    (content[index] ==
+                                     TemplatePattern::LoopPrefix[tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::LoopPrefixLength) {
+                                    tag_ = Tag::Loop;
+                                    return index;
+                                }
+
+                                break;
+                            }
+
+                            case TemplatePattern::IfPrefix[1]: { // <if
+                                ++index;
+                                tmp_offset = 2;
+
+                                while (
+                                    (tmp_offset <
+                                     TemplatePattern::IfPrefixLength) &&
+                                    (index < end_before) &&
+                                    (content[index] ==
+                                     TemplatePattern::IfPrefix[tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::IfPrefixLength) {
+                                    tag_ = Tag::If;
+                                    return index;
+                                }
+
+                                break;
+                            }
+
+                            default: {
+                            }
+                        }
+                    }
+
+                    default: {
+                    }
+                }
+            }
+
+            find_cache_->Bits &= (find_cache_->Bits - 1);
+        } while (true);
+
+        return 0;
+    }
+#else
+    ULong find(const char *content, ULong offset,
+               ULong end_before) noexcept final {
         ULong current_offset = 0;
         UInt  tmp_offset;
 
         while (offset < end_before) {
             switch (content[offset]) {
-                case '{': {
+                case TemplatePattern::InLinePrefix: {
                     current_offset = offset;
                     ++current_offset;
 
                     switch (content[current_offset]) {
-                        case 'v': { // {var:
+                        case TemplatePattern::VariablePrefix[1]: { // {var:
                             ++current_offset;
-                            tmp_offset = 0;
+                            tmp_offset = 2;
 
-                            while ((tmp_offset < 3) &&
-                                   (current_offset < end_before) &&
-                                   (content[current_offset] ==
-                                    "ar:"[tmp_offset])) {
+                            while (
+                                (tmp_offset <
+                                 TemplatePattern::VariablePrefixLength) &&
+                                (current_offset < end_before) &&
+                                (content[current_offset] ==
+                                 TemplatePattern::VariablePrefix[tmp_offset])) {
                                 ++current_offset;
                                 ++tmp_offset;
                             }
 
-                            if (tmp_offset == 3) {
-                                tag_  = Tag::Variable;
-                                found = true;
+                            if (tmp_offset ==
+                                TemplatePattern::VariablePrefixLength) {
+                                tag_ = Tag::Variable;
+                                return current_offset;
                             }
 
                             break;
                         }
 
-                        case 'm': { // {math:
+                        case TemplatePattern::MathPrefix[1]: { // {math:
                             ++current_offset;
-                            tmp_offset = 0;
+                            tmp_offset = 2;
 
-                            while ((tmp_offset < 4) &&
+                            while ((tmp_offset <
+                                    TemplatePattern::MathPrefixLength) &&
                                    (current_offset < end_before) &&
                                    (content[current_offset] ==
-                                    "ath:"[tmp_offset])) {
+                                    TemplatePattern::MathPrefix[tmp_offset])) {
                                 ++current_offset;
                                 ++tmp_offset;
                             }
 
-                            if (tmp_offset == 4) {
-                                tag_  = Tag::Math;
-                                found = true;
+                            if (tmp_offset ==
+                                TemplatePattern::MathPrefixLength) {
+                                tag_ = Tag::Math;
+                                return current_offset;
                             }
 
                             break;
                         }
 
-                        case 'i': { // {if
+                        case TemplatePattern::InLineIfPrefix[1]: { // {if
                             ++current_offset;
+                            tmp_offset = 2;
 
-                            if (content[current_offset] == 'f') {
+                            while (
+                                (tmp_offset <
+                                 TemplatePattern::InLineIfPrefixLength) &&
+                                (current_offset < end_before) &&
+                                (content[current_offset] ==
+                                 TemplatePattern::InLineIfPrefix[tmp_offset])) {
                                 ++current_offset;
-                                tag_  = Tag::InLineIf;
-                                found = true;
+                                ++tmp_offset;
+                            }
+
+                            if (tmp_offset ==
+                                TemplatePattern::InLineIfPrefixLength) {
+                                tag_ = Tag::InLineIf;
+                                return current_offset;
                             }
                         }
 
@@ -333,39 +649,52 @@ class Template : Engine, ALEHelper {
                     break;
                 }
 
-                case '<': {
+                case TemplatePattern::MultiLinePrefix: {
                     current_offset = offset;
                     ++current_offset;
 
                     switch (content[current_offset]) {
-                        case 'l': { // <loop
+                        case TemplatePattern::LoopPrefix[1]: { // <loop
                             ++current_offset;
-                            tmp_offset = 0;
+                            tmp_offset = 2;
 
-                            while ((tmp_offset < 3) &&
+                            while ((tmp_offset <
+                                    TemplatePattern::LoopPrefixLength) &&
                                    (current_offset < end_before) &&
                                    (content[current_offset] ==
-                                    "oop"[tmp_offset])) {
+                                    TemplatePattern::LoopPrefix[tmp_offset])) {
                                 ++current_offset;
                                 ++tmp_offset;
                             }
 
-                            if (tmp_offset == 3) {
-                                tag_  = Tag::Loop;
-                                found = true;
+                            if (tmp_offset ==
+                                TemplatePattern::LoopPrefixLength) {
+                                tag_ = Tag::Loop;
+                                return current_offset;
                             }
 
                             break;
                         }
 
-                        case 'i': { // <if
+                        case TemplatePattern::IfPrefix[1]: { // <if
                             ++current_offset;
+                            tmp_offset = 2;
 
-                            if (content[current_offset] == 'f') {
+                            while ((tmp_offset <
+                                    TemplatePattern::IfPrefixLength) &&
+                                   (current_offset < end_before) &&
+                                   (content[current_offset] ==
+                                    TemplatePattern::IfPrefix[tmp_offset])) {
                                 ++current_offset;
-                                tag_  = Tag::If;
-                                found = true;
+                                ++tmp_offset;
                             }
+
+                            if (tmp_offset == TemplatePattern::IfPrefixLength) {
+                                tag_ = Tag::If;
+                                return current_offset;
+                            }
+
+                            break;
                         }
 
                         default: {
@@ -377,16 +706,13 @@ class Template : Engine, ALEHelper {
                 }
             }
 
-            if (found) {
-                return current_offset;
-            }
-
             ++offset;
         }
 
         // No match.
         return 0;
     }
+#endif
 
     ULong nest(const char *content, ULong offset, ULong end_before,
                ULong max_end_before) final {
@@ -395,8 +721,7 @@ class Template : Engine, ALEHelper {
             case Tag::InLineIf: {
                 return SkipInnerPatterns(TemplatePattern::VariablePrefix,
                                          TemplatePattern::VariablePrefixLength,
-                                         TemplatePattern::InlineSuffix,
-                                         TemplatePattern::InlineSuffixLength,
+                                         TemplatePattern::InLineSuffix2, 1,
                                          content, offset, end_before,
                                          max_end_before);
             }
@@ -437,9 +762,9 @@ class Template : Engine, ALEHelper {
 
                 renderVariable(
                     &(content[start_offset]),
-                    static_cast<UInt>(
-                        (current_offset - TemplatePattern::InlineSuffixLength) -
-                        start_offset));
+                    static_cast<UInt>((current_offset - 1) - start_offset));
+
+                // - 1 is - TemplatePattern::InLineSuffixLength
                 break;
             }
 
@@ -450,9 +775,9 @@ class Template : Engine, ALEHelper {
 
                 renderMath(
                     &(content[start_offset]),
-                    static_cast<UInt>(
-                        (current_offset - TemplatePattern::InlineSuffixLength) -
-                        start_offset));
+                    static_cast<UInt>((current_offset - 1) - start_offset));
+
+                // - 1 is - TemplatePattern::InLineSuffixLength
                 break;
             }
 
@@ -460,13 +785,13 @@ class Template : Engine, ALEHelper {
                 addPreviousContent(
                     content,
                     (start_offset -
-                     TemplatePattern::InlineIfPrefixLength)); // {if
+                     TemplatePattern::InLineIfPrefixLength)); // {if
 
                 renderInLineIf(
                     &(content[start_offset]),
-                    static_cast<UInt>(
-                        (current_offset - TemplatePattern::InlineSuffixLength) -
-                        start_offset));
+                    static_cast<UInt>((current_offset - 1) - start_offset));
+
+                // - 1 is - TemplatePattern::InLineSuffixLength
                 break;
             }
 
@@ -546,20 +871,17 @@ class Template : Engine, ALEHelper {
                           offset, length);
 
             if (offset != 0) {
-                const ULong end_offset =
-                    Find(TemplatePattern::InlineSuffix,
-                         TemplatePattern::InlineSuffixLength, content, offset,
-                         length);
+                const ULong end_offset = FindOne(TemplatePattern::InLineSuffix,
+                                                 content, offset, length);
 
                 if (end_offset == 0) {
                     return false;
                 }
 
-                const Value_ *value = findValue(
-                    &(content[offset]),
-                    static_cast<UInt>(
-                        (end_offset - TemplatePattern::InlineSuffixLength) -
-                        offset));
+                const Value_ *value =
+                    findValue(&(content[offset]),
+                              static_cast<UInt>((end_offset - 1) - offset));
+                // -1 is - TemplatePattern::InLineSuffixLength
 
                 if (value != nullptr) {
                     double num;
@@ -601,18 +923,17 @@ class Template : Engine, ALEHelper {
             }
 
             const ULong start_offset = offset;
-            offset                   = Find(TemplatePattern::InlineSuffix,
-                          TemplatePattern::InlineSuffixLength, content, offset,
-                          length);
+            offset =
+                FindOne(TemplatePattern::InLineSuffix, content, offset, length);
 
             // if (offset == 0) {
             //     break;
             // }
 
             renderVariable(&(content[start_offset]),
-                           static_cast<UInt>(
-                               (offset - TemplatePattern::InlineSuffixLength) -
-                               start_offset));
+                           static_cast<UInt>((offset - 1) - start_offset));
+
+            // -1 is - TemplatePattern::InLineSuffixLength
         } while (true);
 
         if (last_offset < length) {
@@ -738,8 +1059,8 @@ class Template : Engine, ALEHelper {
 
         UInt times = 3;
 
-        const UInt start_offset =
-            static_cast<UInt>(Find(">", 1, content, 0, length));
+        const UInt start_offset = static_cast<UInt>(
+            FindOne(TemplatePattern::MultiLineSuffix, content, 0, length));
         if (start_offset == 0) {
             // The syntax is wrong.
             return;
@@ -1010,8 +1331,8 @@ class Template : Engine, ALEHelper {
         last_offset_ = end_before;
 
         if (getQuotaed(case_offset, case_length, content, end_before)) {
-            offset = Find(">", 1, content, (case_offset + case_length),
-                          end_before); // TODO: Abstract
+            offset = FindOne(TemplatePattern::MultiLineSuffix, content,
+                             (case_offset + case_length), end_before);
         }
 
         while (true) {
@@ -1041,8 +1362,9 @@ class Template : Engine, ALEHelper {
             }
 
             // Find the end of else/elseif
-            offset = Find("/>", 2, content, (case_offset + case_length),
-                          end_before); // TODO: Abstract
+            offset = Find(TemplatePattern::ElseSuffix,
+                          TemplatePattern::ElseSuffixLength, content,
+                          (case_offset + case_length), end_before);
         }
 
         if (result > 0) {
@@ -1334,8 +1656,20 @@ class Template : Engine, ALEHelper {
         return true;
     }
 
+    Template(StringStream *ss, const Value_ *root_value,
+             FindCache_ *find_cache) noexcept
+        : ss_(ss), root_value_(root_value), find_cache_(find_cache) {
+    }
+
+    struct FindCache_ {
+        ULong        Offset{0};
+        ULong        NextOffset{0};
+        QMM_Number_T Bits{0};
+    };
+
     StringStream *ss_;
     const Value_ *root_value_;
+    FindCache_ *  find_cache_{nullptr};
 
     ULong last_offset_{0};
     Tag   tag_{Tag::Variable};

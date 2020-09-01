@@ -119,10 +119,10 @@ inline static bool Compare(const void *left, const void *right,
         const QMM_VAR_ *m_right = static_cast<const QMM_VAR_ *>(right);
 
         do {
-            QMM_NUMBER_TYPE_ bits =
+            QMM_Number_T bits =
                 QMM_COMPARE_8_MASK_(QMM_LOAD_(m_left), QMM_LOAD_(m_right));
 
-            if (bits == QMM_MAX_NUMBER) {
+            if (bits == QMM_MAX_NUMBER_) {
                 offset += QMM_SIZE_;
 
                 if (offset >= length) {
