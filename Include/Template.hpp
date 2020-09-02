@@ -163,21 +163,41 @@ struct TemplatePattern {
     static constexpr const char MultiLineSuffix = '>';
 
     static constexpr const char *VariablePrefix      = "{var:";
+    static constexpr ULong       Variable64bit       = 8537547791251764859ULL;
     static constexpr char        VariableIndexPrefix = '[';
     static constexpr char        VariableIndexSuffix = ']';
 
     static constexpr const char *MathPrefix = "{math:";
+    static constexpr ULong       Math64bit  = 7889019549154766203ULL;
 
     static constexpr const char *InLineIfPrefix = "{if";
+    static constexpr ULong       InLineIf64bit  = 7600784774889433467ULL;
 
     static constexpr const char *LoopPrefix = "<loop";
+    static constexpr ULong       Loop64bit  = 7799227661468593212ULL;
     static constexpr const char *LoopSuffix = "</loop>";
 
     static constexpr const char *IfPrefix = "<if";
+    static constexpr ULong       If64bit  = 7583051580769593660ULL;
+
     static constexpr const char *IfSuffix = "</if>";
 
     static constexpr const char *ElsePrefix = "<else";
     static constexpr const char *ElseSuffix = "/>";
+
+    /*
+        // To get a 64bit value:
+
+        constexpr short var_16 = (TemplatePattern::VariablePrefix[1] << 8U) |
+                                TemplatePattern::VariablePrefix[0];
+        ULong var_64 = var_16;
+        var_64 <<= 48U;
+        var_64 |= var_16;
+        var_64 <<= 32U;
+        var_64 |= var_16;
+        var_64 <<= 16U;
+        var_64 |= var_16;
+    */
 };
 #endif
 
@@ -244,7 +264,7 @@ class Template : Engine, ALEHelper {
     }
 
     ULong find2(const char *content, ULong offset,
-                ULong end_before) noexcept final {
+                ULong end_before) const noexcept final {
         switch (tag_) {
             case Tag::If: {
                 return Find(TemplatePattern::IfSuffix,
@@ -266,19 +286,15 @@ class Template : Engine, ALEHelper {
     }
 
 #ifdef QENTEM_SIMD_ENABLED_
-#if QENTEM_AVX512BW_ == 1
+#if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1
     void qmm_find_(const char *content, ULong offset,
-                   ULong end_before) noexcept {
-        constexpr short var_2 = (TemplatePattern::VariablePrefix[1] << 8U) |
-                                TemplatePattern::VariablePrefix[0];
-        constexpr short math_2 = (TemplatePattern::MathPrefix[1] << 8U) |
-                                 TemplatePattern::MathPrefix[0];
-        constexpr short iif_2 = (TemplatePattern::InLineIfPrefix[1] << 8U) |
-                                TemplatePattern::InLineIfPrefix[0];
-        constexpr short loop_2 = (TemplatePattern::LoopPrefix[1] << 8U) |
-                                 TemplatePattern::LoopPrefix[0];
-        constexpr short if_2 =
-            (TemplatePattern::IfPrefix[1] << 8U) | TemplatePattern::IfPrefix[0];
+                   ULong end_before) const noexcept {
+        const __m256i v64 = _mm256_set1_epi64x(TemplatePattern::Variable64bit);
+        const __m256i m64 = _mm256_set1_epi64x(TemplatePattern::Math64bit);
+        const __m256i iif64 =
+            _mm256_set1_epi64x(TemplatePattern::InLineIf64bit);
+        const __m256i l64  = _mm256_set1_epi64x(TemplatePattern::Loop64bit);
+        const __m256i if64 = _mm256_set1_epi64x(TemplatePattern::If64bit);
 
         do {
             find_cache_->Offset     = offset;
@@ -289,67 +305,46 @@ class Template : Engine, ALEHelper {
                 _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
                     content + find_cache_->Offset));
 
-            find_cache_->Bits =
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(var_2), m_content))) &
-                0x55555555U;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(math_2), m_content))) &
-                0x55555555U;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(iif_2), m_content))) &
-                0x55555555U;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(loop_2), m_content))) &
-                0x55555555U;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(if_2), m_content))) &
-                0x55555555U;
+            find_cache_->Bits = static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(v64, m_content))) &
+                                0x55555555U;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(m64, m_content))) &
+                                 0x55555555U;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(iif64, m_content))) &
+                                 0x55555555U;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(l64, m_content))) &
+                                 0x55555555U;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(if64, m_content))) &
+                                 0x55555555U;
 
             m_content = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
                 content + find_cache_->Offset + 1));
 
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(var_2), m_content))) &
-                0xAAAAAAAAU;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(math_2), m_content))) &
-                0xAAAAAAAAU;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(iif_2), m_content))) &
-                0xAAAAAAAAU;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(loop_2), m_content))) &
-                0xAAAAAAAAU;
-            find_cache_->Bits |=
-                static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                    _mm256_cmpeq_epi16(_mm256_set1_epi16(if_2), m_content))) &
-                0xAAAAAAAAU;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(v64, m_content))) &
+                                 0xAAAAAAAAU;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(m64, m_content))) &
+                                 0xAAAAAAAAU;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(iif64, m_content))) &
+                                 0xAAAAAAAAU;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(l64, m_content))) &
+                                 0xAAAAAAAAU;
+            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                     _mm256_cmpeq_epi16(if64, m_content))) &
+                                 0xAAAAAAAAU;
         } while ((find_cache_->Bits == 0) &&
                  (find_cache_->NextOffset < end_before));
     }
 #else
     void qmm_find_(const char *content, ULong offset,
-                   ULong end_before) noexcept {
-        constexpr short var_2 = (TemplatePattern::VariablePrefix[1] << 8U) |
-                                TemplatePattern::VariablePrefix[0];
-        constexpr short math_2 = (TemplatePattern::MathPrefix[1] << 8U) |
-                                 TemplatePattern::MathPrefix[0];
-        constexpr short iif_2 = (TemplatePattern::InLineIfPrefix[1] << 8U) |
-                                TemplatePattern::InLineIfPrefix[0];
-        constexpr short loop_2 = (TemplatePattern::LoopPrefix[1] << 8U) |
-                                 TemplatePattern::LoopPrefix[0];
-        constexpr short if_2 =
-            (TemplatePattern::IfPrefix[1] << 8U) | TemplatePattern::IfPrefix[0];
-
+                   ULong end_before) const noexcept {
         do {
             find_cache_->Offset     = offset;
             find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
@@ -359,38 +354,48 @@ class Template : Engine, ALEHelper {
                 content + find_cache_->Offset));
 
             find_cache_->Bits =
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(var_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::Variable64bit), m_content) &
                 QMM_BIT_ONE_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(math_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::Math64bit), m_content) &
                 QMM_BIT_ONE_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(iif_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::InLineIf64bit), m_content) &
                 QMM_BIT_ONE_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(loop_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::Loop64bit), m_content) &
                 QMM_BIT_ONE_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(if_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_64_(TemplatePattern::If64bit),
+                                       m_content) &
                 QMM_BIT_ONE_;
 
             m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
                 content + find_cache_->Offset + 1));
 
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(var_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::Variable64bit), m_content) &
                 QMM_BIT_TWO_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(math_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::Math64bit), m_content) &
                 QMM_BIT_TWO_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(iif_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::InLineIf64bit), m_content) &
                 QMM_BIT_TWO_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(loop_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePattern::Loop64bit), m_content) &
                 QMM_BIT_TWO_;
             find_cache_->Bits |=
-                QMM_COMPARE_16_MASK_8_(QMM_SETONE_16_(if_2), m_content) &
+                QMM_COMPARE_16_MASK_8_(QMM_SETONE_64_(TemplatePattern::If64bit),
+                                       m_content) &
                 QMM_BIT_TWO_;
         } while ((find_cache_->Bits == 0) &&
                  (find_cache_->NextOffset < end_before));
@@ -746,7 +751,7 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    void addPreviousContent(const char *content, ULong offset) {
+    void addPreviousContent(const char *content, ULong offset) const {
         // Noneed to check if the  length is zero; because Stringstream will
         // ignore it If it is.
         ss_->Add(&(content[last_offset_]), (offset - last_offset_));
@@ -863,7 +868,7 @@ class Template : Engine, ALEHelper {
     }
 
     bool parseNumber(ULong &number, const char *content,
-                     const UInt length) noexcept {
+                     const UInt length) const noexcept {
         if (length > TemplatePattern::VariableFulllength) {
             ULong offset = 0;
             offset       = Find(TemplatePattern::VariablePrefix,
@@ -899,7 +904,7 @@ class Template : Engine, ALEHelper {
         return Digit::StringToNumber(number, content, length);
     }
 
-    void parseVariables(const char *content, UInt length) {
+    void parseVariables(const char *content, UInt length) const {
         ULong offset = 0;
         ULong last_offset;
 
@@ -943,7 +948,7 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    void renderVariable(const char *content, UInt length) {
+    void renderVariable(const char *content, UInt length) const {
         const Value_ *value = findValue(content, length);
 
         if ((value == nullptr) || !(value->InsertString(*ss_))) {
@@ -952,7 +957,7 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    void renderMath(const char *content, UInt length) {
+    void renderMath(const char *content, UInt length) const {
         double number;
 
         if (ALE::Evaluate(number, content, length, this)) {
@@ -963,7 +968,7 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    void renderInLineIf(const char *content, const UInt length) {
+    void renderInLineIf(const char *content, const UInt length) const {
         UInt offset      = 0;
         UInt last_offset = 0;
         UInt len         = 0;
@@ -1042,7 +1047,7 @@ class Template : Engine, ALEHelper {
         UInt SubLength;
     };
 
-    void renderLoop(const char *content, UInt length) {
+    void renderLoop(const char *content, UInt length) const {
         const Value_ *root_value = root_value_;
         const char *  key_str    = nullptr;
         const char *  value_str  = nullptr;
@@ -1150,7 +1155,7 @@ class Template : Engine, ALEHelper {
 
     Array<loopItem_> loopMatch_(const char *content, UInt length,
                                 const char *key, const char *value,
-                                UInt key_length, UInt value_length) {
+                                UInt key_length, UInt value_length) const {
         Array<loopItem_> items;
         loopItem_        key_item{0, 0, 0, 0};
         loopItem_        value_item{0, 0, 0, 0};
@@ -1410,7 +1415,7 @@ class Template : Engine, ALEHelper {
                      content, next_if, end_before);
 
             if (else_offset > offset) {
-                // <else comes after the child if.
+                // <else came after the child if.
                 return else_offset;
             }
         } while (true);
