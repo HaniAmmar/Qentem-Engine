@@ -261,7 +261,7 @@ class HArray {
         throw 2; // Null key
     }
 
-    Value_ *GetValue(ULong index) noexcept {
+    Value_ *GetValue(ULong index) const noexcept {
         if (index < size_) {
             HAItem_T *item = (storage_ + index);
 
@@ -297,13 +297,13 @@ class HArray {
         return nullptr;
     }
 
-    const HAItem_T *GetItem(const String &key) {
+    const HAItem_T *GetItem(const String &key) const noexcept {
         // You can get the index of the item using (*GetItem() - *Storage())
         return (
             *(find_(key.Char(), key.Length(), Hash(key.Char(), key.Length()))));
     }
 
-    Value_ *Find(const char *key, ULong length) noexcept {
+    Value_ *Find(const char *key, ULong length) const noexcept {
         if (capacity_ != 0) {
             HAItem_T *item = *(find_(key, length, Hash(key, length)));
 
@@ -315,7 +315,7 @@ class HArray {
         return nullptr;
     }
 
-    inline Value_ *Find(const String &key) noexcept {
+    inline Value_ *Find(const String &key) const noexcept {
         return Find(key.Char(), key.Length());
     }
 
@@ -341,7 +341,7 @@ class HArray {
      * This function renames a key to a nonexisting one without changing the
      * order of the item, and returns true if successful.
      */
-    bool Rename(const String &from, String &&to) {
+    bool Rename(const String &from, String &&to) noexcept {
         if (capacity_ != 0) {
             HAItem_T **left_item =
                 (hash_table_ + (Hash(from.Char(), from.Length()) & base_));
@@ -381,7 +381,7 @@ class HArray {
         return false;
     }
 
-    bool Rename(const String &from, const String &to) {
+    bool Rename(const String &from, const String &to) noexcept {
         return Rename(from, String(to));
     }
 
@@ -548,7 +548,7 @@ class HArray {
         --base_;
     }
 
-    HAItem_T **find_(const char *key, ULong length, ULong hash) noexcept {
+    HAItem_T **find_(const char *key, ULong length, ULong hash) const noexcept {
         HAItem_T **item = (hash_table_ + (hash & base_));
 
         while (((*item) != nullptr) &&
@@ -632,7 +632,7 @@ class HArray {
         generate_hash_();
     }
 
-    void generate_hash_() noexcept {
+    void generate_hash_() const noexcept {
         // hash_table_ should be null before calling this function.
         const HAItem_T *end  = (storage_ + size_);
         HAItem_T *      item = storage_;

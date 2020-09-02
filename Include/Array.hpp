@@ -88,7 +88,7 @@ class Array {
             arr.storage_  = nullptr;
         }
 
-        return (*this);
+        return *this;
     }
 
     Array &operator=(const Array &arr) {
@@ -103,7 +103,7 @@ class Array {
             }
         }
 
-        return (*this);
+        return *this;
     }
 
     void operator+=(Array &&arr) {
@@ -163,27 +163,27 @@ class Array {
     }
 
     inline void operator+=(const Type_ &item) {
-        (*this) += static_cast<Type_ &&>(Type_(item));
+        *this += static_cast<Type_ &&>(Type_(item));
     }
 
     Array &Add(Array &&arr) {
-        (*this) += static_cast<Array &&>(arr);
-        return (*this);
+        *this += static_cast<Array &&>(arr);
+        return *this;
     }
 
     Array &Add(const Array &arr) {
-        (*this) += static_cast<Array &&>(Array(arr));
-        return (*this);
+        *this += static_cast<Array &&>(Array(arr));
+        return *this;
     }
 
     Array &Add(Type_ &&item) {
-        (*this) += static_cast<Type_ &&>(item);
-        return (*this);
+        *this += static_cast<Type_ &&>(item);
+        return *this;
     }
 
     Array &Add(const Type_ &item) {
-        (*this) += static_cast<Type_ &&>(Type_(item));
-        return (*this);
+        *this += static_cast<Type_ &&>(Type_(item));
+        return *this;
     }
 
     void Clear() noexcept {

@@ -337,16 +337,16 @@ static int TestEmptyValue3() {
     SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
     value2 = Value{ValueType::Object};
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
+    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
 
     value2 = Value{ValueType::Array};
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
+    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
 
     value2 = Value{ValueType::String};
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
+    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
 
     value2 = Value{ValueType::Number};
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
+    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
 
     END_SUB_TEST;
 }

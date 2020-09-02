@@ -374,7 +374,7 @@ static int TestEngine3() {
         }
 
         ULong find2(const char *content, ULong offset,
-                    ULong end_before) noexcept override {
+                    ULong end_before) const noexcept override {
             return Find(")", 1, content, offset, end_before);
         }
     };
@@ -459,7 +459,7 @@ static int TestEngine4() {
         }
 
         ULong find2(const char *content, ULong offset,
-                    ULong end_before) noexcept override {
+                    ULong end_before) const noexcept override {
             return Find(")", 1, content, offset, end_before);
         }
     };
@@ -470,7 +470,7 @@ static int TestEngine4() {
         }
 
         ULong find2(const char *content, ULong offset,
-                    ULong end_before) noexcept override {
+                    ULong end_before) const noexcept override {
             return Find("))", 2, content, offset, end_before);
         }
     };
@@ -933,7 +933,7 @@ static int TestEngine6() {
         }
 
         ULong find2(const char *content, ULong offset,
-                    ULong end_before) noexcept override {
+                    ULong end_before) const noexcept override {
             return Find("]]]", 3, content, offset, end_before);
         }
 
@@ -1006,7 +1006,7 @@ static int TestEngine6() {
         }
 
         ULong find2(const char *content, ULong offset,
-                    ULong end_before) noexcept override {
+                    ULong end_before) const noexcept override {
             return Find("}", 1, content, offset, end_before);
         }
 

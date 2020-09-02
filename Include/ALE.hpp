@@ -211,7 +211,7 @@ class ALE : Engine {
     }
 
     ULong find2(const char *content, ULong offset,
-                ULong end_before) noexcept final {
+                ULong end_before) const noexcept final {
         if (item_.Op == Operation::Parentheses) {
             return FindOne(')', content, offset, end_before);
         }
@@ -221,7 +221,7 @@ class ALE : Engine {
 
 #ifdef QENTEM_SIMD_ENABLED_
     void qmm_find_(const char *content, ULong offset,
-                   ULong end_before) noexcept {
+                   ULong end_before) const noexcept {
         do {
             find_cache_->Offset     = offset;
             find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);

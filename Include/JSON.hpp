@@ -330,12 +330,11 @@ class JSONParser : Engine {
                                     if (content[offset] == '{') {
                                         obj_ = HAllocator::AllocateClear<
                                             HArray<Value>>(1);
-
-                                        value = Value(obj_);
+                                        value = Value{obj_};
                                     } else {
                                         arr_ = HAllocator::AllocateClear<
                                             Array<Value>>(1);
-                                        value = Value(arr_);
+                                        value = Value{arr_};
                                     }
 
 #ifdef QENTEM_SIMD_ENABLED_
@@ -400,7 +399,7 @@ class JSONParser : Engine {
     }
 
     ULong find2(const char *content, ULong offset,
-                ULong end_before) noexcept final {
+                ULong end_before) const noexcept final {
         switch (type_) {
             case Type_::Square: {
                 return FindOne(']', content, offset, end_before);
@@ -418,7 +417,7 @@ class JSONParser : Engine {
 
 #ifdef QENTEM_SIMD_ENABLED_
     void qmm_find_(const char *content, ULong offset,
-                   ULong end_before) noexcept {
+                   ULong end_before) const noexcept {
         do {
             find_cache_->Offset     = offset;
             find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
@@ -695,7 +694,7 @@ class JSONParser : Engine {
                                 }
 
                                 if (tmp_offset == 3) {
-                                    add_(Value(ValueType::True));
+                                    add_(Value{ValueType::True});
                                     break;
                                 }
                             }
@@ -721,7 +720,7 @@ class JSONParser : Engine {
                                 }
 
                                 if (tmp_offset == 4) {
-                                    add_(Value(ValueType::False));
+                                    add_(Value{ValueType::False});
                                     break;
                                 }
                             }
@@ -747,7 +746,7 @@ class JSONParser : Engine {
                                 }
 
                                 if (tmp_offset == 3) {
-                                    add_(Value(ValueType::Null));
+                                    add_(Value{ValueType::Null});
                                     break;
                                 }
                             }
@@ -766,7 +765,7 @@ class JSONParser : Engine {
                                 return;
                             }
 
-                            add_(Value(num));
+                            add_(Value{num});
                             break;
                         }
                     }
@@ -805,7 +804,7 @@ class JSONParser : Engine {
                 }
 
                 if ((obj_ == nullptr) || has_colon_) { // String
-                    add_(Value(HAllocator::Allocate(String(str, tmp_length))));
+                    add_(Value{HAllocator::Allocate(String(str, tmp_length))});
 
                     has_colon_  = false;
                     pass_comma_ = true;
@@ -831,11 +830,11 @@ class JSONParser : Engine {
 
                 if (type_ == Type_::Curly) {
                     // child_obj_->Compress();
-                    add_(Value(child_obj_));
+                    add_(Value{child_obj_});
                     child_obj_ = nullptr;
                 } else {
                     // child_arr_->Compress();
-                    add_(Value(child_arr_));
+                    add_(Value{child_arr_});
                     child_arr_ = nullptr;
                 }
 
@@ -879,7 +878,7 @@ class JSONParser : Engine {
         }
     }
 
-    void add_(Value &&val) {
+    inline void add_(Value &&val) {
         if (obj_ != nullptr) {
             *obj_value_ = static_cast<Value &&>(val);
             obj_value_  = nullptr;

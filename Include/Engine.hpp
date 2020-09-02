@@ -32,8 +32,12 @@ namespace Qentem {
  */
 class Engine {
   public:
-    Engine()          = default;
-    virtual ~Engine() = default;
+    Engine()               = default;
+    Engine(Engine &&)      = default;
+    Engine(const Engine &) = default;
+    Engine &operator=(Engine &&) = default;
+    Engine &operator=(const Engine &) = default;
+    virtual ~Engine()                 = default;
 
 #ifdef QENTEM_SIMD_ENABLED_
     /*
@@ -385,7 +389,7 @@ class Engine {
 
     // For finding the tail
     virtual ULong find2(const char *content, ULong offset,
-                        ULong end_before) noexcept {
+                        ULong end_before) const noexcept {
         // OVERRIDE IS NEEDED WHEN USING FindNest().
 
         (void)content;
