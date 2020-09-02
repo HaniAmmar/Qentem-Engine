@@ -824,6 +824,12 @@ static int TestParse3() {
     value = JSON::Parse(R"({"a":{"b":"c"}})");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"a":{"b":"c"}})", "Stringify()");
 
+    value = JSON::Parse(
+        R"([                                                                 1,
+                                                                                               2
+                                                                                                          ])");
+    SHOULD_EQUAL_VALUE(value.Stringify(), R"([1,2])", "Stringify()");
+
     END_SUB_TEST;
 }
 
