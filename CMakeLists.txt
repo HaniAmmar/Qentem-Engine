@@ -77,6 +77,13 @@ if (ENABLE_COVERAGE)
     target_link_libraries(ALETest --coverage)
 endif()
 
+# Value
+add_executable(ValueTest Tests/ValueTest.cpp)
+add_test(NAME ValueTest COMMAND ValueTest)
+if (ENABLE_COVERAGE)
+    target_link_libraries(ValueTest --coverage)
+endif()
+
 # JSON
 add_executable(JSONTest Tests/JSONTest.cpp)
 add_test(NAME JSONTest COMMAND JSONTest)
