@@ -146,11 +146,11 @@ inline static unsigned long Q_CTZL(unsigned long value) {
 inline static unsigned int Q_CLZL(unsigned long value) {
     constexpr unsigned int bits = (sizeof(long) * 8) - 1;
 
-    if (value != 0) {
-        return (bits - static_cast<unsigned int>(__builtin_clzl(value)));
-    }
+    // if (value != 0) {
+    return (bits - static_cast<unsigned int>(__builtin_clzl(value)));
+    // }
 
-    return 0;
+    // return 0;
 }
 #endif
 
