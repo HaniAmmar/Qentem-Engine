@@ -2015,9 +2015,20 @@ static int TestArrayValue4() {
     value2 = static_cast<Array<Value> &&>(arr_var);
     SHOULD_EQUAL_VALUE(value2.Size(), 5, "value2.Size()");
 
+    value2 += 1;
+
     value2.Compress();
     SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL_VALUE(value2.GetArray()->Capacity(), 5, "Capacity()");
+    SHOULD_EQUAL_VALUE(value2.GetArray()->Capacity(), 6, "Capacity()");
+    SHOULD_EQUAL_VALUE(value2.GetArray()->Size(), 1, "Size()");
+
+    arr_var.Clear();
+    arr_var.SetCapacity(10);
+    value2 = static_cast<Array<Value> &&>(arr_var);
+    value2.Compress();
+    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
+    SHOULD_EQUAL_VALUE(value2.GetArray()->Capacity(), 0, "Capacity()");
+    SHOULD_EQUAL_VALUE(value2.GetArray()->Size(), 0, "Size()");
 
     END_SUB_TEST;
 }

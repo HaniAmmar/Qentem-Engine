@@ -1094,7 +1094,12 @@ class Value {
         } else if (type_ == ValueType::Array) {
             const ULong size = value_.array_->Size();
 
-            if ((size != 0) && (size != value_.array_->Capacity())) {
+            if (size != value_.array_->Capacity()) {
+                if (size == 0) {
+                    value_.array_->Clear();
+                    return;
+                }
+
                 Array<Value> new_array(size);
                 Value *      src_val = value_.array_->First();
                 const Value *src_end =
