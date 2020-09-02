@@ -3708,6 +3708,14 @@ static int TestALE16() {
     is_valid = ALE::Evaluate(number, equation, &ale);
     SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
 
+    equation = "1!#1";
+    is_valid = ALE::Evaluate(number, equation);
+    SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
+
+    equation = "1|#1";
+    is_valid = ALE::Evaluate(number, equation);
+    SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
+
     END_SUB_TEST;
 }
 
