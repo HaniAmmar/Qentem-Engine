@@ -45,6 +45,19 @@ static int TestCount() {
     length = String::Count("\0");
     SHOULD_EQUAL_VALUE(length, 0, "length");
 
+    length = String::Count("1234567");
+    SHOULD_EQUAL_VALUE(length, 7, "length");
+
+    length = String::Count("123456781234567");
+    SHOULD_EQUAL_VALUE(length, 15, "length");
+
+    length = String::Count("1234567812345678123456781234567");
+    SHOULD_EQUAL_VALUE(length, 31, "length");
+
+    length = String::Count(
+        "123456781234567812345678123456781234567812345678123456781234567");
+    SHOULD_EQUAL_VALUE(length, 63, "length");
+
     END_SUB_TEST;
 }
 
