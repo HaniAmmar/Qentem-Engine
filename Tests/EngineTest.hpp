@@ -354,6 +354,15 @@ static int TestEngine3() {
     ret = test1().FindNest("1   ", 0, 4, 4);
     SHOULD_EQUAL_VALUE(ret, 0, "return");
 
+    struct test11 : test1 {
+        inline bool hasTail() const noexcept override {
+            return true;
+        }
+    };
+
+    ret = test11().FindNest("1", 0, 1, 1);
+    SHOULD_EQUAL_VALUE(ret, 1, "return");
+
     struct test2 : Engine {
         ULong find(const char *content, ULong offset,
                    ULong end_before) noexcept override {
