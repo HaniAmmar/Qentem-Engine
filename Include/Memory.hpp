@@ -129,7 +129,7 @@ inline static bool Compare(const void *left, const void *right,
                     return true;
                 }
             } else {
-                ++bits;
+                bits ^= QMM_MAX_NUMBER_;
                 return ((Q_CTZL(bits) + offset) >= length);
             }
 
