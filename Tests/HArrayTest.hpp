@@ -481,6 +481,16 @@ static int TestHArray4() {
     bool did_throw = false;
 
     try {
+        numbers2[srt1];
+    } catch (...) {
+        did_throw = true;
+    }
+
+    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+
+    did_throw = false;
+
+    try {
         numbers2[static_cast<String &&>(srt1)];
     } catch (...) {
         did_throw = true;
