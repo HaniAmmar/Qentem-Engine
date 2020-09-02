@@ -56,7 +56,7 @@ class Array {
     }
 
     explicit Array(ULong size) : capacity_(size) {
-        if (size > 0) {
+        if (size != 0) {
             storage_ = HAllocator::Allocate<Type_>(capacity_);
         }
     }

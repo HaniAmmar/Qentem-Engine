@@ -54,9 +54,11 @@ class HArray {
     HArray() = default;
 
     explicit HArray(ULong size) : capacity_(size) {
-        set_base_(size);
-        hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
-        storage_    = HAllocator::Allocate<HAItem_T>(size);
+        if (size != 0) {
+            set_base_(size);
+            hash_table_ = HAllocator::AllocatePointers<HAItem_T *>(base_ + 1U);
+            storage_    = HAllocator::Allocate<HAItem_T>(size);
+        }
     }
 
     ~HArray() {
