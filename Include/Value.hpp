@@ -529,7 +529,7 @@ class Value {
                     Value *      src_val = src_arr.First();
                     const Value *src_end = (src_arr.Storage() + src_arr.Size());
 
-                    while (src_val < src_end) {
+                    while (src_val != src_end) {
                         if (src_val->type_ != ValueType::Undefined) {
                             des_arr += static_cast<Value &&>(*src_val);
                         }
@@ -574,7 +574,7 @@ class Value {
                     const Value *src_val = src_arr.Storage();
                     const Value *src_end = (src_arr.Storage() + src_arr.Size());
 
-                    while (src_val < src_end) {
+                    while (src_val != src_end) {
                         if (src_val->type_ != ValueType::Undefined) {
                             des_arr += *src_val;
                         }
@@ -1111,7 +1111,7 @@ class Value {
                     }
 
                     ++src_val;
-                } while (src_val < src_end);
+                } while (src_val != src_end);
 
                 *(value_.array_) = static_cast<Array<Value> &&>(new_array);
             }
@@ -1203,7 +1203,7 @@ class Value {
                 }
 
                 ss += ',';
-            } while (++id < size);
+            } while (++id != size);
 
             if (ss.Char()[(ss.Length() - 1)] == ',') {
                 ss.StepBack(1);

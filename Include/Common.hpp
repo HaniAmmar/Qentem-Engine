@@ -53,7 +53,7 @@
 using QMM_Number_T = unsigned long long;
 #define QMM_SIZE_ 64U
 #define QMM_SHIFTSIZE_ 6U
-#define QMM_MAX_NUMBER_ 0XFFFFFFFFFFFFFFFFULL
+#define QMM_MAX_NUMBER_ 0xFFFFFFFFFFFFFFFFULL
 #define QMM_VAR_ __m512i
 #define QMM_LOAD_ _mm512_loadu_si512
 #define QMM_SETZERO_ _mm512_setzero_si512
@@ -65,7 +65,7 @@ using QMM_Number_T = unsigned long long;
 using QMM_Number_T = unsigned int;
 #define QMM_SIZE_ 32U
 #define QMM_SHIFTSIZE_ 5U
-#define QMM_MAX_NUMBER_ 0XFFFFFFFFU
+#define QMM_MAX_NUMBER_ 0xFFFFFFFFU
 #define QMM_BIT_ONE_ 0x55555555U
 #define QMM_BIT_TWO_ 0xAAAAAAAAU
 #define QMM_VAR_ __m256i
@@ -83,7 +83,7 @@ using QMM_Number_T = unsigned int;
 using QMM_Number_T = unsigned int;
 #define QMM_SIZE_ 16U
 #define QMM_SHIFTSIZE_ 4U
-#define QMM_MAX_NUMBER_ 0XFFFFU
+#define QMM_MAX_NUMBER_ 0xFFFFU
 #define QMM_BIT_ONE_ 0x5555U
 #define QMM_BIT_TWO_ 0xAAAAU
 #define QMM_VAR_ __m128i

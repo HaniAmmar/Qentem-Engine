@@ -51,7 +51,7 @@ class Array {
                     (storage_ + size_),
                     static_cast<Type_ &&>(Type_(arr.storage_[size_])));
                 ++size_;
-            } while (size_ < capacity_);
+            } while (size_ != capacity_);
         }
     }
 
@@ -213,7 +213,7 @@ class Array {
     void SetCapacity(ULong size) {
         Clear();
 
-        if (size > 0) {
+        if (size != 0) {
             capacity_ = size;
             storage_  = HAllocator::Allocate<Type_>(capacity_);
         }

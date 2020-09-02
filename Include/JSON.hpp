@@ -682,7 +682,7 @@ class JSONParser : Engine {
                             if (len == true_len) {
                                 ++item_offset;
 
-                                while (tmp_offset < 3) {
+                                while (tmp_offset != 3) {
                                     if (content[item_offset] !=
                                         "rue"[tmp_offset]) {
                                         tmp_offset = 0;
@@ -708,7 +708,7 @@ class JSONParser : Engine {
                             if (len == false_len) {
                                 ++item_offset;
 
-                                while (tmp_offset < 4) {
+                                while (tmp_offset != 4) {
                                     if (content[item_offset] !=
                                         "alse"[tmp_offset]) {
                                         tmp_offset = 0;
@@ -734,7 +734,7 @@ class JSONParser : Engine {
                             if (len == null_len) {
                                 ++item_offset;
 
-                                while (tmp_offset < 3) {
+                                while (tmp_offset != 3) {
                                     if (content[item_offset] !=
                                         "ull"[tmp_offset]) {
                                         tmp_offset = 0;

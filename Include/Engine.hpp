@@ -170,7 +170,7 @@ class Engine {
                                 return times;
                             }
 
-                            if ((len_less_one < 2U) ||
+                            if ((len_less_one == 1U) ||
                                 Memory::Compare(pattern, (content + index),
                                                 len_less_one)) {
                                 ++times;
@@ -225,7 +225,7 @@ class Engine {
 
                     ++offset;
 
-                    while ((pattern_offset < pattern_length) &&
+                    while ((pattern_offset != pattern_length) &&
                            pattern[pattern_offset] == content[offset]) {
                         ++offset;
                         ++pattern_offset;

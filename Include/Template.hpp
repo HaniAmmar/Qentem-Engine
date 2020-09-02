@@ -425,16 +425,16 @@ class Template : Engine, ALEHelper {
                 switch (content[index]) {
                     case TemplatePattern::InLinePrefix: {
                         ++index;
-
+                        // TODO: Remove  (index != end_before)
                         switch (content[index]) {
                             case TemplatePattern::VariablePrefix[1]: {
                                 ++index;
                                 tmp_offset = 2;
 
                                 while (
-                                    (tmp_offset <
+                                    (tmp_offset !=
                                      TemplatePattern::VariablePrefixLength) &&
-                                    (index < end_before) &&
+                                    (index != end_before) &&
                                     (content[index] ==
                                      TemplatePattern::VariablePrefix
                                          [tmp_offset])) {
@@ -456,9 +456,9 @@ class Template : Engine, ALEHelper {
                                 tmp_offset = 2;
 
                                 while (
-                                    (tmp_offset <
+                                    (tmp_offset !=
                                      TemplatePattern::MathPrefixLength) &&
-                                    (index < end_before) &&
+                                    (index != end_before) &&
                                     (content[index] ==
                                      TemplatePattern::MathPrefix[tmp_offset])) {
                                     ++index;
@@ -479,9 +479,9 @@ class Template : Engine, ALEHelper {
                                 tmp_offset = 2;
 
                                 while (
-                                    (tmp_offset <
+                                    (tmp_offset !=
                                      TemplatePattern::InLineIfPrefixLength) &&
-                                    (index < end_before) &&
+                                    (index != end_before) &&
                                     (content[index] ==
                                      TemplatePattern::InLineIfPrefix
                                          [tmp_offset])) {
@@ -514,7 +514,7 @@ class Template : Engine, ALEHelper {
                                 while (
                                     (tmp_offset <
                                      TemplatePattern::LoopPrefixLength) &&
-                                    (index < end_before) &&
+                                    (index != end_before) &&
                                     (content[index] ==
                                      TemplatePattern::LoopPrefix[tmp_offset])) {
                                     ++index;
@@ -535,9 +535,9 @@ class Template : Engine, ALEHelper {
                                 tmp_offset = 2;
 
                                 while (
-                                    (tmp_offset <
+                                    (tmp_offset !=
                                      TemplatePattern::IfPrefixLength) &&
-                                    (index < end_before) &&
+                                    (index != end_before) &&
                                     (content[index] ==
                                      TemplatePattern::IfPrefix[tmp_offset])) {
                                     ++index;
@@ -586,9 +586,9 @@ class Template : Engine, ALEHelper {
                             tmp_offset = 2;
 
                             while (
-                                (tmp_offset <
+                                (tmp_offset !=
                                  TemplatePattern::VariablePrefixLength) &&
-                                (current_offset < end_before) &&
+                                (current_offset != end_before) &&
                                 (content[current_offset] ==
                                  TemplatePattern::VariablePrefix[tmp_offset])) {
                                 ++current_offset;
@@ -608,9 +608,9 @@ class Template : Engine, ALEHelper {
                             ++current_offset;
                             tmp_offset = 2;
 
-                            while ((tmp_offset <
+                            while ((tmp_offset !=
                                     TemplatePattern::MathPrefixLength) &&
-                                   (current_offset < end_before) &&
+                                   (current_offset != end_before) &&
                                    (content[current_offset] ==
                                     TemplatePattern::MathPrefix[tmp_offset])) {
                                 ++current_offset;
@@ -631,9 +631,9 @@ class Template : Engine, ALEHelper {
                             tmp_offset = 2;
 
                             while (
-                                (tmp_offset <
+                                (tmp_offset !=
                                  TemplatePattern::InLineIfPrefixLength) &&
-                                (current_offset < end_before) &&
+                                (current_offset != end_before) &&
                                 (content[current_offset] ==
                                  TemplatePattern::InLineIfPrefix[tmp_offset])) {
                                 ++current_offset;
@@ -663,9 +663,9 @@ class Template : Engine, ALEHelper {
                             ++current_offset;
                             tmp_offset = 2;
 
-                            while ((tmp_offset <
+                            while ((tmp_offset !=
                                     TemplatePattern::LoopPrefixLength) &&
-                                   (current_offset < end_before) &&
+                                   (current_offset != end_before) &&
                                    (content[current_offset] ==
                                     TemplatePattern::LoopPrefix[tmp_offset])) {
                                 ++current_offset;
@@ -685,9 +685,9 @@ class Template : Engine, ALEHelper {
                             ++current_offset;
                             tmp_offset = 2;
 
-                            while ((tmp_offset <
+                            while ((tmp_offset !=
                                     TemplatePattern::IfPrefixLength) &&
-                                   (current_offset < end_before) &&
+                                   (current_offset != end_before) &&
                                    (content[current_offset] ==
                                     TemplatePattern::IfPrefix[tmp_offset])) {
                                 ++current_offset;
@@ -1037,7 +1037,7 @@ class Template : Engine, ALEHelper {
             } while (iif_not_done && (--tmp_offset > last_offset));
 
             last_offset = offset;
-        } while (--times > 0);
+        } while (--times != 0);
     }
 
     struct loopItem_ {
@@ -1142,7 +1142,7 @@ class Template : Engine, ALEHelper {
             } while (--tmp_offset > last_offset);
 
             last_offset = offset;
-        } while (--times > 0);
+        } while (--times != 0);
 
         content = &(content[start_offset]);
 

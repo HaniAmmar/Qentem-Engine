@@ -693,7 +693,7 @@ class ALE : Engine {
 
             String::SoftTrim(content, n_item.Offset, n_item.Length);
 
-            if (n_item.SubItems.Size() > 0) {
+            if (n_item.SubItems.Size() != 0) {
                 sortOperations_(n_item.SubItems, content, n_item.Offset,
                                 n_item.Length);
             }
@@ -799,7 +799,7 @@ class ALE : Engine {
                         UInt         times = static_cast<UInt>(right_number);
                         const double num   = left_number;
 
-                        while (--times > 0) {
+                        while (--times != 0) {
                             // NOTE: Optimize.
                             left_number *= num;
                         }
