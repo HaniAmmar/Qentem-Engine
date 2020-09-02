@@ -23,8 +23,10 @@
 #ifndef QENTEM_COMMON_H_
 #define QENTEM_COMMON_H_
 
+#if !defined(_WIN64)
 #ifndef QENTEM_AVX512BW_
 #define QENTEM_AVX512BW_ 1
+#endif
 #endif
 
 #ifndef QENTEM_AVX2_
