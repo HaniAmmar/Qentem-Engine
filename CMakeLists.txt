@@ -7,7 +7,7 @@ enable_testing()
 if(MSVC)
     add_compile_options(/W4 /J)
 else()
-    add_compile_options(-Wall -Wextra -funsigned-char -mavx2)
+    add_compile_options(-Wall -Wextra -funsigned-char -march=native)
     option(ENABLE_COVERAGE "Enable Coverage for gcc/clang" FALSE)
 
     if (ENABLE_COVERAGE)
