@@ -1227,6 +1227,13 @@ static int TestALE5() {
     number   = ALE::Evaluate(equation);
     SHOULD_EQUAL_VALUE(number, 1, "number");
 
+    equation =
+        R"(4                                                                      ||1
+                                                                                       ||
+                                                                                             2)";
+    number = ALE::Evaluate(equation);
+    SHOULD_EQUAL_VALUE(number, 1, "number");
+
     equation = "0 || + 9";
     is_valid = ALE::Evaluate(number, equation);
     SHOULD_EQUAL_VALUE(number, 1, "number");
