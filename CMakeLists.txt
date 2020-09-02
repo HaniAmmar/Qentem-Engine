@@ -7,8 +7,9 @@ enable_testing()
 if(MSVC)
     add_compile_options(/W4 /J)
 else()
-    add_compile_options(-Wall -Wextra -funsigned-char)
+    add_compile_options(-Wall -Wextra -funsigned-char -mavx2)
     option(ENABLE_COVERAGE "Enable Coverage for gcc/clang" FALSE)
+
     if (ENABLE_COVERAGE)
         add_compile_options(--coverage -g -O0)
     endif()
@@ -17,6 +18,7 @@ endif()
 # TestHelper
 add_executable(TestHelperTest Tests/TestHelper.cpp)
 add_test(NAME TestHelperTest COMMAND TestHelperTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(TestHelperTest --coverage)
 endif()
@@ -24,6 +26,7 @@ endif()
 # Memory
 add_executable(MemoryTest Tests/MemoryTest.cpp)
 add_test(NAME MemoryTest COMMAND MemoryTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(MemoryTest --coverage)
 endif()
@@ -31,6 +34,7 @@ endif()
 # String
 add_executable(StringTest Tests/StringTest.cpp)
 add_test(NAME StringTest COMMAND StringTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(StringTest --coverage)
 endif()
@@ -38,6 +42,7 @@ endif()
 # StringStream
 add_executable(StringStreamTest Tests/StringStreamTest.cpp)
 add_test(NAME StringStreamTest COMMAND StringStreamTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(StringStreamTest --coverage)
 endif()
@@ -45,6 +50,7 @@ endif()
 # Array
 add_executable(ArrayTest Tests/ArrayTest.cpp)
 add_test(NAME ArrayTest COMMAND ArrayTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(ArrayTest --coverage)
 endif()
@@ -52,6 +58,7 @@ endif()
 # Digit
 add_executable(DigitTest Tests/DigitTest.cpp)
 add_test(NAME DigitTest COMMAND DigitTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(DigitTest --coverage)
 endif()
@@ -59,6 +66,7 @@ endif()
 # HArray
 add_executable(HArrayTest Tests/HArrayTest.cpp)
 add_test(NAME HArrayTest COMMAND HArrayTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(HArrayTest --coverage)
 endif()
@@ -66,6 +74,7 @@ endif()
 # Engine
 add_executable(EngineTest Tests/EngineTest.cpp)
 add_test(NAME EngineTest COMMAND EngineTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(EngineTest --coverage)
 endif()
@@ -73,6 +82,7 @@ endif()
 # ALE
 add_executable(ALETest Tests/ALETest.cpp)
 add_test(NAME ALETest COMMAND ALETest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(ALETest --coverage)
 endif()
@@ -80,6 +90,7 @@ endif()
 # Value
 add_executable(ValueTest Tests/ValueTest.cpp)
 add_test(NAME ValueTest COMMAND ValueTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(ValueTest --coverage)
 endif()
@@ -87,6 +98,7 @@ endif()
 # JSON
 add_executable(JSONTest Tests/JSONTest.cpp)
 add_test(NAME JSONTest COMMAND JSONTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(JSONTest --coverage)
 endif()
@@ -94,6 +106,7 @@ endif()
 # Template
 add_executable(TemplateTest Tests/TemplateTest.cpp)
 add_test(NAME TemplateTest COMMAND TemplateTest)
+
 if (ENABLE_COVERAGE)
     target_link_libraries(TemplateTest --coverage)
 endif()
