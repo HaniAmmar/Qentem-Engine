@@ -289,12 +289,12 @@ class String {
             NumberType     offset = 0;
 
             do {
-                NumberType bits = QMM_COMPARE_8_MASK_(
+                QMM_Number_T bits = QMM_COMPARE_8_MASK_(
                     QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(str + offset)),
                     m_zero);
 
                 if (bits != 0) {
-                    return (static_cast<NumberType>(Q_CTZL(bits)) + offset);
+                    return static_cast<NumberType>(Q_CTZL(bits) + offset);
                 }
 
                 offset += QMM_SIZE_;
