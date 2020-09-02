@@ -134,12 +134,12 @@ class Value {
   public:
     Value() = default;
 
-    Value(Value &&src) noexcept : value_(src.value_), type_(src.type_) {
-        src.type_ = ValueType::Undefined; // Prevents deletion.
+    Value(Value &&val) noexcept : value_(val.value_), type_(val.type_) {
+        val.type_ = ValueType::Undefined; // Prevents deletion.
     }
 
-    Value(const Value &src) : type_(src.type_) {
-        copyValue(src);
+    Value(const Value &val) : type_(val.type_) {
+        copyValue(val);
     }
 
     explicit Value(ValueType type) noexcept : type_(type) {
@@ -272,42 +272,42 @@ class Value {
         throw 3;
     }
 
-    Value &operator=(Value &&src) noexcept {
-        if (this != &src) {
+    Value &operator=(Value &&val) noexcept {
+        if (this != &val) {
             if (type_ != ValueType::Undefined) {
                 Clear();
             }
 
-            type_  = src.type_;
-            value_ = src.value_;
+            type_  = val.type_;
+            value_ = val.value_;
 
-            src.type_ = ValueType::Undefined; // Prevent deletion.
+            val.type_ = ValueType::Undefined; // Prevent deletion.
         }
 
         return *this;
     }
 
-    Value &operator=(const Value &src) {
-        if (this != &src) {
-            if (type_ == src.type_) {
+    Value &operator=(const Value &val) {
+        if (this != &val) {
+            if (type_ == val.type_) {
                 switch (type_) {
                     case ValueType::Object: {
-                        *(value_.object_) = *(src.value_.object_);
+                        *(value_.object_) = *(val.value_.object_);
                         break;
                     }
 
                     case ValueType::Array: {
-                        *(value_.array_) = *(src.value_.array_);
+                        *(value_.array_) = *(val.value_.array_);
                         break;
                     }
 
                     case ValueType::String: {
-                        *(value_.string_) = *(src.value_.string_);
+                        *(value_.string_) = *(val.value_.string_);
                         break;
                     }
 
                     case ValueType::Number: {
-                        value_.number_ = src.value_.number_;
+                        value_.number_ = val.value_.number_;
                         break;
                     }
 
@@ -319,9 +319,9 @@ class Value {
                     Clear();
                 }
 
-                if (src.type_ != ValueType::Undefined) {
-                    type_ = src.type_;
-                    copyValue(src);
+                if (val.type_ != ValueType::Undefined) {
+                    type_ = val.type_;
+                    copyValue(val);
                 }
             }
         }
@@ -514,7 +514,7 @@ class Value {
         return *this;
     }
 
-    void operator+=(Value &&src) {
+    void operator+=(Value &&val) {
         if (type_ == ValueType::Undefined) {
             type_         = ValueType::Array;
             value_.array_ = HAllocator::Allocate(Array<Value>(1));
@@ -522,8 +522,8 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                if (src.type_ == ValueType::Array) {
-                    const Array<Value> &src_arr = *(src.value_.array_);
+                if (val.type_ == ValueType::Array) {
+                    const Array<Value> &src_arr = *(val.value_.array_);
                     Array<Value> &      des_arr = *(value_.array_);
 
                     Value *      src_val = src_arr.First();
@@ -536,17 +536,17 @@ class Value {
 
                         ++src_val;
                     }
-                } else if (src.type_ != ValueType::Undefined) {
-                    *(value_.array_) += static_cast<Value &&>(src);
+                } else if (val.type_ != ValueType::Undefined) {
+                    *(value_.array_) += static_cast<Value &&>(val);
                 }
 
                 break;
             }
 
             case ValueType::Object: {
-                if (src.type_ == ValueType::Object) {
+                if (val.type_ == ValueType::Object) {
                     *(value_.object_) +=
-                        static_cast<HArray<Value> &&>(*(src.value_.object_));
+                        static_cast<HArray<Value> &&>(*(val.value_.object_));
                 }
 
                 break;
@@ -556,10 +556,10 @@ class Value {
             }
         }
 
-        src.Clear();
+        val.Clear();
     }
 
-    void operator+=(const Value &src) {
+    void operator+=(const Value &val) {
         if (type_ == ValueType::Undefined) {
             type_         = ValueType::Array;
             value_.array_ = HAllocator::Allocate(Array<Value>(1));
@@ -567,8 +567,8 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                if (src.type_ == ValueType::Array) {
-                    const Array<Value> &src_arr = *(src.value_.array_);
+                if (val.type_ == ValueType::Array) {
+                    const Array<Value> &src_arr = *(val.value_.array_);
                     Array<Value> &      des_arr = *(value_.array_);
 
                     const Value *src_val = src_arr.Storage();
@@ -581,16 +581,16 @@ class Value {
 
                         ++src_val;
                     }
-                } else if (src.type_ != ValueType::Undefined) {
-                    *(value_.array_) += src;
+                } else if (val.type_ != ValueType::Undefined) {
+                    *(value_.array_) += val;
                 }
 
                 break;
             }
 
             case ValueType::Object: {
-                if (src.type_ == ValueType::Object) {
-                    *(value_.object_) += *(src.value_.object_);
+                if (val.type_ == ValueType::Object) {
+                    *(value_.object_) += *(val.value_.object_);
                 }
 
                 break;
@@ -1226,28 +1226,28 @@ class Value {
         double         number_;
     };
 
-    void copyValue(const Value &src) {
+    void copyValue(const Value &val) {
         switch (type_) {
             case ValueType::Object: {
                 value_.object_ =
-                    HAllocator::Allocate(HArray<Value>(*(src.value_.object_)));
+                    HAllocator::Allocate(HArray<Value>(*(val.value_.object_)));
                 break;
             }
 
             case ValueType::Array: {
                 value_.array_ =
-                    HAllocator::Allocate(Array<Value>(*(src.value_.array_)));
+                    HAllocator::Allocate(Array<Value>(*(val.value_.array_)));
                 break;
             }
 
             case ValueType::String: {
                 value_.string_ =
-                    HAllocator::Allocate(String(*(src.value_.string_)));
+                    HAllocator::Allocate(String(*(val.value_.string_)));
                 break;
             }
 
             case ValueType::Number: {
-                value_.number_ = src.value_.number_;
+                value_.number_ = val.value_.number_;
                 break;
             }
 
