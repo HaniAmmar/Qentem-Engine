@@ -958,8 +958,6 @@ class JSONParser : Engine {
                             return false;
                         }
                     }
-
-                    bits ^= (ULong{1} << bit); // Remove the left bit
                 }
 
                 start_offset = offset2;
