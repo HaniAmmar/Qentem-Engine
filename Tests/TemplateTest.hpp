@@ -1930,6 +1930,9 @@ static int TestIfTag2() {
     content = R"(<if case="0"><elseif />{var:name}</if>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"()", "Render()");
 
+    content = R"(<iw case="0"><elseif />{var:name}</if>)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"()", "Render()");
+
     END_SUB_TEST;
 }
 
