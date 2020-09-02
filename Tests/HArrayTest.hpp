@@ -757,7 +757,7 @@ static int TestHArray7() {
 }
 
 static int TestHArray8() {
-    UInt id = 10;
+    UInt id = 100;
 
     HArray<UInt> list(id);
 
