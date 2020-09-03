@@ -945,10 +945,7 @@ class JSONParser : Engine {
                 }
 
                 while (bits != 0) {
-                    const QMM_Number_T bit   = Q_CLZL(bits);
-                    const ULong        index = (bit + offset2);
-
-                    switch (content[index]) {
+                    switch (content[(Q_CLZL(bits) + offset2)]) {
                         case '{':
                         case '[':
                         case ',':

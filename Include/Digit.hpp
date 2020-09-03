@@ -41,7 +41,7 @@ class Digit {
         if (str != nullptr) {
             UInt base = 0;
 
-            while (length > 0) {
+            while (length != 0) {
                 --length;
 
                 if ((str[length] > '0') && (str[length] < ':')) {
@@ -54,7 +54,7 @@ class Digit {
                     value += ((static_cast<UInt>(str[length]) - 'W') << base);
                 }
 
-                base += 4;
+                base += 4U;
             }
         }
 
