@@ -183,12 +183,13 @@ struct TemplatePattern {
     static constexpr const char *IfSuffix = "</if>";
 
     static constexpr const char *ElsePrefix = "<else";
+    static constexpr char        ElseIfChar = 'i'; // else[i]f
     static constexpr const char *ElseSuffix = "/>";
 
     /*
         // To get a 64bit value:
 
-        constexpr short var_16 = (TemplatePattern::VariablePrefix[1] << 8U) |
+        short var_16 = (TemplatePattern::VariablePrefix[1] << 8U) |
                                 TemplatePattern::VariablePrefix[0];
         ULong var_64 = var_16;
         var_64 <<= 48U;
@@ -425,74 +426,81 @@ class Template : Engine, ALEHelper {
                 switch (content[index]) {
                     case TemplatePattern::InLinePrefix: {
                         ++index;
-                        // TODO: Remove  (index != end_before)
+
                         switch (content[index]) {
                             case TemplatePattern::VariablePrefix[1]: {
-                                ++index;
-                                tmp_offset = 2;
-
-                                while (
-                                    (tmp_offset !=
-                                     TemplatePattern::VariablePrefixLength) &&
-                                    (index != end_before) &&
-                                    (content[index] ==
-                                     TemplatePattern::VariablePrefix
-                                         [tmp_offset])) {
+                                if ((TemplatePattern::VariablePrefixLength +
+                                     index) < end_before) {
                                     ++index;
-                                    ++tmp_offset;
-                                }
+                                    tmp_offset = 2;
 
-                                if (tmp_offset ==
-                                    TemplatePattern::VariablePrefixLength) {
-                                    tag_ = Tag::Variable;
-                                    return index;
+                                    while ((tmp_offset !=
+                                            TemplatePattern::
+                                                VariablePrefixLength) &&
+                                           (content[index] ==
+                                            TemplatePattern::VariablePrefix
+                                                [tmp_offset])) {
+                                        ++index;
+                                        ++tmp_offset;
+                                    }
+
+                                    if (tmp_offset ==
+                                        TemplatePattern::VariablePrefixLength) {
+                                        tag_ = Tag::Variable;
+                                        return index;
+                                    }
                                 }
 
                                 break;
                             }
 
                             case TemplatePattern::MathPrefix[1]: {
-                                ++index;
-                                tmp_offset = 2;
-
-                                while (
-                                    (tmp_offset !=
-                                     TemplatePattern::MathPrefixLength) &&
-                                    (index != end_before) &&
-                                    (content[index] ==
-                                     TemplatePattern::MathPrefix[tmp_offset])) {
+                                if ((TemplatePattern::MathPrefixLength +
+                                     index) < end_before) {
                                     ++index;
-                                    ++tmp_offset;
-                                }
+                                    tmp_offset = 2;
 
-                                if (tmp_offset ==
-                                    TemplatePattern::MathPrefixLength) {
-                                    tag_ = Tag::Math;
-                                    return index;
+                                    while (
+                                        (tmp_offset !=
+                                         TemplatePattern::MathPrefixLength) &&
+                                        (content[index] ==
+                                         TemplatePattern::MathPrefix
+                                             [tmp_offset])) {
+                                        ++index;
+                                        ++tmp_offset;
+                                    }
+
+                                    if (tmp_offset ==
+                                        TemplatePattern::MathPrefixLength) {
+                                        tag_ = Tag::Math;
+                                        return index;
+                                    }
                                 }
 
                                 break;
                             }
 
                             case TemplatePattern::InLineIfPrefix[1]: {
-                                ++index;
-                                tmp_offset = 2;
-
-                                while (
-                                    (tmp_offset !=
-                                     TemplatePattern::InLineIfPrefixLength) &&
-                                    (index != end_before) &&
-                                    (content[index] ==
-                                     TemplatePattern::InLineIfPrefix
-                                         [tmp_offset])) {
+                                if ((TemplatePattern::InLineIfPrefixLength +
+                                     index) < end_before) {
                                     ++index;
-                                    ++tmp_offset;
-                                }
+                                    tmp_offset = 2;
 
-                                if (tmp_offset ==
-                                    TemplatePattern::InLineIfPrefixLength) {
-                                    tag_ = Tag::InLineIf;
-                                    return index;
+                                    while ((tmp_offset !=
+                                            TemplatePattern::
+                                                InLineIfPrefixLength) &&
+                                           (content[index] ==
+                                            TemplatePattern::InLineIfPrefix
+                                                [tmp_offset])) {
+                                        ++index;
+                                        ++tmp_offset;
+                                    }
+
+                                    if (tmp_offset ==
+                                        TemplatePattern::InLineIfPrefixLength) {
+                                        tag_ = Tag::InLineIf;
+                                        return index;
+                                    }
                                 }
                             }
 
@@ -508,46 +516,51 @@ class Template : Engine, ALEHelper {
 
                         switch (content[index]) {
                             case TemplatePattern::LoopPrefix[1]: { // <loop
-                                ++index;
-                                tmp_offset = 2;
-
-                                while (
-                                    (tmp_offset <
-                                     TemplatePattern::LoopPrefixLength) &&
-                                    (index != end_before) &&
-                                    (content[index] ==
-                                     TemplatePattern::LoopPrefix[tmp_offset])) {
+                                if ((TemplatePattern::LoopPrefixLength +
+                                     index) < end_before) {
                                     ++index;
-                                    ++tmp_offset;
-                                }
+                                    tmp_offset = 2;
 
-                                if (tmp_offset ==
-                                    TemplatePattern::LoopPrefixLength) {
-                                    tag_ = Tag::Loop;
-                                    return index;
+                                    while (
+                                        (tmp_offset <
+                                         TemplatePattern::LoopPrefixLength) &&
+                                        (content[index] ==
+                                         TemplatePattern::LoopPrefix
+                                             [tmp_offset])) {
+                                        ++index;
+                                        ++tmp_offset;
+                                    }
+
+                                    if (tmp_offset ==
+                                        TemplatePattern::LoopPrefixLength) {
+                                        tag_ = Tag::Loop;
+                                        return index;
+                                    }
                                 }
 
                                 break;
                             }
 
                             case TemplatePattern::IfPrefix[1]: { // <if
-                                ++index;
-                                tmp_offset = 2;
-
-                                while (
-                                    (tmp_offset !=
-                                     TemplatePattern::IfPrefixLength) &&
-                                    (index != end_before) &&
-                                    (content[index] ==
-                                     TemplatePattern::IfPrefix[tmp_offset])) {
+                                if ((TemplatePattern::IfPrefixLength + index) <
+                                    end_before) {
                                     ++index;
-                                    ++tmp_offset;
-                                }
+                                    tmp_offset = 2;
 
-                                if (tmp_offset ==
-                                    TemplatePattern::IfPrefixLength) {
-                                    tag_ = Tag::If;
-                                    return index;
+                                    while ((tmp_offset !=
+                                            TemplatePattern::IfPrefixLength) &&
+                                           (content[index] ==
+                                            TemplatePattern::IfPrefix
+                                                [tmp_offset])) {
+                                        ++index;
+                                        ++tmp_offset;
+                                    }
+
+                                    if (tmp_offset ==
+                                        TemplatePattern::IfPrefixLength) {
+                                        tag_ = Tag::If;
+                                        return index;
+                                    }
                                 }
 
                                 break;
@@ -571,79 +584,88 @@ class Template : Engine, ALEHelper {
 #else
     ULong find(const char *content, ULong offset,
                ULong end_before) noexcept final {
-        ULong current_offset = 0;
+        ULong index = 0;
         UInt  tmp_offset;
 
         while (offset < end_before) {
             switch (content[offset]) {
                 case TemplatePattern::InLinePrefix: {
-                    current_offset = offset;
-                    ++current_offset;
+                    index = offset;
+                    ++index;
 
-                    switch (content[current_offset]) {
-                        case TemplatePattern::VariablePrefix[1]: { // {var:
-                            ++current_offset;
-                            tmp_offset = 2;
+                    switch (content[index]) {
+                        case TemplatePattern::VariablePrefix[1]: {
+                            if ((TemplatePattern::VariablePrefixLength +
+                                 index) < end_before) {
+                                ++index;
+                                tmp_offset = 2;
 
-                            while (
-                                (tmp_offset !=
-                                 TemplatePattern::VariablePrefixLength) &&
-                                (current_offset != end_before) &&
-                                (content[current_offset] ==
-                                 TemplatePattern::VariablePrefix[tmp_offset])) {
-                                ++current_offset;
-                                ++tmp_offset;
-                            }
+                                while (
+                                    (tmp_offset !=
+                                     TemplatePattern::VariablePrefixLength) &&
+                                    (content[index] ==
+                                     TemplatePattern::VariablePrefix
+                                         [tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
 
-                            if (tmp_offset ==
-                                TemplatePattern::VariablePrefixLength) {
-                                tag_ = Tag::Variable;
-                                return current_offset;
-                            }
-
-                            break;
-                        }
-
-                        case TemplatePattern::MathPrefix[1]: { // {math:
-                            ++current_offset;
-                            tmp_offset = 2;
-
-                            while ((tmp_offset !=
-                                    TemplatePattern::MathPrefixLength) &&
-                                   (current_offset != end_before) &&
-                                   (content[current_offset] ==
-                                    TemplatePattern::MathPrefix[tmp_offset])) {
-                                ++current_offset;
-                                ++tmp_offset;
-                            }
-
-                            if (tmp_offset ==
-                                TemplatePattern::MathPrefixLength) {
-                                tag_ = Tag::Math;
-                                return current_offset;
+                                if (tmp_offset ==
+                                    TemplatePattern::VariablePrefixLength) {
+                                    tag_ = Tag::Variable;
+                                    return index;
+                                }
                             }
 
                             break;
                         }
 
-                        case TemplatePattern::InLineIfPrefix[1]: { // {if
-                            ++current_offset;
-                            tmp_offset = 2;
+                        case TemplatePattern::MathPrefix[1]: {
+                            if ((TemplatePattern::MathPrefixLength + index) <
+                                end_before) {
+                                ++index;
+                                tmp_offset = 2;
 
-                            while (
-                                (tmp_offset !=
-                                 TemplatePattern::InLineIfPrefixLength) &&
-                                (current_offset != end_before) &&
-                                (content[current_offset] ==
-                                 TemplatePattern::InLineIfPrefix[tmp_offset])) {
-                                ++current_offset;
-                                ++tmp_offset;
+                                while (
+                                    (tmp_offset !=
+                                     TemplatePattern::MathPrefixLength) &&
+                                    (content[index] ==
+                                     TemplatePattern::MathPrefix[tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::MathPrefixLength) {
+                                    tag_ = Tag::Math;
+                                    return index;
+                                }
                             }
 
-                            if (tmp_offset ==
-                                TemplatePattern::InLineIfPrefixLength) {
-                                tag_ = Tag::InLineIf;
-                                return current_offset;
+                            break;
+                        }
+
+                        case TemplatePattern::InLineIfPrefix[1]: {
+                            if ((TemplatePattern::InLineIfPrefixLength +
+                                 index) < end_before) {
+                                ++index;
+                                tmp_offset = 2;
+
+                                while (
+                                    (tmp_offset !=
+                                     TemplatePattern::InLineIfPrefixLength) &&
+                                    (content[index] ==
+                                     TemplatePattern::InLineIfPrefix
+                                         [tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
+
+                                if (tmp_offset ==
+                                    TemplatePattern::InLineIfPrefixLength) {
+                                    tag_ = Tag::InLineIf;
+                                    return index;
+                                }
                             }
                         }
 
@@ -655,48 +677,55 @@ class Template : Engine, ALEHelper {
                 }
 
                 case TemplatePattern::MultiLinePrefix: {
-                    current_offset = offset;
-                    ++current_offset;
+                    index = offset;
+                    ++index;
 
-                    switch (content[current_offset]) {
+                    switch (content[index]) {
                         case TemplatePattern::LoopPrefix[1]: { // <loop
-                            ++current_offset;
-                            tmp_offset = 2;
+                            if ((TemplatePattern::LoopPrefixLength + index) <
+                                end_before) {
+                                ++index;
+                                tmp_offset = 2;
 
-                            while ((tmp_offset !=
-                                    TemplatePattern::LoopPrefixLength) &&
-                                   (current_offset != end_before) &&
-                                   (content[current_offset] ==
-                                    TemplatePattern::LoopPrefix[tmp_offset])) {
-                                ++current_offset;
-                                ++tmp_offset;
-                            }
+                                while (
+                                    (tmp_offset <
+                                     TemplatePattern::LoopPrefixLength) &&
+                                    (content[index] ==
+                                     TemplatePattern::LoopPrefix[tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
 
-                            if (tmp_offset ==
-                                TemplatePattern::LoopPrefixLength) {
-                                tag_ = Tag::Loop;
-                                return current_offset;
+                                if (tmp_offset ==
+                                    TemplatePattern::LoopPrefixLength) {
+                                    tag_ = Tag::Loop;
+                                    return index;
+                                }
                             }
 
                             break;
                         }
 
                         case TemplatePattern::IfPrefix[1]: { // <if
-                            ++current_offset;
-                            tmp_offset = 2;
+                            if ((TemplatePattern::IfPrefixLength + index) <
+                                end_before) {
+                                ++index;
+                                tmp_offset = 2;
 
-                            while ((tmp_offset !=
-                                    TemplatePattern::IfPrefixLength) &&
-                                   (current_offset != end_before) &&
-                                   (content[current_offset] ==
-                                    TemplatePattern::IfPrefix[tmp_offset])) {
-                                ++current_offset;
-                                ++tmp_offset;
-                            }
+                                while (
+                                    (tmp_offset !=
+                                     TemplatePattern::IfPrefixLength) &&
+                                    (content[index] ==
+                                     TemplatePattern::IfPrefix[tmp_offset])) {
+                                    ++index;
+                                    ++tmp_offset;
+                                }
 
-                            if (tmp_offset == TemplatePattern::IfPrefixLength) {
-                                tag_ = Tag::If;
-                                return current_offset;
+                                if (tmp_offset ==
+                                    TemplatePattern::IfPrefixLength) {
+                                    tag_ = Tag::If;
+                                    return index;
+                                }
                             }
 
                             break;
@@ -990,7 +1019,8 @@ class Template : Engine, ALEHelper {
                 return;
             }
 
-            UInt tmp_offset   = offset - 3; // TODO: Magic number
+            // = + " + a char == 3 + the char before it == 4
+            UInt tmp_offset   = offset - 4;
             bool iif_not_done = true;
 
             do {
@@ -1357,8 +1387,8 @@ class Template : Engine, ALEHelper {
             }
 
             // <else has no "i" after it.
-            if (content[case_offset] != 'i') { // TODO: Abstract
-                result      = 1;               // Mark <else as true.
+            if (content[case_offset] != TemplatePattern::ElseIfChar) {
+                result      = 1; // Mark <else as true.
                 case_length = 0;
             } else if (!getQuotaed(case_offset, case_length, content,
                                    end_before)) {
@@ -1528,7 +1558,7 @@ class Template : Engine, ALEHelper {
 
     bool ALESetNumber(double &number, const char *content,
                       UInt length) const final {
-        if (length > 4) { // TODO: Magic number
+        if (length > TemplatePattern::VariableFulllength) {
             const Value_ *value = findValue(
                 &(content[TemplatePattern::VariablePrefixLength]),
                 (length - TemplatePattern::VariableFulllength)); // {var:x}

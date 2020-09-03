@@ -1177,7 +1177,7 @@ static int TestInlineIfTag() {
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "{if", "Render()");
 
     content = R"({if})";
-    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "", "Render()");
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "{if}", "Render()");
 
     content = R"({{if case="{var:1}" true="T" false="F"})";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "{T", "Render()");
