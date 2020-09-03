@@ -120,14 +120,14 @@ static char *UnEscapeString(const char *content, ULong &length) {
                     case 'u': {
                         ++offset;
 
-                        if ((length - offset) < 4) {
+                        if ((length - offset) < 4U) {
                             HAllocator::Deallocate(str);
                             return nullptr;
                         }
 
                         UInt code =
-                            Digit::HexStringToNumber((content + offset), 4);
-                        offset += 4;
+                            Digit::HexStringToNumber((content + offset), 4U);
+                        offset += 4U;
 
                         if ((code >> 8U) == 0xD8U) {
                             // Surrogate
@@ -137,20 +137,20 @@ static char *UnEscapeString(const char *content, ULong &length) {
                             }
 
                             code = (code ^ 0xD800U) << 10U;
-                            offset += 2;
+                            offset += 2U;
                             code += Digit::HexStringToNumber((content + offset),
-                                                             4) &
+                                                             4U) &
                                     0x3FFU;
                             code += 0x10000U;
 
                             offset2 += String::ToUTF8(code, (str + offset2));
-                            offset += 4;
-                            bits &= (bits - 1);
+                            offset += 4U;
+                            bits &= (bits - 1U);
                         } else {
                             offset2 += String::ToUTF8(code, (str + offset2));
                         }
 
-                        bits &= (bits - 1);
+                        bits &= (bits - 1U);
                         continue;
                     }
 
