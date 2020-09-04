@@ -1507,7 +1507,7 @@ class Template : Engine, ALEHelper {
             }
 
             while (true) {
-                Value_ *value = nullptr;
+                const Value_ *value = nullptr;
 
                 if (root_value->IsArray()) {
                     ULong value_id;
