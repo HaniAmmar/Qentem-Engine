@@ -299,10 +299,9 @@ The tests are ~12,7k lines of code; ~5 times the size of the library. To run the
 -   gcc/clang
     ```shell
     mkdir Build
-    c++ -g -funsigned-char -std=c++11 -Wall -Wextra -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
+    c++ -std=c++11 -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
     ./Build/QTest.bin
     ```
-    Replace `c++` with clang++ on Windows.
 
 ## License
 
