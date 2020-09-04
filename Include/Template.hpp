@@ -162,23 +162,23 @@ struct TemplatePattern {
     static constexpr const char MultiLinePrefix = '<';
     static constexpr const char MultiLineSuffix = '>';
 
-    static constexpr const char *VariablePrefix      = "{var:";
-    static constexpr ULong       Variable64bit       = 8537547791251764859ULL;
-    static constexpr char        VariableIndexPrefix = '[';
-    static constexpr char        VariableIndexSuffix = ']';
+    static constexpr const char *       VariablePrefix = "{var:";
+    static constexpr unsigned long long Variable64bit  = 8537547791251764859ULL;
+    static constexpr char               VariableIndexPrefix = '[';
+    static constexpr char               VariableIndexSuffix = ']';
 
-    static constexpr const char *MathPrefix = "{math:";
-    static constexpr ULong       Math64bit  = 7889019549154766203ULL;
+    static constexpr const char *       MathPrefix = "{math:";
+    static constexpr unsigned long long Math64bit  = 7889019549154766203ULL;
 
-    static constexpr const char *InLineIfPrefix = "{if";
-    static constexpr ULong       InLineIf64bit  = 7600784774889433467ULL;
+    static constexpr const char *       InLineIfPrefix = "{if";
+    static constexpr unsigned long long InLineIf64bit  = 7600784774889433467ULL;
 
-    static constexpr const char *LoopPrefix = "<loop";
-    static constexpr ULong       Loop64bit  = 7799227661468593212ULL;
-    static constexpr const char *LoopSuffix = "</loop>";
+    static constexpr const char *       LoopPrefix = "<loop";
+    static constexpr unsigned long long Loop64bit  = 7799227661468593212ULL;
+    static constexpr const char *       LoopSuffix = "</loop>";
 
-    static constexpr const char *IfPrefix = "<if";
-    static constexpr ULong       If64bit  = 7583051580769593660ULL;
+    static constexpr const char *       IfPrefix = "<if";
+    static constexpr unsigned long long If64bit  = 7583051580769593660ULL;
 
     static constexpr const char *IfSuffix = "</if>";
 
