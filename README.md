@@ -25,7 +25,7 @@ Qentem Engine is an independent and cross-platform library that uses a fast algo
 ## Features
 
 -   Header only and self-contained; no external libraries like the STL is needed.
--   Uses SSE2, AVX2, and AVX512BW when available to perform better.
+-   Uses SSE2, AVX2, and AVX512BW when available.
 -   Supports UTF-16 and UTF-32 surrogates.
 -   Customizable template patterns with (variable replacement, nesting loops, nesting if conditions and Inline if)
 
