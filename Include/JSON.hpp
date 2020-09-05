@@ -602,8 +602,6 @@ class JSONParser : Engine {
             }
 
             case Type_::Quote: {
-                // TODO: Improve
-
                 UInt  times      = 0;
                 ULong tmp_offset = (end_before - 1);
 
@@ -612,7 +610,7 @@ class JSONParser : Engine {
                     ++times;
                 }
 
-                if ((times % 2) != 0) {
+                if ((times % 2U) != 0) {
                     return end_before;
                 }
 

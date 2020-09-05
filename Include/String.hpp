@@ -243,20 +243,54 @@ class String {
         }
     }
 
-    template <typename Type>
-    static void LeftTrim(const char *str, Type &offset,
-                         Type end_before) noexcept {
+    template <typename Type_>
+    static void LeftTrim(const char *str, Type_ &offset,
+                         Type_ end_before) noexcept {
+        // #ifdef QENTEM_SIMD_ENABLED_
+        // constexpr unsigned long long line     = 723401728380766730ULL;
+        // constexpr unsigned long long tab      = 651061555542690057ULL;
+        // constexpr unsigned long long carriage = 940422246894996749ULL;
+        // constexpr unsigned long long space    = 2314885530818453536ULL;
+
+        // Type_ m_offset = offset;
+
+        // while (m_offset < end_before) {
+        //     const QMM_VAR_ m_str =
+        //         QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(str +
+        //         m_offset));
+        //     QMM_Number_T bits =
+        //         QMM_COMPARE_8_MASK_(m_str, QMM_SETONE_64_(line));
+        //     bits |= QMM_COMPARE_8_MASK_(m_str, QMM_SETONE_64_(tab));
+        //     bits |= QMM_COMPARE_8_MASK_(m_str, QMM_SETONE_64_(carriage));
+        //     bits |= QMM_COMPARE_8_MASK_(m_str, QMM_SETONE_64_(space));
+        //     bits ^= QMM_MAX_NUMBER_; // Remove any whitespace
+
+        //     if (bits != 0) {
+        //         offset = static_cast<Type_>(Q_CTZL(bits) + m_offset);
+
+        //         if (offset > end_before) {
+        //             offset = end_before;
+        //         }
+
+        //         return;
+        //     }
+
+        //     m_offset += QMM_SIZE_;
+        // }
+        // #else
         while ((offset < end_before) &&
                ((str[offset] == ' ') || (str[offset] == '\n') ||
                 (str[offset] == '\t') || (str[offset] == '\r'))) {
             ++offset;
         }
+        // #endif
     }
 
-    template <typename Type>
-    static void SoftTrim(const char *str, Type &offset, Type &length) noexcept {
+    template <typename Type_>
+    static void SoftTrim(const char *str, Type_ &offset,
+                         Type_ &length) noexcept {
         if (length != 0) {
-            Type end = (length + offset);
+            Type_ end = (length + offset);
             LeftTrim(str, offset, end);
 
             while ((--end > offset) &&
