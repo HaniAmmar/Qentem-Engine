@@ -205,7 +205,7 @@ struct TemplatePattern {
 /*
  * Template randering engine.
  */
-template <typename Value_ = Value, typename KeyString_ = String>
+template <typename Value_ = Value>
 class Template : Engine, ALEHelper {
     enum class Tag;
     struct FindCache_;
@@ -1268,12 +1268,11 @@ class Template : Engine, ALEHelper {
                       ULong length, ULong index, ULong size,
                       const Value_ *root_value, UInt key_length,
                       UInt value_length) const {
-        StringStream      ss;
-        ULong             last_offset;
-        ULong             sub_id;
-        const KeyString_ *key;
-        const Value_ *    value;
-        const bool        is_array = (root_value->IsArray() || (size != 0));
+        StringStream  ss;
+        ULong         last_offset;
+        ULong         sub_id;
+        const Value_ *value;
+        const bool    is_array = (root_value->IsArray() || (size != 0));
 
         if (size == 0) {
             size = root_value->Size();
@@ -1325,11 +1324,7 @@ class Template : Engine, ALEHelper {
                     last_offset += key_length;
 
                     if (!is_array) {
-                        key = root_value->GetKey(index);
-
-                        if (key != nullptr) {
-                            ss.Add(key->Char(), key->Length());
-                        }
+                        root_value->InsertKey(ss, index);
                     } else {
                         ss += Digit::NumberToString(index);
                     }
@@ -1569,9 +1564,11 @@ class Template : Engine, ALEHelper {
                     return true;
                 }
 
-                if (value->IsString()) {
-                    return ALE::Evaluate(number, value->Char(),
-                                         static_cast<UInt>(value->Length()),
+                const char *str;
+                ULong       len;
+
+                if (value->SetCharAndLength(str, len)) {
+                    return ALE::Evaluate(number, str, static_cast<UInt>(len),
                                          this);
                 }
 
@@ -1652,14 +1649,13 @@ class Template : Engine, ALEHelper {
         ULong       str_length_left;
 
         if (value_left != nullptr) {
-            if (value_left->IsString()) {
-                str_left        = value_left->Char();
-                str_length_left = value_left->Length();
-            } else if (value_left->SetString(string_left)) {
-                str_left        = string_left.Char();
-                str_length_left = string_left.Length();
-            } else {
-                return false;
+            if (!(value_left->SetCharAndLength(str_left, str_length_left))) {
+                if (value_left->SetString(string_left)) {
+                    str_left        = string_left.Char();
+                    str_length_left = string_left.Length();
+                } else {
+                    return false;
+                }
             }
         } else {
             str_left        = left;
@@ -1672,14 +1668,13 @@ class Template : Engine, ALEHelper {
         ULong       str_length_right;
 
         if (value_right != nullptr) {
-            if (value_right->IsString()) {
-                str_right        = value_right->Char();
-                str_length_right = value_right->Length();
-            } else if (value_right->SetString(string_right)) {
-                str_right        = string_right.Char();
-                str_length_right = string_right.Length();
-            } else {
-                return false;
+            if (!(value_right->SetCharAndLength(str_right, str_length_right))) {
+                if (value_right->SetString(string_right)) {
+                    str_right        = string_right.Char();
+                    str_length_right = string_right.Length();
+                } else {
+                    return false;
+                }
             }
         } else {
             str_right        = right;

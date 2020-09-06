@@ -891,6 +891,18 @@ class Value {
         return 0;
     }
 
+    bool SetCharAndLength(const char *&  key,
+                          Qentem::ULong &length) const noexcept {
+        if ((type_ == ValueType::String) && (value_.string_ != nullptr)) {
+            key    = value_.string_->Char();
+            length = value_.string_->Length();
+
+            return true;
+        }
+
+        return false;
+    }
+
     bool SetString(String &value) const {
         switch (type_) {
             case ValueType::String: {
@@ -957,6 +969,20 @@ class Value {
 
             default: {
             }
+        }
+
+        return false;
+    }
+
+    bool InsertKey(StringStream &ss, ULong index) const {
+        if (type_ == ValueType::Object) {
+            const String *key = value_.object_->GetKey(index);
+
+            if (key != nullptr) {
+                ss += *key;
+            }
+
+            return true;
         }
 
         return false;

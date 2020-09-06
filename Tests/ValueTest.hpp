@@ -36,9 +36,12 @@ static int TestEmptyValue1() {
     Value value1;
     Value value2;
 
-    String str_var;
-    double num_var;
-    bool   bool_var;
+    StringStream ss_var;
+    String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
+    double       num_var;
+    bool         bool_var;
 
     SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
     SHOULD_NOT_EQUAL_TRUE(value1.IsObject(), "IsObject()");
@@ -57,6 +60,9 @@ static int TestEmptyValue1() {
                  ", 0)",
                  "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetKey(10), nullptr, "GetKey(10)", "null");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
@@ -357,6 +363,8 @@ static int TestTrueValue1() {
 
     StringStream ss_var;
     String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
     double       num_var;
     bool         bool_var;
 
@@ -366,6 +374,9 @@ static int TestTrueValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
@@ -599,6 +610,8 @@ static int TestFalseValue1() {
 
     StringStream ss_var;
     String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
     double       num_var;
     bool         bool_var;
 
@@ -608,6 +621,9 @@ static int TestFalseValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
@@ -841,6 +857,8 @@ static int TestNullValue1() {
 
     StringStream ss_var;
     String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
     double       num_var;
     bool         bool_var;
 
@@ -850,6 +868,9 @@ static int TestNullValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
@@ -1083,6 +1104,8 @@ static int TestNumberValue1() {
 
     StringStream ss_var;
     String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
     double       num_var;
     bool         bool_var;
 
@@ -1092,6 +1115,9 @@ static int TestNumberValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
@@ -1349,6 +1375,8 @@ static int TestStringValue1() {
 
     StringStream ss_var;
     String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
     double       num_var;
     bool         bool_var;
 
@@ -1358,6 +1386,9 @@ static int TestStringValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_NOT_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                     "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_NOT_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
@@ -1380,6 +1411,8 @@ static int TestStringValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
@@ -1629,9 +1662,12 @@ static int TestArrayValue1() {
     Value value1;
     Value value2;
 
+    StringStream ss_var;
     Array<Value> arr_var;
     const Value *storage;
     String       str_var;
+    const char * c_str_var;
+    ULong        c_str_len;
     double       num_var;
     bool         bool_var;
 
@@ -1645,6 +1681,9 @@ static int TestArrayValue1() {
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetValue(4), nullptr, "GetValue(4)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_NOT_EQUAL(value1.GetArray()->Storage(), nullptr,
@@ -2041,7 +2080,10 @@ static int TestObjectValue1() {
 
     HArray<Value>      h_arr_var;
     const ObjectItem_ *storage;
+    StringStream       ss_var;
     String             str_var;
+    const char *       c_str_var;
+    ULong              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -2061,6 +2103,12 @@ static int TestObjectValue1() {
     SHOULD_NOT_EQUAL(value1.GetValue(4), nullptr, "GetValue(4)", "null");
     SHOULD_NOT_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     SHOULD_NOT_EQUAL(value1.GetKey(4), nullptr, "GetKey(4)", "null");
+    SHOULD_NOT_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)",
+                     "false");
+    SHOULD_NOT_EQUAL(value1.InsertKey(ss_var, 4), false, "InsertKey(4)",
+                     "false");
+    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
+                 "SetCharAndLength()", "false");
     SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
     SHOULD_NOT_EQUAL(value1.GetObject()->Storage(), nullptr,
                      "GetArray()->Storage()", "null");
@@ -2084,6 +2132,7 @@ static int TestObjectValue1() {
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
     SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
     SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
