@@ -93,7 +93,7 @@ class TestHelper {
         if (!TestHelper::StartTest(name, func)) {                              \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define SHOULD_EQUAL(left, right, name, value)                                 \
     do {                                                                       \
@@ -102,7 +102,7 @@ class TestHelper {
             TestHelper::PrintErrorMessage(false, name, value);                 \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define SHOULD_EQUAL_VALUE(left, right, name)                                  \
     do {                                                                       \
@@ -111,7 +111,7 @@ class TestHelper {
             TestHelper::PrintErrorMessage(false, name, right);                 \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define SHOULD_NOT_EQUAL(left, right, name, value)                             \
     do {                                                                       \
@@ -120,7 +120,7 @@ class TestHelper {
             TestHelper::PrintErrorMessage(true, name, value);                  \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define SHOULD_NOT_EQUAL_VALUE(left, right, name)                              \
     do {                                                                       \
@@ -129,7 +129,7 @@ class TestHelper {
             TestHelper::PrintErrorMessage(true, name, right);                  \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define SHOULD_EQUAL_TRUE(condition, name)                                     \
     do {                                                                       \
@@ -138,7 +138,7 @@ class TestHelper {
             TestHelper::PrintErrorMessage(false, name, "true");                \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define SHOULD_NOT_EQUAL_TRUE(condition, name)                                 \
     do {                                                                       \
@@ -147,13 +147,15 @@ class TestHelper {
             TestHelper::PrintErrorMessage(true, name, "true");                 \
             return 1;                                                          \
         }                                                                      \
-    } while (0)
+    } while (false)
 
 #define END_SUB_TEST return 0
 
 #define END_TEST(name)                                                         \
-    TestHelper::EndTest(name);                                                 \
-    return 0
+    do {                                                                       \
+        TestHelper::EndTest(name);                                             \
+        return 0;                                                              \
+    } while (false)
 
 namespace Test {
 
