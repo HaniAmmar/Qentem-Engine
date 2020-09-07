@@ -15,9 +15,9 @@ int main() {
     value["version"] = 3.0;
 
     String content(R"({var:name}, {var:version})");
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     // Or
     // const char *temp = R"({var:name}, {var:version})";
-    // std::cout << Template<>::Render(temp, &value).Char() << '\n';
+    // std::cout << Template<>::Render(temp, &value).Storage() << '\n';
 }

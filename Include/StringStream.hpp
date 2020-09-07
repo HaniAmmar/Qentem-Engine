@@ -107,7 +107,7 @@ class StringStream {
     }
 
     void operator+=(const String &src) {
-        add_(src.Char(), src.Length());
+        add_(src.Storage(), src.Length());
     }
 
     inline void operator+=(const char *str) {
@@ -131,13 +131,31 @@ class StringStream {
         }
     }
 
-    inline const char *Char() const noexcept {
+    inline const char *Storage() const noexcept {
         if (offset_ != 0) {
             str_[offset_] = '\0';
             return str_;
         }
 
         return nullptr;
+    }
+
+    // To write directly to the buffer, set the needed length.
+    char *Buffer(ULong len) noexcept {
+        const ULong current_offset = offset_;
+        offset_ += len;
+
+        if (capacity_ < offset_) {
+            ULong size = (ULong{1} << Q_CLZL(offset_));
+
+            if (size < offset_) {
+                size <<= 1U;
+            }
+
+            expand_(size);
+        }
+
+        return (str_ + current_offset);
     }
 
     inline ULong Length() const noexcept {

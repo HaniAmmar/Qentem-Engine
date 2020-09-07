@@ -1052,7 +1052,7 @@ inline static Value Parse(const char *content, ULong length) {
 }
 
 inline static Value Parse(const String &content) {
-    return Parse(content.Char(), content.Length());
+    return Parse(content.Storage(), content.Length());
 }
 
 inline static Value Parse(const char *content) {

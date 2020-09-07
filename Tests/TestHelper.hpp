@@ -32,6 +32,8 @@
 #ifndef QENTEM_TESTHELPER_H_
 #define QENTEM_TESTHELPER_H_
 
+namespace Qentem {
+
 class TestHelper {
   public:
     QENTEM_NOINLINE static unsigned long &LineNumber() {
@@ -153,7 +155,6 @@ class TestHelper {
     TestHelper::EndTest(name);                                                 \
     return 0
 
-namespace Qentem {
 namespace Test {
 
 static int TestThrow1_1() {

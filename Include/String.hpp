@@ -73,13 +73,13 @@ class String {
         HAllocator::Deallocate(storage_);
     }
 
-    inline char &operator[](ULong index) const {
-        if (index < length_) {
-            return storage_[index];
-        }
+    // inline char &operator[](ULong index) const {
+    //     if (index < length_) {
+    //         return storage_[index];
+    //     }
 
-        throw 1; // Index out of range
-    }
+    //     throw 1; // Index out of range
+    // }
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
@@ -214,7 +214,7 @@ class String {
         return str;
     }
 
-    inline const char *Char() const noexcept {
+    inline const char *Storage() const noexcept {
         return storage_;
     }
 

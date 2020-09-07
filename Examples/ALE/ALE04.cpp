@@ -37,7 +37,7 @@ struct aleHelper : ALEHelper {
             val = value_->GetValue(left, left_length);
 
             if (val != nullptr) {
-                str_left        = val->Char();
+                str_left        = val->StringStorage();
                 str_left_length = val->Length();
             } else {
                 return false;
@@ -51,7 +51,7 @@ struct aleHelper : ALEHelper {
             val = value_->GetValue(right, right_length);
 
             if (val != nullptr) {
-                str_right        = val->Char();
+                str_right        = val->StringStorage();
                 str_right_length = val->Length();
             } else {
                 return false;
@@ -61,8 +61,9 @@ struct aleHelper : ALEHelper {
             str_right_length = right_length;
         }
 
-        result = ((str_left_length == str_right_length) &&
-                  String::Compare(str_right, str_left, str_right_length));
+        result =
+            ((str_left_length == str_right_length) &&
+             Qentem::Memory::Compare(str_right, str_left, str_right_length));
 
         return true;
     }

@@ -751,7 +751,7 @@ class Value {
     }
 
     explicit operator const char *() const noexcept {
-        return Char();
+        return StringStorage();
     }
 
     explicit operator bool() const noexcept {
@@ -875,9 +875,9 @@ class Value {
         return nullptr;
     }
 
-    const char *Char() const noexcept {
+    const char *StringStorage() const noexcept {
         if ((type_ == ValueType::String) && (value_.string_ != nullptr)) {
-            return value_.string_->Char();
+            return value_.string_->Storage();
         }
 
         return nullptr;
@@ -894,7 +894,7 @@ class Value {
     bool SetCharAndLength(const char *&  key,
                           Qentem::ULong &length) const noexcept {
         if ((type_ == ValueType::String) && (value_.string_ != nullptr)) {
-            key    = value_.string_->Char();
+            key    = value_.string_->Storage();
             length = value_.string_->Length();
 
             return true;
@@ -1005,7 +1005,7 @@ class Value {
 
             case ValueType::String: {
                 return Digit::StringToNumber(
-                    value, value_.string_->Char(),
+                    value, value_.string_->Storage(),
                     static_cast<UInt>(value_.string_->Length()));
             }
 
@@ -1169,13 +1169,13 @@ class Value {
                     ++ha_item;
 
                     if ((ha_item == nullptr) ||
-                        (ha_item->Key.Char() == nullptr) ||
+                        (ha_item->Key.Storage() == nullptr) ||
                         (ha_item->Value.type_ == ValueType::Undefined)) {
                         continue; // Deleted item.
                     }
 
                     ss += '"';
-                    JSON::EscapeString(ha_item->Key.Char(),
+                    JSON::EscapeString(ha_item->Key.Storage(),
                                        ha_item->Key.Length(), ss);
                     ss += '"';
                     ss += ':';
@@ -1198,7 +1198,7 @@ class Value {
 
                     case ValueType::String: {
                         ss += '"';
-                        JSON::EscapeString(item->value_.string_->Char(),
+                        JSON::EscapeString(item->value_.string_->Storage(),
                                            item->value_.string_->Length(), ss);
                         ss += '"';
                         break;
@@ -1231,7 +1231,7 @@ class Value {
                 ss += ',';
             } while (++id != size);
 
-            if (ss.Char()[(ss.Length() - 1)] == ',') {
+            if (ss.Storage()[(ss.Length() - 1)] == ',') {
                 ss.StepBack(1);
             }
         }

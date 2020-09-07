@@ -122,5 +122,5 @@ int main() {
 </html>
 )HTML");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 }

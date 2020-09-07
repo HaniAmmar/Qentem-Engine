@@ -20,7 +20,7 @@ int main() {
 [loop1-id]: loop1-value</loop>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:

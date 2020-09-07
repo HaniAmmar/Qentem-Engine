@@ -16,7 +16,7 @@ int main() {
     String content(
         R"(<loop times="{var:size}" index="5" key="loop1-id">loop1-id</loop>)");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -28,7 +28,7 @@ int main() {
     content =
         R"(<loop times="{var:size}" index="{var:start-at}" key="loop1-id">loop1-id</loop>)";
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:

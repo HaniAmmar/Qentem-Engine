@@ -325,23 +325,23 @@ static int TestArray3() {
     String str1("val1");
     String str2("val2");
 
-    const char *str1_cstr = str1.Char();
-    const char *str2_cstr = str2.Char();
+    const char *str1_cstr = str1.Storage();
+    const char *str2_cstr = str2.Storage();
 
     strings += static_cast<String &&>(str1);
-    SHOULD_EQUAL(strings[0].Char(), str1_cstr, "strings[0].Char()",
+    SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
                  "str1_cstr");
 
     strings.Add(static_cast<String &&>(str2));
-    SHOULD_EQUAL(strings[1].Char(), str2_cstr, "strings[1].Char()",
+    SHOULD_EQUAL(strings[1].Storage(), str2_cstr, "strings[1].Storage()",
                  "str2_cstr");
 
     strings += str1;
-    SHOULD_NOT_EQUAL(strings[2].Char(), str1_cstr, "strings[2].Char()",
+    SHOULD_NOT_EQUAL(strings[2].Storage(), str1_cstr, "strings[2].Storage()",
                      "str1_cstr");
 
     strings.Add(str2);
-    SHOULD_NOT_EQUAL(strings[3].Char(), str2_cstr, "strings[3].Char()",
+    SHOULD_NOT_EQUAL(strings[3].Storage(), str2_cstr, "strings[3].Storage()",
                      "str2_cstr");
 
     // Checking move after expanding.
@@ -349,10 +349,10 @@ static int TestArray3() {
         strings += String("");
     }
 
-    SHOULD_EQUAL(strings[0].Char(), str1_cstr, "strings[0].Char()",
+    SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
                  "str1_cstr");
 
-    SHOULD_EQUAL(strings[1].Char(), str2_cstr, "strings[1].Char()",
+    SHOULD_EQUAL(strings[1].Storage(), str2_cstr, "strings[1].Storage()",
                  "str2_cstr");
 
     END_SUB_TEST;
@@ -365,8 +365,8 @@ static int TestArray4() {
     String str1("val1");
     String str2("val2");
 
-    const char *str1_cstr = str1.Char();
-    const char *str2_cstr = str2.Char();
+    const char *str1_cstr = str1.Storage();
+    const char *str2_cstr = str2.Storage();
 
     strings1 += static_cast<String &&>(str1);
     strings1 += static_cast<String &&>(str2);
@@ -374,18 +374,18 @@ static int TestArray4() {
     strings2 += strings1;
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
     SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(strings2[0].Char(), str1_cstr, "strings[0].Char()",
+    SHOULD_NOT_EQUAL(strings2[0].Storage(), str1_cstr, "strings[0].Storage()",
                      "str1_cstr");
-    SHOULD_NOT_EQUAL(strings2[1].Char(), str2_cstr, "strings[1].Char()",
+    SHOULD_NOT_EQUAL(strings2[1].Storage(), str2_cstr, "strings[1].Storage()",
                      "str2_cstr");
 
     strings2.SetCapacity(2);
     strings2 += static_cast<Array<String> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
     SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL(strings2[0].Char(), str1_cstr, "strings[0].Char()",
+    SHOULD_EQUAL(strings2[0].Storage(), str1_cstr, "strings[0].Storage()",
                  "str1_cstr");
-    SHOULD_EQUAL(strings2[1].Char(), str2_cstr, "strings[1].Char()",
+    SHOULD_EQUAL(strings2[1].Storage(), str2_cstr, "strings[1].Storage()",
                  "str2_cstr");
 
     END_SUB_TEST;

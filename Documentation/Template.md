@@ -118,11 +118,11 @@ int main() {
     value["version"] = 3.0;
 
     String content(R"({var:name}, {var:version})");
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     // Or
     // const char *temp = R"({var:name}, {var:version})";
-    // std::cout << Template<>::Render(temp, &value).Char() << '\n';
+    // std::cout << Template<>::Render(temp, &value).Storage() << '\n';
 }
 ```
 
@@ -164,7 +164,7 @@ int main() {
 9 % 5 = {math:9 % 5}
 )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -274,7 +274,7 @@ int main() {
 loopID1: loopVAL1</loop>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -310,7 +310,7 @@ int main() {
 loopID1: loopVAL1</loop>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -346,7 +346,7 @@ int main() {
 [loop1-id]: loop1-value</loop>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -388,7 +388,7 @@ loop1-key: loop2-key:
 </loop>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -453,7 +453,7 @@ int main() {
         times="2" key="loop2-id"><loop
         times="2" key="loop3-id">(loop1-id: loop2-id: loop3-id) </loop></loop></loop>)");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -483,7 +483,7 @@ int main() {
     String content(
         R"(<loop times="{var:size}" index="5" key="loop1-id">loop1-id</loop>)");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -495,7 +495,7 @@ int main() {
     content =
         R"(<loop times="{var:size}" index="{var:start-at}" key="loop1-id">loop1-id</loop>)";
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -558,7 +558,7 @@ item[var1] item[var2] item[var3] item[var4]</loop>
 item[0] item[1] item[2] item[3]</loop>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -629,7 +629,7 @@ Not zero or one or two.
 </if>
     )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -672,7 +672,7 @@ Zero!
 </if>
 )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 
     /*
         Output:
@@ -750,7 +750,7 @@ int main() {
 </html>
 )");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 }
 ```
 
@@ -881,6 +881,6 @@ int main() {
 </html>
 )HTML");
 
-    std::cout << Template<>::Render(content, &value).Char() << '\n';
+    std::cout << Template<>::Render(content, &value).Storage() << '\n';
 }
 ```

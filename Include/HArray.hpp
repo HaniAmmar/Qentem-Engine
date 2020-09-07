@@ -128,7 +128,7 @@ class HArray {
 
         while (src_item != end) {
             if (src_item->Hash != 0) {
-                HAItem_T **item = find_(src_item->Key.Char(),
+                HAItem_T **item = find_(src_item->Key.Storage(),
                                         src_item->Key.Length(), src_item->Hash);
 
                 if ((*item) == nullptr) {
@@ -170,7 +170,7 @@ class HArray {
 
         while (c_item != end) {
             if (c_item->Hash != 0) {
-                HAItem_T **item = find_(c_item->Key.Char(),
+                HAItem_T **item = find_(c_item->Key.Storage(),
                                         c_item->Key.Length(), c_item->Hash);
 
                 if ((*item) == nullptr) {
@@ -186,19 +186,19 @@ class HArray {
     }
 
     Value_ &operator[](String &&key) {
-        if (key.Char() != nullptr) {
-            const ULong hash = Hash(key.Char(), key.Length());
+        if (key.Storage() != nullptr) {
+            const ULong hash = Hash(key.Storage(), key.Length());
 
             if (capacity_ == 0) {
                 init_storage_();
             }
 
-            HAItem_T **item = find_(key.Char(), key.Length(), hash);
+            HAItem_T **item = find_(key.Storage(), key.Length(), hash);
 
             if ((*item) == nullptr) {
                 if (size_ == capacity_) {
                     grow_();
-                    item = find_(key.Char(), key.Length(), hash);
+                    item = find_(key.Storage(), key.Length(), hash);
                 }
 
                 (*item) = (storage_ + size_);
@@ -238,19 +238,19 @@ class HArray {
     }
 
     inline Value_ &operator[](const String &key) {
-        if (key.Char() != nullptr) {
-            const ULong hash = Hash(key.Char(), key.Length());
+        if (key.Storage() != nullptr) {
+            const ULong hash = Hash(key.Storage(), key.Length());
 
             if (capacity_ == 0) {
                 init_storage_();
             }
 
-            HAItem_T **item = find_(key.Char(), key.Length(), hash);
+            HAItem_T **item = find_(key.Storage(), key.Length(), hash);
 
             if ((*item) == nullptr) {
                 if (size_ == capacity_) {
                     grow_();
-                    item = find_(key.Char(), key.Length(), hash);
+                    item = find_(key.Storage(), key.Length(), hash);
                 }
 
                 (*item) = (storage_ + size_);
@@ -301,8 +301,8 @@ class HArray {
 
     const HAItem_T *GetItem(const String &key) const noexcept {
         // You can get the index of the item using (*GetItem() - *Storage())
-        return (
-            *(find_(key.Char(), key.Length(), Hash(key.Char(), key.Length()))));
+        return (*(find_(key.Storage(), key.Length(),
+                        Hash(key.Storage(), key.Length()))));
     }
 
     Value_ *Find(const char *key, ULong length) const noexcept {
@@ -318,7 +318,7 @@ class HArray {
     }
 
     inline Value_ *Find(const String &key) const noexcept {
-        return Find(key.Char(), key.Length());
+        return Find(key.Storage(), key.Length());
     }
 
     inline void Delete(const char *key, ULong lengthy) noexcept {
@@ -326,7 +326,7 @@ class HArray {
     }
 
     inline void Delete(const String &key) noexcept {
-        Delete(key.Char(), key.Length());
+        Delete(key.Storage(), key.Length());
     }
 
     void DeleteIndex(ULong index) noexcept {
@@ -334,7 +334,7 @@ class HArray {
             const HAItem_T &item = storage_[index];
 
             if (item.Hash != 0) {
-                delete_(item.Key.Char(), item.Key.Length(), item.Hash);
+                delete_(item.Key.Storage(), item.Key.Length(), item.Hash);
             }
         }
     }
@@ -346,20 +346,20 @@ class HArray {
     bool Rename(const String &from, String &&to) noexcept {
         if (capacity_ != 0) {
             HAItem_T **left_item =
-                (hash_table_ + (Hash(from.Char(), from.Length()) & base_));
+                (hash_table_ + (Hash(from.Storage(), from.Length()) & base_));
             HAItem_T **before = left_item;
 
             while (((*left_item) != nullptr) &&
                    (((*left_item)->Key.Length() != from.Length()) ||
-                    !(Memory::Compare((*left_item)->Key.Char(), from.Char(),
-                                      from.Length())))) {
+                    !(Memory::Compare((*left_item)->Key.Storage(),
+                                      from.Storage(), from.Length())))) {
                 before    = left_item; // Store the previous item
                 left_item = &((*left_item)->Next);
             }
 
             if ((*left_item) != nullptr) {
-                const ULong hash       = Hash(to.Char(), to.Length());
-                HAItem_T ** right_item = find_(to.Char(), to.Length(), hash);
+                const ULong hash       = Hash(to.Storage(), to.Length());
+                HAItem_T ** right_item = find_(to.Storage(), to.Length(), hash);
 
                 if ((*right_item) == nullptr) {
                     (*right_item)       = (*left_item);
@@ -555,7 +555,7 @@ class HArray {
 
         while (((*item) != nullptr) &&
                (((*item)->Key.Length() != length) ||
-                !(Memory::Compare((*item)->Key.Char(), key, length)))) {
+                !(Memory::Compare((*item)->Key.Storage(), key, length)))) {
             item = &((*item)->Next);
         }
 
@@ -576,7 +576,7 @@ class HArray {
 
             while (((*item) != nullptr) &&
                    (((*item)->Key.Length() != length) ||
-                    !(Memory::Compare((*item)->Key.Char(), key, length)))) {
+                    !(Memory::Compare((*item)->Key.Storage(), key, length)))) {
                 before = item; // Store the previous item
                 item   = &((*item)->Next);
             }

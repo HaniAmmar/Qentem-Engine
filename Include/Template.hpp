@@ -243,12 +243,12 @@ class Template : Engine, ALEHelper {
 
     inline static void Render(StringStream &ss, const String &content,
                               const Value_ *root_value) {
-        Render(ss, content.Char(), content.Length(), root_value);
+        Render(ss, content.Storage(), content.Length(), root_value);
     }
 
     inline static String Render(const String &content,
                                 const Value_ *root_value) {
-        return Render(content.Char(), content.Length(), root_value);
+        return Render(content.Storage(), content.Length(), root_value);
     }
 
   private:
@@ -1268,11 +1268,12 @@ class Template : Engine, ALEHelper {
                       ULong length, ULong index, ULong size,
                       const Value_ *root_value, UInt key_length,
                       UInt value_length) const {
-        StringStream  ss;
-        ULong         last_offset;
-        ULong         sub_id;
-        const Value_ *value;
-        const bool    is_array = (root_value->IsArray() || (size != 0));
+        StringStream     ss;
+        ULong            last_offset;
+        ULong            sub_id;
+        const Value_ *   value;
+        const bool       is_array = (root_value->IsArray() || (size != 0));
+        const loopItem_ *end      = (items.Storage() + items.Size());
 
         if (size == 0) {
             size = root_value->Size();
@@ -1281,7 +1282,6 @@ class Template : Engine, ALEHelper {
         while (index < size) {
             last_offset           = 0;
             const loopItem_ *item = items.Storage();
-            const loopItem_ *end  = (items.Storage() + items.Size());
 
             while (item < end) {
                 if (last_offset < item->Offset) {
@@ -1300,16 +1300,18 @@ class Template : Engine, ALEHelper {
                             last_offset += item->SubLength;
                             last_offset += 2U;
 
-                            if (value->IsObject()) {
+                            if (value->IsArray()) {
+                                if ((Digit::StringToNumber(
+                                        sub_id, &(content[item->SubOffset]),
+                                        item->SubLength))) {
+                                    value = value->GetValue(sub_id);
+                                } else {
+                                    value = nullptr;
+                                }
+                            } else {
                                 value =
                                     value->GetValue(&(content[item->SubOffset]),
                                                     item->SubLength);
-                            } else if ((Digit::StringToNumber(
-                                           sub_id, &(content[item->SubOffset]),
-                                           item->SubLength))) {
-                                value = value->GetValue(sub_id);
-                            } else {
-                                value = nullptr;
                             }
 
                             if (value != nullptr) {
@@ -1559,8 +1561,7 @@ class Template : Engine, ALEHelper {
                 (length - TemplatePattern::VariableFulllength)); // {var:x}
 
             if (value != nullptr) {
-                if (value->IsNumber()) {
-                    number = value->GetNumber();
+                if (value->GetNumber(number)) {
                     return true;
                 }
 
@@ -1651,7 +1652,7 @@ class Template : Engine, ALEHelper {
         if (value_left != nullptr) {
             if (!(value_left->SetCharAndLength(str_left, str_length_left))) {
                 if (value_left->SetString(string_left)) {
-                    str_left        = string_left.Char();
+                    str_left        = string_left.Storage();
                     str_length_left = string_left.Length();
                 } else {
                     return false;
@@ -1670,7 +1671,7 @@ class Template : Engine, ALEHelper {
         if (value_right != nullptr) {
             if (!(value_right->SetCharAndLength(str_right, str_length_right))) {
                 if (value_right->SetString(string_right)) {
-                    str_right        = string_right.Char();
+                    str_right        = string_right.Storage();
                     str_length_right = string_right.Length();
                 } else {
                     return false;

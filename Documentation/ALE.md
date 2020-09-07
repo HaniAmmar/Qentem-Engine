@@ -167,7 +167,7 @@ struct aleHelper : ALEHelper {
             val = value_->GetValue(left, left_length);
 
             if (val != nullptr) {
-                str_left        = val->Char();
+                str_left        = val->Storage();
                 str_left_length = val->Length();
             } else {
                 return false;
@@ -181,7 +181,7 @@ struct aleHelper : ALEHelper {
             val = value_->GetValue(right, right_length);
 
             if (val != nullptr) {
-                str_right        = val->Char();
+                str_right        = val->Storage();
                 str_right_length = val->Length();
             } else {
                 return false;
