@@ -188,6 +188,35 @@ static int TestStringStream() {
         "123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789",
         "GetString()", "123456789*13");
 
+    ss1.Clear();
+
+    char *buffer = ss1.Buffer(2);
+
+    SHOULD_EQUAL_VALUE(ss1.Length(), 2, "Length");
+
+    buffer[0] = 'a';
+    buffer[1] = 'b';
+
+    const char *ab = "ab";
+
+    SHOULD_EQUAL_VALUE(ss1.Length(), 2, "Length");
+    SHOULD_EQUAL_TRUE(Memory::Compare(ss1.Storage(), ab, 2), "Compare()");
+
+    buffer = ss1.Buffer(1);
+
+    SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
+
+    buffer[0] = 'c';
+
+    const char *ab2 = "abc";
+    SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
+    SHOULD_EQUAL_TRUE(Memory::Compare(ss1.Storage(), ab2, 3), "Compare()");
+
+    ss1 += "de";
+
+    SHOULD_EQUAL_VALUE(ss1.Length(), 5, "Length");
+    SHOULD_EQUAL_VALUE(ss1.GetString(), "abcde", "GetString()");
+
     END_SUB_TEST;
 }
 

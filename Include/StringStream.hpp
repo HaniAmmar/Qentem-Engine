@@ -106,15 +106,15 @@ class StringStream {
         ++offset_;
     }
 
-    void operator+=(const String &src) {
+    inline void operator+=(const String &src) {
         add_(src.Storage(), src.Length());
     }
 
     inline void operator+=(const char *str) {
-        Add(str, String::Count(str));
+        add_(str, String::Count(str));
     }
 
-    void Add(const char *str, ULong length) {
+    inline void Add(const char *str, ULong length) {
         add_(str, length);
     }
 
