@@ -604,7 +604,7 @@ class JSONParser : Engine {
                 return ret;
             }
 
-            case Type_::Quote: {
+            default: {
                 UInt  times      = 0;
                 ULong tmp_offset = (end_before - 1);
 
@@ -621,12 +621,7 @@ class JSONParser : Engine {
 
                 return 0;
             }
-
-            default: {
-            }
         }
-
-        return 0;
     }
 
     void Found(const char *content, ULong offset, ULong end_before,
