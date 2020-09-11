@@ -178,11 +178,11 @@ class StringStream {
     String GetString() {
         if (offset_ != 0) {
             const ULong len = offset_;
-            str_[offset_]   = '\0';
+            char *      tmp = str_;
+            tmp[offset_]    = '\0';
+            str_            = nullptr;
             offset_         = 0;
             capacity_       = 0;
-            char *tmp       = str_;
-            str_            = nullptr;
             return String(tmp, len);
         }
 

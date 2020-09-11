@@ -345,13 +345,12 @@ class HArray {
      */
     bool Rename(const String &from, String &&to) noexcept {
         if (capacity_ != 0) {
-            ULong      hash = Hash(from.Storage(), from.Length());
-            HAItem_T **left_item =
-                (hash_table_ + (Hash(from.Storage(), from.Length()) & base_));
-            HAItem_T **before = left_item;
+            const ULong hash_from = Hash(from.Storage(), from.Length());
+            HAItem_T ** left_item = (hash_table_ + (hash_from & base_));
+            HAItem_T ** before    = left_item;
 
             while (((*left_item) != nullptr) &&
-                   (((*left_item)->Hash != hash) ||
+                   (((*left_item)->Hash != hash_from) ||
                     ((*left_item)->Key.Length() != from.Length()) ||
                     !(Memory::Compare((*left_item)->Key.Storage(),
                                       from.Storage(), from.Length())))) {
@@ -360,13 +359,14 @@ class HArray {
             }
 
             if ((*left_item) != nullptr) {
-                const ULong hash       = Hash(to.Storage(), to.Length());
-                HAItem_T ** right_item = find(to.Storage(), to.Length(), hash);
+                const ULong hash_to = Hash(to.Storage(), to.Length());
+                HAItem_T ** right_item =
+                    find(to.Storage(), to.Length(), hash_to);
 
                 if ((*right_item) == nullptr) {
                     (*right_item)       = (*left_item);
                     (*right_item)->Key  = static_cast<String &&>(to);
-                    (*right_item)->Hash = hash;
+                    (*right_item)->Hash = hash_to;
 
                     // See remove() for the next part
                     if ((*before) >= (*right_item)) {

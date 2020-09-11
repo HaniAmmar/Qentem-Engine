@@ -338,15 +338,15 @@ class JSONParser : Engine {
                                     }
 
 #ifdef QENTEM_SIMD_ENABLED_
-                                    FindCache_ fc = FindCache_();
-                                    find_cache_   = &fc;
+                                    FindCache_ fc;
+                                    find_cache_ = &fc;
 #endif
 
                                     FindNest(content, ++offset, length, length);
 
                                     if (!has_error_ && !pass_comma_) {
                                         length -= (offset - 1);
-                                        digDeeper(content, offset, length);
+                                        searchAgain(content, offset, length);
                                     }
 
                                     if (next_offset_ == 0) {
@@ -589,7 +589,7 @@ class JSONParser : Engine {
                 if (!(jp.has_error_) && (!(pass_comma_) || !(jp.pass_comma_)) &&
                     ((child_obj_ == nullptr) || jp.has_colon_)) {
                     // if the scan is not done.
-                    jp.digDeeper(content, offset, (end_before - offset));
+                    jp.searchAgain(content, offset, (end_before - offset));
                 }
 
                 if (jp.has_error_) {
@@ -856,7 +856,7 @@ class JSONParser : Engine {
      * Look for anything before ] or } and after comma, as not possable to
      * match if it was a number/false/true/null
      */
-    inline void digDeeper(const char *content, ULong offset, ULong length) {
+    inline void searchAgain(const char *content, ULong offset, ULong length) {
         type_ = Type_::Comma;
         --length;
 
@@ -1022,11 +1022,12 @@ class JSONParser : Engine {
 
     HArray<Value> *child_obj_{nullptr};
     Array<Value> * child_arr_{nullptr};
-    ULong          next_offset_{0};
 
     Value *     child_obj_value_{nullptr};
     Value *     obj_value_{nullptr};
     FindCache_ *find_cache_{nullptr};
+
+    ULong next_offset_{0};
 
     Type_ type_{Type_::None};
 

@@ -42,7 +42,6 @@ struct ALEHelper {
  */
 class ALE : Engine {
     struct Item_;
-    struct FindCache_;
 
   public:
     static bool Evaluate(double &number, const char *content, UInt length,
@@ -51,8 +50,7 @@ class ALE : Engine {
 
         if ((content != nullptr) && (length != 0)) {
             Array<Item_> items;
-            FindCache_   fc = FindCache_();
-            ALE(&items, callback, &fc).FindNest(content, 0, length, length);
+            ALE(&items, callback).FindNest(content, 0, length, length);
 
             if (items.Size() != 0) {
                 sortOperations(items, content, 0, length);
@@ -118,15 +116,16 @@ class ALE : Engine {
         Array<Item_> SubItems{};
     };
 
-    explicit ALE(Array<Item_> *items, const ALEHelper *callback,
-                 FindCache_ *find_cache) noexcept
-        : items_(items), callback_(callback), find_cache_(find_cache) {
+    ALE() = delete;
+
+    ALE(Array<Item_> *items, const ALEHelper *callback)
+    noexcept : items_(items), callback_(callback) {
     }
 
     ULong nest(const char *content, ULong offset, ULong end_before,
                ULong max_end_before) final {
         if ((offset + 1) != end_before) {
-            return ALE(&(item_.SubItems), callback_, find_cache_)
+            return ALE(&(item_.SubItems), callback_)
                 .FindNest(content, offset, end_before, max_end_before);
         }
 
@@ -696,16 +695,9 @@ class ALE : Engine {
         return true;
     }
 
-    struct FindCache_ {
-        ULong        Offset{0};
-        ULong        NextOffset{0};
-        QMM_Number_T Bits{0};
-    };
-
     Item_            item_;
     Array<Item_> *   items_;
     const ALEHelper *callback_;
-    FindCache_ *     find_cache_{nullptr};
 };
 
 } // namespace Qentem
