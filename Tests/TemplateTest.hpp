@@ -1740,6 +1740,9 @@ static int TestLoopTag3() {
         R"(<loop set="array" value="item">item[var11]item[var22]item[var33] item[var44]</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), " ", "Render()");
 
+    content = R"(<loop times="1"><l</loop>)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "<l", "Render()");
+
     END_SUB_TEST;
 }
 

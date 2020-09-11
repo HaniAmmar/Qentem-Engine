@@ -383,12 +383,14 @@ class Template : Engine, ALEHelper {
             }
 
             ULong index = (Q_CTZL(find_cache_.Bits) + find_cache_.Offset);
+            find_cache_.Bits &= (find_cache_.Bits - 1);
 
             if (index >= end_before) {
                 return 0;
             }
 
             if (index >= offset) {
+                ++offset;
                 switch (content[index]) {
 #else
         ULong index = 0;
@@ -616,9 +618,7 @@ class Template : Engine, ALEHelper {
 
 #ifdef QENTEM_SIMD_ENABLED_
             }
-            find_cache_.Bits &= (find_cache_.Bits - 1);
         } while (true);
-
 #else
             ++offset;
         }
