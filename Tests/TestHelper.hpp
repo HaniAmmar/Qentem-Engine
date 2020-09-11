@@ -20,11 +20,7 @@
  * SOFTWARE.
  */
 
-#ifdef _MSC_VER
-#define QENTEM_NOINLINE __declspec(noinline)
-#else
-#define QENTEM_NOINLINE __attribute__((noinline))
-#endif
+#include "Common.hpp"
 
 #include <iostream>
 #include <sstream>

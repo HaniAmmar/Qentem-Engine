@@ -110,8 +110,8 @@ static void Copy(void *to, const void *form, ULong size) noexcept {
 #endif
 }
 
-inline static bool Compare(const void *left, const void *right,
-                           ULong length) noexcept {
+static bool Compare(const void *left, const void *right,
+                    ULong length) noexcept {
     ULong offset = 0;
     if ((left != nullptr) && (right != nullptr) && (offset != length)) {
 #ifdef QENTEM_SIMD_ENABLED_

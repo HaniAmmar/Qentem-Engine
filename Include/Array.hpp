@@ -117,7 +117,7 @@ class Array {
             const ULong n_size = (size_ + arr.size_);
 
             if (n_size > capacity_) {
-                resize_(n_size);
+                resize(n_size);
             }
 
             Memory::Copy((storage_ + size_), arr.storage_,
@@ -135,7 +135,7 @@ class Array {
         const ULong n_size = (size_ + arr.size_);
 
         if (n_size > capacity_) {
-            resize_(n_size);
+            resize(n_size);
         }
 
         ULong n = 0;
@@ -155,7 +155,7 @@ class Array {
                 capacity_ = 1;
             }
 
-            resize_(capacity_ << 1U);
+            resize(capacity_ << 1U);
         }
 
         HAllocator::Construct((storage_ + size_), static_cast<Type_ &&>(item));
@@ -166,22 +166,22 @@ class Array {
         *this += static_cast<Type_ &&>(Type_(item));
     }
 
-    Array &Add(Array &&arr) {
+    Array &Insert(Array &&arr) {
         *this += static_cast<Array &&>(arr);
         return *this;
     }
 
-    Array &Add(const Array &arr) {
+    Array &Insert(const Array &arr) {
         *this += static_cast<Array &&>(Array(arr));
         return *this;
     }
 
-    Array &Add(Type_ &&item) {
+    Array &Insert(Type_ &&item) {
         *this += static_cast<Type_ &&>(item);
         return *this;
     }
 
-    Array &Add(const Type_ &item) {
+    Array &Insert(const Type_ &item) {
         *this += static_cast<Type_ &&>(Type_(item));
         return *this;
     }
@@ -225,7 +225,7 @@ class Array {
             return;
         }
 
-        resize_(new_size);
+        resize(new_size);
     }
 
     void Compress() {
@@ -278,7 +278,7 @@ class Array {
     //////////// Private ////////////
 
   private:
-    void resize_(ULong new_size) {
+    void resize(ULong new_size) {
         Type_ *tmp = storage_;
         storage_   = HAllocator::Allocate<Type_>(new_size);
 

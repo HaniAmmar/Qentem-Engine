@@ -562,6 +562,9 @@ static int TestMathTag1() {
     value["a8"] = 1;
     value["a9"] = "1";
 
+    SHOULD_EQUAL_VALUE(Template<>::Render("{math:1+1}", &value), "2",
+                       "Render()");
+
     SHOULD_EQUAL_VALUE(Template<>::Render("{math:{var:a1}+8}", &value), R"(13)",
                        "Render()");
 
@@ -1634,7 +1637,7 @@ static int TestLoopTag3() {
     content = R"(<loop value="v">v</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "1030", "Render()");
 
-    value.Delete(1);
+    value.Remove(1);
 
     content = R"(<loop key="k">k</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "k1k3", "Render()");
@@ -1644,7 +1647,7 @@ static int TestLoopTag3() {
     value += 20;
     value += 30;
 
-    value.Delete(1);
+    value.Remove(1);
 
     content = R"(<loop value="v">v</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "1030", "Render()");
@@ -1916,10 +1919,12 @@ static int TestIfTag2() {
                        R"(<if case="1">Qentem)", "Render()");
 
     content = R"(<if case="1"><if case="1">{var:name}</if>)";
-    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"()", "Render()");
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value),
+                       R"(<if case="1">Qentem)", "Render()");
 
     content = R"(<if case="1"><if case="1"><if case="1">{var:name}</if></if>)";
-    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"()", "Render()");
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value),
+                       R"(<if case="1">Qentem)", "Render()");
 
     content = R"(<if case="ABC">{var:name}</if>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"()", "Render()");

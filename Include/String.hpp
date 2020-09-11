@@ -123,7 +123,7 @@ class String {
     }
 
     String &operator+=(String &&src) {
-        Add(src.storage_, src.length_);
+        Insert(src.storage_, src.length_);
         src.length_ = 0;
 
         HAllocator::Deallocate(src.storage_);
@@ -133,17 +133,17 @@ class String {
     }
 
     String &operator+=(const String &src) {
-        Add(src.storage_, src.length_);
+        Insert(src.storage_, src.length_);
         return *this;
     }
 
     String &operator+=(const char *str) {
-        Add(str, Count(str));
+        Insert(str, Count(str));
         return *this;
     }
 
     String operator+(String &&src) const {
-        String ns(Add(*this, src));
+        String ns(Insert(*this, src));
 
         src.length_ = 0;
         HAllocator::Deallocate(src.storage_);
@@ -153,7 +153,7 @@ class String {
     }
 
     inline String operator+(const String &src) const {
-        return Add(*this, src);
+        return Insert(*this, src);
     }
 
     String operator+(const char *str) const {
@@ -222,7 +222,7 @@ class String {
         return length_;
     }
 
-    static String Add(const String &src1, const String &src2) {
+    static String Insert(const String &src1, const String &src2) {
         String ns(src1.length_ + src2.length_);
         Memory::Copy(ns.storage_, src1.storage_, src1.length_);
         Memory::Copy((ns.storage_ + src1.length_), src2.storage_, src2.length_);
@@ -231,7 +231,7 @@ class String {
         return ns;
     }
 
-    void Add(const char *str, ULong len) {
+    void Insert(const char *str, ULong len) {
         if ((str != nullptr) && (len != 0)) {
             char *old_str = storage_;
             storage_      = HAllocator::Allocate<char>(length_ + len + 1);

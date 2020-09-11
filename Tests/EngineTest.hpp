@@ -80,6 +80,18 @@ static int TestEngine1() {
     content     = "  A A        A";
     content_len = 14;
 
+    ret = Engine::FindOne(*find_, content, 0, content_len);
+    SHOULD_EQUAL_VALUE(ret, 3, "return");
+
+    ret = Engine::FindOne(*find_, content, 2, content_len);
+    SHOULD_EQUAL_VALUE(ret, 3, "return");
+
+    ret = Engine::FindOne(*find_, content, 3, content_len);
+    SHOULD_EQUAL_VALUE(ret, 5, "return");
+
+    ret = Engine::FindOne(*find_, content, 7, content_len);
+    SHOULD_EQUAL_VALUE(ret, 14, "return");
+
     ret = Engine::Find(find_, find_len, content, 0, content_len);
     SHOULD_EQUAL_VALUE(ret, 3, "return");
 
@@ -286,42 +298,6 @@ static int TestEngine2() {
 
     ret = Engine::Find(find_, find_len, content, 0, content_len);
     SHOULD_EQUAL_VALUE(ret, 3, "return");
-
-#ifdef QENTEM_SIMD_ENABLED_
-    ret = Engine::Count("(", 1, "123(", 0, 4);
-    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
-
-    ret = Engine::Count("(", 1, "123(", 3, 4);
-    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
-
-    ret = Engine::Count("(", 1, "(123(", 0, 5);
-    SHOULD_EQUAL_VALUE(ret, 2, "Count()");
-
-    ret = Engine::Count("(", 1, "(123(", 1, 5);
-    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
-
-    ret = Engine::Count(
-        "(", 1, "123123123(1231231231231(23123123123(123123123123123(123", 0,
-        55);
-    SHOULD_EQUAL_VALUE(ret, 4, "Count()");
-
-    ret = Engine::Count("((", 2, "12((", 0, 4);
-    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
-
-    ret = Engine::Count("((", 2, "12((", 2, 4);
-    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
-
-    ret = Engine::Count("((", 2, "((1((", 0, 5);
-    SHOULD_EQUAL_VALUE(ret, 2, "Count()");
-
-    ret = Engine::Count("((", 2, "((1((", 1, 5);
-    SHOULD_EQUAL_VALUE(ret, 1, "Count()");
-
-    ret = Engine::Count(
-        "((", 2, "123123123((1231231231231((23123123123((123123123123123((123",
-        0, 59);
-    SHOULD_EQUAL_VALUE(ret, 4, "Count()");
-#endif
 
     END_SUB_TEST;
 }
@@ -648,8 +624,8 @@ static int TestEngine4() {
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 6, "items.Size()");
 
-    content     = "  ()  ()  ()()  ()";
-    content_len = 18;
+    content     = "  ()  ()  ()( )  (  )";
+    content_len = 21;
     test6_.getItems().SoftClear();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 5, "items.Size()");
@@ -660,9 +636,9 @@ static int TestEngine4() {
     SHOULD_EQUAL_VALUE(test6_.getItems()[2].Offset, 10, "items[2].Offset");
     SHOULD_EQUAL_VALUE(test6_.getItems()[2].Length, 2, "items[2].Length");
     SHOULD_EQUAL_VALUE(test6_.getItems()[3].Offset, 12, "items[3].Offset");
-    SHOULD_EQUAL_VALUE(test6_.getItems()[3].Length, 2, "items[3].Length");
-    SHOULD_EQUAL_VALUE(test6_.getItems()[4].Offset, 16, "items[4].Offset");
-    SHOULD_EQUAL_VALUE(test6_.getItems()[4].Length, 2, "items[4].Length");
+    SHOULD_EQUAL_VALUE(test6_.getItems()[3].Length, 3, "items[3].Length");
+    SHOULD_EQUAL_VALUE(test6_.getItems()[4].Offset, 17, "items[4].Offset");
+    SHOULD_EQUAL_VALUE(test6_.getItems()[4].Length, 4, "items[4].Length");
     SHOULD_EQUAL_VALUE(test6_.getVARS().Content, content, "Content");
     SHOULD_EQUAL_VALUE(test6_.getVARS().Offset, 0, "Offset");
     SHOULD_EQUAL_VALUE(test6_.getVARS().EndBefore, content_len, "EndBefore");
@@ -811,11 +787,11 @@ static int TestEngine5() {
 
     /*
      * The offset has to start after the head (one), because zero is the match
-     * that is being searched in.
+     * that is being searched for its tail.
      */
     ret2 =
         Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, content_len);
-    SHOULD_EQUAL_VALUE(ret2, 11, "return2");
+    SHOULD_EQUAL_VALUE(ret2, 12, "return2");
 
     ret2 =
         Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 0, content_len);
@@ -823,15 +799,23 @@ static int TestEngine5() {
 
     ret2 =
         Engine::SkipInnerPatterns("x", 1, "y", 1, content, 1, 7, content_len);
-    SHOULD_EQUAL_VALUE(ret2, 0, "return2");
-
-    ret2 =
-        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 2, content_len);
-    SHOULD_EQUAL_VALUE(ret2, 2, "return2");
-
-    ret2 =
-        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 3, content_len);
     SHOULD_EQUAL_VALUE(ret2, 7, "return2");
+
+    ret2 =
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 5, 6, content_len);
+    SHOULD_EQUAL_VALUE(ret2, 7, "return2");
+
+    ret2 =
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 4, 6, content_len);
+    SHOULD_EQUAL_VALUE(ret2, 8, "return2");
+
+    ret2 =
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 3, 6, content_len);
+    SHOULD_EQUAL_VALUE(ret2, 9, "return2");
+
+    ret2 =
+        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 3, 7, content_len);
+    SHOULD_EQUAL_VALUE(ret2, 10, "return2");
 
     ret2 = Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 7, 7);
     SHOULD_EQUAL_VALUE(ret2, 7, "return2");
@@ -849,10 +833,6 @@ static int TestEngine5() {
         Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 12, content_len);
     SHOULD_EQUAL_VALUE(ret2, 12, "return2");
 
-    ret2 =
-        Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 12, content_len);
-    SHOULD_EQUAL_VALUE(ret2, 12, "return2");
-
     content     = "{}";
     content_len = 2;
     ret2 =
@@ -863,7 +843,7 @@ static int TestEngine5() {
     content_len = 5;
     ret2 =
         Engine::SkipInnerPatterns("{", 1, "}", 1, content, 1, 5, content_len);
-    SHOULD_EQUAL_VALUE(ret2, 0, "return2");
+    SHOULD_EQUAL_VALUE(ret2, 5, "return2");
 
     END_SUB_TEST;
 }
@@ -888,7 +868,7 @@ static String toJSON(const Array<Item2__> &items, const char *content) {
         }
 
         ss += '"';
-        ss.Add(&(content[items[i].Offset]), items[i].Length);
+        ss.Insert((content + items[i].Offset), items[i].Length);
         ss += "\":{";
 
         ss += "\"O\":";
@@ -965,7 +945,7 @@ static int TestEngine6() {
             item.Length   = ((current_offset + length()) - start_offset);
             item.SubItems = static_cast<Array<Item2__> &&>(sub_items);
 
-            items_->Add(static_cast<Item2__ &&>(item));
+            items_->Insert(static_cast<Item2__ &&>(item));
 
             (void)content;
             (void)offset;
@@ -1036,7 +1016,7 @@ static int TestEngine6() {
         {1{2{3{4{5{6{7}8}9}10}10}12}13})";
 
     // content = R"({....})";
-    items.Clear();
+    items.SoftClear();
     test5_2 t52(&items);
     content_len = String::Count(content);
     t52.FindNest(content, 0, content_len, content_len);
@@ -1047,7 +1027,7 @@ static int TestEngine6() {
     SHOULD_EQUAL_VALUE(toJSON_result, result, "toJSON_result");
 
     content = "";
-    items.Clear();
+    items.SoftClear();
     content_len = 0;
     t52.FindNest(content, 0, content_len, content_len);
     toJSON_result = toJSON(items, content);
@@ -1055,13 +1035,13 @@ static int TestEngine6() {
     SHOULD_EQUAL_VALUE(toJSON_result, "{}", "toJSON_result");
 
     content = "{ { }";
-    items.Clear();
+    items.SoftClear();
     content_len = 5;
     t52.FindNest(content, 0, content_len, content_len);
-    SHOULD_EQUAL_VALUE(items.Size(), 0, "items.Size()");
+    SHOULD_EQUAL_VALUE(items.Size(), 1, "items.Size()");
 
     content = "{ {{ }}";
-    items.Clear();
+    items.SoftClear();
     content_len = 5;
     t52.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(items.Size(), 0, "items.Size()");

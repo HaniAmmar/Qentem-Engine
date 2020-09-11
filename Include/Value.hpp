@@ -50,49 +50,49 @@ static void EscapeString(const char *content, ULong length, StringStream &ss) {
             case '\r':
             case '\t': {
                 if (offset > offset2) {
-                    ss.Add((content + offset2), (offset - offset2));
+                    ss.Insert((content + offset2), (offset - offset2));
                 }
 
                 offset2 = offset + 1;
 
                 switch (content[offset]) {
                     case '\"': {
-                        ss.Add("\\\"", 2);
+                        ss.Insert("\\\"", 2);
                         break;
                     }
 
                     case '\\': {
-                        ss.Add("\\\\", 2);
+                        ss.Insert("\\\\", 2);
                         break;
                     }
 
                     case '/': {
-                        ss.Add("\\/", 2);
+                        ss.Insert("\\/", 2);
                         break;
                     }
 
                     case '\b': {
-                        ss.Add("\\b", 2);
+                        ss.Insert("\\b", 2);
                         break;
                     }
 
                     case '\f': {
-                        ss.Add("\\f", 2);
+                        ss.Insert("\\f", 2);
                         break;
                     }
 
                     case '\n': {
-                        ss.Add("\\n", 2);
+                        ss.Insert("\\n", 2);
                         break;
                     }
 
                     case '\r': {
-                        ss.Add("\\r", 2);
+                        ss.Insert("\\r", 2);
                         break;
                     }
 
                     case '\t': {
-                        ss.Add("\\t", 2);
+                        ss.Insert("\\t", 2);
                         break;
                     }
 
@@ -111,7 +111,7 @@ static void EscapeString(const char *content, ULong length, StringStream &ss) {
     }
 
     if (offset > offset2) {
-        ss.Add((content + offset2), (offset - offset2));
+        ss.Insert((content + offset2), (offset - offset2));
     }
 }
 } // namespace JSON
@@ -243,7 +243,7 @@ class Value {
             case ValueType::Undefined: {
                 type_          = ValueType::Object;
                 value_.object_ = HAllocator::Allocate(HArray<Value>(1));
-                return (*this)[key];
+                return (*(value_.object_))[static_cast<String &&>(key)];
             }
 
             default: {
@@ -262,7 +262,7 @@ class Value {
             case ValueType::Undefined: {
                 type_          = ValueType::Object;
                 value_.object_ = HAllocator::Allocate(HArray<Value>(1));
-                return (*this)[key];
+                return (*(value_.object_))[key];
             }
 
             default: {
@@ -953,17 +953,17 @@ class Value {
             }
 
             case ValueType::True: {
-                ss.Add("true", QENTEM_TRUE_LEN_);
+                ss.Insert("true", QENTEM_TRUE_LEN_);
                 return true;
             }
 
             case ValueType::False: {
-                ss.Add("false", QENTEM_FALSE_LEN_);
+                ss.Insert("false", QENTEM_FALSE_LEN_);
                 return true;
             }
 
             case ValueType::Null: {
-                ss.Add("null", QENTEM_NULL_LEN_);
+                ss.Insert("null", QENTEM_NULL_LEN_);
                 return true;
             }
 
@@ -1067,18 +1067,18 @@ class Value {
         return false;
     }
 
-    void Delete(ULong index) noexcept {
+    void Remove(ULong index) noexcept {
         if (type_ == ValueType::Object) {
-            value_.object_->DeleteIndex(index);
+            value_.object_->RemoveIndex(index);
         } else if ((type_ == ValueType::Array) &&
                    (index < value_.array_->Size())) {
             (value_.array_->First() + index)->Clear();
         }
     }
 
-    inline void Delete(const char *key, ULong length) noexcept {
+    inline void Remove(const char *key, ULong length) noexcept {
         if (type_ == ValueType::Object) {
-            value_.object_->Delete(key, length);
+            value_.object_->Remove(key, length);
         }
     }
 
@@ -1210,17 +1210,17 @@ class Value {
                     }
 
                     case ValueType::False: {
-                        ss.Add("false", QENTEM_FALSE_LEN_);
+                        ss.Insert("false", QENTEM_FALSE_LEN_);
                         break;
                     }
 
                     case ValueType::True: {
-                        ss.Add("true", QENTEM_TRUE_LEN_);
+                        ss.Insert("true", QENTEM_TRUE_LEN_);
                         break;
                     }
 
                     case ValueType::Null: {
-                        ss.Add("null", QENTEM_NULL_LEN_);
+                        ss.Insert("null", QENTEM_NULL_LEN_);
                         break;
                     }
 

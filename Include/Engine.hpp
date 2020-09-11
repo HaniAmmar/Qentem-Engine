@@ -121,73 +121,10 @@ class Engine {
 
         return 0;
     }
-
-    // Returns how many times a pattern is repeated
-    static UInt Count(const char *pattern, UInt pattern_length,
-                      const char *content, ULong offset,
-                      ULong end_before) noexcept {
-        UInt times = 0;
-
-        if (offset < end_before) {
-            const UInt     len_less_one = (pattern_length - 1);
-            const QMM_VAR_ m_pattern_last =
-                QMM_SETONE_8_(pattern[len_less_one]);
-            const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(*pattern);
-
-            do {
-                QMM_VAR_ m_content = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
-                QMM_Number_T bits =
-                    QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
-
-                if (bits != 0) {
-                    if (len_less_one == 0) {
-                        do {
-                            const ULong index = (Q_CTZL(bits) + offset);
-                            const ULong pattern_index =
-                                (index + pattern_length);
-
-                            if (pattern_index > end_before) {
-                                return times;
-                            }
-
-                            ++times;
-
-                            bits &= (bits - 1U);
-                        } while (bits != 0);
-                    } else {
-                        m_content =
-                            QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                                content + offset + len_less_one));
-                        bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
-
-                        while (bits != 0) {
-                            const ULong index = (Q_CTZL(bits) + offset);
-                            const ULong pattern_index =
-                                (index + pattern_length);
-
-                            if (pattern_index > end_before) {
-                                return times;
-                            }
-
-                            if ((len_less_one == 1U) ||
-                                Memory::Compare(pattern, (content + index),
-                                                len_less_one)) {
-                                ++times;
-                            }
-
-                            bits &= (bits - 1U);
-                        }
-                    }
-                }
-
-                offset += QMM_SIZE_;
-            } while (offset < end_before);
-        }
-
-        return times;
-    }
 #else
+    /*
+     * Returns an the offset of a char + 1.
+     */
     static ULong FindOne(const char one_char, const char *content, ULong offset,
                          ULong end_before) noexcept {
         while (offset < end_before) {
@@ -201,7 +138,9 @@ class Engine {
         return 0;
     }
 
-    // Old school
+    /*
+     * Returns an the offset of a pattern + the length of it.
+     */
     static ULong Find(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset,
                       ULong end_before) noexcept {
@@ -220,8 +159,8 @@ class Engine {
 
                 if (pattern[pattern_length] ==
                     content[offset + pattern_length]) {
-                    ULong last_offset    = offset;
-                    UInt  pattern_offset = 1U;
+                    const ULong last_offset    = offset;
+                    UInt        pattern_offset = 1U;
 
                     ++offset;
 
@@ -264,7 +203,7 @@ class Engine {
 
             // Save the starting point to be passed to Found().
             const ULong start_offset = current_offset;
-            // Makes sub-matching possible.
+            // Makes sub-matching easy.
             ULong sub_offset = current_offset;
 
             if (hasTail()) {
@@ -275,8 +214,7 @@ class Engine {
                     if (current_offset == 0) {
                         // The tail hasn't been found.
                         failed();
-                        return ((sub_offset > start_offset) ? sub_offset
-                                                            : start_offset);
+                        return sub_offset;
                     }
 
                     // Look for sub-matches.
@@ -292,16 +230,12 @@ class Engine {
                     }
 
                     /*
-                     * If nest() returns a bigger offset or equal to what the
-                     * tail has, then this match is not complete. Adjust the
-                     * offset and keep looking.
+                     * If nest() returns a bigger offset than current_offset,
+                     * then this match is not complete. Adjust the offset and
+                     * keep looking.
                      */
                     current_offset = sub_offset;
-                } while (current_offset < max_end_before);
-
-                if (current_offset == sub_offset) {
-                    return current_offset;
-                }
+                } while (current_offset != max_end_before);
             }
 
             // A complete/full match is found.
@@ -327,42 +261,41 @@ class Engine {
                                    const char *content, ULong offset,
                                    ULong end_before,
                                    ULong max_end_before) noexcept {
+        ULong last_offset = end_before;
 
-#ifdef QENTEM_SIMD_ENABLED_
-        UInt times = Count(start, start_length, content, offset, end_before);
-#else
-        UInt times = 0;
+        while (end_before < max_end_before) {
+            UInt times = 0;
 
-        do {
-            offset = Find(start, start_length, content, offset, end_before);
+            do {
+                offset = Find(start, start_length, content, offset, end_before);
 
-            if (offset == 0) {
-                break;
+                if (offset == 0) {
+                    break;
+                }
+
+                ++times;
+            } while (true);
+
+            if (times == 0) {
+                return end_before;
             }
 
-            ++times;
-        } while (true);
-#endif
-        if (times != 0) {
-            ULong last_offset = end_before;
-            --times;
-
-            while (times != 0) {
+            offset = end_before;
+            // TODO: Use FindAll
+            do {
                 end_before =
                     Find(end, end_length, content, last_offset, max_end_before);
 
                 if (end_before == 0) {
-                    break;
+                    return last_offset;
                 }
 
                 last_offset = end_before;
                 --times;
-            }
-
-            return last_offset;
+            } while (times != 0);
         }
 
-        return 0;
+        return last_offset;
     }
 
     /*
@@ -422,14 +355,14 @@ class Engine {
 
     /*
      * If the head of the match is found but not the tail, then this
-     * function will be called.
+     * function is called.
      */
     virtual void failed() {
     }
 
     /*
-     * This is called to check if the match has a second part; a tail.
-     * Like head: { and tail: } or () or "" or < > ...etc.
+     * This is called to check if the match has a second part/tail.
+     * Like head: { and the tail is } or () or "" or < > ...etc.
      */
     inline virtual bool hasTail() const noexcept {
         return false;

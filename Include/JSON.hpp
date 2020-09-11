@@ -346,17 +346,17 @@ class JSONParser : Engine {
 
                                     if (!has_error_ && !pass_comma_) {
                                         length -= (offset - 1);
-                                        digDeeper_(content, offset, length);
+                                        digDeeper(content, offset, length);
                                     }
 
                                     if (next_offset_ == 0) {
-                                        // Prevent checkPoint2_ form failing on
+                                        // Prevent checkPoint2 form failing on
                                         // an empty objects or arrays
                                         next_offset_ = offset;
                                     }
 
                                     if (has_error_ ||
-                                        (!checkPoint2_(content, length))) {
+                                        (!checkPoint2(content, length))) {
                                         value.Clear();
                                         return;
                                     }
@@ -393,9 +393,10 @@ class JSONParser : Engine {
             }
 
             default: {
-                return false;
             }
         }
+
+        return false;
     }
 
     ULong find2(const char *content, ULong offset,
@@ -416,8 +417,8 @@ class JSONParser : Engine {
     }
 
 #ifdef QENTEM_SIMD_ENABLED_
-    void qmm_find_(const char *content, ULong offset,
-                   ULong end_before) const noexcept {
+    void qmmFind(const char *content, ULong offset,
+                 ULong end_before) const noexcept {
         do {
             find_cache_->Offset     = offset;
             find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
@@ -450,102 +451,121 @@ class JSONParser : Engine {
 
     inline ULong find(const char *content, ULong offset,
                       ULong end_before) noexcept final {
-        if ((offset > find_cache_->NextOffset) ||
-            ((find_cache_->Bits == 0) &&
-             (find_cache_->NextOffset < end_before))) {
-            qmm_find_(content, offset, end_before);
-        }
-
-        ULong index;
+        // TODO: simplify
 
         do {
-            index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
-
-            if (index >= offset) {
-                break;
+            if ((offset > find_cache_->NextOffset) ||
+                ((find_cache_->Bits == 0) &&
+                 (find_cache_->NextOffset < end_before))) {
+                qmmFind(content, offset, end_before);
             }
 
-            // Remove the current offset.
-            find_cache_->Bits &= (find_cache_->Bits - 1);
+            ULong index;
 
-            if ((find_cache_->Bits == 0) &&
-                (find_cache_->NextOffset < end_before)) {
-                qmm_find_(content, find_cache_->NextOffset, end_before);
+            do {
+                index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
+
+                if (index >= offset) {
+                    break;
+                }
+
+                // Remove the current offset.
+                find_cache_->Bits &= (find_cache_->Bits - 1);
+
+                if ((find_cache_->Bits == 0) &&
+                    (find_cache_->NextOffset < end_before)) {
+                    qmmFind(content, find_cache_->NextOffset, end_before);
+                }
+            } while (find_cache_->Bits != 0);
+
+            if ((index < end_before) && (index >= offset)) {
+                switch (content[index]) {
+                    case '"': {
+                        type_ = Type_::Quote;
+                        return (index + 1);
+                    }
+
+                    case ',': {
+                        type_ = Type_::Comma;
+                        return (index + 1);
+                    }
+
+                    case ':': {
+                        if (has_colon_ || (obj_ == nullptr) ||
+                            (obj_value_ == nullptr)) {
+                            failed();
+                            return 0;
+                        }
+
+                        has_colon_  = true;
+                        pass_comma_ = false;
+                        find_cache_->Bits &= (find_cache_->Bits - 1);
+
+                        next_offset_ = (index + 1);
+                        offset       = next_offset_;
+                        continue;
+                    }
+
+                    case '{':
+                        type_ = Type_::Curly;
+                        child_obj_ =
+                            HAllocator::AllocateClear<HArray<Value>>(1);
+                        return (index + 1);
+
+                    case '[': {
+                        type_      = Type_::Square;
+                        child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
+                        return (index + 1);
+                    }
+
+                    default: {
+                    }
+                }
             }
-        } while (find_cache_->Bits != 0);
 
-        if ((index < end_before) && (index >= offset)) {
-            switch (content[index]) {
-                case '"': {
-                    type_ = Type_::Quote;
-                    break;
-                }
-
-                case ',': {
-                    type_ = Type_::Comma;
-                    break;
-                }
-
-                case ':': {
-                    type_ = Type_::Colon;
-                    break;
-                }
-
-                case '{':
-                    type_      = Type_::Curly;
-                    child_obj_ = HAllocator::AllocateClear<HArray<Value>>(1);
-                    break;
-
-                case '[': {
-                    type_      = Type_::Square;
-                    child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
-                }
-
-                default: {
-                }
-            }
-
-            return (index + 1);
-        }
-
-        // No match.
-        return 0;
+            // No match.
+            return 0;
+        } while (true);
     }
 #else
     inline ULong find(const char *content, ULong offset,
                       ULong end_before) noexcept final {
-        bool found = false;
-
         while (offset < end_before) {
             switch (content[offset]) {
                 case '"': {
-                    found = true;
                     type_ = Type_::Quote;
-                    break;
+                    return (offset + 1);
                 }
 
                 case ',': {
-                    found = true;
                     type_ = Type_::Comma;
-                    break;
+                    return (offset + 1);
                 }
 
                 case ':': {
-                    found = true;
-                    type_ = Type_::Colon;
-                    break;
+                    if (has_colon_ || (obj_ == nullptr) ||
+                        (obj_value_ == nullptr)) {
+                        failed();
+                        return 0;
+                    }
+
+                    has_colon_  = true;
+                    pass_comma_ = false;
+                    ++offset;
+                    next_offset_ = offset;
+                    continue;
                 }
 
-                case '{':
-                    found      = true;
+                case '{': {
                     type_      = Type_::Curly;
                     child_obj_ = HAllocator::AllocateClear<HArray<Value>>(1);
-                    break;
+                    return (offset + 1);
+                }
 
                 case '[': {
-                    found      = true;
                     type_      = Type_::Square;
                     child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
+                    return (offset + 1);
                 }
 
                 default: {
@@ -553,10 +573,6 @@ class JSONParser : Engine {
             }
 
             ++offset;
-
-            if (found) {
-                return offset;
-            }
         }
 
         // No match.
@@ -583,10 +599,10 @@ class JSONParser : Engine {
                 pass_comma_ = (ret != 0); // If it has found a value, then the
                                           // next comma needs to be passed.
 
-                if (!(jp.has_error_) && !(pass_comma_) &&
+                if (!(jp.has_error_) && (!(pass_comma_) || !(jp.pass_comma_)) &&
                     ((child_obj_ == nullptr) || jp.has_colon_)) {
                     // if the scan is not done.
-                    jp.digDeeper_(content, offset, (end_before - offset));
+                    jp.digDeeper(content, offset, (end_before - offset));
                 }
 
                 if (jp.has_error_) {
@@ -614,7 +630,9 @@ class JSONParser : Engine {
                     return end_before;
                 }
 
-                break;
+                type_ = Type_::QuoteEnd;
+
+                return 0;
             }
 
             default: {
@@ -633,7 +651,7 @@ class JSONParser : Engine {
         switch (type_) {
             case Type_::Comma: { // ,
                 if (!pass_comma_) {
-                    if (!checkPoint_()) {
+                    if (!checkPoint()) {
                         current_offset = end_before;
                         failed();
                         return;
@@ -692,7 +710,7 @@ class JSONParser : Engine {
                                 }
 
                                 if (tmp_offset == 3) {
-                                    add_(Value{ValueType::True});
+                                    insert(Value{ValueType::True});
                                     break;
                                 }
                             }
@@ -718,7 +736,7 @@ class JSONParser : Engine {
                                 }
 
                                 if (tmp_offset == 4) {
-                                    add_(Value{ValueType::False});
+                                    insert(Value{ValueType::False});
                                     break;
                                 }
                             }
@@ -744,7 +762,7 @@ class JSONParser : Engine {
                                 }
 
                                 if (tmp_offset == 3) {
-                                    add_(Value{ValueType::Null});
+                                    insert(Value{ValueType::Null});
                                     break;
                                 }
                             }
@@ -763,13 +781,13 @@ class JSONParser : Engine {
                                 return;
                             }
 
-                            add_(Value{num});
+                            insert(Value{num});
                             break;
                         }
                     }
                 } else {
                     // Checking for anything extra.
-                    if (!checkPoint2_(content, --start_offset)) {
+                    if (!checkPoint2(content, --start_offset)) {
                         current_offset = end_before;
                         failed();
                         return;
@@ -782,8 +800,8 @@ class JSONParser : Engine {
                 break;
             }
 
-            case Type_::Quote: { // ""
-                if (!checkPoint3_(content, offset, start_offset)) {
+            case Type_::QuoteEnd: { // ""
+                if (!checkPoint3(content, offset, start_offset)) {
                     current_offset = end_before;
                     failed();
                     return;
@@ -802,7 +820,8 @@ class JSONParser : Engine {
                 }
 
                 if ((obj_ == nullptr) || has_colon_) { // String
-                    add_(Value{HAllocator::Allocate(String(str, tmp_length))});
+                    insert(
+                        Value{HAllocator::Allocate(String(str, tmp_length))});
 
                     has_colon_  = false;
                     pass_comma_ = true;
@@ -815,8 +834,8 @@ class JSONParser : Engine {
 
             case Type_::Curly:    // {}
             case Type_::Square: { // []
-                if (!checkPoint_() ||
-                    !checkPoint3_(content, offset, start_offset)) {
+                if (!checkPoint() ||
+                    !checkPoint3(content, offset, start_offset)) {
                     current_offset = end_before;
                     failed();
                     return;
@@ -828,28 +847,14 @@ class JSONParser : Engine {
 
                 if (type_ == Type_::Curly) {
                     // child_obj_->Compress();
-                    add_(Value{child_obj_});
+                    insert(Value{child_obj_});
                     child_obj_ = nullptr;
                 } else {
                     // child_arr_->Compress();
-                    add_(Value{child_arr_});
+                    insert(Value{child_arr_});
                     child_arr_ = nullptr;
                 }
 
-                break;
-            }
-
-            case Type_::Colon: { // :
-                if (has_colon_ || (obj_ == nullptr) ||
-                    (obj_value_ == nullptr)) {
-                    current_offset = end_before;
-                    failed();
-                    return;
-                }
-
-                has_colon_   = true;
-                pass_comma_  = false;
-                next_offset_ = start_offset;
                 break;
             }
 
@@ -864,7 +869,7 @@ class JSONParser : Engine {
      * Look for anything before ] or } and after comma, as not possable to
      * match if it was a number/false/true/null
      */
-    void digDeeper_(const char *content, ULong offset, ULong length) {
+    inline void digDeeper(const char *content, ULong offset, ULong length) {
         type_ = Type_::Comma;
         --length;
 
@@ -876,7 +881,7 @@ class JSONParser : Engine {
         }
     }
 
-    inline void add_(Value &&val) {
+    inline void insert(Value &&val) {
         if (obj_ != nullptr) {
             *obj_value_ = static_cast<Value &&>(val);
             obj_value_  = nullptr;
@@ -885,7 +890,7 @@ class JSONParser : Engine {
         }
     }
 
-    bool checkPoint_() const noexcept {
+    inline bool checkPoint() const noexcept {
         if (obj_ != nullptr) {
             return (has_colon_ && !has_error_);
         }
@@ -893,7 +898,7 @@ class JSONParser : Engine {
         return (!has_colon_ && !has_error_);
     }
 
-    bool checkPoint2_(const char *content, ULong offset) noexcept {
+    inline bool checkPoint2(const char *content, ULong offset) noexcept {
         if (next_offset_ < offset) {
             String::LeftTrim(content, next_offset_, offset);
 
@@ -906,8 +911,8 @@ class JSONParser : Engine {
     }
 
 #ifdef QENTEM_SIMD_ENABLED_
-    bool checkPoint3_(const char *content, ULong offset,
-                      ULong start_offset) const noexcept {
+    bool checkPoint3(const char *content, ULong offset,
+                     ULong start_offset) const noexcept {
         if (!has_colon_) {
             --start_offset;
 
@@ -962,8 +967,8 @@ class JSONParser : Engine {
         return true;
     }
 #else
-    bool checkPoint3_(const char *content, ULong offset,
-                      ULong start_offset) const noexcept {
+    bool checkPoint3(const char *content, ULong offset,
+                     ULong start_offset) const noexcept {
         if (!has_colon_) {
             --start_offset;
 
@@ -1017,7 +1022,7 @@ class JSONParser : Engine {
           pass_comma_(pass_comma) {
     }
 
-    enum class Type_ { None = 0, Curly, Square, Quote, Comma, Colon };
+    enum class Type_ { None = 0, Curly, Square, Quote, QuoteEnd, Comma };
 
     struct FindCache_ {
         ULong        Offset{0};

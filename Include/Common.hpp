@@ -23,6 +23,12 @@
 #ifndef QENTEM_COMMON_H_
 #define QENTEM_COMMON_H_
 
+#ifdef _MSC_VER
+#define QENTEM_NOINLINE __declspec(noinline)
+#else
+#define QENTEM_NOINLINE __attribute__((noinline))
+#endif
+
 #if !defined(_WIN64)
 #ifndef QENTEM_AVX512BW_
 #define QENTEM_AVX512BW_ 1

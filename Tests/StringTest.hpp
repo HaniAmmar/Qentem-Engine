@@ -215,42 +215,42 @@ static int TestString2() {
     String str1;
     String str2;
 
-    str1.Add("a", 1);
+    str1.Insert("a", 1);
     SHOULD_EQUAL_VALUE(str1.Length(), 1, "Length");
     SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], '\0',
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str1, "a", "str1");
 
-    str1.Add("bc", 2);
+    str1.Insert("bc", 2);
     SHOULD_EQUAL_VALUE(str1.Length(), 3, "Length");
     SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], '\0',
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abc", "str1");
 
-    str1.Add("", 0);
+    str1.Insert("", 0);
     SHOULD_EQUAL_VALUE(str1.Length(), 3, "Length");
     SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], '\0',
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abc", "str1");
 
-    str2 = String::Add(str1, String("def"));
+    str2 = String::Insert(str1, String("def"));
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
     SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], '\0',
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str2, "abcdef", "str2");
 
-    str2 = String::Add(str2, String(""));
+    str2 = String::Insert(str2, String(""));
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
     SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], '\0',
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str2, "abcdef", "str2");
 
-    str2 = String::Add(String(""), str2);
+    str2 = String::Insert(String(""), str2);
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
     SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], '\0',

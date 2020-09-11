@@ -59,7 +59,7 @@ class StringStream {
         if (ss.offset_ != 0) {
             str_      = HAllocator::Allocate<char>(ss.offset_ + 1U);
             capacity_ = ss.offset_;
-            add_(ss.str_, ss.offset_);
+            insert(ss.str_, ss.offset_);
         }
     }
 
@@ -85,7 +85,7 @@ class StringStream {
             HAllocator::Deallocate(str_);
             str_ = nullptr;
 
-            Add(ss.str_, ss.offset_);
+            Insert(ss.str_, ss.offset_);
         }
 
         return *this;
@@ -99,7 +99,7 @@ class StringStream {
                 n_size = QENTEM_STRINGSTREAM_INITIALSIZE_;
             }
 
-            expand_(n_size << 1U);
+            expand(n_size << 2U);
         }
 
         str_[offset_] = one_char;
@@ -107,15 +107,15 @@ class StringStream {
     }
 
     inline void operator+=(const String &src) {
-        add_(src.Storage(), src.Length());
+        insert(src.Storage(), src.Length());
     }
 
     inline void operator+=(const char *str) {
-        add_(str, String::Count(str));
+        insert(str, String::Count(str));
     }
 
-    inline void Add(const char *str, ULong length) {
-        add_(str, length);
+    inline void Insert(const char *str, ULong length) {
+        insert(str, length);
     }
 
     void Clear() noexcept {
@@ -131,13 +131,8 @@ class StringStream {
         }
     }
 
-    inline const char *Storage() const noexcept {
-        if (offset_ != 0) {
-            str_[offset_] = '\0';
-            return str_;
-        }
-
-        return nullptr;
+    inline void SoftReset() noexcept {
+        offset_ = 0;
     }
 
     // To write directly to the buffer, set the needed length.
@@ -146,16 +141,19 @@ class StringStream {
         offset_ += len;
 
         if (capacity_ < offset_) {
-            ULong size = (ULong{1} << Q_CLZL(offset_));
-
-            if (size < offset_) {
-                size <<= 1U;
-            }
-
-            expand_(size);
+            expand((ULong{2} << Q_CLZL(offset_)));
         }
 
         return (str_ + current_offset);
+    }
+
+    inline const char *Storage() const noexcept {
+        if (offset_ != 0) {
+            str_[offset_] = '\0';
+            return str_;
+        }
+
+        return nullptr;
     }
 
     inline ULong Length() const noexcept {
@@ -194,26 +192,20 @@ class StringStream {
     //////////// Private ////////////
 
   private:
-    void add_(const char *str, const ULong len) {
+    void insert(const char *str, const ULong len) {
         if (len != 0) {
             const ULong current_offset = offset_;
             offset_ += len;
 
             if (capacity_ < offset_) {
-                ULong size = (ULong{1} << Q_CLZL(offset_));
-
-                if (size < offset_) {
-                    size <<= 1U;
-                }
-
-                expand_(size);
+                expand((ULong{2} << Q_CLZL(offset_)));
             }
 
             Memory::Copy((str_ + current_offset), str, len);
         }
     }
 
-    void expand_(ULong capacity) {
+    void expand(ULong capacity) {
         char *old_str = str_;
         str_          = HAllocator::Allocate<char>(capacity + 1U);
 

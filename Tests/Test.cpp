@@ -58,7 +58,7 @@ int RunTests() {
 
     total = (passed + failed);
 
-    std::cout << "\x1B[31mNot good\x1B[0m: " << failed << " out of " << total
+    std::cout << "\x1B[31mNot good!\x1B[0m " << failed << " out of " << total
               << " failed.\n";
 
     return 1;

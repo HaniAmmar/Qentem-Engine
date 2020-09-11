@@ -55,13 +55,13 @@ class ALE : Engine {
             ALE(&items, callback, &fc).FindNest(content, 0, length, length);
 
             if (items.Size() != 0) {
-                sortOperations_(items, content, 0, length);
-                return process_(number, items, content, 0, length, callback);
+                sortOperations(items, content, 0, length);
+                return process(number, items, content, 0, length, callback);
             }
 
             UInt offset = 0;
             String::SoftTrim(content, offset, length);
-            return Digit::StringToNumber(number, &(content[offset]), length);
+            return Digit::StringToNumber(number, (content + offset), length);
         }
 
         return false;
@@ -92,7 +92,7 @@ class ALE : Engine {
     //////////// Private ////////////
 
   private:
-    enum class Operation : UInt {
+    enum class Operation_ : UInt {
         Brackets = 0,
         Parentheses,
         Exponent,
@@ -114,7 +114,7 @@ class ALE : Engine {
     struct Item_ {
         UInt         Offset{0};
         UInt         Length{0};
-        Operation    Op{Operation::Parentheses};
+        Operation_   Op{Operation_::Parentheses};
         Array<Item_> SubItems{};
     };
 
@@ -138,13 +138,13 @@ class ALE : Engine {
         item_.Offset = static_cast<UInt>(start_offset - item_.Length);
 
         switch (item_.Op) {
-            case Operation::Brackets: {
+            case Operation_::Brackets: {
                 item_.Length =
                     static_cast<UInt>((current_offset + 1) - start_offset);
                 break;
             }
 
-            case Operation::Parentheses: {
+            case Operation_::Parentheses: {
                 // Set the length and drop )
                 item_.Length =
                     static_cast<UInt>(current_offset - (start_offset + 1));
@@ -155,8 +155,8 @@ class ALE : Engine {
                 break;
             }
 
-            case Operation::Addition:
-            case Operation::Subtraction: {
+            case Operation_::Addition:
+            case Operation_::Subtraction: {
                 /*
                  * If there is a number before - + or ) or } then add it as an
                  * operation not a sign.
@@ -206,275 +206,71 @@ class ALE : Engine {
     }
 
     inline bool hasTail() const noexcept final {
-        return ((item_.Op == Operation::Brackets) ||
-                (item_.Op == Operation::Parentheses));
+        return ((item_.Op == Operation_::Brackets) ||
+                (item_.Op == Operation_::Parentheses));
     }
 
     ULong find2(const char *content, ULong offset,
                 ULong end_before) const noexcept final {
-        if (item_.Op == Operation::Parentheses) {
+        if (item_.Op == Operation_::Parentheses) {
             return FindOne(')', content, offset, end_before);
         }
 
         return FindOne('}', content, offset, end_before);
     }
 
-#ifdef QENTEM_SIMD_ENABLED_
-    void qmm_find_(const char *content, ULong offset,
-                   ULong end_before) const noexcept {
-        do {
-            find_cache_->Offset     = offset;
-            find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
-            offset                  = find_cache_->NextOffset;
-
-            const QMM_VAR_ m_content =
-                QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                    content + find_cache_->Offset));
-
-            find_cache_->Bits =
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('{'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('('));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('^'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('%'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('*'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('/'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('+'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('-'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('='));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('!'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('<'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('>'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('&'));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_8_('|'));
-        } while ((find_cache_->Bits == 0) &&
-                 (find_cache_->NextOffset < end_before));
-    }
-
     inline ULong find(const char *content, ULong offset,
                       ULong end_before) noexcept final {
-        if ((offset > find_cache_->NextOffset) ||
-            ((find_cache_->Bits == 0) &&
-             (find_cache_->NextOffset < end_before))) {
-            qmm_find_(content, offset, end_before);
-        }
-
-        ULong index;
-
-        do {
-            index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
-
-            if (index >= offset) {
-                break;
-            }
-
-            // Remove the current offset.
-            find_cache_->Bits &= (find_cache_->Bits - 1);
-
-            if ((find_cache_->Bits == 0) &&
-                (find_cache_->NextOffset < end_before)) {
-                qmm_find_(content, find_cache_->NextOffset, end_before);
-            }
-        } while (find_cache_->Bits != 0);
-
-        item_.Length = 1;
-
-        if ((index < end_before) && (index >= offset)) {
-            switch (content[index]) {
-                case '{': {
-                    item_.Op = Operation::Brackets;
-                    break;
-                }
-
-                case '(': {
-                    item_.Op = Operation::Parentheses;
-                    break;
-                }
-
-                case '^': {
-                    item_.Op = Operation::Exponent;
-                    break;
-                }
-
-                case '%': {
-                    item_.Op = Operation::Remainder;
-                    break;
-                }
-
-                case '*': {
-                    item_.Op = Operation::Multiplication;
-                    break;
-                }
-
-                case '/': {
-                    item_.Op = Operation::Division;
-                    break;
-                }
-
-                case '+': {
-                    item_.Op = Operation::Addition;
-                    break;
-                }
-
-                case '-': {
-                    item_.Op = Operation::Subtraction;
-                    break;
-                }
-
-                case '=': { // ==
-                    ++index;
-
-                    if (content[index] == '=') {
-                        item_.Op     = Operation::Equal;
-                        item_.Length = 2;
-                    } else {
-                        return 0;
-                    }
-
-                    break;
-                }
-
-                case '!': { // !=
-                    ++index;
-
-                    if (content[index] == '=') {
-                        item_.Op     = Operation::NotEqual;
-                        item_.Length = 2;
-                    } else {
-                        return 0;
-                    }
-
-                    break;
-                }
-
-                case '<': { // < or <=
-                    if (content[(index + 1)] == '=') {
-                        item_.Op     = Operation::LessOrEqual;
-                        item_.Length = 2;
-                        ++index;
-                    } else {
-                        item_.Op = Operation::Less;
-                    }
-
-                    break;
-                }
-
-                case '>': { // > or >=
-                    if (content[(index + 1)] == '=') {
-                        item_.Op     = Operation::BiggerOrEqual;
-                        item_.Length = 2;
-                        ++index;
-                    } else {
-                        item_.Op = Operation::Bigger;
-                    }
-
-                    break;
-                }
-
-                case '&': { // &&
-                    ++index;
-
-                    if (content[index] == '&') {
-                        item_.Op     = Operation::And;
-                        item_.Length = 2;
-                    } else {
-                        return 0;
-                    }
-
-                    break;
-                }
-
-                case '|': { // ||
-                    ++index;
-
-                    if (content[index] == '|') {
-                        item_.Op     = Operation::Or;
-                        item_.Length = 2;
-                    } else {
-                        return 0;
-                    }
-                }
-
-                default: {
-                }
-            }
-
-            ++index;
-
-            if (index < end_before) {
-                return index;
-            }
-        }
-
-        // No match.
-        return 0;
-    }
-#else
-    inline ULong find(const char *content, ULong offset,
-                      ULong end_before) noexcept final {
-        bool found = false;
-
+        bool found   = false;
         item_.Length = 1;
 
         while (offset < end_before) {
             switch (content[offset]) {
                 case '{': {
                     found    = true;
-                    item_.Op = Operation::Brackets;
+                    item_.Op = Operation_::Brackets;
                     break;
                 }
 
                 case '(': {
                     found    = true;
-                    item_.Op = Operation::Parentheses;
+                    item_.Op = Operation_::Parentheses;
                     break;
                 }
 
                 case '^': {
                     found    = true;
-                    item_.Op = Operation::Exponent;
+                    item_.Op = Operation_::Exponent;
                     break;
                 }
 
                 case '%': {
                     found    = true;
-                    item_.Op = Operation::Remainder;
+                    item_.Op = Operation_::Remainder;
                     break;
                 }
 
                 case '*': {
                     found    = true;
-                    item_.Op = Operation::Multiplication;
+                    item_.Op = Operation_::Multiplication;
                     break;
                 }
 
                 case '/': {
                     found    = true;
-                    item_.Op = Operation::Division;
+                    item_.Op = Operation_::Division;
                     break;
                 }
 
                 case '+': {
                     found    = true;
-                    item_.Op = Operation::Addition;
+                    item_.Op = Operation_::Addition;
                     break;
                 }
 
                 case '-': {
                     found    = true;
-                    item_.Op = Operation::Subtraction;
+                    item_.Op = Operation_::Subtraction;
                     break;
                 }
 
@@ -483,7 +279,7 @@ class ALE : Engine {
 
                     if (content[offset] == '=') {
                         found        = true;
-                        item_.Op     = Operation::Equal;
+                        item_.Op     = Operation_::Equal;
                         item_.Length = 2;
                     }
 
@@ -495,7 +291,7 @@ class ALE : Engine {
 
                     if (content[offset] == '=') {
                         found        = true;
-                        item_.Op     = Operation::NotEqual;
+                        item_.Op     = Operation_::NotEqual;
                         item_.Length = 2;
                     }
 
@@ -505,12 +301,12 @@ class ALE : Engine {
                 case '<': { // < or <=
                     if (content[(offset + 1)] == '=') {
                         found        = true;
-                        item_.Op     = Operation::LessOrEqual;
+                        item_.Op     = Operation_::LessOrEqual;
                         item_.Length = 2;
                         ++offset;
                     } else {
                         found    = true;
-                        item_.Op = Operation::Less;
+                        item_.Op = Operation_::Less;
                     }
 
                     break;
@@ -519,12 +315,12 @@ class ALE : Engine {
                 case '>': { // > or >=
                     if (content[(offset + 1)] == '=') {
                         found        = true;
-                        item_.Op     = Operation::BiggerOrEqual;
+                        item_.Op     = Operation_::BiggerOrEqual;
                         item_.Length = 2;
                         ++offset;
                     } else {
                         found    = true;
-                        item_.Op = Operation::Bigger;
+                        item_.Op = Operation_::Bigger;
                     }
 
                     break;
@@ -535,7 +331,7 @@ class ALE : Engine {
 
                     if (content[offset] == '&') {
                         found        = true;
-                        item_.Op     = Operation::And;
+                        item_.Op     = Operation_::And;
                         item_.Length = 2;
                     }
 
@@ -547,7 +343,7 @@ class ALE : Engine {
 
                     if (content[offset] == '|') {
                         found        = true;
-                        item_.Op     = Operation::Or;
+                        item_.Op     = Operation_::Or;
                         item_.Length = 2;
                     }
                 }
@@ -566,12 +362,11 @@ class ALE : Engine {
         // No match.
         return 0;
     }
-#endif
 
-    static void sortOperations_(Array<Item_> &items, const char *content,
-                                UInt offset, UInt length) {
+    static void sortOperations(Array<Item_> &items, const char *content,
+                               UInt offset, UInt length) {
         // Determine the highest operation.
-        Operation highest = Operation::Parentheses;
+        Operation_ highest = Operation_::Parentheses;
 
         const Item_ *item = items.Storage();
         const Item_ *end  = (items.Storage() + items.Size());
@@ -580,7 +375,8 @@ class ALE : Engine {
             if (item->Op > highest) {
                 highest = item->Op;
 
-                if ((highest == Operation::And) || (highest == Operation::Or)) {
+                if ((highest == Operation_::And) ||
+                    (highest == Operation_::Or)) {
                     break;
                 }
             }
@@ -589,11 +385,11 @@ class ALE : Engine {
         }
 
         // If it's just (...)
-        if (highest < Operation::Exponent) {
+        if (highest < Operation_::Exponent) {
             if (items.Size() == 1) {
                 Item_ *item2 = items.First();
 
-                if (item2->Op == Operation::Parentheses) {
+                if (item2->Op == Operation_::Parentheses) {
                     const UInt len = (item2->Length + 2U);
 
                     if (length != len) {
@@ -608,8 +404,8 @@ class ALE : Engine {
 
                     // Sort ops inside (...)
                     String::SoftTrim(content, item2->Offset, item2->Length);
-                    sortOperations_(item2->SubItems, content, item2->Offset,
-                                    item2->Length);
+                    sortOperations(item2->SubItems, content, item2->Offset,
+                                   item2->Length);
                 } else if (length != item2->Length) { // Brackets
                     // Cheking for anything extra.
                     String::SoftTrim(content, offset, length);
@@ -633,32 +429,32 @@ class ALE : Engine {
          */
 
         switch (highest) {
-            case Operation::Remainder: {
-                highest = Operation::Exponent;
+            case Operation_::Remainder: {
+                highest = Operation_::Exponent;
                 break;
             }
 
-            case Operation::Division: {
-                highest = Operation::Multiplication;
+            case Operation_::Division: {
+                highest = Operation_::Multiplication;
                 break;
             }
 
-            case Operation::Subtraction: {
-                highest = Operation::Addition;
+            case Operation_::Subtraction: {
+                highest = Operation_::Addition;
                 break;
             }
 
-            case Operation::NotEqual:
-            case Operation::Less:
-            case Operation::LessOrEqual:
-            case Operation::Bigger:
-            case Operation::BiggerOrEqual: {
-                highest = Operation::Equal;
+            case Operation_::NotEqual:
+            case Operation_::Less:
+            case Operation_::LessOrEqual:
+            case Operation_::Bigger:
+            case Operation_::BiggerOrEqual: {
+                highest = Operation_::Equal;
                 break;
             }
 
-            case Operation::Or: {
-                highest = Operation::And;
+            case Operation_::Or: {
+                highest = Operation_::And;
                 break;
             }
 
@@ -694,8 +490,8 @@ class ALE : Engine {
             String::SoftTrim(content, n_item.Offset, n_item.Length);
 
             if (n_item.SubItems.Size() != 0) {
-                sortOperations_(n_item.SubItems, content, n_item.Offset,
-                                n_item.Length);
+                sortOperations(n_item.SubItems, content, n_item.Offset,
+                               n_item.Length);
             }
 
             if (id < size) {
@@ -712,25 +508,25 @@ class ALE : Engine {
         }
     }
 
-    static bool process_(double &left_number, const Array<Item_> &items,
-                         const char *content, UInt offset, UInt length,
-                         const ALEHelper *callback) {
+    static bool process(double &left_number, const Array<Item_> &items,
+                        const char *content, UInt offset, UInt length,
+                        const ALEHelper *callback) {
         if (items.Size() == 0) {
-            return Digit::StringToNumber(left_number, &(content[offset]),
+            return Digit::StringToNumber(left_number, (content + offset),
                                          length);
         }
 
         const Item_ *item  = items.Storage();
         const Item_ *item2 = (item + 1);
-        Operation    op    = item->Op;
+        Operation_   op    = item->Op;
 
         switch (op) {
-            case Operation::Equal:
-            case Operation::NotEqual: {
+            case Operation_::Equal:
+            case Operation_::NotEqual: {
                 bool is_equal;
 
-                const char *l_item = &(content[item->Offset]);
-                const char *r_item = &(content[item2->Offset]);
+                const char *l_item = (content + item->Offset);
+                const char *r_item = (content + item2->Offset);
 
                 if ((*l_item == '{') || (*r_item == '{')) {
                     if ((callback == nullptr) ||
@@ -738,15 +534,15 @@ class ALE : Engine {
                                                r_item, item2->Length))) {
                         return false;
                     }
-                } else if (process_(left_number, item->SubItems, content,
-                                    item->Offset, item->Length, callback)) {
+                } else if (process(left_number, item->SubItems, content,
+                                   item->Offset, item->Length, callback)) {
                     break;
                 } else {
                     is_equal = ((item->Length == item2->Length) &&
                                 Memory::Compare(l_item, r_item, item2->Length));
                 }
 
-                if (op == Operation::NotEqual) {
+                if (op == Operation_::NotEqual) {
                     is_equal = !is_equal;
                 }
 
@@ -754,16 +550,16 @@ class ALE : Engine {
                 return true;
             }
 
-            case Operation::Brackets: {
+            case Operation_::Brackets: {
                 return ((callback != nullptr) &&
                         callback->ALESetNumber(left_number,
-                                               &(content[item->Offset]),
+                                               (content + item->Offset),
                                                item->Length));
             }
 
             default: {
-                if (!process_(left_number, item->SubItems, content,
-                              item->Offset, item->Length, callback)) {
+                if (!process(left_number, item->SubItems, content, item->Offset,
+                             item->Length, callback)) {
                     return false;
                 }
             }
@@ -773,13 +569,13 @@ class ALE : Engine {
 
         while (item2 != end) {
             double right_number;
-            if (!process_(right_number, item2->SubItems, content, item2->Offset,
-                          item2->Length, callback)) {
+            if (!process(right_number, item2->SubItems, content, item2->Offset,
+                         item2->Length, callback)) {
                 return false;
             }
 
             switch (op) {
-                case Operation::Exponent: { // ^
+                case Operation_::Exponent: { // ^
                     if (right_number != 0.0) {
                         // NOTE: Needs more work.
                         const bool neg = (right_number < 0);
@@ -815,19 +611,19 @@ class ALE : Engine {
                     break;
                 }
 
-                case Operation::Remainder: { // %
+                case Operation_::Remainder: { // %
                     left_number =
                         static_cast<double>(static_cast<ULong>(left_number) %
                                             static_cast<ULong>(right_number));
                     break;
                 }
 
-                case Operation::Multiplication: { // *
+                case Operation_::Multiplication: { // *
                     left_number *= right_number;
                     break;
                 }
 
-                case Operation::Division: { // /
+                case Operation_::Division: { // /
                     if (right_number == 0.0) {
                         return false;
                     }
@@ -836,53 +632,53 @@ class ALE : Engine {
                     break;
                 }
 
-                case Operation::Addition: { // +
+                case Operation_::Addition: { // +
                     left_number += right_number;
                     break;
                 }
 
-                case Operation::Subtraction: { // -
+                case Operation_::Subtraction: { // -
                     left_number -= right_number;
                     break;
                 }
 
-                case Operation::Equal: { // ==
+                case Operation_::Equal: { // ==
                     left_number = (left_number == right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation::NotEqual: { // !=
+                case Operation_::NotEqual: { // !=
                     left_number = (left_number != right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation::Less: { // <
+                case Operation_::Less: { // <
                     left_number = (left_number < right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation::LessOrEqual: { // <=
+                case Operation_::LessOrEqual: { // <=
                     left_number = (left_number <= right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation::Bigger: { // >
+                case Operation_::Bigger: { // >
                     left_number = (left_number > right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation::BiggerOrEqual: { // >=
+                case Operation_::BiggerOrEqual: { // >=
                     left_number = (left_number >= right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation::And: { // &&
+                case Operation_::And: { // &&
                     left_number =
                         ((left_number > 0) && (right_number > 0)) ? 1 : 0;
                     break;
                 }
 
-                case Operation::Or: { // ||
+                case Operation_::Or: { // ||
                     left_number =
                         ((left_number > 0) || (right_number > 0)) ? 1 : 0;
                     break;

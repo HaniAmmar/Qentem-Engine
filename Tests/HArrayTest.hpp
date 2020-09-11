@@ -505,8 +505,8 @@ static int TestHArray4() {
     SHOULD_EQUAL(numbers2.GetKey(1), nullptr, "GetKey(1)", "null");
 
     try {
-        did_throw                = false;
-        numbers1.Add(nullptr, 0) = 10;
+        did_throw                   = false;
+        numbers1.Insert(nullptr, 0) = 10;
     } catch (...) {
         did_throw = true;
     }
@@ -529,7 +529,7 @@ static int TestHArray5() {
         key = "k-";
         key += Digit::NumberToString(i);
 
-        numbers1.Add(key.Storage(), key.Length()) = i;
+        numbers1.Insert(key.Storage(), key.Length()) = i;
 
         value = numbers1.Find(key.Storage(), key.Length());
         SHOULD_NOT_EQUAL(value, nullptr, "value", "null");
@@ -556,7 +556,7 @@ static int TestHArray5() {
     SHOULD_EQUAL_VALUE(*value, 10, "10");
 
     for (ULong i = 1; i < 11; i++) {
-        numbers1.Delete(Digit::NumberToString(i));
+        numbers1.Remove(Digit::NumberToString(i));
     }
 
     for (ULong i = 1; i < 11; i++) {
@@ -571,7 +571,7 @@ static int TestHArray5() {
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
 
     for (ULong i = 1; i < 101; i++) {
-        numbers1.Delete(Digit::NumberToString(i));
+        numbers1.Remove(Digit::NumberToString(i));
     }
 
     for (ULong i = 1; i < 101; i++) {
@@ -586,7 +586,7 @@ static int TestHArray5() {
 
     for (ULong i = 101; i < 201; i++) {
         key = Digit::NumberToString(i);
-        numbers1.Delete(key.Storage(), key.Length());
+        numbers1.Remove(key.Storage(), key.Length());
     }
 
     for (ULong i = 101; i < 201; i++) {
@@ -601,7 +601,7 @@ static int TestHArray5() {
 
     for (ULong i = 0; i < 1001; i++) {
         key = Digit::NumberToString(i);
-        numbers1.Delete(key);
+        numbers1.Remove(key);
     }
 
     for (ULong i = 0; i < 1001; i++) {
@@ -734,7 +734,7 @@ static int TestHArray7() {
     }
 
     for (ULong z = 0; z < id; z++) {
-        numbers1.Delete(Digit::NumberToString(z));
+        numbers1.Remove(Digit::NumberToString(z));
         SHOULD_EQUAL(numbers1.GetKey(z), nullptr, "GetKey(id)->Storage()",
                      "null");
     }
@@ -749,7 +749,7 @@ static int TestHArray7() {
 
     do {
         --id;
-        numbers1.Delete(Digit::NumberToString(id));
+        numbers1.Remove(Digit::NumberToString(id));
         SHOULD_EQUAL(numbers1.GetKey(id), nullptr, "GetKey(id)->Storage()", id);
     } while (id > 0);
 
@@ -853,7 +853,7 @@ static int TestHArray9() {
         String key("k-");
         key += Digit::NumberToString(i);
 
-        list.DeleteIndex(i);
+        list.RemoveIndex(i);
 
         SHOULD_EQUAL(list.Find(key), nullptr, "value", "null");
     }
@@ -867,8 +867,8 @@ static int TestHArray9() {
     }
 
     for (UInt i = 0; i < id; i++) {
-        list.DeleteIndex(i);
-        list.DeleteIndex(i); // Just to see if something goes wrong.
+        list.RemoveIndex(i);
+        list.RemoveIndex(i); // Just to see if something goes wrong.
     }
 
     for (UInt i = 0; i < id; i++) {
@@ -886,7 +886,7 @@ static int TestHArray9() {
     }
 
     for (UInt i = 0; i < id; i++) {
-        list.DeleteIndex(i);
+        list.RemoveIndex(i);
     }
 
     for (UInt i = 0; i < id; i++) {

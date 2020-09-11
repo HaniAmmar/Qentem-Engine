@@ -210,7 +210,7 @@ static int TestArray2() {
     numbers2.SetCapacity(4);
     numbers1.ResizeAndInitialize(4);
     storage = numbers2.Storage();
-    numbers2.Add(numbers1);
+    numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 4, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
@@ -218,19 +218,19 @@ static int TestArray2() {
 
     numbers1.SetCapacity(10);
     numbers2.ResizeAndInitialize(4);
-    numbers2.Add(numbers1);
+    numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 4, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
 
     numbers1.ResizeAndInitialize(4);
-    numbers2.Add(numbers1);
+    numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 8, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
 
     storage = numbers1.Storage();
-    numbers2.Add(static_cast<Array<UInt> &&>(numbers1));
+    numbers2.Insert(static_cast<Array<UInt> &&>(numbers1));
     SHOULD_EQUAL_VALUE(numbers2.Size(), 12, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 12, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
@@ -304,9 +304,9 @@ static int TestArray3() {
 
     SHOULD_EQUAL_TRUE(did_throw, "did_throw");
 
-    numbers2.Add(numbers1[0]).Add(numbers1[1]);
+    numbers2.Insert(numbers1[0]).Insert(numbers1[1]);
     for (UInt i = 2; i < 8; i++) {
-        numbers2.Add(numbers1[i]);
+        numbers2.Insert(numbers1[i]);
         SHOULD_EQUAL_VALUE(numbers2[i], numbers1[i], "numbers2[i]");
     }
 
@@ -332,7 +332,7 @@ static int TestArray3() {
     SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
                  "str1_cstr");
 
-    strings.Add(static_cast<String &&>(str2));
+    strings.Insert(static_cast<String &&>(str2));
     SHOULD_EQUAL(strings[1].Storage(), str2_cstr, "strings[1].Storage()",
                  "str2_cstr");
 
@@ -340,7 +340,7 @@ static int TestArray3() {
     SHOULD_NOT_EQUAL(strings[2].Storage(), str1_cstr, "strings[2].Storage()",
                      "str1_cstr");
 
-    strings.Add(str2);
+    strings.Insert(str2);
     SHOULD_NOT_EQUAL(strings[3].Storage(), str2_cstr, "strings[3].Storage()",
                      "str2_cstr");
 

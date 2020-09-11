@@ -126,21 +126,21 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
 
-    ss2.Add("a", 1);
+    ss2.Insert("a", 1);
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
     SHOULD_NOT_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(ss2.Storage()[0], 'a', "Storage()[0]");
 
-    ss2.Add("bc", 2);
+    ss2.Insert("bc", 2);
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
     SHOULD_EQUAL_VALUE(ss2.GetString(), "abc", "GetString()");
 
-    ss2.Add("abcdef", 1);
-    ss2.Add("bcdef", 1);
-    ss2.Add("cdef", 1);
+    ss2.Insert("abcdef", 1);
+    ss2.Insert("bcdef", 1);
+    ss2.Insert("cdef", 1);
 
     char *e_str    = ss2.Eject();
     ULong length   = String::Count(e_str);

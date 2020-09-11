@@ -7026,43 +7026,43 @@ static int TestDeleteValue() {
     Value value;
 
     value[0] = 1;
-    value.Delete(int{0});
+    value.Remove(int{0});
     SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "c";
-    value.Delete(UInt{0});
+    value.Remove(UInt{0});
     SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = Array<Value>();
-    value.Delete(ULong{0});
+    value.Remove(ULong{0});
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
-    value.Delete(0);
+    value.Remove(0);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([true])", "value.Stringify()");
-    value.Delete(1);
+    value.Remove(1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "abc";
     value[1] = nullptr;
-    value.Delete(1);
+    value.Remove(1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"(["abc"])", "value.Stringify()");
-    value.Delete(0);
+    value.Remove(0);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
-    value.Delete(1);
+    value.Remove(1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([false,null])",
                        "value.Stringify()");
-    value.Delete(0);
+    value.Remove(0);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
 
-    value.Delete(2);
+    value.Remove(2);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
@@ -7080,74 +7080,74 @@ static int TestDeleteValue() {
     value[0] = "a";
     value[1] = Array<Value>();
     value[2] = HArray<Value>();
-    value.Delete(2);
+    value.Remove(2);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a",[]])", "value.Stringify()");
-    value.Delete(1);
+    value.Remove(1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a"])", "value.Stringify()");
 
-    value.Delete(0);
+    value.Remove(0);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     /////////
     value.Clear();
 
     value["A"] = 1;
-    value.Delete(0);
+    value.Remove(0);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"] = "c";
-    value.Delete("A", 1);
+    value.Remove("A", 1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"] = Array<Value>();
-    value.Delete("A", 1);
+    value.Remove("A", 1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value.Clear();
     value["A"]  = false;
     value["bb"] = true;
-    value.Delete("A", 1);
+    value.Remove("A", 1);
     SHOULD_EQUAL(value.GetKey(0), nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"bb":true})",
                        "value.Stringify()");
-    value.Delete(1);
+    value.Remove(1);
     SHOULD_EQUAL(value.GetKey(0), nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL(value.GetValue(1), nullptr, "GetValue(1)", "null");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]  = "abc";
     value["bb"] = nullptr;
-    value.Delete("bb", 2);
+    value.Remove("bb", 2);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"abc"})",
                        "value.Stringify()");
-    value.Delete("A", 1);
+    value.Remove("A", 1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]   = false;
     value["bb"]  = true;
     value["AAA"] = nullptr;
-    value.Delete("bb", 2);
+    value.Remove("bb", 2);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"AAA":null})",
                        "value.Stringify()");
-    value.Delete("A", 1);
+    value.Remove("A", 1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"AAA":null})",
                        "value.Stringify()");
 
-    value.Delete("AAA", 3);
+    value.Remove("AAA", 3);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]   = "a";
     value["bb"]  = HArray<Value>();
     value["AAA"] = Array<Value>();
-    value.Delete("AAA", 3);
+    value.Remove("AAA", 3);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a","bb":{}})",
                        "value.Stringify()");
-    value.Delete("bb", 2);
+    value.Remove("bb", 2);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a"})",
                        value.Stringify().Storage());
 
-    value.Delete("A", 1);
+    value.Remove("A", 1);
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]   = "a";
