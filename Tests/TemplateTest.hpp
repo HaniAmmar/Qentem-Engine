@@ -546,6 +546,14 @@ static int TestVariableTag3() {
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"({var:0 })",
                        "Render()");
 
+    content = R"({var:0 )";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"({var:0 )",
+                       "Render()");
+
+    content = R"({var:0)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), R"({var:0)",
+                       "Render()");
+
     END_SUB_TEST;
 }
 
@@ -1004,7 +1012,11 @@ static int TestMathTag2() {
     SHOULD_EQUAL_VALUE(Template<>::Render("{math-4} {math:{var:2}+5}", &value),
                        "{math-4} 10", "Render()");
 
-    ///////////
+    SHOULD_EQUAL_VALUE(Template<>::Render("{math:4", &value), "{math:4",
+                       "Render()");
+
+    SHOULD_EQUAL_VALUE(Template<>::Render("{math:4    ", &value), "{math:4    ",
+                       "Render()");
 
     END_SUB_TEST;
 }
@@ -1235,6 +1247,14 @@ static int TestInlineIfTag() {
     content = R"({if case="1" true="{var:10}" false="{var:20}"})";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "{var:10}",
                        "Render()");
+
+    content = R"({if case="1" true="1" false="0")";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value),
+                       R"({if case="1" true="1" false="0")", "Render()");
+
+    content = R"({if case="1" true="1" false="0")";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value),
+                       R"({if case="1" true="1" false="0")", "Render()");
 
     END_SUB_TEST;
 }
@@ -1662,6 +1682,14 @@ static int TestLoopTag3() {
 
     content = R"(<loop key="k">k</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "k1k3", "Render()");
+
+    content = R"(<loop key="k">k)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value),
+                       R"(<loop key="k">k)", "Render()");
+
+    content = R"(<loop key="k">k     )";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value),
+                       R"(<loop key="k">k     )", "Render()");
 
     value.Reset();
     value += 10;
