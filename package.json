@@ -1,10 +1,5 @@
 {
-  "author": {
-    "name": "Hani Ammar"
-  },
-  "bugs": {
-    "url": "https://github.com/HaniAmmar/Qentem-Engine/issues"
-  },
+  "name": "qentem",
   "bundleDependencies": false,
   "description": "A fast template engine with JIT-ALE and JSON",
   "homepage": "https://github.com/HaniAmmar/Qentem-Engine",
@@ -13,5 +8,11 @@
     "type": "git",
     "url": "https://github.com/HaniAmmar/Qentem-Engine.git"
   },
-  "version": "1.0.4"
+  "version": "1.0.5",
+  "author": {
+    "name": "Hani Ammar"
+  },
+  "bugs": {
+    "url": "https://github.com/HaniAmmar/Qentem-Engine/issues"
+  }
 }
