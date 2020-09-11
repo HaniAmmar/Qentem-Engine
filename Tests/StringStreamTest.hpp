@@ -92,6 +92,12 @@ static int TestStringStream() {
                       "(ss1.Capacity() >= ss2.Length())");
     SHOULD_EQUAL_VALUE(ss1.GetString(), "abc", "GetString()");
 
+    ULong lss = ss1.Capacity();
+
+    ss1.SoftReset();
+    SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
+    SHOULD_EQUAL_VALUE(ss1.Capacity(), lss, "Capacity");
+
     ss1.Clear();
     ss1 = static_cast<StringStream &&>(ss2); // Move
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
