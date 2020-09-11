@@ -451,81 +451,68 @@ class JSONParser : Engine {
 
     inline ULong find(const char *content, ULong offset,
                       ULong end_before) noexcept final {
-        // TODO: simplify
-
         do {
-            if ((offset > find_cache_->NextOffset) ||
-                ((find_cache_->Bits == 0) &&
-                 (find_cache_->NextOffset < end_before))) {
-                qmmFind(content, offset, end_before);
-            }
-
-            ULong index;
-
-            do {
-                index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
+            if (find_cache_->Bits != 0) {
+                ULong index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
 
                 if (index >= offset) {
-                    break;
+                    if (index >= end_before) {
+                        return 0;
+                    }
+
+                    switch (content[index]) {
+                        case '"': {
+                            type_ = Type_::Quote;
+                            return (index + 1);
+                        }
+
+                        case ',': {
+                            type_ = Type_::Comma;
+                            return (index + 1);
+                        }
+
+                        case ':': {
+                            if (has_colon_ || (obj_ == nullptr) ||
+                                (obj_value_ == nullptr)) {
+                                failed();
+                                return 0;
+                            }
+
+                            has_colon_   = true;
+                            pass_comma_  = false;
+                            next_offset_ = (index + 1);
+                            offset       = next_offset_;
+                            break;
+                        }
+
+                        case '{':
+                            type_ = Type_::Curly;
+                            child_obj_ =
+                                HAllocator::AllocateClear<HArray<Value>>(1);
+                            return (index + 1);
+
+                        case '[': {
+                            type_ = Type_::Square;
+                            child_arr_ =
+                                HAllocator::AllocateClear<Array<Value>>(1);
+                            return (index + 1);
+                        }
+
+                        default: {
+                        }
+                    }
                 }
 
                 // Remove the current offset.
                 find_cache_->Bits &= (find_cache_->Bits - 1);
-
-                if ((find_cache_->Bits == 0) &&
-                    (find_cache_->NextOffset < end_before)) {
-                    qmmFind(content, find_cache_->NextOffset, end_before);
-                }
-            } while (find_cache_->Bits != 0);
-
-            if ((index < end_before) && (index >= offset)) {
-                switch (content[index]) {
-                    case '"': {
-                        type_ = Type_::Quote;
-                        return (index + 1);
-                    }
-
-                    case ',': {
-                        type_ = Type_::Comma;
-                        return (index + 1);
-                    }
-
-                    case ':': {
-                        if (has_colon_ || (obj_ == nullptr) ||
-                            (obj_value_ == nullptr)) {
-                            failed();
-                            return 0;
-                        }
-
-                        has_colon_  = true;
-                        pass_comma_ = false;
-                        find_cache_->Bits &= (find_cache_->Bits - 1);
-
-                        next_offset_ = (index + 1);
-                        offset       = next_offset_;
-                        continue;
-                    }
-
-                    case '{':
-                        type_ = Type_::Curly;
-                        child_obj_ =
-                            HAllocator::AllocateClear<HArray<Value>>(1);
-                        return (index + 1);
-
-                    case '[': {
-                        type_      = Type_::Square;
-                        child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
-                        return (index + 1);
-                    }
-
-                    default: {
-                    }
-                }
             }
 
-            // No match.
-            return 0;
-        } while (true);
+            if ((find_cache_->Bits == 0) && (offset < end_before)) {
+                qmmFind(content, offset, end_before);
+            }
+        } while (find_cache_->Bits != 0);
+
+        return 0;
     }
 #else
     inline ULong find(const char *content, ULong offset,
