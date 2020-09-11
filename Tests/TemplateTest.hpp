@@ -1348,14 +1348,14 @@ static int TestLoopTag1() {
     content = R"(<loop times="4" key="loop1-key">loop1-key</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "0123", "Render()");
 
-    content = R"(<loop times="4" key="loop1-key" index="1">loop1-key</loop>)";
+    content = R"(<loop key="loop1-key" times="3" index="1">loop1-key</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "123", "Render()");
 
     content =
-        R"(<loop times="4" key="loop1-key" index="  {var:6}   ">loop1-key</loop>)";
+        R"(<loop key="loop1-key" index="  {var:6}   " times="1">loop1-key</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "3", "Render()");
 
-    content = R"(<loop times="4" key="loop1-key" index="1">loop1-key:C</loop>)";
+    content = R"(<loop index="1" times="3" key="loop1-key">loop1-key:C</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "1:C2:C3:C",
                        "Render()");
 
@@ -1556,6 +1556,27 @@ static int TestLoopTag2() {
         Template<>::Render(content, &value3),
         R"(k-1: 4, k-1: 4, k-2: 1.5, k-2: 1.5, k-3: ABC, k-3: ABC, k-4: true, k-4: true, k-5: false, k-5: false, k-6: null, k-6: null, )",
         "Render()");
+
+    value3 = JSON::Parse(R"({"group":[[10],[20],[30]]})");
+
+    content =
+        R"(<loop set="group" key="_Key1" value="_Val1"><loop set="group[_Key1]" value="_Val2">_Val2</loop></loop>)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value3), "102030",
+                       "Render()");
+
+    value3 = JSON::Parse(R"({"group":[1,2,3,4]})");
+
+    content =
+        R"(<loop set="group" key="_Key" value="_Val" times="1">_Key:_Val</loop>)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value3), "0:1", "Render()");
+
+    content =
+        R"(<loop set="group" key="_Key" value="_Val" index="3">_Key:_Val</loop>)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value3), "3:4", "Render()");
+
+    content =
+        R"(<loop set="group" key="_Key" value="_Val" index="2" times="1">_Key:_Val</loop>)";
+    SHOULD_EQUAL_VALUE(Template<>::Render(content, &value3), "2:3", "Render()");
 
     END_SUB_TEST;
 }

@@ -203,7 +203,7 @@ struct TemplatePattern {
 #endif
 
 /*
- * Template randering engine.
+ * Template rendering.
  */
 template <typename Value_ = Value>
 class Template : Engine, ALEHelper {
@@ -211,26 +211,18 @@ class Template : Engine, ALEHelper {
     struct FindCache_;
 
   public:
-    static void Render(StringStream &ss, const char *content, ULong length,
-                       const Value_ *root_value) {
-        FindCache_ fc = FindCache_();
-        Template   temp(&ss, root_value, &fc);
-        ULong      tmp_offset = 0;
-        // To render all remaining tags if there were errors.
-        while (temp.not_done_ && ((tmp_offset + 1) < length)) {
-            temp.not_done_ = false;
-            tmp_offset     = temp.find(content, tmp_offset, length);
-        }
+    inline static void Render(StringStream &ss, const char *content,
+                              ULong length, const Value_ *root_value) {
+        Template temp(&ss, root_value);
 
-        if (temp.last_offset_ < length) {
-            // Add the remaining string.
-            ss.Insert((content + temp.last_offset_),
-                      (length - temp.last_offset_));
-        }
+        temp.find(content, 0, length);
+
+        // Add the remaining string.
+        ss.Insert((content + temp.last_offset_), (length - temp.last_offset_));
     }
 
-    static String Render(const char *content, const ULong length,
-                         const Value_ *root_value) {
+    inline static String Render(const char *content, const ULong length,
+                                const Value_ *root_value) {
         StringStream ss;
         Render(ss, content, length, root_value);
 
@@ -253,17 +245,16 @@ class Template : Engine, ALEHelper {
 
   private:
     enum class Tag {
-        Variable = 0, // {var:x}
-        Math,         // {math:x}
-        InLineIf,     // {if:x}
-        Loop,         // <loop set="..." key="..." value="...">
-        If,           // <if case="...">
+        Variable = 0U, // {var:x}
+        Math,          // {math:x}
+        InLineIf,      // {if:x}
+        Loop,          // <loop set="..." key="..." value="...">
+        If,            // <if case="...">
     };
 
 #ifdef QENTEM_SIMD_ENABLED_
 #if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1
-    void qmmFind(const char *content, ULong offset,
-                 ULong end_before) const noexcept {
+    void qmmFind(const char *content, ULong offset, ULong end_before) noexcept {
         const __m256i v64 = _mm256_set1_epi64x(TemplatePattern::Variable64bit);
         const __m256i m64 = _mm256_set1_epi64x(TemplatePattern::Math64bit);
         const __m256i iif64 =
@@ -272,108 +263,107 @@ class Template : Engine, ALEHelper {
         const __m256i if64 = _mm256_set1_epi64x(TemplatePattern::If64bit);
 
         do {
-            find_cache_->Offset     = offset;
-            find_cache_->NextOffset = (find_cache_->Offset + 32U);
-            offset                  = find_cache_->NextOffset;
+            find_cache_.Offset     = offset;
+            find_cache_.NextOffset = (find_cache_.Offset + 32U);
+            offset                 = find_cache_.NextOffset;
 
             __m256i m_content =
                 _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
-                    content + find_cache_->Offset));
+                    content + find_cache_.Offset));
 
-            find_cache_->Bits = static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                    _mm256_cmpeq_epi16(v64, m_content))) &
+            find_cache_.Bits = static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                   _mm256_cmpeq_epi16(v64, m_content))) &
+                               0x55555555U;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(m64, m_content))) &
                                 0x55555555U;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(m64, m_content))) &
-                                 0x55555555U;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(iif64, m_content))) &
-                                 0x55555555U;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(l64, m_content))) &
-                                 0x55555555U;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(if64, m_content))) &
-                                 0x55555555U;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(iif64, m_content))) &
+                                0x55555555U;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(l64, m_content))) &
+                                0x55555555U;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(if64, m_content))) &
+                                0x55555555U;
 
             m_content = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
-                content + find_cache_->Offset + 1));
+                content + find_cache_.Offset + 1));
 
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(v64, m_content))) &
-                                 0xAAAAAAAAU;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(m64, m_content))) &
-                                 0xAAAAAAAAU;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(iif64, m_content))) &
-                                 0xAAAAAAAAU;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(l64, m_content))) &
-                                 0xAAAAAAAAU;
-            find_cache_->Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                     _mm256_cmpeq_epi16(if64, m_content))) &
-                                 0xAAAAAAAAU;
-        } while ((find_cache_->Bits == 0) &&
-                 (find_cache_->NextOffset < end_before));
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(v64, m_content))) &
+                                0xAAAAAAAAU;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(m64, m_content))) &
+                                0xAAAAAAAAU;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(iif64, m_content))) &
+                                0xAAAAAAAAU;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(l64, m_content))) &
+                                0xAAAAAAAAU;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(if64, m_content))) &
+                                0xAAAAAAAAU;
+        } while ((find_cache_.Bits == 0) &&
+                 (find_cache_.NextOffset < end_before));
     }
 #else
-    void qmmFind(const char *content, ULong offset,
-                 ULong end_before) const noexcept {
+    void qmmFind(const char *content, ULong offset, ULong end_before) noexcept {
         do {
-            find_cache_->Offset     = offset;
-            find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
-            offset                  = find_cache_->NextOffset;
+            find_cache_.Offset     = offset;
+            find_cache_.NextOffset = (find_cache_.Offset + QMM_SIZE_);
+            offset                 = find_cache_.NextOffset;
 
             QMM_VAR_ m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                content + find_cache_->Offset));
+                content + find_cache_.Offset));
 
-            find_cache_->Bits =
+            find_cache_.Bits =
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::Variable64bit), m_content) &
                 QMM_BIT_ONE_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::Math64bit), m_content) &
                 QMM_BIT_ONE_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::InLineIf64bit), m_content) &
                 QMM_BIT_ONE_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::Loop64bit), m_content) &
                 QMM_BIT_ONE_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(QMM_SETONE_64_(TemplatePattern::If64bit),
                                        m_content) &
                 QMM_BIT_ONE_;
 
             m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                content + find_cache_->Offset + 1));
+                content + find_cache_.Offset + 1));
 
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::Variable64bit), m_content) &
                 QMM_BIT_TWO_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::Math64bit), m_content) &
                 QMM_BIT_TWO_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::InLineIf64bit), m_content) &
                 QMM_BIT_TWO_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePattern::Loop64bit), m_content) &
                 QMM_BIT_TWO_;
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(QMM_SETONE_64_(TemplatePattern::If64bit),
                                        m_content) &
                 QMM_BIT_TWO_;
-        } while ((find_cache_->Bits == 0) &&
-                 (find_cache_->NextOffset < end_before));
+        } while ((find_cache_.Bits == 0) &&
+                 (find_cache_.NextOffset < end_before));
     }
 #endif
 #endif
@@ -383,16 +373,16 @@ class Template : Engine, ALEHelper {
 
 #ifdef QENTEM_SIMD_ENABLED_
         do {
-            if ((find_cache_->Bits == 0) &&
-                (find_cache_->NextOffset < end_before)) {
-                qmmFind(content, find_cache_->NextOffset, end_before);
+            if ((find_cache_.Bits == 0) &&
+                (find_cache_.NextOffset < end_before)) {
+                qmmFind(content, find_cache_.NextOffset, end_before);
             }
 
-            if (find_cache_->Bits == 0) {
+            if (find_cache_.Bits == 0) {
                 break;
             }
 
-            ULong index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
+            ULong index = (Q_CTZL(find_cache_.Bits) + find_cache_.Offset);
 
             if (index >= end_before) {
                 return 0;
@@ -626,7 +616,7 @@ class Template : Engine, ALEHelper {
 
 #ifdef QENTEM_SIMD_ENABLED_
             }
-            find_cache_->Bits &= (find_cache_->Bits - 1);
+            find_cache_.Bits &= (find_cache_.Bits - 1);
         } while (true);
 
 #else
@@ -866,10 +856,8 @@ class Template : Engine, ALEHelper {
         UInt offset      = 0;
         UInt last_offset = 0;
         UInt len         = 0;
-
-        UInt times = 3;
-
-        bool case_value = false;
+        UInt times       = 3;
+        bool case_value  = false;
 
         do {
             ++len;
@@ -942,21 +930,18 @@ class Template : Engine, ALEHelper {
     };
 
     void renderLoop(const char *content, UInt length) const {
-        const Value_ *root_value = root_value_;
-        const char *  key_str    = nullptr;
-        const char *  value_str  = nullptr;
+        const Value_ *root_value   = root_value_;
+        const char *  key_str      = nullptr;
+        const char *  value_str    = nullptr;
+        ULong         size         = 0;
+        ULong         index        = 0;
+        UInt          key_length   = 0;
+        UInt          value_length = 0;
+        UInt          len          = 0;
+        UInt          offset       = 0;
+        UInt          last_offset  = 0;
 
-        UInt key_length   = 0;
-        UInt value_length = 0;
-        UInt len          = 0;
-
-        UInt offset      = 0;
-        UInt last_offset = 0;
-
-        ULong size  = 0;
-        ULong index = 0;
-
-        UInt times = 3;
+        UInt times = 5; // set, key, value, times, index
 
         const UInt start_offset = static_cast<UInt>(
             FindOne(TemplatePattern::MultiLineSuffix, content, 0, length));
@@ -980,7 +965,7 @@ class Template : Engine, ALEHelper {
                 return;
             }
 
-            UInt tmp_offset = (offset - 3);
+            UInt tmp_offset = offset;
 
             do {
                 switch (content[tmp_offset]) {
@@ -1057,12 +1042,9 @@ class Template : Engine, ALEHelper {
         UInt value_offset = 0;
         UInt key_offset   = 0;
 
-        UInt sub_offset;
-        UInt sub_length;
-
         do {
-            sub_offset = 0;
-            sub_length = 0;
+            UInt sub_offset = 0;
+            UInt sub_length = 0;
 
             if ((value != nullptr) && (value_item.Type == 0)) {
                 value_offset = static_cast<UInt>(Engine::Find(
@@ -1135,22 +1117,28 @@ class Template : Engine, ALEHelper {
         StringStream     loop_ss;
         ULong            last_offset;
         ULong            sub_id;
-        const Value_ *   value    = nullptr;
-        const bool       is_array = (root_value->IsArray() || (size != 0));
-        const loopItem_ *end      = (items.Storage() + items.Size());
+        StringStream *   current_ss = &loop_ss;
+        const Value_ *   value      = nullptr;
+        const loopItem_ *end        = (items.Storage() + items.Size());
 
         if (size == 0) {
             size = root_value->Size();
+
+            if (size <= index) {
+                return;
+            }
+
+            size -= index;
         }
 
-        while (index < size) {
+        while (size != 0) {
             last_offset           = 0;
             const loopItem_ *item = items.Storage();
 
             while (item < end) {
                 if (last_offset < item->Offset) {
-                    loop_ss.Insert((content + last_offset),
-                                   (item->Offset - last_offset));
+                    current_ss->Insert((content + last_offset),
+                                       (item->Offset - last_offset));
                 }
 
                 if (item->Type == 2) {
@@ -1161,12 +1149,16 @@ class Template : Engine, ALEHelper {
 
                     if (value != nullptr) {
                         if (item->SubLength == 0) {
-                            value->InsertString(loop_ss);
+                            value->InsertString(*current_ss);
                         } else {
                             last_offset += item->SubLength;
                             last_offset += 2U;
 
-                            if (value->IsArray()) {
+                            if (value->IsObject()) {
+                                value =
+                                    value->GetValue((content + item->SubOffset),
+                                                    item->SubLength);
+                            } else {
                                 if ((Digit::StringToNumber(
                                         sub_id, (content + item->SubOffset),
                                         item->SubLength))) {
@@ -1174,14 +1166,10 @@ class Template : Engine, ALEHelper {
                                 } else {
                                     value = nullptr;
                                 }
-                            } else {
-                                value =
-                                    value->GetValue((content + item->SubOffset),
-                                                    item->SubLength);
                             }
 
                             if (value != nullptr) {
-                                value->InsertString(loop_ss);
+                                value->InsertString(*current_ss);
                             }
                         }
                     }
@@ -1189,10 +1177,10 @@ class Template : Engine, ALEHelper {
                     last_offset = item->Offset;
                     last_offset += key_length;
 
-                    if (!is_array) {
-                        root_value->InsertKey(loop_ss, index);
+                    if (root_value->IsObject()) {
+                        root_value->InsertKey(*current_ss, index);
                     } else {
-                        loop_ss += Digit::NumberToString(index);
+                        *current_ss += Digit::NumberToString(index);
                     }
                 }
 
@@ -1201,23 +1189,38 @@ class Template : Engine, ALEHelper {
 
             // Add the remaining string.
             if (last_offset != length) {
-                loop_ss.Insert((content + last_offset), (length - last_offset));
+                current_ss->Insert((content + last_offset),
+                                   (length - last_offset));
             }
 
-            // TODO: Use ss_ and do not call Render if there is no tags
-            Render(*ss_, loop_ss.Storage(), loop_ss.Length(), root_value_);
-            loop_ss.SoftReset();
+            if (current_ss == &loop_ss) {
+                Template loop_temp(ss_, root_value_);
+
+                loop_temp.find(loop_ss.Storage(), 0, loop_ss.Length());
+
+                ss_->Insert((loop_ss.Storage() + loop_temp.last_offset_),
+                            (loop_ss.Length() - loop_temp.last_offset_));
+
+                if (loop_temp.last_offset_ != 0) {
+                    loop_ss.SoftReset();
+                } else {
+                    loop_ss.Clear();
+                    // It hash no inner tags, therefore, No need for rendering.
+                    current_ss = ss_;
+                }
+            }
 
             ++index;
+            --size;
         }
     }
 
     // renderIf(const char *content, const UInt length) const
     void renderIf(const char *content, UInt length) {
-        UInt   offset      = 0;
+        double result      = 0;
+        ULong  offset      = 0;
         UInt   case_offset = 0;
         UInt   case_length = 0;
-        double result      = 0;
 
         if (getQuoted(case_offset, case_length, content, length)) {
             offset = FindOne(TemplatePattern::MultiLineSuffix, content,
@@ -1266,10 +1269,9 @@ class Template : Engine, ALEHelper {
         }
     }
 
-    static UInt findNextElse(const char *content, UInt offset,
+    static UInt findNextElse(const char *content, ULong offset,
                              UInt length) noexcept {
         ULong else_offset = 0;
-        ULong next_if;
 
         do {
             else_offset = Find(TemplatePattern::ElsePrefix,
@@ -1281,7 +1283,7 @@ class Template : Engine, ALEHelper {
                 return 0;
             }
 
-            next_if =
+            const ULong next_if =
                 Find(TemplatePattern::IfPrefix, TemplatePattern::IfPrefixLength,
                      content, offset, length);
 
@@ -1302,10 +1304,6 @@ class Template : Engine, ALEHelper {
         } while (true);
 
         return static_cast<UInt>(else_offset);
-    }
-
-    void failed() noexcept final {
-        not_done_ = true;
     }
 
     /*
@@ -1338,14 +1336,14 @@ class Template : Engine, ALEHelper {
                 if (root_value->IsArray()) {
                     ULong value_id;
 
-                    if (!(Digit::StringToNumber(value_id, &(key[offset]),
+                    if (!(Digit::StringToNumber(value_id, (key + offset),
                                                 (next_offset - offset)))) {
                         break;
                     }
 
                     value = root_value->GetValue(value_id);
                 } else {
-                    value = root_value->GetValue(&(key[offset]),
+                    value = root_value->GetValue((key + offset),
                                                  (next_offset - offset));
                 }
 
@@ -1409,14 +1407,20 @@ class Template : Engine, ALEHelper {
                     const char *right, UInt right_length) const final {
         const Value_ *value_left{nullptr};
         const Value_ *value_right{nullptr};
+        const char *  str_left;
+        const char *  str_right;
+        ULong         str_length_left;
+        ULong         str_length_right;
+        String        string_left;
+        String        string_right;
 
-        bool is_number{false};
+        bool is_number = false;
 
         // If the right side is a variable
         if ((left[0] == TemplatePattern::VariablePrefix[0]) &&
             (left_length > TemplatePattern::VariableFulllength)) {
             value_left = findValue(
-                &(left[TemplatePattern::VariablePrefixLength]),
+                (left + TemplatePattern::VariablePrefixLength),
                 (left_length - TemplatePattern::VariableFulllength)); // {var:x}
 
             if (value_left == nullptr) {
@@ -1430,7 +1434,7 @@ class Template : Engine, ALEHelper {
         if ((right[0] == TemplatePattern::VariablePrefix[0]) &&
             (right_length > TemplatePattern::VariableFulllength)) {
             value_right =
-                findValue(&(right[TemplatePattern::VariablePrefixLength]),
+                findValue((right + TemplatePattern::VariablePrefixLength),
                           (right_length -
                            TemplatePattern::VariableFulllength)); // {var:x}
 
@@ -1469,11 +1473,6 @@ class Template : Engine, ALEHelper {
             return true;
         }
 
-        String string_left;
-
-        const char *str_left;
-        ULong       str_length_left;
-
         if (value_left != nullptr) {
             if (!(value_left->SetCharAndLength(str_left, str_length_left))) {
                 if (value_left->SetString(string_left)) {
@@ -1487,11 +1486,6 @@ class Template : Engine, ALEHelper {
             str_left        = left;
             str_length_left = left_length;
         }
-
-        String string_right;
-
-        const char *str_right;
-        ULong       str_length_right;
 
         if (value_right != nullptr) {
             if (!(value_right->SetCharAndLength(str_right, str_length_right))) {
@@ -1512,10 +1506,11 @@ class Template : Engine, ALEHelper {
         return true;
     }
 
-    Template(StringStream *ss, const Value_ *root_value,
-             FindCache_ *find_cache) noexcept
-        : ss_(ss), root_value_(root_value), find_cache_(find_cache) {
+    Template(StringStream *ss, const Value_ *root_value) noexcept
+        : ss_(ss), root_value_(root_value) {
     }
+
+    Template() = delete;
 
     struct FindCache_ {
         ULong        Offset{0};
@@ -1525,11 +1520,10 @@ class Template : Engine, ALEHelper {
 
     StringStream *ss_;
     const Value_ *root_value_;
-    FindCache_ *  find_cache_{nullptr};
+    FindCache_    find_cache_{};
 
     ULong last_offset_{0};
     Tag   tag_{Tag::Variable};
-    bool  not_done_{true};
 };
 
 } // namespace Qentem
