@@ -42,7 +42,7 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
 
-    ss2.Clear();
+    ss2.Reset();
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
@@ -98,7 +98,7 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss1.Capacity(), lss, "Capacity");
 
-    ss1.Clear();
+    ss1.Reset();
     ss1 = static_cast<StringStream &&>(ss2); // Move
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)");
@@ -108,7 +108,7 @@ static int TestStringStream() {
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
 
     ss2 += 'a';
-    ss1.Clear();
+    ss1.Reset();
     ss1 = static_cast<StringStream &&>(ss2); // Move
     SHOULD_EQUAL_VALUE(ss1.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 1), "(ss1.Capacity() >= 1)");
@@ -170,7 +170,7 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
 
     SHOULD_EQUAL_VALUE(ss2.GetString().Storage()[0], '\0', "GetString()[0]");
-    ss2.Clear();
+    ss2.Reset();
     SHOULD_EQUAL_VALUE(ss2.GetString().Storage()[0], '\0', "GetString()[0]");
 
     ss2 += "123456789";
@@ -194,7 +194,7 @@ static int TestStringStream() {
         "123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789",
         "GetString()", "123456789*13");
 
-    ss1.Clear();
+    ss1.Reset();
 
     char *buffer = ss1.Buffer(2);
 

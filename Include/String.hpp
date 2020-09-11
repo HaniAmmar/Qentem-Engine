@@ -200,7 +200,7 @@ class String {
         return Memory::Compare(storage_, str, length);
     }
 
-    void Clear() noexcept {
+    void Reset() noexcept {
         HAllocator::Deallocate(storage_);
         storage_ = nullptr;
         length_  = 0;

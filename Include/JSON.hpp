@@ -357,7 +357,7 @@ class JSONParser : Engine {
 
                                     if (has_error_ ||
                                         (!checkPoint2(content, length))) {
-                                        value.Clear();
+                                        value.Reset();
                                         return;
                                     }
 

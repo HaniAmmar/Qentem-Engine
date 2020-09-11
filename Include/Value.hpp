@@ -187,7 +187,7 @@ class Value {
 
     ~Value() {
         if (type_ != ValueType::Undefined) {
-            Clear();
+            Reset();
         }
     }
 
@@ -275,7 +275,7 @@ class Value {
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
             if (type_ != ValueType::Undefined) {
-                Clear();
+                Reset();
             }
 
             type_  = val.type_;
@@ -316,7 +316,7 @@ class Value {
                 }
             } else {
                 if (type_ != ValueType::Undefined) {
-                    Clear();
+                    Reset();
                 }
 
                 if (val.type_ != ValueType::Undefined) {
@@ -348,7 +348,7 @@ class Value {
             }
 
             default: {
-                Clear();
+                Reset();
                 type_ = ValueType::Object;
                 value_.object_ =
                     HAllocator::Allocate(static_cast<HArray<Value> &&>(obj));
@@ -382,7 +382,7 @@ class Value {
             }
 
             default: {
-                Clear();
+                Reset();
                 type_ = ValueType::Array;
                 value_.array_ =
                     HAllocator::Allocate(static_cast<Array<Value> &&>(arr));
@@ -416,7 +416,7 @@ class Value {
             }
 
             default: {
-                Clear();
+                Reset();
                 type_ = ValueType::String;
                 value_.string_ =
                     HAllocator::Allocate(static_cast<String &&>(str));
@@ -448,7 +448,7 @@ class Value {
                 }
 
                 default: {
-                    Clear();
+                    Reset();
                     type_ = ValueType::Null;
                 }
             }
@@ -472,7 +472,7 @@ class Value {
             }
 
             default: {
-                Clear();
+                Reset();
                 type_ = ValueType::Number;
             }
         }
@@ -506,7 +506,7 @@ class Value {
             }
 
             default: {
-                Clear();
+                Reset();
             }
         }
 
@@ -556,7 +556,7 @@ class Value {
             }
         }
 
-        val.Clear();
+        val.Reset();
     }
 
     void operator+=(const Value &val) {
@@ -935,7 +935,7 @@ class Value {
             }
         }
 
-        value.Clear();
+        value.Reset();
         return false;
     }
 
@@ -1072,7 +1072,7 @@ class Value {
             value_.object_->RemoveIndex(index);
         } else if ((type_ == ValueType::Array) &&
                    (index < value_.array_->Size())) {
-            (value_.array_->First() + index)->Clear();
+            (value_.array_->First() + index)->Reset();
         }
     }
 
@@ -1082,7 +1082,7 @@ class Value {
         }
     }
 
-    void Clear() noexcept {
+    void Reset() noexcept {
         switch (type_) {
             case ValueType::Object: {
                 type_ = ValueType::Undefined;
@@ -1122,7 +1122,7 @@ class Value {
 
             if (size != value_.array_->Capacity()) {
                 if (size == 0) {
-                    value_.array_->Clear();
+                    value_.array_->Reset();
                     return;
                 }
 

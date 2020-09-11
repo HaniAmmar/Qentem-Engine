@@ -75,7 +75,7 @@ static int TestString1() {
     SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], '\0',
                        "Storage()[Length]");
 
-    str2.Clear();
+    str2.Reset();
     SHOULD_EQUAL_VALUE(str2.Length(), 0, "Length");
     SHOULD_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
 
@@ -125,7 +125,7 @@ static int TestString1() {
         Memory::Compare(str2.Storage(), str1.Storage(), str2.Length()),
         "Compare");
 
-    str2.Clear();
+    str2.Reset();
     str1 = "efg";        // Copy
     str2 = String(str1); // Copy
     SHOULD_EQUAL_VALUE(str2.Length(), str1.Length(), "Length");
@@ -257,7 +257,7 @@ static int TestString2() {
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str2, "abcdef", "str2");
 
-    str1.Clear();
+    str1.Reset();
     str1 += "a";
     SHOULD_EQUAL_VALUE(str1.Length(), 1, "Length");
     SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
@@ -312,7 +312,7 @@ static int TestString2() {
                        "Storage()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcdefghigkl123", "str1");
 
-    str1.Clear();
+    str1.Reset();
     str1 = "123";
     str2 = "456";
     str1 = str1 + static_cast<String &&>(str2);

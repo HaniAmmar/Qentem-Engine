@@ -744,7 +744,7 @@ static int TestMathTag1() {
         R"(1)", "Render()");
 
     //////////////
-    value.Clear();
+    value.Reset();
 
     value += 5;
     value += true;
@@ -1519,7 +1519,7 @@ static int TestLoopTag2() {
         "Render()");
 
     //////////////////////
-    value3.Clear();
+    value3.Reset();
     value3["arr1"]["arr2"]["arr3"] = value1;
 
     content =
@@ -1528,7 +1528,7 @@ static int TestLoopTag2() {
                        "0: 100, 1: -50, 2: A, 3: true, 4: false, 5: null, ",
                        "Render()");
 
-    value3.Clear();
+    value3.Reset();
     value3[0][0][0] = value2;
 
     content =
@@ -1538,7 +1538,7 @@ static int TestLoopTag2() {
         "k-1: 4, k-2: 1.5, k-3: ABC, k-4: true, k-5: false, k-6: null, ",
         "Render()");
 
-    value3.Clear();
+    value3.Reset();
     value3["k1"][0]["k3"] = value1;
 
     content =
@@ -1547,7 +1547,7 @@ static int TestLoopTag2() {
                        "0: 100, 1: -50, 2: A, 3: true, 4: false, 5: null, ",
                        "Render()");
 
-    value3.Clear();
+    value3.Reset();
     value3[0]["k2"][0] = value2;
 
     content =
@@ -1648,12 +1648,12 @@ static int TestLoopTag3() {
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "", "Render()");
 
     /////
-    value.Clear();
+    value.Reset();
     value["k1"] = 10;
     value["k2"] = 20;
     value["k3"] = 30;
 
-    value["k2"].Clear();
+    value["k2"].Reset();
 
     content = R"(<loop value="v">v</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "1030", "Render()");
@@ -1663,7 +1663,7 @@ static int TestLoopTag3() {
     content = R"(<loop key="k">k</loop>)";
     SHOULD_EQUAL_VALUE(Template<>::Render(content, &value), "k1k3", "Render()");
 
-    value.Clear();
+    value.Reset();
     value += 10;
     value += 20;
     value += 30;

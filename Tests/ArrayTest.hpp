@@ -43,7 +43,7 @@ static int TestArray1() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
 
-    numbers2.Clear();
+    numbers2.Reset();
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
@@ -90,8 +90,8 @@ static int TestArray1() {
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
 
-    numbers1.Clear();
-    numbers2.Clear();
+    numbers1.Reset();
+    numbers2.Reset();
 
     numbers1.ResizeAndInitialize(8);
     storage = numbers1.Storage();
@@ -150,7 +150,7 @@ static int TestArray1() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
 
-    numbers1.SoftClear();
+    numbers1.SoftReset();
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");

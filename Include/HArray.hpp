@@ -106,7 +106,7 @@ class HArray {
 
     HArray &operator=(const HArray &h_arr) {
         if (this != &h_arr) {
-            Clear();
+            Reset();
             copyArray(h_arr);
         }
 
@@ -390,7 +390,7 @@ class HArray {
     }
 
     void SetCapacity(ULong size) {
-        Clear();
+        Reset();
 
         if (size != 0) {
             setBase(size);
@@ -401,7 +401,7 @@ class HArray {
         }
     }
 
-    void Clear() noexcept {
+    void Reset() noexcept {
         HAllocator::Deallocate(hash_table_);
         HAllocator::Destruct(storage_, (storage_ + size_));
         HAllocator::Deallocate(storage_);
@@ -413,10 +413,10 @@ class HArray {
         size_     = 0;
     }
 
-    // Resize to more or to less, and not zero, use Clear() instead.
+    // Resize to more or to less, and not zero, use Reset() instead.
     void Resize(ULong new_size) {
         if (new_size == 0) {
-            Clear();
+            Reset();
             return;
         }
 
@@ -450,7 +450,7 @@ class HArray {
             }
 
             if (n_size == 0) {
-                Clear();
+                Reset();
             } else if (n_size != capacity_) {
                 const ULong old_base = base_;
                 setBase(n_size);
@@ -655,7 +655,7 @@ class HArray {
     }
 
     void copyArray(const HArray &h_arr) {
-        // The function Clear() should be called before this.
+        // The function Reset() should be called before this.
         if (h_arr.size_ != 0) {
             capacity_ = h_arr.size_;
             storage_  = HAllocator::Allocate<HAItem_T>(capacity_);

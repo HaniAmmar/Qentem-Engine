@@ -39,7 +39,7 @@ class StringStream {
     StringStream() = default;
 
     ~StringStream() {
-        Clear();
+        Reset();
     }
 
     explicit StringStream(ULong size) : capacity_(size) {
@@ -118,7 +118,7 @@ class StringStream {
         insert(str, length);
     }
 
-    void Clear() noexcept {
+    void Reset() noexcept {
         offset_   = 0;
         capacity_ = 0;
         HAllocator::Deallocate(str_);

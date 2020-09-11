@@ -1204,7 +1204,7 @@ class Template : Engine, ALEHelper {
                 if (loop_temp.last_offset_ != 0) {
                     loop_ss.SoftReset();
                 } else {
-                    loop_ss.Clear();
+                    loop_ss.Reset();
                     // It hash no inner tags, therefore, No need for rendering.
                     current_ss = ss_;
                 }

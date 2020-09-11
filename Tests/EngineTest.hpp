@@ -593,7 +593,7 @@ static int TestEngine4() {
     content     = "()(";
     content_len = 3;
 
-    test6_.getItems().SoftClear();
+    test6_.getItems().SoftReset();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 1, "items.Size()");
     SHOULD_EQUAL_VALUE(test6_.getItems()[0].Offset, 0, "items[0].Offset");
@@ -602,7 +602,7 @@ static int TestEngine4() {
     content     = "()((((((";
     content_len = 8;
 
-    test6_.getItems().SoftClear();
+    test6_.getItems().SoftReset();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 1, "items.Size()");
     SHOULD_EQUAL_VALUE(test6_.getItems()[0].Offset, 0, "items[0].Offset");
@@ -610,7 +610,7 @@ static int TestEngine4() {
 
     content     = "()((((((()";
     content_len = 10;
-    test6_.getItems().SoftClear();
+    test6_.getItems().SoftReset();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 2, "items.Size()");
     SHOULD_EQUAL_VALUE(test6_.getItems()[0].Offset, 0, "items[0].Offset");
@@ -620,13 +620,13 @@ static int TestEngine4() {
 
     content     = "()(((()((()()(()()";
     content_len = 18;
-    test6_.getItems().SoftClear();
+    test6_.getItems().SoftReset();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 6, "items.Size()");
 
     content     = "  ()  ()  ()( )  (  )";
     content_len = 21;
-    test6_.getItems().SoftClear();
+    test6_.getItems().SoftReset();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 5, "items.Size()");
     SHOULD_EQUAL_VALUE(test6_.getItems()[0].Offset, 2, "items[0].Offset");
@@ -645,7 +645,7 @@ static int TestEngine4() {
 
     content     = "( ) (     ) (  )";
     content_len = 16;
-    test6_.getItems().SoftClear();
+    test6_.getItems().SoftReset();
     test6_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test6_.getItems().Size(), 3, "items.Size()");
     SHOULD_EQUAL_VALUE(test6_.getItems()[0].Offset, 0, "items[0].Offset");
@@ -691,7 +691,7 @@ static int TestEngine4() {
     content     = "(())(";
     content_len = 5;
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 1, "items.Size()");
     SHOULD_EQUAL_VALUE(test7_.getItems()[0].Offset, 0, "items[0].Offset");
@@ -700,7 +700,7 @@ static int TestEngine4() {
     content     = "(())((";
     content_len = 6;
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 1, "items.Size()");
     SHOULD_EQUAL_VALUE(test7_.getItems()[0].Offset, 0, "items[0].Offset");
@@ -709,26 +709,26 @@ static int TestEngine4() {
     content     = "(())(()";
     content_len = 7;
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 1, "items.Size()");
 
     content     = "(())(((()(()(()()";
     content_len = 17;
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 1, "items.Size()");
 
     content     = "(())(((())";
     content_len = 10;
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 2, "items.Size()");
 
     content     = "  (())  (())  (())(())  (())";
     content_len = 28;
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 5, "items.Size()");
     SHOULD_EQUAL_VALUE(test7_.getItems()[0].Offset, 2, "items[0].Offset");
@@ -745,7 +745,7 @@ static int TestEngine4() {
     content     = "  ((   )) (( )) ((               ))";
     content_len = 35;
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 3, "items.Size()");
     SHOULD_EQUAL_VALUE(test7_.getItems()[0].Offset, 2, "items[0].Offset");
@@ -755,7 +755,7 @@ static int TestEngine4() {
     SHOULD_EQUAL_VALUE(test7_.getItems()[2].Offset, 16, "items[2].Offset");
     SHOULD_EQUAL_VALUE(test7_.getItems()[2].Length, 19, "items[2].Length");
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 10, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 2, "items.Size()");
     SHOULD_EQUAL_VALUE(test7_.getItems()[0].Offset, 10, "items[0].Offset");
@@ -765,7 +765,7 @@ static int TestEngine4() {
     SHOULD_EQUAL_VALUE(test7_.getVARS().Offset, 10, "Offset");
     SHOULD_EQUAL_VALUE(test7_.getVARS().EndBefore, content_len, "EndBefore");
 
-    test7_.getItems().SoftClear();
+    test7_.getItems().SoftReset();
     test7_.FindNest(content, 15, content_len, content_len);
     SHOULD_EQUAL_VALUE(test7_.getItems().Size(), 1, "items.Size()");
     SHOULD_EQUAL_VALUE(test7_.getItems()[0].Offset, 16, "items[0].Offset");
@@ -1016,7 +1016,7 @@ static int TestEngine6() {
         {1{2{3{4{5{6{7}8}9}10}10}12}13})";
 
     // content = R"({....})";
-    items.SoftClear();
+    items.SoftReset();
     test5_2 t52(&items);
     content_len = String::Count(content);
     t52.FindNest(content, 0, content_len, content_len);
@@ -1027,7 +1027,7 @@ static int TestEngine6() {
     SHOULD_EQUAL_VALUE(toJSON_result, result, "toJSON_result");
 
     content = "";
-    items.SoftClear();
+    items.SoftReset();
     content_len = 0;
     t52.FindNest(content, 0, content_len, content_len);
     toJSON_result = toJSON(items, content);
@@ -1035,13 +1035,13 @@ static int TestEngine6() {
     SHOULD_EQUAL_VALUE(toJSON_result, "{}", "toJSON_result");
 
     content = "{ { }";
-    items.SoftClear();
+    items.SoftReset();
     content_len = 5;
     t52.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(items.Size(), 1, "items.Size()");
 
     content = "{ {{ }}";
-    items.SoftClear();
+    items.SoftReset();
     content_len = 5;
     t52.FindNest(content, 0, content_len, content_len);
     SHOULD_EQUAL_VALUE(items.Size(), 0, "items.Size()");

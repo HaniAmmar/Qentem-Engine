@@ -86,7 +86,7 @@ static int TestHArray1() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
 
-    numbers2.Clear();
+    numbers2.Reset();
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
@@ -513,7 +513,7 @@ static int TestHArray4() {
 
     SHOULD_EQUAL_TRUE(did_throw, "did_throw");
 
-    numbers1.Clear();
+    numbers1.Reset();
     numbers1[""] = 555;
     SHOULD_EQUAL_VALUE(numbers1[""], 555, "empty key");
 
@@ -536,7 +536,7 @@ static int TestHArray5() {
         SHOULD_EQUAL_VALUE(*value, i, key.Storage());
     }
 
-    numbers1.Clear();
+    numbers1.Reset();
 
     for (ULong i = 1; i < 1001; i++) {
         numbers1[Digit::NumberToString(i)] = i;
@@ -700,7 +700,7 @@ static int TestHArray6() {
     strings1 += static_cast<HArray<String> &&>(strings2);
     strings1.Resize(10);
     storage = strings1.Storage();
-    strings2.Clear();
+    strings2.Reset();
     strings2 += static_cast<HArray<String> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
     SHOULD_EQUAL_VALUE(strings2.Capacity(), 2, "Capacity()");
@@ -858,7 +858,7 @@ static int TestHArray9() {
         SHOULD_EQUAL(list.Find(key), nullptr, "value", "null");
     }
 
-    list.Clear();
+    list.Reset();
 
     for (UInt i = 0; i < id; i++) {
         String key("k-");

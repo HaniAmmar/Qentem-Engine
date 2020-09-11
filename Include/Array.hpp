@@ -186,7 +186,7 @@ class Array {
         return *this;
     }
 
-    void Clear() noexcept {
+    void Reset() noexcept {
         HAllocator::Destruct(storage_, (storage_ + size_));
         HAllocator::Deallocate(storage_);
 
@@ -196,7 +196,7 @@ class Array {
     }
 
     // Reset just the size
-    void SoftClear() noexcept {
+    void SoftReset() noexcept {
         HAllocator::Destruct(storage_, (storage_ + size_));
         size_ = 0;
     }
@@ -211,7 +211,7 @@ class Array {
     }
 
     void SetCapacity(ULong size) {
-        Clear();
+        Reset();
 
         if (size != 0) {
             capacity_ = size;
@@ -221,7 +221,7 @@ class Array {
 
     void Resize(ULong new_size) {
         if (new_size == 0) {
-            Clear();
+            Reset();
             return;
         }
 

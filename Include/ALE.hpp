@@ -201,7 +201,7 @@ class ALE : Engine {
     }
 
     void failed() noexcept final {
-        items_->Clear();
+        items_->Reset();
     }
 
     inline bool hasTail() const noexcept final {
@@ -396,7 +396,7 @@ class ALE : Engine {
                         String::SoftTrim(content, offset, length);
 
                         if (length != len) {
-                            items.Clear();
+                            items.Reset();
                             return;
                         }
                     }
@@ -410,7 +410,7 @@ class ALE : Engine {
                     String::SoftTrim(content, offset, length);
 
                     if (length != item2->Length) {
-                        items.Clear();
+                        items.Reset();
                     }
                 }
             }
