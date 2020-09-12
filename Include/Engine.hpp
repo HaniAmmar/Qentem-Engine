@@ -364,7 +364,7 @@ class Engine {
      * This is called to check if the match has a second part/tail.
      * Like head: { and the tail is } or () or "" or < > ...etc.
      */
-    inline virtual bool hasTail() const noexcept {
+    virtual bool hasTail() const noexcept {
         return false;
     }
 };
