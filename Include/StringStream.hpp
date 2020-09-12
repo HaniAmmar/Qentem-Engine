@@ -32,7 +32,9 @@
 namespace Qentem {
 
 /*
- * Resizable string container with null terminator.
+ * String Stream class without null terminator.
+ *
+ * Use StringStream += '\0'; to add one.
  */
 class StringStream {
   public:
@@ -44,7 +46,13 @@ class StringStream {
 
     explicit StringStream(ULong size) : capacity_(size) {
         if (size != 0) {
-            str_ = HAllocator::Allocate<char>(size + 1U);
+            capacity_ = (ULong{1} << Q_CLZL(capacity_));
+
+            if (capacity_ < size) {
+                capacity_ <<= 1;
+            }
+
+            str_ = HAllocator::Allocate<char>(capacity_);
         }
     }
 
@@ -57,8 +65,16 @@ class StringStream {
 
     StringStream(const StringStream &ss) {
         if (ss.offset_ != 0) {
-            str_      = HAllocator::Allocate<char>(ss.offset_ + 1U);
             capacity_ = ss.offset_;
+
+            capacity_ = (ULong{1} << Q_CLZL(capacity_));
+
+            if (capacity_ < ss.offset_) {
+                capacity_ <<= 1;
+            }
+
+            str_ = HAllocator::Allocate<char>(capacity_);
+
             insert(ss.str_, ss.offset_);
         }
     }
@@ -99,7 +115,7 @@ class StringStream {
                 n_size = QENTEM_STRINGSTREAM_INITIALSIZE_;
             }
 
-            expand(n_size << 2U);
+            expand(n_size << 1U);
         }
 
         str_[offset_] = one_char;
@@ -148,12 +164,7 @@ class StringStream {
     }
 
     inline const char *Storage() const noexcept {
-        if (offset_ != 0) {
-            str_[offset_] = '\0';
-            return str_;
-        }
-
-        return nullptr;
+        return str_;
     }
 
     inline ULong Length() const noexcept {
@@ -165,8 +176,6 @@ class StringStream {
     }
 
     char *Eject() noexcept {
-        str_[offset_] = '\0';
-
         offset_   = 0;
         capacity_ = 0;
         char *str = str_;
@@ -176,17 +185,12 @@ class StringStream {
     }
 
     String GetString() {
-        if (offset_ != 0) {
-            const ULong len = offset_;
-            char *      tmp = str_;
-            tmp[offset_]    = '\0';
-            str_            = nullptr;
-            offset_         = 0;
-            capacity_       = 0;
-            return String(tmp, len);
-        }
-
-        return String("");
+        const ULong len = offset_;
+        char *      tmp = str_;
+        str_            = nullptr;
+        offset_         = 0;
+        capacity_       = 0;
+        return String(tmp, len);
     }
 
     //////////// Private ////////////
@@ -207,7 +211,7 @@ class StringStream {
 
     void expand(ULong capacity) {
         char *old_str = str_;
-        str_          = HAllocator::Allocate<char>(capacity + 1U);
+        str_          = HAllocator::Allocate<char>(capacity);
 
         if (capacity_ != 0) {
             Memory::Copy(str_, old_str, capacity_);
