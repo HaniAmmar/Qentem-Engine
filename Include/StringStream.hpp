@@ -157,13 +157,7 @@ class StringStream {
         length_ += len;
 
         if (capacity_ < length_) {
-            capacity_ = (ULong{1} << Q_CLZL(length_));
-
-            if (capacity_ < length_) {
-                capacity_ <<= 1;
-            }
-
-            expand(capacity_);
+            expand((ULong{2} << Q_CLZL(length_)));
         }
 
         return (str_ + current_offset);
