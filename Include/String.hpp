@@ -158,7 +158,7 @@ class String {
     String operator+(const Char_T_ *str) const {
         const ULong len         = StringUtils::Count(str);
         const ULong ns_len      = (length_ + len);
-        Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(len + 1);
+        Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
 
         Memory::Copy<Char_T_>(ns_storage_, storage_,
                               (length_ * sizeof(Char_T_)));
