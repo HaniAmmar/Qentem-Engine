@@ -61,13 +61,16 @@ static int TestStringStream() {
     ss2 += String<char>("a");
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
-    SHOULD_EQUAL_VALUE(ss2.GetString(), "a", "GetString()");
+    SHOULD_EQUAL_VALUE(ss2.GetString(), "a", "GetString()==a");
+    SHOULD_NOT_EQUAL_VALUE(ss2.GetString(), "aa", "GetString()!=aa");
 
     str = String<char>("a");
     ss2 += str;
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
-    SHOULD_EQUAL_VALUE(ss2, "a", "StringStream");
+    SHOULD_EQUAL_VALUE(ss2, "a", "StringStream==a");
+    SHOULD_NOT_EQUAL_VALUE(ss2, "aa", "StringStream!=aa");
+
     ss2.Reset();
 
     ss2 += "abc";
