@@ -87,6 +87,22 @@ if (ENABLE_COVERAGE)
     target_link_libraries(ALETest --coverage)
 endif()
 
+# Unicode
+add_executable(UnicodeTest Tests/UnicodeTest.cpp)
+add_test(NAME UnicodeTest COMMAND UnicodeTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(UnicodeTest --coverage)
+endif()
+
+# JSONUtils
+add_executable(JSONUtilsTest Tests/JSONUtilsTest.cpp)
+add_test(NAME JSONUtilsTest COMMAND JSONUtilsTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(JSONUtilsTest --coverage)
+endif()
+
 # Value
 add_executable(ValueTest Tests/ValueTest.cpp)
 add_test(NAME ValueTest COMMAND ValueTest)
