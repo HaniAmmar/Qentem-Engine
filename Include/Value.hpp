@@ -21,101 +21,13 @@
  */
 
 #include "Array.hpp"
-#include "Digit.hpp"
 #include "HArray.hpp"
-#include "StringStream.hpp"
+#include "JSONUtils.hpp"
 
 #ifndef QENTEM_VALUE_H_
 #define QENTEM_VALUE_H_
 
-#define QENTEM_TRUE_LEN_ 4U
-#define QENTEM_FALSE_LEN_ 5U
-#define QENTEM_NULL_LEN_ 4U
-
 namespace Qentem {
-namespace JSON {
-
-static void EscapeString(const char *content, ULong length, StringStream &ss) {
-    ULong offset  = 0;
-    ULong offset2 = 0;
-
-    while (offset < length) {
-        switch (content[offset]) {
-            case '\"':
-            case '\\':
-            case '/':
-            case '\b':
-            case '\f':
-            case '\n':
-            case '\r':
-            case '\t': {
-                if (offset > offset2) {
-                    ss.Insert((content + offset2), (offset - offset2));
-                }
-
-                offset2 = offset + 1;
-
-                switch (content[offset]) {
-                    case '\"': {
-                        ss.Insert("\\\"", 2);
-                        break;
-                    }
-
-                    case '\\': {
-                        ss.Insert("\\\\", 2);
-                        break;
-                    }
-
-                    case '/': {
-                        ss.Insert("\\/", 2);
-                        break;
-                    }
-
-                    case '\b': {
-                        ss.Insert("\\b", 2);
-                        break;
-                    }
-
-                    case '\f': {
-                        ss.Insert("\\f", 2);
-                        break;
-                    }
-
-                    case '\n': {
-                        ss.Insert("\\n", 2);
-                        break;
-                    }
-
-                    case '\r': {
-                        ss.Insert("\\r", 2);
-                        break;
-                    }
-
-                    case '\t': {
-                        ss.Insert("\\t", 2);
-                        break;
-                    }
-
-                    default: {
-                    }
-                }
-
-                break;
-            }
-
-            default: {
-            }
-        }
-
-        ++offset;
-    }
-
-    if (offset > offset2) {
-        ss.Insert((content + offset2), (offset - offset2));
-    }
-}
-} // namespace JSON
-////////////////////////////////////////////////////////////
 
 enum class ValueType {
     Undefined = 0,
@@ -128,8 +40,9 @@ enum class ValueType {
     Null
 };
 
+template <typename Char_T_>
 class Value {
-    union Value_U_;
+    using JSONotation_T_ = JSON::JSONotation<Char_T_>;
 
   public:
     Value() = default;
@@ -145,7 +58,8 @@ class Value {
     explicit Value(ValueType type) noexcept : type_(type) {
         switch (type) {
             case ValueType::Object: {
-                value_.object_ = HAllocator::AllocateClear<HArray<Value>>(1);
+                value_.object_ =
+                    HAllocator::AllocateClear<HArray<Value, Char_T_>>(1);
                 break;
             }
 
@@ -155,7 +69,7 @@ class Value {
             }
 
             case ValueType::String: {
-                value_.string_ = HAllocator::AllocateClear<String>(1);
+                value_.string_ = HAllocator::AllocateClear<String<Char_T_>>(1);
                 break;
             }
 
@@ -169,7 +83,8 @@ class Value {
         }
     }
 
-    explicit Value(HArray<Value> *obj) noexcept : type_(ValueType::Object) {
+    explicit Value(HArray<Value, Char_T_> *obj) noexcept
+        : type_(ValueType::Object) {
         value_.object_ = obj;
     }
 
@@ -177,7 +92,7 @@ class Value {
         value_.array_ = arr;
     }
 
-    explicit Value(String *str) noexcept : type_(ValueType::String) {
+    explicit Value(String<Char_T_> *str) noexcept : type_(ValueType::String) {
         value_.string_ = str;
     }
 
@@ -234,16 +149,19 @@ class Value {
         throw 1;
     }
 
-    Value &operator[](String &&key) {
+    Value &operator[](String<Char_T_> &&key) {
         switch (type_) {
             case ValueType::Object: {
-                return (*(value_.object_))[static_cast<String &&>(key)];
+                return (
+                    *(value_.object_))[static_cast<String<Char_T_> &&>(key)];
             }
 
             case ValueType::Undefined: {
-                type_          = ValueType::Object;
-                value_.object_ = HAllocator::Allocate(HArray<Value>(1));
-                return (*(value_.object_))[static_cast<String &&>(key)];
+                type_ = ValueType::Object;
+                value_.object_ =
+                    HAllocator::Allocate(HArray<Value, Char_T_>(1));
+                return (
+                    *(value_.object_))[static_cast<String<Char_T_> &&>(key)];
             }
 
             default: {
@@ -253,15 +171,16 @@ class Value {
         throw 3;
     }
 
-    Value &operator[](const String &key) {
+    Value &operator[](const String<Char_T_> &key) {
         switch (type_) {
             case ValueType::Object: {
                 return (*(value_.object_))[key];
             }
 
             case ValueType::Undefined: {
-                type_          = ValueType::Object;
-                value_.object_ = HAllocator::Allocate(HArray<Value>(1));
+                type_ = ValueType::Object;
+                value_.object_ =
+                    HAllocator::Allocate(HArray<Value, Char_T_>(1));
                 return (*(value_.object_))[key];
             }
 
@@ -329,10 +248,10 @@ class Value {
         return *this;
     }
 
-    Value &operator=(HArray<Value> &&obj) {
+    Value &operator=(HArray<Value, Char_T_> &&obj) {
         switch (type_) {
             case ValueType::Object: {
-                *(value_.object_) = static_cast<HArray<Value> &&>(obj);
+                *(value_.object_) = static_cast<HArray<Value, Char_T_> &&>(obj);
                 break;
             }
 
@@ -341,25 +260,25 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_ = ValueType::Object;
-                value_.object_ =
-                    HAllocator::Allocate(static_cast<HArray<Value> &&>(obj));
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::Allocate(
+                    static_cast<HArray<Value, Char_T_> &&>(obj));
                 break;
             }
 
             default: {
                 Reset();
-                type_ = ValueType::Object;
-                value_.object_ =
-                    HAllocator::Allocate(static_cast<HArray<Value> &&>(obj));
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::Allocate(
+                    static_cast<HArray<Value, Char_T_> &&>(obj));
             }
         }
 
         return *this;
     }
 
-    Value &operator=(const HArray<Value> &obj) {
-        *this = HArray<Value>(obj);
+    Value &operator=(const HArray<Value, Char_T_> &obj) {
+        *this = HArray<Value, Char_T_>(obj);
         return *this;
     }
 
@@ -397,10 +316,10 @@ class Value {
         return *this;
     }
 
-    Value &operator=(String &&str) {
+    Value &operator=(String<Char_T_> &&str) {
         switch (type_) {
             case ValueType::String: {
-                *(value_.string_) = static_cast<String &&>(str);
+                *(value_.string_) = static_cast<String<Char_T_> &&>(str);
                 break;
             }
 
@@ -411,7 +330,7 @@ class Value {
             case ValueType::Null: {
                 type_ = ValueType::String;
                 value_.string_ =
-                    HAllocator::Allocate(static_cast<String &&>(str));
+                    HAllocator::Allocate(static_cast<String<Char_T_> &&>(str));
                 break;
             }
 
@@ -419,21 +338,21 @@ class Value {
                 Reset();
                 type_ = ValueType::String;
                 value_.string_ =
-                    HAllocator::Allocate(static_cast<String &&>(str));
+                    HAllocator::Allocate(static_cast<String<Char_T_> &&>(str));
             }
         }
 
         return *this;
     }
 
-    Value &operator=(const String &str) {
-        *this = String(str);
+    Value &operator=(const String<Char_T_> &str) {
+        *this = String<Char_T_>(str);
         return *this;
     }
 
-    Value &operator=(const char *str) {
+    Value &operator=(const Char_T_ *str) {
         if (str != nullptr) {
-            *this = String(str);
+            *this = String<Char_T_>(str);
         } else {
             switch (type_) {
                 case ValueType::Null: {
@@ -545,8 +464,8 @@ class Value {
 
             case ValueType::Object: {
                 if (val.type_ == ValueType::Object) {
-                    *(value_.object_) +=
-                        static_cast<HArray<Value> &&>(*(val.value_.object_));
+                    *(value_.object_) += static_cast<HArray<Value, Char_T_> &&>(
+                        *(val.value_.object_));
                 }
 
                 break;
@@ -601,7 +520,7 @@ class Value {
         }
     }
 
-    void operator+=(HArray<Value> &&obj) {
+    void operator+=(HArray<Value, Char_T_> &&obj) {
         if (type_ == ValueType::Undefined) {
             type_         = ValueType::Array;
             value_.array_ = HAllocator::Allocate(Array<Value>(1));
@@ -609,13 +528,14 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) += Value(
-                    HAllocator::Allocate(static_cast<HArray<Value> &&>(obj)));
+                *(value_.array_) += Value(HAllocator::Allocate(
+                    static_cast<HArray<Value, Char_T_> &&>(obj)));
                 break;
             }
 
             case ValueType::Object: {
-                *(value_.object_) += static_cast<HArray<Value> &&>(obj);
+                *(value_.object_) +=
+                    static_cast<HArray<Value, Char_T_> &&>(obj);
                 break;
             }
 
@@ -624,8 +544,8 @@ class Value {
         }
     }
 
-    void operator+=(const HArray<Value> &obj) {
-        *this += HArray<Value>(obj);
+    void operator+=(const HArray<Value, Char_T_> &obj) {
+        *this += HArray<Value, Char_T_>(obj);
     }
 
     void operator+=(Array<Value> &&arr) {
@@ -642,7 +562,7 @@ class Value {
         (*this) += Array<Value>(arr);
     }
 
-    void operator+=(String &&str) {
+    void operator+=(String<Char_T_> &&str) {
         if (type_ == ValueType::Undefined) {
             type_         = ValueType::Array;
             value_.array_ = HAllocator::Allocate(Array<Value>(1));
@@ -650,13 +570,13 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) +=
-                    Value(HAllocator::Allocate(static_cast<String &&>(str)));
+                *(value_.array_) += Value(
+                    HAllocator::Allocate(static_cast<String<Char_T_> &&>(str)));
                 break;
             }
 
             case ValueType::String: {
-                *(value_.string_) += static_cast<String &&>(str);
+                *(value_.string_) += static_cast<String<Char_T_> &&>(str);
                 break;
             }
 
@@ -665,13 +585,13 @@ class Value {
         }
     }
 
-    void operator+=(const String &string_) {
-        (*this) += String(string_);
+    void operator+=(const String<Char_T_> &string_) {
+        (*this) += String<Char_T_>(string_);
     }
 
-    void operator+=(const char *str) {
+    void operator+=(const Char_T_ *str) {
         if (str != nullptr) {
-            *this += String(str);
+            *this += String<Char_T_>(str);
         } else {
             if (type_ == ValueType::Array) {
                 *(value_.array_) += Value(ValueType::Null);
@@ -750,7 +670,7 @@ class Value {
         return GetNumber();
     }
 
-    explicit operator const char *() const noexcept {
+    explicit operator const Char_T_ *() const noexcept {
         return StringStorage();
     }
 
@@ -831,7 +751,7 @@ class Value {
         return nullptr;
     }
 
-    Value *GetValue(const char *key, ULong length) const noexcept {
+    Value *GetValue(const Char_T_ *key, ULong length) const noexcept {
         if (type_ == ValueType::Object) {
             Value *val = (value_.object_->Find(key, length));
 
@@ -843,7 +763,7 @@ class Value {
         return nullptr;
     }
 
-    const String *GetKey(ULong index) const noexcept {
+    const String<Char_T_> *GetKey(ULong index) const noexcept {
         if (type_ == ValueType::Object) {
             return value_.object_->GetKey(index);
         }
@@ -851,7 +771,7 @@ class Value {
         return nullptr;
     }
 
-    HArray<Value> *GetObject() const noexcept {
+    HArray<Value, Char_T_> *GetObject() const noexcept {
         if (type_ == ValueType::Object) {
             return value_.object_;
         }
@@ -867,7 +787,7 @@ class Value {
         return nullptr;
     }
 
-    const String *GetString() const noexcept {
+    const String<Char_T_> *GetString() const noexcept {
         if (type_ == ValueType::String) {
             return value_.string_;
         }
@@ -875,8 +795,8 @@ class Value {
         return nullptr;
     }
 
-    const char *StringStorage() const noexcept {
-        if ((type_ == ValueType::String) && (value_.string_ != nullptr)) {
+    const Char_T_ *StringStorage() const noexcept {
+        if (type_ == ValueType::String) {
             return value_.string_->Storage();
         }
 
@@ -884,26 +804,47 @@ class Value {
     }
 
     ULong Length() const noexcept {
-        if (type_ == ValueType::String && (value_.string_ != nullptr)) {
+        if (type_ == ValueType::String) {
             return value_.string_->Length();
         }
 
         return 0;
     }
 
-    bool SetCharAndLength(const char *&  key,
-                          Qentem::ULong &length) const noexcept {
-        if ((type_ == ValueType::String) && (value_.string_ != nullptr)) {
-            key    = value_.string_->Storage();
-            length = value_.string_->Length();
+    bool SetCharAndLength(const Char_T_ *&key,
+                          Qentem::ULong & length) const noexcept {
+        switch (type_) {
+            case ValueType::String: {
+                key    = value_.string_->Storage();
+                length = value_.string_->Length();
+                return true;
+            }
 
-            return true;
+            case ValueType::True: {
+                key    = JSONotation_T_::GetTrueString();
+                length = JSONotation_T_::TrueStringLength;
+                return true;
+            }
+
+            case ValueType::False: {
+                key    = JSONotation_T_::GetFalseString();
+                length = JSONotation_T_::FalseStringLength;
+                return true;
+            }
+
+            case ValueType::Null: {
+                key    = JSONotation_T_::GetNullString();
+                length = JSONotation_T_::NullStringLength;
+                return true;
+            }
+
+            default: {
+                return false;
+            }
         }
-
-        return false;
     }
 
-    bool SetString(String &value) const {
+    bool SetString(String<Char_T_> &value) const {
         switch (type_) {
             case ValueType::String: {
                 value = *(value_.string_);
@@ -911,23 +852,26 @@ class Value {
             }
 
             case ValueType::Number: {
-                value = Digit::NumberToString(value_.number_, 1, 0,
-                                              QENTEM_DOUBLE_PRECISION_);
+                value = Digit<Char_T_>::NumberToString(
+                    value_.number_, 1, 0, QENTEM_DOUBLE_PRECISION_);
                 return true;
             }
 
             case ValueType::True: {
-                value = String("true", QENTEM_TRUE_LEN_);
+                value = String<Char_T_>(JSONotation_T_::GetTrueString(),
+                                        JSONotation_T_::TrueStringLength);
                 return true;
             }
 
             case ValueType::False: {
-                value = String("false", QENTEM_FALSE_LEN_);
+                value = String<Char_T_>(JSONotation_T_::GetFalseString(),
+                                        JSONotation_T_::FalseStringLength);
                 return true;
             }
 
             case ValueType::Null: {
-                value = String("null", QENTEM_NULL_LEN_);
+                value = String<Char_T_>(JSONotation_T_::GetNullString(),
+                                        JSONotation_T_::NullStringLength);
                 return true;
             }
 
@@ -935,11 +879,10 @@ class Value {
             }
         }
 
-        value.Reset();
         return false;
     }
 
-    bool InsertString(StringStream &ss) const {
+    bool InsertString(StringStream<Char_T_> &ss) const {
         switch (type_) {
             case ValueType::String: {
                 ss += *(value_.string_);
@@ -947,23 +890,26 @@ class Value {
             }
 
             case ValueType::Number: {
-                ss += Digit::NumberToString(value_.number_, 1, 0,
-                                            QENTEM_DOUBLE_PRECISION_);
+                Digit<Char_T_>::NumberToStringStream(ss, value_.number_, 1, 0,
+                                                     QENTEM_DOUBLE_PRECISION_);
                 return true;
             }
 
             case ValueType::True: {
-                ss.Insert("true", QENTEM_TRUE_LEN_);
+                ss.Insert(JSONotation_T_::GetTrueString(),
+                          JSONotation_T_::TrueStringLength);
                 return true;
             }
 
             case ValueType::False: {
-                ss.Insert("false", QENTEM_FALSE_LEN_);
+                ss.Insert(JSONotation_T_::GetFalseString(),
+                          JSONotation_T_::FalseStringLength);
                 return true;
             }
 
             case ValueType::Null: {
-                ss.Insert("null", QENTEM_NULL_LEN_);
+                ss.Insert(JSONotation_T_::GetNullString(),
+                          JSONotation_T_::NullStringLength);
                 return true;
             }
 
@@ -974,9 +920,9 @@ class Value {
         return false;
     }
 
-    bool InsertKey(StringStream &ss, ULong index) const {
+    bool InsertKey(StringStream<Char_T_> &ss, ULong index) const {
         if (type_ == ValueType::Object) {
-            const String *key = value_.object_->GetKey(index);
+            const String<Char_T_> *key = value_.object_->GetKey(index);
 
             if (key != nullptr) {
                 ss += *key;
@@ -1004,7 +950,7 @@ class Value {
             }
 
             case ValueType::String: {
-                return Digit::StringToNumber(
+                return Digit<Char_T_>::StringToNumber(
                     value, value_.string_->Storage(),
                     static_cast<UInt>(value_.string_->Length()));
             }
@@ -1047,12 +993,15 @@ class Value {
             }
 
             case ValueType::String: {
-                if (value_.string_->Compare("true", QENTEM_TRUE_LEN_)) {
+                if (value_.string_->IsEqual(JSONotation_T_::GetTrueString(),
+                                            JSONotation_T_::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (value_.string_->Compare("false", QENTEM_FALSE_LEN_)) {
+                if (value_.string_->IsEqual(
+                        JSONotation_T_::GetFalseString(),
+                        JSONotation_T_::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1067,7 +1016,7 @@ class Value {
         return false;
     }
 
-    void Remove(ULong index) noexcept {
+    void Remove(ULong index) const noexcept {
         if (type_ == ValueType::Object) {
             value_.object_->RemoveIndex(index);
         } else if ((type_ == ValueType::Array) &&
@@ -1076,9 +1025,9 @@ class Value {
         }
     }
 
-    inline void Remove(const char *key, ULong length) noexcept {
+    inline void Remove(const String<Char_T_> &key) const noexcept {
         if (type_ == ValueType::Object) {
-            value_.object_->Remove(key, length);
+            value_.object_->Remove(key);
         }
     }
 
@@ -1144,19 +1093,19 @@ class Value {
         }
     }
 
-    void Stringify(StringStream &ss) const {
+    void Stringify(StringStream<Char_T_> &ss) const {
         const ULong size   = Size();
         const bool  is_obj = (type_ == ValueType::Object);
 
-        const HAItem<Value> *ha_item = nullptr;
-        const Value *        item    = nullptr;
+        const HAItem<Value, Char_T_> *ha_item = nullptr;
+        const Value *                 item    = nullptr;
 
         if (is_obj) {
             ha_item = (value_.object_->Storage() - 1);
-            ss += '{';
+            ss += JSONotation_T_::OCurlyChar;
         } else if (type_ == ValueType::Array) {
             item = (value_.array_->Storage() - 1);
-            ss += '[';
+            ss += JSONotation_T_::OSquareChar;
         } else {
             return;
         }
@@ -1174,11 +1123,11 @@ class Value {
                         continue; // Deleted item.
                     }
 
-                    ss += '"';
-                    JSON::EscapeString(ha_item->Key.Storage(),
-                                       ha_item->Key.Length(), ss);
-                    ss += '"';
-                    ss += ':';
+                    ss += JSONotation_T_::QuoteChar;
+                    JSON::EscapeJSON(ha_item->Key.Storage(),
+                                     ha_item->Key.Length(), ss);
+                    ss += JSONotation_T_::QuoteChar;
+                    ss += JSONotation_T_::ColonChar;
 
                     item = &(ha_item->Value);
                 } else {
@@ -1197,30 +1146,34 @@ class Value {
                     }
 
                     case ValueType::String: {
-                        ss += '"';
-                        JSON::EscapeString(item->value_.string_->Storage(),
-                                           item->value_.string_->Length(), ss);
-                        ss += '"';
+                        ss += JSONotation_T_::QuoteChar;
+                        JSON::EscapeJSON(item->value_.string_->Storage(),
+                                         item->value_.string_->Length(), ss);
+                        ss += JSONotation_T_::QuoteChar;
                         break;
                     }
 
                     case ValueType::Number: {
-                        ss += Digit::NumberToString(item->value_.number_);
+                        Digit<Char_T_>::NumberToStringStream(
+                            ss, item->value_.number_);
                         break;
                     }
 
                     case ValueType::False: {
-                        ss.Insert("false", QENTEM_FALSE_LEN_);
+                        ss.Insert(JSONotation_T_::GetFalseString(),
+                                  JSONotation_T_::FalseStringLength);
                         break;
                     }
 
                     case ValueType::True: {
-                        ss.Insert("true", QENTEM_TRUE_LEN_);
+                        ss.Insert(JSONotation_T_::GetTrueString(),
+                                  JSONotation_T_::TrueStringLength);
                         break;
                     }
 
                     case ValueType::Null: {
-                        ss.Insert("null", QENTEM_NULL_LEN_);
+                        ss.Insert(JSONotation_T_::GetNullString(),
+                                  JSONotation_T_::NullStringLength);
                         break;
                     }
 
@@ -1228,40 +1181,33 @@ class Value {
                     }
                 }
 
-                ss += ',';
+                ss += JSONotation_T_::CommaChar;
             } while (++id != size);
 
-            if (ss.Storage()[(ss.Length() - 1)] == ',') {
+            if (ss.Storage()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
                 ss.StepBack(1);
             }
         }
 
         if (is_obj) {
-            ss += '}';
+            ss += JSONotation_T_::CCurlyChar;
         } else {
-            ss += ']';
+            ss += JSONotation_T_::CSquareChar;
         }
     }
 
-    inline String Stringify() const {
-        StringStream ss;
+    inline String<Char_T_> Stringify() const {
+        StringStream<Char_T_> ss;
         Stringify(ss);
         return ss.GetString();
     }
 
   private:
-    union Value_U_ {
-        HArray<Value> *object_;
-        Array<Value> * array_;
-        String *       string_;
-        double         number_;
-    };
-
     void copyValue(const Value &val) {
         switch (type_) {
             case ValueType::Object: {
-                value_.object_ =
-                    HAllocator::Allocate(HArray<Value>(*(val.value_.object_)));
+                value_.object_ = HAllocator::Allocate(
+                    HArray<Value, Char_T_>(*(val.value_.object_)));
                 break;
             }
 
@@ -1272,8 +1218,8 @@ class Value {
             }
 
             case ValueType::String: {
-                value_.string_ =
-                    HAllocator::Allocate(String(*(val.value_.string_)));
+                value_.string_ = HAllocator::Allocate(
+                    String<Char_T_>(*(val.value_.string_)));
                 break;
             }
 
@@ -1287,7 +1233,13 @@ class Value {
         }
     }
 
-    Value_U_  value_{nullptr};
+    union Value_U_ {
+        HArray<Value, Char_T_> *object_;
+        Array<Value> *          array_;
+        String<Char_T_> *       string_;
+        double                  number_;
+    } value_{nullptr};
+
     ValueType type_{ValueType::Undefined};
 };
 
