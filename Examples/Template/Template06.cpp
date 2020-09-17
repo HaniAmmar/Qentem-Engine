@@ -1,22 +1,20 @@
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "Group-1": [["A","B","C"],["DD","EE","FF"],["GGG","HHH","Qentem"]],
     "Group-2": [[1,2,3],[10,20,30],[100,200,300]]
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <loop key="loop1-key">
     <loop set="loop1-key" key="loop2-key">
 loop1-key: loop2-key:
@@ -24,9 +22,10 @@ loop1-key: loop2-key:
         loop3-key: loop3-val</loop>
     </loop>
 </loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:

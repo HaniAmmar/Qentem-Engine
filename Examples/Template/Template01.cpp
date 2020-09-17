@@ -1,23 +1,23 @@
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
-    value["name"]    = "Qentem";
-    value["version"] = 3.0;
+    value["name"]       = "Qentem";
+    value["version"]    = 3.0;
+    const char *content = R"({var:name}, {var:version})";
 
-    String content(R"({var:name}, {var:version})");
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
-    // Or
-    // const char *temp = R"({var:name}, {var:version})";
-    // std::cout << Template<>::Render(temp, &value).Storage() << '\n';
+    /*
+        Output:
+            Qentem, 3
+    */
 }

@@ -1,15 +1,13 @@
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "object": [
         {
@@ -41,15 +39,16 @@ int main() {
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <loop set="object" value="item">
 item[var1] item[var2] item[var3] item[var4]</loop>
 
 <loop set="array" value="item">
 item[0] item[1] item[2] item[3]</loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:

@@ -102,27 +102,27 @@ Mixed of both:
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
-    value["name"]    = "Qentem";
-    value["version"] = 3.0;
+    value["name"]       = "Qentem";
+    value["version"]    = 3.0;
+    const char *content = R"({var:name}, {var:version})";
 
-    String content(R"({var:name}, {var:version})");
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
-    // Or
-    // const char *temp = R"({var:name}, {var:version})";
-    // std::cout << Template<>::Render(temp, &value).Storage() << '\n';
+    /*
+        Output:
+            Qentem, 3
+    */
 }
 ```
 
@@ -140,31 +140,30 @@ This tag passes its value to [ALE](https://github.com/HaniAmmar/Qentem-Engine/bl
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
     value["Equation"] = "1+4*2+1";
     value["one"]      = "1";
     value["three"]    = "3";
 
-    String content(R"(
+    const char *content = R"(
 0.1+0.2 is: {math: 0.1  +   0.2 }
 {var:Equation} = {math:{var:Equation}}; (1+8+1)
 6^2 = {math:6^2}
 --1 = {math:--1}
 {var:one}+{var:three} = {math:{var:one}+{var:three}}
 9 % 5 = {math:9 % 5}
-)");
+)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -250,18 +249,16 @@ Loops over a set and replaces the values with the string inside `value` and keys
 ### Loop Example 1 (unordered set)
 
 ```cpp
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "a": 1,
     "b": 2,
@@ -269,12 +266,13 @@ int main() {
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <loop key="loopID1" value="loopVAL1">
 loopID1: loopVAL1</loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -289,28 +287,27 @@ loopID1: loopVAL1</loop>
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
     value["d"]["a"] = 10;
     value["d"]["b"] = 20;
     value["d"]["c"] = 30;
 
-    String content(R"(
+    const char *content = R"(
 <loop set="d" key="loopID1" value="loopVAL1">
 loopID1: loopVAL1</loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -325,28 +322,27 @@ loopID1: loopVAL1</loop>
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
     value[0] = 40;
     value[1] = 60;
     value[2] = 80;
 
-    String content(R"(
+    const char *content = R"(
 <loop key="loop1-id" value="loop1-value">
 [loop1-id]: loop1-value</loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -360,25 +356,23 @@ int main() {
 ### Loop Example 4 (nested sets)
 
 ```cpp
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "Group-1": [["A","B","C"],["DD","EE","FF"],["GGG","HHH","Qentem"]],
     "Group-2": [[1,2,3],[10,20,30],[100,200,300]]
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <loop key="loop1-key">
     <loop set="loop1-key" key="loop2-key">
 loop1-key: loop2-key:
@@ -386,9 +380,10 @@ loop1-key: loop2-key:
         loop3-key: loop3-val</loop>
     </loop>
 </loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -437,23 +432,22 @@ loop1-key: loop2-key:
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
-    String content(R"(<loop times="2" key="loop1-id"><loop
+    const char *content = R"(<loop times="2" key="loop1-id"><loop
         times="2" key="loop2-id"><loop
-        times="2" key="loop3-id">(loop1-id: loop2-id: loop3-id) </loop></loop></loop>)");
+        times="2" key="loop3-id">(loop1-id: loop2-id: loop3-id) </loop></loop></loop>)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -466,36 +460,36 @@ int main() {
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
-    value["size"] = 10;
+    value[0] = 5;
 
-    String content(
-        R"(<loop times="{var:size}" index="5" key="loop1-id">loop1-id</loop>)");
+    const char *content =
+        R"(<loop times="{var:0}" index="5" key="loop1-id">loop1-id</loop>)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
             56789
     */
 
-    value["start-at"] = 3;
+    value[1] = 3;
 
     content =
-        R"(<loop times="{var:size}" index="{var:start-at}" key="loop1-id">loop1-id</loop>)";
+        R"(<loop times="{var:0}" index="{var:1}" key="loop1-id">loop1-id</loop>)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -507,18 +501,16 @@ int main() {
 ### Loop Example 7 (sub value)
 
 ```cpp
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "object": [
         {
@@ -550,15 +542,16 @@ int main() {
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <loop set="object" value="item">
 item[var1] item[var2] item[var3] item[var4]</loop>
 
 <loop set="array" value="item">
 item[0] item[1] item[2] item[3]</loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -587,19 +580,22 @@ Similar to `{if case="..." ...}`, but capable of branching, and nesting.
 
 ```cpp
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"([0,1,2,3])");
+    Value<char> value;
 
-    String content(R"(
+    value += 0;
+    value += 1;
+    value += 2;
+    value += 3;
+
+    const char *content = R"(
 <if case="{var:0} == 0">
 Zero!
 </if>
@@ -627,9 +623,10 @@ Two!
 <else />
 Not zero or one or two.
 </if>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -647,20 +644,18 @@ Not zero or one or two.
 ### If Example 2
 
 ```cpp
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"([0,1,2,3])");
+    auto value = Qentem::JSON::Parse(R"([0,1,2,3])");
 
-    String content(R"(
+    const char *content = R"(
 <if case="{var:0} == 0">
 Zero!<if case="{var:1} == 1"> and one<if case="{var:2} == 2"> and two!</if></if>
 </if>
@@ -670,9 +665,10 @@ Zero!
 <else />
 <if case="{var:3} == 3">{var:3}+5 is 8 not {var:3}</if>
 </if>
-)");
+)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:
@@ -686,18 +682,16 @@ Zero!
 ### Template Example 1
 
 ```cpp
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "major": {
         "Computer Science": [
@@ -714,7 +708,7 @@ int main() {
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <!DOCTYPE html>
 <html>
 
@@ -748,27 +742,26 @@ int main() {
 </body>
 
 </html>
-)");
+)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 }
 ```
 
 ### Template Example 2
 
 ```cpp
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"css(
+    auto value = Qentem::JSON::Parse(R"css(
 {
     "dir": "ltr",
     "title": "Wishful News",
@@ -835,7 +828,7 @@ int main() {
 }
     )css");
 
-    String content(R"HTML(
+    const char *content = R"HTML(
 <!DOCTYPE html>
 <html dir="{var:dir}">
 
@@ -879,8 +872,9 @@ int main() {
 </body>
 
 </html>
-)HTML");
+)HTML";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 }
 ```

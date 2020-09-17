@@ -1,22 +1,20 @@
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
     value += 0;
     value += 1;
     value += 2;
     value += 3;
 
-    String content(R"(
+    const char *content = R"(
 <if case="{var:0} == 0">
 Zero!
 </if>
@@ -44,9 +42,10 @@ Two!
 <else />
 Not zero or one or two.
 </if>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:

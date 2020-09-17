@@ -1,21 +1,19 @@
 #include "ALE.hpp"
-#include "JSON.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
 using Qentem::ALE;
 using Qentem::ALEHelper;
-using Qentem::String;
 using Qentem::UInt;
 using Qentem::ULong;
-using Qentem::Value;
+using Value = Qentem::Value<char>;
 
-struct aleHelper : ALEHelper {
+struct aleHelper {
     explicit aleHelper(const Value *value) : value_(value) {
     }
 
-    bool ALESetNumber(double &number, const char *content,
-                      UInt length) const override {
+    bool ALESetNumber(double &number, const char *content, UInt length) const {
         const Value *val = value_->GetValue(content, length);
 
         if (val != nullptr) {
@@ -26,7 +24,7 @@ struct aleHelper : ALEHelper {
     }
 
     bool ALEIsEqual(bool &result, const char *left, UInt left_length,
-                    const char *right, UInt right_length) const override {
+                    const char *right, UInt right_length) const {
         const Value *val;
         const char * str_left;
         const char * str_right;

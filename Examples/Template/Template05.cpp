@@ -1,26 +1,25 @@
 #include "Template.hpp"
+#include "Value.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value;
+    Value<char> value;
 
     value[0] = 40;
     value[1] = 60;
     value[2] = 80;
 
-    String content(R"(
+    const char *content = R"(
 <loop key="loop1-id" value="loop1-value">
 [loop1-id]: loop1-value</loop>
-    )");
+    )";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 
     /*
         Output:

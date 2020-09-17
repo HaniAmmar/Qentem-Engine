@@ -1,15 +1,13 @@
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"(
+    auto value = Qentem::JSON::Parse(R"(
 {
     "major": {
         "Computer Science": [
@@ -26,7 +24,7 @@ int main() {
 }
     )");
 
-    String content(R"(
+    const char *content = R"(
 <!DOCTYPE html>
 <html>
 
@@ -60,7 +58,8 @@ int main() {
 </body>
 
 </html>
-)");
+)";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 }

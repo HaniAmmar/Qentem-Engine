@@ -2,8 +2,7 @@
 
 #include <iostream>
 
-using Qentem::Value;
-
+using Value    = Qentem::Value<char>;
 namespace JSON = Qentem::JSON;
 
 int main() {

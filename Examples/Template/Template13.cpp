@@ -1,15 +1,13 @@
+#include "JSON.hpp"
 #include "Template.hpp"
 
 #include <iostream>
 
-using Qentem::String;
 using Qentem::Template;
 using Qentem::Value;
 
-namespace JSON = Qentem::JSON;
-
 int main() {
-    Value value = JSON::Parse(R"css(
+    auto value = Qentem::JSON::Parse(R"css(
 {
     "dir": "ltr",
     "title": "Wishful News",
@@ -76,7 +74,7 @@ int main() {
 }
     )css");
 
-    String content(R"HTML(
+    const char *content = R"HTML(
 <!DOCTYPE html>
 <html dir="{var:dir}">
 
@@ -120,7 +118,8 @@ int main() {
 </body>
 
 </html>
-)HTML");
+)HTML";
 
-    std::cout << Template<>::Render(content, &value).Storage() << '\n';
+    std::cout << Template::Render(content, &value).GetString().Storage()
+              << '\n';
 }
