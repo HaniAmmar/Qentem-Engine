@@ -21,9 +21,9 @@
  */
 
 #include "Array.hpp"
-#include "Digit.hpp"
 #include "Engine.hpp"
 #include "HArray.hpp"
+#include "JSONUtils.hpp"
 #include "Value.hpp"
 
 #ifndef QENTEM_JSON_H_
@@ -32,309 +32,66 @@
 namespace Qentem {
 namespace JSON {
 
-#ifdef QENTEM_SIMD_ENABLED_
-static char *UnEscapeString(const char *content, ULong &length) {
-    constexpr unsigned long long line       = 723401728380766730ULL;
-    constexpr unsigned long long tab        = 651061555542690057ULL;
-    constexpr unsigned long long carriage   = 940422246894996749ULL;
-    constexpr unsigned long long back_slash = 6655295901103053916ULL;
+template <typename>
+class JSONParser;
 
-    char *str      = HAllocator::Allocate<char>(length + 1);
-    ULong offset   = 0;
-    ULong offset2  = 0;
-    ULong m_offset = 0;
-    ULong length2;
-
-    if (length != 0) {
-        QMM_Number_T bits;
-
-        do {
-            const QMM_VAR_ m_content = QMM_LOAD_(
-                reinterpret_cast<const QMM_VAR_ *>(content + m_offset));
-            bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(line));
-            bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(tab));
-            bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
-
-            if ((bits != 0) && ((Q_CTZL(bits) + m_offset) < length)) {
-                HAllocator::Deallocate(str);
-                return nullptr;
-            }
-
-            bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(back_slash));
-
-            while (bits != 0) {
-                const ULong index = (Q_CTZL(bits) + m_offset);
-
-                if (index >= length) {
-                    break;
-                }
-
-                length2 = (index - offset);
-
-                if (length2 != 0) {
-                    Memory::Copy((str + offset2), (content + offset), length2);
-                    offset2 += length2;
-                }
-
-                offset = index;
-                ++offset;
-
-                switch (content[offset]) {
-                    case '\\': {
-                        str[offset2] = content[offset];
-                        bits &= (bits - 1);
-                        break;
-                    }
-
-                    case '"':
-                    case '/': {
-                        str[offset2] = content[offset];
-                        break;
-                    }
-
-                    case 'b': {
-                        str[offset2] = '\b';
-                        break;
-                    }
-
-                    case 'f': {
-                        str[offset2] = '\f';
-                        break;
-                    }
-
-                    case 'n': {
-                        str[offset2] = '\n';
-                        break;
-                    }
-                    case 'r': {
-                        str[offset2] = '\r';
-                        break;
-                    }
-
-                    case 't': {
-                        str[offset2] = '\t';
-                        break;
-                    }
-
-                    case 'U':
-                    case 'u': {
-                        ++offset;
-
-                        if ((length - offset) < 4U) {
-                            HAllocator::Deallocate(str);
-                            return nullptr;
-                        }
-
-                        UInt code =
-                            Digit::HexStringToNumber((content + offset), 4U);
-                        offset += 4U;
-
-                        if ((code >> 8U) == 0xD8U) {
-                            // Surrogate
-                            if ((length - offset) < 6U) {
-                                HAllocator::Deallocate(str);
-                                return nullptr;
-                            }
-
-                            code = (code ^ 0xD800U) << 10U;
-                            offset += 2U;
-                            code += Digit::HexStringToNumber((content + offset),
-                                                             4U) &
-                                    0x3FFU;
-                            code += 0x10000U;
-
-                            offset2 += String::ToUTF8(code, (str + offset2));
-                            offset += 4U;
-                            bits &= (bits - 1U);
-                        } else {
-                            offset2 += String::ToUTF8(code, (str + offset2));
-                        }
-
-                        bits &= (bits - 1U);
-                        continue;
-                    }
-
-                    default: {
-                        HAllocator::Deallocate(str);
-                        return nullptr;
-                    }
-                }
-
-                ++offset;
-                ++offset2;
-
-                bits &= (bits - 1);
-            }
-
-            m_offset += QMM_SIZE_;
-
-            if (m_offset < offset) {
-                m_offset = offset;
-            }
-        } while (m_offset < length);
-    }
-
-    length2 = (length - offset);
-
-    if (length2 != 0) {
-        Memory::Copy((str + offset2), (content + offset), length2);
-        offset2 += length2;
-    }
-
-    str[offset2] = '\0';
-    length       = offset2;
-
-    return str;
+template <typename Char_T_>
+inline static Value<Char_T_> Parse(const Char_T_ *content, ULong length) {
+    Value<Char_T_> value;
+    JSONParser<Char_T_>().Parse(value, content, length);
+    return value;
 }
-#else
-static char *UnEscapeString(const char *content, ULong &length) {
-    UInt  offset  = 0;
-    UInt  offset2 = 0;
-    char *str     = HAllocator::Allocate<char>(length + 1);
 
-    while (offset < length) {
-        switch (content[offset]) {
-            case '\\': {
-                ++offset;
-
-                switch (content[offset]) {
-                    case '"':
-                    case '\\':
-                    case '/': {
-                        str[offset2] = content[offset];
-                        break;
-                    }
-
-                    case 'b': {
-                        str[offset2] = '\b';
-                        break;
-                    }
-
-                    case 'f': {
-                        str[offset2] = '\f';
-                        break;
-                    }
-
-                    case 'n': {
-                        str[offset2] = '\n';
-                        break;
-                    }
-                    case 'r': {
-                        str[offset2] = '\r';
-                        break;
-                    }
-
-                    case 't': {
-                        str[offset2] = '\t';
-                        break;
-                    }
-
-                    case 'U':
-                    case 'u': {
-                        ++offset;
-
-                        if ((length - offset) < 4) {
-                            HAllocator::Deallocate(str);
-                            return nullptr;
-                        }
-
-                        UInt code =
-                            Digit::HexStringToNumber((content + offset), 4);
-                        offset += 4;
-
-                        if ((code >> 8U) == 0xD8U) {
-                            // Surrogate
-                            if ((length - offset) < 6U) {
-                                HAllocator::Deallocate(str);
-                                return nullptr;
-                            }
-
-                            code = (code ^ 0xD800U) << 10U;
-                            offset += 2;
-                            code += Digit::HexStringToNumber((content + offset),
-                                                             4) &
-                                    0x3FFU;
-                            code += 0x10000U;
-
-                            offset2 += String::ToUTF8(code, (str + offset2));
-                            offset += 4;
-                        } else {
-                            offset2 += String::ToUTF8(code, (str + offset2));
-                        }
-
-                        continue;
-                    }
-
-                    default: {
-                        HAllocator::Deallocate(str);
-                        return nullptr;
-                    }
-                }
-
-                break;
-            }
-
-            case '\n':
-            case '\t':
-            case '\r': {
-                HAllocator::Deallocate(str);
-                return nullptr;
-            }
-
-            default: {
-                str[offset2] = content[offset];
-            }
-        }
-
-        ++offset;
-        ++offset2;
-    }
-
-    str[offset2] = '\0';
-    length       = offset2;
-
-    return str;
+template <typename Char_T_>
+inline static Value<Char_T_> Parse(const Char_T_ *content) {
+    return Parse<Char_T_>(content, StringUtils::Count(content));
 }
-#endif
 
-////////////////////////////////////////////////////////////
-
-class JSONParser : Engine {
+template <typename Char_T_>
+class JSONParser {
+    using JSONotation_T_ = JSONotation<Char_T_>;
     enum class Type_;
     struct FindCache_;
+
+    friend class Qentem::Engine;
 
   public:
     JSONParser() = default;
 
-    void Parse(Value &value, const char *content, ULong length) {
+    void Parse(Value<Char_T_> &value, const Char_T_ *content, ULong length) {
         ULong offset = 0;
 
-        while (offset != length) {
+        while (offset < length) {
             switch (content[offset]) {
-                case '{':
-                case '[': {
+                case JSONotation_T_::OCurlyChar:
+                case JSONotation_T_::OSquareChar: {
                     while (offset != length) {
                         switch (content[--length]) {
-                            case ',':
-                            case '"': {
+                            case JSONotation_T_::CommaChar:
+                            case JSONotation_T_::QuoteChar: {
                                 return;
                             }
 
-                            case '}':
-                            case ']': {
-                                if (((content[offset] == '{') &&
-                                     (content[length] == '}')) ||
-                                    ((content[offset] == '[') &&
-                                     (content[length] == ']'))) {
+                            case JSONotation_T_::CCurlyChar:
+                            case JSONotation_T_::CSquareChar: {
+                                if (((content[offset] ==
+                                      JSONotation_T_::OCurlyChar) &&
+                                     (content[length] ==
+                                      JSONotation_T_::CCurlyChar)) ||
+                                    ((content[offset] ==
+                                      JSONotation_T_::OSquareChar) &&
+                                     (content[length] ==
+                                      JSONotation_T_::CSquareChar))) {
 
-                                    if (content[offset] == '{') {
+                                    if (content[offset] ==
+                                        JSONotation_T_::OCurlyChar) {
                                         obj_ = HAllocator::AllocateClear<
-                                            HArray<Value>>(1);
-                                        value = Value{obj_};
+                                            HArray<Value<Char_T_>, Char_T_>>(1);
+                                        value = Value<Char_T_>{obj_};
                                     } else {
                                         arr_ = HAllocator::AllocateClear<
-                                            Array<Value>>(1);
-                                        value = Value{arr_};
+                                            Array<Value<Char_T_>>>(1);
+                                        value = Value<Char_T_>{arr_};
                                     }
 
 #ifdef QENTEM_SIMD_ENABLED_
@@ -342,7 +99,8 @@ class JSONParser : Engine {
                                     find_cache_ = &fc;
 #endif
 
-                                    FindNest(content, ++offset, length, length);
+                                    Engine::FindNest(content, ++offset, length,
+                                                     length, this);
 
                                     if (!has_error_ && !pass_comma_) {
                                         length -= (offset - 1);
@@ -384,7 +142,7 @@ class JSONParser : Engine {
     //////////// Private ////////////
 
   private:
-    inline bool hasTail() const noexcept final {
+    inline bool HasTail() const noexcept {
         switch (type_) {
             case Type_::Quote:
             case Type_::Curly:
@@ -399,26 +157,10 @@ class JSONParser : Engine {
         return false;
     }
 
-    ULong find2(const char *content, ULong offset,
-                ULong end_before) const noexcept final {
-        switch (type_) {
-            case Type_::Square: {
-                return FindOne(']', content, offset, end_before);
-            }
-
-            case Type_::Curly: {
-                return FindOne('}', content, offset, end_before);
-            }
-
-            default: {
-                return FindOne('"', content, offset, end_before);
-            }
-        }
-    }
-
 #ifdef QENTEM_SIMD_ENABLED_
-    void qmmFind(const char *content, ULong offset,
-                 ULong end_before) const noexcept {
+    // TODO: Add 16 and 32-bit character
+    void qmmFindH(const char *content, ULong offset,
+                  ULong end_before) const noexcept {
         do {
             find_cache_->Offset     = offset;
             find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
@@ -449,11 +191,12 @@ class JSONParser : Engine {
                  (find_cache_->NextOffset < end_before));
     }
 
-    inline ULong find(const char *content, ULong offset,
-                      ULong end_before) noexcept final {
+    inline ULong FindH(const char *content, ULong offset,
+                       ULong end_before) noexcept {
         do {
             if (find_cache_->Bits != 0) {
-                ULong index = (Q_CTZL(find_cache_->Bits) + find_cache_->Offset);
+                ULong index =
+                    (Platform::CTZL(find_cache_->Bits) + find_cache_->Offset);
 
                 if (index >= offset) {
                     if (index >= end_before) {
@@ -461,20 +204,20 @@ class JSONParser : Engine {
                     }
 
                     switch (content[index]) {
-                        case '"': {
+                        case JSONotation_T_::QuoteChar: {
                             type_ = Type_::Quote;
                             return (index + 1);
                         }
 
-                        case ',': {
+                        case JSONotation_T_::CommaChar: {
                             type_ = Type_::Comma;
                             return (index + 1);
                         }
 
-                        case ':': {
+                        case JSONotation_T_::ColonChar: {
                             if (has_colon_ || (obj_ == nullptr) ||
                                 (obj_value_ == nullptr)) {
-                                failed();
+                                Failed();
                                 return 0;
                             }
 
@@ -485,16 +228,17 @@ class JSONParser : Engine {
                             break;
                         }
 
-                        case '{':
-                            type_ = Type_::Curly;
-                            child_obj_ =
-                                HAllocator::AllocateClear<HArray<Value>>(1);
+                        case JSONotation_T_::OCurlyChar:
+                            type_      = Type_::Curly;
+                            child_obj_ = HAllocator::AllocateClear<
+                                HArray<Value<char>, char>>(1);
                             return (index + 1);
 
-                        case '[': {
+                        case JSONotation_T_::OSquareChar: {
                             type_ = Type_::Square;
                             child_arr_ =
-                                HAllocator::AllocateClear<Array<Value>>(1);
+                                HAllocator::AllocateClear<Array<Value<char>>>(
+                                    1);
                             return (index + 1);
                         }
 
@@ -508,31 +252,31 @@ class JSONParser : Engine {
             }
 
             if ((find_cache_->Bits == 0) && (offset < end_before)) {
-                qmmFind(content, offset, end_before);
+                qmmFindH(content, offset, end_before);
             }
         } while (find_cache_->Bits != 0);
 
         return 0;
     }
 #else
-    inline ULong find(const char *content, ULong offset,
-                      ULong end_before) noexcept final {
+    inline ULong FindH(const Char_T_ *content, ULong offset,
+                       ULong end_before) noexcept {
         while (offset < end_before) {
             switch (content[offset]) {
-                case '"': {
+                case JSONotation_T_::QuoteChar: {
                     type_ = Type_::Quote;
                     return (offset + 1);
                 }
 
-                case ',': {
+                case JSONotation_T_::CommaChar: {
                     type_ = Type_::Comma;
                     return (offset + 1);
                 }
 
-                case ':': {
+                case JSONotation_T_::ColonChar: {
                     if (has_colon_ || (obj_ == nullptr) ||
                         (obj_value_ == nullptr)) {
-                        failed();
+                        Failed();
                         return 0;
                     }
 
@@ -543,15 +287,17 @@ class JSONParser : Engine {
                     continue;
                 }
 
-                case '{': {
+                case JSONotation_T_::OCurlyChar: {
                     type_      = Type_::Curly;
-                    child_obj_ = HAllocator::AllocateClear<HArray<Value>>(1);
+                    child_obj_ = HAllocator::AllocateClear<
+                        HArray<Value<Char_T_>, Char_T_>>(1);
                     return (offset + 1);
                 }
 
-                case '[': {
-                    type_      = Type_::Square;
-                    child_arr_ = HAllocator::AllocateClear<Array<Value>>(1);
+                case JSONotation_T_::OSquareChar: {
+                    type_ = Type_::Square;
+                    child_arr_ =
+                        HAllocator::AllocateClear<Array<Value<Char_T_>>>(1);
                     return (offset + 1);
                 }
 
@@ -567,21 +313,41 @@ class JSONParser : Engine {
     }
 #endif
 
-    ULong nest(const char *content, ULong offset, ULong end_before,
-               ULong max_end_before) final {
+    ULong FindT(const Char_T_ *content, ULong offset,
+                ULong end_before) const noexcept {
+        switch (type_) {
+            case Type_::Square: {
+                return Engine::FindOne(JSONotation_T_::CSquareChar, content,
+                                       offset, end_before);
+            }
+
+            case Type_::Curly: {
+                return Engine::FindOne(JSONotation_T_::CCurlyChar, content,
+                                       offset, end_before);
+            }
+
+            default: {
+                return Engine::FindOne(JSONotation_T_::QuoteChar, content,
+                                       offset, end_before);
+            }
+        }
+    }
+
+    ULong Nest(const Char_T_ *content, ULong offset, ULong end_before,
+               ULong max_end_before) {
         switch (type_) {
             case Type_::Curly:
             case Type_::Square: {
-                JSONParser jp(child_obj_, child_arr_, child_obj_value_,
-                              find_cache_, pass_comma_);
+                JSONParser jp{child_obj_, child_arr_, child_obj_value_,
+                              find_cache_, pass_comma_};
 
                 if (next_offset_ >= offset) {
                     // Prevent false error.
                     jp.next_offset_ = next_offset_;
                 }
 
-                const ULong ret =
-                    jp.FindNest(content, offset, end_before, max_end_before);
+                const ULong ret = Engine::FindNest(content, offset, end_before,
+                                                   max_end_before, &jp);
 
                 pass_comma_ = (ret != 0); // If it has found a value, then the
                                           // next comma needs to be passed.
@@ -593,7 +359,7 @@ class JSONParser : Engine {
                 }
 
                 if (jp.has_error_) {
-                    failed();
+                    Failed();
                     return max_end_before;
                 }
 
@@ -609,7 +375,7 @@ class JSONParser : Engine {
                 ULong tmp_offset = (end_before - 1);
 
                 while ((offset < tmp_offset) &&
-                       (content[--tmp_offset] == '\\')) {
+                       (content[--tmp_offset] == JSONotation_T_::BSlashChar)) {
                     ++times;
                 }
 
@@ -624,18 +390,18 @@ class JSONParser : Engine {
         }
     }
 
-    void Found(const char *content, ULong offset, ULong end_before,
-               ULong start_offset, ULong &current_offset) final {
-        constexpr UInt true_len  = 4;
-        constexpr UInt false_len = 5;
-        constexpr UInt null_len  = 4;
+    void Found(const Char_T_ *content, ULong offset, ULong end_before,
+               ULong start_offset, ULong &current_offset) {
+        static const Char_T_ *true_string  = JSONotation_T_::GetTrueString();
+        static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
+        static const Char_T_ *null_string  = JSONotation_T_::GetNullString();
 
         switch (type_) {
             case Type_::Comma: { // ,
                 if (!pass_comma_) {
                     if (!checkPoint()) {
                         current_offset = end_before;
-                        failed();
+                        Failed();
                         return;
                     }
 
@@ -644,23 +410,27 @@ class JSONParser : Engine {
                     ULong item_offset =
                         (next_offset_ != 0) ? next_offset_ : offset;
 
-                    String::LeftTrim(content, item_offset, start_offset);
+                    StringUtils::StartTrim(content, item_offset, start_offset);
 
                     if (item_offset == start_offset) {
                         // Empty
                         current_offset = end_before;
-                        failed();
+                        Failed();
                         return;
                     }
 
                     --start_offset;
 
-                    // Right trim.
-                    while ((item_offset < --start_offset) &&
-                           ((content[start_offset] == ' ') ||
-                            (content[start_offset] == '\n') ||
-                            (content[start_offset] == '\t') ||
-                            (content[start_offset] == '\r'))) {
+                    // End trim.
+                    while (
+                        (item_offset < --start_offset) &&
+                        ((content[start_offset] == JSONotation_T_::SpaceChar) ||
+                         (content[start_offset] ==
+                          JSONotation_T_::LineControlChar) ||
+                         (content[start_offset] ==
+                          JSONotation_T_::TabControlChar) ||
+                         (content[start_offset] ==
+                          JSONotation_T_::CarriageControlChar))) {
                     }
 
                     const UInt len =
@@ -669,101 +439,95 @@ class JSONParser : Engine {
                     if (len == 0) {
                         // Empty
                         current_offset = end_before;
-                        failed();
+                        Failed();
                         return;
                     }
 
-                    UInt tmp_offset = 0;
+                    UInt tmp_offset = 1;
 
                     switch (content[item_offset]) {
-                        case 't': {
-                            if (len == true_len) {
+                        case JSONotation_T_::T_Char: {
+                            if (len == JSONotation_T_::TrueStringLength) {
                                 ++item_offset;
 
-                                while (tmp_offset != 3) {
-                                    if (content[item_offset] !=
-                                        "rue"[tmp_offset]) {
-                                        tmp_offset = 0;
-                                        break;
-                                    }
-
+                                while ((tmp_offset !=
+                                        JSONotation_T_::TrueStringLength) &&
+                                       (content[item_offset] ==
+                                        true_string[tmp_offset])) {
                                     ++item_offset;
                                     ++tmp_offset;
                                 }
 
-                                if (tmp_offset == 3) {
-                                    insert(Value{ValueType::True});
+                                if (tmp_offset ==
+                                    JSONotation_T_::TrueStringLength) {
+                                    insert(Value<Char_T_>{ValueType::True});
                                     break;
                                 }
                             }
 
                             current_offset = end_before;
-                            failed();
+                            Failed();
                             return;
                         }
 
-                        case 'f': {
-                            if (len == false_len) {
+                        case JSONotation_T_::F_Char: {
+                            if (len == JSONotation_T_::FalseStringLength) {
                                 ++item_offset;
 
-                                while (tmp_offset != 4) {
-                                    if (content[item_offset] !=
-                                        "alse"[tmp_offset]) {
-                                        tmp_offset = 0;
-                                        break;
-                                    }
-
+                                while ((tmp_offset !=
+                                        JSONotation_T_::FalseStringLength) &&
+                                       (content[item_offset] ==
+                                        false_string[tmp_offset])) {
                                     ++item_offset;
                                     ++tmp_offset;
                                 }
 
-                                if (tmp_offset == 4) {
-                                    insert(Value{ValueType::False});
+                                if (tmp_offset ==
+                                    JSONotation_T_::FalseStringLength) {
+                                    insert(Value<Char_T_>{ValueType::False});
                                     break;
                                 }
                             }
 
                             current_offset = end_before;
-                            failed();
+                            Failed();
                             return;
                         }
 
-                        case 'n': {
-                            if (len == null_len) {
+                        case JSONotation_T_::N_Char: {
+                            if (len == JSONotation_T_::NullStringLength) {
                                 ++item_offset;
 
-                                while (tmp_offset != 3) {
-                                    if (content[item_offset] !=
-                                        "ull"[tmp_offset]) {
-                                        tmp_offset = 0;
-                                        break;
-                                    }
-
+                                while ((tmp_offset !=
+                                        JSONotation_T_::NullStringLength) &&
+                                       (content[item_offset] ==
+                                        null_string[tmp_offset])) {
                                     ++item_offset;
                                     ++tmp_offset;
                                 }
 
-                                if (tmp_offset == 3) {
-                                    insert(Value{ValueType::Null});
+                                if (tmp_offset ==
+                                    JSONotation_T_::NullStringLength) {
+                                    insert(Value<Char_T_>{ValueType::Null});
                                     break;
                                 }
                             }
 
                             current_offset = end_before;
-                            failed();
+                            Failed();
                             return;
                         }
 
                         default: {
                             double num;
-                            if (!Digit::StringToNumber(
+                            if (!Digit<Char_T_>::StringToNumber(
                                     num, (content + item_offset), len)) {
                                 current_offset = end_before;
-                                failed();
+                                Failed();
                                 return;
                             }
 
-                            insert(Value{num});
+                            insert(Value<Char_T_>{num});
                             break;
                         }
                     }
@@ -771,7 +535,7 @@ class JSONParser : Engine {
                     // Checking for anything extra.
                     if (!checkPoint2(content, --start_offset)) {
                         current_offset = end_before;
-                        failed();
+                        Failed();
                         return;
                     }
 
@@ -785,30 +549,30 @@ class JSONParser : Engine {
             case Type_::QuoteEnd: { // ""
                 if (!checkPoint3(content, offset, start_offset)) {
                     current_offset = end_before;
-                    failed();
+                    Failed();
                     return;
                 }
 
                 next_offset_ = current_offset;
 
-                ULong tmp_length = (current_offset - (start_offset + 1));
-                char *str =
-                    UnEscapeString((content + start_offset), tmp_length);
+                ULong    tmp_length = (current_offset - (start_offset + 1));
+                Char_T_ *str =
+                    UnEscapeJSON((content + start_offset), tmp_length);
 
                 if (str == nullptr) {
                     current_offset = end_before;
-                    failed();
+                    Failed();
                     return;
                 }
 
                 if ((obj_ == nullptr) || has_colon_) { // String
-                    insert(
-                        Value{HAllocator::Allocate(String(str, tmp_length))});
+                    insert(Value<Char_T_>{HAllocator::Allocate(
+                        String<Char_T_>(str, tmp_length))});
 
                     has_colon_  = false;
                     pass_comma_ = true;
                 } else { // Key
-                    obj_value_ = &((*obj_)[String(str, tmp_length)]);
+                    obj_value_ = &((*obj_)[String<Char_T_>(str, tmp_length)]);
                 }
 
                 break;
@@ -819,7 +583,7 @@ class JSONParser : Engine {
                 if (!checkPoint() ||
                     !checkPoint3(content, offset, start_offset)) {
                     current_offset = end_before;
-                    failed();
+                    Failed();
                     return;
                 }
 
@@ -829,11 +593,11 @@ class JSONParser : Engine {
 
                 if (type_ == Type_::Curly) {
                     // child_obj_->Compress();
-                    insert(Value{child_obj_});
+                    insert(Value<Char_T_>{child_obj_});
                     child_obj_ = nullptr;
                 } else {
                     // child_arr_->Compress();
-                    insert(Value{child_arr_});
+                    insert(Value<Char_T_>{child_arr_});
                     child_arr_ = nullptr;
                 }
 
@@ -847,15 +611,32 @@ class JSONParser : Engine {
         type_ = Type_::None;
     }
 
+    void Failed() noexcept {
+        if (child_obj_ != nullptr) {
+            HAllocator::Destruct(child_obj_);
+            HAllocator::Deallocate(child_obj_);
+            child_obj_ = nullptr;
+        }
+
+        if (child_arr_ != nullptr) {
+            HAllocator::Destruct(child_arr_);
+            HAllocator::Deallocate(child_arr_);
+            child_arr_ = nullptr;
+        }
+
+        has_error_ = true;
+    }
+
     /*
      * Look for anything before ] or } and after comma, as not possable to
      * match if it was a number/false/true/null
      */
-    inline void searchAgain(const char *content, ULong offset, ULong length) {
+    inline void searchAgain(const Char_T_ *content, ULong offset,
+                            ULong length) {
         type_ = Type_::Comma;
         --length;
 
-        String::SoftTrim(content, offset, length);
+        StringUtils::SoftTrim(content, offset, length);
 
         if (length != 0) {
             ULong fake_comma = ((offset + length) + 1);
@@ -863,12 +644,12 @@ class JSONParser : Engine {
         }
     }
 
-    inline void insert(Value &&val) {
+    inline void insert(Value<Char_T_> &&val) {
         if (obj_ != nullptr) {
-            *obj_value_ = static_cast<Value &&>(val);
+            *obj_value_ = static_cast<Value<Char_T_> &&>(val);
             obj_value_  = nullptr;
         } else {
-            (*arr_) += static_cast<Value &&>(val);
+            (*arr_) += static_cast<Value<Char_T_> &&>(val);
         }
     }
 
@@ -880,9 +661,9 @@ class JSONParser : Engine {
         return (!has_colon_ && !has_error_);
     }
 
-    inline bool checkPoint2(const char *content, ULong offset) noexcept {
+    inline bool checkPoint2(const Char_T_ *content, ULong offset) noexcept {
         if (next_offset_ < offset) {
-            String::LeftTrim(content, next_offset_, offset);
+            StringUtils::StartTrim(content, next_offset_, offset);
 
             if (next_offset_ != offset) {
                 return false;
@@ -893,6 +674,7 @@ class JSONParser : Engine {
     }
 
 #ifdef QENTEM_SIMD_ENABLED_
+    // TODO: Add 16 and 32-bit character
     bool checkPoint3(const char *content, ULong offset,
                      ULong start_offset) const noexcept {
         if (!has_colon_) {
@@ -930,10 +712,10 @@ class JSONParser : Engine {
                 }
 
                 while (bits != 0) {
-                    switch (content[(Q_CLZL(bits) + offset2)]) {
-                        case '{':
-                        case '[':
-                        case ',':
+                    switch (content[(Platform::CLZL(bits) + offset2)]) {
+                        case JSONotation_T_::OCurlyChar:
+                        case JSONotation_T_::OSquareChar:
+                        case JSONotation_T_::CommaChar:
                             return true;
 
                         default: {
@@ -949,7 +731,7 @@ class JSONParser : Engine {
         return true;
     }
 #else
-    bool checkPoint3(const char *content, ULong offset,
+    bool checkPoint3(const Char_T_ *content, ULong offset,
                      ULong start_offset) const noexcept {
         if (!has_colon_) {
             --start_offset;
@@ -958,16 +740,16 @@ class JSONParser : Engine {
                 --start_offset;
 
                 switch (content[start_offset]) {
-                    case '\t':
-                    case '\n':
-                    case '\r':
-                    case ' ': {
+                    case JSONotation_T_::TabControlChar:
+                    case JSONotation_T_::LineControlChar:
+                    case JSONotation_T_::CarriageControlChar:
+                    case JSONotation_T_::SpaceChar: {
                         break;
                     }
 
-                    case '{':
-                    case '[':
-                    case ',': {
+                    case JSONotation_T_::OCurlyChar:
+                    case JSONotation_T_::OSquareChar:
+                    case JSONotation_T_::CommaChar: {
                         return true;
                     }
 
@@ -982,24 +764,9 @@ class JSONParser : Engine {
     }
 #endif
 
-    void failed() noexcept final {
-        if (child_obj_ != nullptr) {
-            HAllocator::Destruct(child_obj_);
-            HAllocator::Deallocate(child_obj_);
-            child_obj_ = nullptr;
-        }
-
-        if (child_arr_ != nullptr) {
-            HAllocator::Destruct(child_arr_);
-            HAllocator::Deallocate(child_arr_);
-            child_arr_ = nullptr;
-        }
-
-        has_error_ = true;
-    }
-
-    JSONParser(HArray<Value> *obj, Array<Value> *arr, Value *obj_value,
-               FindCache_ *find_cache, bool pass_comma) noexcept
+    JSONParser(HArray<Value<Char_T_>, Char_T_> *obj, Array<Value<Char_T_>> *arr,
+               Value<Char_T_> *obj_value, FindCache_ *find_cache,
+               bool pass_comma) noexcept
         : obj_(obj), arr_(arr), obj_value_(obj_value), find_cache_(find_cache),
           pass_comma_(pass_comma) {
     }
@@ -1012,15 +779,15 @@ class JSONParser : Engine {
         QMM_Number_T Bits{0};
     };
 
-    HArray<Value> *obj_{nullptr};
-    Array<Value> * arr_{nullptr};
+    HArray<Value<Char_T_>, Char_T_> *obj_{nullptr};
+    Array<Value<Char_T_>> *          arr_{nullptr};
 
-    HArray<Value> *child_obj_{nullptr};
-    Array<Value> * child_arr_{nullptr};
+    HArray<Value<Char_T_>, Char_T_> *child_obj_{nullptr};
+    Array<Value<Char_T_>> *          child_arr_{nullptr};
 
-    Value *     child_obj_value_{nullptr};
-    Value *     obj_value_{nullptr};
-    FindCache_ *find_cache_{nullptr};
+    Value<Char_T_> *child_obj_value_{nullptr};
+    Value<Char_T_> *obj_value_{nullptr};
+    FindCache_ *    find_cache_{nullptr};
 
     ULong next_offset_{0};
 
@@ -1030,22 +797,6 @@ class JSONParser : Engine {
     bool pass_comma_{false};
     bool has_error_{false};
 };
-
-////////////////////////////////////////////////////////////
-
-inline static Value Parse(const char *content, ULong length) {
-    Value value;
-    JSONParser().Parse(value, content, length);
-    return value;
-}
-
-inline static Value Parse(const String &content) {
-    return Parse(content.Storage(), content.Length());
-}
-
-inline static Value Parse(const char *content) {
-    return Parse(content, String::Count(content));
-}
 
 } // namespace JSON
 } // namespace Qentem

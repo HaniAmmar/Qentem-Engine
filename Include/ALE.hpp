@@ -20,59 +20,90 @@
  * SOFTWARE.
  */
 
+#include "ALEOperations.hpp"
 #include "Array.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
-#include "String.hpp"
 
 #ifndef QENTEM_ALE_H_
 #define QENTEM_ALE_H_
 
 namespace Qentem {
 
+template <typename Char_T_>
 struct ALEHelper {
-    virtual bool ALESetNumber(double &number, const char *content,
-                              UInt length) const                        = 0;
-    virtual bool ALEIsEqual(bool &result, const char *left, UInt left_length,
-                            const char *right, UInt right_length) const = 0;
+    bool ALESetNumber(double &number, const Char_T_ *content,
+                      UInt length) const {
+        (void)number;
+        (void)content;
+        (void)length;
+        return false;
+    }
+
+    bool ALEIsEqual(bool &result, const Char_T_ *left, UInt left_length,
+                    const Char_T_ *right, UInt right_length) const {
+        (void)result;
+        (void)left;
+        (void)left_length;
+        (void)right;
+        (void)right_length;
+        return false;
+    }
 };
 
 /*
- * Arithmetic and logic evaluation
+ * Arithmetic and logic evaluator
  */
-class ALE : Engine {
+template <typename, typename>
+class ALE_T_;
+
+class ALE {
+  public:
+    ALE()            = delete;
+    ALE(ALE &&)      = delete;
+    ALE(const ALE &) = delete;
+    ALE &operator=(ALE &&) = delete;
+    ALE &operator=(const ALE &) = delete;
+    ~ALE()                      = delete;
+
     struct Item_;
 
-  public:
-    static bool Evaluate(double &number, const char *content, UInt length,
-                         const ALEHelper *callback = nullptr) {
+    template <typename Char_T_, typename Helper_T_>
+    static bool Evaluate(double &number, const Char_T_ *content, UInt length,
+                         const Helper_T_ *callback) {
         number = 0;
 
         if ((content != nullptr) && (length != 0)) {
-            Array<Item_> items;
-            ALE(&items, callback).FindNest(content, 0, length, length);
+            Array<Item_>               items;
+            ALE_T_<Char_T_, Helper_T_> ale{&items, callback};
+            Engine::FindNest(content, 0, length, length, &ale);
 
             if (items.Size() != 0) {
-                sortOperations(items, content, 0, length);
-                return process(number, items, content, 0, length, callback);
+                ALE_T_<Char_T_, Helper_T_>::sortOperations(items, content, 0,
+                                                           length);
+                return ALE_T_<Char_T_, Helper_T_>::process(
+                    number, items, content, 0, length, callback);
             }
 
             UInt offset = 0;
-            String::SoftTrim(content, offset, length);
-            return Digit::StringToNumber(number, (content + offset), length);
+            StringUtils::SoftTrim(content, offset, length);
+            return Digit<Char_T_>::StringToNumber(number, (content + offset),
+                                                  length);
         }
 
         return false;
     }
 
-    inline static bool Evaluate(double &number, const char *content,
-                                const ALEHelper *callback = nullptr) {
-        return Evaluate(number, content, String::Count<UInt>(content),
-                        callback);
+    template <typename Char_T_, typename Helper_T_>
+    inline static bool Evaluate(double &number, const Char_T_ *content,
+                                const Helper_T_ *callback) {
+        return Evaluate(number, content,
+                        StringUtils::Count<Char_T_, UInt>(content), callback);
     }
 
-    static double Evaluate(const char *content, UInt length,
-                           const ALEHelper *callback = nullptr) {
+    template <typename Char_T_, typename Helper_T_>
+    static double Evaluate(const Char_T_ *content, UInt length,
+                           const Helper_T_ *callback) {
         double number;
 
         if (Evaluate(number, content, length, callback)) {
@@ -82,15 +113,40 @@ class ALE : Engine {
         return 0;
     }
 
-    inline static double Evaluate(const char *     content,
-                                  const ALEHelper *callback = nullptr) {
-        return Evaluate(content, String::Count<UInt>(content), callback);
+    template <typename Char_T_, typename Helper_T_>
+    inline static double Evaluate(const Char_T_ *  content,
+                                  const Helper_T_ *callback) {
+        return Evaluate(content, StringUtils::Count<Char_T_, UInt>(content),
+                        callback);
     }
 
-    //////////// Private ////////////
+    ///////////////////////////////////////////////////////////////////////
 
-  private:
-    enum class Operation_ : UInt {
+    template <typename Char_T_>
+    static bool Evaluate(double &number, const Char_T_ *content, UInt length) {
+        ALEHelper<Char_T_> helper;
+        return Evaluate(number, content, length, &helper);
+    }
+
+    template <typename Char_T_>
+    inline static bool Evaluate(double &number, const Char_T_ *content) {
+        ALEHelper<Char_T_> helper;
+        return Evaluate(number, content, &helper);
+    }
+
+    template <typename Char_T_>
+    static double Evaluate(const Char_T_ *content, UInt length) {
+        ALEHelper<Char_T_> helper;
+        return Evaluate(content, length, &helper);
+    }
+
+    template <typename Char_T_>
+    inline static double Evaluate(const Char_T_ *content) {
+        ALEHelper<Char_T_> helper;
+        return Evaluate(content, &helper);
+    }
+
+    enum class Operation_ {
         Brackets = 0,
         Parentheses,
         Exponent,
@@ -115,25 +171,197 @@ class ALE : Engine {
         Operation_   Op{Operation_::Parentheses};
         Array<Item_> SubItems{};
     };
+};
 
-    ALE() = delete;
+template <typename Char_T_, typename Helper_T_>
+class ALE_T_ {
+    friend class ALE;
+    friend class Qentem::Engine;
 
-    ALE(Array<Item_> *items, const ALEHelper *callback)
+    using Item_            = ALE::Item_;
+    using Operation_       = ALE::Operation_;
+    using ALEOperations_T_ = ALEOperations<Char_T_>;
+
+  public:
+    ALE_T_() = delete;
+
+  private:
+    ALE_T_(Array<Item_> *items, const Helper_T_ *callback)
     noexcept : items_(items), callback_(callback) {
     }
 
-    ULong nest(const char *content, ULong offset, ULong end_before,
-               ULong max_end_before) final {
+    inline bool HasTail() const noexcept {
+        return ((item_.Op == Operation_::Brackets) ||
+                (item_.Op == Operation_::Parentheses));
+    }
+
+    ULong Nest(const Char_T_ *content, ULong offset, ULong end_before,
+               ULong max_end_before) {
         if ((offset + 1) != end_before) {
-            return ALE(&(item_.SubItems), callback_)
-                .FindNest(content, offset, end_before, max_end_before);
+            ALE_T_<Char_T_, Helper_T_> ale{&(item_.SubItems), callback_};
+            return Engine::FindNest(content, offset, end_before, max_end_before,
+                                    &ale);
         }
 
         return 0;
     }
 
-    void Found(const char *content, ULong offset, ULong end_before,
-               ULong start_offset, ULong &current_offset) final {
+    inline ULong FindH(const Char_T_ *content, ULong offset,
+                       ULong end_before) noexcept {
+        bool found   = false;
+        item_.Length = 1;
+
+        while (offset < end_before) {
+            switch (content[offset]) {
+                case ALEOperations_T_::BracketOp: {
+                    found    = true;
+                    item_.Op = Operation_::Brackets;
+                    break;
+                }
+
+                case ALEOperations_T_::ParenthesOp: {
+                    found    = true;
+                    item_.Op = Operation_::Parentheses;
+                    break;
+                }
+
+                case ALEOperations_T_::ExponentOp: {
+                    found    = true;
+                    item_.Op = Operation_::Exponent;
+                    break;
+                }
+
+                case ALEOperations_T_::RemainderOp: {
+                    found    = true;
+                    item_.Op = Operation_::Remainder;
+                    break;
+                }
+
+                case ALEOperations_T_::MultipleOp: {
+                    found    = true;
+                    item_.Op = Operation_::Multiplication;
+                    break;
+                }
+
+                case ALEOperations_T_::DivideOp: {
+                    found    = true;
+                    item_.Op = Operation_::Division;
+                    break;
+                }
+
+                case ALEOperations_T_::AddOp: {
+                    found    = true;
+                    item_.Op = Operation_::Addition;
+                    break;
+                }
+
+                case ALEOperations_T_::SubtractOp: {
+                    found    = true;
+                    item_.Op = Operation_::Subtraction;
+                    break;
+                }
+
+                case ALEOperations_T_::EqualOp: { // ==
+                    ++offset;
+
+                    if (content[offset] == ALEOperations_T_::EqualOp) {
+                        found        = true;
+                        item_.Op     = Operation_::Equal;
+                        item_.Length = 2;
+                    }
+
+                    break;
+                }
+
+                case ALEOperations_T_::NotOp: { // !=
+                    ++offset;
+
+                    if (content[offset] == ALEOperations_T_::EqualOp) {
+                        found        = true;
+                        item_.Op     = Operation_::NotEqual;
+                        item_.Length = 2;
+                    }
+
+                    break;
+                }
+
+                case ALEOperations_T_::LessOp: { // < or <=
+                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
+                        found        = true;
+                        item_.Op     = Operation_::LessOrEqual;
+                        item_.Length = 2;
+                        ++offset;
+                    } else {
+                        found    = true;
+                        item_.Op = Operation_::Less;
+                    }
+
+                    break;
+                }
+
+                case ALEOperations_T_::BiggerOp: { // > or >=
+                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
+                        found        = true;
+                        item_.Op     = Operation_::BiggerOrEqual;
+                        item_.Length = 2;
+                        ++offset;
+                    } else {
+                        found    = true;
+                        item_.Op = Operation_::Bigger;
+                    }
+
+                    break;
+                }
+
+                case ALEOperations_T_::AndOp: { // &&
+                    ++offset;
+
+                    if (content[offset] == ALEOperations_T_::AndOp) {
+                        found        = true;
+                        item_.Op     = Operation_::And;
+                        item_.Length = 2;
+                    }
+
+                    break;
+                }
+
+                case ALEOperations_T_::OrOp: { // ||
+                    ++offset;
+
+                    if (content[offset] == ALEOperations_T_::OrOp) {
+                        found        = true;
+                        item_.Op     = Operation_::Or;
+                        item_.Length = 2;
+                    }
+                }
+
+                default: {
+                }
+            }
+
+            ++offset;
+
+            if (found && (offset < end_before)) {
+                return offset;
+            }
+        }
+
+        return 0; // No match
+    }
+
+    ULong FindT(const Char_T_ *content, ULong offset,
+                ULong end_before) const noexcept {
+        if (item_.Op == Operation_::Parentheses) {
+            return Engine::FindOne(ALEOperations_T_::Parenthes2Op, content,
+                                   offset, end_before);
+        }
+
+        return Engine::FindOne(ALEOperations_T_::Bracket2Op, content, offset,
+                               end_before);
+    }
+
+    void Found(const Char_T_ *content, ULong offset, ULong end_before,
+               ULong start_offset, const ULong &current_offset) {
         item_.Offset = static_cast<UInt>(start_offset - item_.Length);
 
         switch (item_.Op) {
@@ -157,25 +385,26 @@ class ALE : Engine {
             case Operation_::Addition:
             case Operation_::Subtraction: {
                 /*
-                 * If there is a number before - + or ) or } then add it as an
-                 * operation not a sign.
+                 * If there is a number before - + or ) or } then add it as
+                 * an operation not a sign.
                  */
                 --start_offset; // Going back to the sign.
 
                 if (start_offset != offset) {
                     do {
                         --start_offset;
-                        const char tmp_c = content[start_offset];
+                        const Char_T_ tmp_c = content[start_offset];
 
-                        if (tmp_c != ' ') {
+                        if (tmp_c != ALEOperations_T_::SpaceChar) {
                             switch (tmp_c) {
-                                case ')':
-                                case '}':
+                                case ALEOperations_T_::Parenthes2Op:
+                                case ALEOperations_T_::Bracket2Op:
                                     (*items_) += static_cast<Item_ &&>(item_);
                                     return;
 
                                 default:
-                                    if ((tmp_c < ':') && (tmp_c > '/')) {
+                                    if ((tmp_c < ALEOperations_T_::ColonChar) &&
+                                        (tmp_c > ALEOperations_T_::SlashChar)) {
                                         (*items_) +=
                                             static_cast<Item_ &&>(item_);
                                     }
@@ -200,169 +429,11 @@ class ALE : Engine {
         (void)end_before;
     }
 
-    void failed() noexcept final {
+    void Failed() const noexcept {
         items_->Reset();
     }
 
-    inline bool hasTail() const noexcept final {
-        return ((item_.Op == Operation_::Brackets) ||
-                (item_.Op == Operation_::Parentheses));
-    }
-
-    ULong find2(const char *content, ULong offset,
-                ULong end_before) const noexcept final {
-        if (item_.Op == Operation_::Parentheses) {
-            return FindOne(')', content, offset, end_before);
-        }
-
-        return FindOne('}', content, offset, end_before);
-    }
-
-    inline ULong find(const char *content, ULong offset,
-                      ULong end_before) noexcept final {
-        bool found   = false;
-        item_.Length = 1;
-
-        while (offset < end_before) {
-            switch (content[offset]) {
-                case '{': {
-                    found    = true;
-                    item_.Op = Operation_::Brackets;
-                    break;
-                }
-
-                case '(': {
-                    found    = true;
-                    item_.Op = Operation_::Parentheses;
-                    break;
-                }
-
-                case '^': {
-                    found    = true;
-                    item_.Op = Operation_::Exponent;
-                    break;
-                }
-
-                case '%': {
-                    found    = true;
-                    item_.Op = Operation_::Remainder;
-                    break;
-                }
-
-                case '*': {
-                    found    = true;
-                    item_.Op = Operation_::Multiplication;
-                    break;
-                }
-
-                case '/': {
-                    found    = true;
-                    item_.Op = Operation_::Division;
-                    break;
-                }
-
-                case '+': {
-                    found    = true;
-                    item_.Op = Operation_::Addition;
-                    break;
-                }
-
-                case '-': {
-                    found    = true;
-                    item_.Op = Operation_::Subtraction;
-                    break;
-                }
-
-                case '=': { // ==
-                    ++offset;
-
-                    if (content[offset] == '=') {
-                        found        = true;
-                        item_.Op     = Operation_::Equal;
-                        item_.Length = 2;
-                    }
-
-                    break;
-                }
-
-                case '!': { // !=
-                    ++offset;
-
-                    if (content[offset] == '=') {
-                        found        = true;
-                        item_.Op     = Operation_::NotEqual;
-                        item_.Length = 2;
-                    }
-
-                    break;
-                }
-
-                case '<': { // < or <=
-                    if (content[(offset + 1)] == '=') {
-                        found        = true;
-                        item_.Op     = Operation_::LessOrEqual;
-                        item_.Length = 2;
-                        ++offset;
-                    } else {
-                        found    = true;
-                        item_.Op = Operation_::Less;
-                    }
-
-                    break;
-                }
-
-                case '>': { // > or >=
-                    if (content[(offset + 1)] == '=') {
-                        found        = true;
-                        item_.Op     = Operation_::BiggerOrEqual;
-                        item_.Length = 2;
-                        ++offset;
-                    } else {
-                        found    = true;
-                        item_.Op = Operation_::Bigger;
-                    }
-
-                    break;
-                }
-
-                case '&': { // &&
-                    ++offset;
-
-                    if (content[offset] == '&') {
-                        found        = true;
-                        item_.Op     = Operation_::And;
-                        item_.Length = 2;
-                    }
-
-                    break;
-                }
-
-                case '|': { // ||
-                    ++offset;
-
-                    if (content[offset] == '|') {
-                        found        = true;
-                        item_.Op     = Operation_::Or;
-                        item_.Length = 2;
-                    }
-                }
-
-                default: {
-                }
-            }
-
-            ++offset;
-
-            if (found && (offset < end_before)) {
-                return offset;
-            }
-        }
-
-        // No match.
-        return 0;
-    }
-
-    static void sortOperations(Array<Item_> &items, const char *content,
+    static void sortOperations(Array<Item_> &items, const Char_T_ *content,
                                UInt offset, UInt length) {
         // Determine the highest operation.
         Operation_ highest = Operation_::Parentheses;
@@ -383,7 +454,7 @@ class ALE : Engine {
             ++item;
         }
 
-        // If it's just (...)
+        // If it is just (...)
         if (highest < Operation_::Exponent) {
             if (items.Size() == 1) {
                 Item_ *item2 = items.First();
@@ -393,7 +464,7 @@ class ALE : Engine {
 
                     if (length != len) {
                         // Cheking for anything extra.
-                        String::SoftTrim(content, offset, length);
+                        StringUtils::SoftTrim(content, offset, length);
 
                         if (length != len) {
                             items.Reset();
@@ -402,12 +473,13 @@ class ALE : Engine {
                     }
 
                     // Sort ops inside (...)
-                    String::SoftTrim(content, item2->Offset, item2->Length);
+                    StringUtils::SoftTrim(content, item2->Offset,
+                                          item2->Length);
                     sortOperations(item2->SubItems, content, item2->Offset,
                                    item2->Length);
                 } else if (length != item2->Length) { // Brackets
                     // Cheking for anything extra.
-                    String::SoftTrim(content, offset, length);
+                    StringUtils::SoftTrim(content, offset, length);
 
                     if (length != item2->Length) {
                         items.Reset();
@@ -486,7 +558,7 @@ class ALE : Engine {
                 n_item.Length = (endOffset - offset);
             }
 
-            String::SoftTrim(content, n_item.Offset, n_item.Length);
+            StringUtils::SoftTrim(content, n_item.Offset, n_item.Length);
 
             if (n_item.SubItems.Size() != 0) {
                 sortOperations(n_item.SubItems, content, n_item.Offset,
@@ -508,11 +580,11 @@ class ALE : Engine {
     }
 
     static bool process(double &left_number, const Array<Item_> &items,
-                        const char *content, UInt offset, UInt length,
-                        const ALEHelper *callback) {
+                        const Char_T_ *content, UInt offset, UInt length,
+                        const Helper_T_ *callback) {
         if (items.Size() == 0) {
-            return Digit::StringToNumber(left_number, (content + offset),
-                                         length);
+            return Digit<Char_T_>::StringToNumber(left_number,
+                                                  (content + offset), length);
         }
 
         const Item_ *item  = items.Storage();
@@ -524,12 +596,12 @@ class ALE : Engine {
             case Operation_::NotEqual: {
                 bool is_equal;
 
-                const char *l_item = (content + item->Offset);
-                const char *r_item = (content + item2->Offset);
+                const Char_T_ *l_item = (content + item->Offset);
+                const Char_T_ *r_item = (content + item2->Offset);
 
-                if ((*l_item == '{') || (*r_item == '{')) {
-                    if ((callback == nullptr) ||
-                        !(callback->ALEIsEqual(is_equal, l_item, item->Length,
+                if ((*l_item == ALEOperations_T_::BracketOp) ||
+                    (*r_item == ALEOperations_T_::BracketOp)) {
+                    if (!(callback->ALEIsEqual(is_equal, l_item, item->Length,
                                                r_item, item2->Length))) {
                         return false;
                     }
@@ -538,7 +610,7 @@ class ALE : Engine {
                     break;
                 } else {
                     is_equal = ((item->Length == item2->Length) &&
-                                Memory::Compare(l_item, r_item, item2->Length));
+                                Memory::IsEqual(l_item, r_item, item2->Length));
                 }
 
                 if (op == Operation_::NotEqual) {
@@ -550,10 +622,8 @@ class ALE : Engine {
             }
 
             case Operation_::Brackets: {
-                return ((callback != nullptr) &&
-                        callback->ALESetNumber(left_number,
-                                               (content + item->Offset),
-                                               item->Length));
+                return (callback->ALESetNumber(
+                    left_number, (content + item->Offset), item->Length));
             }
 
             default: {
@@ -697,7 +767,7 @@ class ALE : Engine {
 
     Item_            item_;
     Array<Item_> *   items_;
-    const ALEHelper *callback_;
+    const Helper_T_ *callback_;
 };
 
 } // namespace Qentem

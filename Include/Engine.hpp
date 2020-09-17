@@ -28,23 +28,23 @@
 namespace Qentem {
 
 /*
- * A customizable lexer for nest/sub-matching.
+ * A fast search class for nest/sub-matching.
  */
 class Engine {
   public:
-    Engine()               = default;
-    Engine(Engine &&)      = default;
-    Engine(const Engine &) = default;
-    Engine &operator=(Engine &&) = default;
-    Engine &operator=(const Engine &) = default;
-    virtual ~Engine()                 = default;
-
+    Engine()               = delete;
+    Engine(Engine &&)      = delete;
+    Engine(const Engine &) = delete;
+    Engine &operator=(Engine &&) = delete;
+    Engine &operator=(const Engine &) = delete;
+    ~Engine()                         = delete;
 #ifdef QENTEM_SIMD_ENABLED_
     /*
-     * Returns an the offset of a char + 1.
+     * Returns an the index of a character + 1.
      */
     static ULong FindOne(const char one_char, const char *content, ULong offset,
                          ULong end_before) noexcept {
+        // TODO: Add 16 and 32-bit char
         if (offset < end_before) {
             const QMM_VAR_ m_pattern = QMM_SETONE_8_(one_char);
 
@@ -56,7 +56,7 @@ class Engine {
                     QMM_COMPARE_8_MASK_(m_pattern, m_content);
 
                 if (bits != 0) {
-                    const ULong index = (Q_CTZL(bits) + offset + 1);
+                    const ULong index = (Platform::CTZL(bits) + offset + 1);
 
                     if (index > end_before) {
                         return 0;
@@ -73,12 +73,12 @@ class Engine {
     }
 
     /*
-     * Returns an the offset of a pattern + the length of it.
+     * Returns an the index of a pattern + the length of it.
      */
     static ULong Find(const char *pattern, UInt pattern_length,
                       const char *content, ULong offset,
                       ULong end_before) noexcept {
-        if (pattern_length == 1U) {
+        if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
 
@@ -99,20 +99,20 @@ class Engine {
                 bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
 
                 while (bits != 0) {
-                    const ULong index         = (Q_CTZL(bits) + offset);
+                    const ULong index         = (Platform::CTZL(bits) + offset);
                     const ULong pattern_index = (index + pattern_length);
 
                     if (pattern_index > end_before) {
                         return 0;
                     }
 
-                    if ((len_less_one == 1U) ||
-                        Memory::Compare(pattern, (content + index),
+                    if ((len_less_one == 1) ||
+                        Memory::IsEqual(pattern, (content + index),
                                         len_less_one)) {
                         return pattern_index;
                     }
 
-                    bits &= (bits - 1U);
+                    bits &= (bits - 1);
                 }
 
                 offset += QMM_SIZE_;
@@ -123,10 +123,11 @@ class Engine {
     }
 #else
     /*
-     * Returns an the offset of a char + 1.
+     * Returns an the index of a character + 1.
      */
-    static ULong FindOne(const char one_char, const char *content, ULong offset,
-                         ULong end_before) noexcept {
+    template <typename Char_T_>
+    static ULong FindOne(const Char_T_ one_char, const Char_T_ *content,
+                         ULong offset, ULong end_before) noexcept {
         while (offset < end_before) {
             if (one_char == content[offset]) {
                 return (offset + 1);
@@ -139,12 +140,13 @@ class Engine {
     }
 
     /*
-     * Returns an the offset of a pattern + the length of it.
+     * Returns an the index of a pattern + the length of it.
      */
-    static ULong Find(const char *pattern, UInt pattern_length,
-                      const char *content, ULong offset,
+    template <typename Char_T_>
+    static ULong Find(const Char_T_ *pattern, UInt pattern_length,
+                      const Char_T_ *content, ULong offset,
                       ULong end_before) noexcept {
-        if (pattern_length == 1U) {
+        if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
 
@@ -160,7 +162,7 @@ class Engine {
                 if (pattern[pattern_length] ==
                     content[offset + pattern_length]) {
                     const ULong last_offset    = offset;
-                    UInt        pattern_offset = 1U;
+                    UInt        pattern_offset = 1;
 
                     ++offset;
 
@@ -171,7 +173,7 @@ class Engine {
                     }
 
                     if (pattern_offset == pattern_length) {
-                        return (offset + 1U);
+                        return (offset + 1);
                     }
 
                     offset = last_offset;
@@ -189,37 +191,70 @@ class Engine {
      * finds the head and the tail of a match and search aging inside the match
      * to see if it's Nested by itself or a custom expression.
      */
-    ULong FindNest(const char *content, ULong offset, ULong end_before,
-                   ULong max_end_before) {
+    template <typename Char_T_, typename Class_T_>
+    static ULong FindNest(const Char_T_ *content, ULong offset,
+                          ULong end_before, ULong max_end_before,
+                          Class_T_ *caller) {
         ULong current_offset = offset;
 
         while (current_offset < end_before) {
-            current_offset = find(content, current_offset, end_before);
+            /*
+             * ULong FindH(const Class_T_ *content, ULong offset, ULong
+             * end_before)
+             *
+             * For finding the head
+             */
+            current_offset = caller->FindH(content, current_offset, end_before);
 
             if (current_offset == 0) {
                 // The head hasn't been found
                 break;
             }
 
-            // Save the starting point to be passed to Found().
+            // Save the current offset for Found().
             const ULong start_offset = current_offset;
             // Makes sub-matching easy.
             ULong sub_offset = current_offset;
 
-            if (hasTail()) {
+            /*
+             * bool HasTail();
+             *
+             * This is invoked to check if the match has a second part/tail.
+             * Like head: { and the tail is } or () or "" or < > ...etc.
+             */
+            if (caller->HasTail()) {
                 do {
+                    /*
+                     * ULong FindT(const Class_T_ *content, ULong offset, ULong
+                     *             end_before)
+                     *
+                     * For finding the tail
+                     */
                     current_offset =
-                        find2(content, current_offset, max_end_before);
+                        caller->FindT(content, current_offset, max_end_before);
 
                     if (current_offset == 0) {
-                        // The tail hasn't been found.
-                        failed();
+                        /*
+                         * void Failed()
+                         *
+                         * If the head of the match is found but not the tail,
+                         * this function will be invoked.
+                         */
+                        caller->Failed();
                         return sub_offset;
                     }
 
-                    // Look for sub-matches.
-                    sub_offset = nest(content, sub_offset, current_offset,
-                                      max_end_before);
+                    /*
+                     * ULong Nest(const Class_T_ *content, ULong offset, ULong
+                     *            end_before, ULong max_end_before)
+                     *
+                     * This function is invoked everytime a match found, and
+                     * should look like the first line that started the search.
+                     * with the exception of setting different values; like
+                     * passing a sub-container.
+                     */
+                    sub_offset = caller->Nest(content, sub_offset,
+                                              current_offset, max_end_before);
 
                     if (current_offset > sub_offset) {
                         /*
@@ -238,8 +273,16 @@ class Engine {
                 } while (current_offset != max_end_before);
             }
 
-            // A complete/full match is found.
-            Found(content, offset, end_before, start_offset, current_offset);
+            /*
+             * void Found(const Class_T_ *content, ULong offset, ULong
+             *            end_before, ULong start_offset, ULong &current_offset)
+             *
+             * Once a full match is found (head & tail), the function will be
+             * invoked. "current_offset" is referenced: it can be adjusted to
+             * set the starting offset of the next search.
+             */
+            caller->Found(content, offset, end_before, start_offset,
+                          current_offset);
         }
 
         // Return the location of the last match.
@@ -248,7 +291,7 @@ class Engine {
 
     /*
      * If a search is about { ... }, and nest itself like:
-     * {.{..{...}..}.}; then this function can be called from nest() to skip
+     * {.{..{...}..}.}; then this function can be invoked from nest() to skip
      * inner brackets:
      *
      * return SkipInnerPatterns("{", 1, "}", 1,
@@ -256,9 +299,10 @@ class Engine {
      *
      * See Template::nest(...)
      */
-    static ULong SkipInnerPatterns(const char *start, UInt start_length,
-                                   const char *end, UInt end_length,
-                                   const char *content, ULong offset,
+    template <typename Char_T_>
+    static ULong SkipInnerPatterns(const Char_T_ *start, UInt start_length,
+                                   const Char_T_ *end, UInt end_length,
+                                   const Char_T_ *content, ULong offset,
                                    ULong end_before,
                                    ULong max_end_before) noexcept {
         ULong last_offset = end_before;
@@ -296,76 +340,6 @@ class Engine {
         }
 
         return last_offset;
-    }
-
-    /*
-     * Once a full match is found (head & tail), the function will be called.
-     * "current_offset" is referenced: it can be adjusted to set
-     * the starting offset of the next search.
-     */
-    virtual void Found(const char *content, ULong offset, ULong end_before,
-                       ULong start_offset, ULong &current_offset) {
-        // OVERRIDE IS NEEDED WHEN USING FindNest().
-
-        (void)content;
-        (void)offset;
-        (void)end_before;
-        (void)start_offset;
-        (void)current_offset;
-    }
-
-    //////////// Private ////////////
-
-  private:
-    virtual ULong find(const char *content, ULong offset,
-                       ULong end_before) noexcept = 0;
-
-    // For finding the tail
-    virtual ULong find2(const char *content, ULong offset,
-                        ULong end_before) const noexcept {
-        // OVERRIDE IS NEEDED WHEN USING FindNest().
-
-        (void)content;
-        (void)offset;
-        (void)end_before;
-
-        return 0;
-    }
-
-    /*
-     * This function is called everytime a match found, and should look like the
-     * first line that started the search. with the exception of setting
-     * different values; like passing a sub-container.
-     *
-     * FindNest() should be conditioned to check if the
-     * remaining length could hold another match between "offset" and
-     * "end_before".
-     */
-    virtual ULong nest(const char *content, ULong offset, ULong end_before,
-                       ULong max_end_before) {
-        // OVERRIDE IS NEEDED WHEN USING FindNest().
-
-        (void)content;
-        (void)offset;
-        (void)end_before;
-        (void)max_end_before;
-
-        return 0;
-    }
-
-    /*
-     * If the head of the match is found but not the tail, then this
-     * function is called.
-     */
-    virtual void failed() {
-    }
-
-    /*
-     * This is called to check if the match has a second part/tail.
-     * Like head: { and the tail is } or () or "" or < > ...etc.
-     */
-    virtual bool hasTail() const noexcept {
-        return false;
     }
 };
 
