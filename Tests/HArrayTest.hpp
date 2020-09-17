@@ -24,30 +24,29 @@
 #include "HArray.hpp"
 #include "TestHelper.hpp"
 
-#ifndef QENTEM_HARRAYTEST_H_
-#define QENTEM_HARRAYTEST_H_
+#ifndef QENTEM_HARRAY_TESTS_H_
+#define QENTEM_HARRAY_TESTS_H_
 
 namespace Qentem {
 namespace Test {
 
 static int TestHash() {
-    using H_ARR = HArray<UInt>;
     ULong hash;
     ULong hash2;
     ULong hash3;
     ULong hash4;
 
-    hash = H_ARR::Hash("", 0);
+    hash = HArray<UInt, char>::Hash("", 0);
     SHOULD_NOT_EQUAL(hash, 0, "hash", "0");
 
-    hash  = H_ARR::Hash("1", 1);
-    hash2 = H_ARR::Hash("0", 1);
+    hash  = HArray<UInt, char>::Hash("1", 1);
+    hash2 = HArray<UInt, char>::Hash("0", 1);
     SHOULD_NOT_EQUAL(hash, 0, "hash", "0");
     SHOULD_NOT_EQUAL(hash2, 0, "hash2", "0");
     SHOULD_NOT_EQUAL(hash, hash2, "hash", "hash2");
 
-    hash3 = H_ARR::Hash("10", 2);
-    hash4 = H_ARR::Hash("01", 2);
+    hash3 = HArray<UInt, char>::Hash("10", 2);
+    hash4 = HArray<UInt, char>::Hash("01", 2);
     SHOULD_NOT_EQUAL(hash3, 0, "hash3", "0");
     SHOULD_NOT_EQUAL(hash4, 0, "hash4", "0");
     SHOULD_NOT_EQUAL(hash, hash3, "hash", "hash3");
@@ -56,8 +55,8 @@ static int TestHash() {
     SHOULD_NOT_EQUAL(hash2, hash4, "hash2", "hash4");
     SHOULD_NOT_EQUAL(hash3, hash4, "hash3", "hash4");
 
-    hash  = H_ARR::Hash("100", 3);
-    hash2 = H_ARR::Hash("001", 3);
+    hash  = HArray<UInt, char>::Hash("100", 3);
+    hash2 = HArray<UInt, char>::Hash("001", 3);
     SHOULD_NOT_EQUAL(hash, 0, "hash", "0");
     SHOULD_NOT_EQUAL(hash2, 0, "hash2", "0");
     SHOULD_NOT_EQUAL(hash, hash3, "hash", "hash3");
@@ -65,8 +64,8 @@ static int TestHash() {
     SHOULD_NOT_EQUAL(hash, hash4, "hash", "hash4");
     SHOULD_NOT_EQUAL(hash2, hash4, "hash2", "hash4");
 
-    hash  = H_ARR::Hash("abc", 3);
-    hash2 = H_ARR::Hash("cba", 3);
+    hash  = HArray<UInt, char>::Hash("abc", 3);
+    hash2 = HArray<UInt, char>::Hash("cba", 3);
     SHOULD_NOT_EQUAL(hash, hash2, "hash", "hash2");
     SHOULD_NOT_EQUAL(hash, 0, "hash", "0");
     SHOULD_NOT_EQUAL(hash2, 0, "hash2", "0");
@@ -75,8 +74,8 @@ static int TestHash() {
 }
 
 static int TestHArray1() {
-    HArray<UInt> numbers1;
-    HArray<UInt> numbers2(8);
+    HArray<UInt, char> numbers1;
+    HArray<UInt, char> numbers2(8);
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
@@ -134,11 +133,11 @@ static int TestHArray1() {
 }
 
 static int TestHArray2() {
-    HArray<UInt>        numbers1(8);
-    HArray<UInt>        numbers2;
-    const String *      key;
-    const char *        str_c;
-    const HAItem<UInt> *storage;
+    HArray<UInt, char>        numbers1(8);
+    HArray<UInt, char>        numbers2;
+    const String<char> *      key;
+    const char *              str_c;
+    const HAItem<UInt, char> *storage;
 
     numbers1["key1"] = 1;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
@@ -200,28 +199,28 @@ static int TestHArray2() {
 
     key = numbers1.GetKey(0);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key1", 4), "(GetKey(0) == key1)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key1", 4), "(GetKey(0) == key1)");
     key = numbers1.GetKey(1);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key2", 4), "(GetKey(1) == key2)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key2", 4), "(GetKey(1) == key2)");
     key = numbers1.GetKey(2);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key3", 4), "(GetKey(2) == key3)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key3", 4), "(GetKey(2) == key3)");
     key = numbers1.GetKey(3);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key4", 4), "(GetKey(3) == key4)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key4", 4), "(GetKey(3) == key4)");
     key = numbers1.GetKey(4);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key5", 4), "(GetKey(4) == key5)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key5", 4), "(GetKey(4) == key5)");
     key = numbers1.GetKey(5);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key6", 4), "(GetKey(5) == key6)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key6", 4), "(GetKey(5) == key6)");
     key = numbers1.GetKey(6);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key7", 4), "(GetKey(6) == key7)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key7", 4), "(GetKey(6) == key7)");
     key = numbers1.GetKey(7);
     SHOULD_NOT_EQUAL(key, nullptr, "key", "null");
-    SHOULD_EQUAL_TRUE(key->Compare("key8", 4), "(GetKey(7) == key8)");
+    SHOULD_EQUAL_TRUE(key->IsEqual("key8", 4), "(GetKey(7) == key8)");
 
     key   = numbers1.GetKey(5);
     str_c = key->Storage();
@@ -241,7 +240,7 @@ static int TestHArray2() {
     SHOULD_EQUAL_VALUE(numbers1["key8"], 80, "key8");
     SHOULD_EQUAL_VALUE(numbers1["key9"], 90, "key9");
 
-    const String *key2 = numbers1.GetKey(5);
+    const String<char> *key2 = numbers1.GetKey(5);
     SHOULD_NOT_EQUAL(key2, key, "str", "GetKey(5)");
     SHOULD_NOT_EQUAL(key2, nullptr, "key", "null");
     SHOULD_EQUAL_VALUE(key2->Storage(), str_c, "GetKey(5)->Storage()");
@@ -259,7 +258,7 @@ static int TestHArray2() {
                      "numbers1.GetKey(5)", "numbers2.GetKey(5)");
     SHOULD_NOT_EQUAL(key->Storage(), str_c, "str_c", "GetKey(5)->Storage()");
 
-    numbers2 = static_cast<HArray<UInt> &&>(numbers1);
+    numbers2 = static_cast<HArray<UInt, char> &&>(numbers1);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
@@ -277,7 +276,7 @@ static int TestHArray2() {
     SHOULD_EQUAL_VALUE(numbers2["key8"], 80, "key8");
     SHOULD_EQUAL_VALUE(numbers2["key9"], 90, "key9");
 
-    numbers1 = HArray<UInt>(numbers2);
+    numbers1 = HArray<UInt, char>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 9, "Size");
     SHOULD_EQUAL_TRUE((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
@@ -300,11 +299,11 @@ static int TestHArray2() {
 }
 
 static int TestHArray3() {
-    HArray<UInt>        numbers1(8);
-    HArray<UInt>        numbers2;
-    const String *      key;
-    const char *        str_c;
-    const HAItem<UInt> *storage;
+    HArray<UInt, char>        numbers1(8);
+    HArray<UInt, char>        numbers2;
+    const String<char> *      key;
+    const char *              str_c;
+    const HAItem<UInt, char> *storage;
 
     numbers2["key4"] = 40;
     numbers2["key1"] = 10;
@@ -321,7 +320,7 @@ static int TestHArray3() {
     str_c = key->Storage();
 
     storage  = numbers2.Storage();
-    numbers1 = static_cast<HArray<UInt> &&>(numbers2);
+    numbers1 = static_cast<HArray<UInt, char> &&>(numbers2);
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 9, "Size");
     SHOULD_EQUAL_TRUE((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
@@ -348,10 +347,10 @@ static int TestHArray3() {
 }
 
 static int TestHArray4() {
-    HArray<UInt>        numbers1;
-    HArray<UInt>        numbers2;
-    HArray<UInt>        numbers3(3);
-    const HAItem<UInt> *storage;
+    HArray<UInt, char>        numbers1;
+    HArray<UInt, char>        numbers2;
+    HArray<UInt, char>        numbers3(3);
+    const HAItem<UInt, char> *storage;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -454,7 +453,7 @@ static int TestHArray4() {
     numbers3 = numbers1; // Backup
 
     storage = numbers1.Storage();
-    numbers2 += static_cast<HArray<UInt> &&>(numbers1);
+    numbers2 += static_cast<HArray<UInt, char> &&>(numbers1);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
@@ -475,43 +474,13 @@ static int TestHArray4() {
     SHOULD_EQUAL_VALUE(numbers2["key10"], 1000, "key10");
 
     // Addition of an empty array does nothing.
-    numbers2 += HArray<UInt>(10);
+    numbers2 += HArray<UInt, char>(10);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 10, "Size");
-    String srt1;
-
-    bool did_throw = false;
-
-    try {
-        numbers2[srt1];
-    } catch (...) {
-        did_throw = true;
-    }
-
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
-
-    did_throw = false;
-
-    try {
-        numbers2[static_cast<String &&>(srt1)];
-    } catch (...) {
-        did_throw = true;
-    }
-
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
 
     numbers2.Resize(1);
     SHOULD_EQUAL_VALUE(numbers2["key1"], 10, "key1");
 
     SHOULD_EQUAL(numbers2.GetKey(1), nullptr, "GetKey(1)", "null");
-
-    try {
-        did_throw                   = false;
-        numbers1.Insert(nullptr, 0) = 10;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
 
     numbers1.Reset();
     numbers1[""] = 555;
@@ -521,15 +490,15 @@ static int TestHArray4() {
 }
 
 static int TestHArray5() {
-    HArray<ULong> numbers1;
-    String        key;
-    ULong *       value;
+    HArray<ULong, char> numbers1;
+    String<char>        key;
+    ULong *             value;
 
     for (ULong i = 1; i < 11; i++) {
         key = "k-";
-        key += Digit::NumberToString(i);
+        key += Digit<char>::NumberToString(i);
 
-        numbers1.Insert(key.Storage(), key.Length()) = i;
+        numbers1[key] = i;
 
         value = numbers1.Find(key.Storage(), key.Length());
         SHOULD_NOT_EQUAL(value, nullptr, "value", "null");
@@ -539,15 +508,15 @@ static int TestHArray5() {
     numbers1.Reset();
 
     for (ULong i = 1; i < 1001; i++) {
-        numbers1[Digit::NumberToString(i)] = i;
+        numbers1[Digit<char>::NumberToString(i)] = i;
 
-        value = numbers1.Find(Digit::NumberToString(i));
+        value = numbers1.Find(Digit<char>::NumberToString(i));
         SHOULD_NOT_EQUAL(value, nullptr, "value", "null");
         SHOULD_EQUAL_VALUE(*value, i, key.Storage());
     }
 
     for (ULong i = 1; i < 10; i++) {
-        SHOULD_EQUAL_VALUE(numbers1[Digit::NumberToString(i)], i,
+        SHOULD_EQUAL_VALUE(numbers1[Digit<char>::NumberToString(i)], i,
                            "key.Storage()");
     }
 
@@ -556,12 +525,12 @@ static int TestHArray5() {
     SHOULD_EQUAL_VALUE(*value, 10, "10");
 
     for (ULong i = 1; i < 11; i++) {
-        numbers1.Remove(Digit::NumberToString(i));
+        numbers1.Remove(Digit<char>::NumberToString(i));
     }
 
     for (ULong i = 1; i < 11; i++) {
-        SHOULD_EQUAL(numbers1.Find(Digit::NumberToString(i)), nullptr, "value",
-                     "null");
+        SHOULD_EQUAL(numbers1.Find(Digit<char>::NumberToString(i)), nullptr,
+                     "value", "null");
     }
 
     numbers1.Compress();
@@ -571,12 +540,12 @@ static int TestHArray5() {
     SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
 
     for (ULong i = 1; i < 101; i++) {
-        numbers1.Remove(Digit::NumberToString(i));
+        numbers1.Remove(Digit<char>::NumberToString(i));
     }
 
     for (ULong i = 1; i < 101; i++) {
-        SHOULD_EQUAL(numbers1.Find(Digit::NumberToString(i)), nullptr, "value",
-                     "null");
+        SHOULD_EQUAL(numbers1.Find(Digit<char>::NumberToString(i)), nullptr,
+                     "value", "null");
     }
 
     numbers1.Compress();
@@ -585,13 +554,12 @@ static int TestHArray5() {
                       "(numbers1.Capacity() >= 900)");
 
     for (ULong i = 101; i < 201; i++) {
-        key = Digit::NumberToString(i);
-        numbers1.Remove(key.Storage(), key.Length());
+        numbers1.Remove(Digit<char>::NumberToString(i));
     }
 
     for (ULong i = 101; i < 201; i++) {
-        SHOULD_EQUAL(numbers1.Find(Digit::NumberToString(i)), nullptr, "value",
-                     "null");
+        SHOULD_EQUAL(numbers1.Find(Digit<char>::NumberToString(i)), nullptr,
+                     "value", "null");
     }
 
     numbers1.Compress();
@@ -600,13 +568,13 @@ static int TestHArray5() {
                       "(numbers1.Capacity() >= 800)");
 
     for (ULong i = 0; i < 1001; i++) {
-        key = Digit::NumberToString(i);
+        key = Digit<char>::NumberToString(i);
         numbers1.Remove(key);
     }
 
     for (ULong i = 0; i < 1001; i++) {
-        SHOULD_EQUAL(numbers1.Find(Digit::NumberToString(i)), nullptr, "value",
-                     "null");
+        SHOULD_EQUAL(numbers1.Find(Digit<char>::NumberToString(i)), nullptr,
+                     "value", "null");
     }
 
     numbers1.Compress();
@@ -621,24 +589,26 @@ static int TestHArray5() {
 }
 
 static int TestHArray6() {
-    ULong                 id;
-    HArray<String>        strings1;
-    HArray<String>        strings2;
-    const HAItem<String> *storage;
+    ULong                             id;
+    HArray<String<char>, char>        strings1;
+    HArray<String<char>, char>        strings2;
+    const HAItem<String<char>, char> *storage;
 
-    String key1("k-1");
-    String key2("k-2");
+    String<char> key1("k-1");
+    String<char> key2("k-2");
 
-    String str1("val1");
-    String str2("val2");
+    String<char> str1("val1");
+    String<char> str2("val2");
 
     const char *k_str1 = key1.Storage();
     const char *k_str2 = key2.Storage();
     const char *c_str1 = str1.Storage();
     const char *c_str2 = str2.Storage();
 
-    strings1[static_cast<String &&>(key1)] = static_cast<String &&>(str1);
-    strings1[static_cast<String &&>(key2)] = static_cast<String &&>(str2);
+    strings1[static_cast<String<char> &&>(key1)] =
+        static_cast<String<char> &&>(str1);
+    strings1[static_cast<String<char> &&>(key2)] =
+        static_cast<String<char> &&>(str2);
 
     SHOULD_EQUAL_VALUE(strings1.Size(), 2, "Size");
     SHOULD_NOT_EQUAL(strings1.Storage(), nullptr, "Storage()", "null");
@@ -677,7 +647,7 @@ static int TestHArray6() {
 
     strings2.SetCapacity(2);
     storage = strings1.Storage();
-    strings2 += static_cast<HArray<String> &&>(strings1);
+    strings2 += static_cast<HArray<String<char>, char> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size()");
     SHOULD_EQUAL_VALUE(strings2.Capacity(), 2, "Capacity()");
     SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
@@ -697,11 +667,11 @@ static int TestHArray6() {
     SHOULD_EQUAL(strings2.GetValue(++id)->Storage(), c_str2,
                  "strings[1].Storage()", "c_str2");
 
-    strings1 += static_cast<HArray<String> &&>(strings2);
+    strings1 += static_cast<HArray<String<char>, char> &&>(strings2);
     strings1.Resize(10);
     storage = strings1.Storage();
     strings2.Reset();
-    strings2 += static_cast<HArray<String> &&>(strings1);
+    strings2 += static_cast<HArray<String<char>, char> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
     SHOULD_EQUAL_VALUE(strings2.Capacity(), 2, "Capacity()");
     SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
@@ -727,14 +697,14 @@ static int TestHArray6() {
 static int TestHArray7() {
     ULong id = 1000;
 
-    HArray<ULong> numbers1(id);
+    HArray<ULong, char> numbers1(id);
 
     for (ULong x = 0; x < id; x++) {
-        numbers1[Digit::NumberToString(x)] = x;
+        numbers1[Digit<char>::NumberToString(x)] = x;
     }
 
     for (ULong z = 0; z < id; z++) {
-        numbers1.Remove(Digit::NumberToString(z));
+        numbers1.Remove(Digit<char>::NumberToString(z));
         SHOULD_EQUAL(numbers1.GetKey(z), nullptr, "GetKey(id)->Storage()",
                      "null");
     }
@@ -744,12 +714,12 @@ static int TestHArray7() {
 
     numbers1.SetCapacity(id);
     for (ULong y = 0; y < id; y++) {
-        numbers1[Digit::NumberToString(y)] = y;
+        numbers1[Digit<char>::NumberToString(y)] = y;
     }
 
     do {
         --id;
-        numbers1.Remove(Digit::NumberToString(id));
+        numbers1.Remove(Digit<char>::NumberToString(id));
         SHOULD_EQUAL(numbers1.GetKey(id), nullptr, "GetKey(id)->Storage()", id);
     } while (id > 0);
 
@@ -762,20 +732,20 @@ static int TestHArray7() {
 static int TestHArray8() {
     UInt id = 100;
 
-    HArray<UInt> list(id);
+    HArray<UInt, char> list(id);
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
 
         list[key] = i;
     }
 
     for (UInt i = 0; i < id; i++) {
-        String key1("k-");
-        key1 += Digit::NumberToString(i);
+        String<char> key1("k-");
+        key1 += Digit<char>::NumberToString(i);
 
-        String key2 = Digit::NumberToString(i);
+        String<char> key2 = Digit<char>::NumberToString(i);
         key2 += "-k";
 
         SHOULD_EQUAL_TRUE(list.Rename(key1, key2), "Rename()");
@@ -795,18 +765,18 @@ static int TestHArray8() {
     UInt j = id;
     do {
         --j;
-        String key1("k-");
-        key1 += Digit::NumberToString(j);
+        String<char> key1("k-");
+        key1 += Digit<char>::NumberToString(j);
 
-        String key2 = Digit::NumberToString(j);
+        String<char> key2 = Digit<char>::NumberToString(j);
         key2 += "-k";
 
         SHOULD_EQUAL_TRUE(list.Rename(key2, key1), "Rename()");
     } while (j > 0);
 
     for (UInt i = 0; i < id; i++) {
-        String key1("k-");
-        key1 += Digit::NumberToString(i);
+        String<char> key1("k-");
+        key1 += Digit<char>::NumberToString(i);
 
         UInt *y = list.Find(key1);
         UInt  w = id + 1;
@@ -819,7 +789,7 @@ static int TestHArray8() {
     }
 
     for (UInt i = 0; i < id; i++) {
-        String key2 = Digit::NumberToString(i);
+        String<char> key2 = Digit<char>::NumberToString(i);
         key2 += "-k";
 
         SHOULD_EQUAL(list.Find(key2), nullptr, "value", "null");
@@ -831,12 +801,12 @@ static int TestHArray8() {
 static int TestHArray9() {
     UInt id = 10;
 
-    HArray<UInt>                list(id);
-    const Qentem::HAItem<UInt> *item;
+    HArray<UInt, char>                list(id);
+    const Qentem::HAItem<UInt, char> *item;
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
 
         list[key] = i;
         item      = list.GetItem(i);
@@ -850,8 +820,8 @@ static int TestHArray9() {
     SHOULD_EQUAL(item, nullptr, "item", "null");
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
 
         list.RemoveIndex(i);
 
@@ -861,8 +831,8 @@ static int TestHArray9() {
     list.Reset();
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
         list[key] = i;
     }
 
@@ -872,16 +842,16 @@ static int TestHArray9() {
     }
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
         SHOULD_EQUAL(list.Find(key), nullptr, "value", "null");
     }
 
     // No clear
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
         list[key] = i;
     }
 
@@ -890,8 +860,8 @@ static int TestHArray9() {
     }
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
         SHOULD_EQUAL(list.Find(key), nullptr, "value", "null");
     }
 
@@ -901,15 +871,15 @@ static int TestHArray9() {
 static int TestHArray10() {
     UInt id = 10;
 
-    HArray<UInt> list(id);
+    HArray<UInt, char> list(id);
 
     for (UInt i = 0; i < id; i++) {
-        String key("k-");
-        key += Digit::NumberToString(i);
+        String<char> key("k-");
+        key += Digit<char>::NumberToString(i);
 
         list[key] = i;
 
-        const Qentem::HAItem<UInt> *item = list.GetItem(key);
+        const Qentem::HAItem<UInt, char> *item = list.GetItem(key);
 
         SHOULD_NOT_EQUAL(item, nullptr, "item", "null");
         SHOULD_EQUAL_VALUE(item->Value, i, "index");

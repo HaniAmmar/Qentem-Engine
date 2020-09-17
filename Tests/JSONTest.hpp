@@ -23,19 +23,16 @@
 #include "JSON.hpp"
 #include "TestHelper.hpp"
 
-#ifndef QENTEM_JSONTEST_H_
-#define QENTEM_JSONTEST_H_
+#ifndef QENTEM_JSON_TESTS_H_
+#define QENTEM_JSON_TESTS_H_
 
 namespace Qentem {
 namespace Test {
 
-using Qentem::Value;
-using Qentem::ValueType;
-
 namespace JSON = Qentem::JSON;
 
 static int TestParse1() {
-    Value value;
+    Value<char> value;
 
     ///////////
     value = JSON::Parse(R"([])");
@@ -304,7 +301,7 @@ static int TestParse1() {
 }
 
 static int TestParse2() {
-    Value value;
+    Value<char> value;
 
     value = JSON::Parse(R"({})");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "Stringify()");
@@ -614,7 +611,7 @@ static int TestParse2() {
 }
 
 static int TestParse3() {
-    Value value;
+    Value<char> value;
 
     value = JSON::Parse(R"([{"one":1}])");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([{"one":1}])", "Stringify()");
@@ -841,607 +838,175 @@ static int TestParse3() {
 }
 
 static int TestParse4() {
-    Value         value;
-    const String *key_ptr;
-    const char *  str1;
-    const char *  str2;
-    char *        str3;
-    ULong         len;
-
-    str1 = R"(\")";
-    str2 = "\"";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\\)";
-    str2 = "\\";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\/)";
-    str2 = "/";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\b)";
-    str2 = "\b";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\f)";
-    str2 = "\f";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\n)";
-    str2 = "\n";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\r)";
-    str2 = "\r";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\t)";
-    str2 = "\t";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+    Value<char>         value;
+    const String<char> *key_ptr;
+    const char *        str1;
 
     value = JSON::Parse(R"(["\r"])");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\r", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\r", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"({"x":   "\n"})");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\n", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\n", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value   = JSON::Parse(R"({"\""   :"x"       })");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\"", key_ptr->Storage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\"", key_ptr->Storage(), value[0].Length()),
+        "IsEqual()");
 
     value   = JSON::Parse(R"({    "\n":   "\f"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\n", key_ptr->Storage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\n", key_ptr->Storage(), value[0].Length()),
+        "IsEqual()");
 
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\f", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
-    //////////
-
-    str1 = R"(\"\")";
-    str2 = "\"\"";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\\\\)";
-    str2 = R"(\\)";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\/\/)";
-    str2 = "//";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\b\b)";
-    str2 = "\b\b";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\f\f)";
-    str2 = "\f\f";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\n\n)";
-    str2 = "\n\n";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\r\r)";
-    str2 = "\r\r";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\t\t)";
-    str2 = "\t\t";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+        Memory::IsEqual("\f", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"(["\/\/"])");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("//", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("//", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\r\r"})");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\r\r", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\r\r", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value   = JSON::Parse(R"({"\b\b":"x"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\b\b", key_ptr->Storage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\b\b", key_ptr->Storage(), value[0].Length()),
+        "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\":"\"\""})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare(R"(\\)", key_ptr->Storage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual(R"(\\)", key_ptr->Storage(), value[0].Length()),
+        "IsEqual()");
 
     SHOULD_EQUAL_TRUE(
-        Memory::Compare(R"("")", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
-
-    //////////
-
-    str1 = R"(\"\"\")";
-    str2 = R"(""")";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\\\\\\)";
-    str2 = R"(\\\)";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\/\/\/)";
-    str2 = "///";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\b\b\b)";
-    str2 = "\b\b\b";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\f\f\f)";
-    str2 = "\f\f\f";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\n\n\n)";
-    str2 = "\n\n\n";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\r\r\r)";
-    str2 = "\r\r\r";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\t\t\t)";
-    str2 = "\t\t\t";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+        Memory::IsEqual(R"("")", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"(["\t\t\t"])");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\t\t\t", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\t\t\t", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\f\f\f"})");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\f\f\f", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("\f\f\f", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\\\":"x"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare(R"(\\\)", key_ptr->Storage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual(R"(\\\)", key_ptr->Storage(), value[0].Length()),
+        "IsEqual()");
 
     value   = JSON::Parse(R"({"\/\/\/":"\n\n\n"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("///", key_ptr->Storage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("///", key_ptr->Storage(), value[0].Length()),
+        "IsEqual()");
 
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\n\n\n", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
-
-    //////////
-
-    str1 = R"( \")";
-    str2 = " \"";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \\)";
-    str2 = " \\";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \/)";
-    str2 = " /";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \b)";
-    str2 = " \b";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \f)";
-    str2 = " \f";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \n)";
-    str2 = " \n";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \r)";
-    str2 = " \r";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \t)";
-    str2 = " \t";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+        Memory::IsEqual("\n\n\n", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"([" \""])");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare(" \"", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
-
-    //////////
-
-    str1 = R"(\" )";
-    str2 = "\" ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\\ )";
-    str2 = "\\ ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\/ )";
-    str2 = "/ ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\b )";
-    str2 = "\b ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\f )";
-    str2 = "\f ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\n )";
-    str2 = "\n ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\r )";
-    str2 = "\r ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\t )";
-    str2 = "\t ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \" )";
-    str2 = " \" ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \\ )";
-    str2 = " \\ ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \/ )";
-    str2 = " / ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \b )";
-    str2 = " \b ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \f )";
-    str2 = " \f ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \n )";
-    str2 = " \n ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \r )";
-    str2 = " \r ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"( \t )";
-    str2 = " \t ";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+        Memory::IsEqual(" \"", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"([" \t "])");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare(" \t ", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
-
-    END_SUB_TEST;
-}
-
-static int TestParse5() {
-    Value         value;
-    const String *key_ptr;
-    const char *  str1;
-    const char *  str2;
-    char *        str3;
-    ULong         len;
-
-    str1 = R"(\" \")";
-    str2 = "\" \"";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\\ \\)";
-    str2 = "\\ \\";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\/ \/)";
-    str2 = "/ /";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\b \b)";
-    str2 = "\b \b";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\f \f)";
-    str2 = "\f \f";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\n \n)";
-    str2 = "\n \n";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\r \r)";
-    str2 = "\r \r";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\t \t)";
-    str2 = "\t \t";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+        Memory::IsEqual(" \t ", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"(["\\ \\"])");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("\\ \\", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
-
-    //////////
-
-    str1 = R"(\"\\\/\b\f\n\r\t)";
-    str2 = "\"\\/\b\f\n\r\t";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
-
-    str1 = R"(\t\r\n\f\b\/\\\")";
-    str2 = "\t\r\n\f\b/\\\"";
-    len  = String::Count(str1);
-    str3 = JSON::UnEscapeString(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::Compare(str2, str3, len), "str2 == str3");
-    HAllocator::Deallocate(str3);
+        Memory::IsEqual("\\ \\", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     value = JSON::Parse(R"(["\"\\\/\b\f\n\r\t"])");
-    SHOULD_EQUAL_TRUE(Memory::Compare("\"\\/\b\f\n\r\t",
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("\"\\/\b\f\n\r\t",
                                       value[0].StringStorage(),
                                       value[0].Length()),
-                      "Compare()");
+                      "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\t\r\n\f\b\/\\\""})");
-    SHOULD_EQUAL_TRUE(Memory::Compare("\t\r\n\f\b/\\\"",
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("\t\r\n\f\b/\\\"",
                                       value[0].StringStorage(),
                                       value[0].Length()),
-                      "Compare()");
+                      "IsEqual()");
 
     value   = JSON::Parse(R"({"\t\r\n\f\b\/\\\"":"\"\\\/\b\f\n\r\t"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL_TRUE(Memory::Compare("\t\r\n\f\b/\\\"", key_ptr->Storage(),
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("\t\r\n\f\b/\\\"", key_ptr->Storage(),
                                       value[0].Length()),
-                      "Compare()");
+                      "IsEqual()");
 
-    SHOULD_EQUAL_TRUE(Memory::Compare("\"\\/\b\f\n\r\t",
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("\"\\/\b\f\n\r\t",
                                       value[0].StringStorage(),
                                       value[0].Length()),
-                      "Compare()");
-
-    ////////////////////////////////////
+                      "IsEqual()");
 
     str1  = R"(["\u003D"])";
     value = JSON::Parse(str1);
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("=", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("=", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     str1  = R"(["\u00a1"])";
     value = JSON::Parse(str1, 10);
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("¡", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("¡", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
-    String str(R"(["\u08A7"])");
-    value = JSON::Parse(str);
+    String<char> str(R"(["\u08A7"])");
+    value = JSON::Parse(str.Storage(), str.Length());
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("ࢧ", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     str   = R"(["\ud802\uDE7B"])";
-    value = JSON::Parse(str);
+    value = JSON::Parse(str.Storage(), str.Length());
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("𐩻", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     str   = R"(["\uD83E\uFC59"])";
-    value = JSON::Parse(str);
+    value = JSON::Parse(str.Storage(), str.Length());
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("🡙", value[0].StringStorage(), value[0].Length()),
-        "Compare()");
+        Memory::IsEqual("🡙", value[0].StringStorage(), value[0].Length()),
+        "IsEqual()");
 
     str   = R"(["\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7"])";
-    value = JSON::Parse(str);
-    SHOULD_EQUAL_TRUE(Memory::Compare("𐊃W=W𐊃¡🡙ࢧ",
+    value = JSON::Parse(str.Storage(), str.Length());
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("𐊃W=W𐊃¡🡙ࢧ",
                                       value[0].StringStorage(),
                                       value[0].Length()),
-                      "Compare()");
-    //////////
+                      "IsEqual()");
 
     END_SUB_TEST;
 }
 
 static int TestParse6() {
-    Value value;
+    Value<char> value;
 
     value = JSON::Parse(R"([1   ]    ])");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
@@ -1704,46 +1269,6 @@ static int TestParse6() {
     END_SUB_TEST;
 }
 
-// static String decToHex(ULong code) {
-//     StringStream ss;
-//     ULong        hex = 0;
-
-//     while (code != 0) {
-//         hex  = code % 16U;
-//         code = code / 16;
-//         ss += char(hex + ((hex < 10) ? 48U : 55U));
-//     }
-
-//     String val = ss.GetString();
-
-//     if (val.Length() > 1) {
-//         ULong x = 0;
-//         ULong y = (val.Length() - 1);
-
-//         // Reverse
-//         do {
-//             char tmp = val[x];
-//             val[x]   = val[y];
-//             val[y]   = tmp;
-//             ++x;
-//             --y;
-//         } while (x < y);
-//     }
-
-//     return val;
-// }
-
-// static void convertTo4Hex(ULong code) {
-//     if (code < 0x10000U) {
-//         std::cout << "\\u" << decToHex(code).Storage() << "\n";
-//     } else {
-//         code -= 0x10000U;
-//         std::cout << "\n\\u" << decToHex((code >> 10U) | 0xD800U).Storage();
-//         std::cout << "\\u" << decToHex((code ^ 0x800U) | 0xDC00U).Storage()
-//                   << "\n";
-//     }
-// }
-
 static int RunJSONTests() {
     STARTING_TEST("JSON.hpp");
 
@@ -1751,7 +1276,6 @@ static int RunJSONTests() {
     START_TEST("Parse Test 2", TestParse2);
     START_TEST("Parse Test 3", TestParse3);
     START_TEST("Parse Test 4", TestParse4);
-    START_TEST("Parse Test 5", TestParse5);
     START_TEST("Parse Test 6", TestParse6);
 
     // convertTo4Hex(0x10A7B);

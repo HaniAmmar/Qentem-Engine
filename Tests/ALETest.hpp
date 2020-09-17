@@ -23,15 +23,14 @@
 #include "ALE.hpp"
 #include "TestHelper.hpp"
 
-#ifndef QENTEM_ALETEST_H_
-#define QENTEM_ALETEST_H_
+#ifndef QENTEM_ALE_TESTS_H_
+#define QENTEM_ALE_TESTS_H_
 
 namespace Qentem {
 namespace Test {
 
-struct aleHelper : ALEHelper {
-    bool ALESetNumber(double &number, const char *content,
-                      UInt length) const override {
+struct aleHelper {
+    static bool ALESetNumber(double &number, const char *content, UInt length) {
         static const char *   a_val     = "{A}";
         static constexpr UInt a_val_len = 3;
 
@@ -41,19 +40,19 @@ struct aleHelper : ALEHelper {
         static const char *   abc_val     = "{ABC}";
         static constexpr UInt abc_val_len = 5;
 
-        if ((a_val_len == length) && Memory::Compare(a_val, content, length)) {
+        if ((a_val_len == length) && Memory::IsEqual(a_val, content, length)) {
             number = 6;
             return true;
         }
 
         if ((ab_val_len == length) &&
-            Memory::Compare(ab_val, content, length)) {
+            Memory::IsEqual(ab_val, content, length)) {
             number = 13;
             return true;
         }
 
         if ((abc_val_len == length) &&
-            Memory::Compare(abc_val, content, length)) {
+            Memory::IsEqual(abc_val, content, length)) {
             number = 26;
             return true;
         }
@@ -61,8 +60,8 @@ struct aleHelper : ALEHelper {
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const char *left, UInt left_length,
-                    const char *right, UInt right_length) const override {
+    static bool ALEIsEqual(bool &result, const char *left, UInt left_length,
+                           const char *right, UInt right_length) {
         static const char *a_str = "{1}";
         static const ULong a_len = 3;
 
@@ -81,11 +80,11 @@ struct aleHelper : ALEHelper {
         ULong       str_right_length;
 
         if (left[0] == '{') {
-            if ((left_length == a_len) && Memory::Compare(left, a_str, a_len)) {
+            if ((left_length == a_len) && Memory::IsEqual(left, a_str, a_len)) {
                 str_left        = a_val;
                 str_left_length = a_val_len;
             } else if ((left_length == ab_len) &&
-                       Memory::Compare(left, ab_str, ab_len)) {
+                       Memory::IsEqual(left, ab_str, ab_len)) {
                 str_left        = ab_val;
                 str_left_length = ab_val_len;
             } else {
@@ -98,11 +97,11 @@ struct aleHelper : ALEHelper {
 
         if (right[0] == '{') {
             if ((right_length == a_len) &&
-                Memory::Compare(right, a_str, a_len)) {
+                Memory::IsEqual(right, a_str, a_len)) {
                 str_right        = a_val;
                 str_right_length = a_val_len;
             } else if ((right_length == ab_len) &&
-                       Memory::Compare(right, ab_str, ab_len)) {
+                       Memory::IsEqual(right, ab_str, ab_len)) {
                 str_right        = ab_val;
                 str_right_length = ab_val_len;
             } else {
@@ -114,7 +113,7 @@ struct aleHelper : ALEHelper {
         }
 
         result = ((str_left_length == str_right_length) &&
-                  Memory::Compare(str_right, str_left, str_right_length));
+                  Memory::IsEqual(str_right, str_left, str_right_length));
 
         return true;
     }

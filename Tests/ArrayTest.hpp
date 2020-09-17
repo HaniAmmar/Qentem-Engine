@@ -24,8 +24,8 @@
 #include "String.hpp"
 #include "TestHelper.hpp"
 
-#ifndef QENTEM_ARRAYTEST_H_
-#define QENTEM_ARRAYTEST_H_
+#ifndef QENTEM_ARRAY_TESTS_H_
+#define QENTEM_ARRAY_TESTS_H_
 
 namespace Qentem {
 namespace Test {
@@ -263,9 +263,9 @@ static int TestArray2() {
 }
 
 static int TestArray3() {
-    Array<UInt>   numbers1;
-    Array<UInt>   numbers2(8);
-    Array<String> strings;
+    Array<UInt>         numbers1;
+    Array<UInt>         numbers2(8);
+    Array<String<char>> strings;
 
     for (UInt i = 0; i < 8; i++) {
         numbers1 += i;
@@ -322,17 +322,17 @@ static int TestArray3() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
 
     // Checking move
-    String str1("val1");
-    String str2("val2");
+    String<char> str1("val1");
+    String<char> str2("val2");
 
     const char *str1_cstr = str1.Storage();
     const char *str2_cstr = str2.Storage();
 
-    strings += static_cast<String &&>(str1);
+    strings += static_cast<String<char> &&>(str1);
     SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
                  "str1_cstr");
 
-    strings.Insert(static_cast<String &&>(str2));
+    strings.Insert(static_cast<String<char> &&>(str2));
     SHOULD_EQUAL(strings[1].Storage(), str2_cstr, "strings[1].Storage()",
                  "str2_cstr");
 
@@ -346,7 +346,7 @@ static int TestArray3() {
 
     // Checking move after expanding.
     for (UInt i = 0; i < 16; i++) {
-        strings += String("");
+        strings += String<char>("");
     }
 
     SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
@@ -359,17 +359,17 @@ static int TestArray3() {
 }
 
 static int TestArray4() {
-    Array<String> strings1;
-    Array<String> strings2;
+    Array<String<char>> strings1;
+    Array<String<char>> strings2;
 
-    String str1("val1");
-    String str2("val2");
+    String<char> str1("val1");
+    String<char> str2("val2");
 
     const char *str1_cstr = str1.Storage();
     const char *str2_cstr = str2.Storage();
 
-    strings1 += static_cast<String &&>(str1);
-    strings1 += static_cast<String &&>(str2);
+    strings1 += static_cast<String<char> &&>(str1);
+    strings1 += static_cast<String<char> &&>(str2);
 
     strings2 += strings1;
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
@@ -380,7 +380,7 @@ static int TestArray4() {
                      "str2_cstr");
 
     strings2.SetCapacity(2);
-    strings2 += static_cast<Array<String> &&>(strings1);
+    strings2 += static_cast<Array<String<char>> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
     SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL(strings2[0].Storage(), str1_cstr, "strings[0].Storage()",

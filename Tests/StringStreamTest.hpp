@@ -23,21 +23,21 @@
 #include "StringStream.hpp"
 #include "TestHelper.hpp"
 
-#ifndef QENTEM_STRINGSTREAMTEST_H_
-#define QENTEM_STRINGSTREAMTEST_H_
+#ifndef QENTEM_STRINGSTREAM_TESTS_H_
+#define QENTEM_STRINGSTREAM_TESTS_H_
 
 namespace Qentem {
 namespace Test {
 
 static int TestStringStream() {
-    StringStream ss1;
-    String       str;
+    StringStream<char> ss1;
+    String<char>       str;
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss1.Storage(), nullptr, "Storage()", "null");
 
-    StringStream ss2(10); // Preset size
+    StringStream<char> ss2(10); // Preset size
     SHOULD_EQUAL_VALUE((ss2.Capacity() >= 10), true, "Capacity() >= 10");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_NOT_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
@@ -47,6 +47,7 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
 
+    ss1 = StringStream<char>(1);
     ss1 += 'a';
     SHOULD_EQUAL_VALUE(ss1.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 1), "(ss1.Capacity() >= 1)");
@@ -57,39 +58,43 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss1.Storage(), nullptr, "Storage()", "null");
 
-    ss2 += String("a");
+    ss2 += String<char>("a");
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
     SHOULD_EQUAL_VALUE(ss2.GetString(), "a", "GetString()");
 
-    str = String("a");
+    str = String<char>("a");
     ss2 += str;
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
-    SHOULD_EQUAL_VALUE(ss2.GetString(), "a", "GetString()");
+    SHOULD_EQUAL_VALUE(ss2, "a", "StringStream");
+    ss2.Reset();
 
     ss2 += "abc";
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
     SHOULD_EQUAL_VALUE(ss2.GetString(), "abc", "GetString()");
 
-    ss2 += String("abc");
+    ss2 += String<char>("abc");
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss2.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss2, "abc", "StringStream");
+    ss2.Reset();
 
-    str = String("abc");
+    str = String<char>("abc");
     ss2 += str;
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss2.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss2, "abc", "StringStream");
+    ss2.Reset();
 
-    ss2 += String("abc");
+    ss2 += String<char>("abc");
     ss1 = ss2; // Copy
     SHOULD_EQUAL_VALUE(ss1.Length(), ss2.Length(), "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= ss2.Length()),
                       "(ss1.Capacity() >= ss2.Length())");
-    SHOULD_EQUAL_VALUE(ss1.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss1, "abc", "StringStream");
+    ss1.Reset();
 
     ULong lss = ss1.Capacity();
 
@@ -98,35 +103,38 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1.Capacity(), lss, "Capacity");
 
     ss1.Reset();
-    ss1 = static_cast<StringStream &&>(ss2); // Move
+    ss1 = static_cast<StringStream<char> &&>(ss2); // Move
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss1.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss1, "abc", "StringStream");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
 
     ss2 += 'a';
     ss1.Reset();
-    ss1 = static_cast<StringStream &&>(ss2); // Move
+    ss1 = static_cast<StringStream<char> &&>(ss2); // Move
     SHOULD_EQUAL_VALUE(ss1.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 1), "(ss1.Capacity() >= 1)");
-    SHOULD_EQUAL_VALUE(ss1.GetString(), "a", "GetString()");
+    SHOULD_EQUAL_VALUE(ss1, "a", "StringStream");
+    ss1.Reset();
 
     ss1 += "abc";
-    ss2 = StringStream(ss1); // Copy
+    ss2 = StringStream<char>(ss1); // Copy
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss1.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss1, "abc", "StringStream");
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss2.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss2, "abc", "StringStream");
+    ss1.Reset();
+    ss2.Reset();
 
     ss1 += "efg";
-    ss2 = StringStream(static_cast<StringStream &&>(ss2)); // Move
+    ss2 = StringStream<char>(static_cast<StringStream<char> &&>(ss2)); // Move
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss1.GetString(), "efg", "GetString()");
+    SHOULD_EQUAL_VALUE(ss1, "efg", "StringStream");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
@@ -141,14 +149,15 @@ static int TestStringStream() {
     ss2.Insert("bc", 2);
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
-    SHOULD_EQUAL_VALUE(ss2.GetString(), "abc", "GetString()");
+    SHOULD_EQUAL_VALUE(ss2, "abc", "StringStream");
+    ss2.Reset();
 
     ss2.Insert("abcdef", 1);
     ss2.Insert("bcdef", 1);
     ss2.Insert("cdef", 1);
 
     char *e_str    = ss2.Eject();
-    bool  is_equal = Memory::Compare(e_str, "abc", 3);
+    bool  is_equal = Memory::IsEqual(e_str, "abc", 3);
     HAllocator::Deallocate(e_str);
 
     SHOULD_EQUAL_TRUE(is_equal, "is_equal");
@@ -183,11 +192,12 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss2.Length(), 117, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 117), "(ss2.Capacity() >= 117)");
     SHOULD_EQUAL(
-        ss2.GetString(),
+        ss2,
         "123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789",
-        "GetString()", "123456789*13");
+        "StringStream", "123456789*13");
 
     ss1.Reset();
+    ss2.Reset();
 
     char *buffer = ss1.Buffer(2);
 
@@ -199,7 +209,7 @@ static int TestStringStream() {
     const char *ab = "ab";
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 2, "Length");
-    SHOULD_EQUAL_TRUE(Memory::Compare(ss1.Storage(), ab, 2), "Compare()");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual(ss1.Storage(), ab, 2), "IsEqual()");
 
     buffer = ss1.Buffer(1);
 
@@ -209,12 +219,12 @@ static int TestStringStream() {
 
     const char *ab2 = "abc";
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
-    SHOULD_EQUAL_TRUE(Memory::Compare(ss1.Storage(), ab2, 3), "Compare()");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual(ss1.Storage(), ab2, 3), "IsEqual()");
 
     ss1 += "de";
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 5, "Length");
-    SHOULD_EQUAL_VALUE(ss1.GetString(), "abcde", "GetString()");
+    SHOULD_EQUAL_VALUE(ss1, "abcde", "StringStream");
 
     END_SUB_TEST;
 }

@@ -23,83 +23,83 @@
 #include "Memory.hpp"
 #include "TestHelper.hpp"
 
-#ifndef QENTEM_MEMORYTEST_H_
-#define QENTEM_MEMORYTEST_H_
+#ifndef QENTEM_MEMORY_TESTS_H_
+#define QENTEM_MEMORY_TESTS_H_
 
 namespace Qentem {
 namespace Test {
 
-static int TestCompare() {
-    SHOULD_EQUAL_TRUE(Memory::Compare("", "", 0), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("a", "a", 1), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("ab", "ab", 2), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("abcdefgh", "abcdefgh", 8), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("a", "abcdefgh", 1), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("abc", "abcdefgh", 3), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("abcdefgh", "a", 1), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("abcdefgh", "abc", 3), "Compare");
+static int TestIsEqual() {
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("", "", 0), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("a", "a", 1), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("ab", "ab", 2), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("abcdefgh", "abcdefgh", 8), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("a", "abcdefgh", 1), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("abc", "abcdefgh", 3), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("abcdefgh", "a", 1), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("abcdefgh", "abc", 3), "IsEqual");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare("0123456789123456", "0123456789123456", 16), "Compare");
-    SHOULD_EQUAL_TRUE(Memory::Compare("01234567891234560123456789123456",
+        Memory::IsEqual("0123456789123456", "0123456789123456", 16), "IsEqual");
+    SHOULD_EQUAL_TRUE(Memory::IsEqual("01234567891234560123456789123456",
                                       "01234567891234560123456789123456", 32),
-                      "Compare");
+                      "IsEqual");
     SHOULD_EQUAL_TRUE(
-        Memory::Compare(
+        Memory::IsEqual(
             "0123456789123456012345678912345601234567891234560123456789123456",
             "0123456789123456012345678912345601234567891234560123456789123456",
             64),
-        "Compare");
+        "IsEqual");
 
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("a", "b", 1), "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("ab", "ba", 2), "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("abcdefgh", "--------", 8),
-                          "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("h", "abcdefgh", 1), "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("abc", "def", 3), "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("abcdefgh", "b", 1), "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("abcdefgh", "cde", 3), "Compare");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("a", "b", 1), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("ab", "ba", 2), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("abcdefgh", "--------", 8),
+                          "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("h", "abcdefgh", 1), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("abc", "def", 3), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("abcdefgh", "b", 1), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("abcdefgh", "cde", 3), "IsEqual");
 
     SHOULD_NOT_EQUAL_TRUE(
-        Memory::Compare("01234567891234568", "0123456789123456", 17),
-        "Compare");
-    SHOULD_NOT_EQUAL_TRUE(Memory::Compare("012345678912345601234567891234567",
+        Memory::IsEqual("01234567891234568", "0123456789123456", 17),
+        "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(Memory::IsEqual("012345678912345601234567891234567",
                                           "012345678912345601234567891234568",
                                           33),
-                          "Compare");
+                          "IsEqual");
     SHOULD_NOT_EQUAL_TRUE(
-        Memory::Compare(
+        Memory::IsEqual(
             "01234567829123456012345678912345601234567891234560123456789123456",
             "00234567829123456012345678912345601234567891234560123456789123456",
             65),
-        "Compare");
+        "IsEqual");
 
     SHOULD_NOT_EQUAL_TRUE(
-        Memory::Compare(
+        Memory::IsEqual(
             "01234567829123456012345678912345601234567891234560123456789123456",
             "01234567829123456012345678912345601234567891234560123456789123457",
             65),
-        "Compare");
+        "IsEqual");
 
     SHOULD_NOT_EQUAL_TRUE(
-        Memory::Compare(
+        Memory::IsEqual(
             "01234567829123456012345678912345601234567891234560123456789123456",
             "01234567829123456012345678912345601234567891235560123456789123456",
             65),
-        "Compare");
+        "IsEqual");
 
     SHOULD_NOT_EQUAL_TRUE(
-        Memory::Compare(
+        Memory::IsEqual(
             "01234567829123456012345678912345601234567891234560123456789123456",
             "01234567829123456012335678912345601234567891234560123456789123456",
             65),
-        "Compare");
+        "IsEqual");
 
     SHOULD_NOT_EQUAL_TRUE(
-        Memory::Compare(
+        Memory::IsEqual(
             "a2345678912345678912345678912345612340678912345678912345678912345w",
             "a2345678912345678912345678912345612345678912345678912345678912345w",
             65),
-        "Compare");
+        "IsEqual");
 
     END_SUB_TEST;
 }
@@ -107,7 +107,7 @@ static int TestCompare() {
 static int RunMemoryTests() {
     STARTING_TEST("Memory.hpp");
 
-    START_TEST("Memory::Compare", TestCompare);
+    START_TEST("IsEqual", TestIsEqual);
 
     END_TEST("Memory.hpp");
 }
