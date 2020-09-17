@@ -31,92 +31,156 @@
 namespace Qentem {
 namespace Memory {
 
-inline static void SetToZero(void *ptr, ULong size) noexcept {
-#ifdef QENTEM_SIMD_ENABLED_
-    const ULong m_size    = (size >> QMM_SHIFTSIZE_);
-    const ULong remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
+///////////////////////// Start SetToZero /////////////////////////
 
-    if (m_size != 0) {
-        QMM_VAR_ *      m_ptr  = static_cast<QMM_VAR_ *>(ptr);
-        const QMM_VAR_ *end    = (m_ptr + m_size);
-        const QMM_VAR_  m_zero = QMM_SETZERO_();
+template <ULong S>
+struct Setter { // ASM QWORD
+    static void SetToZero(void *ptr, ULong size) noexcept {
+        size >>= 3U;
 
-        do {
-            QMM_STOREU_(m_ptr, m_zero);
-            ++m_ptr;
-        } while (m_ptr != end);
-    }
+        long long *      des = static_cast<long long *>(ptr);
+        const long long *end = (des + size);
 
-    if (remaining != 0) {
-        char *      des = (static_cast<char *>(ptr) + (size - remaining));
-        const char *end = (des + remaining);
-
-        do {
+        while (des != end) {
             *des = 0;
             ++des;
-        } while (des != end);
+        }
     }
-#else
-    char *      des = static_cast<char *>(ptr);
-    const char *end = (des + size);
+};
 
-    while (des != end) {
-        *des = 0;
-        ++des;
+template <>
+struct Setter<1> { // ASM BYTE
+    static void SetToZero(void *ptr, ULong size) noexcept {
+        char *      des = static_cast<char *>(ptr);
+        const char *end = (des + size);
+
+        while (des != end) {
+            *des = 0;
+            ++des;
+        }
     }
-#endif
+};
+
+template <>
+struct Setter<2> { // ASM WORD
+    static void SetToZero(void *ptr, ULong size) noexcept {
+        size >>= 1U;
+
+        short *      des = static_cast<short *>(ptr);
+        const short *end = (des + size);
+
+        while (des != end) {
+            *des = 0;
+            ++des;
+        }
+    }
+};
+
+template <>
+struct Setter<4> { // ASM DWORD
+    static void SetToZero(void *ptr, ULong size) noexcept {
+        size >>= 2U;
+
+        int *      des = static_cast<int *>(ptr);
+        const int *end = (des + size);
+
+        while (des != end) {
+            *des = 0;
+            ++des;
+        }
+    }
+};
+
+template <typename Char_T_>
+static void SetToZero(void *ptr, ULong size) noexcept {
+    return Setter<sizeof(Char_T_)>::SetToZero(ptr, size);
 }
 
-static void Copy(void *to, const void *form, ULong size) noexcept {
-#ifdef QENTEM_SIMD_ENABLED_
-    const ULong m_size    = (size >> QMM_SHIFTSIZE_);
-    const ULong remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
+///////////////////////// End SetToZero /////////////////////////
 
-    if (m_size != 0) {
-        QMM_VAR_ *      m_to   = static_cast<QMM_VAR_ *>(to);
-        const QMM_VAR_ *m_form = static_cast<const QMM_VAR_ *>(form);
-        const QMM_VAR_ *end    = (m_form + m_size);
+///////////////////////// Start Copy /////////////////////////
 
-        do {
-            QMM_STOREU_(m_to, QMM_LOAD_(m_form));
-            ++m_form;
-            ++m_to;
-        } while (m_form != end);
-    }
+template <ULong S>
+struct Copier { // ASM QWORD (8, 16, 32)
+    static void Copy(void *to, const void *form, ULong size) noexcept {
+        size >>= 3U;
 
-    if (remaining != 0) {
-        const ULong start = (size - remaining);
-        const char *src   = static_cast<const char *>(form) + start;
-        const char *end   = (src + remaining);
+        const long long *src = static_cast<const long long *>(form);
+        const long long *end = (src + size);
+        long long *      des = static_cast<long long *>(to);
 
-        char *des = static_cast<char *>(to) + start;
-
-        do {
+        while (src != end) {
             *des = *src;
             ++des;
             ++src;
-        } while (src != end);
+        }
     }
-#else
-    const char *src = static_cast<const char *>(form);
-    const char *end = (src + size);
-    char *      des = static_cast<char *>(to);
+};
 
-    while (src != end) {
-        *des = *src;
-        ++des;
-        ++src;
+template <>
+struct Copier<1> { // ASM BYTE
+    static void Copy(void *to, const void *form, ULong size) noexcept {
+        const char *src = static_cast<const char *>(form);
+        const char *end = (src + size);
+        char *      des = static_cast<char *>(to);
+
+        while (src != end) {
+            *des = *src;
+            ++des;
+            ++src;
+        }
     }
-#endif
+};
+
+template <>
+struct Copier<2> { // ASM WORD
+    static void Copy(void *to, const void *form, ULong size) noexcept {
+        size >>= 1U;
+
+        const short *src = static_cast<const short *>(form);
+        const short *end = (src + size);
+        short *      des = static_cast<short *>(to);
+
+        while (src != end) {
+            *des = *src;
+            ++des;
+            ++src;
+        }
+    }
+};
+
+template <>
+struct Copier<4> { // ASM DWORD
+    static void Copy(void *to, const void *form, ULong size) noexcept {
+        size >>= 2U;
+
+        const int *src = static_cast<const int *>(form);
+        const int *end = (src + size);
+        int *      des = static_cast<int *>(to);
+
+        while (src != end) {
+            *des = *src;
+            ++des;
+            ++src;
+        }
+    }
+};
+
+template <typename Char_T_>
+static void Copy(void *to, const void *form, ULong size) noexcept {
+    return Copier<sizeof(Char_T_)>::Copy(to, form, size);
 }
 
-static bool Compare(const void *left, const void *right,
+///////////////////////// End Copy /////////////////////////
+
+template <typename Char_T_>
+static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
                     ULong length) noexcept {
     ULong offset = 0;
     if ((left != nullptr) && (right != nullptr) && (offset != length)) {
 #ifdef QENTEM_SIMD_ENABLED_
-        const QMM_VAR_ *m_left  = static_cast<const QMM_VAR_ *>(left);
-        const QMM_VAR_ *m_right = static_cast<const QMM_VAR_ *>(right);
+        const QMM_VAR_ *m_left  = reinterpret_cast<const QMM_VAR_ *>(left);
+        const QMM_VAR_ *m_right = reinterpret_cast<const QMM_VAR_ *>(right);
 
         do {
             QMM_Number_T bits =
@@ -130,18 +194,15 @@ static bool Compare(const void *left, const void *right,
                 }
             } else {
                 bits ^= QMM_MAX_NUMBER_;
-                return ((Q_CTZL(bits) + offset) >= length);
+                return ((Platform::CTZL(bits) + offset) >= length);
             }
 
             ++m_left;
             ++m_right;
         } while (offset < length);
 #else
-        const char *c_left  = static_cast<const char *>(left);
-        const char *c_right = static_cast<const char *>(right);
-
         do {
-            if (c_left[offset] != c_right[offset]) {
+            if (left[offset] != right[offset]) {
                 break;
             }
 
@@ -185,7 +246,7 @@ class HAllocator {
     inline static Type_ *AllocateClear(ULong size) noexcept {
         const ULong c_size = (size * sizeof(Type_));
         void *      vptr   = malloc(c_size);
-        Memory::SetToZero(vptr, c_size);
+        Memory::SetToZero<Type_>(vptr, c_size);
 
         return static_cast<Type_ *>(vptr);
     }
@@ -194,7 +255,7 @@ class HAllocator {
     inline static Type_ *AllocatePointers(ULong size) noexcept {
         const ULong c_size = (size * sizeof(void *));
         void *      vptr   = malloc(c_size);
-        Memory::SetToZero(vptr, c_size);
+        Memory::SetToZero<void *>(vptr, c_size);
 
         return static_cast<Type_ *>(vptr);
     }
