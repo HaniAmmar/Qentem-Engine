@@ -31,6 +31,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(MemoryTest --coverage)
 endif()
 
+# StringUtils
+add_executable(StringUtilsTest Tests/StringUtilsTest.cpp)
+add_test(NAME StringUtilsTest COMMAND StringUtilsTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(StringUtilsTest --coverage)
+endif()
+
 # String
 add_executable(StringTest Tests/StringTest.cpp)
 add_test(NAME StringTest COMMAND StringTest)
