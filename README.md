@@ -269,7 +269,7 @@ More examples are inside [Examples/ALE](https://github.com/HaniAmmar/Qentem-Engi
 
 ## Tests
 
-The tests are ~12,7k lines of code; ~5 times the size of the library. To run the tests:
+The tests are ~13k lines of code; ~4 times the size of the library. To run the tests:
 
 -   cmake
     -   Linux
