@@ -26,11 +26,14 @@
 #include "EngineTest.hpp"
 #include "HArrayTest.hpp"
 #include "JSONTest.hpp"
+#include "JSONUtilsTest.hpp"
 #include "MemoryTest.hpp"
 #include "StringStreamTest.hpp"
 #include "StringTest.hpp"
+#include "StringUtilsTest.hpp"
 #include "TemplateTest.hpp"
 #include "TestHelper.hpp"
+#include "UnicodeTest.hpp"
 #include "ValueTest.hpp"
 
 int RunTests() {
@@ -40,6 +43,7 @@ int RunTests() {
 
     ((Qentem::Test::RunTestHelperTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunMemoryTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
@@ -47,6 +51,8 @@ int RunTests() {
     ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunEngineTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunALETests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunUnicodeTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
@@ -58,8 +64,8 @@ int RunTests() {
 
     total = (passed + failed);
 
-    std::cout << "\x1B[31mNot good!\x1B[0m " << failed << " out of " << total
-              << " failed.\n";
+    std::wcout << "\x1B[31mNot good!\x1B[0m " << failed << " out of " << total
+               << " failed." << std::endl;
 
     return 1;
 }
@@ -68,14 +74,16 @@ int main() {
     // for (size_t i = 0; i < 100000; i++) {
     //     Qentem::Test::RunTestHelperTests();
     //     Qentem::Test::RunMemoryTests();
+    //     Qentem::Test::RunStringUtilsTests();
     //     Qentem::Test::RunStringTests();
-    //     Qentem::Test::RunMemoryTests();
     //     Qentem::Test::RunStringStreamTests();
     //     Qentem::Test::RunArrayTests();
     //     Qentem::Test::RunDigitTests();
     //     Qentem::Test::RunHArrayTests();
     //     Qentem::Test::RunEngineTests();
     //     Qentem::Test::RunALETests();
+    //     Qentem::Test::RunJSONUtilsTests();
+    //     Qentem::Test::RunUnicodeTests();
     //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
     //     Qentem::Test::RunTemplateTests();
