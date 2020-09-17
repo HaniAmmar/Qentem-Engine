@@ -6,3 +6,4 @@
 /build
 /.vs
 /x64
+/run.sh
