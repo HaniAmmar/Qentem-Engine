@@ -38,25 +38,26 @@ class TestHelper {
         return line;
     }
 
-    template <typename Value_>
+    template <typename Char_T_, typename Value_T_>
     QENTEM_NOINLINE static void
-    PrintErrorMessage(bool equal, const char *name, Value_ value,
-                      std::ostream &out = std::cout) {
+    PrintErrorMessage(bool equal, const Char_T_ *name, Value_T_ value,
+                      std::wostream &out = std::wcout) {
         out << ":\x1B[31m Failed\x1B[0m\n"
             << "At line " << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value << "'\n"
             << std::endl;
     }
 
-    QENTEM_NOINLINE static void StartingTest(const char *  name,
-                                             std::ostream &out = std::cout) {
+    template <typename Char_T_>
+    QENTEM_NOINLINE static void StartingTest(const Char_T_ *name,
+                                             std::wostream &out = std::wcout) {
         out << "\x1B[36m" << name << "\x1B[0m"
             << " Tests:" << std::endl;
     }
 
-    template <typename FUNC_>
-    QENTEM_NOINLINE static bool StartTest(const char *name, FUNC_ func,
-                                          std::ostream &out = std::cout) {
+    template <typename Char_T_, typename FUNC_>
+    QENTEM_NOINLINE static bool StartTest(const Char_T_ *name, FUNC_ func,
+                                          std::wostream &out = std::wcout) {
         try {
             out << name;
 
@@ -75,8 +76,9 @@ class TestHelper {
         return true;
     }
 
-    QENTEM_NOINLINE static void EndTest(const char *  name,
-                                        std::ostream &out = std::cout) {
+    template <typename Char_T_>
+    QENTEM_NOINLINE static void EndTest(const Char_T_ *name,
+                                        std::wostream &out = std::wcout) {
         out << "\x1B[36m" << name << "\x1B[32m Passed all tests\x1B[0m\n"
             << std::endl;
     }
@@ -155,25 +157,29 @@ class TestHelper {
 
 namespace Test {
 
+QENTEM_MAYBE_UNUSED_
 static int TestThrow1_1() {
     return 1;
 }
 
+QENTEM_MAYBE_UNUSED_
 static int TestThrow1() {
-    std::stringstream ss;
+    std::wstringstream ss;
 
     TestHelper::StartTest("Test Throw 1", TestThrow1_1, ss);
-    SHOULD_EQUAL_VALUE(ss.str(), "Test Throw 1", "Test Throw 1");
+    SHOULD_EQUAL_VALUE(ss.str(), L"Test Throw 1", "Test Throw 1");
 
     END_SUB_TEST;
 }
 
+QENTEM_MAYBE_UNUSED_
 static int TestThrow2_2() {
     throw 1;
 }
 
+QENTEM_MAYBE_UNUSED_
 static int TestThrow2() {
-    std::stringstream ss;
+    std::wstringstream ss;
 
     TestHelper::PrintErrorMessage(false, "", 0, ss);
 
@@ -183,6 +189,7 @@ static int TestThrow2() {
     END_SUB_TEST;
 }
 
+QENTEM_MAYBE_UNUSED_
 static int RunTestHelperTests() {
     STARTING_TEST("TestHelper.hpp");
 
