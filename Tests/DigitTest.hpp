@@ -690,6 +690,14 @@ static int TestNumberToString1() {
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(number_ulong, 10), "0000000001",
                        "return");
 
+    number_ulong = 4;
+    SHOULD_EQUAL_VALUE(DigitC::NumberToString(number_ulong, 50),
+                       "00000000000000000004", "return");
+
+    number_int = -7;
+    SHOULD_EQUAL_VALUE(DigitC::NumberToString(number_int, 50),
+                       "-0000000000000000007", "return");
+
     number_uint = 10;
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(number_uint, 2), "10", "return");
 

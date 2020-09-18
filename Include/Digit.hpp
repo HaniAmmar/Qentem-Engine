@@ -368,13 +368,9 @@ class Digit {
     struct S_NumberToString {
         inline static String<Char_T_> NumberToString(Number_T_ number,
                                                      UInt      min = 1) {
-            Char_T_ *str =
-                HAllocator::Allocate<Char_T_>(QENTEM_NUMBERS_STRING_SIZE_ + 1);
-
-            const UInt len = intToString(str, number, min, false);
-            str[len]       = 0;
-
-            return String<Char_T_>(str, len);
+            String<Char_T_> str;
+            intToString(str, number, min, false);
+            return str;
         }
     };
 
@@ -382,19 +378,16 @@ class Digit {
     struct S_NumberToString<Number_T_, false> {
         inline static String<Char_T_> NumberToString(Number_T_ number,
                                                      UInt      min = 1) {
-            UInt     len;
-            Char_T_ *str =
-                HAllocator::Allocate<Char_T_>(QENTEM_NUMBERS_STRING_SIZE_ + 1);
+            String<Char_T_> str;
 
             if (number < 0) {
                 number *= -1;
-                len = intToString(str, number, min, true);
+                intToString(str, number, min, true);
             } else {
-                len = intToString(str, number, min, false);
+                intToString(str, number, min, false);
             }
 
-            str[len] = 0;
-            return String<Char_T_>(str, len);
+            return str;
         }
     };
 
@@ -403,9 +396,7 @@ class Digit {
         inline static void NumberToStringStream(StringStream<Char_T_> &ss,
                                                 Number_T_              number,
                                                 UInt min = 1) {
-            Char_T_ *  str = ss.Buffer(QENTEM_NUMBERS_STRING_SIZE_);
-            const UInt len = intToString(str, number, min, false);
-            ss.StepBack(QENTEM_NUMBERS_STRING_SIZE_ - len);
+            intToString(ss, number, min, false);
         }
     };
 
@@ -414,17 +405,12 @@ class Digit {
         inline static void NumberToStringStream(StringStream<Char_T_> &ss,
                                                 Number_T_              number,
                                                 UInt min = 1) {
-            UInt     len;
-            Char_T_ *str = ss.Buffer(QENTEM_NUMBERS_STRING_SIZE_);
-
             if (number < 0) {
                 number *= -1;
-                len = intToString(str, number, min, true);
+                intToString(ss, number, min, true);
             } else {
-                len = intToString(str, number, min, false);
+                intToString(ss, number, min, false);
             }
-
-            ss.StepBack(QENTEM_NUMBERS_STRING_SIZE_ - len);
         }
     };
 
@@ -660,79 +646,61 @@ class Digit {
         return true;
     }
 
-    template <typename Number_T_>
-    static UInt intToString(Char_T_ *str, Number_T_ number, UInt min,
+    template <typename String_T_, typename Number_T_>
+    static void intToString(String_T_ &dstring, Number_T_ number, UInt min,
                             bool negative) {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
-        constexpr UInt end_offset = QENTEM_NUMBERS_STRING_SIZE_;
-        UInt           length     = end_offset;
+        Char_T_ tmp[QENTEM_NUMBERS_STRING_SIZE_];
+        UInt    offset = 0;
 
         /*
          *  18446744073709551615 MAX unsigned long long 20
          *  -9223372036854775807 MAX long long          19 + (-|+) = 20
          *
-         *  4294967295           MAX unsigned long      10
-         *  -2147483647          MAX long               10 + (-|+) = 11
+         *  4294967295           MAX unsigned int       10
+         *  -2147483647          MAX int                10 + (-|+) = 11
          *
-         *  65535                MAX unsigned int       5
-         *  -32767               MAX int                5 + (-|+) = 6
+         *  65535                MAX unsigned short       5
+         *  -32767               MAX short                5 + (-|+) = 6
          */
 
         while (number != 0) {
-            --length;
-            str[length] = Char_T_((number % QENTEM_DECIMAL_BASE_) +
-                                  DigitChars_T_::ZeroChar);
+            tmp[offset] = (Char_T_(number % QENTEM_DECIMAL_BASE_) +
+                           DigitChars_T_::ZeroChar);
+            ++offset;
             number /= QENTEM_DECIMAL_BASE_;
         }
 
-        min = (end_offset - min);
+        if (min > offset) {
+            min -= offset;
 
-        while (length > min) {
-            str[--length] = DigitChars_T_::ZeroChar;
+            if ((offset + min) > QENTEM_NUMBERS_STRING_SIZE_) {
+                min = QENTEM_NUMBERS_STRING_SIZE_ - offset;
+            }
+
+            if (negative) {
+                --min;
+            }
+
+            while (min != 0) {
+                tmp[offset] = DigitChars_T_::ZeroChar;
+                ++offset;
+                --min;
+            }
         }
 
         if (negative) {
-            str[--length] = DigitChars_T_::MinusChar;
+            tmp[offset] = DigitChars_T_::MinusChar;
+            ++offset;
         }
 
-        min = 0;
-        while (length < end_offset) {
-            str[min] = str[length];
-            ++min;
-            ++length;
-        }
+        Char_T_ *str = getCharForNumber(dstring, offset);
 
-        return min;
-    }
-
-    static void extractExponent(double &number, int &exponent) noexcept {
-        if (number > 1E19) {
-            do {
-                if (number > 1E99) {
-                    exponent += 100;
-                    number /= 1E100;
-                } else if (number > 1E9) {
-                    exponent += QENTEM_DECIMAL_BASE_;
-                    number /= 1E10;
-                } else {
-                    ++exponent;
-                    number /= QENTEM_DECIMAL_BASE_;
-                }
-            } while (number > 9);
-        } else {
-            do {
-                if (number < 1E-99) {
-                    exponent -= 100;
-                    number *= 1E100;
-                } else if (number < 1E-9) {
-                    exponent -= QENTEM_DECIMAL_BASE_;
-                    number *= 1E10;
-                } else {
-                    --exponent;
-                    number *= QENTEM_DECIMAL_BASE_;
-                }
-            } while (number < 0.9);
+        while (offset != 0) {
+            --offset;
+            *str = tmp[offset];
+            ++str;
         }
     }
 
@@ -741,16 +709,16 @@ class Digit {
                                UInt r_min, UInt precision) {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
-        constexpr UInt max_length = 19;
-        // 1844674407370955161 == 19
-        // 0.18446744073709551 == 19
+        constexpr UInt max_length = QENTEM_NUMBERS_STRING_SIZE_ - 1;
+        // 1844674407370955161 = 19
+        // 0.18446744073709551 = 19
 
         Char_T_            tmp[max_length];
+        Char_T_            tmp2[max_length];
         unsigned long long fraction        = 0;
         UInt               fraction_length = 0;
         UInt               end_offset      = max_length;
         UInt               offset          = 0;
-        UInt               exponent_length = 0;
         int                exponent        = 0;
         const bool         negative        = (number < 0);
         const bool         no_exponent     = (r_min != 0);
@@ -762,9 +730,8 @@ class Digit {
 
         if ((number > 1E19) || ((number != 0) && (number < 1E-17))) {
             extractExponent(number, exponent);
-            r_min           = 0;
-            precision       = 15;
-            exponent_length = QENTEM_EXPONENT_MAX_LENGTH_;
+            r_min     = 0;
+            precision = 15;
         }
 
         unsigned long long left_number =
@@ -774,8 +741,8 @@ class Digit {
 
         while (tmp_number != 0) {
             --end_offset;
-            tmp[end_offset] = Char_T_((tmp_number % QENTEM_DECIMAL_BASE_) +
-                                      DigitChars_T_::ZeroChar);
+            tmp[end_offset] = (Char_T_(tmp_number % QENTEM_DECIMAL_BASE_) +
+                               DigitChars_T_::ZeroChar);
             tmp_number /= QENTEM_DECIMAL_BASE_;
         }
 
@@ -821,8 +788,8 @@ class Digit {
                     while (left_number != 0) {
                         --end_offset;
                         tmp[end_offset] =
-                            Char_T_(left_number % QENTEM_DECIMAL_BASE_);
-                        tmp[end_offset] += DigitChars_T_::ZeroChar;
+                            (Char_T_(left_number % QENTEM_DECIMAL_BASE_) +
+                             DigitChars_T_::ZeroChar);
                         left_number /= QENTEM_DECIMAL_BASE_;
                     }
 
@@ -843,37 +810,8 @@ class Digit {
             ++fraction_length; // One for DotChar
         }
 
-        // Using "offset" for the MinusChar sign
-        UInt str_len =
-            left_length + fraction_length + r_min + offset + exponent_length;
-
-        if (min >= left_length) {
-            min -= left_length;
-            str_len += min;
-
-            if (str_len > QENTEM_NUMBERS_STRING_SIZE_) {
-                min += QENTEM_NUMBERS_STRING_SIZE_;
-                min     = (min - str_len);
-                str_len = QENTEM_NUMBERS_STRING_SIZE_;
-            }
-        } else {
-            min = 0;
-        }
-
-        Char_T_ *str = getCharForDouble(dstring, str_len);
-
-        while (min != 0) {
-            str[offset] = DigitChars_T_::ZeroChar;
-            ++offset;
-            --min;
-        }
-
-        if (negative) {
-            str[0] = DigitChars_T_::MinusChar;
-        }
-
         while (end_offset < max_length) {
-            str[offset] = tmp[end_offset];
+            tmp2[offset] = tmp[end_offset];
             ++offset;
             ++end_offset;
         }
@@ -883,8 +821,8 @@ class Digit {
 
             while (fraction != 0) {
                 --end_offset;
-                tmp[end_offset] = Char_T_((fraction % QENTEM_DECIMAL_BASE_) +
-                                          DigitChars_T_::ZeroChar);
+                tmp[end_offset] = (Char_T_(fraction % QENTEM_DECIMAL_BASE_) +
+                                   DigitChars_T_::ZeroChar);
                 fraction /= QENTEM_DECIMAL_BASE_;
             }
 
@@ -892,41 +830,42 @@ class Digit {
                 no_exponent) {
                 UInt offset2 = end_offset;
 
-                str[offset] = DigitChars_T_::DotChar;
+                tmp2[offset] = DigitChars_T_::DotChar;
                 ++offset;
 
                 while (end_offset != 0) {
-                    str[offset] = DigitChars_T_::ZeroChar;
+                    tmp2[offset] = DigitChars_T_::ZeroChar;
                     ++offset;
                     --end_offset;
                 }
 
                 while (offset2 < fraction_length) {
-                    str[offset] = tmp[offset2];
+                    tmp2[offset] = tmp[offset2];
                     ++offset;
                     ++offset2;
                 }
 
                 while (r_min != 0) {
-                    str[offset] = DigitChars_T_::ZeroChar;
+                    tmp2[offset] = DigitChars_T_::ZeroChar;
                     ++offset;
                     --r_min;
                 }
             } else {
                 offset = (negative) ? 1 : 0;
                 --exponent;
+                ++left_length;
                 exponent -= static_cast<int>(end_offset);
 
-                str[offset] = tmp[end_offset];
+                tmp2[offset] = tmp[end_offset];
                 ++offset;
                 ++end_offset;
 
                 if (end_offset != fraction_length) {
-                    str[offset] = DigitChars_T_::DotChar;
+                    tmp2[offset] = DigitChars_T_::DotChar;
                     ++offset;
 
                     do {
-                        str[offset] = tmp[end_offset];
+                        tmp2[offset] = tmp[end_offset];
                         ++offset;
                         ++end_offset;
                     } while (end_offset < fraction_length);
@@ -935,12 +874,12 @@ class Digit {
         }
 
         if (exponent != 0) {
-            str[offset] = DigitChars_T_::E_Char;
+            tmp2[offset] = DigitChars_T_::E_Char;
             ++offset;
 
             if (exponent < 0) {
                 exponent *= -1;
-                str[offset] = DigitChars_T_::MinusChar;
+                tmp2[offset] = DigitChars_T_::MinusChar;
                 ++offset;
             }
 
@@ -955,37 +894,90 @@ class Digit {
             }
 
             while (end_offset < 4) {
-                str[offset] = tmp[end_offset];
+                tmp2[offset] = tmp[end_offset];
                 ++offset;
                 ++end_offset;
             }
         }
 
-        finishCharForDouble(dstring, str, str_len, offset);
+        end_offset = offset;
+        offset     = 0;
+
+        if (min >= left_length) {
+            min -= left_length;
+            end_offset += min;
+
+            if (end_offset > QENTEM_NUMBERS_STRING_SIZE_) {
+                min += QENTEM_NUMBERS_STRING_SIZE_;
+                min        = (min - end_offset);
+                end_offset = QENTEM_NUMBERS_STRING_SIZE_;
+            }
+        } else {
+            min = 0;
+        }
+
+        Char_T_ *str     = getCharForNumber(dstring, end_offset);
+        UInt     offset2 = 0;
+
+        if (negative) {
+            str[0] = DigitChars_T_::MinusChar;
+            ++offset;
+            ++offset2;
+        }
+
+        while (min != 0) {
+            str[offset] = DigitChars_T_::ZeroChar;
+            ++offset;
+            --min;
+        }
+
+        while (offset != end_offset) {
+            str[offset] = tmp2[offset2];
+            ++offset;
+            ++offset2;
+        }
     }
 
-    static void finishCharForDouble(String<Char_T_> &dstring, Char_T_ *str,
-                                    UInt length, UInt offset) {
-        str[offset] = 0;
-        dstring     = String<Char_T_>{str, offset};
-        (void)length;
-    }
-
-    static void finishCharForDouble(StringStream<Char_T_> &dstring,
-                                    Char_T_ *str, UInt length, UInt offset) {
-        dstring.StepBack(offset - length);
-        (void)str;
-    }
-
-    static Char_T_ *getCharForDouble(String<Char_T_> &dstring, UInt length) {
+    static Char_T_ *getCharForNumber(String<Char_T_> &dstring, UInt length) {
         Char_T_ *str = HAllocator::Allocate<Char_T_>(length + 1U);
+        str[length]  = 0;
+        dstring      = String<Char_T_>{str, length};
         return str;
-        (void)dstring;
     }
 
-    static Char_T_ *getCharForDouble(StringStream<Char_T_> &dstring,
+    static Char_T_ *getCharForNumber(StringStream<Char_T_> &dstring,
                                      UInt                   length) {
         return dstring.Buffer(length);
+    }
+
+    static void extractExponent(double &number, int &exponent) noexcept {
+        if (number > 1E19) {
+            do {
+                if (number > 1E99) {
+                    exponent += 100;
+                    number /= 1E100;
+                } else if (number > 1E9) {
+                    exponent += QENTEM_DECIMAL_BASE_;
+                    number /= 1E10;
+                } else {
+                    ++exponent;
+                    number /= QENTEM_DECIMAL_BASE_;
+                }
+            } while (number > 9);
+        } else {
+            do {
+                if (number < 1E-99) {
+                    exponent -= 100;
+                    number *= 1E100;
+                } else if (number < 1E-9) {
+                    exponent -= QENTEM_DECIMAL_BASE_;
+                    number *= 1E10;
+                } else {
+                    --exponent;
+                    number *= QENTEM_DECIMAL_BASE_;
+                }
+            } while (number < 0.9);
+        }
     }
 
     static unsigned long long extractFraction(double number,
