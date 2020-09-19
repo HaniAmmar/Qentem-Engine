@@ -197,7 +197,7 @@ static int TestArray1() {
     SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(tmp, storage, "Storage()");
 
-    delete tmp;
+    HAllocator::Deallocate(tmp);
 
     END_SUB_TEST;
 }
