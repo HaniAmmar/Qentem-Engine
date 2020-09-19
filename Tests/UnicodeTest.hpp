@@ -52,76 +52,191 @@ static int TestToUTF8() {
 
     using QChar = unsigned char;
 
-    ULong  length;
-    QChar *str = HAllocator::Allocate<QChar>(5);
+    ULong length;
+    QChar str[4];
 
-    length = Unicode::ToUTF8(0x0000, str);
+    length = Unicode::ToUTF(0x0000, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 1, "length");
     SHOULD_EQUAL_VALUE(str[0], 0, "str[0]");
 
-    length = Unicode::ToUTF8(0x003D, str);
+    length = Unicode::ToUTF(0x003D, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 1, "length");
     SHOULD_EQUAL_VALUE(str[0], '=', "str[0]");
 
-    length = Unicode::ToUTF8(0x007F, str);
+    length = Unicode::ToUTF(0x007F, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 1, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(127), "str[0]");
 
-    length = Unicode::ToUTF8(0x0080, str);
+    length = Unicode::ToUTF(0x0080, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 2, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(194), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(128), "str[1]");
 
-    length = Unicode::ToUTF8(0x00A1, str);
+    length = Unicode::ToUTF(0x00A1, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 2, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(194), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(161), "str[1]");
 
-    length = Unicode::ToUTF8(0x07FF, str);
+    length = Unicode::ToUTF(0x07FF, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 2, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(223), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(191), "str[1]");
 
-    length = Unicode::ToUTF8(0x0800, str);
+    length = Unicode::ToUTF(0x0800, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 3, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(224), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(160), "str[1]");
     SHOULD_EQUAL_VALUE(str[2], QChar(128), "str[2]");
 
-    length = Unicode::ToUTF8(0x08A7, str);
+    length = Unicode::ToUTF(0x08A7, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 3, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(224), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(162), "str[1]");
     SHOULD_EQUAL_VALUE(str[2], QChar(167), "str[2]");
 
-    length = Unicode::ToUTF8(0xFFFF, str);
+    length = Unicode::ToUTF(0xFFFF, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 3, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(239), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(191), "str[1]");
     SHOULD_EQUAL_VALUE(str[2], QChar(191), "str[2]");
 
-    length = Unicode::ToUTF8(0x10000, str);
+    length = Unicode::ToUTF(0x10000, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 4, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(240), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(144), "str[1]");
     SHOULD_EQUAL_VALUE(str[2], QChar(128), "str[2]");
     SHOULD_EQUAL_VALUE(str[3], QChar(128), "str[3]");
 
-    length = Unicode::ToUTF8(0x10A7B, str);
+    length = Unicode::ToUTF(0x10A7B, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 4, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(240), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(144), "str[1]");
     SHOULD_EQUAL_VALUE(str[2], QChar(169), "str[2]");
     SHOULD_EQUAL_VALUE(str[3], QChar(187), "str[3]");
 
-    length = Unicode::ToUTF8(0xE01EF, str);
+    length = Unicode::ToUTF(0xE01EF, &(str[0]));
     SHOULD_EQUAL_VALUE(length, 4, "length");
     SHOULD_EQUAL_VALUE(str[0], QChar(243), "str[0]");
     SHOULD_EQUAL_VALUE(str[1], QChar(160), "str[1]");
     SHOULD_EQUAL_VALUE(str[2], QChar(135), "str[2]");
     SHOULD_EQUAL_VALUE(str[3], QChar(175), "str[3]");
 
-    HAllocator::Deallocate(str);
+    END_SUB_TEST;
+}
+
+static int TestToUTF16() {
+    using QChar = char16_t;
+
+    ULong length;
+    QChar str[2];
+
+    length = Unicode::ToUTF(0x0000, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], 0, "str[0]");
+
+    length = Unicode::ToUTF(0x003D, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], '=', "str[0]");
+
+    length = Unicode::ToUTF(0x007F, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(127), "str[0]");
+
+    length = Unicode::ToUTF(0x0080, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(128), "str[0]");
+
+    length = Unicode::ToUTF(0x00A1, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(161), "str[0]");
+
+    length = Unicode::ToUTF(0x07FF, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(2047), "str[0]");
+
+    length = Unicode::ToUTF(0x0800, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(2048), "str[0]");
+
+    length = Unicode::ToUTF(0x08A7, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(2215), "str[0]");
+
+    length = Unicode::ToUTF(0xFFFF, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(65535), "str[0]");
+
+    length = Unicode::ToUTF(0x10000, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 2, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(55296), "str[0]");
+    SHOULD_EQUAL_VALUE(str[1], QChar(56320), "str[1]");
+
+    length = Unicode::ToUTF(0x10A7B, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 2, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(55298), "str[0]");
+    SHOULD_EQUAL_VALUE(str[1], QChar(56955), "str[1]");
+
+    length = Unicode::ToUTF(0xE01EF, &(str[0]));
+    SHOULD_EQUAL_VALUE(length, 2, "length");
+    SHOULD_EQUAL_VALUE(str[0], QChar(56128), "str[0]");
+    SHOULD_EQUAL_VALUE(str[1], QChar(56815), "str[1]");
+
+    END_SUB_TEST;
+}
+
+static int TestToUTF32() {
+    using QChar = char32_t;
+
+    ULong length;
+    QChar str;
+
+    length = Unicode::ToUTF(0x0000, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, 0, "str");
+
+    length = Unicode::ToUTF(0x003D, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, '=', "str");
+
+    length = Unicode::ToUTF(0x007F, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(127), "str");
+
+    length = Unicode::ToUTF(0x0080, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(128), "str");
+
+    length = Unicode::ToUTF(0x00A1, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(161), "str");
+
+    length = Unicode::ToUTF(0x07FF, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(2047), "str");
+
+    length = Unicode::ToUTF(0x0800, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(2048), "str");
+
+    length = Unicode::ToUTF(0x08A7, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(2215), "str");
+
+    length = Unicode::ToUTF(0xFFFF, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(65535), "str");
+
+    length = Unicode::ToUTF(0x10000, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(65536), "str");
+
+    length = Unicode::ToUTF(0x10A7B, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(68219), "str");
+
+    length = Unicode::ToUTF(0xE01EF, &str);
+    SHOULD_EQUAL_VALUE(length, 1, "length");
+    SHOULD_EQUAL_VALUE(str, QChar(917999), "str");
 
     END_SUB_TEST;
 }
@@ -160,8 +275,8 @@ static int TestToUTF8() {
 //         std::cout << "\\u" << decToHex(code).Storage() << "\n";
 //     } else {
 //         code -= 0x10000U;
-//         std::cout << "\n\\u" << decToHex((code >> 10U) | 0xD800U).Storage();
-//         std::cout << "\\u" << decToHex((code ^ 0x800U) | 0xDC00U).Storage()
+//         std::cout << "\n\\u" << decToHex(0xD800U | (code >> 10U)).Storage();
+//         std::cout << "\\u" << decToHex(0xDC00U | (code & 0x3FFU)).Storage()
 //                   << "\n";
 //     }
 // }
@@ -169,7 +284,9 @@ static int TestToUTF8() {
 static int RunUnicodeTests() {
     STARTING_TEST("Unicode.hpp");
 
-    START_TEST("Unicode::ToUTF8", TestToUTF8);
+    START_TEST("ToUTF 8 Test", TestToUTF8);
+    START_TEST("ToUTF 16 Test", TestToUTF16);
+    START_TEST("ToUTF 32 Test", TestToUTF32);
 
     END_TEST("Unicode.hpp");
 }
