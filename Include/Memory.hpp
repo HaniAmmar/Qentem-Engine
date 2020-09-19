@@ -176,41 +176,15 @@ static void Copy(void *to, const void *form, ULong size) noexcept {
 template <typename Char_T_>
 static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
                     ULong length) noexcept {
-    ULong offset = 0;
-    if ((left != nullptr) && (right != nullptr) && (offset != length)) {
-#ifdef QENTEM_SIMD_ENABLED_
-        const QMM_VAR_ *m_left  = reinterpret_cast<const QMM_VAR_ *>(left);
-        const QMM_VAR_ *m_right = reinterpret_cast<const QMM_VAR_ *>(right);
-
-        do {
-            QMM_Number_T bits =
-                QMM_COMPARE_8_MASK_(QMM_LOAD_(m_left), QMM_LOAD_(m_right));
-
-            if (bits == QMM_MAX_NUMBER_) {
-                offset += QMM_SIZE_;
-
-                if (offset >= length) {
-                    return true;
-                }
-            } else {
-                bits ^= QMM_MAX_NUMBER_;
-                return ((Platform::CTZL(bits) + offset) >= length);
-            }
-
-            ++m_left;
-            ++m_right;
-        } while (offset < length);
-#else
-        do {
-            if (left[offset] != right[offset]) {
-                break;
-            }
-
-            ++offset;
-        } while (offset != length);
-#endif
+    if ((left != nullptr) && (right != nullptr)) {
+        while ((length != 0) && (*left == *right)) {
+            ++left;
+            ++right;
+            --length;
+        }
     }
-    return (offset == length);
+
+    return (length == 0);
 }
 
 } // namespace Memory
