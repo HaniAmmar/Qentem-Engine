@@ -42,7 +42,7 @@ Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/
 
 ### JSON
 
-Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and strict; a single mistake in the JSON string will give an empty value. Stringify gives a UTF-8 c-string.
+Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and strict; a single mistake in the JSON string will give an empty value.
 
 #### JSON Example
 
