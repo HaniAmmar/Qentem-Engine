@@ -24,10 +24,11 @@ Qentem Engine is an independent and cross-platform library that uses a fast algo
 
 ## Features
 
--   Header only and self-contained; no external libraries like the STL is needed.
--   Uses SSE2, AVX2, and AVX512BW when available.
--   Supports UTF-16 and UTF-32 surrogates.
--   Customizable template patterns with (variable replacement, nesting loops, nesting if conditions and Inline if)
+-   Cross platform, header only and self-contained; no external libraries like the STL is needed.
+-   Supports UTF-8, UTF-16 and UTF-32.
+-   Supports any character type (char. u_char, short, int, wchar_t).
+-   Fast JSON parser.
+-   Fast HTML templating (variable replacement, nested loop, nested if condition, and Inline if).
 
 ## Requirements
 
@@ -41,7 +42,7 @@ Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/
 
 ### JSON
 
-Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and very strict; a single mistake in the JSON string will give an empty value. Stringify gives a UTF-8 c-string.
+Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and strict; a single mistake in the JSON string will give an empty value. Stringify gives a UTF-8 c-string.
 
 #### JSON Example
 
