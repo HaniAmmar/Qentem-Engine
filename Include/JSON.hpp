@@ -20,10 +20,7 @@
  * SOFTWARE.
  */
 
-#include "Array.hpp"
 #include "Engine.hpp"
-#include "HArray.hpp"
-#include "JSONUtils.hpp"
 #include "Value.hpp"
 
 #ifndef QENTEM_JSON_H_
