@@ -21,6 +21,7 @@
  */
 
 #include "Memory.hpp"
+#include "Platform.hpp"
 
 #ifndef QENTEM_ENGINE_H_
 #define QENTEM_ENGINE_H_
