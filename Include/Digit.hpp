@@ -714,7 +714,7 @@ class Digit {
         // 0.18446744073709551 = 19
 
         Char_T_            tmp[max_length];
-        Char_T_            tmp2[max_length];
+        Char_T_            tmp2[QENTEM_NUMBERS_STRING_SIZE_];
         unsigned long long fraction        = 0;
         UInt               fraction_length = 0;
         UInt               end_offset      = max_length;
