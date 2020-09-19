@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-#include "Memory.hpp"
 #include "Platform.hpp"
 #include "String.hpp"
 
@@ -315,8 +314,8 @@ class HArray {
             while (((*left_item) != nullptr) &&
                    (((*left_item)->Hash != hash_from) ||
                     ((*left_item)->Key.Length() != from.Length()) ||
-                    !(Memory::IsEqual((*left_item)->Key.Storage(),
-                                      from.Storage(), from.Length())))) {
+                    !(StringUtils::IsEqual((*left_item)->Key.Storage(),
+                                           from.Storage(), from.Length())))) {
                 before    = left_item; // Store the previous item
                 left_item = &((*left_item)->Next);
             }
@@ -522,7 +521,7 @@ class HArray {
 
         while (((*item) != nullptr) &&
                (((*item)->Hash != hash) || ((*item)->Key.Length() != length) ||
-                !(Memory::IsEqual((*item)->Key.Storage(), key, length)))) {
+                !(StringUtils::IsEqual((*item)->Key.Storage(), key, length)))) {
             item = &((*item)->Next);
         }
 

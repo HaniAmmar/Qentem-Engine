@@ -173,20 +173,6 @@ static void Copy(void *to, const void *form, ULong size) noexcept {
 
 ///////////////////////// End Copy /////////////////////////
 
-template <typename Char_T_>
-static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
-                    ULong length) noexcept {
-    if ((left != nullptr) && (right != nullptr)) {
-        while ((length != 0) && (*left == *right)) {
-            ++left;
-            ++right;
-            --length;
-        }
-    }
-
-    return (length == 0);
-}
-
 } // namespace Memory
 
 class HAllocator {

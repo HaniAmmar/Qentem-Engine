@@ -135,7 +135,7 @@ class StringStream {
             return false;
         }
 
-        return Memory::IsEqual(storage_, ss.storage_, length_);
+        return StringUtils::IsEqual(storage_, ss.storage_, length_);
     }
 
     inline bool operator==(const String<Char_T_> &string) const noexcept {
@@ -143,7 +143,7 @@ class StringStream {
             return false;
         }
 
-        return Memory::IsEqual(storage_, string.Storage(), length_);
+        return StringUtils::IsEqual(storage_, string.Storage(), length_);
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
@@ -153,7 +153,7 @@ class StringStream {
             return false;
         }
 
-        return Memory::IsEqual(storage_, str, len);
+        return StringUtils::IsEqual(storage_, str, len);
     }
 
     inline bool operator!=(const StringStream &ss) const noexcept {
@@ -173,7 +173,7 @@ class StringStream {
             return false;
         }
 
-        return Memory::IsEqual(storage_, str, length);
+        return StringUtils::IsEqual(storage_, str, length);
     }
 
     inline void Insert(const Char_T_ *str, ULong length) {

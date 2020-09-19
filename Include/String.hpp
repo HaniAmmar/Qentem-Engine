@@ -174,7 +174,7 @@ class String {
             return false;
         }
 
-        return Memory::IsEqual(storage_, string.storage_, length_);
+        return StringUtils::IsEqual(storage_, string.storage_, length_);
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
@@ -184,7 +184,7 @@ class String {
             return false;
         }
 
-        return Memory::IsEqual(storage_, str, len);
+        return StringUtils::IsEqual(storage_, str, len);
     }
 
     inline bool operator!=(const String &string) const noexcept {
@@ -200,7 +200,7 @@ class String {
             return false;
         }
 
-        return Memory::IsEqual(storage_, str, length);
+        return StringUtils::IsEqual(storage_, str, length);
     }
 
     void Reset() noexcept {

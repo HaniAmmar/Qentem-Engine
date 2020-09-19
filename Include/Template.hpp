@@ -1358,7 +1358,7 @@ class Template_T_ {
         }
 
         result = ((str_length_left == str_length_right) &&
-                  Memory::IsEqual(str_left, str_right, str_length_right));
+                  StringUtils::IsEqual(str_left, str_right, str_length_right));
         return true;
     }
 

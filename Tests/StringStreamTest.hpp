@@ -160,7 +160,7 @@ static int TestStringStream() {
     ss2.Insert("cdef", 1);
 
     char *e_str    = ss2.Eject();
-    bool  is_equal = Memory::IsEqual(e_str, "abc", 3);
+    bool  is_equal = StringUtils::IsEqual(e_str, "abc", 3);
     HAllocator::Deallocate(e_str);
 
     SHOULD_EQUAL_TRUE(is_equal, "is_equal");
@@ -212,7 +212,7 @@ static int TestStringStream() {
     const char *ab = "ab";
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 2, "Length");
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(ss1.Storage(), ab, 2), "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.Storage(), ab, 2), "IsEqual()");
 
     buffer = ss1.Buffer(1);
 
@@ -222,7 +222,7 @@ static int TestStringStream() {
 
     const char *ab2 = "abc";
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(ss1.Storage(), ab2, 3), "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.Storage(), ab2, 3), "IsEqual()");
 
     ss1 += "de";
 

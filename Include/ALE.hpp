@@ -609,8 +609,9 @@ class ALE_T_ {
                                    item->Offset, item->Length, callback)) {
                     break;
                 } else {
-                    is_equal = ((item->Length == item2->Length) &&
-                                Memory::IsEqual(l_item, r_item, item2->Length));
+                    is_equal =
+                        ((item->Length == item2->Length) &&
+                         StringUtils::IsEqual(l_item, r_item, item2->Length));
                 }
 
                 if (op == Operation_::NotEqual) {

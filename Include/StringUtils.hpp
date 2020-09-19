@@ -69,7 +69,6 @@ struct WhiteSpaceChars<wchar_t> {
 } // namespace SubStringUtils
 
 struct StringUtils {
-
     template <typename Char_T_, typename NumberType = ULong>
     static NumberType Count(const Char_T_ *str) noexcept {
         NumberType len = 0;
@@ -116,6 +115,20 @@ struct StringUtils {
             ++end;
             length = (end - offset);
         }
+    }
+
+    template <typename Char_T_>
+    static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
+                        ULong length) noexcept {
+        if ((left != nullptr) && (right != nullptr)) {
+            while ((length != 0) && (*left == *right)) {
+                ++left;
+                ++right;
+                --length;
+            }
+        }
+
+        return (length == 0);
     }
 };
 

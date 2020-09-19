@@ -418,12 +418,92 @@ static int TestSoftTrim() {
     END_SUB_TEST;
 }
 
+static int TestIsEqual() {
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("", "", 0), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("a", "a", 1), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("ab", "ab", 2), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("abcdefgh", "abcdefgh", 8),
+                      "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("a", "abcdefgh", 1), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("abc", "abcdefgh", 3), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("abcdefgh", "a", 1), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("abcdefgh", "abc", 3), "IsEqual");
+    SHOULD_EQUAL_TRUE(
+        StringUtils::IsEqual("0123456789123456", "0123456789123456", 16),
+        "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("01234567891234560123456789123456",
+                                           "01234567891234560123456789123456",
+                                           32),
+                      "IsEqual");
+    SHOULD_EQUAL_TRUE(
+        StringUtils::IsEqual(
+            "0123456789123456012345678912345601234567891234560123456789123456",
+            "0123456789123456012345678912345601234567891234560123456789123456",
+            64),
+        "IsEqual");
+
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("a", "b", 1), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("ab", "ba", 2), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("abcdefgh", "--------", 8),
+                          "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("h", "abcdefgh", 1), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("abc", "def", 3), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("abcdefgh", "b", 1), "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(StringUtils::IsEqual("abcdefgh", "cde", 3),
+                          "IsEqual");
+
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual("01234567891234568", "0123456789123456", 17),
+        "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual("012345678912345601234567891234567",
+                             "012345678912345601234567891234568", 33),
+        "IsEqual");
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual(
+            "01234567829123456012345678912345601234567891234560123456789123456",
+            "00234567829123456012345678912345601234567891234560123456789123456",
+            65),
+        "IsEqual");
+
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual(
+            "01234567829123456012345678912345601234567891234560123456789123456",
+            "01234567829123456012345678912345601234567891234560123456789123457",
+            65),
+        "IsEqual");
+
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual(
+            "01234567829123456012345678912345601234567891234560123456789123456",
+            "01234567829123456012345678912345601234567891235560123456789123456",
+            65),
+        "IsEqual");
+
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual(
+            "01234567829123456012345678912345601234567891234560123456789123456",
+            "01234567829123456012335678912345601234567891234560123456789123456",
+            65),
+        "IsEqual");
+
+    SHOULD_NOT_EQUAL_TRUE(
+        StringUtils::IsEqual(
+            "a2345678912345678912345678912345612340678912345678912345678912345w",
+            "a2345678912345678912345678912345612345678912345678912345678912345w",
+            65),
+        "IsEqual");
+
+    END_SUB_TEST;
+}
+
 static int RunStringUtilsTests() {
     STARTING_TEST("StringUtils.hpp");
 
     START_TEST("Count Test", TestCount);
     START_TEST("StartTrim Test", TestLeftTrim);
     START_TEST("SoftTrim Test", TestSoftTrim);
+    START_TEST("IsEqual Test", TestIsEqual);
 
     END_TEST("StringUtils.hpp");
 }

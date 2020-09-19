@@ -40,19 +40,20 @@ struct aleHelper {
         static const char *   abc_val     = "{ABC}";
         static constexpr UInt abc_val_len = 5;
 
-        if ((a_val_len == length) && Memory::IsEqual(a_val, content, length)) {
+        if ((a_val_len == length) &&
+            StringUtils::IsEqual(a_val, content, length)) {
             number = 6;
             return true;
         }
 
         if ((ab_val_len == length) &&
-            Memory::IsEqual(ab_val, content, length)) {
+            StringUtils::IsEqual(ab_val, content, length)) {
             number = 13;
             return true;
         }
 
         if ((abc_val_len == length) &&
-            Memory::IsEqual(abc_val, content, length)) {
+            StringUtils::IsEqual(abc_val, content, length)) {
             number = 26;
             return true;
         }
@@ -80,11 +81,12 @@ struct aleHelper {
         ULong       str_right_length;
 
         if (left[0] == '{') {
-            if ((left_length == a_len) && Memory::IsEqual(left, a_str, a_len)) {
+            if ((left_length == a_len) &&
+                StringUtils::IsEqual(left, a_str, a_len)) {
                 str_left        = a_val;
                 str_left_length = a_val_len;
             } else if ((left_length == ab_len) &&
-                       Memory::IsEqual(left, ab_str, ab_len)) {
+                       StringUtils::IsEqual(left, ab_str, ab_len)) {
                 str_left        = ab_val;
                 str_left_length = ab_val_len;
             } else {
@@ -97,11 +99,11 @@ struct aleHelper {
 
         if (right[0] == '{') {
             if ((right_length == a_len) &&
-                Memory::IsEqual(right, a_str, a_len)) {
+                StringUtils::IsEqual(right, a_str, a_len)) {
                 str_right        = a_val;
                 str_right_length = a_val_len;
             } else if ((right_length == ab_len) &&
-                       Memory::IsEqual(right, ab_str, ab_len)) {
+                       StringUtils::IsEqual(right, ab_str, ab_len)) {
                 str_right        = ab_val;
                 str_right_length = ab_val_len;
             } else {
@@ -113,7 +115,7 @@ struct aleHelper {
         }
 
         result = ((str_left_length == str_right_length) &&
-                  Memory::IsEqual(str_right, str_left, str_right_length));
+                  StringUtils::IsEqual(str_right, str_left, str_right_length));
 
         return true;
     }

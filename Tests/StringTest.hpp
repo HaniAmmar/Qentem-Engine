@@ -80,7 +80,8 @@ static int TestString1() {
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
     SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
     SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], 0, "Storage()[Length]");
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2.Storage(), "abcdef", 5), "IsEqual");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2.Storage(), "abcdef", 5),
+                      "IsEqual");
 
     str2 = str1; // Copy
     SHOULD_EQUAL_VALUE(str2.Length(), str1.Length(), "Length");
@@ -88,7 +89,7 @@ static int TestString1() {
     SHOULD_NOT_EQUAL(str2.Storage(), str1.Storage(), "Storage()",
                      str1.Storage());
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
+        StringUtils::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
         "IsEqual");
 
     str2.Reset();
@@ -99,7 +100,7 @@ static int TestString1() {
     SHOULD_NOT_EQUAL(str2.Storage(), str1.Storage(), "Storage()",
                      str1.Storage());
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
+        StringUtils::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
         "IsEqual");
 
     str1 = "hig";         // Copy
@@ -108,7 +109,7 @@ static int TestString1() {
     SHOULD_NOT_EQUAL(str2.Storage(), str1.Storage(), "Storage()",
                      str1.Storage());
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
+        StringUtils::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
         "IsEqual");
 
     length = str1.Length();

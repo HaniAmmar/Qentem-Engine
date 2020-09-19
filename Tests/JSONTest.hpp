@@ -844,162 +844,163 @@ static int TestParse4() {
 
     value = JSON::Parse(R"(["\r"])");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\r", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("\r", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     value = JSON::Parse(R"({"x":   "\n"})");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\n", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("\n", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({"\""   :"x"       })");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\"", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("\"", key_ptr->Storage(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({    "\n":   "\f"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\n", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("\n", key_ptr->Storage(), value[0].Length()),
         "IsEqual()");
 
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\f", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("\f", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     value = JSON::Parse(R"(["\/\/"])");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("//", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("//", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\r\r"})");
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\r\r", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\r\r", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value   = JSON::Parse(R"({"\b\b":"x"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\b\b", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("\b\b", key_ptr->Storage(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\":"\"\""})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(R"(\\)", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual(R"(\\)", key_ptr->Storage(), value[0].Length()),
         "IsEqual()");
 
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(R"("")", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(R"("")", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value = JSON::Parse(R"(["\t\t\t"])");
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\t\t\t", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\t\t\t", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\f\f\f"})");
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\f\f\f", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\f\f\f", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\\\":"x"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(R"(\\\)", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual(R"(\\\)", key_ptr->Storage(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({"\/\/\/":"\n\n\n"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("///", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("///", key_ptr->Storage(), value[0].Length()),
         "IsEqual()");
 
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\n\n\n", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value = JSON::Parse(R"([" \""])");
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(" \"", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(" \"", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value = JSON::Parse(R"([" \t "])");
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual(" \t ", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(" \t ", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value = JSON::Parse(R"(["\\ \\"])");
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("\\ \\", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\\ \\", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     value = JSON::Parse(R"(["\"\\\/\b\f\n\r\t"])");
-    SHOULD_EQUAL_TRUE(Memory::IsEqual("\"\\/\b\f\n\r\t",
-                                      value[0].StringStorage(),
-                                      value[0].Length()),
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\"\\/\b\f\n\r\t",
+                                           value[0].StringStorage(),
+                                           value[0].Length()),
                       "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\t\r\n\f\b\/\\\""})");
-    SHOULD_EQUAL_TRUE(Memory::IsEqual("\t\r\n\f\b/\\\"",
-                                      value[0].StringStorage(),
-                                      value[0].Length()),
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"",
+                                           value[0].StringStorage(),
+                                           value[0].Length()),
                       "IsEqual()");
 
     value   = JSON::Parse(R"({"\t\r\n\f\b\/\\\"":"\"\\\/\b\f\n\r\t"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL_TRUE(Memory::IsEqual("\t\r\n\f\b/\\\"", key_ptr->Storage(),
-                                      value[0].Length()),
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"",
+                                           key_ptr->Storage(),
+                                           value[0].Length()),
                       "IsEqual()");
 
-    SHOULD_EQUAL_TRUE(Memory::IsEqual("\"\\/\b\f\n\r\t",
-                                      value[0].StringStorage(),
-                                      value[0].Length()),
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\"\\/\b\f\n\r\t",
+                                           value[0].StringStorage(),
+                                           value[0].Length()),
                       "IsEqual()");
 
     str1  = R"(["\u003D"])";
     value = JSON::Parse(str1);
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("=", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("=", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     str1  = R"(["\u00a1"])";
     value = JSON::Parse(str1, 10);
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("¡", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("¡", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     String<char> str(R"(["\u08A7"])");
     value = JSON::Parse(str.Storage(), str.Length());
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     str   = R"(["\ud802\uDE7B"])";
     value = JSON::Parse(str.Storage(), str.Length());
     SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()),
+        StringUtils::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     str   = R"(["\uD83E\uFC59"])";
     value = JSON::Parse(str.Storage(), str.Length());
-    SHOULD_EQUAL_TRUE(
-        Memory::IsEqual("🡙", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("🡙", value[0].StringStorage(),
+                                           value[0].Length()),
+                      "IsEqual()");
 
     str   = R"(["\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7"])";
     value = JSON::Parse(str.Storage(), str.Length());
-    SHOULD_EQUAL_TRUE(Memory::IsEqual("𐊃W=W𐊃¡🡙ࢧ",
-                                      value[0].StringStorage(),
-                                      value[0].Length()),
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ",
+                                           value[0].StringStorage(),
+                                           value[0].Length()),
                       "IsEqual()");
 
     END_SUB_TEST;

@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#include "Memory.hpp"
 #include "Platform.hpp"
+#include "StringUtils.hpp"
 
 #ifndef QENTEM_ENGINE_H_
 #define QENTEM_ENGINE_H_
@@ -108,8 +108,8 @@ class Engine {
                     }
 
                     if ((len_less_one == 1) ||
-                        Memory::IsEqual(pattern, (content + index),
-                                        len_less_one)) {
+                        StringUtils::IsEqual(pattern, (content + index),
+                                             len_less_one)) {
                         return pattern_index;
                     }
 

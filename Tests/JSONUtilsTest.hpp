@@ -346,336 +346,336 @@ static int TestUnEscapeJSON1() {
     str2 = "\"";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\\)";
     str2 = "\\";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\/)";
     str2 = "/";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\b)";
     str2 = "\b";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\f)";
     str2 = "\f";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\n)";
     str2 = "\n";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\r)";
     str2 = "\r";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\t)";
     str2 = "\t";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\"\")";
     str2 = "\"\"";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\\\\)";
     str2 = R"(\\)";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\/\/)";
     str2 = "//";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\b\b)";
     str2 = "\b\b";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\f\f)";
     str2 = "\f\f";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\n\n)";
     str2 = "\n\n";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\r\r)";
     str2 = "\r\r";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\t\t)";
     str2 = "\t\t";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\"\"\")";
     str2 = R"(""")";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\\\\\\)";
     str2 = R"(\\\)";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\/\/\/)";
     str2 = "///";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\b\b\b)";
     str2 = "\b\b\b";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\f\f\f)";
     str2 = "\f\f\f";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\n\n\n)";
     str2 = "\n\n\n";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\r\r\r)";
     str2 = "\r\r\r";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\t\t\t)";
     str2 = "\t\t\t";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \")";
     str2 = " \"";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \\)";
     str2 = " \\";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \/)";
     str2 = " /";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \b)";
     str2 = " \b";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \f)";
     str2 = " \f";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \n)";
     str2 = " \n";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \r)";
     str2 = " \r";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \t)";
     str2 = " \t";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\" )";
     str2 = "\" ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\\ )";
     str2 = "\\ ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\/ )";
     str2 = "/ ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\b )";
     str2 = "\b ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\f )";
     str2 = "\f ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\n )";
     str2 = "\n ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\r )";
     str2 = "\r ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\t )";
     str2 = "\t ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \" )";
     str2 = " \" ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \\ )";
     str2 = " \\ ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \/ )";
     str2 = " / ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \b )";
     str2 = " \b ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \f )";
     str2 = " \f ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \n )";
     str2 = " \n ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \r )";
     str2 = " \r ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"( \t )";
     str2 = " \t ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     END_SUB_TEST;
@@ -691,112 +691,112 @@ static int TestUnEscapeJSON2() {
     str2 = "\" \"";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\\ \\)";
     str2 = "\\ \\";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\/ \/)";
     str2 = "/ /";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\b \b)";
     str2 = "\b \b";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\f \f)";
     str2 = "\f \f";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\n \n)";
     str2 = "\n \n";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\r \r)";
     str2 = "\r \r";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\t \t)";
     str2 = "\t \t";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\"\\\/\b\f\n\r\t)";
     str2 = "\"\\/\b\f\n\r\t";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\t\r\n\f\b\/\\\")";
     str2 = "\t\r\n\f\b/\\\"";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\u003D)";
     str2 = "=";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\u00a1)";
     str2 = "¡";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\u08A7)";
     str2 = "ࢧ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\ud802\uDE7B)";
     str2 = "𐩻";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\uD83E\uFC59)";
     str2 = "🡙";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     str1 = R"(\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7)";
     str2 = "𐊃W=W𐊃¡🡙ࢧ";
     len  = StringUtils::Count(str1);
     str3 = JSON::UnEscapeJSON(str1, len);
-    SHOULD_EQUAL_TRUE(Memory::IsEqual(str2, str3, len), "str2 == str3");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2, str3, len), "str2 == str3");
     HAllocator::Deallocate(str3);
 
     END_SUB_TEST;
