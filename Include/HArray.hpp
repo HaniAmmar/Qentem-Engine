@@ -21,6 +21,7 @@
  */
 
 #include "Memory.hpp"
+#include "Platform.hpp"
 #include "String.hpp"
 
 #ifndef QENTEM_HARRAY_H_
