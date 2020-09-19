@@ -212,7 +212,7 @@ class Template_T_ {
     }
 #endif
 #endif
-    ULong find(const Char_T_ *content, ULong offset, ULong end_before) {
+    void find(const Char_T_ *content, ULong offset, ULong end_before) {
         static const Char_T_ *variable_prefix =
             TemplatePatterns_T_::GetVariablePrefix();
         static const Char_T_ *math_prefix =
@@ -241,7 +241,7 @@ class Template_T_ {
             find_cache_.Bits &= (find_cache_.Bits - 1);
 
             if (index >= end_before) {
-                return 0;
+                return;
             }
 
             if (index >= offset) {
@@ -481,9 +481,6 @@ class Template_T_ {
             ++offset;
         }
 #endif
-
-        // No match.
-        return 0;
     }
 
     inline void addPreviousContent(const Char_T_ *content, ULong offset) const {
@@ -501,9 +498,8 @@ class Template_T_ {
                     (start_offset -
                      TemplatePatterns_T_::VariablePrefixLength)); // {var:
 
-                renderVariable(
-                    (content + start_offset),
-                    static_cast<UInt>((current_offset - 1) - start_offset));
+                renderVariable((content + start_offset),
+                               ((current_offset - 1) - start_offset));
 
                 // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                 break;
@@ -541,9 +537,8 @@ class Template_T_ {
                     TemplatePatterns_T_::GetInLineSuffix(), 1, content,
                     start_offset, current_offset, end_before);
 
-                renderInLineIf(
-                    (content + start_offset),
-                    static_cast<UInt>((current_offset - 1) - start_offset));
+                renderInLineIf((content + start_offset),
+                               ((current_offset - 1) - start_offset));
 
                 // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                 break;
@@ -564,9 +559,8 @@ class Template_T_ {
 
                 renderLoop(
                     (content + start_offset),
-                    static_cast<UInt>((current_offset -
-                                       TemplatePatterns_T_::LoopSuffixLength) -
-                                      start_offset));
+                    ((current_offset - TemplatePatterns_T_::LoopSuffixLength) -
+                     start_offset));
                 break;
             }
 
@@ -584,7 +578,7 @@ class Template_T_ {
                     current_offset, end_before);
 
                 renderIf((content + start_offset),
-                         static_cast<UInt>(current_offset - start_offset));
+                         (current_offset - start_offset));
             }
 
             default: {
@@ -633,8 +627,7 @@ class Template_T_ {
                 }
 
                 const Value_T_ *value =
-                    findValue((content + offset),
-                              static_cast<UInt>((end_offset - 1) - offset));
+                    findValue((content + offset), ((end_offset - 1) - offset));
                 // -1 is - TemplatePatterns_T_::InLineSuffixLength
 
                 if (value != nullptr) {
@@ -672,9 +665,8 @@ class Template_T_ {
                 // Add any content that comes before any {var:x}
                 ss_->Insert(
                     (content + last_offset),
-                    static_cast<ULong>(
-                        (offset - TemplatePatterns_T_::VariablePrefixLength) -
-                        last_offset));
+                    ((offset - TemplatePatterns_T_::VariablePrefixLength) -
+                     last_offset));
             }
 
             const ULong start_offset = offset;
@@ -682,19 +674,18 @@ class Template_T_ {
                                      content, offset, length);
 
             renderVariable((content + start_offset),
-                           static_cast<UInt>((offset - 1) - start_offset));
+                           ((offset - 1) - start_offset));
 
             // -1 is - TemplatePatterns_T_::InLineSuffixLength
         } while (true);
 
         if (last_offset < length) {
             // Add any content that comes after }
-            ss_->Insert((content + last_offset),
-                        static_cast<UInt>(length - last_offset));
+            ss_->Insert((content + last_offset), (length - last_offset));
         }
     }
 
-    void renderVariable(const Char_T_ *content, UInt length) const {
+    void renderVariable(const Char_T_ *content, ULong length) const {
         const Value_T_ *value = findValue(content, length);
 
         if ((value == nullptr) || !(value->InsertString(*ss_))) {
@@ -716,7 +707,7 @@ class Template_T_ {
         }
     }
 
-    void renderInLineIf(const Char_T_ *content, const UInt length) const {
+    void renderInLineIf(const Char_T_ *content, const ULong length) const {
         UInt offset      = 0;
         UInt last_offset = 0;
         UInt len         = 0;
@@ -793,7 +784,7 @@ class Template_T_ {
         UInt SubLength;
     };
 
-    void renderLoop(const Char_T_ *content, UInt length) const {
+    void renderLoop(const Char_T_ *content, ULong length) const {
         const Value_T_ *root_value   = root_value_;
         const Char_T_ * key_str      = nullptr;
         const Char_T_ * value_str    = nullptr;
@@ -807,8 +798,8 @@ class Template_T_ {
 
         UInt times = 5; // set, key, value, times, index
 
-        const UInt start_offset = static_cast<UInt>(Engine::FindOne(
-            TemplatePatterns_T_::MultiLineSuffix, content, 0, length));
+        const ULong start_offset = Engine::FindOne(
+            TemplatePatterns_T_::MultiLineSuffix, content, 0, length);
         if (start_offset == 0) {
             // The syntax is wrong.
             return;
@@ -852,14 +843,14 @@ class Template_T_ {
 
                     case TemplatePatterns_T_::KeyChar: {
                         key_str     = (content + offset);
-                        key_length  = static_cast<UInt>(len);
+                        key_length  = len;
                         last_offset = tmp_offset; // Break loop.
                         break;
                     }
 
                     case TemplatePatterns_T_::ValueChar: {
                         value_str    = (content + offset);
-                        value_length = static_cast<UInt>(len);
+                        value_length = len;
                         last_offset  = tmp_offset; // Break loop.
                         break;
                     }
@@ -899,7 +890,7 @@ class Template_T_ {
                     key_length, value_length);
     }
 
-    Array<loopItem_> loopMatch(const Char_T_ *content, UInt length,
+    Array<loopItem_> loopMatch(const Char_T_ *content, ULong length,
                                const Char_T_ *key, const Char_T_ *value,
                                UInt key_length, UInt value_length) const {
         Array<loopItem_> items;
@@ -1083,7 +1074,7 @@ class Template_T_ {
         }
     }
 
-    void renderIf(const Char_T_ *content, UInt length) {
+    void renderIf(const Char_T_ *content, ULong length) {
         double result      = 0;
         ULong  offset      = 0;
         UInt   case_offset = 0;
@@ -1141,7 +1132,7 @@ class Template_T_ {
     }
 
     static UInt findNextElse(const Char_T_ *content, ULong offset,
-                             UInt length) noexcept {
+                             ULong length) noexcept {
         ULong else_offset = 0;
 
         do {
@@ -1182,13 +1173,13 @@ class Template_T_ {
      * name/id[name/id][sub-name/id][sub-sub-name/id]... "name": a string that
      * is stored in "keys_". "id" is the index that starts with 0: values_[id]
      */
-    const Value_T_ *findValue(const Char_T_ *key, UInt length) const noexcept {
+    const Value_T_ *findValue(const Char_T_ *key, ULong length) const noexcept {
         // TODO: Implement a caching method for values.
 
         if (length != 0) {
             const Value_T_ *root_value = root_value_;
-            UInt            offset     = 0;
-            UInt            next_offset;
+            ULong           offset     = 0;
+            ULong           next_offset;
 
             if (key[(length - 1)] == TemplatePatterns_T_::VariableIndexSuffix) {
                 next_offset = 0;
@@ -1211,7 +1202,7 @@ class Template_T_ {
 
                     if (!(Digit<Char_T_>::StringToNumber(
                             value_id, (key + offset),
-                            (next_offset - offset)))) {
+                            static_cast<UInt>(next_offset - offset)))) {
                         break;
                     }
 
