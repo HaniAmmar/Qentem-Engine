@@ -505,11 +505,11 @@ static char *UnEscapeJSON(const char *content, ULong &length) {
                                     0x3FFU;
                             code += 0x10000U;
 
-                            offset2 += Unicode::ToUTF8(code, (str + offset2));
+                            offset2 += Unicode::ToUTF(code, (str + offset2));
                             offset += 4U;
                             bits &= (bits - 1U);
                         } else {
-                            offset2 += Unicode::ToUTF8(code, (str + offset2));
+                            offset2 += Unicode::ToUTF(code, (str + offset2));
                         }
 
                         bits &= (bits - 1U);
@@ -622,10 +622,10 @@ QENTEM_MAYBE_UNUSED_ static Char_T_ *UnEscapeJSON(const Char_T_ *content,
                                     0x3FFU;
                             code += 0x10000U;
 
-                            offset2 += Unicode::ToUTF8(code, (str + offset2));
+                            offset2 += Unicode::ToUTF(code, (str + offset2));
                             offset += 4;
                         } else {
-                            offset2 += Unicode::ToUTF8(code, (str + offset2));
+                            offset2 += Unicode::ToUTF(code, (str + offset2));
                         }
 
                         continue;
