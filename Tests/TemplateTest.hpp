@@ -1969,21 +1969,21 @@ static int TestIfTag2() {
 static int RunTemplateTests() {
     STARTING_TEST("Template.hpp");
 
-    START_TEST("Variable tag Test 1", TestVariableTag1);
-    START_TEST("Variable tag Test 2", TestVariableTag2);
-    START_TEST("Variable tag Test 3", TestVariableTag3);
+    START_TEST("Variable Tag Test 1", TestVariableTag1);
+    START_TEST("Variable Tag Test 2", TestVariableTag2);
+    START_TEST("Variable Tag Test 3", TestVariableTag3);
 
-    START_TEST("Math tag Test 1", TestMathTag1);
-    START_TEST("Math tag Test 2", TestMathTag2);
+    START_TEST("Math Tag Test 1", TestMathTag1);
+    START_TEST("Math Tag Test 2", TestMathTag2);
 
-    START_TEST("Inline if tag Test", TestInlineIfTag);
+    START_TEST("Inline if Tag Test", TestInlineIfTag);
 
-    START_TEST("Loop tag Test 1", TestLoopTag1);
-    START_TEST("Loop tag Test 2", TestLoopTag2);
-    START_TEST("Loop tag Test 3", TestLoopTag3);
+    START_TEST("Loop Tag Test 1", TestLoopTag1);
+    START_TEST("Loop Tag Test 2", TestLoopTag2);
+    START_TEST("Loop Tag Test 3", TestLoopTag3);
 
-    START_TEST("If tag Test 1", TestIfTag1);
-    START_TEST("If tag Test 2", TestIfTag2);
+    START_TEST("If Tag Test 1", TestIfTag1);
+    START_TEST("If Tag Test 2", TestIfTag2);
 
     END_TEST("Template.hpp");
 }

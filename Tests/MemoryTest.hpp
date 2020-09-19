@@ -107,7 +107,7 @@ static int TestIsEqual() {
 static int RunMemoryTests() {
     STARTING_TEST("Memory.hpp");
 
-    START_TEST("IsEqual", TestIsEqual);
+    START_TEST("IsEqual Test", TestIsEqual);
 
     END_TEST("Memory.hpp");
 }

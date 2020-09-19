@@ -193,8 +193,8 @@ QENTEM_MAYBE_UNUSED_
 static int RunTestHelperTests() {
     STARTING_TEST("TestHelper.hpp");
 
-    START_TEST("Test Throw 1", TestThrow1);
-    START_TEST("Test Throw 2", TestThrow2);
+    START_TEST("Throw Test 1", TestThrow1);
+    START_TEST("Throw Test 2", TestThrow2);
 
     END_TEST("TestHelper.hpp");
 }

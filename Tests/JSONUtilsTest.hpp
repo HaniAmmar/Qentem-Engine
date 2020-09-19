@@ -805,9 +805,9 @@ static int TestUnEscapeJSON2() {
 static int RunJSONUtilsTests() {
     STARTING_TEST("JSONUtils.hpp");
 
-    START_TEST("JSONUtils::EscapeJSON", TestEscapeJSON);
-    START_TEST("JSONUtils::UnEscapeJSON 1", TestUnEscapeJSON1);
-    START_TEST("JSONUtils::UnEscapeJSON 2", TestUnEscapeJSON2);
+    START_TEST("EscapeJSON Test", TestEscapeJSON);
+    START_TEST("UnEscapeJSON Test 1", TestUnEscapeJSON1);
+    START_TEST("UnEscapeJSON Test 2", TestUnEscapeJSON2);
 
     END_TEST("JSONUtils.hpp");
 }
