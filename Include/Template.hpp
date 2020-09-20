@@ -47,10 +47,9 @@ class Template {
     inline static void Render(StringStream<Char_T_> &ss, const Char_T_ *content,
                               ULong length, const Value_T_ *root_value) {
         Array<loopItem_>               loop_items;
-        Template_T_<Char_T_, Value_T_> temp(&ss, root_value, &loop_items);
-        temp.find(content, 0, length);
-        // Add the remaining string.
-        ss.Insert((content + temp.last_offset_), (length - temp.last_offset_));
+        Template_T_<Char_T_, Value_T_> temp(content, length, &ss, root_value,
+                                            &loop_items);
+        temp.parse();
     }
 
     template <typename Char_T_, typename Value_T_>
@@ -104,7 +103,7 @@ class Template_T_ {
 #ifdef QENTEM_SIMD_ENABLED_
 #if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1
     // TODO: Add 16 and 32-bit character
-    void qmmFind(const char *content, ULong offset, ULong end_before) noexcept {
+    void qmmFind(ULong offset) noexcept {
         const __m256i rv64 =
             _mm256_set1_epi64x(TemplatePatterns_T_::RawVariable64bit);
         const __m256i v64 =
@@ -120,9 +119,10 @@ class Template_T_ {
             find_cache_.NextOffset = (find_cache_.Offset + 32U);
             offset                 = find_cache_.NextOffset;
 
+            const Char_T_ *content = (content_ + find_cache_.Offset);
+
             __m256i m_content =
-                _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
-                    content + find_cache_.Offset));
+                _mm256_loadu_si256(reinterpret_cast<const __m256i *>(content));
 
             find_cache_.Bits = static_cast<QMM_Number_T>(_mm256_movemask_epi8(
                                    _mm256_cmpeq_epi16(rv64, m_content))) &
@@ -143,8 +143,8 @@ class Template_T_ {
                                     _mm256_cmpeq_epi16(if64, m_content))) &
                                 0x55555555U;
 
-            m_content = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
-                content + find_cache_.Offset + 1));
+            m_content = _mm256_loadu_si256(
+                reinterpret_cast<const __m256i *>(++content));
 
             find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
                                     _mm256_cmpeq_epi16(rv64, m_content))) &
@@ -164,18 +164,18 @@ class Template_T_ {
             find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
                                     _mm256_cmpeq_epi16(if64, m_content))) &
                                 0xAAAAAAAAU;
-        } while ((find_cache_.Bits == 0) &&
-                 (find_cache_.NextOffset < end_before));
+        } while ((find_cache_.Bits == 0) && (find_cache_.NextOffset < length_));
     }
 #else
-    void qmmFind(const char *content, ULong offset, ULong end_before) noexcept {
+    void qmmFind(ULong offset) noexcept {
         do {
             find_cache_.Offset     = offset;
             find_cache_.NextOffset = (find_cache_.Offset + QMM_SIZE_);
             offset                 = find_cache_.NextOffset;
 
-            QMM_VAR_ m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                content + find_cache_.Offset));
+            const Char_T_ *content = (content_ + find_cache_.Offset);
+            QMM_VAR_       m_content =
+                QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content));
 
             find_cache_.Bits =
                 QMM_COMPARE_16_MASK_8_(
@@ -205,8 +205,8 @@ class Template_T_ {
                     QMM_SETONE_64_(TemplatePatterns_T_::If64bit), m_content) &
                 QMM_BIT_ONE_;
 
-            m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                content + find_cache_.Offset + 1));
+            m_content =
+                QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(++content));
 
             find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
@@ -235,12 +235,15 @@ class Template_T_ {
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePatterns_T_::If64bit), m_content) &
                 QMM_BIT_TWO_;
-        } while ((find_cache_.Bits == 0) &&
-                 (find_cache_.NextOffset < end_before));
+        } while ((find_cache_.Bits == 0) && (find_cache_.NextOffset < length_));
     }
 #endif
 #endif
-    void find(const Char_T_ *content, ULong offset, ULong end_before) {
+    void parse() {
+        ULong offset         = 0;
+        ULong current_offset = 0;
+        UInt  tmp_offset;
+
         static const Char_T_ *raw_variable_prefix =
             TemplatePatterns_T_::GetRawVariablePrefix();
         static const Char_T_ *variable_prefix =
@@ -253,73 +256,67 @@ class Template_T_ {
             TemplatePatterns_T_::GetLoopPrefix();
         static const Char_T_ *if_prefix = TemplatePatterns_T_::GetIfPrefix();
 
-        UInt tmp_offset;
-
 #ifdef QENTEM_SIMD_ENABLED_
         do {
-            if ((find_cache_.Bits == 0) &&
-                (find_cache_.NextOffset < end_before)) {
-                qmmFind(content, find_cache_.NextOffset, end_before);
+            if ((find_cache_.Bits == 0) && (find_cache_.NextOffset < length_)) {
+                qmmFind(find_cache_.NextOffset);
             }
 
             if (find_cache_.Bits == 0) {
                 break;
             }
 
-            ULong index =
+            const ULong m_offset =
                 (Platform::CTZL(find_cache_.Bits) + find_cache_.Offset);
             find_cache_.Bits &= (find_cache_.Bits - 1);
 
-            if (index >= end_before) {
-                return;
+            if (m_offset >= length_) {
+                break;
             }
 
-            if (index >= offset) {
-                ++offset;
-                switch (content[index]) {
+            if (m_offset >= offset) {
+                offset = m_offset;
+                switch (content_[offset]) {
 #else
-        ULong index = 0;
-        while (offset < end_before) {
-            switch (content[offset]) {
+        while (offset < length_) {
+            switch (content_[offset]) {
 #endif
                     case TemplatePatterns_T_::InLinePrefix: {
-#ifndef QENTEM_SIMD_ENABLED_
-                        index = offset;
-#endif
-                        ++index;
+                        current_offset = offset;
+                        ++current_offset;
 
-                        switch (content[index]) {
+                        switch (content_[current_offset]) {
                             case TemplatePatterns_T_::Raw_Var_2ND_Char: {
                                 if ((TemplatePatterns_T_::
                                          RawVariablePrefixLength +
-                                     index) < end_before) {
-                                    ++index;
+                                     current_offset) < length_) {
+                                    ++current_offset;
                                     tmp_offset = 2;
 
                                     while ((tmp_offset !=
                                             TemplatePatterns_T_::
                                                 RawVariablePrefixLength) &&
-                                           (content[index] ==
+                                           (content_[current_offset] ==
                                             raw_variable_prefix[tmp_offset])) {
-                                        ++index;
+                                        ++current_offset;
                                         ++tmp_offset;
                                     }
 
                                     if (tmp_offset ==
                                         TemplatePatterns_T_::
                                             RawVariablePrefixLength) {
-                                        ULong current_offset = Engine::FindOne(
+                                        ULong end_offset = Engine::FindOne(
                                             TemplatePatterns_T_::
                                                 GetInLineSuffix()[0],
-                                            content, index, end_before);
+                                            content_, current_offset, length_);
 
-                                        if (current_offset != 0) {
+                                        if (end_offset != 0) {
                                             tag_ = Tag::Raw;
-                                            found(content, end_before, index,
-                                                  current_offset);
-                                            offset = current_offset;
+                                            render(offset, current_offset,
+                                                   end_offset);
+                                            offset = end_offset;
                                         } else {
-                                            offset = index;
+                                            offset = current_offset;
                                         }
 
                                         continue;
@@ -331,34 +328,34 @@ class Template_T_ {
 
                             case TemplatePatterns_T_::Var_2ND_Char: {
                                 if ((TemplatePatterns_T_::VariablePrefixLength +
-                                     index) < end_before) {
-                                    ++index;
+                                     current_offset) < length_) {
+                                    ++current_offset;
                                     tmp_offset = 2;
 
                                     while ((tmp_offset !=
                                             TemplatePatterns_T_::
                                                 VariablePrefixLength) &&
-                                           (content[index] ==
+                                           (content_[current_offset] ==
                                             variable_prefix[tmp_offset])) {
-                                        ++index;
+                                        ++current_offset;
                                         ++tmp_offset;
                                     }
 
                                     if (tmp_offset ==
                                         TemplatePatterns_T_::
                                             VariablePrefixLength) {
-                                        ULong current_offset = Engine::FindOne(
+                                        ULong end_offset = Engine::FindOne(
                                             TemplatePatterns_T_::
                                                 GetInLineSuffix()[0],
-                                            content, index, end_before);
+                                            content_, current_offset, length_);
 
-                                        if (current_offset != 0) {
+                                        if (end_offset != 0) {
                                             tag_ = Tag::Variable;
-                                            found(content, end_before, index,
-                                                  current_offset);
-                                            offset = current_offset;
+                                            render(offset, current_offset,
+                                                   end_offset);
+                                            offset = end_offset;
                                         } else {
-                                            offset = index;
+                                            offset = current_offset;
                                         }
 
                                         continue;
@@ -370,33 +367,33 @@ class Template_T_ {
 
                             case TemplatePatterns_T_::MAth_2ND_Char: {
                                 if ((TemplatePatterns_T_::MathPrefixLength +
-                                     index) < end_before) {
-                                    ++index;
+                                     current_offset) < length_) {
+                                    ++current_offset;
                                     tmp_offset = 2;
 
                                     while ((tmp_offset !=
                                             TemplatePatterns_T_::
                                                 MathPrefixLength) &&
-                                           (content[index] ==
+                                           (content_[current_offset] ==
                                             math_prefix[tmp_offset])) {
-                                        ++index;
+                                        ++current_offset;
                                         ++tmp_offset;
                                     }
 
                                     if (tmp_offset ==
                                         TemplatePatterns_T_::MathPrefixLength) {
-                                        ULong current_offset = Engine::FindOne(
+                                        ULong end_offset = Engine::FindOne(
                                             TemplatePatterns_T_::
                                                 GetInLineSuffix()[0],
-                                            content, index, end_before);
+                                            content_, current_offset, length_);
 
-                                        if (current_offset != 0) {
+                                        if (end_offset != 0) {
                                             tag_ = Tag::Math;
-                                            found(content, end_before, index,
-                                                  current_offset);
-                                            offset = current_offset;
+                                            render(offset, current_offset,
+                                                   end_offset);
+                                            offset = end_offset;
                                         } else {
-                                            offset = index;
+                                            offset = current_offset;
                                         }
 
                                         continue;
@@ -408,34 +405,34 @@ class Template_T_ {
 
                             case TemplatePatterns_T_::InlineIf_2ND_Char: {
                                 if ((TemplatePatterns_T_::InLineIfPrefixLength +
-                                     index) < end_before) {
-                                    ++index;
+                                     current_offset) < length_) {
+                                    ++current_offset;
                                     tmp_offset = 2;
 
                                     while ((tmp_offset !=
                                             TemplatePatterns_T_::
                                                 InLineIfPrefixLength) &&
-                                           (content[index] ==
+                                           (content_[current_offset] ==
                                             inLine_if_prefix[tmp_offset])) {
-                                        ++index;
+                                        ++current_offset;
                                         ++tmp_offset;
                                     }
 
                                     if (tmp_offset ==
                                         TemplatePatterns_T_::
                                             InLineIfPrefixLength) {
-                                        ULong current_offset = Engine::FindOne(
+                                        ULong end_offset = Engine::FindOne(
                                             TemplatePatterns_T_::
                                                 GetInLineSuffix()[0],
-                                            content, index, end_before);
+                                            content_, current_offset, length_);
 
-                                        if (current_offset != 0) {
+                                        if (end_offset != 0) {
                                             tag_ = Tag::InLineIf;
-                                            found(content, end_before, index,
-                                                  current_offset);
-                                            offset = current_offset;
+                                            render(offset, current_offset,
+                                                   end_offset);
+                                            offset = end_offset;
                                         } else {
-                                            offset = index;
+                                            offset = current_offset;
                                         }
 
                                         continue;
@@ -451,43 +448,41 @@ class Template_T_ {
                     }
 
                     case TemplatePatterns_T_::MultiLinePrefix: {
-#ifndef QENTEM_SIMD_ENABLED_
-                        index = offset;
-#endif
-                        ++index;
+                        current_offset = offset;
+                        ++current_offset;
 
-                        switch (content[index]) {
+                        switch (content_[current_offset]) {
                             case TemplatePatterns_T_::Loop_2ND_Char: { // <loop
                                 if ((TemplatePatterns_T_::LoopPrefixLength +
-                                     index) < end_before) {
-                                    ++index;
+                                     current_offset) < length_) {
+                                    ++current_offset;
                                     tmp_offset = 2;
 
                                     while ((tmp_offset <
                                             TemplatePatterns_T_::
                                                 LoopPrefixLength) &&
-                                           (content[index] ==
+                                           (content_[current_offset] ==
                                             loop_prefix[tmp_offset])) {
-                                        ++index;
+                                        ++current_offset;
                                         ++tmp_offset;
                                     }
 
                                     if (tmp_offset ==
                                         TemplatePatterns_T_::LoopPrefixLength) {
-                                        ULong current_offset = Engine::Find(
+                                        ULong end_offset = Engine::Find(
                                             TemplatePatterns_T_::
                                                 GetLoopSuffix(),
                                             TemplatePatterns_T_::
                                                 LoopSuffixLength,
-                                            content, index, end_before);
+                                            content_, current_offset, length_);
 
-                                        if (current_offset != 0) {
+                                        if (end_offset != 0) {
                                             tag_ = Tag::Loop;
-                                            found(content, end_before, index,
-                                                  current_offset);
-                                            offset = current_offset;
+                                            render(offset, current_offset,
+                                                   end_offset);
+                                            offset = end_offset;
                                         } else {
-                                            offset = index;
+                                            offset = current_offset;
                                         }
 
                                         continue;
@@ -499,33 +494,33 @@ class Template_T_ {
 
                             case TemplatePatterns_T_::If_2ND_Char: { // <if
                                 if ((TemplatePatterns_T_::IfPrefixLength +
-                                     index) < end_before) {
-                                    ++index;
+                                     current_offset) < length_) {
+                                    ++current_offset;
                                     tmp_offset = 2;
 
                                     while (
                                         (tmp_offset !=
                                          TemplatePatterns_T_::IfPrefixLength) &&
-                                        (content[index] ==
+                                        (content_[current_offset] ==
                                          if_prefix[tmp_offset])) {
-                                        ++index;
+                                        ++current_offset;
                                         ++tmp_offset;
                                     }
 
                                     if (tmp_offset ==
                                         TemplatePatterns_T_::IfPrefixLength) {
-                                        ULong current_offset = Engine::Find(
+                                        ULong end_offset = Engine::Find(
                                             TemplatePatterns_T_::GetIfSuffix(),
                                             TemplatePatterns_T_::IfSuffixLength,
-                                            content, index, end_before);
+                                            content_, current_offset, length_);
 
-                                        if (current_offset != 0) {
+                                        if (end_offset != 0) {
                                             tag_ = Tag::If;
-                                            found(content, end_before, index,
-                                                  current_offset);
-                                            offset = current_offset;
+                                            render(offset, current_offset,
+                                                   end_offset);
+                                            offset = end_offset;
                                         } else {
-                                            offset = index;
+                                            offset = current_offset;
                                         }
 
                                         continue;
@@ -551,140 +546,115 @@ class Template_T_ {
             ++offset;
         }
 #endif
+
+        // Add the remaining string.
+        addPreviousContent(length_);
     }
 
-    inline void addPreviousContent(const Char_T_ *content, ULong offset) const {
-        // Noneed to check if the  length is zero; because Stringstream will
-        // ignore it If it is.
-        ss_->Insert((content + last_offset_), (offset - last_offset_));
+    inline void addPreviousContent(ULong offset) const {
+        // No need to check if the length is zero; because StringStream will
+        // ignore it if it is.
+        ss_->Insert((content_ + last_offset_), (offset - last_offset_));
     }
 
-    void found(const Char_T_ *content, ULong end_before, ULong start_offset,
-               ULong &current_offset) {
+    void render(ULong offset, ULong content_offset, ULong &end_offset) {
+        addPreviousContent(offset);
+
         switch (tag_) {
             case Tag::Raw: {
-                addPreviousContent(
-                    content,
-                    (start_offset -
-                     TemplatePatterns_T_::RawVariablePrefixLength)); // {var:
-
-                renderRawVariable((content + start_offset),
-                                  ((current_offset - 1) - start_offset));
+                renderRawVariable((content_ + content_offset),
+                                  ((end_offset - 1) - content_offset));
 
                 // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                 break;
             }
 
             case Tag::Variable: {
-                addPreviousContent(
-                    content,
-                    (start_offset -
-                     TemplatePatterns_T_::VariablePrefixLength)); // {var:
-
-                renderVariable((content + start_offset),
-                               ((current_offset - 1) - start_offset));
+                renderVariable((content_ + content_offset),
+                               ((end_offset - 1) - content_offset));
 
                 // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                 break;
             }
 
             case Tag::Math: {
-                addPreviousContent(
-                    content,
-                    (start_offset -
-                     TemplatePatterns_T_::MathPrefixLength)); // {math:
-
-                current_offset = Engine::SkipInnerPatterns(
+                end_offset = Engine::SkipInnerPatterns(
                     TemplatePatterns_T_::GetVariablePrefix(),
                     TemplatePatterns_T_::VariablePrefixLength,
-                    TemplatePatterns_T_::GetInLineSuffix(), 1, content,
-                    start_offset, current_offset, end_before);
+                    TemplatePatterns_T_::GetInLineSuffix(), 1, content_,
+                    content_offset, end_offset, length_);
 
                 renderMath(
-                    (content + start_offset),
-                    static_cast<UInt>((current_offset - 1) - start_offset));
+                    (content_ + content_offset),
+                    static_cast<UInt>((end_offset - 1) - content_offset));
 
                 // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                 break;
             }
 
             case Tag::InLineIf: {
-                addPreviousContent(
-                    content,
-                    (start_offset -
-                     TemplatePatterns_T_::InLineIfPrefixLength)); // {if
-
-                current_offset = Engine::SkipInnerPatterns(
+                end_offset = Engine::SkipInnerPatterns(
                     TemplatePatterns_T_::GetVariablePrefix(),
                     TemplatePatterns_T_::VariablePrefixLength,
-                    TemplatePatterns_T_::GetInLineSuffix(), 1, content,
-                    start_offset, current_offset, end_before);
+                    TemplatePatterns_T_::GetInLineSuffix(), 1, content_,
+                    content_offset, end_offset, length_);
 
-                renderInLineIf((content + start_offset),
-                               ((current_offset - 1) - start_offset));
+                renderInLineIf((content_ + content_offset),
+                               ((end_offset - 1) - content_offset));
 
                 // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                 break;
             }
 
             case Tag::Loop: {
-                addPreviousContent(
-                    content,
-                    (start_offset -
-                     TemplatePatterns_T_::LoopPrefixLength)); // <loop
-
-                current_offset = Engine::SkipInnerPatterns(
+                end_offset = Engine::SkipInnerPatterns(
                     TemplatePatterns_T_::GetLoopPrefix(),
                     TemplatePatterns_T_::LoopPrefixLength,
                     TemplatePatterns_T_::GetLoopSuffix(),
-                    TemplatePatterns_T_::LoopSuffixLength, content,
-                    start_offset, current_offset, end_before);
+                    TemplatePatterns_T_::LoopSuffixLength, content_,
+                    content_offset, end_offset, length_);
 
                 renderLoop(
-                    (content + start_offset),
-                    ((current_offset - TemplatePatterns_T_::LoopSuffixLength) -
-                     start_offset));
+                    (content_ + content_offset),
+                    ((end_offset - TemplatePatterns_T_::LoopSuffixLength) -
+                     content_offset));
+
                 break;
             }
 
             case Tag::If: {
-                addPreviousContent(
-                    content,
-                    (start_offset -
-                     TemplatePatterns_T_::IfPrefixLength)); // <if
-
-                current_offset = Engine::SkipInnerPatterns(
+                end_offset = Engine::SkipInnerPatterns(
                     TemplatePatterns_T_::GetIfPrefix(),
                     TemplatePatterns_T_::IfPrefixLength,
                     TemplatePatterns_T_::GetIfSuffix(),
-                    TemplatePatterns_T_::IfSuffixLength, content, start_offset,
-                    current_offset, end_before);
+                    TemplatePatterns_T_::IfSuffixLength, content_,
+                    content_offset, end_offset, length_);
 
-                renderIf((content + start_offset),
-                         (current_offset - start_offset));
+                renderIf((content_ + content_offset),
+                         (end_offset - content_offset));
             }
 
             default: {
             }
         }
 
-        last_offset_ = current_offset;
+        last_offset_ = end_offset;
     }
 
     /*
      * Gets anything between "..."
      */
-    bool getQuoted(UInt &offset, UInt &length, const Char_T_ *content,
-                   const ULong end_before) const noexcept {
+    bool getQuoted(UInt &offset, UInt &end_offset, const Char_T_ *content,
+                   const ULong length) const noexcept {
         offset = static_cast<UInt>(Engine::FindOne(
-            TemplatePatterns_T_::QuoteChar, content, offset, end_before));
+            TemplatePatterns_T_::QuoteChar, content, offset, length));
 
         if (offset != 0) {
             const ULong start_offset = Engine::FindOne(
-                TemplatePatterns_T_::QuoteChar, content, offset, end_before);
+                TemplatePatterns_T_::QuoteChar, content, offset, length);
 
             if (start_offset != 0) {
-                length = static_cast<UInt>((start_offset - 1) - offset);
+                end_offset = static_cast<UInt>((start_offset - 1) - offset);
                 return true;
             }
         }
@@ -1064,7 +1034,7 @@ class Template_T_ {
             (loop_items_->Storage() + loop_items_->Size());
         Array<loopItem_> sub_loop_items;
 
-        Template_T_<Char_T_, Value_T_> loop_temp{ss_, root_value_,
+        Template_T_<Char_T_, Value_T_> loop_temp{nullptr, 0, ss_, root_value_,
                                                  &sub_loop_items};
 
         if (times == 0) {
@@ -1143,14 +1113,14 @@ class Template_T_ {
             }
 
             if (current_ss == &loop_ss) {
+                loop_temp.content_     = loop_ss.Storage();
+                loop_temp.length_      = loop_ss.Length();
+                loop_temp.last_offset_ = 0;
 #ifdef QENTEM_SIMD_ENABLED_
                 loop_temp.find_cache_ = FindCache_{};
 #endif
-                loop_temp.last_offset_ = 0;
-                loop_temp.find(loop_ss.Storage(), 0, loop_ss.Length());
 
-                ss_->Insert((loop_ss.Storage() + loop_temp.last_offset_),
-                            (loop_ss.Length() - loop_temp.last_offset_));
+                loop_temp.parse();
 
                 if (loop_temp.last_offset_ != 0) {
                     loop_ss.SoftReset();
@@ -1454,15 +1424,19 @@ class Template_T_ {
         return true;
     }
 
-    Template_T_(StringStream<Char_T_> *ss, const Value_T_ *root_value,
+    Template_T_(const Char_T_ *content, ULong length, StringStream<Char_T_> *ss,
+                const Value_T_ *  root_value,
                 Array<loopItem_> *loop_Items) noexcept
-        : ss_(ss), root_value_(root_value), loop_items_(loop_Items) {
+        : content_(content), length_(length), ss_(ss), root_value_(root_value),
+          loop_items_(loop_Items) {
     }
 
-    ULong                  last_offset_{0};
+    const Char_T_ *        content_;
+    ULong                  length_;
     StringStream<Char_T_> *ss_;
     const Value_T_ *       root_value_;
-    Array<loopItem_> *     loop_items_{};
+    Array<loopItem_> *     loop_items_;
+    ULong                  last_offset_{0};
 
 #ifdef QENTEM_SIMD_ENABLED_
     struct FindCache_ {
