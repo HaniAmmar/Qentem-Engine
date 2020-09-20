@@ -84,8 +84,6 @@ using QMM_Number_T = unsigned int;
 #if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1 || QENTEM_SSE2_ == 1
 #include <immintrin.h>
 #define QENTEM_SIMD_ENABLED_
-#else
-#define QMM_Number_T unsigned long // See JSON::FindCache_
 #endif
 
 #ifdef _MSC_VER
