@@ -168,8 +168,8 @@ class ALE {
     struct Item_ {
         UInt         Offset{0};
         UInt         Length{0};
-        Operation_   Op{Operation_::Parentheses};
         Array<Item_> SubItems{};
+        Operation_   Op{Operation_::Parentheses};
     };
 };
 
@@ -766,9 +766,9 @@ class ALE_T_ {
         return true;
     }
 
-    Item_            item_;
     Array<Item_> *   items_;
     const Helper_T_ *callback_;
+    Item_            item_;
 };
 
 } // namespace Qentem

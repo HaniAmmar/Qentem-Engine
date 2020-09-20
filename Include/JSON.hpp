@@ -336,7 +336,10 @@ class JSONParser {
             case Type_::Curly:
             case Type_::Square: {
                 JSONParser jp{child_obj_, child_arr_, child_obj_value_,
-                              find_cache_, pass_comma_};
+                              pass_comma_};
+#ifdef QENTEM_SIMD_ENABLED_
+                jp.find_cache_ = find_cache_;
+#endif
 
                 if (next_offset_ >= offset) {
                     // Prevent false error.
@@ -762,20 +765,13 @@ class JSONParser {
 #endif
 
     JSONParser(HArray<Value<Char_T_>, Char_T_> *obj, Array<Value<Char_T_>> *arr,
-               Value<Char_T_> *obj_value, FindCache_ *find_cache,
-               bool pass_comma) noexcept
-        : obj_(obj), arr_(arr), obj_value_(obj_value), find_cache_(find_cache),
-          pass_comma_(pass_comma) {
+               Value<Char_T_> *obj_value, bool pass_comma) noexcept
+        : obj_(obj), arr_(arr), obj_value_(obj_value), pass_comma_(pass_comma) {
     }
 
     enum class Type_ { None = 0, Curly, Square, Quote, QuoteEnd, Comma };
 
-    struct FindCache_ {
-        ULong        Offset{0};
-        ULong        NextOffset{0};
-        QMM_Number_T Bits{0};
-    };
-
+    ULong                            next_offset_{0};
     HArray<Value<Char_T_>, Char_T_> *obj_{nullptr};
     Array<Value<Char_T_>> *          arr_{nullptr};
 
@@ -784,9 +780,16 @@ class JSONParser {
 
     Value<Char_T_> *child_obj_value_{nullptr};
     Value<Char_T_> *obj_value_{nullptr};
-    FindCache_ *    find_cache_{nullptr};
 
-    ULong next_offset_{0};
+#ifdef QENTEM_SIMD_ENABLED_
+    struct FindCache_ {
+        ULong        Offset{0};
+        ULong        NextOffset{0};
+        QMM_Number_T Bits{0};
+    };
+
+    FindCache_ *find_cache_{nullptr};
+#endif
 
     Type_ type_{Type_::None};
 

@@ -30,10 +30,10 @@ namespace Qentem {
 
 template <typename Value_, typename Char_T_>
 struct HAItem {
+    ULong           Hash;
     HAItem *        Next;
     String<Char_T_> Key;
     Value_          Value;
-    ULong           Hash;
 };
 
 // A fork of https://github.com/HaniAmmar/HArray
@@ -530,9 +530,9 @@ class HArray {
 
     inline void insert(String<Char_T_> &&key, ULong hash) noexcept {
         HAllocator::Construct((storage_ + size_),
-                              HAItem_T{nullptr,
+                              HAItem_T{hash, nullptr,
                                        static_cast<String<Char_T_> &&>(key),
-                                       Value_(), hash});
+                                       Value_()});
         ++size_;
     }
 
@@ -584,10 +584,12 @@ class HArray {
             if (src_item->Hash != 0) {
                 HAllocator::Construct(
                     des_item,
-                    HAItem_T{nullptr,
-                             static_cast<String<Char_T_> &&>(src_item->Key),
-                             static_cast<Value_ &&>(src_item->Value),
-                             src_item->Hash});
+                    HAItem_T{
+                        src_item->Hash,
+                        nullptr,
+                        static_cast<String<Char_T_> &&>(src_item->Key),
+                        static_cast<Value_ &&>(src_item->Value),
+                    });
                 ++des_item;
             }
 
@@ -631,8 +633,8 @@ class HArray {
             do {
                 if (src_item->Hash != 0) {
                     HAllocator::Construct(
-                        des_item, HAItem_T{nullptr, src_item->Key,
-                                           src_item->Value, src_item->Hash});
+                        des_item, HAItem_T{src_item->Hash, nullptr,
+                                           src_item->Key, src_item->Value});
                     ++des_item;
                 }
             } while (++src_item != end);
