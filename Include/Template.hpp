@@ -46,7 +46,8 @@ class Template {
     template <typename Char_T_, typename Value_T_>
     inline static void Render(StringStream<Char_T_> &ss, const Char_T_ *content,
                               ULong length, const Value_T_ *root_value) {
-        Template_T_<Char_T_, Value_T_> temp(&ss, root_value);
+        Array<loopItem_>               loop_items;
+        Template_T_<Char_T_, Value_T_> temp(&ss, root_value, &loop_items);
         temp.find(content, 0, length);
         // Add the remaining string.
         ss.Insert((content + temp.last_offset_), (length - temp.last_offset_));
@@ -67,11 +68,21 @@ class Template {
                                                const Value_T_ *root_value) {
         return Render(content, StringUtils::Count(content), root_value);
     }
+
+  private:
+    struct loopItem_ {
+        unsigned short Type{0};
+        unsigned short SubLength{0};
+        UInt           Offset{0};
+    };
 };
 
 template <typename Char_T_, typename Value_T_>
 class Template_T_ {
+    struct FindCache_;
+
     using TemplatePatterns_T_ = TemplatePatterns<Char_T_>;
+    using loopItem_           = Template::loopItem_;
 
   public:
     Template_T_() = delete;
@@ -860,14 +871,7 @@ class Template_T_ {
         } while (--times != 0);
     }
 
-    struct loopItem_ {
-        UInt Offset;
-        UInt Type;
-        UInt SubOffset;
-        UInt SubLength;
-    };
-
-    void renderLoop(const Char_T_ *content, ULong length) const {
+    void renderLoop(const Char_T_ *content, ULong length) {
         const Value_T_ *root_value   = root_value_;
         const Char_T_ * key_str      = nullptr;
         const Char_T_ * value_str    = nullptr;
@@ -966,49 +970,50 @@ class Template_T_ {
 
         content = (content + start_offset);
 
-        const Array<loopItem_> loop_items = loopMatch(
-            content, length, key_str, value_str, key_length, value_length);
+        loop_items_->SoftReset();
+        loopMatch(content, length, key_str, value_str, key_length,
+                  value_length);
 
-        loopReplace(loop_items, content, length, index, loop_times, root_value,
-                    key_length, value_length);
+        loopReplace(content, length, index, loop_times, root_value, key_length,
+                    value_length);
     }
 
-    Array<loopItem_> loopMatch(const Char_T_ *content, ULong length,
-                               const Char_T_ *key, const Char_T_ *value,
-                               UInt key_length, UInt value_length) const {
-        Array<loopItem_> items;
-        loopItem_        key_item{0, 0, 0, 0};
-        loopItem_        value_item{0, 0, 0, 0};
+    void loopMatch(const Char_T_ *content, ULong length, const Char_T_ *key,
+                   const Char_T_ *value, UInt key_length, UInt value_length) {
+        loopItem_ key_item;
+        loopItem_ value_item;
 
         UInt value_offset = 0;
         UInt key_offset   = 0;
 
-        do {
-            UInt sub_offset = 0;
-            UInt sub_length = 0;
+        // TODO: Use sort
 
+        do {
             if ((value != nullptr) && (value_item.Type == 0)) {
                 value_offset = static_cast<UInt>(Engine::Find(
                     value, value_length, content, value_offset, length));
 
-                if (value_offset == 0) {
-                    value = nullptr; // To stop looking for it.
-                } else {
+                if (value_offset != 0) {
+                    unsigned short sub_length = 0;
+
                     if (content[value_offset] ==
                         TemplatePatterns_T_::VariableIndexPrefix) {
-                        sub_offset = (value_offset + 1);
 
-                        for (UInt i = sub_offset; i < length; i++) {
+                        for (UInt i = (value_offset + 1); i < length; i++) {
                             if (content[i] ==
                                 TemplatePatterns_T_::VariableIndexSuffix) {
-                                sub_length = (i - sub_offset);
+                                sub_length = static_cast<unsigned short>(
+                                    i - (value_offset + 1));
                                 break;
                             }
                         }
                     }
 
-                    value_item = {(value_offset - value_length), 2, sub_offset,
-                                  sub_length}; // value is 2
+                    value_item.Type      = 2; // value is two
+                    value_item.SubLength = sub_length;
+                    value_item.Offset    = (value_offset - value_length);
+                } else {
+                    value = nullptr; // To stop looking for it.
                 }
             }
 
@@ -1016,51 +1021,51 @@ class Template_T_ {
                 key_offset = static_cast<UInt>(
                     Engine::Find(key, key_length, content, key_offset, length));
 
-                if (key_offset == 0) {
-                    key = nullptr; // To stop looking for it.
+                if (key_offset != 0) {
+                    key_item.Type   = 1; // key is one
+                    key_item.Offset = (key_offset - key_length);
                 } else {
-                    key_item = {(key_offset - key_length), 1, 0,
-                                0}; // key is one
+                    key = nullptr; // To stop looking for it.
                 }
             }
 
             // Sorting by the offset
-            if (key_item.Type == 0) {
-                if (value_item.Type != 0) {
-                    items += value_item;
-                    value_item.Type = 0; // Reset
+            if (value_item.Type == 0) {
+                if (key_item.Type != 0) {
+                    *loop_items_ += key_item;
+                    key_item.Type = 0; // Reset
                 }
-            } else if (value_item.Type == 0) {
-                items += key_item;
-                key_item.Type = 0; // Reset
+            } else if (key_item.Type == 0) {
+                *loop_items_ += value_item;
+                value_item.Type = 0; // Reset
             } else {
                 // Both are set
                 if (value_item.Offset > key_item.Offset) {
-                    items += key_item;
+                    *loop_items_ += key_item;
                     key_item.Type = 0; // Reset
                 } else {
-                    items += value_item;
+                    *loop_items_ += value_item;
                     value_item.Type = 0; // Reset
                 }
             }
-
         } while ((key != nullptr) || (value != nullptr));
-
-        // items.Compress();
-
-        return items;
     }
 
-    void loopReplace(const Array<loopItem_> &items, const Char_T_ *content,
-                     ULong length, ULong index, ULong times,
-                     const Value_T_ *root_value, UInt key_length,
+    void loopReplace(const Char_T_ *content, ULong length, ULong index,
+                     ULong times, const Value_T_ *root_value, UInt key_length,
                      UInt value_length) const {
+
         StringStream<Char_T_>  loop_ss;
         ULong                  last_offset;
         ULong                  sub_id;
         StringStream<Char_T_> *current_ss = &loop_ss;
         const Value_T_ *       value      = nullptr;
-        const loopItem_ *      end        = (items.Storage() + items.Size());
+        const loopItem_ *      loop_items_end =
+            (loop_items_->Storage() + loop_items_->Size());
+        Array<loopItem_> sub_loop_items;
+
+        Template_T_<Char_T_, Value_T_> loop_temp{ss_, root_value_,
+                                                 &sub_loop_items};
 
         if (times == 0) {
             times = root_value->Size();
@@ -1074,9 +1079,9 @@ class Template_T_ {
 
         while (times != 0) {
             last_offset           = 0;
-            const loopItem_ *item = items.Storage();
+            const loopItem_ *item = loop_items_->Storage();
 
-            while (item < end) {
+            while (item < loop_items_end) {
                 if (last_offset < item->Offset) {
                     current_ss->Insert((content + last_offset),
                                        (item->Offset - last_offset));
@@ -1096,12 +1101,14 @@ class Template_T_ {
                             last_offset += 2U;
 
                             if (value->IsObject()) {
-                                value =
-                                    value->GetValue((content + item->SubOffset),
-                                                    item->SubLength);
+                                value = value->GetValue(
+                                    (content + item->Offset + value_length + 1),
+                                    item->SubLength);
                             } else {
                                 if ((Digit<Char_T_>::StringToNumber(
-                                        sub_id, (content + item->SubOffset),
+                                        sub_id,
+                                        (content + item->Offset + value_length +
+                                         1),
                                         item->SubLength))) {
                                     value = value->GetValue(sub_id);
                                 } else {
@@ -1136,8 +1143,10 @@ class Template_T_ {
             }
 
             if (current_ss == &loop_ss) {
-                Template_T_<Char_T_, Value_T_> loop_temp{ss_, root_value_};
-
+#ifdef QENTEM_SIMD_ENABLED_
+                loop_temp.find_cache_ = FindCache_{};
+#endif
+                loop_temp.last_offset_ = 0;
                 loop_temp.find(loop_ss.Storage(), 0, loop_ss.Length());
 
                 ss_->Insert((loop_ss.Storage() + loop_temp.last_offset_),
@@ -1363,7 +1372,7 @@ class Template_T_ {
 
         bool is_number = false;
 
-        // If the right side is a variable
+        // If the left side is a variable
         if ((left[0] == TemplatePatterns_T_::GetVariablePrefix()[0]) &&
             (left_length > TemplatePatterns_T_::VariableFulllength)) {
             value_left =
@@ -1378,7 +1387,7 @@ class Template_T_ {
             is_number = value_left->IsNumber();
         }
 
-        // If the left side is a variable
+        // If the right side is a variable
         if ((right[0] == TemplatePatterns_T_::GetVariablePrefix()[0]) &&
             (right_length > TemplatePatterns_T_::VariableFulllength)) {
             value_right =
@@ -1445,22 +1454,25 @@ class Template_T_ {
         return true;
     }
 
-    Template_T_(StringStream<Char_T_> *ss, const Value_T_ *root_value) noexcept
-        : ss_(ss), root_value_(root_value) {
+    Template_T_(StringStream<Char_T_> *ss, const Value_T_ *root_value,
+                Array<loopItem_> *loop_Items) noexcept
+        : ss_(ss), root_value_(root_value), loop_items_(loop_Items) {
     }
 
+    ULong                  last_offset_{0};
+    StringStream<Char_T_> *ss_;
+    const Value_T_ *       root_value_;
+    Array<loopItem_> *     loop_items_{};
+
+#ifdef QENTEM_SIMD_ENABLED_
     struct FindCache_ {
         ULong        Offset{0};
         ULong        NextOffset{0};
         QMM_Number_T Bits{0};
-    };
+    } find_cache_{};
+#endif
 
-    StringStream<Char_T_> *ss_;
-    const Value_T_ *       root_value_;
-    FindCache_             find_cache_{};
-
-    ULong last_offset_{0};
-    Tag   tag_{Tag::Variable};
+    Tag tag_{Tag::Raw};
 };
 
 } // namespace Qentem
