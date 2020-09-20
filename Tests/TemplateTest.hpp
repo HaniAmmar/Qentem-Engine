@@ -30,6 +30,518 @@
 namespace Qentem {
 namespace Test {
 
+static int TestRawVariableTag1() {
+    const char *content;
+
+    Value<char> value = JSON::Parse(
+        R"(["A", "abc", true, 456, 1.5,
+           [null, false, ["Qentem"]]])");
+
+    Value<char> sub_value = JSON::Parse(
+        R"({"key1": "a", "key2": "ABC", "key3": false, "key4": 100, "key5": 1.5, "key6": {"one": 1}
+        ,"key7": [null, false, ["Qentem"]]})");
+
+    value += sub_value;
+
+    content = R"({raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(A)", "Render()");
+
+    content = R"({raw:1})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(abc)", "Render()");
+
+    content = R"({raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(true)",
+                       "Render()");
+
+    content = R"({raw:3})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(456)", "Render()");
+
+    content = R"({raw:4})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1.5)", "Render()");
+
+    content = R"({raw:5[0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(null)",
+                       "Render()");
+
+    content = R"({raw:5[1]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(false)",
+                       "Render()");
+
+    content = R"({raw:5[2][0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(Qentem)",
+                       "Render()");
+
+    //////
+
+    content = R"({raw:key1})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(a)",
+                       "Render()");
+
+    content = R"({raw:key2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(ABC)",
+                       "Render()");
+
+    content = R"({raw:key3})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(false)",
+                       "Render()");
+
+    content = R"({raw:key4})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(100)",
+                       "Render()");
+
+    content = R"({raw:key5})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(1.5)",
+                       "Render()");
+
+    content = R"({raw:key6[one]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(1)",
+                       "Render()");
+
+    content = R"({raw:key7[0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(null)",
+                       "Render()");
+
+    content = R"({raw:key7[1]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(false)",
+                       "Render()");
+
+    content = R"({raw:key7[2][0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(Qentem)",
+                       "Render()");
+
+    //
+    content = R"({raw:6[key1]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(a)", "Render()");
+
+    content = R"({raw:6[key2]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(ABC)", "Render()");
+
+    content = R"({raw:6[key3]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(false)",
+                       "Render()");
+
+    content = R"({raw:6[key4]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(100)", "Render()");
+
+    content = R"({raw:6[key5]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1.5)", "Render()");
+
+    content = R"({raw:6[key6][one]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1)", "Render()");
+
+    ////////////////
+
+    content = R"(-{raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(-true)",
+                       "Render()");
+
+    content = R"(-{raw:key7[0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(-null)",
+                       "Render()");
+
+    content = R"(-{raw:key7[2][0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(-Qentem)",
+                       "Render()");
+
+    content = R"(-{raw:6[key3]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(-false)",
+                       "Render()");
+
+    content = R"(-{raw:6[key4]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(-100)",
+                       "Render()");
+    ////////////
+
+    content = R"({raw:2}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(true-)",
+                       "Render()");
+
+    content = R"({raw:key7[0]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(null-)",
+                       "Render()");
+
+    content = R"({raw:key7[2][0]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(Qentem-)",
+                       "Render()");
+
+    content = R"({raw:6[key3]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(false-)",
+                       "Render()");
+
+    content = R"({raw:6[key4]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(100-)",
+                       "Render()");
+
+    ////////////
+
+    content = R"(-{raw:2}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(-true-)",
+                       "Render()");
+
+    content = R"(-{raw:key7[0]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(-null-)",
+                       "Render()");
+
+    content = R"(-{raw:key7[2][0]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(-Qentem-)",
+                       "Render()");
+
+    content = R"(-{raw:6[key3]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(-false-)",
+                       "Render()");
+
+    content = R"(-{raw:6[key4]}-)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(-100-)",
+                       "Render()");
+
+    ////////////
+
+    content = R"(------{raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(------true)",
+                       "Render()");
+
+    content = R"(------{raw:key7[0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(------null)",
+                       "Render()");
+
+    content = R"(------{raw:key7[2][0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(------Qentem)",
+                       "Render()");
+
+    content = R"(------{raw:6[key3]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(------false)",
+                       "Render()");
+
+    content = R"(------{raw:6[key4]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(------100)",
+                       "Render()");
+
+    ////////////
+
+    content = R"({raw:2}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(true------)",
+                       "Render()");
+
+    content = R"({raw:key7[0]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(null------)",
+                       "Render()");
+
+    content = R"({raw:key7[2][0]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value), R"(Qentem------)",
+                       "Render()");
+
+    content = R"({raw:6[key3]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(false------)",
+                       "Render()");
+
+    content = R"({raw:6[key4]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(100------)",
+                       "Render()");
+
+    ////////////
+
+    content = R"(------{raw:2}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(------true------)",
+                       "Render()");
+
+    content = R"(------{raw:key7[0]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value),
+                       R"(------null------)", "Render()");
+
+    content = R"(------{raw:key7[2][0]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &sub_value),
+                       R"(------Qentem------)", "Render()");
+
+    content = R"(------{raw:6[key3]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value),
+                       R"(------false------)", "Render()");
+
+    content = R"(------{raw:6[key4]}------)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(------100------)",
+                       "Render()");
+
+    END_SUB_TEST;
+}
+
+static int TestRawVariableTag2() {
+    Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
+    const char *content;
+
+    content = R"({raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(AA)", "Render()");
+
+    content = R"({raw:1}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(abcA)",
+                       "Render()");
+
+    content = R"({raw:1}{raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(abctrue)",
+                       "Render()");
+
+    content = R"({raw:2}{raw:3}{raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(true456true)",
+                       "Render()");
+
+    content = R"({raw:4}{raw:4}{raw:4})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1.51.51.5)",
+                       "Render()");
+    ///
+
+    content = R"({raw:0}-{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(A-A)", "Render()");
+
+    content = R"({raw:1}--{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(abc--A)",
+                       "Render()");
+
+    content = R"({raw:1}---{raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(abc---true)",
+                       "Render()");
+
+    content = R"({raw:2}{raw:3}--{raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(true456--true)",
+                       "Render()");
+
+    content = R"({raw:4}--{raw:4}{raw:4})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1.5--1.51.5)",
+                       "Render()");
+
+    content = R"({raw:4}--{raw:4}--{raw:4})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1.5--1.5--1.5)",
+                       "Render()");
+
+    content = R"({raw:4}---{raw:4}---{raw:4})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(1.5---1.5---1.5)",
+                       "Render()");
+
+    END_SUB_TEST;
+}
+
+static int TestRawVariableTag3() {
+    Value<char> value;
+    const char *content;
+
+    content = R"({raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0})",
+                       "Render()");
+
+    SHOULD_EQUAL_VALUE(Template::Render(R"({raw:a})", &value), R"({raw:a})",
+                       "Render()");
+
+    content = R"({raw:0[0]})";
+    SHOULD_EQUAL_VALUE(
+        Template::Render(content, StringUtils::Count(content), &value),
+        R"({raw:0[0]})", "Render()");
+
+    content = R"({raw:a[0]})";
+    SHOULD_EQUAL_VALUE(
+        Template::Render(content, StringUtils::Count(content), &value),
+        R"({raw:a[0]})", "Render()");
+
+    content = R"({raw:0[a]})";
+    SHOULD_EQUAL_VALUE(
+        Template::Render(content, StringUtils::Count(content), &value),
+        R"({raw:0[a]})", "Render()");
+
+    content = R"({raw:a[abc]})";
+    SHOULD_EQUAL_VALUE(
+        Template::Render(content, StringUtils::Count(content), &value),
+        R"({raw:a[abc]})", "Render()");
+
+    ////////////////
+
+    value = JSON::Parse(R"([[[]],{"a":["x"],"b":{"a":"X"}}])");
+
+    content = R"({raw:0})";
+    SHOULD_EQUAL_VALUE(
+        Template::Render(content, StringUtils::Count(content), &value),
+        R"({raw:0})", "Render()");
+
+    content = R"({raw:0[0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0[0]})",
+                       "Render()");
+
+    content = R"({raw:0[0][0]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0[0][0]})",
+                       "Render()");
+
+    /////
+
+    content = R"({raw:1})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:1})",
+                       "Render()");
+
+    content = R"({raw:2})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:2})",
+                       "Render()");
+
+    content = R"({raw:1[a]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:1[a]})",
+                       "Render()");
+
+    content = R"({raw:1[b]})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:1[b]})",
+                       "Render()");
+
+    ////
+
+    value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
+
+    content = R"({raw:0)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0)",
+                       "Render()");
+
+    content = R"(raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(raw:0})",
+                       "Render()");
+
+    content = R"({v})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({v})", "Render()");
+
+    content = R"({va})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({va})",
+                       "Render()");
+
+    content = R"({var})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({var})",
+                       "Render()");
+
+    content = R"({raw:})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:})",
+                       "Render()");
+
+    content = R"({v:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({v:0})",
+                       "Render()");
+
+    content = R"({va:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({va:0})",
+                       "Render()");
+    ////
+
+    content = R"({raw:0{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0{raw:0})",
+                       "Render()");
+
+    content = R"(raw:0{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(raw:0A)",
+                       "Render()");
+
+    content = R"(raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(raw:0}A)",
+                       "Render()");
+
+    content = R"({raw:0{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0{raw:0}A)",
+                       "Render()");
+
+    ////
+
+    content = R"({raw:0{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0{raw:0})",
+                       "Render()");
+
+    content = R"(raw:0{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(raw:0A)",
+                       "Render()");
+
+    content = R"(raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"(raw:0}A)",
+                       "Render()");
+
+    content = R"({raw:0{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0{raw:0}A)",
+                       "Render()");
+
+    ////
+
+    content = R"({{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({A)", "Render()");
+
+    content = R"({{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({AA)", "Render()");
+
+    content = R"({v{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({vA)", "Render()");
+
+    content = R"({v{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({vAA)",
+                       "Render()");
+
+    content = R"({va{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({vaA)",
+                       "Render()");
+
+    content = R"({va{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({vaAA)",
+                       "Render()");
+
+    content = R"({var{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({varA)",
+                       "Render()");
+
+    content = R"({var{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({varAA)",
+                       "Render()");
+
+    ///
+
+    content = R"({-{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({-A)", "Render()");
+
+    content = R"({-{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({-AA)",
+                       "Render()");
+
+    content = R"({v-{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({v-A)",
+                       "Render()");
+
+    content = R"({v-{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({v-AA)",
+                       "Render()");
+
+    content = R"({va-{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({va-A)",
+                       "Render()");
+
+    content = R"({va-{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({va-AA)",
+                       "Render()");
+
+    content = R"({var-{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({var-A)",
+                       "Render()");
+
+    content = R"({var-{raw:0}{raw:0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({var-AA)",
+                       "Render()");
+
+    //
+
+    content = R"({var-0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({var-0})",
+                       "Render()");
+
+    content = R"({var 0})";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({var 0})",
+                       "Render()");
+
+    content = R"({raw:0 })";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0 })",
+                       "Render()");
+
+    content = R"({raw:0 )";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0 )",
+                       "Render()");
+
+    content = R"({raw:0)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), R"({raw:0)",
+                       "Render()");
+
+    END_SUB_TEST;
+}
+
 static int TestVariableTag1() {
     const char *content;
 
@@ -1968,6 +2480,10 @@ static int TestIfTag2() {
 
 static int RunTemplateTests() {
     STARTING_TEST("Template.hpp");
+
+    START_TEST("Raw Variable Tag Test 1", TestRawVariableTag1);
+    START_TEST("Raw Variable Tag Test 2", TestRawVariableTag2);
+    START_TEST("Raw Variable Tag Test 3", TestRawVariableTag3);
 
     START_TEST("Variable Tag Test 1", TestVariableTag1);
     START_TEST("Variable Tag Test 2", TestVariableTag2);

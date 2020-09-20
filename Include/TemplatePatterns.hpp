@@ -38,18 +38,22 @@ struct TemplatePatterns {};
  * Tags:
  *
  *  {...}
- *  - {var:s|n}  var: Variable, s: String, n: Number.
+ *  - {raw:s|n}
+ *      - raw: Raw variable, s: String, n: Number.
  *
- *  - {math:var|e|n}
- *      - var|e|n: Variable, Equation or Number.
+ *  - {var:s|n}
+ *      - var: Variable, s: String, n: Number.
  *
- *  - {if case="var|s" true="var|s" false="var|s"}
- *      - Inline if,  var: Variable, s: String.
+ *  - {math:raw|e|n}
+ *      - raw|e|n: Raw variable, Equation or Number.
+ *
+ *  - {if case="raw|s" true="raw|var|s" false="raw|var|s"}
+ *      - Inline if,  raw: Raw variable, var: Variable, s: String.
  *
  *  <...>
- *  - <loop set="s"? key="s"? value="s"? times="n|var"? index="n|var"?>
+ *  - <loop set="s"? key="s"? value="s"? times="raw|n"? index="raw|n"?>
  *                                                          ...</loop>
- *      - s: String, n: Number, var: Variable,
+ *      - s: String, n: Number, raw: Raw ariable,
  *      - set: child name in the passed colloction: Optional.
  *      - key: the string the will be replaced with keys: Optional.
  *      - value: the current value in the colloction: Optional.
@@ -57,10 +61,22 @@ struct TemplatePatterns {};
  *      - times: if set, it will be used instead of the "set" size.
  *      - index: starting index.
  *
- *  - <if case="var|e|n">...<else(if)? ... >?...</if>
- *      - var|e|n: Variable, Equation or Number.
+ *  - <if case="raw|e|n">...<else(if)? ... >?...</if>
+ *      - raw|e|n: Raw variable, Equation or Number.
  *      - <else if ....> same as if: Optional.
  *      - <else> no case: Optional.
+ */
+
+/*
+ * Raw Variable Tag:
+ *
+ * {raw:name}, {raw:name[id]}
+ * {raw:id}, {raw:id[id2]}, {raw:id[id2][id3]}
+ * {raw:id[name]}, {raw:id[id2][name]}, {raw:id[id2][name1][id3][name2]}
+ *
+ * {raw:name}, {raw:name[name2]}, {raw:name[name2][name3][...]}
+ * {raw:name}, {raw:name[id]}, {raw:name[id][id2][...]}
+ * {raw:id}, {raw:id[id2]}, {raw:id[id2][...]}
  */
 
 /*
@@ -83,7 +99,7 @@ struct TemplatePatterns {};
  * {math: 1 && 1 } {math:0 || 1} {math: (1 && 1) || (3&&3) }
  * {math: 3==3} {math: 3!=4} {math: 3>4}  {math: 3>=4}
  * {math: 2<3} {math: 2 <= 3}
- * {math: {var:n1} * {var:n2}}
+ * {math: {raw:n1} * {raw:n2}}
  * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
  * {math: 0.2 + 0.3}
  * See ALE::Evaluate
@@ -93,9 +109,11 @@ struct TemplatePatterns {};
  * Inline If Tag:
  *
  * {if case="3 == 3" true="Yes" false="No"}
- * {if case="{var:var_five} == 5" true="5" false="no"}
- * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
+ * {if case="{raw:rvar_five} == 5" true="5" false="no"}
+ * {if case="{raw:rvar1}" true="{raw:rvar_five} is equal to 5" false="no"}
  * {if case="3 == 3" true="Yes" false="No"}
+ * {if case="3 == 3" true="{raw:r1}" false="{raw:r2}"}
+ * {if case="3 == 3" true="{var:v1}" false="{var:v2}"}
  */
 
 /*
@@ -117,11 +135,11 @@ struct TemplatePatterns {};
  *      </loop>
  * </loop>
  *
- * <loop key="loop1-key" times="number|var">
+ * <loop key="loop1-key" times="number|raw">
  *     loop1-key
  * </loop>
  *
- * <loop key="loop1-key" index="number|var">
+ * <loop key="loop1-key" index="number|raw">
  *     loop1-key
  * </loop>
  */
@@ -144,6 +162,10 @@ struct TemplatePatterns<Char_T_, 1> {
 
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
+
+    static constexpr UInt RawVariablePrefixLength = 5U;
+    static constexpr UInt RawVariableFulllength =
+        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
 
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
@@ -175,6 +197,14 @@ struct TemplatePatterns<Char_T_, 1> {
 
     static constexpr Char_T_ VariableIndexPrefix = '[';
     static constexpr Char_T_ VariableIndexSuffix = ']';
+
+    // {raw:
+    static const unsigned long long RawVariable64bit = 8249313016986432123ULL;
+    static constexpr Char_T_        Raw_Var_2ND_Char = 'r'; // Second char
+    static const Char_T_ *          GetRawVariablePrefix() noexcept {
+        static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
+        return &(val[0]);
+    }
 
     // {var:
     static const unsigned long long Variable64bit = 8537547791251764859ULL;
@@ -254,11 +284,16 @@ struct TemplatePatterns<Char_T_, 1> {
     /*
         // To get a 64bit value:
 
-        short var_16 = (VariablePrefix[1] << 8U) | VariablePrefix[0];
+        unsigned short var_16 = (static_cast<unsigned short>(
+                                    TemplatePatterns<char>::GetVariablePrefix()[1])
+                                << 8U);
+        var_16 |= static_cast<unsigned short>(
+            TemplatePatterns<char>::GetVariablePrefix()[0]);
+
         ULong var_64 = var_16;
-        var_64 <<= 48U;
+        var_64 <<= 16U;
         var_64 |= var_16;
-        var_64 <<= 32U;
+        var_64 <<= 16U;
         var_64 |= var_16;
         var_64 <<= 16U;
         var_64 |= var_16;
@@ -274,6 +309,10 @@ struct TemplatePatterns<Char_T_, 2> {
 
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
+
+    static constexpr UInt RawVariablePrefixLength = 5U;
+    static constexpr UInt RawVariableFulllength =
+        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
 
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
@@ -305,6 +344,13 @@ struct TemplatePatterns<Char_T_, 2> {
 
     static constexpr Char_T_ VariableIndexPrefix = u'[';
     static constexpr Char_T_ VariableIndexSuffix = u']';
+
+    // {raw:
+    static constexpr Char_T_ Raw_Var_2ND_Char = u'r'; // Second char
+    static const Char_T_ *   GetRawVariablePrefix() noexcept {
+        static constexpr Char_T_ val[] = {u'{', u'r', u'a', u'w', u':'};
+        return &(val[0]);
+    }
 
     // {var:
     static constexpr Char_T_ Var_2ND_Char = u'v'; // Second char
@@ -388,6 +434,10 @@ struct TemplatePatterns<Char_T_, 4> {
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
 
+    static constexpr UInt RawVariablePrefixLength = 5U;
+    static constexpr UInt RawVariableFulllength =
+        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
+
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
@@ -418,6 +468,13 @@ struct TemplatePatterns<Char_T_, 4> {
 
     static constexpr Char_T_ VariableIndexPrefix = U'[';
     static constexpr Char_T_ VariableIndexSuffix = U']';
+
+    // {raw:
+    static constexpr Char_T_ Raw_Var_2ND_Char = U'r'; // Second char
+    static const Char_T_ *   GetRawVariablePrefix() noexcept {
+        static constexpr Char_T_ val[] = {U'{', U'r', U'a', U'w', U':'};
+        return &(val[0]);
+    }
 
     // {var:
     static constexpr Char_T_ Var_2ND_Char = U'v'; // Second char
@@ -501,6 +558,10 @@ struct TemplatePatterns<wchar_t> {
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
 
+    static constexpr UInt RawVariablePrefixLength = 5U;
+    static constexpr UInt RawVariableFulllength =
+        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
+
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
@@ -531,6 +592,13 @@ struct TemplatePatterns<wchar_t> {
 
     static constexpr wchar_t VariableIndexPrefix = L'[';
     static constexpr wchar_t VariableIndexSuffix = L']';
+
+    // {raw:
+    static constexpr wchar_t Raw_Var_2ND_Char = L'r'; // Second char
+    static const wchar_t *   GetRawVariablePrefix() noexcept {
+        static constexpr wchar_t val[] = {L'{', L'r', L'a', L'w', L':'};
+        return &(val[0]);
+    }
 
     // {var:
     static constexpr wchar_t Var_2ND_Char = L'v'; // Second char

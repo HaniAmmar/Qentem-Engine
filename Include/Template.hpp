@@ -81,20 +81,21 @@ class Template_T_ {
     friend class Qentem::ALE_T_;
     friend class Qentem::Template;
 
-    struct FindCache_;
-
     enum class Tag {
-        Variable = 0, // {var:x}
-        Math,         // {math:x}
-        InLineIf,     // {if:x}
-        Loop,         // <loop set="..." key="..." value="...">
-        If,           // <if case="...">
+        Raw = 0,  // {raw:x}
+        Variable, // {var:x}
+        Math,     // {math:x}
+        InLineIf, // {if:x}
+        Loop,     // <loop set="..." key="..." value="...">
+        If,       // <if case="...">
     };
 
 #ifdef QENTEM_SIMD_ENABLED_
 #if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1
     // TODO: Add 16 and 32-bit character
     void qmmFind(const char *content, ULong offset, ULong end_before) noexcept {
+        const __m256i rv64 =
+            _mm256_set1_epi64x(TemplatePatterns_T_::RawVariable64bit);
         const __m256i v64 =
             _mm256_set1_epi64x(TemplatePatterns_T_::Variable64bit);
         const __m256i m64 = _mm256_set1_epi64x(TemplatePatterns_T_::Math64bit);
@@ -113,8 +114,11 @@ class Template_T_ {
                     content + find_cache_.Offset));
 
             find_cache_.Bits = static_cast<QMM_Number_T>(_mm256_movemask_epi8(
-                                   _mm256_cmpeq_epi16(v64, m_content))) &
+                                   _mm256_cmpeq_epi16(rv64, m_content))) &
                                0x55555555U;
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(v64, m_content))) &
+                                0x55555555U;
             find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
                                     _mm256_cmpeq_epi16(m64, m_content))) &
                                 0x55555555U;
@@ -131,6 +135,9 @@ class Template_T_ {
             m_content = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(
                 content + find_cache_.Offset + 1));
 
+            find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
+                                    _mm256_cmpeq_epi16(rv64, m_content))) &
+                                0xAAAAAAAAU;
             find_cache_.Bits |= static_cast<QMM_Number_T>(_mm256_movemask_epi8(
                                     _mm256_cmpeq_epi16(v64, m_content))) &
                                 0xAAAAAAAAU;
@@ -161,6 +168,11 @@ class Template_T_ {
 
             find_cache_.Bits =
                 QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePatterns_T_::RawVariable64bit),
+                    m_content) &
+                QMM_BIT_ONE_;
+            find_cache_.Bits |=
+                QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePatterns_T_::Variable64bit),
                     m_content) &
                 QMM_BIT_ONE_;
@@ -185,6 +197,11 @@ class Template_T_ {
             m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
                 content + find_cache_.Offset + 1));
 
+            find_cache_.Bits |=
+                QMM_COMPARE_16_MASK_8_(
+                    QMM_SETONE_64_(TemplatePatterns_T_::RawVariable64bit),
+                    m_content) &
+                QMM_BIT_TWO_;
             find_cache_.Bits |=
                 QMM_COMPARE_16_MASK_8_(
                     QMM_SETONE_64_(TemplatePatterns_T_::Variable64bit),
@@ -213,6 +230,8 @@ class Template_T_ {
 #endif
 #endif
     void find(const Char_T_ *content, ULong offset, ULong end_before) {
+        static const Char_T_ *raw_variable_prefix =
+            TemplatePatterns_T_::GetRawVariablePrefix();
         static const Char_T_ *variable_prefix =
             TemplatePatterns_T_::GetVariablePrefix();
         static const Char_T_ *math_prefix =
@@ -259,6 +278,46 @@ class Template_T_ {
                         ++index;
 
                         switch (content[index]) {
+                            case TemplatePatterns_T_::Raw_Var_2ND_Char: {
+                                if ((TemplatePatterns_T_::
+                                         RawVariablePrefixLength +
+                                     index) < end_before) {
+                                    ++index;
+                                    tmp_offset = 2;
+
+                                    while ((tmp_offset !=
+                                            TemplatePatterns_T_::
+                                                RawVariablePrefixLength) &&
+                                           (content[index] ==
+                                            raw_variable_prefix[tmp_offset])) {
+                                        ++index;
+                                        ++tmp_offset;
+                                    }
+
+                                    if (tmp_offset ==
+                                        TemplatePatterns_T_::
+                                            RawVariablePrefixLength) {
+                                        ULong current_offset = Engine::FindOne(
+                                            TemplatePatterns_T_::
+                                                GetInLineSuffix()[0],
+                                            content, index, end_before);
+
+                                        if (current_offset != 0) {
+                                            tag_ = Tag::Raw;
+                                            found(content, end_before, index,
+                                                  current_offset);
+                                            offset = current_offset;
+                                        } else {
+                                            offset = index;
+                                        }
+
+                                        continue;
+                                    }
+                                }
+
+                                break;
+                            }
+
                             case TemplatePatterns_T_::Var_2ND_Char: {
                                 if ((TemplatePatterns_T_::VariablePrefixLength +
                                      index) < end_before) {
@@ -492,6 +551,19 @@ class Template_T_ {
     void found(const Char_T_ *content, ULong end_before, ULong start_offset,
                ULong &current_offset) {
         switch (tag_) {
+            case Tag::Raw: {
+                addPreviousContent(
+                    content,
+                    (start_offset -
+                     TemplatePatterns_T_::RawVariablePrefixLength)); // {var:
+
+                renderRawVariable((content + start_offset),
+                                  ((current_offset - 1) - start_offset));
+
+                // - 1 is - TemplatePatterns_T_::InLineSuffixLength
+                break;
+            }
+
             case Tag::Variable: {
                 addPreviousContent(
                     content,
@@ -682,6 +754,17 @@ class Template_T_ {
         if (last_offset < length) {
             // Add any content that comes after }
             ss_->Insert((content + last_offset), (length - last_offset));
+        }
+    }
+
+    void renderRawVariable(const Char_T_ *content, ULong length) const {
+        const Value_T_ *value = findValue(content, length);
+
+        if ((value == nullptr) || !(value->InsertString(*ss_))) {
+            length += TemplatePatterns_T_::RawVariableFulllength;
+            ss_->Insert(
+                (content - TemplatePatterns_T_::RawVariablePrefixLength),
+                length);
         }
     }
 
