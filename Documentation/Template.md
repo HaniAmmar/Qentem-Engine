@@ -716,10 +716,10 @@ int main() {
 <body>
     <div>
         <h2>Students' list:</h2>
-        <loop value="major_val">
-            <h3>Major: major_val[major]</h3>
+        <loop value="department_val">
+            <h3>Major: department_val[major]</h3>
             <ul>
-            <loop set="major_val[students]" value="student_val">
+            <loop set="department_val[students]" value="student_val">
                 <li>
                     <span>Name: student_val[Name]</span>
                     <span>
