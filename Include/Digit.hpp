@@ -27,7 +27,8 @@
 
 #define QENTEM_DECIMAL_BASE_ 10
 #define QENTEM_EXPONENT_MAX_LENGTH_ 5
-#define QENTEM_NUMBERS_STRING_SIZE_ 20
+#define QENTEM_INT_NUMBER_MAX_SIZE_ 20
+#define QENTEM_FLOAT_NUMBER_MAX_SIZE_ 22
 
 namespace Qentem {
 
@@ -470,8 +471,8 @@ class Digit {
         return false;
     }
 
-    static bool parseExponent(int &exponent, const Char_T_ *str,
-                              UInt &length) noexcept {
+    QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str,
+                                              UInt &length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         UInt offset = (length - 1);
@@ -548,8 +549,9 @@ class Digit {
     }
 
     template <typename Number_T_>
-    static bool stringToFloat(Number_T_ &number, int exponent,
-                              const Char_T_ *str, UInt length) noexcept {
+    QENTEM_NOINLINE static bool stringToFloat(Number_T_ &number, int exponent,
+                                              const Char_T_ *str,
+                                              UInt           length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         unsigned long long w_number = 0;
@@ -647,11 +649,11 @@ class Digit {
     }
 
     template <typename String_T_, typename Number_T_>
-    static void intToString(String_T_ &dstring, Number_T_ number, UInt min,
-                            bool negative) {
+    QENTEM_NOINLINE static void
+    intToString(String_T_ &dstring, Number_T_ number, UInt min, bool negative) {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
-        Char_T_ tmp[QENTEM_NUMBERS_STRING_SIZE_];
+        Char_T_ tmp[QENTEM_INT_NUMBER_MAX_SIZE_];
         UInt    offset = 0;
 
         /*
@@ -675,8 +677,8 @@ class Digit {
         if (min > offset) {
             min -= offset;
 
-            if ((offset + min) > QENTEM_NUMBERS_STRING_SIZE_) {
-                min = QENTEM_NUMBERS_STRING_SIZE_ - offset;
+            if ((offset + min) > QENTEM_INT_NUMBER_MAX_SIZE_) {
+                min = QENTEM_INT_NUMBER_MAX_SIZE_ - offset;
             }
 
             if (negative) {
@@ -705,16 +707,15 @@ class Digit {
     }
 
     template <typename String_T_>
-    static void doubleToString(String_T_ &dstring, double number, UInt min,
-                               UInt r_min, UInt precision) {
+    QENTEM_NOINLINE static void doubleToString(String_T_ &dstring,
+                                               double number, UInt min,
+                                               UInt r_min, UInt precision) {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
-        constexpr UInt max_length = QENTEM_NUMBERS_STRING_SIZE_ - 1;
-        // 1844674407370955161 = 19
-        // 0.18446744073709551 = 19
+        constexpr UInt max_length = QENTEM_FLOAT_NUMBER_MAX_SIZE_ - 1;
 
         Char_T_            tmp[max_length];
-        Char_T_            tmp2[QENTEM_NUMBERS_STRING_SIZE_];
+        Char_T_            tmp2[QENTEM_FLOAT_NUMBER_MAX_SIZE_];
         unsigned long long fraction        = 0;
         UInt               fraction_length = 0;
         UInt               end_offset      = max_length;
@@ -907,10 +908,10 @@ class Digit {
             min -= left_length;
             end_offset += min;
 
-            if (end_offset > QENTEM_NUMBERS_STRING_SIZE_) {
-                min += QENTEM_NUMBERS_STRING_SIZE_;
+            if (end_offset > QENTEM_FLOAT_NUMBER_MAX_SIZE_) {
+                min += QENTEM_FLOAT_NUMBER_MAX_SIZE_;
                 min        = (min - end_offset);
-                end_offset = QENTEM_NUMBERS_STRING_SIZE_;
+                end_offset = QENTEM_FLOAT_NUMBER_MAX_SIZE_;
             }
         } else {
             min = 0;
@@ -938,19 +939,21 @@ class Digit {
         }
     }
 
-    static Char_T_ *getCharForNumber(String<Char_T_> &dstring, UInt length) {
+    inline static Char_T_ *getCharForNumber(String<Char_T_> &dstring,
+                                            UInt             length) {
         Char_T_ *str = HAllocator::Allocate<Char_T_>(length + 1U);
         str[length]  = 0;
         dstring      = String<Char_T_>{str, length};
         return str;
     }
 
-    static Char_T_ *getCharForNumber(StringStream<Char_T_> &dstring,
-                                     UInt                   length) {
+    inline static Char_T_ *getCharForNumber(StringStream<Char_T_> &dstring,
+                                            UInt                   length) {
         return dstring.Buffer(length);
     }
 
-    static void extractExponent(double &number, int &exponent) noexcept {
+    QENTEM_NOINLINE static void extractExponent(double &number,
+                                                int &   exponent) noexcept {
         if (number > 1E19) {
             do {
                 if (number > 1E99) {
@@ -980,8 +983,8 @@ class Digit {
         }
     }
 
-    static unsigned long long extractFraction(double number,
-                                              UInt   precision) noexcept {
+    QENTEM_NOINLINE static unsigned long long
+    extractFraction(double number, UInt precision) noexcept {
         switch (precision) {
             case 1: {
                 number *= 1E2;
