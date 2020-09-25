@@ -217,7 +217,7 @@ class String {
         return str;
     }
 
-    inline const Char_T_ *Storage() const noexcept {
+    inline Char_T_ *First() const noexcept {
         return storage_;
     }
 
