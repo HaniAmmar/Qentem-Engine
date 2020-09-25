@@ -5437,16 +5437,12 @@ static int TestAddition4() {
     SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
 
     value2 = Array<Value<char>>(10);
     value1 += value2;
     SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
 
     value1.Reset();
     ///
@@ -5625,8 +5621,6 @@ static int TestAddition5() {
     SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
     SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
 
     value2 = Array<Value<char>>(1);
@@ -5634,8 +5628,6 @@ static int TestAddition5() {
     SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
     SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
     SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
     SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
 
     value1.Reset();

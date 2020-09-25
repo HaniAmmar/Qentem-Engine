@@ -86,11 +86,15 @@ class JSONParser {
 
                                     if (content[offset] ==
                                         JSONotation_T_::OCurlyChar) {
-                                        obj_  = HAllocator::Allocate(VHArray());
-                                        value = Value<Char_T_>{obj_};
+                                        obj_ =
+                                            HAllocator::AllocateInit<VHArray>();
+                                        value = static_cast<Value<Char_T_> &&>(
+                                            Value<Char_T_>{obj_});
                                     } else {
-                                        arr_  = HAllocator::Allocate(VArray());
-                                        value = Value<Char_T_>{arr_};
+                                        arr_ =
+                                            HAllocator::AllocateInit<VArray>();
+                                        value = static_cast<Value<Char_T_> &&>(
+                                            Value<Char_T_>{arr_});
                                     }
 
 #ifdef QENTEM_SIMD_ENABLED_
@@ -287,13 +291,13 @@ class JSONParser {
 
                 case JSONotation_T_::OCurlyChar: {
                     type_      = Type_::Curly;
-                    child_obj_ = HAllocator::Allocate(VHArray());
+                    child_obj_ = HAllocator::AllocateInit<VHArray>();
                     return (offset + 1);
                 }
 
                 case JSONotation_T_::OSquareChar: {
                     type_      = Type_::Square;
-                    child_arr_ = HAllocator::Allocate(VArray());
+                    child_arr_ = HAllocator::AllocateInit<VArray>();
                     return (offset + 1);
                 }
 
@@ -573,7 +577,8 @@ class JSONParser {
                     has_colon_  = false;
                     pass_comma_ = true;
                 } else { // Key
-                    obj_value_ = &((*obj_)[VString(str, tmp_length)]);
+                    obj_value_ = &((*obj_)[static_cast<VString &&>(
+                        VString(str, tmp_length))]);
                 }
 
                 break;

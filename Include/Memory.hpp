@@ -22,10 +22,12 @@
 
 #include "Common.hpp"
 
+#ifndef _MALLOC_H
 #ifdef __APPLE__
 #include <malloc/malloc.h>
 #else
 #include <malloc.h>
+#endif
 #endif
 
 #include <new>
@@ -220,35 +222,11 @@ class HAllocator {
         return ptr;
     }
 
-    // template <typename Type_>
-    // static Type_ *Allocate(ULong size, Type_ &&value) {
-    //     Type_ *ptr = Allocate<Type_>(size);
-
-    //     ULong i = 0;
-    //     while (i != size) {
-    //         *(ptr + i) = value;
-    //         ++i;
-    //     }
-
-    //     return ptr;
-    // // }
-
-    // template <typename Type_>
-    // inline static Type_ *AllocateClear(ULong size) noexcept {
-    //     const ULong c_size = (size * sizeof(Type_));
-    //     void *      vptr   = malloc(c_size);
-    //     Memory::SetToZero<Type_>(vptr, c_size);
-
-    //     return static_cast<Type_ *>(vptr);
-    // }
-
     template <typename Type_>
-    inline static Type_ *AllocatePointers(ULong size) noexcept {
-        const ULong c_size = (size * sizeof(void *));
-        void *      vptr   = malloc(c_size);
-        Memory::SetToZero<void *>(vptr, c_size);
-
-        return static_cast<Type_ *>(vptr);
+    inline static Type_ *AllocateInit() {
+        Type_ *ptr = Allocate<Type_>(1);
+        new (ptr) Type_();
+        return ptr;
     }
 
     // template <typename Type_>
@@ -270,6 +248,28 @@ class HAllocator {
 
     //     return ptr;
     // }
+
+    // template <typename Type_>
+    // static Type_ *Allocate(ULong size, Type_ &&value) {
+    //     Type_ *ptr = Allocate<Type_>(size);
+
+    //     ULong i = 0;
+    //     while (i != size) {
+    //         *(ptr + i) = value;
+    //         ++i;
+    //     }
+
+    //     return ptr;
+    // // }
+
+    template <typename Type_>
+    inline static Type_ *AllocatePointers(ULong size) noexcept {
+        const ULong c_size = (size * sizeof(void *));
+        void *      vptr   = malloc(c_size);
+        Memory::SetToZero<void *>(vptr, c_size);
+
+        return static_cast<Type_ *>(vptr);
+    }
 
     template <typename Type_>
     inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
