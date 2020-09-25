@@ -63,6 +63,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(ArrayTest --coverage)
 endif()
 
+# FixedArray
+add_executable(FixedArrayTest Tests/FixedArrayTest.cpp)
+add_test(NAME FixedArrayTest COMMAND FixedArrayTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(FixedArrayTest --coverage)
+endif()
+
 # Digit
 add_executable(DigitTest Tests/DigitTest.cpp)
 add_test(NAME DigitTest COMMAND DigitTest)

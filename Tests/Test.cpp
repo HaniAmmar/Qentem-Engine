@@ -24,6 +24,7 @@
 #include "ArrayTest.hpp"
 #include "DigitTest.hpp"
 #include "EngineTest.hpp"
+#include "FixedArrayTest.hpp"
 #include "HArrayTest.hpp"
 #include "JSONTest.hpp"
 #include "JSONUtilsTest.hpp"
@@ -47,6 +48,7 @@ int RunTests() {
     ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunFixedArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunDigitTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunEngineTests() == 0) ? ++passed : ++failed);
@@ -77,6 +79,7 @@ int main() {
     //     Qentem::Test::RunStringUtilsTests();
     //     Qentem::Test::RunStringTests();
     //     Qentem::Test::RunStringStreamTests();
+    //     Qentem::Test::RunFixedArrayTests();
     //     Qentem::Test::RunArrayTests();
     //     Qentem::Test::RunDigitTests();
     //     Qentem::Test::RunHArrayTests();
