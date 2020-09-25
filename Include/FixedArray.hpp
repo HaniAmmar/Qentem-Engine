@@ -58,10 +58,6 @@ class FixedArray {
         return &(storage_[0]);
     }
 
-    inline const Type_ *Last() const noexcept {
-        return (&(storage_[0]) + (Size() - 1));
-    }
-
     inline const Type_ *End() const noexcept {
         return (&(storage_[0]) + Size());
     }
@@ -76,6 +72,14 @@ class FixedArray {
 
     inline UInt Capacity() const noexcept {
         return Size_T_;
+    }
+
+    inline bool IsEmpty() const noexcept {
+        return (index_ == 0);
+    }
+
+    inline bool IsNotEmpty() const noexcept {
+        return (index_ != 0);
     }
 
     inline bool IsFull() const noexcept {

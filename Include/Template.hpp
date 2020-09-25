@@ -113,7 +113,7 @@ class Template_T_ {
             }
 
             render(tags.First(), tags.End(), content, offset);
-            offset = tags.Last()->EndOffset;
+            offset = (tags.First() + tags.Size() - 1)->EndOffset;
 
             if (!(tags.IsFull())) {
                 break;
@@ -875,7 +875,7 @@ class Template_T_ {
                 break;
             }
 
-            loop_offset = loop_tags.Last()->EndOffset;
+            loop_offset = (loop_tags.First() + loop_tags.Size() - 1)->EndOffset;
             loop_tags.Clear();
         } while (true);
 
