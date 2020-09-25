@@ -122,8 +122,12 @@ class StringStream {
         ++length_;
     }
 
+    inline void operator+=(const StringStream<Char_T_> &ss_src) {
+        insert(ss_src.First(), ss_src.Length());
+    }
+
     inline void operator+=(const String<Char_T_> &src) {
-        insert(src.Storage(), src.Length());
+        insert(src.First(), src.Length());
     }
 
     inline void operator+=(const Char_T_ *str) {
@@ -143,7 +147,7 @@ class StringStream {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, string.Storage(), length_);
+        return StringUtils::IsEqual(storage_, string.First(), length_);
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
@@ -180,6 +184,10 @@ class StringStream {
         insert(str, length);
     }
 
+    inline void Clear() noexcept {
+        length_ = 0;
+    }
+
     void Reset() noexcept {
         length_   = 0;
         capacity_ = 0;
@@ -193,23 +201,27 @@ class StringStream {
         }
     }
 
-    inline void SoftReset() noexcept {
-        length_ = 0;
-    }
-
     // To write directly to the buffer, set the needed length.
     Char_T_ *Buffer(ULong len) noexcept {
         const ULong current_offset = length_;
         length_ += len;
 
-        if (capacity_ < length_) {
+        if (length_ > capacity_) {
             expand((ULong{2} << Platform::CLZL(length_)));
         }
 
         return (storage_ + current_offset);
     }
 
-    inline const Char_T_ *Storage() const noexcept {
+    inline void Expect(ULong len) {
+        const ULong new_len = (length_ + len);
+
+        if (new_len > capacity_) {
+            expand((ULong{1} << Platform::CLZL(new_len)));
+        }
+    }
+
+    inline const Char_T_ *First() const noexcept {
         return storage_;
     }
 
@@ -237,7 +249,7 @@ class StringStream {
             return String<Char_T_>(Eject(), len);
         }
 
-        String<Char_T_> str{Storage(), length_};
+        String<Char_T_> str{First(), length_};
         Reset();
 
         return str;
@@ -266,14 +278,7 @@ class StringStream {
 
         if (capacity_ != 0) {
             const ULong c_size = (capacity_ * sizeof(Char_T_));
-
-            if (c_size > 7) {
-                // DWORD
-                Memory::Copy<long long>(storage_, old_str, c_size);
-            } else {
-                Memory::Copy<Char_T_>(storage_, old_str, c_size);
-            }
-
+            Memory::Copy<Char_T_>(storage_, old_str, c_size);
             HAllocator::Deallocate(old_str);
         }
 
