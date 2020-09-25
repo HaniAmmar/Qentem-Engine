@@ -132,21 +132,7 @@ class Array {
     }
 
     void operator+=(const Array &arr) {
-        const ULong n_size = (index_ + arr.index_);
-
-        if (n_size > capacity_) {
-            resize(n_size);
-        }
-
-        ULong n = 0;
-
-        while (n != arr.index_) {
-            HAllocator::Construct<Type_>(
-                (storage_ + index_),
-                static_cast<Type_ &&>(Type_(arr.storage_[n])));
-            ++index_;
-            ++n;
-        }
+        copyArray(arr);
     }
 
     void operator+=(Type_ &&item) {
@@ -172,7 +158,7 @@ class Array {
     }
 
     inline Array &Insert(const Array &arr) {
-        *this += arr;
+        copyArray(arr);
         return *this;
     }
 
@@ -182,7 +168,7 @@ class Array {
     }
 
     inline Array &Insert(const Type_ &item) {
-        *this += item;
+        *this += static_cast<Type_ &&>(Type_(item));
         return *this;
     }
 
@@ -313,6 +299,24 @@ class Array {
         Memory::Copy<Type_>(storage_, tmp, (index_ * sizeof(Type_)));
         HAllocator::Deallocate(tmp);
         capacity_ = new_size;
+    }
+
+    void copyArray(const Array &arr) {
+        const ULong n_size = (index_ + arr.index_);
+
+        if (n_size > capacity_) {
+            resize(n_size);
+        }
+
+        ULong n = 0;
+
+        while (n != arr.index_) {
+            HAllocator::Construct<Type_>(
+                (storage_ + index_),
+                static_cast<Type_ &&>(Type_(arr.storage_[n])));
+            ++index_;
+            ++n;
+        }
     }
 
     ULong  index_{0};
