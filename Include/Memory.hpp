@@ -229,39 +229,6 @@ class HAllocator {
         return ptr;
     }
 
-    // template <typename Type_>
-    // inline static Type_ *AllocateInit() {
-    //     Type_ *ptr = Allocate<Type_>(1);
-    //     new (ptr) Type_();
-    //     return ptr;
-    // }
-
-    // template <typename Type_>
-    // static Type_ *AllocateInit(ULong size) {
-    //     Type_ *ptr = Allocate<Type_>(size);
-
-    //     ULong i = 0;
-    //     while (i != size) {
-    //         new (ptr + i) Type_();
-    //         ++i;
-    //     }
-
-    //     return ptr;
-    // }
-
-    // template <typename Type_>
-    // static Type_ *Allocate(ULong size, Type_ &&value) {
-    //     Type_ *ptr = Allocate<Type_>(size);
-
-    //     ULong i = 0;
-    //     while (i != size) {
-    //         *(ptr + i) = value;
-    //         ++i;
-    //     }
-
-    //     return ptr;
-    // // }
-
     template <typename Type_>
     inline static Type_ *AllocatePointers(ULong size) noexcept {
         const ULong c_size = (size * sizeof(void *));
