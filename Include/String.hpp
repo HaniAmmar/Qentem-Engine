@@ -39,6 +39,12 @@ class String {
     String(const Char_T_ *str) : String(str, StringUtils::Count(str)) {
     }
 
+    String(String &&src) noexcept
+        : length_(src.length_), storage_(src.storage_) {
+        src.length_  = 0;
+        src.storage_ = nullptr;
+    }
+
     String(const String &src) : length_(src.length_) {
         if (length_ != 0) {
             const ULong len = (length_ + 1);
@@ -46,12 +52,6 @@ class String {
             Memory::Copy<Char_T_>(storage_, src.storage_,
                                   (len * sizeof(Char_T_)));
         }
-    }
-
-    String(String &&src) noexcept
-        : length_(src.length_), storage_(src.storage_) {
-        src.length_  = 0;
-        src.storage_ = nullptr;
     }
 
     explicit String(const Char_T_ *str, ULong len) : length_(len) {
