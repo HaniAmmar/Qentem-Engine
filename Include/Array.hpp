@@ -218,7 +218,7 @@ class Array {
         const ULong n_size = (size + index_);
 
         if (n_size > capacity_) {
-            resize(n_size);
+            resize(n_size << 1U);
         }
     }
 

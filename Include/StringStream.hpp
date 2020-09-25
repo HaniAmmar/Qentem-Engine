@@ -217,7 +217,7 @@ class StringStream {
         const ULong new_len = (length_ + len);
 
         if (new_len > capacity_) {
-            expand((ULong{1} << Platform::CLZ(new_len)));
+            expand((ULong{2} << Platform::CLZ(new_len)));
         }
     }
 
