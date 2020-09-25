@@ -14,17 +14,16 @@ int main() {
     value[2] = 80;
 
     const char *content = R"(
-<loop key="loop1-id" value="loop1-value">
-[loop1-id]: loop1-value</loop>
+<loop value="loop1-value">
+loop1-value</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
-        [0]: 40
-        [1]: 60
-        [2]: 80
+        40
+        60
+        80
     */
 }

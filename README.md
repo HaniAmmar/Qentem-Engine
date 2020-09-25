@@ -26,7 +26,7 @@ Qentem Engine is an independent and cross-platform library that uses a fast algo
 
 -   Cross platform, header only and self-contained; no external libraries like the STL is needed.
 -   Supports UTF-8, UTF-16 and UTF-32.
--   Supports any character type (char. u_char, short, int, wchar_t).
+-   Supports any character type (char. u_char, char16_t, char32_t, wchar_t, ...).
 -   Fast JSON parser.
 -   Fast HTML templating (variable replacement, nested loop, nested if condition, and Inline if).
 
@@ -70,7 +70,7 @@ int main() {
     v_arr[5] = abc;                           // Add sub-array
     v_arr += JSON::Parse(R"([100,200,300])"); // Addition
 
-    std::cout << v_arr.Stringify().Storage() << '\n';
+    std::cout << v_arr.Stringify().First() << '\n';
     /* Output:
         [
             "text",
@@ -106,7 +106,7 @@ int main() {
     v_obj += JSON::Parse(
         R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
 
-    std::cout << v_obj.Stringify().Storage() << '\n';
+    std::cout << v_obj.Stringify().First() << '\n';
     /* Output:
        {
             "key0": "text",
@@ -149,20 +149,24 @@ using Qentem::Value;
 
 int main() {
     auto value = Qentem::JSON::Parse(R"(
-{
-    "major": {
-        "Computer Science": [
+[
+    {
+        "major": "Computer Science",
+        "students": [
             { "Name": "Oliver", "GPA": 3.2 },
             { "Name": "Jonah", "GPA": 3.8 },
-            { "Name": "Ava", "GPA": 2.8 }
-        ],
-        "Math": [
+            { "Name": "Jack", "GPA": 2.8 }
+        ]
+    },
+    {
+        "major": "Math",
+        "students": [
             { "Name": "Maxim", "GPA": 3.0 },
             { "Name": "Cole", "GPA": 2.5 },
             { "Name": "Claire", "GPA": 2.4 }
         ]
     }
-}
+]
     )");
 
     const char *content = R"(
@@ -178,10 +182,10 @@ int main() {
 <body>
     <div>
         <h2>Students' list:</h2>
-        <loop set="major" key="loop-major-key">
-            <h3>Major: loop-major-key</h3>
+        <loop value="major_val">
+            <h3>Major: major_val[major]</h3>
             <ul>
-            <loop set="major[loop-major-key]" value="student_val">
+            <loop set="major_val[students]" value="student_val">
                 <li>
                     <span>Name: student_val[Name]</span>
                     <span>
@@ -201,8 +205,7 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 }
 ```
 

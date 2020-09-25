@@ -116,8 +116,7 @@ int main() {
     value["version"]    = 3.0;
     const char *content = R"({var:name}, {var:version})";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -149,21 +148,20 @@ using Qentem::Value;
 
 int main() {
     Value<char> value;
-    value["Equation"] = "1+4*2+1";
-    value["one"]      = "1";
-    value["three"]    = "3";
+    value["some_math"] = "1+4*2+1";
+    value["one"]       = "1";
+    value["three"]     = "3";
 
     const char *content = R"(
 0.1+0.2 is: {math: 0.1  +   0.2 }
-{var:Equation} = {math:{var:Equation}}; (1+8+1)
+{var:some_math} = {math:{var:some_math}}; (1+8+1)
 6^2 = {math:6^2}
 --1 = {math:--1}
 {var:one}+{var:three} = {math:{var:one}+{var:three}}
 9 % 5 = {math:9 % 5}
 )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -240,11 +238,11 @@ To force ALE to treat the variables as numbers, use parentheses: (({var:bool}) =
 <loop set="..." key="...">...</loop>
 
 <loop value="...">...</loop>
-<loop key="..." times="...">...</loop>
+<loop key="..." repeat="...">...</loop>
 <loop key="...">...</loop>
 ```
 
-Loops over a set and replaces the values with the string inside `value` and keys with `key`. The size can be set using `times` option. and the index can start from the value of `index`. If the array an ordered array, numeric keys will be places as keys. The options `times` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `key` and `value` accept only strings; for matching and replacing of the template inside the loop.
+Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop.
 
 ### Loop Example 1 (unordered set)
 
@@ -259,20 +257,28 @@ using Qentem::Value;
 
 int main() {
     auto value = Qentem::JSON::Parse(R"(
-{
-    "a": 1,
-    "b": 2,
-    "c": 3
-}
+[
+    {
+        "name": "a",
+        "value": 1
+    },
+    {
+        "name": "b",
+        "value": 2
+    },
+    {
+        "name": "c",
+        "value": 3
+    }
+]
     )");
 
     const char *content = R"(
-<loop key="loopID1" value="loopVAL1">
-loopID1: loopVAL1</loop>
+<loop value="loop1-value">
+loop1-value[name]: loop1-value[value]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -297,23 +303,22 @@ using Qentem::Value;
 int main() {
     Value<char> value;
 
-    value["d"]["a"] = 10;
-    value["d"]["b"] = 20;
-    value["d"]["c"] = 30;
+    value["some_set"]["a"] = 10;
+    value["some_set"]["b"] = 20;
+    value["some_set"]["c"] = 30;
 
     const char *content = R"(
-<loop set="d" key="loopID1" value="loopVAL1">
-loopID1: loopVAL1</loop>
+<loop set="some_set" value="loop1-value">
+loop1-value</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
-            a: 10
-            b: 20
-            c: 30
+            10
+            20
+            30
     */
 }
 ```
@@ -337,18 +342,17 @@ int main() {
     value[2] = 80;
 
     const char *content = R"(
-<loop key="loop1-id" value="loop1-value">
-[loop1-id]: loop1-value</loop>
+<loop value="loop1-value">
+loop1-value</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
-        [0]: 40
-        [1]: 60
-        [2]: 80
+        40
+        60
+        80
     */
 }
 ```
@@ -373,62 +377,47 @@ int main() {
     )");
 
     const char *content = R"(
-<loop key="loop1-key">
-    <loop set="loop1-key" key="loop2-key">
-loop1-key: loop2-key:
-        <loop set="loop1-key[loop2-key]" key="loop3-key" value="loop3-val">
-        loop3-key: loop3-val</loop>
+<loop value="loop1-val">
+    <loop set="loop1-val" value="loop2-val">
+        <loop set="loop2-val" value="loop3-val">
+            loop3-val
+        </loop>
     </loop>
 </loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
-            Group-1: 0:
+            A
+            B
+            C
 
-                    0: A
-                    1: B
-                    2: C
+            DD
+            EE
+            FF
 
-            Group-1: 1:
+            GGG
+            HHH
+            Qentem
 
-                    0: DD
-                    1: EE
-                    2: FF
+            1
+            2
+            3
 
-            Group-1: 2:
+            10
+            20
+            30
 
-                    0: GGG
-                    1: HHH
-                    2: Qentem
-
-
-
-            Group-2: 0:
-
-                    0: 1
-                    1: 2
-                    2: 3
-
-            Group-2: 1:
-
-                    0: 10
-                    1: 20
-                    2: 30
-
-            Group-2: 2:
-
-                    0: 100
-                    1: 200
-                    2: 300
+            100
+            200
+            300
     */
 }
 ```
 
-### Loop Example 5 (times)
+### Loop Example 5 (repeat)
 
 ```cpp
 #include "Template.hpp"
@@ -442,12 +431,14 @@ using Qentem::Value;
 int main() {
     Value<char> value;
 
-    const char *content = R"(<loop times="2" key="loop1-id"><loop
-        times="2" key="loop2-id"><loop
-        times="2" key="loop3-id">(loop1-id: loop2-id: loop3-id) </loop></loop></loop>)";
+    value += 0;
+    value += 1;
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    const char *content =
+        R"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
+        repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
+
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -470,26 +461,29 @@ using Qentem::Value;
 int main() {
     Value<char> value;
 
-    value[0] = 5;
+    for (int i = 0; i < 10; i++) {
+        value["list"] += i;
+    }
+
+    value["size"] = 5;
 
     const char *content =
-        R"(<loop times="{var:0}" index="5" key="loop1-id">loop1-id</loop>)";
+        R"(<loop set="list" repeat="{var:size}" index="5" value="loop1-value">loop1-value</loop>)";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
             56789
     */
 
-    value[1] = 3;
+    value["size"]     = 7;
+    value["start_at"] = 3;
 
     content =
-        R"(<loop times="{var:0}" index="{var:1}" key="loop1-id">loop1-id</loop>)";
+        R"(<loop set="list" repeat="{var:size}" index="{var:start_at}" value="loop1-value">loop1-value</loop>)";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -550,8 +544,7 @@ item[var1] item[var2] item[var3] item[var4]</loop>
 item[0] item[1] item[2] item[3]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -625,8 +618,7 @@ Not zero or one or two.
 </if>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -667,8 +659,7 @@ Zero!
 </if>
 )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
@@ -692,20 +683,24 @@ using Qentem::Value;
 
 int main() {
     auto value = Qentem::JSON::Parse(R"(
-{
-    "major": {
-        "Computer Science": [
+[
+    {
+        "major": "Computer Science",
+        "students": [
             { "Name": "Oliver", "GPA": 3.2 },
             { "Name": "Jonah", "GPA": 3.8 },
-            { "Name": "Ava", "GPA": 2.8 }
-        ],
-        "Math": [
+            { "Name": "Jack", "GPA": 2.8 }
+        ]
+    },
+    {
+        "major": "Math",
+        "students": [
             { "Name": "Maxim", "GPA": 3.0 },
             { "Name": "Cole", "GPA": 2.5 },
             { "Name": "Claire", "GPA": 2.4 }
         ]
     }
-}
+]
     )");
 
     const char *content = R"(
@@ -721,10 +716,10 @@ int main() {
 <body>
     <div>
         <h2>Students' list:</h2>
-        <loop set="major" key="loop-major-key">
-            <h3>Major: loop-major-key</h3>
+        <loop value="major_val">
+            <h3>Major: major_val[major]</h3>
             <ul>
-            <loop set="major[loop-major-key]" value="student_val">
+            <loop set="major_val[students]" value="student_val">
                 <li>
                     <span>Name: student_val[Name]</span>
                     <span>
@@ -744,8 +739,7 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 }
 ```
 
@@ -772,59 +766,68 @@ int main() {
         "darkmode_color": "white",
         "H1": "Leatest News"
     },
-    "news": {
-        "Tech": [
-            {
-                "text": "The new modern operating system CoolOp is \"Cool\".",
-                "date": "1",
-                "options": ""
-            },
-            {
-                "text": "The Global Internet is now free.",
-                "date": "2",
-                "options": "style=\"color: violet;\""
-            },
-            {
-                "text": "No more hackers after implementing NO-WAY-CRPT encryption.",
-                "date": "3",
-                "options": ""
-            }
-        ],
-        "Health": [
-            {
-                "text": "Free medicine are being given away.",
-                "date": "3011-1-28",
-                "options": ""
-            },
-            {
-                "text": "People are healthier now after using MakeMYMeds devices.",
-                "date": "3011-1-20",
-                "options": ""
-            },
-            {
-                "text": "TeraMedicine forced to shutdown.",
-                "date": "3011-1-16",
-                "options": "style=\"font-style: italic;\""
-            }
-        ],
-        "Energy": [
-            {
-                "text": "No more Uranium.",
-                "date": "3011-1-19",
-                "options": "style=\"color: red;\""
-            },
-            {
-                "text": "The Global Internet is now free.",
-                "date": "3011-1-19",
-                "options": ""
-            },
-            {
-                "text": "Gasoline cars are now banned.",
-                "date": "3011-1-18",
-                "options": ""
-            }
-        ]
-    }
+    "news": [
+        {
+            "name": "Tech",
+            "list": [
+                {
+                    "text": "The new modern operating system CoolOp is \"Cool\".",
+                    "date": "1",
+                    "options": ""
+                },
+                {
+                    "text": "The Global Internet is now free.",
+                    "date": "2",
+                    "options": "style=\"color: violet;\""
+                },
+                {
+                    "text": "No more hackers after implementing NO-WAY-CRPT encryption.",
+                    "date": "3",
+                    "options": ""
+                }
+            ]
+        },
+        {
+            "name": "Health",
+            "list": [
+                {
+                    "text": "Free medicine are being given away.",
+                    "date": "3011-1-28",
+                    "options": ""
+                },
+                {
+                    "text": "People are healthier now after using MakeMYMeds devices.",
+                    "date": "3011-1-20",
+                    "options": ""
+                },
+                {
+                    "text": "TeraMedicine forced to shutdown.",
+                    "date": "3011-1-16",
+                    "options": "style=\"font-style: italic;\""
+                }
+            ]
+        },
+        {
+            "name": "Energy",
+            "list": [
+                {
+                    "text": "No more Uranium.",
+                    "date": "3011-1-19",
+                    "options": "style=\"color: red;\""
+                },
+                {
+                    "text": "The Global Internet is now free.",
+                    "date": "3011-1-19",
+                    "options": ""
+                },
+                {
+                    "text": "Gasoline cars are now banned.",
+                    "date": "3011-1-18",
+                    "options": ""
+                }
+            ]
+        }
+    ]
 }
     )css");
 
@@ -847,23 +850,23 @@ int main() {
 <body>
     <h1>{var:body[H1]}</h1>
 
-    <loop set="news" key="NewsID">
-    <h2>NewsID</h2>
+    <loop set="news" value="value_s">
+    <h2>value_s[name]</h2>
     <div>
         <ul>
-            <loop set="news[NewsID]" value="news_val">
-            <li><span news_val[options]>news_val[text]</span> -
-            <span>
-                <if case="news_val[date] == 1">
-                New
-                <elseif case="news_val[date] == 2" />
-                Yesterday
-                <elseif case="news_val[date] == 3" />
-                Two days ago
-                <else />
-                news_val[date]
-                </if>
-            </span>
+            <loop set="value_s[list]" value="value">
+            <li><span value[options]>value[text]</span> -
+                <span>
+                    <if case="value[date] == 1">
+                    New
+                    <elseif case="value[date] == 2" />
+                    Yesterday
+                    <elseif case="value[date] == 3" />
+                    Two days ago
+                    <else />
+                    value[date]
+                    </if>
+                </span>
             </li>
             </loop>
         </ul>
@@ -874,7 +877,6 @@ int main() {
 </html>
 )HTML";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 }
 ```

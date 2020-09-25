@@ -8,20 +8,24 @@ using Qentem::Value;
 
 int main() {
     auto value = Qentem::JSON::Parse(R"(
-{
-    "major": {
-        "Computer Science": [
+[
+    {
+        "major": "Computer Science",
+        "students": [
             { "Name": "Oliver", "GPA": 3.2 },
             { "Name": "Jonah", "GPA": 3.8 },
-            { "Name": "Ava", "GPA": 2.8 }
-        ],
-        "Math": [
+            { "Name": "Jack", "GPA": 2.8 }
+        ]
+    },
+    {
+        "major": "Math",
+        "students": [
             { "Name": "Maxim", "GPA": 3.0 },
             { "Name": "Cole", "GPA": 2.5 },
             { "Name": "Claire", "GPA": 2.4 }
         ]
     }
-}
+]
     )");
 
     const char *content = R"(
@@ -37,10 +41,10 @@ int main() {
 <body>
     <div>
         <h2>Students' list:</h2>
-        <loop set="major" key="loop-major-key">
-            <h3>Major: loop-major-key</h3>
+        <loop value="major_val">
+            <h3>Major: major_val[major]</h3>
             <ul>
-            <loop set="major[loop-major-key]" value="student_val">
+            <loop set="major_val[students]" value="student_val">
                 <li>
                     <span>Name: student_val[Name]</span>
                     <span>
@@ -60,6 +64,5 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 }

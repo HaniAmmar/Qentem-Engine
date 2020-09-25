@@ -8,20 +8,28 @@ using Qentem::Value;
 
 int main() {
     auto value = Qentem::JSON::Parse(R"(
-{
-    "a": 1,
-    "b": 2,
-    "c": 3
-}
+[
+    {
+        "name": "a",
+        "value": 1
+    },
+    {
+        "name": "b",
+        "value": 2
+    },
+    {
+        "name": "c",
+        "value": 3
+    }
+]
     )");
 
     const char *content = R"(
-<loop key="loopID1" value="loopVAL1">
-loopID1: loopVAL1</loop>
+<loop value="loop1-value">
+loop1-value[name]: loop1-value[value]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:

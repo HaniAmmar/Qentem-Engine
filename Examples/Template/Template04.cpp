@@ -9,22 +9,21 @@ using Qentem::Value;
 int main() {
     Value<char> value;
 
-    value["d"]["a"] = 10;
-    value["d"]["b"] = 20;
-    value["d"]["c"] = 30;
+    value["some_set"]["a"] = 10;
+    value["some_set"]["b"] = 20;
+    value["some_set"]["c"] = 30;
 
     const char *content = R"(
-<loop set="d" key="loopID1" value="loopVAL1">
-loopID1: loopVAL1</loop>
+<loop set="some_set" value="loop1-value">
+loop1-value</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().Storage()
-              << '\n';
+    std::cout << Template::Render(content, &value).GetString().First() << '\n';
 
     /*
         Output:
-            a: 10
-            b: 20
-            c: 30
+            10
+            20
+            30
     */
 }

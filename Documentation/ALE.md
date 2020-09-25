@@ -183,9 +183,9 @@ struct aleHelper {
             str_right_length = right_length;
         }
 
-        result =
-            ((str_left_length == str_right_length) &&
-             Qentem::Memory::Compare(str_right, str_left, str_right_length));
+        result = ((str_left_length == str_right_length) &&
+                  Qentem::StringUtils::IsEqual(str_right, str_left,
+                                               str_right_length));
 
         return true;
     }

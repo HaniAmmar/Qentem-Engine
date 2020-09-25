@@ -21,7 +21,7 @@ int main() {
     v_arr[5] = abc;                           // Add sub-array
     v_arr += JSON::Parse(R"([100,200,300])"); // Addition
 
-    std::cout << v_arr.Stringify().Storage() << '\n';
+    std::cout << v_arr.Stringify().First() << '\n';
     /* Output:
         [
             "text",
@@ -57,7 +57,7 @@ int main() {
     v_obj += JSON::Parse(
         R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
 
-    std::cout << v_obj.Stringify().Storage() << '\n';
+    std::cout << v_obj.Stringify().First() << '\n';
     /* Output:
        {
             "key0": "text",
