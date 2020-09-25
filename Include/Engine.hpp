@@ -43,8 +43,10 @@ class Engine {
     /*
      * Returns an the index of a character + 1.
      */
-    static ULong FindOne(const char one_char, const char *content, ULong offset,
-                         ULong end_before) noexcept {
+
+    template <typename Number_T_>
+    static Number_T_ FindOne(const char one_char, const char *content,
+                             Number_T_ offset, Number_T_ end_before) noexcept {
         // TODO: Add 16 and 32-bit char
         if (offset < end_before) {
             const QMM_VAR_ m_pattern = QMM_SETONE_8_(one_char);
@@ -57,7 +59,7 @@ class Engine {
                     QMM_COMPARE_8_MASK_(m_pattern, m_content);
 
                 if (bits != 0) {
-                    const ULong index = (Platform::CTZL(bits) + offset + 1);
+                    const Number_T_ index = (Platform::CTZ(bits) + offset + 1);
 
                     if (index > end_before) {
                         return 0;
@@ -76,9 +78,10 @@ class Engine {
     /*
      * Returns an the index of a pattern + the length of it.
      */
-    static ULong Find(const char *pattern, UInt pattern_length,
-                      const char *content, ULong offset,
-                      ULong end_before) noexcept {
+    template <typename Number_T_>
+    QENTEM_NOINLINE static Number_T_
+    Find(const char *pattern, UInt pattern_length, const char *content,
+         Number_T_ offset, Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
@@ -100,8 +103,8 @@ class Engine {
                 bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
 
                 while (bits != 0) {
-                    const ULong index         = (Platform::CTZL(bits) + offset);
-                    const ULong pattern_index = (index + pattern_length);
+                    const Number_T_ index = (Platform::CTZ(bits) + offset);
+                    const Number_T_ pattern_index = (index + pattern_length);
 
                     if (pattern_index > end_before) {
                         return 0;
@@ -126,9 +129,9 @@ class Engine {
     /*
      * Returns an the index of a character + 1.
      */
-    template <typename Char_T_>
-    static ULong FindOne(const Char_T_ one_char, const Char_T_ *content,
-                         ULong offset, ULong end_before) noexcept {
+    template <typename Char_T_, typename Number_T_>
+    static Number_T_ FindOne(const Char_T_ one_char, const Char_T_ *content,
+                             Number_T_ offset, Number_T_ end_before) noexcept {
         while (offset < end_before) {
             if (one_char == content[offset]) {
                 return (offset + 1);
@@ -143,41 +146,38 @@ class Engine {
     /*
      * Returns an the index of a pattern + the length of it.
      */
-    template <typename Char_T_>
-    static ULong Find(const Char_T_ *pattern, UInt pattern_length,
-                      const Char_T_ *content, ULong offset,
-                      ULong end_before) noexcept {
+    template <typename Char_T_, typename Number_T_>
+    QENTEM_NOINLINE static Number_T_
+    Find(const Char_T_ *pattern, UInt pattern_length, const Char_T_ *content,
+         Number_T_ offset, Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
 
         --pattern_length;
 
+        if ((offset + pattern_length) >= end_before) {
+            return 0;
+        }
+
+        end_before -= pattern_length;
+
         while (offset < end_before) {
-            if (pattern[0] == content[offset]) {
+            if (*pattern == content[offset]) {
+                Number_T_ tmp_offset = (offset + pattern_length);
 
-                if ((offset + pattern_length) >= end_before) {
-                    return 0;
-                }
+                if (pattern[pattern_length] == content[tmp_offset]) {
+                    const Char_T_ *tmp_content = (content + offset);
+                    tmp_offset                 = 1;
 
-                if (pattern[pattern_length] ==
-                    content[offset + pattern_length]) {
-                    const ULong last_offset    = offset;
-                    UInt        pattern_offset = 1;
-
-                    ++offset;
-
-                    while ((pattern_offset != pattern_length) &&
-                           pattern[pattern_offset] == content[offset]) {
-                        ++offset;
-                        ++pattern_offset;
+                    while ((tmp_offset != pattern_length) &&
+                           pattern[tmp_offset] == tmp_content[tmp_offset]) {
+                        ++tmp_offset;
                     }
 
-                    if (pattern_offset == pattern_length) {
-                        return (offset + 1);
+                    if (tmp_offset == pattern_length) {
+                        return (offset + tmp_offset + 1);
                     }
-
-                    offset = last_offset;
                 }
             }
 
@@ -192,16 +192,16 @@ class Engine {
      * finds the head and the tail of a match and search aging inside the match
      * to see if it's Nested by itself or a custom expression.
      */
-    template <typename Char_T_, typename Class_T_>
-    static ULong FindNest(const Char_T_ *content, ULong offset,
-                          ULong end_before, ULong max_end_before,
-                          Class_T_ *caller) {
-        ULong current_offset = offset;
+    template <typename Char_T_, typename Number_T_, typename Class_T_>
+    static Number_T_ FindNest(const Char_T_ *content, Number_T_ offset,
+                              Number_T_ end_before, Number_T_ max_end_before,
+                              Class_T_ *caller) {
+        Number_T_ current_offset = offset;
 
         while (current_offset < end_before) {
             /*
-             * ULong FindH(const Class_T_ *content, ULong offset, ULong
-             * end_before)
+             * Number_T_ FindH(const Class_T_ *content, Number_T_ offset,
+             * Number_T_ end_before)
              *
              * For finding the head
              */
@@ -213,9 +213,9 @@ class Engine {
             }
 
             // Save the current offset for Found().
-            const ULong start_offset = current_offset;
+            const Number_T_ start_offset = current_offset;
             // Makes sub-matching easy.
-            ULong sub_offset = current_offset;
+            Number_T_ sub_offset = current_offset;
 
             /*
              * bool HasTail();
@@ -226,8 +226,8 @@ class Engine {
             if (caller->HasTail()) {
                 do {
                     /*
-                     * ULong FindT(const Class_T_ *content, ULong offset, ULong
-                     *             end_before)
+                     * Number_T_ FindT(const Class_T_ *content, Number_T_
+                     * offset, Number_T_ end_before)
                      *
                      * For finding the tail
                      */
@@ -246,8 +246,8 @@ class Engine {
                     }
 
                     /*
-                     * ULong Nest(const Class_T_ *content, ULong offset, ULong
-                     *            end_before, ULong max_end_before)
+                     * Number_T_ Nest(const Class_T_ *content, Number_T_ offset,
+                     * Number_T_ end_before, Number_T_ max_end_before)
                      *
                      * This function is invoked everytime a match found, and
                      * should look like the first line that started the search.
@@ -275,8 +275,9 @@ class Engine {
             }
 
             /*
-             * void Found(const Class_T_ *content, ULong offset, ULong
-             *            end_before, ULong start_offset, ULong &current_offset)
+             * void Found(const Class_T_ *content, Number_T_ offset, Number_T_
+             *            end_before, Number_T_ start_offset, Number_T_
+             * &current_offset)
              *
              * Once a full match is found (head & tail), the function will be
              * invoked. "current_offset" is referenced: it can be adjusted to
@@ -300,13 +301,13 @@ class Engine {
      *
      * See Template::nest(...)
      */
-    template <typename Char_T_>
-    static ULong SkipInnerPatterns(const Char_T_ *start, UInt start_length,
-                                   const Char_T_ *end, UInt end_length,
-                                   const Char_T_ *content, ULong offset,
-                                   ULong end_before,
-                                   ULong max_end_before) noexcept {
-        ULong last_offset = end_before;
+    template <typename Char_T_, typename Number_T_>
+    static Number_T_ SkipInnerPatterns(const Char_T_ *start, UInt start_length,
+                                       const Char_T_ *end, UInt end_length,
+                                       const Char_T_ *content, Number_T_ offset,
+                                       Number_T_ end_before,
+                                       Number_T_ max_end_before) noexcept {
+        Number_T_ last_offset = end_before;
 
         while (end_before < max_end_before) {
             UInt times = 0;
@@ -327,6 +328,7 @@ class Engine {
 
             offset = end_before;
             // TODO: Use FindAll
+
             do {
                 end_before =
                     Find(end, end_length, content, last_offset, max_end_before);
