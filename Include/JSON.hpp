@@ -48,7 +48,7 @@ template <typename Char_T_>
 class JSONParser {
     using JSONotation_T_ = JSONotation<Char_T_>;
     enum class Type_;
-    struct FindCache_;
+    struct FindCache_T_;
 
     friend class Qentem::Engine;
 
@@ -82,17 +82,17 @@ class JSONParser {
 
                                     if (content[offset] ==
                                         JSONotation_T_::OCurlyChar) {
-                                        obj_ = HAllocator::AllocateClear<
-                                            HArray<Value<Char_T_>, Char_T_>>(1);
+                                        obj_ = HAllocator::Allocate(
+                                            HArray<Value<Char_T_>, Char_T_>());
                                         value = Value<Char_T_>{obj_};
                                     } else {
-                                        arr_ = HAllocator::AllocateClear<
-                                            Array<Value<Char_T_>>>(1);
+                                        arr_ = HAllocator::Allocate(
+                                            Array<Value<Char_T_>>());
                                         value = Value<Char_T_>{arr_};
                                     }
 
 #ifdef QENTEM_SIMD_ENABLED_
-                                    FindCache_ fc;
+                                    FindCache_T_ fc;
                                     find_cache_ = &fc;
 #endif
 
@@ -193,7 +193,7 @@ class JSONParser {
         do {
             if (find_cache_->Bits != 0) {
                 ULong index =
-                    (Platform::CTZL(find_cache_->Bits) + find_cache_->Offset);
+                    (Platform::CTZ(find_cache_->Bits) + find_cache_->Offset);
 
                 if (index >= offset) {
                     if (index >= end_before) {
@@ -227,15 +227,14 @@ class JSONParser {
 
                         case JSONotation_T_::OCurlyChar:
                             type_      = Type_::Curly;
-                            child_obj_ = HAllocator::AllocateClear<
-                                HArray<Value<char>, char>>(1);
+                            child_obj_ = HAllocator::Allocate(
+                                HArray<Value<char>, char>());
                             return (index + 1);
 
                         case JSONotation_T_::OSquareChar: {
                             type_ = Type_::Square;
                             child_arr_ =
-                                HAllocator::AllocateClear<Array<Value<char>>>(
-                                    1);
+                                HAllocator::Allocate(Array<Value<char>>());
                             return (index + 1);
                         }
 
@@ -285,16 +284,15 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::OCurlyChar: {
-                    type_      = Type_::Curly;
-                    child_obj_ = HAllocator::AllocateClear<
-                        HArray<Value<Char_T_>, Char_T_>>(1);
+                    type_ = Type_::Curly;
+                    child_obj_ =
+                        HAllocator::Allocate(HArray<Value<Char_T_>, Char_T_>());
                     return (offset + 1);
                 }
 
                 case JSONotation_T_::OSquareChar: {
-                    type_ = Type_::Square;
-                    child_arr_ =
-                        HAllocator::AllocateClear<Array<Value<Char_T_>>>(1);
+                    type_      = Type_::Square;
+                    child_arr_ = HAllocator::Allocate(Array<Value<Char_T_>>());
                     return (offset + 1);
                 }
 
@@ -332,6 +330,8 @@ class JSONParser {
 
     ULong Nest(const Char_T_ *content, ULong offset, ULong end_before,
                ULong max_end_before) {
+        // Note: Rewrite it like Template.hpp
+
         switch (type_) {
             case Type_::Curly:
             case Type_::Square: {
@@ -649,7 +649,7 @@ class JSONParser {
             *obj_value_ = static_cast<Value<Char_T_> &&>(val);
             obj_value_  = nullptr;
         } else {
-            (*arr_) += static_cast<Value<Char_T_> &&>(val);
+            *arr_ += static_cast<Value<Char_T_> &&>(val);
         }
     }
 
@@ -782,13 +782,13 @@ class JSONParser {
     Value<Char_T_> *obj_value_{nullptr};
 
 #ifdef QENTEM_SIMD_ENABLED_
-    struct FindCache_ {
+    struct FindCache_T_ {
         ULong        Offset{0};
         ULong        NextOffset{0};
         QMM_Number_T Bits{0};
     };
 
-    FindCache_ *find_cache_{nullptr};
+    FindCache_T_ *find_cache_{nullptr};
 #endif
 
     Type_ type_{Type_::None};
