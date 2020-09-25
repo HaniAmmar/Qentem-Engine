@@ -76,7 +76,7 @@ class ALE {
         if ((content != nullptr) && (length != 0)) {
             Array<Item_>               items;
             ALE_T_<Char_T_, Helper_T_> ale{&items, callback};
-            Engine::FindNest(content, 0, length, length, &ale);
+            Engine::FindNest(content, 0U, length, length, &ale);
 
             if (items.Size() != 0) {
                 ALE_T_<Char_T_, Helper_T_>::sortOperations(items, content, 0,
@@ -195,8 +195,8 @@ class ALE_T_ {
                 (item_.Op == Operation_::Parentheses));
     }
 
-    ULong Nest(const Char_T_ *content, ULong offset, ULong end_before,
-               ULong max_end_before) {
+    UInt Nest(const Char_T_ *content, UInt offset, UInt end_before,
+              UInt max_end_before) {
         if ((offset + 1) != end_before) {
             ALE_T_<Char_T_, Helper_T_> ale{&(item_.SubItems), callback_};
             return Engine::FindNest(content, offset, end_before, max_end_before,
@@ -206,8 +206,8 @@ class ALE_T_ {
         return 0;
     }
 
-    inline ULong FindH(const Char_T_ *content, ULong offset,
-                       ULong end_before) noexcept {
+    inline UInt FindH(const Char_T_ *content, UInt offset,
+                      UInt end_before) noexcept {
         bool found   = false;
         item_.Length = 1;
 
@@ -349,8 +349,8 @@ class ALE_T_ {
         return 0; // No match
     }
 
-    ULong FindT(const Char_T_ *content, ULong offset,
-                ULong end_before) const noexcept {
+    UInt FindT(const Char_T_ *content, UInt offset,
+               UInt end_before) const noexcept {
         if (item_.Op == Operation_::Parentheses) {
             return Engine::FindOne(ALEOperations_T_::Parenthes2Op, content,
                                    offset, end_before);
@@ -360,21 +360,19 @@ class ALE_T_ {
                                end_before);
     }
 
-    void Found(const Char_T_ *content, ULong offset, ULong end_before,
-               ULong start_offset, const ULong &current_offset) {
-        item_.Offset = static_cast<UInt>(start_offset - item_.Length);
+    void Found(const Char_T_ *content, UInt offset, UInt end_before,
+               UInt start_offset, const UInt &current_offset) {
+        item_.Offset = (start_offset - item_.Length);
 
         switch (item_.Op) {
             case Operation_::Brackets: {
-                item_.Length =
-                    static_cast<UInt>((current_offset + 1) - start_offset);
+                item_.Length = ((current_offset + 1) - start_offset);
                 break;
             }
 
             case Operation_::Parentheses: {
                 // Set the length and drop )
-                item_.Length =
-                    static_cast<UInt>(current_offset - (start_offset + 1));
+                item_.Length = (current_offset - (start_offset + 1));
 
                 // Drop (
                 ++item_.Offset;
@@ -438,8 +436,8 @@ class ALE_T_ {
         // Determine the highest operation.
         Operation_ highest = Operation_::Parentheses;
 
-        const Item_ *item = items.Storage();
-        const Item_ *end  = (items.Storage() + items.Size());
+        const Item_ *item = items.First();
+        const Item_ *end  = items.End();
 
         while (item != end) {
             if (item->Op > highest) {
@@ -575,7 +573,7 @@ class ALE_T_ {
         }
 
         if (id != size) {
-            items.SoftResize(id);
+            items.GoBackTo(id);
         }
     }
 
@@ -587,7 +585,7 @@ class ALE_T_ {
                                                   (content + offset), length);
         }
 
-        const Item_ *item  = items.Storage();
+        const Item_ *item  = items.First();
         const Item_ *item2 = (item + 1);
         Operation_   op    = item->Op;
 
@@ -635,7 +633,7 @@ class ALE_T_ {
             }
         }
 
-        const Item_ *end = (items.Storage() + items.Size());
+        const Item_ *end = items.End();
 
         while (item2 != end) {
             double right_number;
