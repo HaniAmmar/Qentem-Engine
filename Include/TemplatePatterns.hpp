@@ -37,46 +37,29 @@ struct TemplatePatterns {};
 /*
  * Tags:
  *
- *  {...}
- *  - {raw:s|n}
- *      - raw: Raw variable, s: String, n: Number.
- *
  *  - {var:s|n}
  *      - var: Variable, s: String, n: Number.
  *
- *  - {math:raw|e|n}
- *      - raw|e|n: Raw variable, Equation or Number.
+ *  - {math:var|e|n}
+ *      - var|e|n: Raw variable, Equation or Number.
  *
- *  - {if case="raw|s" true="raw|var|s" false="raw|var|s"}
- *      - Inline if,  raw: Raw variable, var: Variable, s: String.
+ *  - {if case="var|s" true="var|var|s" false="var|var|s"}
+ *      - Inline if,  var: Raw variable, var: Variable, s: String.
  *
  *  <...>
- *  - <loop set="s"? key="s"? value="s"? times="raw|n"? index="raw|n"?>
+ *  - <loop set="s"? value="s"? repeat="var|n"? index="var|n"?>
  *                                                          ...</loop>
- *      - s: String, n: Number, raw: Raw ariable,
+ *      - s: String, n: Number, var: Raw ariable,
  *      - set: child name in the passed colloction: Optional.
- *      - key: the string the will be replaced with keys: Optional.
  *      - value: the current value in the colloction: Optional.
- *          Note: Choose a unique names for key and value.
- *      - times: if set, it will be used instead of the "set" size.
+ *          Note: Choose a unique name.
+ *      - repeat: if set, it will be used instead of the "set" size.
  *      - index: starting index.
  *
- *  - <if case="raw|e|n">...<else(if)? ... >?...</if>
- *      - raw|e|n: Raw variable, Equation or Number.
+ *  - <if case="var|e|n">...<else(if)? ... >?...</if>
+ *      - var|e|n: Raw variable, Equation or Number.
  *      - <else if ....> same as if: Optional.
  *      - <else> no case: Optional.
- */
-
-/*
- * Raw Variable Tag:
- *
- * {raw:name}, {raw:name[id]}
- * {raw:id}, {raw:id[id2]}, {raw:id[id2][id3]}
- * {raw:id[name]}, {raw:id[id2][name]}, {raw:id[id2][name1][id3][name2]}
- *
- * {raw:name}, {raw:name[name2]}, {raw:name[name2][name3][...]}
- * {raw:name}, {raw:name[id]}, {raw:name[id][id2][...]}
- * {raw:id}, {raw:id[id2]}, {raw:id[id2][...]}
  */
 
 /*
@@ -99,7 +82,7 @@ struct TemplatePatterns {};
  * {math: 1 && 1 } {math:0 || 1} {math: (1 && 1) || (3&&3) }
  * {math: 3==3} {math: 3!=4} {math: 3>4}  {math: 3>=4}
  * {math: 2<3} {math: 2 <= 3}
- * {math: {raw:n1} * {raw:n2}}
+ * {math: {var:n1} * {var:n2}}
  * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
  * {math: 0.2 + 0.3}
  * See ALE::Evaluate
@@ -109,38 +92,38 @@ struct TemplatePatterns {};
  * Inline If Tag:
  *
  * {if case="3 == 3" true="Yes" false="No"}
- * {if case="{raw:rvar_five} == 5" true="5" false="no"}
- * {if case="{raw:rvar1}" true="{raw:rvar_five} is equal to 5" false="no"}
+ * {if case="{var:var_five} == 5" true="5" false="no"}
+ * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
  * {if case="3 == 3" true="Yes" false="No"}
- * {if case="3 == 3" true="{raw:r1}" false="{raw:r2}"}
+ * {if case="3 == 3" true="{var:1}" false="{var:2}"}
  * {if case="3 == 3" true="{var:v1}" false="{var:v2}"}
  */
 
 /*
  * Loop Tag:
  *
- * <loop set="tree_name" key="loop1-key" value="loop1-value">
- *     loop1-key: loop1-value
+ * <loop set="tree_name" value="loop1-value">
+ *     loop1-value
  * </loop>
  *
  * <loop set="items" value="item">
  *     item[subitem1], item[subitem2], item[subitem3]
  * </loop>
  *
- * <loop set="tree_name" key="loop1-key" value="loop1-value">
- *      loop1-key: loop1-value
+ * <loop set="tree_name" value="loop1-value">
+ *      loop1-value
  *
- *      <loop set="tree_name2" key="loop2-key" value="loop2-value">
- *          loop2-key: loop2-value
+ *      <loop set="tree_name2" value="loop2-value">
+ *          loop2-value
  *      </loop>
  * </loop>
  *
- * <loop key="loop1-key" times="number|raw">
- *     loop1-key
+ * <loop value="loop1-value" repeat="number|var">
+ *     loop1-value
  * </loop>
  *
- * <loop key="loop1-key" index="number|raw">
- *     loop1-key
+ * <loop value="loop1-value" index="number|var">
+ *     loop1-value
  * </loop>
  */
 
@@ -162,10 +145,6 @@ struct TemplatePatterns<Char_T_, 1> {
 
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
-
-    static constexpr UInt RawVariablePrefixLength = 5U;
-    static constexpr UInt RawVariableFulllength =
-        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
 
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
@@ -198,14 +177,6 @@ struct TemplatePatterns<Char_T_, 1> {
     static constexpr Char_T_ VariableIndexPrefix = '[';
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
-    // {raw:
-    static const unsigned long long RawVariable64bit = 8249313016986432123ULL;
-    static constexpr Char_T_        Raw_Var_2ND_Char = 'r'; // Second char
-    static const Char_T_ *          GetRawVariablePrefix() noexcept {
-        static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
-        return &(val[0]);
-    }
-
     // {var:
     static const unsigned long long Variable64bit = 8537547791251764859ULL;
     static constexpr Char_T_        Var_2ND_Char  = 'v'; // Second char
@@ -216,7 +187,7 @@ struct TemplatePatterns<Char_T_, 1> {
 
     // {math:
     static const unsigned long long Math64bit     = 7889019549154766203ULL;
-    static constexpr Char_T_        MAth_2ND_Char = 'm'; // Second char
+    static constexpr Char_T_        Math_2ND_Char = 'm'; // Second char
     static const Char_T_ *          GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
         return &(val[0]);
@@ -271,15 +242,15 @@ struct TemplatePatterns<Char_T_, 1> {
         return &(val[0]);
     }
 
-    static constexpr Char_T_ QuoteChar = '"';
-    static constexpr Char_T_ CaseChar  = 'a'; // c[a]se
-    static constexpr Char_T_ TrueChar  = 'u'; // tr[u]e
-    static constexpr Char_T_ FalseChar = 'l'; // fa[l]se
-    static constexpr Char_T_ SetChar   = 't'; // se[t]
-    static constexpr Char_T_ KeyChar   = 'y'; // ke[y]
-    static constexpr Char_T_ ValueChar = 'u'; // val[u]e
-    static constexpr Char_T_ TimesChar = 'm'; // ti[m]es
-    static constexpr Char_T_ IndexChar = 'x'; // inde[x]
+    static constexpr Char_T_ QuoteChar  = '"';
+    static constexpr Char_T_ CaseChar   = 'a'; // c[a]se
+    static constexpr Char_T_ TrueChar   = 'u'; // tr[u]e
+    static constexpr Char_T_ FalseChar  = 'l'; // fa[l]se
+    static constexpr Char_T_ SetChar    = 's'; // [s]et
+    static constexpr Char_T_ ValueChar  = 'u'; // val[u]e
+    static constexpr Char_T_ RepeatChar = 'p'; // re[p]eat
+    static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
+    static constexpr Char_T_ TildeChar  = '~'; // Tilde
 
     /*
         // To get a 64bit value:
@@ -309,10 +280,6 @@ struct TemplatePatterns<Char_T_, 2> {
 
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
-
-    static constexpr UInt RawVariablePrefixLength = 5U;
-    static constexpr UInt RawVariableFulllength =
-        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
 
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
@@ -345,13 +312,6 @@ struct TemplatePatterns<Char_T_, 2> {
     static constexpr Char_T_ VariableIndexPrefix = u'[';
     static constexpr Char_T_ VariableIndexSuffix = u']';
 
-    // {raw:
-    static constexpr Char_T_ Raw_Var_2ND_Char = u'r'; // Second char
-    static const Char_T_ *   GetRawVariablePrefix() noexcept {
-        static constexpr Char_T_ val[] = {u'{', u'r', u'a', u'w', u':'};
-        return &(val[0]);
-    }
-
     // {var:
     static constexpr Char_T_ Var_2ND_Char = u'v'; // Second char
     static const Char_T_ *   GetVariablePrefix() noexcept {
@@ -360,7 +320,7 @@ struct TemplatePatterns<Char_T_, 2> {
     }
 
     // {math:
-    static constexpr Char_T_ MAth_2ND_Char = u'm'; // Second char
+    static constexpr Char_T_ Math_2ND_Char = u'm'; // Second char
     static const Char_T_ *   GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {u'{', u'm', u'a', u't', u'h', u':'};
         return &(val[0]);
@@ -413,15 +373,15 @@ struct TemplatePatterns<Char_T_, 2> {
         return &(val[0]);
     }
 
-    static constexpr Char_T_ QuoteChar = u'"';
-    static constexpr Char_T_ CaseChar  = u'a'; // c[a]se
-    static constexpr Char_T_ TrueChar  = u'u'; // tr[u]e
-    static constexpr Char_T_ FalseChar = u'l'; // fa[l]se
-    static constexpr Char_T_ SetChar   = u't'; // se[t]
-    static constexpr Char_T_ KeyChar   = u'y'; // ke[y]
-    static constexpr Char_T_ ValueChar = u'u'; // val[u]e
-    static constexpr Char_T_ TimesChar = u'm'; // ti[m]es
-    static constexpr Char_T_ IndexChar = u'x'; // inde[x]
+    static constexpr Char_T_ QuoteChar  = u'"';
+    static constexpr Char_T_ CaseChar   = u'a'; // c[a]se
+    static constexpr Char_T_ TrueChar   = u'u'; // tr[u]e
+    static constexpr Char_T_ FalseChar  = u'l'; // fa[l]se
+    static constexpr Char_T_ SetChar    = u's'; // [s]et
+    static constexpr Char_T_ ValueChar  = u'u'; // val[u]e
+    static constexpr Char_T_ RepeatChar = u'p'; // re[p]eat
+    static constexpr Char_T_ IndexChar  = u'd'; // in[d]ex
+    static constexpr Char_T_ TildeChar  = u'~'; // Tilde
 };
 
 // Four bytes character.
@@ -433,10 +393,6 @@ struct TemplatePatterns<Char_T_, 4> {
 
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
-
-    static constexpr UInt RawVariablePrefixLength = 5U;
-    static constexpr UInt RawVariableFulllength =
-        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
 
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
@@ -469,13 +425,6 @@ struct TemplatePatterns<Char_T_, 4> {
     static constexpr Char_T_ VariableIndexPrefix = U'[';
     static constexpr Char_T_ VariableIndexSuffix = U']';
 
-    // {raw:
-    static constexpr Char_T_ Raw_Var_2ND_Char = U'r'; // Second char
-    static const Char_T_ *   GetRawVariablePrefix() noexcept {
-        static constexpr Char_T_ val[] = {U'{', U'r', U'a', U'w', U':'};
-        return &(val[0]);
-    }
-
     // {var:
     static constexpr Char_T_ Var_2ND_Char = U'v'; // Second char
     static const Char_T_ *   GetVariablePrefix() noexcept {
@@ -484,7 +433,7 @@ struct TemplatePatterns<Char_T_, 4> {
     }
 
     // {math:
-    static constexpr Char_T_ MAth_2ND_Char = U'm'; // Second char
+    static constexpr Char_T_ Math_2ND_Char = U'm'; // Second char
     static const Char_T_ *   GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {U'{', U'm', U'a', U't', U'h', U':'};
         return &(val[0]);
@@ -537,15 +486,15 @@ struct TemplatePatterns<Char_T_, 4> {
         return &(val[0]);
     }
 
-    static constexpr Char_T_ QuoteChar = U'"';
-    static constexpr Char_T_ CaseChar  = U'a'; // c[a]se
-    static constexpr Char_T_ TrueChar  = U'u'; // tr[u]e
-    static constexpr Char_T_ FalseChar = U'l'; // fa[l]se
-    static constexpr Char_T_ SetChar   = U't'; // se[t]
-    static constexpr Char_T_ KeyChar   = U'y'; // ke[y]
-    static constexpr Char_T_ ValueChar = U'u'; // val[u]e
-    static constexpr Char_T_ TimesChar = U'm'; // ti[m]es
-    static constexpr Char_T_ IndexChar = U'x'; // inde[x]
+    static constexpr Char_T_ QuoteChar  = U'"';
+    static constexpr Char_T_ CaseChar   = U'a'; // c[a]se
+    static constexpr Char_T_ TrueChar   = U'u'; // tr[u]e
+    static constexpr Char_T_ FalseChar  = U'l'; // fa[l]se
+    static constexpr Char_T_ SetChar    = U's'; // [s]et
+    static constexpr Char_T_ ValueChar  = U'u'; // val[u]e
+    static constexpr Char_T_ RepeatChar = U'p'; // re[p]eat
+    static constexpr Char_T_ IndexChar  = U'd'; // in[d]ex
+    static constexpr Char_T_ TildeChar  = U'~'; // Tilde
 };
 
 // wchar_t
@@ -557,10 +506,6 @@ struct TemplatePatterns<wchar_t> {
 
     // static constexpr UInt InLineSuffixLength = 1U;
     // static constexpr UInt InLinePrefixLength = 1U;
-
-    static constexpr UInt RawVariablePrefixLength = 5U;
-    static constexpr UInt RawVariableFulllength =
-        (RawVariablePrefixLength + 1U); // + InLineSuffixLength
 
     static constexpr UInt VariablePrefixLength = 5U;
     static constexpr UInt VariableFulllength =
@@ -593,13 +538,6 @@ struct TemplatePatterns<wchar_t> {
     static constexpr wchar_t VariableIndexPrefix = L'[';
     static constexpr wchar_t VariableIndexSuffix = L']';
 
-    // {raw:
-    static constexpr wchar_t Raw_Var_2ND_Char = L'r'; // Second char
-    static const wchar_t *   GetRawVariablePrefix() noexcept {
-        static constexpr wchar_t val[] = {L'{', L'r', L'a', L'w', L':'};
-        return &(val[0]);
-    }
-
     // {var:
     static constexpr wchar_t Var_2ND_Char = L'v'; // Second char
     static const wchar_t *   GetVariablePrefix() noexcept {
@@ -608,7 +546,7 @@ struct TemplatePatterns<wchar_t> {
     }
 
     // {math:
-    static constexpr wchar_t MAth_2ND_Char = L'm'; // Second char
+    static constexpr wchar_t Math_2ND_Char = L'm'; // Second char
     static const wchar_t *   GetMathPrefix() noexcept {
         static constexpr wchar_t val[] = {L'{', L'm', L'a', L't', L'h', L':'};
         return &(val[0]);
@@ -661,15 +599,15 @@ struct TemplatePatterns<wchar_t> {
         return &(val[0]);
     }
 
-    static constexpr wchar_t QuoteChar = L'"';
-    static constexpr wchar_t CaseChar  = L'a'; // c[a]se
-    static constexpr wchar_t TrueChar  = L'u'; // tr[u]e
-    static constexpr wchar_t FalseChar = L'l'; // fa[l]se
-    static constexpr wchar_t SetChar   = L't'; // se[t]
-    static constexpr wchar_t KeyChar   = L'y'; // ke[y]
-    static constexpr wchar_t ValueChar = L'u'; // val[u]e
-    static constexpr wchar_t TimesChar = L'm'; // ti[m]es
-    static constexpr wchar_t IndexChar = L'x'; // inde[x]
+    static constexpr wchar_t QuoteChar  = L'"';
+    static constexpr wchar_t CaseChar   = L'a'; // c[a]se
+    static constexpr wchar_t TrueChar   = L'u'; // tr[u]e
+    static constexpr wchar_t FalseChar  = L'l'; // fa[l]se
+    static constexpr wchar_t SetChar    = L's'; // [s]et
+    static constexpr wchar_t ValueChar  = L'u'; // val[u]e
+    static constexpr wchar_t RepeatChar = L'p'; // re[p]eat
+    static constexpr wchar_t IndexChar  = L'd'; // in[d]ex
+    static constexpr wchar_t TildeChar  = L'~'; // Tilde
 };
 
 #endif
