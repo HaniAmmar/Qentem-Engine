@@ -71,7 +71,7 @@ int RunTests() {
 }
 
 int main() {
-    // for (size_t i = 0; i < 100000; i++) {
+    // for (UInt i = 0; i < 100000; i++) {
     //     Qentem::Test::RunTestHelperTests();
     //     Qentem::Test::RunMemoryTests();
     //     Qentem::Test::RunStringUtilsTests();

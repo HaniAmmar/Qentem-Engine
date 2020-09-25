@@ -856,14 +856,14 @@ static int TestParse4() {
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual("\"", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("\"", key_ptr->First(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({    "\n":   "\f"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual("\n", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("\n", key_ptr->First(), value[0].Length()),
         "IsEqual()");
 
     SHOULD_EQUAL_TRUE(
@@ -884,14 +884,14 @@ static int TestParse4() {
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual("\b\b", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("\b\b", key_ptr->First(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\":"\"\""})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(R"(\\)", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual(R"(\\)", key_ptr->First(), value[0].Length()),
         "IsEqual()");
 
     SHOULD_EQUAL_TRUE(StringUtils::IsEqual(R"("")", value[0].StringStorage(),
@@ -912,14 +912,14 @@ static int TestParse4() {
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(R"(\\\)", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual(R"(\\\)", key_ptr->First(), value[0].Length()),
         "IsEqual()");
 
     value   = JSON::Parse(R"({"\/\/\/":"\n\n\n"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual("///", key_ptr->Storage(), value[0].Length()),
+        StringUtils::IsEqual("///", key_ptr->First(), value[0].Length()),
         "IsEqual()");
 
     SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(),
@@ -956,8 +956,7 @@ static int TestParse4() {
     value   = JSON::Parse(R"({"\t\r\n\f\b\/\\\"":"\"\\\/\b\f\n\r\t"})");
     key_ptr = value.GetKey(0);
     SHOULD_NOT_EQUAL(key_ptr, nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"",
-                                           key_ptr->Storage(),
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"", key_ptr->First(),
                                            value[0].Length()),
                       "IsEqual()");
 
@@ -979,25 +978,25 @@ static int TestParse4() {
         "IsEqual()");
 
     String<char> str(R"(["\u08A7"])");
-    value = JSON::Parse(str.Storage(), str.Length());
+    value = JSON::Parse(str.First(), str.Length());
     SHOULD_EQUAL_TRUE(
         StringUtils::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     str   = R"(["\ud802\uDE7B"])";
-    value = JSON::Parse(str.Storage(), str.Length());
+    value = JSON::Parse(str.First(), str.Length());
     SHOULD_EQUAL_TRUE(
         StringUtils::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()),
         "IsEqual()");
 
     str   = R"(["\uD83E\uFC59"])";
-    value = JSON::Parse(str.Storage(), str.Length());
+    value = JSON::Parse(str.First(), str.Length());
     SHOULD_EQUAL_TRUE(StringUtils::IsEqual("🡙", value[0].StringStorage(),
                                            value[0].Length()),
                       "IsEqual()");
 
     str   = R"(["\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7"])";
-    value = JSON::Parse(str.Storage(), str.Length());
+    value = JSON::Parse(str.First(), str.Length());
     SHOULD_EQUAL_TRUE(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ",
                                            value[0].StringStorage(),
                                            value[0].Length()),

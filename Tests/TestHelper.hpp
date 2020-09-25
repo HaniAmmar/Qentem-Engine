@@ -43,7 +43,7 @@ class TestHelper {
     PrintErrorMessage(bool equal, const Char_T_ *name, Value_T_ value,
                       std::wostream &out = std::wcout) {
         out << ":\x1B[31m Failed\x1B[0m\n"
-            << "At line " << LineNumber() << ": '" << name << "' should"
+            << "At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value << "'\n"
             << std::endl;
     }
@@ -68,7 +68,7 @@ class TestHelper {
             out << ":\x1B[32m Passed\x1B[0m" << std::endl;
         } catch (...) {
             out << ":\x1B[31m Failed to pass (throw)\x1B[0m"
-                << " after line: " << TestHelper::LineNumber() << '\n'
+                << " after line :" << TestHelper::LineNumber() << '\n'
                 << std::endl;
             return false;
         }

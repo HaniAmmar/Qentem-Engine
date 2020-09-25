@@ -1146,7 +1146,7 @@ static int TestNumberToString3() {
 static int TestNumberToString4() {
     double number = -123456;
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(number, 30, 0, 0),
-                       "-0000000000000123456", "return");
+                       "-000000000000000123456", "return");
 
     number = -2;
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(number, 0, 0, 0), "-2", "return");
@@ -1310,6 +1310,9 @@ static int TestNumberToString5() {
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(1e-308), "1e-308", "return");
 
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(15e100), "1.5e101", "return");
+
+    SHOULD_EQUAL_VALUE(DigitC::NumberToString(1.6866831148613157e308),
+                       "1.686683114861316e308", "return");
 
     SHOULD_EQUAL_VALUE(DigitC::NumberToString(99999999999999999999.0), "1e20",
                        "return");

@@ -37,165 +37,165 @@ static int TestArray1() {
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers2.Reset();
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers1.SetCapacity(5);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 5, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     numbers1.SetCapacity(10);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 10, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     numbers1.Resize(18);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 18, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    storage = numbers1.Storage();
+    storage = numbers1.First();
     numbers1.Resize(4);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 4, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
 
     numbers2.Resize(5);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 5, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers2.Resize(2);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 2, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers2.Resize(0);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers1.SetCapacity(0);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     numbers1.Reset();
     numbers2.Reset();
 
     numbers1.ResizeAndInitialize(8);
-    storage = numbers1.Storage();
+    storage = numbers1.First();
     SHOULD_EQUAL_VALUE(numbers1.Size(), 8, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     numbers1.ResizeAndInitialize(4);
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
 
-    storage  = numbers1.Storage();
+    storage  = numbers1.First();
     numbers2 = numbers1;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 4, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 4, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers2.Size(), 4, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), storage, "First()", "storage");
 
     numbers1.ResizeAndInitialize(16);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    storage  = numbers1.Storage();
+    storage  = numbers1.First();
     numbers2 = numbers1;
     SHOULD_EQUAL_VALUE(numbers2.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), storage, "First()", "storage");
 
     numbers2 = static_cast<Array<UInt> &&>(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 16, "Capacity");
-    SHOULD_EQUAL_VALUE(numbers2.Storage(), storage, "Storage()");
+    SHOULD_EQUAL_VALUE(numbers2.First(), storage, "First()");
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    storage  = numbers1.Storage();
+    storage  = numbers1.First();
     numbers1 = Array<UInt>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
 
-    storage  = numbers2.Storage();
+    storage  = numbers2.First();
     numbers1 = Array<UInt>(static_cast<Array<UInt> &&>(numbers2));
     SHOULD_EQUAL_VALUE(numbers1.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(numbers1.Storage(), storage, "Storage()");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(numbers1.First(), storage, "First()");
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
-    numbers1.SoftReset();
+    numbers1.Clear();
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     numbers1.ResizeAndInitialize(3);
     numbers2.ResizeAndInitialize(5);
-    storage = numbers2.Storage();
+    storage = numbers2.First();
 
     numbers1 += numbers2;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 8, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
 
-    storage = numbers1.Storage();
+    storage = numbers1.First();
     numbers1 += static_cast<Array<UInt> &&>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 13, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 13, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers2.ResizeAndInitialize(5);
     numbers1.Resize(18);
-    storage = numbers1.Storage();
+    storage = numbers1.First();
     numbers1 += static_cast<Array<UInt> &&>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 18, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 18, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(numbers1.Storage(), storage, "Storage()");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(numbers1.First(), storage, "First()");
 
-    storage = numbers1.Storage();
+    storage = numbers1.First();
     numbers2 += static_cast<Array<UInt> &&>(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 18, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 18, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(numbers2.Storage(), storage, "Storage()");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(numbers2.First(), storage, "First()");
 
     UInt *tmp = numbers2.Eject();
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(tmp, storage, "Storage()");
+    SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(tmp, storage, "First()");
 
     HAllocator::Deallocate(tmp);
 
@@ -209,55 +209,54 @@ static int TestArray2() {
 
     numbers2.SetCapacity(4);
     numbers1.ResizeAndInitialize(4);
-    storage = numbers2.Storage();
+    storage = numbers2.First();
     numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 4, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL(numbers2.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL(numbers2.First(), storage, "First()", "storage");
 
     numbers1.SetCapacity(10);
     numbers2.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 4, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers1.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 8, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
-    storage = numbers1.Storage();
+    storage = numbers1.First();
     numbers2.Insert(static_cast<Array<UInt> &&>(numbers1));
     SHOULD_EQUAL_VALUE(numbers2.Size(), 12, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 12, "Capacity");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(numbers2.Storage(), storage, "Storage()", "storage");
+    SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(numbers2.First(), storage, "First()", "storage");
 
-    numbers1.SetCapacity(16);
+    numbers1.ResizeAndInitialize(16);
 
-    numbers1.SoftResize(5);
+    numbers1.GoBackTo(5);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 5, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    numbers1.SoftResize(0);
+    numbers1.GoBackTo(0);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    numbers1.SoftResize(16);
-    SHOULD_EQUAL_VALUE(numbers1.Size(), 16, "Size");
+    numbers1.GoBackTo(16);
+    SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    numbers1.SoftResize(0);
     numbers1.Compress();
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     END_SUB_TEST;
 }
@@ -273,7 +272,7 @@ static int TestArray3() {
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 8, "Size");
     SHOULD_EQUAL_TRUE((numbers1.Capacity() >= 8), "(numbers1.Capacity() >= 8)");
-    SHOULD_NOT_EQUAL(numbers1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     bool did_throw;
 
@@ -325,23 +324,23 @@ static int TestArray3() {
     String<char> str1("val1");
     String<char> str2("val2");
 
-    const char *str1_cstr = str1.Storage();
-    const char *str2_cstr = str2.Storage();
+    const char *str1_cstr = str1.First();
+    const char *str2_cstr = str2.First();
 
     strings += static_cast<String<char> &&>(str1);
-    SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
+    SHOULD_EQUAL(strings[0].First(), str1_cstr, "strings[0].First()",
                  "str1_cstr");
 
     strings.Insert(static_cast<String<char> &&>(str2));
-    SHOULD_EQUAL(strings[1].Storage(), str2_cstr, "strings[1].Storage()",
+    SHOULD_EQUAL(strings[1].First(), str2_cstr, "strings[1].First()",
                  "str2_cstr");
 
     strings += str1;
-    SHOULD_NOT_EQUAL(strings[2].Storage(), str1_cstr, "strings[2].Storage()",
+    SHOULD_NOT_EQUAL(strings[2].First(), str1_cstr, "strings[2].First()",
                      "str1_cstr");
 
     strings.Insert(str2);
-    SHOULD_NOT_EQUAL(strings[3].Storage(), str2_cstr, "strings[3].Storage()",
+    SHOULD_NOT_EQUAL(strings[3].First(), str2_cstr, "strings[3].First()",
                      "str2_cstr");
 
     // Checking move after expanding.
@@ -349,10 +348,10 @@ static int TestArray3() {
         strings += String<char>("");
     }
 
-    SHOULD_EQUAL(strings[0].Storage(), str1_cstr, "strings[0].Storage()",
+    SHOULD_EQUAL(strings[0].First(), str1_cstr, "strings[0].First()",
                  "str1_cstr");
 
-    SHOULD_EQUAL(strings[1].Storage(), str2_cstr, "strings[1].Storage()",
+    SHOULD_EQUAL(strings[1].First(), str2_cstr, "strings[1].First()",
                  "str2_cstr");
 
     END_SUB_TEST;
@@ -365,27 +364,27 @@ static int TestArray4() {
     String<char> str1("val1");
     String<char> str2("val2");
 
-    const char *str1_cstr = str1.Storage();
-    const char *str2_cstr = str2.Storage();
+    const char *str1_cstr = str1.First();
+    const char *str2_cstr = str2.First();
 
     strings1 += static_cast<String<char> &&>(str1);
     strings1 += static_cast<String<char> &&>(str2);
 
     strings2 += strings1;
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
-    SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(strings2[0].Storage(), str1_cstr, "strings[0].Storage()",
+    SHOULD_NOT_EQUAL(strings2.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(strings2[0].First(), str1_cstr, "strings[0].First()",
                      "str1_cstr");
-    SHOULD_NOT_EQUAL(strings2[1].Storage(), str2_cstr, "strings[1].Storage()",
+    SHOULD_NOT_EQUAL(strings2[1].First(), str2_cstr, "strings[1].First()",
                      "str2_cstr");
 
     strings2.SetCapacity(2);
     strings2 += static_cast<Array<String<char>> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
-    SHOULD_NOT_EQUAL(strings2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL(strings2[0].Storage(), str1_cstr, "strings[0].Storage()",
+    SHOULD_NOT_EQUAL(strings2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL(strings2[0].First(), str1_cstr, "strings[0].First()",
                  "str1_cstr");
-    SHOULD_EQUAL(strings2[1].Storage(), str2_cstr, "strings[1].Storage()",
+    SHOULD_EQUAL(strings2[1].First(), str2_cstr, "strings[1].First()",
                  "str2_cstr");
 
     END_SUB_TEST;

@@ -37,28 +37,28 @@ static int TestString1() {
 
     String8 str1;
     SHOULD_EQUAL_VALUE(str1.Length(), 0, "Length");
-    SHOULD_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(str1.First(), nullptr, "First()", "null");
 
     String8 str2{"0123456789"};
     SHOULD_EQUAL_VALUE(str2.Length(), 10, "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
 
     str2.Reset();
     SHOULD_EQUAL_VALUE(str2.Length(), 0, "Length");
-    SHOULD_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(str2.First(), nullptr, "First()", "null");
 
     str1 = String8("abcd");
     SHOULD_EQUAL_VALUE(str1.Length(), 4, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcd", "str1");
     SHOULD_NOT_EQUAL(str1, "abcdef", "str1", "abcdef");
 
     str1 = String8("abcd", 2);
     SHOULD_EQUAL_VALUE(str1.Length(), 2, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "ab", "str1");
     SHOULD_NOT_EQUAL(str1, "abcd", "str1", "abcd");
 
@@ -67,55 +67,52 @@ static int TestString1() {
     SHOULD_NOT_EQUAL(strptr, nullptr, "Eject", "null");
 
     str2 = String8(strptr, length); // Manage
-    SHOULD_EQUAL_VALUE(str2.Storage(), strptr, "Storage()");
+    SHOULD_EQUAL_VALUE(str2.First(), strptr, "First()");
     SHOULD_EQUAL_VALUE(str2.Length(), length, "Length");
 
     str1 = static_cast<String8 &&>(str2); // Move
-    SHOULD_EQUAL_VALUE(str1.Storage(), strptr, "Storage()");
+    SHOULD_EQUAL_VALUE(str1.First(), strptr, "First()");
     SHOULD_EQUAL_VALUE(str1.Length(), length, "Length");
     SHOULD_EQUAL_VALUE(str2.Length(), 0, "Length");
-    SHOULD_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(str2.First(), nullptr, "First()", "null");
 
     str2 = "abcdef"; // Copy
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], 0, "Storage()[Length]");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2.Storage(), "abcdef", 5),
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(str2.First(), "abcdef", 5),
                       "IsEqual");
 
     str2 = str1; // Copy
     SHOULD_EQUAL_VALUE(str2.Length(), str1.Length(), "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(str2.Storage(), str1.Storage(), "Storage()",
-                     str1.Storage());
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(str2.First(), str1.First(), "First()", str1.First());
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
+        StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()),
         "IsEqual");
 
     str2.Reset();
     str1 = "efg";         // Copy
     str2 = String8(str1); // Copy
     SHOULD_EQUAL_VALUE(str2.Length(), str1.Length(), "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_NOT_EQUAL(str2.Storage(), str1.Storage(), "Storage()",
-                     str1.Storage());
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_NOT_EQUAL(str2.First(), str1.First(), "First()", str1.First());
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
+        StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()),
         "IsEqual");
 
     str1 = "hig";         // Copy
     str2 = String8(str1); // Copy over a value
     SHOULD_EQUAL_VALUE(str2.Length(), str1.Length(), "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), str1.Storage(), "Storage()",
-                     str1.Storage());
+    SHOULD_NOT_EQUAL(str2.First(), str1.First(), "First()", str1.First());
     SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(str2.Storage(), str1.Storage(), str2.Length()),
+        StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()),
         "IsEqual");
 
     length = str1.Length();
     str2   = String8(static_cast<String8 &&>(str1));
     SHOULD_EQUAL_VALUE(str1.Length(), 0, "Length");
-    SHOULD_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(str1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(str2.Length(), length, "Length");
 
     END_SUB_TEST;
@@ -184,86 +181,86 @@ static int TestString2() {
 
     str1.Insert("a", 1);
     SHOULD_EQUAL_VALUE(str1.Length(), 1, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "a", "str1");
 
     str1.Insert("bc", 2);
     SHOULD_EQUAL_VALUE(str1.Length(), 3, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abc", "str1");
 
     str1.Insert("", 0);
     SHOULD_EQUAL_VALUE(str1.Length(), 3, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abc", "str1");
 
     str2 = String8::Insert(str1, String8("def"));
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str2, "abcdef", "str2");
 
     str2 = String8::Insert(str2, String8(""));
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str2, "abcdef", "str2");
 
     str2 = String8::Insert(String8(""), str2);
     SHOULD_EQUAL_VALUE(str2.Length(), 6, "Length");
-    SHOULD_NOT_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str2.Storage()[str2.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str2, "abcdef", "str2");
 
     str1.Reset();
     str1 += "a";
     SHOULD_EQUAL_VALUE(str1.Length(), 1, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "a", "str1");
 
     str1 += "bc";
     SHOULD_EQUAL_VALUE(str1.Length(), 3, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abc", "str1");
 
     str2 = "def";
     str1 += str2;
     SHOULD_EQUAL_VALUE(str1.Length(), 6, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcdef", "str1");
 
     str2 = "ghi";
     str1 += static_cast<String8 &&>(str2);
     SHOULD_EQUAL_VALUE(str1.Length(), 9, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcdefghi", "str1");
     SHOULD_EQUAL_VALUE(str2.Length(), 0, "Length");
-    SHOULD_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(str2.First(), nullptr, "First()", "null");
 
     str1 = str1 + "";
     SHOULD_EQUAL_VALUE(str1.Length(), 9, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcdefghi", "str1");
 
     str1 = str1 + "gkl";
     SHOULD_EQUAL_VALUE(str1.Length(), 12, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcdefghigkl", "str1");
 
     str2 = "123";
     str1 = str1 + str2;
     SHOULD_EQUAL_VALUE(str1.Length(), 15, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "abcdefghigkl123", "str1");
 
     str1.Reset();
@@ -271,11 +268,11 @@ static int TestString2() {
     str2 = "456";
     str1 = str1 + static_cast<String8 &&>(str2);
     SHOULD_EQUAL_VALUE(str1.Length(), 6, "Length");
-    SHOULD_NOT_EQUAL(str1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(str1.Storage()[str1.Length()], 0, "Storage()[Length]");
+    SHOULD_NOT_EQUAL(str1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     SHOULD_EQUAL_VALUE(str1, "123456", "str1");
     SHOULD_EQUAL_VALUE(str2.Length(), 0, "Length");
-    SHOULD_EQUAL(str2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(str2.First(), nullptr, "First()", "null");
 
     END_SUB_TEST;
 }

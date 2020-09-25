@@ -272,11 +272,11 @@ static int TestToUTF32() {
 
 // static void convertTo4Hex(ULong code) {
 //     if (code < 0x10000U) {
-//         std::cout << "\\u" << decToHex(code).Storage() << "\n";
+//         std::cout << "\\u" << decToHex(code).First() << "\n";
 //     } else {
 //         code -= 0x10000U;
-//         std::cout << "\n\\u" << decToHex(0xD800U | (code >> 10U)).Storage();
-//         std::cout << "\\u" << decToHex(0xDC00U | (code & 0x3FFU)).Storage()
+//         std::cout << "\n\\u" << decToHex(0xD800U | (code >> 10U)).First();
+//         std::cout << "\\u" << decToHex(0xDC00U | (code & 0x3FFU)).First()
 //                   << "\n";
 //     }
 // }

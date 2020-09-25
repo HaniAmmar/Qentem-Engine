@@ -46,292 +46,292 @@ static int TestEscapeJSON() {
     str = "\"";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\")", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\\";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\\)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "/";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\/)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\b";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\b)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\f";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\f)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\n";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\n)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\r";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\r)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\t";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\t)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\"\"";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\"\")", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\\\\";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\\\\)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "//";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\/\/)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\b\b";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\b\b)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\f\f";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\f\f)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\n\n";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\n\n)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\r\r";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\r\r)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\t\t";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\t\t)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = R"(""")";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\"\"\")", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = R"(\\\)";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\\\\\\)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "///";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\/\/\/)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\b\b\b";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\b\b\b)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\f\f\f";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\f\f\f)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\n\n\n";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\n\n\n)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\r\r\r";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\r\r\r)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\t\t\t";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\t\t\t)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \"";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \")", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \\";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \\)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " /";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \/)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \b";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \b)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \f";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \f)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \n";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \n)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \r";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \r)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \t";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \t)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\" ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\" )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\\ ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\\ )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "/ ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\/ )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\b ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\b )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\f ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\f )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\n ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\n )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\r ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\r )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\t ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\t )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \" ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \" )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \\ ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \\ )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " / ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \/ )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \b ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \b )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \f ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \f )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \n ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \n )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \r ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \r )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = " \t ";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"( \t )", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = R"(" ")";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\" \")", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = R"(\ \)";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\\ \\)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "/ /";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\/ \/)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\b \b";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\b \b)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\f \f";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\f \f)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\n \n";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\n \n)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\r \r";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\r \r)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\t \t";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\t \t)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\"\\/\b\f\n\r\t";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\"\\\/\b\f\n\r\t)", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     str = "\t\r\n\f\b/\\\"";
     JSON::EscapeJSON(str, StringUtils::Count(str), ss);
     SHOULD_EQUAL_VALUE(ss, R"(\t\r\n\f\b\/\\\")", "ss");
-    ss.SoftReset();
+    ss.Clear();
 
     END_SUB_TEST;
 }

@@ -35,28 +35,28 @@ static int TestStringStream() {
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss1.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(ss1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(ss1.First(), nullptr, "First()", "null");
 
     StringStream<char> ss2(10); // Preset size
     SHOULD_EQUAL_VALUE((ss2.Capacity() >= 10), true, "Capacity() >= 10");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
-    SHOULD_NOT_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_NOT_EQUAL(ss2.First(), nullptr, "First()", "null");
 
     ss2.Reset();
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(ss2.First(), nullptr, "First()", "null");
 
     ss1 = StringStream<char>(1);
     ss1 += 'a';
     SHOULD_EQUAL_VALUE(ss1.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss1.Capacity() >= 1), "(ss1.Capacity() >= 1)");
-    SHOULD_NOT_EQUAL(ss1.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(ss1.Storage()[0], 'a', "Storage()[0]");
+    SHOULD_NOT_EQUAL(ss1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(ss1.First()[0], 'a', "First()[0]");
     SHOULD_EQUAL_VALUE(ss1.GetString(), "a", "GetString()");
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss1.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(ss1.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(ss1.First(), nullptr, "First()", "null");
 
     ss2 += String<char>("a");
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
@@ -101,7 +101,7 @@ static int TestStringStream() {
 
     ULong lss = ss1.Capacity();
 
-    ss1.SoftReset();
+    ss1.Clear();
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss1.Capacity(), lss, "Capacity");
 
@@ -112,7 +112,7 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1, "abc", "StringStream");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(ss2.First(), nullptr, "First()", "null");
 
     ss2 += 'a';
     ss1.Reset();
@@ -140,14 +140,14 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1, "efg", "StringStream");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss2.Capacity(), 0, "Capacity");
-    SHOULD_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
+    SHOULD_EQUAL(ss2.First(), nullptr, "First()", "null");
 
     ss2.Insert("a", 1);
     SHOULD_EQUAL_VALUE(ss2.Length(), 1, "Length");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
     SHOULD_EQUAL_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
-    SHOULD_NOT_EQUAL(ss2.Storage(), nullptr, "Storage()", "null");
-    SHOULD_EQUAL_VALUE(ss2.Storage()[0], 'a', "Storage()[0]");
+    SHOULD_NOT_EQUAL(ss2.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL_VALUE(ss2.First()[0], 'a', "First()[0]");
 
     ss2.Insert("bc", 2);
     SHOULD_EQUAL_VALUE(ss2.Length(), 3, "Length");
@@ -212,7 +212,7 @@ static int TestStringStream() {
     const char *ab = "ab";
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 2, "Length");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.Storage(), ab, 2), "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.First(), ab, 2), "IsEqual()");
 
     buffer = ss1.Buffer(1);
 
@@ -222,7 +222,7 @@ static int TestStringStream() {
 
     const char *ab2 = "abc";
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.Storage(), ab2, 3), "IsEqual()");
+    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.First(), ab2, 3), "IsEqual()");
 
     ss1 += "de";
 
