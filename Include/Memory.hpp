@@ -34,22 +34,34 @@ namespace Memory {
 ///////////////////////// Start SetToZero /////////////////////////
 
 template <ULong S>
-struct Setter { // ASM QWORD
+struct SetToZeroHelper { // ASM QWORD
     static void SetToZero(void *ptr, ULong size) noexcept {
-        size >>= 3U;
+        if (Is64Bit()) {
+            size >>= 3U;
 
-        long long *      des = static_cast<long long *>(ptr);
-        const long long *end = (des + size);
+            long long *      des = static_cast<long long *>(ptr);
+            const long long *end = (des + size);
 
-        while (des != end) {
-            *des = 0;
-            ++des;
+            while (des != end) {
+                *des = 0;
+                ++des;
+            }
+        } else {
+            size >>= 2U;
+
+            int *      des = static_cast<int *>(ptr);
+            const int *end = (des + size);
+
+            while (des != end) {
+                *des = 0;
+                ++des;
+            }
         }
     }
 };
 
 template <>
-struct Setter<1> { // ASM BYTE
+struct SetToZeroHelper<1> { // ASM BYTE
     static void SetToZero(void *ptr, ULong size) noexcept {
         char *      des = static_cast<char *>(ptr);
         const char *end = (des + size);
@@ -62,7 +74,7 @@ struct Setter<1> { // ASM BYTE
 };
 
 template <>
-struct Setter<2> { // ASM WORD
+struct SetToZeroHelper<2> { // ASM WORD
     static void SetToZero(void *ptr, ULong size) noexcept {
         size >>= 1U;
 
@@ -77,7 +89,7 @@ struct Setter<2> { // ASM WORD
 };
 
 template <>
-struct Setter<4> { // ASM DWORD
+struct SetToZeroHelper<4> { // ASM DWORD
     static void SetToZero(void *ptr, ULong size) noexcept {
         size >>= 2U;
 
@@ -93,7 +105,7 @@ struct Setter<4> { // ASM DWORD
 
 template <typename Char_T_>
 static void SetToZero(void *ptr, ULong size) noexcept {
-    return Setter<sizeof(Char_T_)>::SetToZero(ptr, size);
+    return SetToZeroHelper<sizeof(Char_T_)>::SetToZero(ptr, size);
 }
 
 ///////////////////////// End SetToZero /////////////////////////
@@ -101,24 +113,38 @@ static void SetToZero(void *ptr, ULong size) noexcept {
 ///////////////////////// Start Copy /////////////////////////
 
 template <ULong S>
-struct Copier { // ASM QWORD (8, 16, 32)
+struct CopyHelper { // ASM QWORD
     static void Copy(void *to, const void *form, ULong size) noexcept {
-        size >>= 3U;
+        if (Is64Bit()) {
+            size >>= 3U;
 
-        const long long *src = static_cast<const long long *>(form);
-        const long long *end = (src + size);
-        long long *      des = static_cast<long long *>(to);
+            const long long *src = static_cast<const long long *>(form);
+            const long long *end = (src + size);
+            long long *      des = static_cast<long long *>(to);
 
-        while (src != end) {
-            *des = *src;
-            ++des;
-            ++src;
+            while (src != end) {
+                *des = *src;
+                ++des;
+                ++src;
+            }
+        } else {
+            size >>= 2U;
+
+            const int *src = static_cast<const int *>(form);
+            const int *end = (src + size);
+            int *      des = static_cast<int *>(to);
+
+            while (src != end) {
+                *des = *src;
+                ++des;
+                ++src;
+            }
         }
     }
 };
 
 template <>
-struct Copier<1> { // ASM BYTE
+struct CopyHelper<1> { // ASM BYTE
     static void Copy(void *to, const void *form, ULong size) noexcept {
         const char *src = static_cast<const char *>(form);
         const char *end = (src + size);
@@ -133,7 +159,7 @@ struct Copier<1> { // ASM BYTE
 };
 
 template <>
-struct Copier<2> { // ASM WORD
+struct CopyHelper<2> { // ASM WORD
     static void Copy(void *to, const void *form, ULong size) noexcept {
         size >>= 1U;
 
@@ -150,7 +176,7 @@ struct Copier<2> { // ASM WORD
 };
 
 template <>
-struct Copier<4> { // ASM DWORD
+struct CopyHelper<4> { // ASM DWORD
     static void Copy(void *to, const void *form, ULong size) noexcept {
         size >>= 2U;
 
@@ -168,7 +194,7 @@ struct Copier<4> { // ASM DWORD
 
 template <typename Char_T_>
 static void Copy(void *to, const void *form, ULong size) noexcept {
-    return Copier<sizeof(Char_T_)>::Copy(to, form, size);
+    return CopyHelper<sizeof(Char_T_)>::Copy(to, form, size);
 }
 
 ///////////////////////// End Copy /////////////////////////
@@ -200,16 +226,16 @@ class HAllocator {
     //     }
 
     //     return ptr;
+    // // }
+
+    // template <typename Type_>
+    // inline static Type_ *AllocateClear(ULong size) noexcept {
+    //     const ULong c_size = (size * sizeof(Type_));
+    //     void *      vptr   = malloc(c_size);
+    //     Memory::SetToZero<Type_>(vptr, c_size);
+
+    //     return static_cast<Type_ *>(vptr);
     // }
-
-    template <typename Type_>
-    inline static Type_ *AllocateClear(ULong size) noexcept {
-        const ULong c_size = (size * sizeof(Type_));
-        void *      vptr   = malloc(c_size);
-        Memory::SetToZero<Type_>(vptr, c_size);
-
-        return static_cast<Type_ *>(vptr);
-    }
 
     template <typename Type_>
     inline static Type_ *AllocatePointers(ULong size) noexcept {
@@ -248,7 +274,7 @@ class HAllocator {
     template <typename Type_>
     inline static void Construct(Type_ *start, const Type_ *end,
                                  Type_ &&value) noexcept {
-        while (start != end) {
+        while (start < end) {
             new (start) Type_(static_cast<Type_ &&>(value));
             ++start;
         }
@@ -261,7 +287,7 @@ class HAllocator {
 
     template <typename Type_>
     inline static void Destruct(Type_ *start, const Type_ *end) noexcept {
-        while (start != end) {
+        while (start < end) {
             start->~Type_();
             ++start;
         }
