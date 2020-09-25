@@ -85,20 +85,20 @@ class Value {
         }
     }
 
-    explicit Value(VHArray *obj) noexcept : type_(ValueType::Object) {
-        value_.object_ = obj;
+    explicit Value(VHArray *obj) noexcept
+        : value_(obj), type_(ValueType::Object) {
     }
 
-    explicit Value(VArray *arr) noexcept : type_(ValueType::Array) {
-        value_.array_ = arr;
+    explicit Value(VArray *arr) noexcept
+        : value_(arr), type_(ValueType::Array) {
     }
 
-    explicit Value(VString *str) noexcept : type_(ValueType::String) {
-        value_.string_ = str;
+    explicit Value(VString *str) noexcept
+        : value_(str), type_(ValueType::String) {
     }
 
-    explicit Value(double value) noexcept : type_(ValueType::Number) {
-        value_.number_ = value;
+    explicit Value(double num) noexcept
+        : value_(num), type_(ValueType::Number) {
     }
 
     ~Value() {
@@ -1229,11 +1229,31 @@ class Value {
     }
 
     union Value_U_ {
+        Value_U_() {
+            object_ = nullptr;
+        }
+
+        explicit Value_U_(VHArray *object) noexcept {
+            object_ = object;
+        }
+
+        explicit Value_U_(VArray *array) noexcept {
+            array_ = array;
+        }
+
+        explicit Value_U_(VString *string) noexcept {
+            string_ = string;
+        }
+
+        explicit Value_U_(double number) noexcept {
+            number_ = number;
+        }
+
         VHArray *object_;
         VArray * array_;
         VString *string_;
         double   number_;
-    } value_{nullptr};
+    } value_{};
 
     ValueType type_{ValueType::Undefined};
 };
