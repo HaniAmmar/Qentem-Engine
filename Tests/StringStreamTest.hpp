@@ -31,13 +31,13 @@ namespace Test {
 
 static int TestStringStream() {
     StringStream<char> ss1;
+    StringStream<char> ss2(10); // Preset size
     String<char>       str;
 
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");
     SHOULD_EQUAL_VALUE(ss1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(ss1.First(), nullptr, "First()", "null");
 
-    StringStream<char> ss2(10); // Preset size
     SHOULD_EQUAL_VALUE((ss2.Capacity() >= 10), true, "Capacity() >= 10");
     SHOULD_EQUAL_VALUE(ss2.Length(), 0, "Length");
     SHOULD_NOT_EQUAL(ss2.First(), nullptr, "First()", "null");
@@ -215,17 +215,18 @@ static int TestStringStream() {
     SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.First(), ab, 2), "IsEqual()");
 
     buffer = ss1.Buffer(1);
-
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
 
-    buffer[0] = 'c';
-
+    buffer[0]       = 'c';
     const char *ab2 = "abc";
     SHOULD_EQUAL_VALUE(ss1.Length(), 3, "Length");
     SHOULD_EQUAL_TRUE(StringUtils::IsEqual(ss1.First(), ab2, 3), "IsEqual()");
 
-    ss1 += "de";
+    ss2.Clear();
+    ss2 += "ab";
+    SHOULD_EQUAL_VALUE((ss1 == ss2), false, "IsEqual()");
 
+    ss1 += "de";
     SHOULD_EQUAL_VALUE(ss1.Length(), 5, "Length");
     SHOULD_EQUAL_VALUE(ss1, "abcde", "StringStream");
 
