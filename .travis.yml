@@ -7,16 +7,22 @@ git:
 
 sudo: false
 
-os:
- - linux
+jobs:
+  - os: linux
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake -D ENABLE_COVERAGE:BOOL=TRUE ..
+    script:
+      - cmake --build .
+      - ctest
+      - bash <(curl -s https://codecov.io/bash)
 
-before_script:
-  - mkdir Build
-  - cd Build
-  - cmake -D ENABLE_COVERAGE:BOOL=TRUE ..
-
-script:
-  - cmake --build .
-  - ctest
-  - bash <(curl -s https://codecov.io/bash)
-
+  - os: osx
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake ..
+    script:
+      - cmake --build .
+      - ctest
