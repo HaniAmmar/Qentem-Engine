@@ -416,7 +416,7 @@ static char *UnEscapeJSON(const char *content, ULong &length) {
             bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(tab));
             bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
 
-            if ((bits != 0) && ((Platform::CTZL(bits) + m_offset) < length)) {
+            if ((bits != 0) && ((Platform::CTZ(bits) + m_offset) < length)) {
                 HAllocator::Deallocate(str);
                 return nullptr;
             }
@@ -424,7 +424,7 @@ static char *UnEscapeJSON(const char *content, ULong &length) {
             bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(back_slash));
 
             while (bits != 0) {
-                const ULong index = (Platform::CTZL(bits) + m_offset);
+                const ULong index = (Platform::CTZ(bits) + m_offset);
 
                 if (index >= length) {
                     break;
@@ -670,7 +670,7 @@ static void EscapeJSON(const Char_T_ *content, ULong length,
 
     ULong offset  = 0;
     ULong offset2 = 0;
-    // TODO: Improve
+
     while (offset < length) {
         switch (content[offset]) {
             case JSONotation_T_::QuoteChar:
