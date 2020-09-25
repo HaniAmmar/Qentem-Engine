@@ -163,7 +163,7 @@ class Array {
     }
 
     inline void operator+=(const Type_ &item) {
-        *this += Type_(item);
+        *this += static_cast<Type_ &&>(Type_(item));
     }
 
     inline Array &Insert(Array &&arr) {
