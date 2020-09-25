@@ -75,6 +75,23 @@ using ULong = unsigned long;
 
 using UInt = unsigned int;
 
+template <int>
+constexpr bool Is64BitHelper();
+
+template <>
+constexpr bool Is64BitHelper<4>() {
+    return false;
+}
+
+template <>
+constexpr bool Is64BitHelper<8>() {
+    return true;
+}
+
+inline constexpr bool Is64Bit() {
+    return Is64BitHelper<sizeof(ULong)>();
+}
+
 } // namespace Qentem
 
 #endif
