@@ -1026,10 +1026,6 @@ class Template_T_ {
             UInt id;
 
             do {
-                if (value == nullptr) {
-                    break;
-                }
-
                 while (key[tmp] != TemplatePatterns_T_::VariableIndexSuffix) {
                     ++tmp;
                 }
