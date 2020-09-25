@@ -80,6 +80,7 @@ static int TestHArray1() {
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL(numbers1.End(), nullptr, "End()", "null");
 
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
@@ -143,6 +144,7 @@ static int TestHArray2() {
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL(numbers1.End(), (numbers1.First() + 1), "End()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 1, "key1");
 
     numbers1["key1"] = 20;
