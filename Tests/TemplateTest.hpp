@@ -1502,6 +1502,9 @@ static int TestLoopTag2() {
     SHOULD_EQUAL_VALUE(Template::Render(content, &value3), "A12345678B",
                        "Render()");
 
+    content = R"(<loop set="numbers" value="t">t[0]</loop>)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value3), "", "Render()");
+
     content =
         R"(<loop set="numbers" value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
     SHOULD_EQUAL_VALUE(Template::Render(content, &value3), "1357", "Render()");
@@ -1574,6 +1577,12 @@ static int TestLoopTag3() {
 
     content = R"(<loop value="v">v</loop>)";
     SHOULD_EQUAL_VALUE(Template::Render(content, &value), "", "Render()");
+
+    value.Reset();
+    value["in"] = 2;
+
+    content = R"(<loop repeat="{var:in}">A</loop>)";
+    SHOULD_EQUAL_VALUE(Template::Render(content, &value), "AA", "Render()");
 
     /////
     value.Reset();
