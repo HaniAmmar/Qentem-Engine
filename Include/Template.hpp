@@ -108,7 +108,7 @@ class Template_T_ {
         while (offset != length) {
             parse(tags, content, offset, length);
 
-            if (tags.Size() == 0U) {
+            if (tags.IsEmpty()) {
                 break;
             }
 
@@ -857,7 +857,7 @@ class Template_T_ {
         do {
             parse(loop_tags, loop_ss.First(), loop_offset, loop_ss_len);
 
-            if (loop_tags.Size() == 0U) {
+            if (loop_tags.IsEmpty()) {
                 break;
             }
 
