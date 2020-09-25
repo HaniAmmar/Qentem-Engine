@@ -36,27 +36,27 @@ namespace Memory {
 template <ULong S>
 struct SetToZeroHelper { // ASM QWORD
     static void SetToZero(void *ptr, ULong size) noexcept {
-        if (Is64Bit()) {
-            size >>= 3U;
+#ifdef QENTEM_64BIT_
+        size >>= 3U;
 
-            long long *      des = static_cast<long long *>(ptr);
-            const long long *end = (des + size);
+        long long *      des = static_cast<long long *>(ptr);
+        const long long *end = (des + size);
 
-            while (des != end) {
-                *des = 0;
-                ++des;
-            }
-        } else {
-            size >>= 2U;
-
-            int *      des = static_cast<int *>(ptr);
-            const int *end = (des + size);
-
-            while (des != end) {
-                *des = 0;
-                ++des;
-            }
+        while (des != end) {
+            *des = 0;
+            ++des;
         }
+#else
+        size >>= 2U;
+
+        int *      des = static_cast<int *>(ptr);
+        const int *end = (des + size);
+
+        while (des != end) {
+            *des = 0;
+            ++des;
+        }
+#endif
     }
 };
 
@@ -115,31 +115,31 @@ static void SetToZero(void *ptr, ULong size) noexcept {
 template <ULong S>
 struct CopyHelper { // ASM QWORD
     static void Copy(void *to, const void *form, ULong size) noexcept {
-        if (Is64Bit()) {
-            size >>= 3U;
+#ifdef QENTEM_64BIT_
+        size >>= 3U;
 
-            const long long *src = static_cast<const long long *>(form);
-            const long long *end = (src + size);
-            long long *      des = static_cast<long long *>(to);
+        const long long *src = static_cast<const long long *>(form);
+        const long long *end = (src + size);
+        long long *      des = static_cast<long long *>(to);
 
-            while (src != end) {
-                *des = *src;
-                ++des;
-                ++src;
-            }
-        } else {
-            size >>= 2U;
-
-            const int *src = static_cast<const int *>(form);
-            const int *end = (src + size);
-            int *      des = static_cast<int *>(to);
-
-            while (src != end) {
-                *des = *src;
-                ++des;
-                ++src;
-            }
+        while (src != end) {
+            *des = *src;
+            ++des;
+            ++src;
         }
+#else
+        size >>= 2U;
+
+        const int *src = static_cast<const int *>(form);
+        const int *end = (src + size);
+        int *      des = static_cast<int *>(to);
+
+        while (src != end) {
+            *des = *src;
+            ++des;
+            ++src;
+        }
+#endif
     }
 };
 

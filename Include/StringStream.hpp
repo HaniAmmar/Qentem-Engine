@@ -46,7 +46,7 @@ class StringStream {
 
     explicit StringStream(ULong size) : capacity_(size) {
         if (size != 0) {
-            capacity_ = (ULong{1} << Platform::CLZL(capacity_));
+            capacity_ = (ULong{1} << Platform::CLZ(capacity_));
 
             if (capacity_ < size) {
                 capacity_ <<= 1U;
@@ -67,7 +67,7 @@ class StringStream {
         if (ss.length_ != 0) {
             capacity_ = ss.length_;
 
-            capacity_ = (ULong{1} << Platform::CLZL(capacity_));
+            capacity_ = (ULong{1} << Platform::CLZ(capacity_));
 
             if (capacity_ < ss.length_) {
                 capacity_ <<= 1U;
@@ -207,7 +207,7 @@ class StringStream {
         length_ += len;
 
         if (length_ > capacity_) {
-            expand((ULong{2} << Platform::CLZL(length_)));
+            expand((ULong{2} << Platform::CLZ(length_)));
         }
 
         return (storage_ + current_offset);
@@ -217,7 +217,7 @@ class StringStream {
         const ULong new_len = (length_ + len);
 
         if (new_len > capacity_) {
-            expand((ULong{1} << Platform::CLZL(new_len)));
+            expand((ULong{1} << Platform::CLZ(new_len)));
         }
     }
 
@@ -264,7 +264,7 @@ class StringStream {
             length_ += len;
 
             if (capacity_ < length_) {
-                expand((ULong{2} << Platform::CLZL(length_)));
+                expand((ULong{2} << Platform::CLZ(length_)));
             }
 
             Memory::Copy<Char_T_>((storage_ + current_offset), str,

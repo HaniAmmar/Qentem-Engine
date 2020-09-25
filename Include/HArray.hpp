@@ -518,7 +518,7 @@ class HArray {
     }
 
     void setBase(ULong n_size) noexcept {
-        base_ = (ULong{1} << Platform::CLZL(n_size));
+        base_ = (ULong{1} << Platform::CLZ(n_size));
 
         if (base_ < n_size) {
             base_ <<= 1U;

@@ -712,7 +712,7 @@ class JSONParser {
                 }
 
                 while (bits != 0) {
-                    switch (content[(Platform::CLZL(bits) + offset2)]) {
+                    switch (content[(Platform::CLZ(bits) + offset2)]) {
                         case JSONotation_T_::OCurlyChar:
                         case JSONotation_T_::OSquareChar:
                         case JSONotation_T_::CommaChar:

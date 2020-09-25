@@ -110,18 +110,18 @@ namespace Platform {
 // }
 
 #ifdef _MSC_VER
-#if _WIN64
+#ifdef QENTEM_64BIT_
 inline static unsigned long CTZ(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanForward64(&index, value) != 0) ? index : 64UL);
 }
 
-inline static unsigned long CLZL(unsigned long long value) noexcept {
+inline static unsigned long CLZ(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse64(&index, value) != 0) ? index : 0);
 }
+#endif
 
-#else
 inline static unsigned int CTZ(unsigned long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanForward(&index, value) != 0)
@@ -129,28 +129,31 @@ inline static unsigned int CTZ(unsigned long value) noexcept {
                 : 32U);
 }
 
-inline static unsigned long CLZL(unsigned long value) noexcept {
+inline static unsigned long CLZ(unsigned long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse(&index, value) != 0) ? index : 0);
 }
-#endif
+
 #else
+
+#ifdef QENTEM_64BIT_
+inline static unsigned long CTZ(unsigned long long value) noexcept {
+    return static_cast<unsigned long>(__builtin_ctzl(value));
+}
+
+inline static unsigned long CLZ(unsigned long long value) noexcept {
+    constexpr unsigned long bits = (sizeof(long) * 8) - 1;
+    return (bits - static_cast<unsigned long>(__builtin_clzl(value)));
+}
+#endif
+
 inline static unsigned int CTZ(unsigned int value) noexcept {
     return static_cast<unsigned int>(__builtin_ctz(value));
 }
 
-inline static unsigned long CTZ(unsigned long value) noexcept {
-    return static_cast<unsigned long>(__builtin_ctzl(value));
-}
-
-inline static unsigned long CLZL(unsigned long value) noexcept {
-    constexpr unsigned long bits = (sizeof(long) * 8) - 1;
-
-    // if (value != 0) {
-    return (bits - static_cast<unsigned long>(__builtin_clzl(value)));
-    // }
-
-    // return 0;
+inline static unsigned int CLZ(unsigned int value) noexcept {
+    constexpr unsigned int bits = (sizeof(int) * 8) - 1;
+    return (bits - static_cast<unsigned int>(__builtin_clzl(value)));
 }
 #endif
 

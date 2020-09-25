@@ -23,29 +23,43 @@
 #ifndef QENTEM_COMMON_H_
 #define QENTEM_COMMON_H_
 
-#if !defined(_WIN64)
+#ifndef QENTEM_DOUBLE_PRECISION_
+#define QENTEM_DOUBLE_PRECISION_ 14
+#endif
+
+////////// 64 bit
+#if _WIN64
+#define QENTEM_64BIT_ 1
+#endif
+
+#if __x86_64__ || __ppc64__
+#define QENTEM_64BIT_ 1
+#endif
+////////// end 64 bit
+
+#ifndef _WIN64
 #ifndef QENTEM_AVX512BW_
 #define QENTEM_AVX512BW_ 0
 #endif
 #endif
 
 #ifndef QENTEM_AVX2_
-#define QENTEM_AVX2_ 0
+#define QENTEM_AVX2_ 1
 #endif
 
 #ifndef QENTEM_SSE2_
 #define QENTEM_SSE2_ 0
 #endif
 
-#if !defined(__AVX512BW__)
+#ifndef __AVX512BW__
 #undef QENTEM_AVX512BW_
 #endif
 
-#if !defined(__AVX2__)
+#ifndef __AVX2__
 #undef QENTEM_AVX2_
 #endif
 
-#if !defined(__SSE2__)
+#ifndef __SSE2__
 #undef QENTEM_SSE2_
 #endif
 
@@ -55,42 +69,20 @@
 #define QENTEM_NOINLINE __attribute__((noinline))
 #endif
 
-#ifdef _MSC_VER
-#define QENTEM_MAYBE_UNUSED_
-#else
+#ifndef _MSC_VER
 #define QENTEM_MAYBE_UNUSED_ __attribute__((unused))
+#else
+#define QENTEM_MAYBE_UNUSED_
 #endif
 
 namespace Qentem {
+using UInt = unsigned int;
 
-#ifndef QENTEM_DOUBLE_PRECISION_
-#define QENTEM_DOUBLE_PRECISION_ 14
-#endif
-
-#if defined(_WIN64)
+#ifdef QENTEM_64BIT_
 using ULong = unsigned long long;
 #else
 using ULong = unsigned long;
 #endif
-
-using UInt = unsigned int;
-
-template <int>
-constexpr bool Is64BitHelper();
-
-template <>
-constexpr bool Is64BitHelper<4>() {
-    return false;
-}
-
-template <>
-constexpr bool Is64BitHelper<8>() {
-    return true;
-}
-
-inline constexpr bool Is64Bit() {
-    return Is64BitHelper<sizeof(ULong)>();
-}
 
 } // namespace Qentem
 
