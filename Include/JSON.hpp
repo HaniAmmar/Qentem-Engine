@@ -47,6 +47,10 @@ inline static Value<Char_T_> Parse(const Char_T_ *content) {
 template <typename Char_T_>
 class JSONParser {
     using JSONotation_T_ = JSONotation<Char_T_>;
+    using VHArray        = HArray<Value<Char_T_>, Char_T_>;
+    using VArray         = Array<Value<Char_T_>>;
+    using VString        = String<Char_T_>;
+
     enum class Type_;
     struct FindCache_T_;
 
@@ -82,12 +86,10 @@ class JSONParser {
 
                                     if (content[offset] ==
                                         JSONotation_T_::OCurlyChar) {
-                                        obj_ = HAllocator::Allocate(
-                                            HArray<Value<Char_T_>, Char_T_>());
+                                        obj_  = HAllocator::Allocate(VHArray());
                                         value = Value<Char_T_>{obj_};
                                     } else {
-                                        arr_ = HAllocator::Allocate(
-                                            Array<Value<Char_T_>>());
+                                        arr_  = HAllocator::Allocate(VArray());
                                         value = Value<Char_T_>{arr_};
                                     }
 
@@ -284,15 +286,14 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::OCurlyChar: {
-                    type_ = Type_::Curly;
-                    child_obj_ =
-                        HAllocator::Allocate(HArray<Value<Char_T_>, Char_T_>());
+                    type_      = Type_::Curly;
+                    child_obj_ = HAllocator::Allocate(VHArray());
                     return (offset + 1);
                 }
 
                 case JSONotation_T_::OSquareChar: {
                     type_      = Type_::Square;
-                    child_arr_ = HAllocator::Allocate(Array<Value<Char_T_>>());
+                    child_arr_ = HAllocator::Allocate(VArray());
                     return (offset + 1);
                 }
 
@@ -566,13 +567,13 @@ class JSONParser {
                 }
 
                 if ((obj_ == nullptr) || has_colon_) { // String
-                    insert(Value<Char_T_>{HAllocator::Allocate(
-                        String<Char_T_>(str, tmp_length))});
+                    insert(Value<Char_T_>{
+                        HAllocator::Allocate(VString(str, tmp_length))});
 
                     has_colon_  = false;
                     pass_comma_ = true;
                 } else { // Key
-                    obj_value_ = &((*obj_)[String<Char_T_>(str, tmp_length)]);
+                    obj_value_ = &((*obj_)[VString(str, tmp_length)]);
                 }
 
                 break;
@@ -764,19 +765,19 @@ class JSONParser {
     }
 #endif
 
-    JSONParser(HArray<Value<Char_T_>, Char_T_> *obj, Array<Value<Char_T_>> *arr,
-               Value<Char_T_> *obj_value, bool pass_comma) noexcept
+    JSONParser(VHArray *obj, VArray *arr, Value<Char_T_> *obj_value,
+               bool pass_comma) noexcept
         : obj_(obj), arr_(arr), obj_value_(obj_value), pass_comma_(pass_comma) {
     }
 
     enum class Type_ { None = 0, Curly, Square, Quote, QuoteEnd, Comma };
 
-    ULong                            next_offset_{0};
-    HArray<Value<Char_T_>, Char_T_> *obj_{nullptr};
-    Array<Value<Char_T_>> *          arr_{nullptr};
+    ULong    next_offset_{0};
+    VHArray *obj_{nullptr};
+    VArray * arr_{nullptr};
 
-    HArray<Value<Char_T_>, Char_T_> *child_obj_{nullptr};
-    Array<Value<Char_T_>> *          child_arr_{nullptr};
+    VHArray *child_obj_{nullptr};
+    VArray * child_arr_{nullptr};
 
     Value<Char_T_> *child_obj_value_{nullptr};
     Value<Char_T_> *obj_value_{nullptr};
