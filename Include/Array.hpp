@@ -282,7 +282,7 @@ class Array {
     }
 
     inline const Type_ *Last() const noexcept {
-        if (storage_ != nullptr) {
+        if (index_ != 0) {
             return (storage_ + (index_ - 1));
         }
 
