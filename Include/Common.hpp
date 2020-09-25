@@ -41,10 +41,10 @@
 #ifndef QENTEM_AVX512BW_
 #define QENTEM_AVX512BW_ 0
 #endif
-#endif
 
 #ifndef QENTEM_AVX2_
-#define QENTEM_AVX2_ 1
+#define QENTEM_AVX2_ 0
+#endif
 #endif
 
 #ifndef QENTEM_SSE2_
