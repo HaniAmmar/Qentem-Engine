@@ -35,6 +35,12 @@ class Array {
   public:
     Array() = default;
 
+    explicit Array(ULong size) : capacity_(size) {
+        if (size != 0) {
+            storage_ = HAllocator::Allocate<Type_>(capacity_);
+        }
+    }
+
     Array(Array &&arr) noexcept
         : index_(arr.index_), capacity_(arr.capacity_), storage_(arr.storage_) {
         arr.index_    = 0;
@@ -52,12 +58,6 @@ class Array {
                     static_cast<Type_ &&>(Type_(arr.storage_[index_])));
                 ++index_;
             } while (index_ != capacity_);
-        }
-    }
-
-    explicit Array(ULong size) : capacity_(size) {
-        if (size != 0) {
-            storage_ = HAllocator::Allocate<Type_>(capacity_);
         }
     }
 
