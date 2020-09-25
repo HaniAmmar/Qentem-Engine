@@ -22,7 +22,12 @@
 
 #include "Common.hpp"
 
+#ifdef __APPLE__
+#include <malloc/malloc.h>
+#else
 #include <malloc.h>
+#endif
+
 #include <new>
 
 #ifndef QENTEM_MEMORY_H_
