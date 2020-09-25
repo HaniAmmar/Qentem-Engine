@@ -1,6 +1,5 @@
-[![Build Status](https://travis-ci.org/HaniAmmar/Qentem-Engine.svg?branch=master)](https://travis-ci.org/HaniAmmar/Qentem-Engine)
+[![Build Status](https://travis-ci.com/HaniAmmar/Qentem-Engine.svg?branch=master)](https://travis-ci.com/HaniAmmar/Qentem-Engine)
 [![Build status](https://ci.appveyor.com/api/projects/status/08uk7dxqw3vn3usi/branch/master?svg=true)](https://ci.appveyor.com/project/HaniAmmar/qentem-engine/branch/master)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/4f7b5b192150491b8a1062465d15de51)](https://www.codacy.com/manual/HaniAmmar/Qentem-Engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HaniAmmar/Qentem-Engine&amp;utm_campaign=Badge_Grade)
 [![codecov](https://codecov.io/gh/HaniAmmar/Qentem-Engine/branch/master/graph/badge.svg)](https://codecov.io/gh/HaniAmmar/Qentem-Engine)
 
 # Qentem Engine
