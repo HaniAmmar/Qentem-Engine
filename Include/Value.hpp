@@ -177,7 +177,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_          = ValueType::Object;
-                value_.object_ = HAllocator::Allocate(VHArray(1));
+                value_.object_ = HAllocator::AllocateInit<VHArray>();
                 return (*(value_.object_))[key];
             }
 
@@ -257,17 +257,17 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_ = ValueType::Object;
-                value_.object_ =
-                    HAllocator::Allocate(static_cast<VHArray &&>(obj));
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::AllocateInit<VHArray>(
+                    static_cast<VHArray &&>(obj));
                 break;
             }
 
             default: {
                 Reset();
-                type_ = ValueType::Object;
-                value_.object_ =
-                    HAllocator::Allocate(static_cast<VHArray &&>(obj));
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::AllocateInit<VHArray>(
+                    static_cast<VHArray &&>(obj));
             }
         }
 
@@ -275,7 +275,7 @@ class Value {
     }
 
     Value &operator=(const VHArray &obj) {
-        *this = VHArray(obj);
+        *this = static_cast<VHArray &&>(VHArray(obj));
         return *this;
     }
 
@@ -291,17 +291,17 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_ = ValueType::Array;
-                value_.array_ =
-                    HAllocator::Allocate(static_cast<VArray &&>(arr));
+                type_         = ValueType::Array;
+                value_.array_ = HAllocator::AllocateInit<VArray>(
+                    static_cast<VArray &&>(arr));
                 break;
             }
 
             default: {
                 Reset();
-                type_ = ValueType::Array;
-                value_.array_ =
-                    HAllocator::Allocate(static_cast<VArray &&>(arr));
+                type_         = ValueType::Array;
+                value_.array_ = HAllocator::AllocateInit<VArray>(
+                    static_cast<VArray &&>(arr));
             }
         }
 
@@ -309,7 +309,7 @@ class Value {
     }
 
     Value &operator=(const VArray &arr) {
-        *this = VArray(arr);
+        *this = static_cast<VArray &&>(VArray(arr));
         return *this;
     }
 
@@ -325,17 +325,17 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_ = ValueType::String;
-                value_.string_ =
-                    HAllocator::Allocate(static_cast<VString &&>(str));
+                type_          = ValueType::String;
+                value_.string_ = HAllocator::AllocateInit<VString>(
+                    static_cast<VString &&>(str));
                 break;
             }
 
             default: {
                 Reset();
-                type_ = ValueType::String;
-                value_.string_ =
-                    HAllocator::Allocate(static_cast<VString &&>(str));
+                type_          = ValueType::String;
+                value_.string_ = HAllocator::AllocateInit<VString>(
+                    static_cast<VString &&>(str));
             }
         }
 
@@ -343,13 +343,13 @@ class Value {
     }
 
     Value &operator=(const VString &str) {
-        *this = VString(str);
+        *this = static_cast<VString &&>(VString(str));
         return *this;
     }
 
     Value &operator=(const Char_T_ *str) {
         if (str != nullptr) {
-            *this = VString(str);
+            *this = static_cast<VString &&>(VString(str));
         } else {
             switch (type_) {
                 case ValueType::Null: {
@@ -525,8 +525,8 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) +=
-                    Value(HAllocator::Allocate(static_cast<VHArray &&>(obj)));
+                *(value_.array_) += Value(HAllocator::AllocateInit<VHArray>(
+                    static_cast<VHArray &&>(obj)));
                 break;
             }
 
@@ -548,8 +548,9 @@ class Value {
         if (type_ == ValueType::Array) {
             *(value_.array_) += static_cast<VArray &&>(arr);
         } else if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
-            value_.array_ = HAllocator::Allocate(static_cast<VArray &&>(arr));
+            type_ = ValueType::Array;
+            value_.array_ =
+                HAllocator::AllocateInit<VArray>(static_cast<VArray &&>(arr));
         }
     }
 
@@ -565,8 +566,8 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) +=
-                    Value(HAllocator::Allocate(static_cast<VString &&>(str)));
+                *(value_.array_) += Value(HAllocator::AllocateInit<VString>(
+                    static_cast<VString &&>(str)));
                 break;
             }
 
@@ -1201,20 +1202,21 @@ class Value {
     void copyValue(const Value &val) {
         switch (type_) {
             case ValueType::Object: {
-                value_.object_ = HAllocator::Allocate(
-                    static_cast<VHArray &&>(VHArray(*(val.value_.object_))));
+                value_.object_    = HAllocator::AllocateInit<VHArray>();
+                *(value_.object_) = *(val.value_.object_);
                 break;
             }
 
             case ValueType::Array: {
-                value_.array_ = HAllocator::Allocate(
-                    static_cast<VArray &&>(VArray(*(val.value_.array_))));
+                value_.array_    = HAllocator::AllocateInit<VArray>();
+                *(value_.array_) = *(val.value_.array_);
+
                 break;
             }
 
             case ValueType::String: {
-                value_.string_ = HAllocator::Allocate(
-                    static_cast<VString &&>(VString(*(val.value_.string_))));
+                value_.string_    = HAllocator::AllocateInit<VString>();
+                *(value_.string_) = *(val.value_.string_);
                 break;
             }
 

@@ -215,10 +215,10 @@ class HAllocator {
         return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
     }
 
-    template <typename Type_>
-    inline static Type_ *Allocate(Type_ &&value) {
+    template <typename Type_, typename... Values_T_>
+    inline static Type_ *AllocateInit(Values_T_ &&... values) {
         Type_ *ptr = Allocate<Type_>(1);
-        new (ptr) Type_(static_cast<Type_ &&>(value));
+        new (ptr) Type_(static_cast<Values_T_ &&>(values)...);
         return ptr;
     }
 
@@ -278,9 +278,9 @@ class HAllocator {
 
     template <typename Type_>
     inline static void Construct(Type_ *start, const Type_ *end,
-                                 Type_ &&value) noexcept {
+                                 const Type_ &value) noexcept {
         while (start < end) {
-            new (start) Type_(static_cast<Type_ &&>(value));
+            new (start) Type_(value);
             ++start;
         }
     }

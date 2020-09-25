@@ -572,7 +572,7 @@ class JSONParser {
 
                 if ((obj_ == nullptr) || has_colon_) { // String
                     insert(Value<Char_T_>{
-                        HAllocator::Allocate(VString(str, tmp_length))});
+                        HAllocator::AllocateInit<VString>(str, tmp_length)});
 
                     has_colon_  = false;
                     pass_comma_ = true;

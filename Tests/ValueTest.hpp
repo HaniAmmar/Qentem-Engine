@@ -1667,8 +1667,9 @@ static int TestStringValue3() {
     bool b_var = static_cast<bool>(value2);
     SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
-    String<char> *str_p = HAllocator::Allocate(String<char>("ABC"));
-    value2              = Value<char>{str_p};
+    String<char> *str_p =
+        HAllocator::AllocateInit<String<char>>(String<char>("ABC"));
+    value2 = Value<char>{str_p};
     SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
     SHOULD_NOT_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
     SHOULD_EQUAL(value2.GetString(), str_p, "GetString()", "str_p");
@@ -1978,8 +1979,9 @@ static int TestArrayValue3() {
     bool b_var = static_cast<bool>(value2);
     SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
-    Array<Value<char>> *arr_p = HAllocator::Allocate(Array<Value<char>>(3));
-    value2                    = Value<char>{arr_p};
+    Array<Value<char>> *arr_p =
+        HAllocator::AllocateInit<Array<Value<char>>>(Array<Value<char>>(3));
+    value2 = Value<char>{arr_p};
     SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
     SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
     SHOULD_EQUAL(value2.GetArray(), arr_p, "GetArray()", "arr_p");
@@ -2475,7 +2477,8 @@ static int TestObjectValue3() {
     SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
     HArray<Value<char>, char> *h_arr_p =
-        HAllocator::Allocate(HArray<Value<char>, char>(4));
+        HAllocator::AllocateInit<HArray<Value<char>, char>>(
+            HArray<Value<char>, char>(4));
     value2 = Value<char>{h_arr_p};
     SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
     SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
@@ -5207,7 +5210,8 @@ static int TestAddition3() {
 
     arr_var += Value<char>{ValueType::False};
     arr_var += Value<char>{ValueType::True};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Qentem"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Qentem"))};
     c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
 
@@ -5231,7 +5235,8 @@ static int TestAddition3() {
     arr_var.Reset();
     arr_var += Value<char>{ValueType::Null};
     arr_var += Value<char>{14};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Hani"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Hani"))};
     c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
 
@@ -5282,7 +5287,8 @@ static int TestAddition3() {
     arr_var.Reset();
     arr_var += Value<char>{ValueType::False};
     arr_var += Value<char>{ValueType::True};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Qentem"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Qentem"))};
     c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
 
@@ -5305,7 +5311,8 @@ static int TestAddition3() {
 
     arr_var += Value<char>{ValueType::Null};
     arr_var += Value<char>{14};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Hani"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Hani"))};
     c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
 
@@ -5449,7 +5456,8 @@ static int TestAddition4() {
 
     arr_var += Value<char>{ValueType::False};
     arr_var += Value<char>{ValueType::True};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Qentem"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Qentem"))};
     c_str = arr_var[2].StringStorage();
 
     arr_storage = arr_var.First();
@@ -5475,7 +5483,8 @@ static int TestAddition4() {
     arr_var.Reset();
     arr_var += Value<char>{ValueType::Null};
     arr_var += Value<char>{14};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Hani"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Hani"))};
     c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
@@ -5635,7 +5644,8 @@ static int TestAddition5() {
 
     arr_var += Value<char>{ValueType::False};
     arr_var += Value<char>{ValueType::True};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Qentem"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Qentem"))};
     c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
@@ -5660,7 +5670,8 @@ static int TestAddition5() {
     arr_var.Reset();
     arr_var += Value<char>{ValueType::Null};
     arr_var += Value<char>{14};
-    arr_var += Value<char>{HAllocator::Allocate(String<char>("Hani"))};
+    arr_var += Value<char>{
+        HAllocator::AllocateInit<String<char>>(String<char>("Hani"))};
     c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
