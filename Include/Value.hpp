@@ -34,7 +34,7 @@ enum class ValueType {
     Object,
     Array,
     String,
-    Number,
+    Number, // TODO: Add INT
     True,
     False,
     Null
@@ -58,18 +58,17 @@ class Value {
     explicit Value(ValueType type) noexcept : type_(type) {
         switch (type) {
             case ValueType::Object: {
-                value_.object_ =
-                    HAllocator::AllocateClear<HArray<Value, Char_T_>>(1);
+                value_.object_ = HAllocator::Allocate(HArray<Value, Char_T_>());
                 break;
             }
 
             case ValueType::Array: {
-                value_.array_ = HAllocator::AllocateClear<Array<Value>>(1);
+                value_.array_ = HAllocator::Allocate(Array<Value>());
                 break;
             }
 
             case ValueType::String: {
-                value_.string_ = HAllocator::AllocateClear<String<Char_T_>>(1);
+                value_.string_ = HAllocator::Allocate(String<Char_T_>());
                 break;
             }
 
@@ -134,7 +133,7 @@ class Value {
             case ValueType::Undefined: {
                 if (index == 0) {
                     type_         = ValueType::Array;
-                    value_.array_ = HAllocator::AllocateClear<Array<Value>>(1);
+                    value_.array_ = HAllocator::Allocate(Array<Value>());
                     value_.array_->ResizeAndInitialize(1);
                     return *(value_.array_->First());
                 }
@@ -446,7 +445,7 @@ class Value {
                     Array<Value> &      des_arr = *(value_.array_);
 
                     Value *      src_val = src_arr.First();
-                    const Value *src_end = (src_arr.Storage() + src_arr.Size());
+                    const Value *src_end = src_arr.End();
 
                     while (src_val != src_end) {
                         if (src_val->type_ != ValueType::Undefined) {
@@ -490,8 +489,8 @@ class Value {
                     const Array<Value> &src_arr = *(val.value_.array_);
                     Array<Value> &      des_arr = *(value_.array_);
 
-                    const Value *src_val = src_arr.Storage();
-                    const Value *src_end = (src_arr.Storage() + src_arr.Size());
+                    const Value *src_val = src_arr.First();
+                    const Value *src_end = src_arr.End();
 
                     while (src_val != src_end) {
                         if (src_val->type_ != ValueType::Undefined) {
@@ -797,7 +796,7 @@ class Value {
 
     const Char_T_ *StringStorage() const noexcept {
         if (type_ == ValueType::String) {
-            return value_.string_->Storage();
+            return value_.string_->First();
         }
 
         return nullptr;
@@ -811,12 +810,13 @@ class Value {
         return 0;
     }
 
+    template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key,
-                          Qentem::ULong & length) const noexcept {
+                          Number_T_ &     length) const noexcept {
         switch (type_) {
             case ValueType::String: {
-                key    = value_.string_->Storage();
-                length = value_.string_->Length();
+                key    = value_.string_->First();
+                length = static_cast<Number_T_>(value_.string_->Length());
                 return true;
             }
 
@@ -951,7 +951,7 @@ class Value {
 
             case ValueType::String: {
                 return Digit<Char_T_>::StringToNumber(
-                    value, value_.string_->Storage(),
+                    value, value_.string_->First(),
                     static_cast<UInt>(value_.string_->Length()));
             }
 
@@ -1077,8 +1077,7 @@ class Value {
 
                 Array<Value> new_array(size);
                 Value *      src_val = value_.array_->First();
-                const Value *src_end =
-                    (value_.array_->Storage() + value_.array_->Size());
+                const Value *src_end = value_.array_->End();
 
                 do {
                     if (src_val->type_ != ValueType::Undefined) {
@@ -1101,10 +1100,10 @@ class Value {
         const Value *                 item    = nullptr;
 
         if (is_obj) {
-            ha_item = (value_.object_->Storage() - 1);
+            ha_item = (value_.object_->First() - 1);
             ss += JSONotation_T_::OCurlyChar;
         } else if (type_ == ValueType::Array) {
-            item = (value_.array_->Storage() - 1);
+            item = (value_.array_->First() - 1);
             ss += JSONotation_T_::OSquareChar;
         } else {
             return;
@@ -1118,13 +1117,13 @@ class Value {
                     ++ha_item;
 
                     if ((ha_item == nullptr) ||
-                        (ha_item->Key.Storage() == nullptr) ||
+                        (ha_item->Key.First() == nullptr) ||
                         (ha_item->Value.type_ == ValueType::Undefined)) {
                         continue; // Deleted item.
                     }
 
                     ss += JSONotation_T_::QuoteChar;
-                    JSON::EscapeJSON(ha_item->Key.Storage(),
+                    JSON::EscapeJSON(ha_item->Key.First(),
                                      ha_item->Key.Length(), ss);
                     ss += JSONotation_T_::QuoteChar;
                     ss += JSONotation_T_::ColonChar;
@@ -1147,7 +1146,7 @@ class Value {
 
                     case ValueType::String: {
                         ss += JSONotation_T_::QuoteChar;
-                        JSON::EscapeJSON(item->value_.string_->Storage(),
+                        JSON::EscapeJSON(item->value_.string_->First(),
                                          item->value_.string_->Length(), ss);
                         ss += JSONotation_T_::QuoteChar;
                         break;
@@ -1184,7 +1183,7 @@ class Value {
                 ss += JSONotation_T_::CommaChar;
             } while (++id != size);
 
-            if (ss.Storage()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
+            if (ss.First()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
                 ss.StepBack(1);
             }
         }
