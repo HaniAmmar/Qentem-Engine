@@ -178,33 +178,29 @@ struct TemplatePatterns<Char_T_, 1> {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static const unsigned long long Variable64bit = 8537547791251764859ULL;
-    static constexpr Char_T_        Var_2ND_Char  = 'v'; // Second char
-    static const Char_T_ *          GetVariablePrefix() noexcept {
+    static constexpr Char_T_ Var_2ND_Char = 'v'; // Second char
+    static const Char_T_ *   GetVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
         return &(val[0]);
     }
 
     // {math:
-    static const unsigned long long Math64bit     = 7889019549154766203ULL;
-    static constexpr Char_T_        Math_2ND_Char = 'm'; // Second char
-    static const Char_T_ *          GetMathPrefix() noexcept {
+    static constexpr Char_T_ Math_2ND_Char = 'm'; // Second char
+    static const Char_T_ *   GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
         return &(val[0]);
     }
 
     // {if:
-    static const unsigned long long InLineIf64bit     = 7600784774889433467ULL;
-    static constexpr Char_T_        InlineIf_2ND_Char = 'i'; // Second char
-    static const Char_T_ *          GetInLineIfPrefix() noexcept {
+    static constexpr Char_T_ InlineIf_2ND_Char = 'i'; // Second char
+    static const Char_T_ *   GetInLineIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
         return &(val[0]);
     }
 
     // <loop
-    static const unsigned long long Loop64bit     = 7799227661468593212ULL;
-    static constexpr Char_T_        Loop_2ND_Char = 'l'; // Second char
-    static const Char_T_ *          GetLoopPrefix() noexcept {
+    static constexpr Char_T_ Loop_2ND_Char = 'l'; // Second char
+    static const Char_T_ *   GetLoopPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
         return &(val[0]);
     }
@@ -216,9 +212,8 @@ struct TemplatePatterns<Char_T_, 1> {
     }
 
     // <if
-    static const unsigned long long If64bit     = 7583051580769593660ULL;
-    static constexpr Char_T_        If_2ND_Char = 'i'; // Second char
-    static const Char_T_ *          GetIfPrefix() noexcept {
+    static constexpr Char_T_ If_2ND_Char = 'i'; // Second char
+    static const Char_T_ *   GetIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'i', 'f'};
         return &(val[0]);
     }
@@ -251,24 +246,6 @@ struct TemplatePatterns<Char_T_, 1> {
     static constexpr Char_T_ RepeatChar = 'p'; // re[p]eat
     static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
     static constexpr Char_T_ TildeChar  = '~'; // Tilde
-
-    /*
-        // To get a 64bit value:
-
-        unsigned short var_16 = (static_cast<unsigned short>(
-                                    TemplatePatterns<char>::GetVariablePrefix()[1])
-                                << 8U);
-        var_16 |= static_cast<unsigned short>(
-            TemplatePatterns<char>::GetVariablePrefix()[0]);
-
-        ULong var_64 = var_16;
-        var_64 <<= 16U;
-        var_64 |= var_16;
-        var_64 <<= 16U;
-        var_64 |= var_16;
-        var_64 <<= 16U;
-        var_64 |= var_16;
-    */
 };
 
 // Two bytes character.
