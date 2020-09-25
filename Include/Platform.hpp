@@ -100,7 +100,6 @@ using QMM_Number_T = unsigned int;
 namespace Qentem {
 namespace Platform {
 
-// QENTEM_MAYBE_UNUSED_
 // static bool IsBigEndian() noexcept {
 //     union {
 //         unsigned short c;
@@ -112,19 +111,22 @@ namespace Platform {
 
 #ifdef _MSC_VER
 #if _WIN64
-inline static unsigned long CTZL(unsigned long long value) noexcept {
+inline static unsigned long CTZ(unsigned long long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward64(&index, value) != 0) ? index : 64);
+    return ((_BitScanForward64(&index, value) != 0) ? index : 64UL);
 }
 
 inline static unsigned long CLZL(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse64(&index, value) != 0) ? index : 0);
 }
+
 #else
-inline static unsigned long CTZL(unsigned long value) noexcept {
+inline static unsigned int CTZ(unsigned long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0) ? index : 32);
+    return ((_BitScanForward(&index, value) != 0)
+                ? static_cast<unsigned int>(index)
+                : 32U);
 }
 
 inline static unsigned long CLZL(unsigned long value) noexcept {
@@ -133,11 +135,15 @@ inline static unsigned long CLZL(unsigned long value) noexcept {
 }
 #endif
 #else
-inline static unsigned long CTZL(unsigned long value) {
+inline static unsigned int CTZ(unsigned int value) noexcept {
+    return static_cast<unsigned int>(__builtin_ctz(value));
+}
+
+inline static unsigned long CTZ(unsigned long value) noexcept {
     return static_cast<unsigned long>(__builtin_ctzl(value));
 }
 
-inline static unsigned long CLZL(unsigned long value) {
+inline static unsigned long CLZL(unsigned long value) noexcept {
     constexpr unsigned long bits = (sizeof(long) * 8) - 1;
 
     // if (value != 0) {
