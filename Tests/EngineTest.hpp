@@ -821,7 +821,7 @@ struct Item2__ {
 
 static void toJSON(StringStream<char> &ss, const Array<Item2__> &items,
                    const char *content) {
-    if (items.Size() == 0) {
+    if (items.IsEmpty()) {
         return;
     }
 
@@ -841,7 +841,7 @@ static void toJSON(StringStream<char> &ss, const Array<Item2__> &items,
         ss += ",\"L\":";
         ss += Digit<char>::NumberToString(items[i].Length);
 
-        if (items[i].SubItems.Size() != 0) {
+        if (items[i].SubItems.IsNotEmpty()) {
             ss += ",\"S\":";
             toJSON(ss, items[i].SubItems, content);
         }

@@ -36,6 +36,8 @@ static int TestArray1() {
     Array<UInt> numbers2(8);
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
+    SHOULD_EQUAL_TRUE(numbers1.IsEmpty(), "IsEmpty");
+    SHOULD_NOT_EQUAL_TRUE(numbers1.IsNotEmpty(), "IsNotEmpty");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
@@ -96,6 +98,8 @@ static int TestArray1() {
     numbers1.ResizeAndInitialize(8);
     storage = numbers1.First();
     SHOULD_EQUAL_VALUE(numbers1.Size(), 8, "Size");
+    SHOULD_NOT_EQUAL_TRUE(numbers1.IsEmpty(), "IsEmpty");
+    SHOULD_EQUAL_TRUE(numbers1.IsNotEmpty(), "IsNotEmpty");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 

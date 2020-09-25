@@ -78,7 +78,7 @@ class ALE {
             ALE_T_<Char_T_, Helper_T_> ale{&items, callback};
             Engine::FindNest(content, 0U, length, length, &ale);
 
-            if (items.Size() != 0) {
+            if (items.IsNotEmpty()) {
                 ALE_T_<Char_T_, Helper_T_>::sortOperations(items, content, 0,
                                                            length);
                 return ALE_T_<Char_T_, Helper_T_>::process(
@@ -411,7 +411,7 @@ class ALE_T_ {
                             break;
                         }
                     } while (start_offset != 0);
-                } else if (items_->Size() != 0) {
+                } else if (items_->IsNotEmpty()) {
                     // An OP.
                     break;
                 }
@@ -558,7 +558,7 @@ class ALE_T_ {
 
             StringUtils::SoftTrim(content, n_item.Offset, n_item.Length);
 
-            if (n_item.SubItems.Size() != 0) {
+            if (n_item.SubItems.IsNotEmpty()) {
                 sortOperations(n_item.SubItems, content, n_item.Offset,
                                n_item.Length);
             }
@@ -580,7 +580,7 @@ class ALE_T_ {
     static bool process(double &left_number, const Array<Item_> &items,
                         const Char_T_ *content, UInt offset, UInt length,
                         const Helper_T_ *callback) {
-        if (items.Size() == 0) {
+        if (items.IsEmpty()) {
             return Digit<Char_T_>::StringToNumber(left_number,
                                                   (content + offset), length);
         }

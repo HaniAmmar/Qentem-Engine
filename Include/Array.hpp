@@ -269,6 +269,14 @@ class Array {
         return capacity_;
     }
 
+    inline bool IsEmpty() const noexcept {
+        return (index_ == 0);
+    }
+
+    inline bool IsNotEmpty() const noexcept {
+        return (index_ != 0);
+    }
+
     inline Type_ *First() const noexcept {
         return storage_;
     }
