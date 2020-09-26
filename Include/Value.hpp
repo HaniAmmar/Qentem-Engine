@@ -525,8 +525,8 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) += Value(HAllocator::AllocateInit<VHArray>(
-                    static_cast<VHArray &&>(obj)));
+                *(value_.array_) += Value{HAllocator::AllocateInit<VHArray>(
+                    static_cast<VHArray &&>(obj))};
                 break;
             }
 
@@ -566,8 +566,8 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) += Value(HAllocator::AllocateInit<VString>(
-                    static_cast<VString &&>(str)));
+                *(value_.array_) += Value{HAllocator::AllocateInit<VString>(
+                    static_cast<VString &&>(str))};
                 break;
             }
 
@@ -590,11 +590,11 @@ class Value {
             *this += VString(str);
         } else {
             if (type_ == ValueType::Array) {
-                *(value_.array_) += Value(ValueType::Null);
+                *(value_.array_) += Value{ValueType::Null};
             } else if (type_ == ValueType::Undefined) {
                 type_         = ValueType::Array;
                 value_.array_ = HAllocator::AllocateInit<VArray>();
-                *(value_.array_) += Value(ValueType::Null);
+                *(value_.array_) += Value{ValueType::Null};
             }
         }
     }
@@ -607,7 +607,7 @@ class Value {
 
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) += Value(num);
+                *(value_.array_) += Value{num};
                 break;
             }
 
@@ -653,8 +653,8 @@ class Value {
 
     void operator+=(bool is_true) {
         if (type_ == ValueType::Array) {
-            *(value_.array_) +=
-                (is_true) ? Value(ValueType::True) : Value(ValueType::False);
+            ValueType type = (is_true ? ValueType::True : ValueType::False);
+            *(value_.array_) += Value{type};
         } else if (type_ == ValueType::Undefined) {
             type_         = ValueType::Array;
             value_.array_ = HAllocator::AllocateInit<VArray>();

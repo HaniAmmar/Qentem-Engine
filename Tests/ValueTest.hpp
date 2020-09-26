@@ -463,7 +463,7 @@ static int TestTrueValue2() {
     bool         bool_var;
 
     value1 = true;
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
     SHOULD_EQUAL(value2.Type(), ValueType::True, "Type()", "True");
     SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
@@ -713,7 +713,7 @@ static int TestFalseValue2() {
     bool         bool_var;
 
     value1 = false;
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
     SHOULD_EQUAL(value2.Type(), ValueType::False, "Type()", "False");
     SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
@@ -963,7 +963,7 @@ static int TestNullValue2() {
     bool         bool_var;
 
     value1 = nullptr;
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
     SHOULD_EQUAL(value2.Type(), ValueType::Null, "Type()", "Null");
     SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
@@ -1211,7 +1211,7 @@ static int TestNumberValue2() {
     bool         bool_var;
 
     value1 = 10;
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
     SHOULD_EQUAL(value2.Type(), ValueType::Number, "Type()", "Number");
     SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
@@ -1496,7 +1496,7 @@ static int TestStringValue2() {
     bool         bool_var;
 
     value1 = "true";
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
     SHOULD_EQUAL(value2.Type(), ValueType::String, "Type()", "String");
     SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
@@ -1810,7 +1810,7 @@ static int TestArrayValue2() {
     storage = arr_var.First();
     value1  = static_cast<Array<Value<char>> &&>(arr_var);
 
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
     SHOULD_EQUAL(value2.Type(), ValueType::Array, "Type()", "Array");
     SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
@@ -2271,7 +2271,7 @@ static int TestObjectValue2() {
     storage = h_arr_var.First();
     value1  = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
 
-    value2 = Value<char>(value1);
+    value2 = Value<char>{value1};
     SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
     SHOULD_EQUAL(value2.Type(), ValueType::Object, "Type()", "Array");
     SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
