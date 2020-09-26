@@ -43,7 +43,7 @@ class String {
         if (str != nullptr) {
             ++len;
             storage_ = HAllocator::Allocate<Char_T_>(len);
-            Memory::Copy<Char_T_>(storage_, str, (length_ * sizeof(Char_T_)));
+            Memory::Copy(storage_, str, (length_ * sizeof(Char_T_)));
             storage_[length_] = 0;
         }
     }
@@ -61,8 +61,7 @@ class String {
         if (length_ != 0) {
             const ULong len = (length_ + 1);
             storage_        = HAllocator::Allocate<Char_T_>(len);
-            Memory::Copy<Char_T_>(storage_, src.storage_,
-                                  (len * sizeof(Char_T_)));
+            Memory::Copy(storage_, src.storage_, (len * sizeof(Char_T_)));
         }
     }
 
@@ -96,8 +95,7 @@ class String {
             HAllocator::Deallocate(storage_);
             length_  = src.length_;
             storage_ = HAllocator::Allocate<Char_T_>(length_ + 1);
-            Memory::Copy<Char_T_>(storage_, src.storage_,
-                                  (length_ * sizeof(Char_T_)));
+            Memory::Copy(storage_, src.storage_, (length_ * sizeof(Char_T_)));
             storage_[length_] = 0;
         }
 
@@ -112,7 +110,7 @@ class String {
         storage_ = HAllocator::Allocate<Char_T_>(len + 1);
 
         if (str != nullptr) {
-            Memory::Copy<Char_T_>(storage_, str, (len * sizeof(Char_T_)));
+            Memory::Copy(storage_, str, (len * sizeof(Char_T_)));
         }
 
         storage_[len] = 0;
@@ -159,10 +157,8 @@ class String {
         const ULong ns_len      = (length_ + len);
         Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
 
-        Memory::Copy<Char_T_>(ns_storage_, storage_,
-                              (length_ * sizeof(Char_T_)));
-        Memory::Copy<Char_T_>((ns_storage_ + length_), str,
-                              (len * sizeof(Char_T_)));
+        Memory::Copy(ns_storage_, storage_, (length_ * sizeof(Char_T_)));
+        Memory::Copy((ns_storage_ + length_), str, (len * sizeof(Char_T_)));
 
         ns_storage_[ns_len] = 0;
         return String(ns_storage_, ns_len);
@@ -228,10 +224,10 @@ class String {
         const ULong ns_len      = (src1.length_ + src2.length_);
         Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
 
-        Memory::Copy<Char_T_>(ns_storage_, src1.storage_,
-                              (src1.length_ * sizeof(Char_T_)));
-        Memory::Copy<Char_T_>((ns_storage_ + src1.length_), src2.storage_,
-                              (src2.length_ * sizeof(Char_T_)));
+        Memory::Copy(ns_storage_, src1.storage_,
+                     (src1.length_ * sizeof(Char_T_)));
+        Memory::Copy((ns_storage_ + src1.length_), src2.storage_,
+                     (src2.length_ * sizeof(Char_T_)));
 
         ns_storage_[ns_len] = 0;
         return String(ns_storage_, ns_len);
@@ -241,10 +237,8 @@ class String {
         if ((str != nullptr) && (len != 0)) {
             Char_T_ *old_str = storage_;
             storage_         = HAllocator::Allocate<Char_T_>(length_ + len + 1);
-            Memory::Copy<Char_T_>(storage_, old_str,
-                                  (length_ * sizeof(Char_T_)));
-            Memory::Copy<Char_T_>((storage_ + length_), str,
-                                  (len * sizeof(Char_T_)));
+            Memory::Copy(storage_, old_str, (length_ * sizeof(Char_T_)));
+            Memory::Copy((storage_ + length_), str, (len * sizeof(Char_T_)));
             HAllocator::Deallocate(old_str);
             length_ += len;
             storage_[length_] = 0;

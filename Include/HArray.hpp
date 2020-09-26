@@ -458,8 +458,8 @@ class HArray {
                      * Clear the hash table if there is no need to reallocate
                      * it.
                      */
-                    Memory::SetToZero<void *>(hash_table_,
-                                              ((base_ + 1U) * sizeof(void *)));
+                    Memory::SetToZero(hash_table_,
+                                      ((base_ + 1U) * sizeof(void *)));
                 }
 
                 resize(n_size);

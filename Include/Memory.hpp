@@ -38,173 +38,27 @@
 namespace Qentem {
 namespace Memory {
 
-///////////////////////// Start SetToZero /////////////////////////
-
-template <ULong S>
-struct SetToZeroHelper { // ASM QWORD
-    static void SetToZero(void *ptr, ULong size) noexcept {
-#ifdef QENTEM_64BIT_
-        size >>= 3U;
-
-        long long *      des = static_cast<long long *>(ptr);
-        const long long *end = (des + size);
-
-        while (des != end) {
-            *des = 0;
-            ++des;
-        }
-#else
-        size >>= 2U;
-
-        int *      des = static_cast<int *>(ptr);
-        const int *end = (des + size);
-
-        while (des != end) {
-            *des = 0;
-            ++des;
-        }
-#endif
-    }
-};
-
-template <>
-struct SetToZeroHelper<1> { // ASM BYTE
-    static void SetToZero(void *ptr, ULong size) noexcept {
-        char *      des = static_cast<char *>(ptr);
-        const char *end = (des + size);
-
-        while (des != end) {
-            *des = 0;
-            ++des;
-        }
-    }
-};
-
-template <>
-struct SetToZeroHelper<2> { // ASM WORD
-    static void SetToZero(void *ptr, ULong size) noexcept {
-        size >>= 1U;
-
-        short *      des = static_cast<short *>(ptr);
-        const short *end = (des + size);
-
-        while (des != end) {
-            *des = 0;
-            ++des;
-        }
-    }
-};
-
-template <>
-struct SetToZeroHelper<4> { // ASM DWORD
-    static void SetToZero(void *ptr, ULong size) noexcept {
-        size >>= 2U;
-
-        int *      des = static_cast<int *>(ptr);
-        const int *end = (des + size);
-
-        while (des != end) {
-            *des = 0;
-            ++des;
-        }
-    }
-};
-
-template <typename Char_T_>
 static void SetToZero(void *ptr, ULong size) noexcept {
-    return SetToZeroHelper<sizeof(Char_T_)>::SetToZero(ptr, size);
+    char *      des = static_cast<char *>(ptr);
+    const char *end = (des + size);
+
+    while (des != end) {
+        *des = 0;
+        ++des;
+    }
 }
 
-///////////////////////// End SetToZero /////////////////////////
-
-///////////////////////// Start Copy /////////////////////////
-
-template <ULong S>
-struct CopyHelper { // ASM QWORD
-    static void Copy(void *to, const void *form, ULong size) noexcept {
-#ifdef QENTEM_64BIT_
-        size >>= 3U;
-
-        const long long *src = static_cast<const long long *>(form);
-        const long long *end = (src + size);
-        long long *      des = static_cast<long long *>(to);
-
-        while (src != end) {
-            *des = *src;
-            ++des;
-            ++src;
-        }
-#else
-        size >>= 2U;
-
-        const int *src = static_cast<const int *>(form);
-        const int *end = (src + size);
-        int *      des = static_cast<int *>(to);
-
-        while (src != end) {
-            *des = *src;
-            ++des;
-            ++src;
-        }
-#endif
-    }
-};
-
-template <>
-struct CopyHelper<1> { // ASM BYTE
-    static void Copy(void *to, const void *form, ULong size) noexcept {
-        const char *src = static_cast<const char *>(form);
-        const char *end = (src + size);
-        char *      des = static_cast<char *>(to);
-
-        while (src != end) {
-            *des = *src;
-            ++des;
-            ++src;
-        }
-    }
-};
-
-template <>
-struct CopyHelper<2> { // ASM WORD
-    static void Copy(void *to, const void *form, ULong size) noexcept {
-        size >>= 1U;
-
-        const short *src = static_cast<const short *>(form);
-        const short *end = (src + size);
-        short *      des = static_cast<short *>(to);
-
-        while (src != end) {
-            *des = *src;
-            ++des;
-            ++src;
-        }
-    }
-};
-
-template <>
-struct CopyHelper<4> { // ASM DWORD
-    static void Copy(void *to, const void *form, ULong size) noexcept {
-        size >>= 2U;
-
-        const int *src = static_cast<const int *>(form);
-        const int *end = (src + size);
-        int *      des = static_cast<int *>(to);
-
-        while (src != end) {
-            *des = *src;
-            ++des;
-            ++src;
-        }
-    }
-};
-
-template <typename Char_T_>
 static void Copy(void *to, const void *form, ULong size) noexcept {
-    return CopyHelper<sizeof(Char_T_)>::Copy(to, form, size);
-}
+    const char *src = static_cast<const char *>(form);
+    const char *end = (src + size);
+    char *      des = static_cast<char *>(to);
 
-///////////////////////// End Copy /////////////////////////
+    while (src != end) {
+        *des = *src;
+        ++des;
+        ++src;
+    }
+}
 
 } // namespace Memory
 
@@ -233,7 +87,7 @@ class HAllocator {
     inline static Type_ *AllocatePointers(ULong size) noexcept {
         const ULong c_size = (size * sizeof(void *));
         void *      vptr   = malloc(c_size);
-        Memory::SetToZero<void *>(vptr, c_size);
+        Memory::SetToZero(vptr, c_size);
 
         return static_cast<Type_ *>(vptr);
     }

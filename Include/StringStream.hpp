@@ -267,8 +267,8 @@ class StringStream {
                 expand((ULong{2} << Platform::CLZ(length_)));
             }
 
-            Memory::Copy<Char_T_>((storage_ + current_offset), str,
-                                  (len * sizeof(Char_T_)));
+            Memory::Copy((storage_ + current_offset), str,
+                         (len * sizeof(Char_T_)));
         }
     }
 
@@ -278,7 +278,7 @@ class StringStream {
 
         if (capacity_ != 0) {
             const ULong c_size = (capacity_ * sizeof(Char_T_));
-            Memory::Copy<Char_T_>(storage_, old_str, c_size);
+            Memory::Copy(storage_, old_str, c_size);
             HAllocator::Deallocate(old_str);
         }
 

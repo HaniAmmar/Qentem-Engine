@@ -120,8 +120,8 @@ class Array {
                 resize(n_size);
             }
 
-            Memory::Copy<Type_>((storage_ + index_), arr.storage_,
-                                arr.index_ * sizeof(Type_));
+            Memory::Copy((storage_ + index_), arr.storage_,
+                         arr.index_ * sizeof(Type_));
             index_ = n_size;
             HAllocator::Deallocate(arr.storage_);
         }
@@ -296,7 +296,7 @@ class Array {
             index_ = new_size;
         }
 
-        Memory::Copy<Type_>(storage_, tmp, (index_ * sizeof(Type_)));
+        Memory::Copy(storage_, tmp, (index_ * sizeof(Type_)));
         HAllocator::Deallocate(tmp);
         capacity_ = new_size;
     }
