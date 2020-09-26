@@ -5105,8 +5105,8 @@ static int TestAddition3() {
     value.Reset();
     ///
 
-    arr_var += Value<char>{ValueType::False};
-    arr_var += Value<char>{ValueType::True};
+    arr_var += Value<char>{false};
+    arr_var += Value<char>{true};
     arr_var += Value<char>{
         HAllocator::AllocateInit<String<char>>(String<char>("Qentem"))};
     c_str       = arr_var[2].StringStorage();
@@ -5130,7 +5130,7 @@ static int TestAddition3() {
         "StringUtils::IsEqual");
 
     arr_var.Reset();
-    arr_var += Value<char>{ValueType::Null};
+    arr_var += Value<char>{nullptr};
     arr_var += Value<char>{14};
     arr_var += Value<char>{
         HAllocator::AllocateInit<String<char>>(String<char>("Hani"))};
@@ -5206,7 +5206,7 @@ static int TestAddition3() {
         StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
         "StringUtils::IsEqual");
 
-    arr_var += Value<char>{ValueType::Null};
+    arr_var += Value<char>{nullptr};
     arr_var += Value<char>{14};
     arr_var += Value<char>{
         HAllocator::AllocateInit<String<char>>(String<char>("Hani"))};
