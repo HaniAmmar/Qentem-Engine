@@ -233,14 +233,14 @@ class JSONParser {
 
                         case JSONotation_T_::OCurlyChar:
                             type_      = Type_::Curly;
-                            child_obj_ = HAllocator::Allocate(
-                                HArray<Value<char>, char>());
+                            child_obj_ = HAllocator::AllocateInit<
+                                HArray<Value<char>, char>>();
                             return (index + 1);
 
                         case JSONotation_T_::OSquareChar: {
                             type_ = Type_::Square;
                             child_arr_ =
-                                HAllocator::Allocate(Array<Value<char>>());
+                                HAllocator::AllocateInit<Array<Value<char>>>();
                             return (index + 1);
                         }
 
