@@ -36,7 +36,19 @@ class String {
   public:
     String() = default;
 
-    String(const Char_T_ *str) : String(str, StringUtils::Count(str)) {
+    String(Char_T_ *str, ULong len) noexcept : length_(len), storage_(str) {
+    }
+
+    String(const Char_T_ *str, ULong len) : length_(len) {
+        if (str != nullptr) {
+            ++len;
+            storage_ = HAllocator::Allocate<Char_T_>(len);
+            Memory::Copy<Char_T_>(storage_, str, (length_ * sizeof(Char_T_)));
+            storage_[length_] = 0;
+        }
+    }
+
+    explicit String(const Char_T_ *str) : String(str, StringUtils::Count(str)) {
     }
 
     String(String &&src) noexcept
@@ -52,19 +64,6 @@ class String {
             Memory::Copy<Char_T_>(storage_, src.storage_,
                                   (len * sizeof(Char_T_)));
         }
-    }
-
-    explicit String(const Char_T_ *str, ULong len) : length_(len) {
-        if (str != nullptr) {
-            ++len;
-            storage_ = HAllocator::Allocate<Char_T_>(len);
-            Memory::Copy<Char_T_>(storage_, str, (length_ * sizeof(Char_T_)));
-            storage_[length_] = 0;
-        }
-    }
-
-    explicit String(Char_T_ *str, ULong len) noexcept
-        : length_(len), storage_(str) {
     }
 
     ~String() {
