@@ -101,10 +101,79 @@ class Value {
         : value_(num), type_(ValueType::Number) {
     }
 
+    template <typename Type_T_>
+    explicit Value(Type_T_ num) noexcept
+        : value_(static_cast<double>(num)), type_(ValueType::Number) {
+    }
+
+    explicit Value(NullType) noexcept : type_(ValueType::Null) {
+    }
+
+    explicit Value(bool bl) noexcept
+        : type_(bl ? ValueType::True : ValueType::False) {
+    }
+
     ~Value() {
         if (type_ != ValueType::Undefined) {
             Reset();
         }
+    }
+
+    Value &operator[](const Char_T_ *key) {
+        switch (type_) {
+            case ValueType::Object: {
+                return (*(value_.object_))[key];
+            }
+
+            case ValueType::Undefined: {
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                return (*(value_.object_))[key];
+            }
+
+            default: {
+            }
+        }
+
+        throw 3;
+    }
+
+    Value &operator[](VString &&key) {
+        switch (type_) {
+            case ValueType::Object: {
+                return (*(value_.object_))[static_cast<VString &&>(key)];
+            }
+
+            case ValueType::Undefined: {
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                return (*(value_.object_))[static_cast<VString &&>(key)];
+            }
+
+            default: {
+            }
+        }
+
+        throw 3;
+    }
+
+    Value &operator[](const VString &key) {
+        switch (type_) {
+            case ValueType::Object: {
+                return (*(value_.object_))[key];
+            }
+
+            case ValueType::Undefined: {
+                type_          = ValueType::Object;
+                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                return (*(value_.object_))[key];
+            }
+
+            default: {
+            }
+        }
+
+        throw 3;
     }
 
     Value &operator[](ULong index) {
@@ -150,42 +219,9 @@ class Value {
         throw 1;
     }
 
-    Value &operator[](VString &&key) {
-        switch (type_) {
-            case ValueType::Object: {
-                return (*(value_.object_))[static_cast<VString &&>(key)];
-            }
-
-            case ValueType::Undefined: {
-                type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
-                return (*(value_.object_))[static_cast<VString &&>(key)];
-            }
-
-            default: {
-            }
-        }
-
-        throw 3;
-    }
-
-    Value &operator[](const VString &key) {
-        switch (type_) {
-            case ValueType::Object: {
-                return (*(value_.object_))[key];
-            }
-
-            case ValueType::Undefined: {
-                type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
-                return (*(value_.object_))[key];
-            }
-
-            default: {
-            }
-        }
-
-        throw 3;
+    template <typename Type_T_>
+    Value &operator[](Type_T_ index) {
+        return (*this)[static_cast<ULong>(index)];
     }
 
     Value &operator=(Value &&val) noexcept {
@@ -341,29 +377,30 @@ class Value {
         return *this;
     }
 
-    Value &operator=(const Char_T_ *str) {
-        if (str != nullptr) {
-            *this = static_cast<VString &&>(VString(str));
-        } else {
-            switch (type_) {
-                case ValueType::Null: {
-                    break;
-                }
+    Value &operator=(NullType) {
+        switch (type_) {
+            case ValueType::Null: {
+                break;
+            }
 
-                case ValueType::Undefined:
-                case ValueType::True:
-                case ValueType::False: {
-                    type_ = ValueType::Null;
-                    break;
-                }
+            case ValueType::Undefined:
+            case ValueType::True:
+            case ValueType::False: {
+                type_ = ValueType::Null;
+                break;
+            }
 
-                default: {
-                    Reset();
-                    type_ = ValueType::Null;
-                }
+            default: {
+                Reset();
+                type_ = ValueType::Null;
             }
         }
 
+        return *this;
+    }
+
+    Value &operator=(const Char_T_ *str) {
+        *this = static_cast<VString &&>(VString(str));
         return *this;
     }
 
@@ -391,17 +428,8 @@ class Value {
         return *this;
     }
 
-    inline Value &operator=(ULong num) noexcept {
-        *this = static_cast<double>(num);
-        return *this;
-    }
-
-    inline Value &operator=(int num) noexcept {
-        *this = static_cast<double>(num);
-        return *this;
-    }
-
-    inline Value &operator=(UInt num) noexcept {
+    template <typename Type_T_>
+    inline Value &operator=(Type_T_ num) {
         *this = static_cast<double>(num);
         return *this;
     }
@@ -537,19 +565,7 @@ class Value {
     }
 
     void operator+=(const Char_T_ *str) {
-        if (str != nullptr) {
-            *this += static_cast<VString &&>(VString(str));
-            return;
-        }
-
-        if (type_ == ValueType::Undefined) {
-            value_.array_ = HAllocator::AllocateInit<VArray>();
-            type_         = ValueType::Array;
-        }
-
-        if (type_ == ValueType::Array) {
-            *(value_.array_) += static_cast<Value &&>(Value{ValueType::Null});
-        }
+        *this += static_cast<VString &&>(VString(str));
     }
 
     void operator+=(double num) {
@@ -563,28 +579,30 @@ class Value {
         }
     }
 
-    inline void operator+=(ULong num) {
+    template <typename Type_T_>
+    inline void operator+=(Type_T_ num) {
         *this += static_cast<double>(num);
     }
 
-    inline void operator+=(int num) {
-        *this += static_cast<double>(num);
-    }
-
-    inline void operator+=(UInt num) {
-        *this += static_cast<double>(num);
-    }
-
-    void operator+=(bool is_true) {
-        ValueType type = (is_true ? ValueType::True : ValueType::False);
-
+    void operator+=(NullType) {
         if (type_ == ValueType::Undefined) {
             value_.array_ = HAllocator::AllocateInit<VArray>();
             type_         = ValueType::Array;
         }
 
         if (type_ == ValueType::Array) {
-            *(value_.array_) += static_cast<Value &&>(Value{type});
+            *(value_.array_) += static_cast<Value &&>(Value{nullptr});
+        }
+    }
+
+    void operator+=(bool is_true) {
+        if (type_ == ValueType::Undefined) {
+            value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
+        }
+
+        if (type_ == ValueType::Array) {
+            *(value_.array_) += static_cast<Value &&>(Value{is_true});
         }
     }
 
@@ -927,6 +945,18 @@ class Value {
         return false;
     }
 
+    inline void Remove(const Char_T_ *key) const noexcept {
+        if (type_ == ValueType::Object) {
+            value_.object_->Remove(key);
+        }
+    }
+
+    inline void Remove(const VString &key) const noexcept {
+        if (type_ == ValueType::Object) {
+            value_.object_->Remove(key);
+        }
+    }
+
     void Remove(ULong index) const noexcept {
         if (type_ == ValueType::Object) {
             value_.object_->RemoveIndex(index);
@@ -936,10 +966,9 @@ class Value {
         }
     }
 
-    inline void Remove(const VString &key) const noexcept {
-        if (type_ == ValueType::Object) {
-            value_.object_->Remove(key);
-        }
+    template <typename Type_T_>
+    inline void Remove(Type_T_ index) const noexcept {
+        Remove(static_cast<ULong>(index));
     }
 
     void Reset() noexcept {
@@ -1145,24 +1174,19 @@ class Value {
     }
 
     union Value_U_ {
-        Value_U_() {
-            object_ = nullptr;
+        Value_U_() : number_(0) {
         }
 
-        explicit Value_U_(VHArray *object) noexcept {
-            object_ = object;
+        explicit Value_U_(VHArray *object) noexcept : object_(object) {
         }
 
-        explicit Value_U_(VArray *array) noexcept {
-            array_ = array;
+        explicit Value_U_(VArray *array) noexcept : array_(array) {
         }
 
-        explicit Value_U_(VString *string) noexcept {
-            string_ = string;
+        explicit Value_U_(VString *str) noexcept : string_(str) {
         }
 
-        explicit Value_U_(double number) noexcept {
-            number_ = number;
+        explicit Value_U_(double number) noexcept : number_(number) {
         }
 
         VHArray *object_;

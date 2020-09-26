@@ -465,7 +465,7 @@ class JSONParser {
 
                                 if (tmp_offset ==
                                     JSONotation_T_::TrueStringLength) {
-                                    insert(Value<Char_T_>{ValueType::True});
+                                    insert(Value<Char_T_>{true});
                                     break;
                                 }
                             }
@@ -489,7 +489,7 @@ class JSONParser {
 
                                 if (tmp_offset ==
                                     JSONotation_T_::FalseStringLength) {
-                                    insert(Value<Char_T_>{ValueType::False});
+                                    insert(Value<Char_T_>{false});
                                     break;
                                 }
                             }
@@ -513,7 +513,7 @@ class JSONParser {
 
                                 if (tmp_offset ==
                                     JSONotation_T_::NullStringLength) {
-                                    insert(Value<Char_T_>{ValueType::Null});
+                                    insert(Value<Char_T_>{nullptr});
                                     break;
                                 }
                             }
