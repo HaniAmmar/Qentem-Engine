@@ -141,7 +141,7 @@ struct aleHelper {
         const Value *val = value_->GetValue(content, length);
 
         if (val != nullptr) {
-            return val->GetNumber(number);
+            return val->SetNumber(number);
         }
 
         return false;

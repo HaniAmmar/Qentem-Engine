@@ -68,7 +68,7 @@ static int TestEmptyValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -98,7 +98,7 @@ static int TestEmptyValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -127,7 +127,7 @@ static int TestEmptyValue1() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
 
@@ -168,7 +168,7 @@ static int TestEmptyValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -197,7 +197,7 @@ static int TestEmptyValue2() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
 
@@ -227,7 +227,7 @@ static int TestEmptyValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -256,7 +256,7 @@ static int TestEmptyValue2() {
     SHOULD_EQUAL_VALUE(value3.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value3.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value3.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value3.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value3.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value3.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value3.Stringify(), "", "Stringify()");
 
@@ -298,7 +298,7 @@ static int TestEmptyValue3() {
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
     SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
@@ -326,7 +326,7 @@ static int TestEmptyValue3() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
 
@@ -386,7 +386,7 @@ static int TestTrueValue1() {
     SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
     SHOULD_EQUAL_VALUE(ss_var, "true", "ss_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -406,7 +406,7 @@ static int TestTrueValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -426,7 +426,7 @@ static int TestTrueValue1() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -445,7 +445,7 @@ static int TestTrueValue1() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -477,7 +477,7 @@ static int TestTrueValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -496,7 +496,7 @@ static int TestTrueValue2() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -516,7 +516,7 @@ static int TestTrueValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -533,7 +533,7 @@ static int TestTrueValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -563,7 +563,7 @@ static int TestTrueValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -580,7 +580,7 @@ static int TestTrueValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -636,7 +636,7 @@ static int TestFalseValue1() {
     SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
     SHOULD_EQUAL_VALUE(ss_var, "false", "ss_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -656,7 +656,7 @@ static int TestFalseValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -676,7 +676,7 @@ static int TestFalseValue1() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -695,7 +695,7 @@ static int TestFalseValue1() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -727,7 +727,7 @@ static int TestFalseValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -746,7 +746,7 @@ static int TestFalseValue2() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -766,7 +766,7 @@ static int TestFalseValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -783,7 +783,7 @@ static int TestFalseValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -813,7 +813,7 @@ static int TestFalseValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -830,7 +830,7 @@ static int TestFalseValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -886,7 +886,7 @@ static int TestNullValue1() {
     SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
     SHOULD_EQUAL_VALUE(ss_var, "null", "ss_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -906,7 +906,7 @@ static int TestNullValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -926,7 +926,7 @@ static int TestNullValue1() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -945,7 +945,7 @@ static int TestNullValue1() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -977,7 +977,7 @@ static int TestNullValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -996,7 +996,7 @@ static int TestNullValue2() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -1016,7 +1016,7 @@ static int TestNullValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1033,7 +1033,7 @@ static int TestNullValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -1063,7 +1063,7 @@ static int TestNullValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1080,7 +1080,7 @@ static int TestNullValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -1134,7 +1134,7 @@ static int TestNumberValue1() {
     SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
     SHOULD_EQUAL_VALUE(ss_var, "33", "ss_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 33, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1154,7 +1154,7 @@ static int TestNumberValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1174,7 +1174,7 @@ static int TestNumberValue1() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 45, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1193,7 +1193,7 @@ static int TestNumberValue1() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 45, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1225,7 +1225,7 @@ static int TestNumberValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "10", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 10, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1244,7 +1244,7 @@ static int TestNumberValue2() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "10", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 10, "num_var");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1264,7 +1264,7 @@ static int TestNumberValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1281,7 +1281,7 @@ static int TestNumberValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "10", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 10, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1311,7 +1311,7 @@ static int TestNumberValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1328,7 +1328,7 @@ static int TestNumberValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "13", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 13, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 13, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_TRUE(bool_var, "bool_var");
@@ -1413,7 +1413,7 @@ static int TestStringValue1() {
     SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
     SHOULD_EQUAL_VALUE(ss_var, "Qentem", "ss_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
@@ -1433,7 +1433,7 @@ static int TestStringValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1457,7 +1457,7 @@ static int TestStringValue1() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
@@ -1479,7 +1479,7 @@ static int TestStringValue1() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
@@ -1514,7 +1514,7 @@ static int TestStringValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     bool_var = false;
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
@@ -1538,7 +1538,7 @@ static int TestStringValue2() {
     SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1561,7 +1561,7 @@ static int TestStringValue2() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
@@ -1578,7 +1578,7 @@ static int TestStringValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1611,7 +1611,7 @@ static int TestStringValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
     bool_var = true;
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
@@ -1630,7 +1630,7 @@ static int TestStringValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1721,7 +1721,7 @@ static int TestArrayValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "[]", "Stringify()");
 
@@ -1738,7 +1738,7 @@ static int TestArrayValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1768,7 +1768,7 @@ static int TestArrayValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "[]", "Stringify()");
 
@@ -1789,7 +1789,7 @@ static int TestArrayValue1() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
 
@@ -1828,7 +1828,7 @@ static int TestArrayValue2() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
 
@@ -1849,7 +1849,7 @@ static int TestArrayValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "[]", "Stringify()");
 
@@ -1872,7 +1872,7 @@ static int TestArrayValue2() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
 
@@ -1888,7 +1888,7 @@ static int TestArrayValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -1927,7 +1927,7 @@ static int TestArrayValue3() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
 
@@ -1943,7 +1943,7 @@ static int TestArrayValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -2153,7 +2153,7 @@ static int TestObjectValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value1 = h_arr_var;
@@ -2173,7 +2173,7 @@ static int TestObjectValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -2208,7 +2208,7 @@ static int TestObjectValue1() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     value1 = h_arr_var;
     SHOULD_EQUAL_VALUE(value1.Stringify(), "{}", "Stringify()");
@@ -2232,7 +2232,7 @@ static int TestObjectValue1() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
 
     h_arr_var.Reset();
@@ -2290,7 +2290,7 @@ static int TestObjectValue2() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value2 = h_arr_var;
@@ -2314,7 +2314,7 @@ static int TestObjectValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value1 = h_arr_var;
@@ -2349,7 +2349,7 @@ static int TestObjectValue2() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value2 = h_arr_var;
@@ -2367,7 +2367,7 @@ static int TestObjectValue2() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 
@@ -2413,7 +2413,7 @@ static int TestObjectValue3() {
     SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value2 = h_arr_var;
@@ -2431,7 +2431,7 @@ static int TestObjectValue3() {
     SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
     SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetNumber(num_var), "GetNumber(num_var)");
+    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
 

@@ -643,7 +643,7 @@ class Template_T_ {
                 if (value != nullptr) {
                     double num;
 
-                    if (value->GetNumber(num)) {
+                    if (value->SetNumber(num)) {
                         number = static_cast<UInt>(num);
                         return true;
                     }
@@ -1130,7 +1130,7 @@ class Template_T_ {
             const Value_T_ *value = findValue(content, length);
 
             if (value != nullptr) {
-                if (value->GetNumber(number)) {
+                if (value->SetNumber(number)) {
                     return true;
                 }
 
@@ -1141,7 +1141,7 @@ class Template_T_ {
                     return ALE::Evaluate(number, str, len, this);
                 }
 
-                return value->GetNumber(number);
+                return value->SetNumber(number);
             }
         }
 
@@ -1195,7 +1195,7 @@ class Template_T_ {
             double num_left;
 
             if (value_left != nullptr) {
-                if (!(value_left->GetNumber(num_left))) {
+                if (!(value_left->SetNumber(num_left))) {
                     return false;
                 }
             } else if (!(Digit<Char_T_>::StringToNumber(num_left, left,
@@ -1206,7 +1206,7 @@ class Template_T_ {
             double num_right;
 
             if (value_right != nullptr) {
-                if (!(value_right->GetNumber(num_right))) {
+                if (!(value_right->SetNumber(num_right))) {
                     return false;
                 }
             } else if (!(Digit<Char_T_>::StringToNumber(num_right, right,

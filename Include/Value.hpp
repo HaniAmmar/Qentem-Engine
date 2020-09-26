@@ -939,7 +939,7 @@ class Value {
         return 0;
     }
 
-    bool GetNumber(double &value) const noexcept {
+    bool SetNumber(double &value) const noexcept {
         switch (type_) {
             case ValueType::Number: {
                 value = value_.number_;
