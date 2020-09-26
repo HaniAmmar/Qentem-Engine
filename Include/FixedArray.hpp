@@ -32,7 +32,7 @@ namespace Qentem {
 template <typename Type_, UInt Size_T_>
 class FixedArray {
   private:
-    Type_ storage_[Size_T_];
+    Type_ storage_[Size_T_]{};
     UInt  index_{0};
 
   public:
