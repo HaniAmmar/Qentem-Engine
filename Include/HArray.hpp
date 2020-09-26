@@ -185,6 +185,29 @@ class HArray {
         }
     }
 
+    Value_ &operator[](const Char_T_ *key) {
+        ULong       len  = StringUtils::Count(key);
+        const ULong hash = Hash(key, len);
+
+        if (capacity_ == 0) {
+            initStorage();
+        }
+
+        HAItem_T **item = find(key, len, hash);
+
+        if ((*item) == nullptr) {
+            if (index_ == capacity_) {
+                grow();
+                item = find(key, len, hash);
+            }
+
+            (*item) = (storage_ + index_);
+            insert(String<Char_T_>(key, len), hash);
+        }
+
+        return (*item)->Value;
+    }
+
     Value_ &operator[](String<Char_T_> &&key) {
         const ULong hash = Hash(key.First(), key.Length());
 
@@ -207,7 +230,7 @@ class HArray {
         return (*item)->Value;
     }
 
-    inline Value_ &operator[](const String<Char_T_> &key) {
+    Value_ &operator[](const String<Char_T_> &key) {
         const ULong hash = Hash(key.First(), key.Length());
 
         if (capacity_ == 0) {
