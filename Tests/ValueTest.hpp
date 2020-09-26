@@ -1304,9 +1304,6 @@ static int TestNumberValue3() {
     value2 = 785;
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 785, "GetNumber()");
 
-    value2 += 105;
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 890, "GetNumber()");
-
     value2 = UInt{0};
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
@@ -1586,22 +1583,6 @@ static int TestStringValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "qen", "str_var");
     SHOULD_NOT_EQUAL(value2.StringStorage(), c_str, "str_var.First()", "c_str");
-
-    str_var = "Qen";
-    c_str   = str_var.First();
-    value2  = static_cast<String<char> &&>(str_var); // Move
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "Qen", "str_var");
-    SHOULD_EQUAL(value2.StringStorage(), c_str, "str_var.First()", "c_str");
-
-    value2 += "tem";
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "Qentem", "str_var");
-
-    str_var = " 3";
-    value2 += str_var;
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "Qentem 3", "str_var");
 
     String<char> *str_p =
         HAllocator::AllocateInit<String<char>>(String<char>("ABC"));

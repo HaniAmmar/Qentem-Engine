@@ -248,7 +248,6 @@ class Value {
     Value &operator=(VHArray &&obj) {
         switch (type_) {
             case ValueType::Object: {
-                *(value_.object_) = static_cast<VHArray &&>(obj);
                 break;
             }
 
@@ -258,19 +257,18 @@ class Value {
             case ValueType::False:
             case ValueType::Null: {
                 type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>(
-                    static_cast<VHArray &&>(obj));
+                value_.object_ = HAllocator::AllocateInit<VHArray>();
                 break;
             }
 
             default: {
                 Reset();
                 type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>(
-                    static_cast<VHArray &&>(obj));
+                value_.object_ = HAllocator::AllocateInit<VHArray>();
             }
         }
 
+        *(value_.object_) = static_cast<VHArray &&>(obj);
         return *this;
     }
 
@@ -282,7 +280,6 @@ class Value {
     Value &operator=(VArray &&arr) {
         switch (type_) {
             case ValueType::Array: {
-                *(value_.array_) = static_cast<VArray &&>(arr);
                 break;
             }
 
@@ -292,19 +289,18 @@ class Value {
             case ValueType::False:
             case ValueType::Null: {
                 type_         = ValueType::Array;
-                value_.array_ = HAllocator::AllocateInit<VArray>(
-                    static_cast<VArray &&>(arr));
+                value_.array_ = HAllocator::AllocateInit<VArray>();
                 break;
             }
 
             default: {
                 Reset();
                 type_         = ValueType::Array;
-                value_.array_ = HAllocator::AllocateInit<VArray>(
-                    static_cast<VArray &&>(arr));
+                value_.array_ = HAllocator::AllocateInit<VArray>();
             }
         }
 
+        *(value_.array_) = static_cast<VArray &&>(arr);
         return *this;
     }
 
@@ -316,7 +312,6 @@ class Value {
     Value &operator=(VString &&str) {
         switch (type_) {
             case ValueType::String: {
-                *(value_.string_) = static_cast<VString &&>(str);
                 break;
             }
 
@@ -326,19 +321,18 @@ class Value {
             case ValueType::False:
             case ValueType::Null: {
                 type_          = ValueType::String;
-                value_.string_ = HAllocator::AllocateInit<VString>(
-                    static_cast<VString &&>(str));
+                value_.string_ = HAllocator::AllocateInit<VString>();
                 break;
             }
 
             default: {
                 Reset();
                 type_          = ValueType::String;
-                value_.string_ = HAllocator::AllocateInit<VString>(
-                    static_cast<VString &&>(str));
+                value_.string_ = HAllocator::AllocateInit<VString>();
             }
         }
 
+        *(value_.string_) = static_cast<VString &&>(str);
         return *this;
     }
 
@@ -432,44 +426,30 @@ class Value {
 
     void operator+=(Value &&val) {
         if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
             value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
         }
 
-        switch (type_) {
-            case ValueType::Array: {
-                if (val.type_ == ValueType::Array) {
-                    const VArray &src_arr = *(val.value_.array_);
-                    VArray &      des_arr = *(value_.array_);
+        if (type_ == ValueType::Array) {
+            if (val.type_ == ValueType::Array) {
+                const VArray &src_arr = *(val.value_.array_);
+                VArray &      des_arr = *(value_.array_);
 
-                    Value *      src_val = src_arr.First();
-                    const Value *src_end = src_arr.End();
+                Value *      src_val = src_arr.First();
+                const Value *src_end = src_arr.End();
 
-                    while (src_val != src_end) {
-                        if (src_val->type_ != ValueType::Undefined) {
-                            des_arr += static_cast<Value &&>(*src_val);
-                        }
-
-                        ++src_val;
+                while (src_val != src_end) {
+                    if (src_val->type_ != ValueType::Undefined) {
+                        des_arr += static_cast<Value &&>(*src_val);
                     }
-                } else if (val.type_ != ValueType::Undefined) {
-                    *(value_.array_) += static_cast<Value &&>(val);
+
+                    ++src_val;
                 }
-
-                break;
+            } else if (val.type_ != ValueType::Undefined) {
+                *(value_.array_) += static_cast<Value &&>(val);
             }
-
-            case ValueType::Object: {
-                if (val.type_ == ValueType::Object) {
-                    *(value_.object_) +=
-                        static_cast<VHArray &&>(*(val.value_.object_));
-                }
-
-                break;
-            }
-
-            default: {
-            }
+        } else if ((type_ == ValueType::Object) && (val.type_ == type_)) {
+            *(value_.object_) += static_cast<VHArray &&>(*(val.value_.object_));
         }
 
         val.Reset();
@@ -477,147 +457,109 @@ class Value {
 
     void operator+=(const Value &val) {
         if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
             value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
         }
 
-        switch (type_) {
-            case ValueType::Array: {
-                if (val.type_ == ValueType::Array) {
-                    const VArray &src_arr = *(val.value_.array_);
-                    VArray &      des_arr = *(value_.array_);
+        if (type_ == ValueType::Array) {
+            if (val.type_ == ValueType::Array) {
+                const VArray &src_arr = *(val.value_.array_);
+                VArray &      des_arr = *(value_.array_);
 
-                    const Value *src_val = src_arr.First();
-                    const Value *src_end = src_arr.End();
+                const Value *src_val = src_arr.First();
+                const Value *src_end = src_arr.End();
 
-                    while (src_val != src_end) {
-                        if (src_val->type_ != ValueType::Undefined) {
-                            des_arr += *src_val;
-                        }
-
-                        ++src_val;
+                while (src_val != src_end) {
+                    if (src_val->type_ != ValueType::Undefined) {
+                        des_arr += *src_val;
                     }
-                } else if (val.type_ != ValueType::Undefined) {
-                    *(value_.array_) += val;
+
+                    ++src_val;
                 }
-
-                break;
+            } else if (val.type_ != ValueType::Undefined) {
+                *(value_.array_) += val;
             }
-
-            case ValueType::Object: {
-                if (val.type_ == ValueType::Object) {
-                    *(value_.object_) += *(val.value_.object_);
-                }
-
-                break;
-            }
-
-            default: {
-            }
+        } else if ((type_ == ValueType::Object) && (val.type_ == type_)) {
+            *(value_.object_) += *(val.value_.object_);
         }
     }
 
     void operator+=(VHArray &&obj) {
         if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
             value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
         }
 
-        switch (type_) {
-            case ValueType::Array: {
-                *(value_.array_) += Value{HAllocator::AllocateInit<VHArray>(
-                    static_cast<VHArray &&>(obj))};
-                break;
-            }
-
-            case ValueType::Object: {
-                *(value_.object_) += static_cast<VHArray &&>(obj);
-                break;
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Array) {
+            *(value_.array_) +=
+                static_cast<Value &&>(Value{HAllocator::AllocateInit<VHArray>(
+                    static_cast<VHArray &&>(obj))});
+        } else if (type_ == ValueType::Object) {
+            *(value_.object_) += static_cast<VHArray &&>(obj);
         }
     }
 
     void operator+=(const VHArray &obj) {
-        *this += VHArray(obj);
+        *this += static_cast<VHArray &&>(VHArray(obj));
     }
 
     void operator+=(VArray &&arr) {
+        if (type_ == ValueType::Undefined) {
+            value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
+        }
+
         if (type_ == ValueType::Array) {
             *(value_.array_) += static_cast<VArray &&>(arr);
-        } else if (type_ == ValueType::Undefined) {
-            type_ = ValueType::Array;
-            value_.array_ =
-                HAllocator::AllocateInit<VArray>(static_cast<VArray &&>(arr));
         }
     }
 
     void operator+=(const VArray &arr) {
-        (*this) += VArray(arr);
+        (*this) += static_cast<VArray &&>(VArray(arr));
     }
 
     void operator+=(VString &&str) {
+        Value s_value = Value{
+            HAllocator::AllocateInit<VString>(static_cast<VString &&>(str))};
+
         if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
             value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
         }
 
-        switch (type_) {
-            case ValueType::Array: {
-                *(value_.array_) += Value{HAllocator::AllocateInit<VString>(
-                    static_cast<VString &&>(str))};
-                break;
-            }
-
-            case ValueType::String: {
-                *(value_.string_) += static_cast<VString &&>(str);
-                break;
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Array) {
+            *(value_.array_) += static_cast<Value &&>(s_value);
         }
     }
 
-    void operator+=(const VString &string_) {
-        (*this) += VString(string_);
+    void operator+=(const VString &str) {
+        *this += static_cast<VString &&>(VString(str));
     }
 
     void operator+=(const Char_T_ *str) {
         if (str != nullptr) {
-            *this += VString(str);
-        } else {
-            if (type_ == ValueType::Array) {
-                *(value_.array_) += Value{ValueType::Null};
-            } else if (type_ == ValueType::Undefined) {
-                type_         = ValueType::Array;
-                value_.array_ = HAllocator::AllocateInit<VArray>();
-                *(value_.array_) += Value{ValueType::Null};
-            }
+            *this += static_cast<VString &&>(VString(str));
+            return;
+        }
+
+        if (type_ == ValueType::Undefined) {
+            value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
+        }
+
+        if (type_ == ValueType::Array) {
+            *(value_.array_) += static_cast<Value &&>(Value{ValueType::Null});
         }
     }
 
     void operator+=(double num) {
         if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
             value_.array_ = HAllocator::AllocateInit<VArray>();
+            type_         = ValueType::Array;
         }
 
-        switch (type_) {
-            case ValueType::Array: {
-                *(value_.array_) += Value{num};
-                break;
-            }
-
-            case ValueType::Number: {
-                value_.number_ += num;
-                break;
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Array) {
+            *(value_.array_) += static_cast<Value &&>(Value{num});
         }
     }
 
@@ -634,13 +576,15 @@ class Value {
     }
 
     void operator+=(bool is_true) {
-        if (type_ == ValueType::Array) {
-            ValueType type = (is_true ? ValueType::True : ValueType::False);
-            *(value_.array_) += Value{type};
-        } else if (type_ == ValueType::Undefined) {
-            type_         = ValueType::Array;
+        ValueType type = (is_true ? ValueType::True : ValueType::False);
+
+        if (type_ == ValueType::Undefined) {
             value_.array_ = HAllocator::AllocateInit<VArray>();
-            *this += is_true;
+            type_         = ValueType::Array;
+        }
+
+        if (type_ == ValueType::Array) {
+            *(value_.array_) += static_cast<Value &&>(Value{type});
         }
     }
 
