@@ -84,6 +84,8 @@ using ULong = unsigned long long;
 using ULong = unsigned long;
 #endif
 
+using NullType = decltype(nullptr);
+
 } // namespace Qentem
 
 #endif
