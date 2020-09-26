@@ -330,15 +330,6 @@ static int TestEmptyValue3() {
     SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
 
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
-
     value2 = Value<char>{ValueType::Object};
     SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
 
@@ -589,15 +580,6 @@ static int TestTrueValue3() {
     value2 = true;
     SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
 
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_EQUAL_TRUE(b_var, "static_cast<bool>");
-
     value2 = Value<char>{ValueType::True};
     SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
 
@@ -839,15 +821,6 @@ static int TestFalseValue3() {
     value2 = false;
     SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
 
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
-
     value2 = Value<char>{ValueType::False};
     SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
 
@@ -1088,15 +1061,6 @@ static int TestNullValue3() {
 
     value2 = nullptr;
     SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
     value2 = Value<char>{ValueType::Null};
     SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
@@ -1342,24 +1306,6 @@ static int TestNumberValue3() {
 
     value2 += 105;
     SHOULD_EQUAL_VALUE(value2.GetNumber(), 890, "GetNumber()");
-
-    value2 -= 90;
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 800, "GetNumber()");
-
-    value2 /= 80;
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 10, "GetNumber()");
-
-    value2 *= 3;
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 30, "GetNumber()");
-
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 30, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
     value2 = UInt{0};
     SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
@@ -1657,16 +1603,6 @@ static int TestStringValue3() {
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "Qentem 3", "str_var");
 
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_NOT_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-    SHOULD_EQUAL(value2.StringStorage(), c_var, "str_var.First()", "c_str");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
-
     String<char> *str_p =
         HAllocator::AllocateInit<String<char>>(String<char>("ABC"));
     value2 = Value<char>{str_p};
@@ -1678,8 +1614,6 @@ static int TestStringValue3() {
     value2 = String<char>("123");
     SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
     SHOULD_EQUAL_VALUE(str_var, "123", "str_var");
-    d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
 
     END_SUB_TEST;
 }
@@ -1969,15 +1903,6 @@ static int TestArrayValue3() {
                      "null");
     SHOULD_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
                  "storage");
-
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
     Array<Value<char>> *arr_p =
         HAllocator::AllocateInit<Array<Value<char>>>(Array<Value<char>>(3));
@@ -2466,15 +2391,6 @@ static int TestObjectValue3() {
                      "GetArray()->First()", "null");
     SHOULD_EQUAL(value2.GetObject()->First(), storage, "GetArray()->First()",
                  "storage");
-
-    double d_var = static_cast<double>(value2);
-    SHOULD_EQUAL_VALUE(d_var, 0, "static_cast<double>");
-
-    const char *c_var = static_cast<const char *>(value2);
-    SHOULD_EQUAL(c_var, nullptr, "static_cast<const char *>", "null");
-
-    bool b_var = static_cast<bool>(value2);
-    SHOULD_NOT_EQUAL_TRUE(b_var, "static_cast<bool>");
 
     HArray<Value<char>, char> *h_arr_p =
         HAllocator::AllocateInit<HArray<Value<char>, char>>(

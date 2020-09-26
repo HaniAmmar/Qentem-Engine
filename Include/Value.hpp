@@ -621,24 +621,6 @@ class Value {
         }
     }
 
-    void operator-=(double num) noexcept {
-        if (type_ == ValueType::Number) {
-            value_.number_ -= num;
-        }
-    }
-
-    void operator*=(double num) noexcept {
-        if (type_ == ValueType::Number) {
-            value_.number_ *= num;
-        }
-    }
-
-    void operator/=(double num) noexcept {
-        if (type_ == ValueType::Number) {
-            value_.number_ /= num;
-        }
-    }
-
     inline void operator+=(ULong num) {
         *this += static_cast<double>(num);
     }
@@ -660,18 +642,6 @@ class Value {
             value_.array_ = HAllocator::AllocateInit<VArray>();
             *this += is_true;
         }
-    }
-
-    explicit operator double() const noexcept {
-        return GetNumber();
-    }
-
-    explicit operator const Char_T_ *() const noexcept {
-        return StringStorage();
-    }
-
-    explicit operator bool() const noexcept {
-        return IsTrue();
     }
 
     inline bool IsUndefined() const noexcept {
