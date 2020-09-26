@@ -310,16 +310,24 @@ class HArray {
         return Find(key.First(), key.Length());
     }
 
-    inline void Remove(const String<Char_T_> &key) noexcept {
-        remove(key, Hash(key.First(), key.Length()));
+    inline void Remove(const Char_T_ *key, UInt length) const noexcept {
+        remove(key, length, Hash(key, length));
     }
 
-    void RemoveIndex(ULong index) noexcept {
+    inline void Remove(const Char_T_ *key) const noexcept {
+        Remove(key, StringUtils::Count<Char_T_, UInt>(key));
+    }
+
+    inline void Remove(const String<Char_T_> &key) const noexcept {
+        remove(key.First(), key.Length(), Hash(key.First(), key.Length()));
+    }
+
+    void RemoveIndex(ULong index) const noexcept {
         if (index < index_) {
             const HAItem_T &item = storage_[index];
 
             if (item.Hash != 0) {
-                remove(item.Key, item.Hash);
+                remove(item.Key.First(), item.Key.Length(), item.Hash);
             }
         }
     }
@@ -328,7 +336,8 @@ class HArray {
      * This function renames a key to a nonexisting one without changing the
      * order of the item, and returns true if successful.
      */
-    bool Rename(const String<Char_T_> &from, String<Char_T_> &&to) noexcept {
+    bool Rename(const String<Char_T_> &from,
+                String<Char_T_> &&     to) const noexcept {
         if (capacity_ != 0) {
             const ULong hash_from = Hash(from.First(), from.Length());
             HAItem_T ** left_item = (hash_table_ + (hash_from & base_));
@@ -370,7 +379,7 @@ class HArray {
     }
 
     bool Rename(const String<Char_T_> &from,
-                const String<Char_T_> &to) noexcept {
+                const String<Char_T_> &to) const noexcept {
         return Rename(from, String<Char_T_>(to));
     }
 
@@ -574,13 +583,15 @@ class HArray {
         ++index_;
     }
 
-    void remove(const String<Char_T_> &key, ULong hash) noexcept {
+    void remove(const Char_T_ *key, ULong length, ULong hash) const noexcept {
         if (capacity_ != 0) {
             HAItem_T **item   = (hash_table_ + (hash & base_));
             HAItem_T **before = item;
 
-            while (((*item) != nullptr) &&
-                   (((*item)->Hash != hash) || ((*item)->Key != key))) {
+            while (
+                ((*item) != nullptr) &&
+                (((*item)->Hash != hash) || ((*item)->Key.Length() != length) ||
+                 !(StringUtils::IsEqual((*item)->Key.First(), key, length)))) {
                 before = item; // Store the previous item
                 item   = &((*item)->Next);
             }
