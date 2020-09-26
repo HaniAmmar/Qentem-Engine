@@ -51,7 +51,7 @@ class Value {
     Value() = default;
 
     Value(Value &&val) noexcept : value_(val.value_), type_(val.type_) {
-        val.type_ = ValueType::Undefined; // Prevents deletion.
+        val.type_ = ValueType::Undefined;
     }
 
     Value(const Value &val) : type_(val.type_) {
@@ -72,11 +72,6 @@ class Value {
 
             case ValueType::String: {
                 value_.string_ = HAllocator::AllocateInit<VString>();
-                break;
-            }
-
-            case ValueType::Number: {
-                value_.number_ = 0;
                 break;
             }
 
@@ -230,10 +225,10 @@ class Value {
                 Reset();
             }
 
-            type_  = val.type_;
             value_ = val.value_;
+            type_  = val.type_;
 
-            val.type_ = ValueType::Undefined; // Prevent deletion.
+            val.type_ = ValueType::Undefined;
         }
 
         return *this;
@@ -272,8 +267,8 @@ class Value {
                 }
 
                 if (val.type_ != ValueType::Undefined) {
-                    type_ = val.type_;
                     copyValue(val);
+                    type_ = val.type_;
                 }
             }
         }
@@ -292,15 +287,15 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_          = ValueType::Object;
                 value_.object_ = HAllocator::AllocateInit<VHArray>();
+                type_          = ValueType::Object;
                 break;
             }
 
             default: {
                 Reset();
-                type_          = ValueType::Object;
                 value_.object_ = HAllocator::AllocateInit<VHArray>();
+                type_          = ValueType::Object;
             }
         }
 
@@ -324,15 +319,15 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_         = ValueType::Array;
                 value_.array_ = HAllocator::AllocateInit<VArray>();
+                type_         = ValueType::Array;
                 break;
             }
 
             default: {
                 Reset();
-                type_         = ValueType::Array;
                 value_.array_ = HAllocator::AllocateInit<VArray>();
+                type_         = ValueType::Array;
             }
         }
 
@@ -356,15 +351,15 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                type_          = ValueType::String;
                 value_.string_ = HAllocator::AllocateInit<VString>();
+                type_          = ValueType::String;
                 break;
             }
 
             default: {
                 Reset();
-                type_          = ValueType::String;
                 value_.string_ = HAllocator::AllocateInit<VString>();
+                type_          = ValueType::String;
             }
         }
 
@@ -974,33 +969,29 @@ class Value {
     void Reset() noexcept {
         switch (type_) {
             case ValueType::Object: {
-                type_ = ValueType::Undefined;
                 HAllocator::Destruct(value_.object_);
                 HAllocator::Deallocate(value_.object_);
-                value_.object_ = nullptr;
                 break;
             }
 
             case ValueType::Array: {
-                type_ = ValueType::Undefined;
                 HAllocator::Destruct(value_.array_);
                 HAllocator::Deallocate(value_.array_);
-                value_.array_ = nullptr;
                 break;
             }
 
             case ValueType::String: {
-                type_ = ValueType::Undefined;
                 HAllocator::Destruct(value_.string_);
                 HAllocator::Deallocate(value_.string_);
-                value_.string_ = nullptr;
                 break;
             }
 
             default: {
-                type_ = ValueType::Undefined;
             }
         }
+
+        value_.object_ = nullptr;
+        type_          = ValueType::Undefined;
     }
 
     void Compress() {
@@ -1143,7 +1134,7 @@ class Value {
 
   private:
     void copyValue(const Value &val) {
-        switch (type_) {
+        switch (val.type_) {
             case ValueType::Object: {
                 value_.object_    = HAllocator::AllocateInit<VHArray>();
                 *(value_.object_) = *(val.value_.object_);
@@ -1153,7 +1144,6 @@ class Value {
             case ValueType::Array: {
                 value_.array_    = HAllocator::AllocateInit<VArray>();
                 *(value_.array_) = *(val.value_.array_);
-
                 break;
             }
 
@@ -1174,18 +1164,15 @@ class Value {
     }
 
     union Value_U_ {
-        Value_U_() : number_(0) {
+        Value_U_() : object_(nullptr) {
         }
 
         explicit Value_U_(VHArray *object) noexcept : object_(object) {
         }
-
         explicit Value_U_(VArray *array) noexcept : array_(array) {
         }
-
         explicit Value_U_(VString *str) noexcept : string_(str) {
         }
-
         explicit Value_U_(double number) noexcept : number_(number) {
         }
 
