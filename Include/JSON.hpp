@@ -21,6 +21,7 @@
  */
 
 #include "Engine.hpp"
+#include "FixedArray.hpp"
 #include "Value.hpp"
 
 #ifndef QENTEM_JSON_H_
@@ -33,108 +34,87 @@ template <typename>
 class JSONParser;
 
 template <typename Char_T_>
-inline static Value<Char_T_> Parse(const Char_T_ *content, ULong length) {
+inline static Value<Char_T_> Parse(const Char_T_ *content, SizeT length) {
     Value<Char_T_> value;
-    JSONParser<Char_T_>().Parse(value, content, length);
+    JSONParser<Char_T_>::Parse(value, content, length);
     return value;
+}
+
+template <typename Char_T_, typename Number_T>
+inline static Value<Char_T_> Parse(const Char_T_ *content, Number_T length) {
+    return Parse(content, static_cast<SizeT>(length));
 }
 
 template <typename Char_T_>
 inline static Value<Char_T_> Parse(const Char_T_ *content) {
-    return Parse<Char_T_>(content, StringUtils::Count(content));
+    return Parse(content, StringUtils::Count(content));
 }
 
 template <typename Char_T_>
 class JSONParser {
-    using JSONotation_T_ = JSONotation<Char_T_>;
-    using VHArray        = HArray<Value<Char_T_>, Char_T_>;
-    using VArray         = Array<Value<Char_T_>>;
-    using VString        = String<Char_T_>;
-
-    enum class Type_;
     struct FindCache_T_;
 
-    friend class Qentem::Engine;
+    using VValue = Value<Char_T_>;
 
   public:
     JSONParser() = default;
 
-    void Parse(Value<Char_T_> &value, const Char_T_ *content, ULong length) {
-        ULong offset = 0;
+    inline static void Parse(VValue &value, const Char_T_ *content,
+                             UInt length) {
+        UInt offset = 0;
 
         while (offset < length) {
             switch (content[offset]) {
-                case JSONotation_T_::OCurlyChar:
-                case JSONotation_T_::OSquareChar: {
+                case JSONotation_T_::SCurlyChar:
+                case JSONotation_T_::SSquareChar: {
                     while (offset != length) {
-                        switch (content[--length]) {
+                        --length;
+
+                        switch (content[length]) {
                             case JSONotation_T_::CommaChar:
                             case JSONotation_T_::QuoteChar: {
                                 return;
                             }
 
-                            case JSONotation_T_::CCurlyChar:
-                            case JSONotation_T_::CSquareChar: {
-                                if (((content[offset] ==
-                                      JSONotation_T_::OCurlyChar) &&
-                                     (content[length] ==
-                                      JSONotation_T_::CCurlyChar)) ||
+                            case JSONotation_T_::ECurlyChar:
+                            case JSONotation_T_::ESquareChar: {
+                                const bool is_obj =
+                                    (content[offset] ==
+                                     JSONotation_T_::SCurlyChar);
+
+                                if ((is_obj && (content[length] ==
+                                                JSONotation_T_::ECurlyChar)) ||
                                     ((content[offset] ==
-                                      JSONotation_T_::OSquareChar) &&
+                                      JSONotation_T_::SSquareChar) &&
                                      (content[length] ==
-                                      JSONotation_T_::CSquareChar))) {
+                                      JSONotation_T_::ESquareChar))) {
 
-                                    if (content[offset] ==
-                                        JSONotation_T_::OCurlyChar) {
-                                        obj_ =
-                                            HAllocator::AllocateInit<VHArray>();
-                                        value = static_cast<Value<Char_T_> &&>(
-                                            Value<Char_T_>{obj_});
+                                    ++offset;
+                                    ++length;
+
+                                    JSONParser jp;
+
+                                    if (is_obj) {
+                                        value = jp.parseObject(content, offset,
+                                                               length);
                                     } else {
-                                        arr_ =
-                                            HAllocator::AllocateInit<VArray>();
-                                        value = static_cast<Value<Char_T_> &&>(
-                                            Value<Char_T_>{arr_});
+                                        value = jp.parseArray(content, offset,
+                                                              length);
                                     }
 
-#ifdef QENTEM_SIMD_ENABLED_
-                                    FindCache_T_ fc;
-                                    find_cache_ = &fc;
-#endif
-
-                                    Engine::FindNest(content, ++offset, length,
-                                                     length, this);
-
-                                    if (!has_error_ && !pass_comma_) {
-                                        length -= (offset - 1);
-                                        searchAgain(content, offset, length);
-                                    }
-
-                                    if (next_offset_ == 0) {
-                                        // Prevent checkPoint2 form failing on
-                                        // an empty objects or arrays
-                                        next_offset_ = offset;
-                                    }
-
-                                    if (has_error_ ||
-                                        (!checkPoint2(content, length))) {
-                                        value.Reset();
+                                    if (offset == length) {
                                         return;
                                     }
 
-                                    // value.Compress();
+                                    value.Reset();
                                 }
 
                                 return;
                             }
-
-                            default: {
-                            }
                         }
                     }
-                }
 
-                default: {
+                    return;
                 }
             }
 
@@ -142,666 +122,464 @@ class JSONParser {
         }
     }
 
-    //////////// Private ////////////
-
   private:
-    inline bool HasTail() const noexcept {
-        switch (type_) {
-            case Type_::Quote:
-            case Type_::Curly:
-            case Type_::Square: {
-                return true;
-            }
-
-            default: {
-            }
-        }
-
-        return false;
-    }
+    using JSONotation_T_ = JSONotation<Char_T_>;
+    using VObject        = HArray<VValue, Char_T_>;
+    using VArray         = Array<VValue>;
+    using VString        = String<Char_T_>;
 
 #ifdef QENTEM_SIMD_ENABLED_
     // TODO: Add 16 and 32-bit character
-    void qmmFindH(const char *content, ULong offset,
-                  ULong end_before) const noexcept {
+    QENTEM_NOINLINE void SIMDFind(const Char_T_ *content, SizeT offset,
+                                  SizeT length) noexcept {
         do {
-            find_cache_->Offset     = offset;
-            find_cache_->NextOffset = (find_cache_->Offset + QMM_SIZE_);
-            offset                  = find_cache_->NextOffset;
+            find_cache_.Offset     = offset;
+            find_cache_.NextOffset = (find_cache_.Offset + QMM_SIZE_);
+            offset                 = find_cache_.NextOffset;
 
             const QMM_VAR_ m_content =
                 QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                    content + find_cache_->Offset));
+                    content + find_cache_.Offset));
 
             // The value of 8 characters:
-            constexpr unsigned long long colon  = 4195730024608447034ULL;
-            constexpr unsigned long long curly  = 8897841259083430779ULL;
-            constexpr unsigned long long square = 6582955728264977243ULL;
-            constexpr unsigned long long quote  = 2459565876494606882ULL;
-            constexpr unsigned long long comma  = 3182967604875373612ULL;
+            constexpr unsigned long long colon    = 4195730024608447034ULL;
+            constexpr unsigned long long curly    = 8897841259083430779ULL;
+            constexpr unsigned long long square   = 6582955728264977243ULL;
+            constexpr unsigned long long e_curly  = 9042521604759584125ULL;
+            constexpr unsigned long long e_square = 6727636073941130589ULL;
+            constexpr unsigned long long quote    = 2459565876494606882ULL;
+            constexpr unsigned long long comma    = 3182967604875373612ULL;
 
-            find_cache_->Bits =
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(colon));
-            find_cache_->Bits |=
+            find_cache_.Bits =
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(curly));
-            find_cache_->Bits |=
+            find_cache_.Bits |=
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(square));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(quote));
-            find_cache_->Bits |=
-                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(comma));
-        } while ((find_cache_->Bits == 0) &&
-                 (find_cache_->NextOffset < end_before));
-    }
 
-    inline ULong FindH(const char *content, ULong offset,
-                       ULong end_before) noexcept {
+            find_cache_.Bits |=
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(colon));
+            find_cache_.Bits |=
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(quote));
+            find_cache_.Bits |=
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(comma));
+
+            find_cache_.Bits |=
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(e_curly));
+            find_cache_.Bits |=
+                QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(e_square));
+        } while ((find_cache_.Bits == 0) && (find_cache_.NextOffset < length));
+    }
+#endif
+
+    VValue parseObject(const Char_T_ *content, SizeT &offset, SizeT length) {
+        VValue   value       = VValue{ValueType::Object};
+        VObject &obj         = *(value.GetObject());
+        VValue * obj_value   = nullptr;
+        SizeT    last_offset = offset;
+        bool     pass_comma  = false;
+        bool     has_colon   = false;
+        bool     is_valid;
+
+#ifndef QENTEM_SIMD_ENABLED_
+        while (offset < length) {
+#else
         do {
-            if (find_cache_->Bits != 0) {
-                ULong index =
-                    (Platform::CTZ(find_cache_->Bits) + find_cache_->Offset);
+            if (find_cache_.Bits != 0) {
+                SizeT index =
+                    (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
 
                 if (index >= offset) {
-                    if (index >= end_before) {
-                        return 0;
-                    }
-
-                    switch (content[index]) {
-                        case JSONotation_T_::QuoteChar: {
-                            type_ = Type_::Quote;
-                            return (index + 1);
-                        }
-
-                        case JSONotation_T_::CommaChar: {
-                            type_ = Type_::Comma;
-                            return (index + 1);
-                        }
-
-                        case JSONotation_T_::ColonChar: {
-                            if (has_colon_ || (obj_ == nullptr) ||
-                                (obj_value_ == nullptr)) {
-                                Failed();
-                                return 0;
-                            }
-
-                            has_colon_   = true;
-                            pass_comma_  = false;
-                            next_offset_ = (index + 1);
-                            offset       = next_offset_;
-                            break;
-                        }
-
-                        case JSONotation_T_::OCurlyChar:
-                            type_      = Type_::Curly;
-                            child_obj_ = HAllocator::AllocateInit<
-                                HArray<Value<char>, char>>();
-                            return (index + 1);
-
-                        case JSONotation_T_::OSquareChar: {
-                            type_ = Type_::Square;
-                            child_arr_ =
-                                HAllocator::AllocateInit<Array<Value<char>>>();
-                            return (index + 1);
-                        }
-
-                        default: {
-                        }
-                    }
-                }
-
-                // Remove the current offset.
-                find_cache_->Bits &= (find_cache_->Bits - 1);
-            }
-
-            if ((find_cache_->Bits == 0) && (offset < end_before)) {
-                qmmFindH(content, offset, end_before);
-            }
-        } while (find_cache_->Bits != 0);
-
-        return 0;
-    }
-#else
-    inline ULong FindH(const Char_T_ *content, ULong offset,
-                       ULong end_before) noexcept {
-        while (offset < end_before) {
-            switch (content[offset]) {
-                case JSONotation_T_::QuoteChar: {
-                    type_ = Type_::Quote;
-                    return (offset + 1);
-                }
-
-                case JSONotation_T_::CommaChar: {
-                    type_ = Type_::Comma;
-                    return (offset + 1);
-                }
-
-                case JSONotation_T_::ColonChar: {
-                    if (has_colon_ || (obj_ == nullptr) ||
-                        (obj_value_ == nullptr)) {
-                        Failed();
-                        return 0;
-                    }
-
-                    has_colon_  = true;
-                    pass_comma_ = false;
-                    ++offset;
-                    next_offset_ = offset;
-                    continue;
-                }
-
-                case JSONotation_T_::OCurlyChar: {
-                    type_      = Type_::Curly;
-                    child_obj_ = HAllocator::AllocateInit<VHArray>();
-                    return (offset + 1);
-                }
-
-                case JSONotation_T_::OSquareChar: {
-                    type_      = Type_::Square;
-                    child_arr_ = HAllocator::AllocateInit<VArray>();
-                    return (offset + 1);
-                }
-
-                default: {
-                }
-            }
-
-            ++offset;
-        }
-
-        // No match.
-        return 0;
-    }
-#endif
-
-    ULong FindT(const Char_T_ *content, ULong offset,
-                ULong end_before) const noexcept {
-        switch (type_) {
-            case Type_::Square: {
-                return Engine::FindOne(JSONotation_T_::CSquareChar, content,
-                                       offset, end_before);
-            }
-
-            case Type_::Curly: {
-                return Engine::FindOne(JSONotation_T_::CCurlyChar, content,
-                                       offset, end_before);
-            }
-
-            default: {
-                return Engine::FindOne(JSONotation_T_::QuoteChar, content,
-                                       offset, end_before);
-            }
-        }
-    }
-
-    ULong Nest(const Char_T_ *content, ULong offset, ULong end_before,
-               ULong max_end_before) {
-        // Note: Rewrite it like Template.hpp
-
-        switch (type_) {
-            case Type_::Curly:
-            case Type_::Square: {
-                JSONParser jp{child_obj_, child_arr_, child_obj_value_,
-                              pass_comma_};
-#ifdef QENTEM_SIMD_ENABLED_
-                jp.find_cache_ = find_cache_;
-#endif
-
-                if (next_offset_ >= offset) {
-                    // Prevent false error.
-                    jp.next_offset_ = next_offset_;
-                }
-
-                const ULong ret = Engine::FindNest(content, offset, end_before,
-                                                   max_end_before, &jp);
-
-                pass_comma_ = (ret != 0); // If it has found a value, then the
-                                          // next comma needs to be passed.
-
-                if (!(jp.has_error_) && (!(pass_comma_) || !(jp.pass_comma_)) &&
-                    ((child_obj_ == nullptr) || jp.has_colon_)) {
-                    // if the scan is not done.
-                    jp.searchAgain(content, offset, (end_before - offset));
-                }
-
-                if (jp.has_error_) {
-                    Failed();
-                    return max_end_before;
-                }
-
-                next_offset_ = jp.next_offset_; // Set the current offset.
-                child_obj_value_ =
-                    jp.obj_value_; // Preserve the child value pointer.
-
-                return ret;
-            }
-
-            default: {
-                UInt  times      = 0;
-                ULong tmp_offset = (end_before - 1);
-
-                while ((offset < tmp_offset) &&
-                       (content[--tmp_offset] == JSONotation_T_::BSlashChar)) {
-                    ++times;
-                }
-
-                if ((times % 2U) != 0) {
-                    return end_before;
-                }
-
-                type_ = Type_::QuoteEnd;
-
-                return 0;
-            }
-        }
-    }
-
-    void Found(const Char_T_ *content, ULong offset, ULong end_before,
-               ULong start_offset, ULong &current_offset) {
-        static const Char_T_ *true_string  = JSONotation_T_::GetTrueString();
-        static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
-        static const Char_T_ *null_string  = JSONotation_T_::GetNullString();
-
-        switch (type_) {
-            case Type_::Comma: { // ,
-                if (!pass_comma_) {
-                    if (!checkPoint()) {
-                        current_offset = end_before;
-                        Failed();
-                        return;
-                    }
-
-                    has_colon_ = false;
-
-                    ULong item_offset =
-                        (next_offset_ != 0) ? next_offset_ : offset;
-
-                    StringUtils::StartTrim(content, item_offset, start_offset);
-
-                    if (item_offset == start_offset) {
-                        // Empty
-                        current_offset = end_before;
-                        Failed();
-                        return;
-                    }
-
-                    --start_offset;
-
-                    // End trim.
-                    while (
-                        (item_offset < --start_offset) &&
-                        ((content[start_offset] == JSONotation_T_::SpaceChar) ||
-                         (content[start_offset] ==
-                          JSONotation_T_::LineControlChar) ||
-                         (content[start_offset] ==
-                          JSONotation_T_::TabControlChar) ||
-                         (content[start_offset] ==
-                          JSONotation_T_::CarriageControlChar))) {
-                    }
-
-                    const UInt len =
-                        static_cast<UInt>((start_offset + 1) - item_offset);
-
-                    if (len == 0) {
-                        // Empty
-                        current_offset = end_before;
-                        Failed();
-                        return;
-                    }
-
-                    UInt tmp_offset = 1;
-
-                    switch (content[item_offset]) {
-                        case JSONotation_T_::T_Char: {
-                            if (len == JSONotation_T_::TrueStringLength) {
-                                ++item_offset;
-
-                                while ((tmp_offset !=
-                                        JSONotation_T_::TrueStringLength) &&
-                                       (content[item_offset] ==
-                                        true_string[tmp_offset])) {
-                                    ++item_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    JSONotation_T_::TrueStringLength) {
-                                    insert(Value<Char_T_>{true});
-                                    break;
-                                }
-                            }
-
-                            current_offset = end_before;
-                            Failed();
-                            return;
-                        }
-
-                        case JSONotation_T_::F_Char: {
-                            if (len == JSONotation_T_::FalseStringLength) {
-                                ++item_offset;
-
-                                while ((tmp_offset !=
-                                        JSONotation_T_::FalseStringLength) &&
-                                       (content[item_offset] ==
-                                        false_string[tmp_offset])) {
-                                    ++item_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    JSONotation_T_::FalseStringLength) {
-                                    insert(Value<Char_T_>{false});
-                                    break;
-                                }
-                            }
-
-                            current_offset = end_before;
-                            Failed();
-                            return;
-                        }
-
-                        case JSONotation_T_::N_Char: {
-                            if (len == JSONotation_T_::NullStringLength) {
-                                ++item_offset;
-
-                                while ((tmp_offset !=
-                                        JSONotation_T_::NullStringLength) &&
-                                       (content[item_offset] ==
-                                        null_string[tmp_offset])) {
-                                    ++item_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    JSONotation_T_::NullStringLength) {
-                                    insert(Value<Char_T_>{nullptr});
-                                    break;
-                                }
-                            }
-
-                            current_offset = end_before;
-                            Failed();
-                            return;
-                        }
-
-                        default: {
-                            double num;
-                            if (!Digit<Char_T_>::StringToNumber(
-                                    num, (content + item_offset), len)) {
-                                current_offset = end_before;
-                                Failed();
-                                return;
-                            }
-
-                            insert(Value<Char_T_>{num});
-                            break;
-                        }
-                    }
-                } else {
-                    // Checking for anything extra.
-                    if (!checkPoint2(content, --start_offset)) {
-                        current_offset = end_before;
-                        Failed();
-                        return;
-                    }
-
-                    pass_comma_ = false;
-                }
-
-                next_offset_ = current_offset;
-                break;
-            }
-
-            case Type_::QuoteEnd: { // ""
-                if (!checkPoint3(content, offset, start_offset)) {
-                    current_offset = end_before;
-                    Failed();
-                    return;
-                }
-
-                next_offset_ = current_offset;
-
-                ULong    tmp_length = (current_offset - (start_offset + 1));
-                Char_T_ *str =
-                    UnEscapeJSON((content + start_offset), tmp_length);
-
-                if (str == nullptr) {
-                    current_offset = end_before;
-                    Failed();
-                    return;
-                }
-
-                if ((obj_ == nullptr) || has_colon_) { // String
-                    insert(Value<Char_T_>{
-                        HAllocator::AllocateInit<VString>(str, tmp_length)});
-
-                    has_colon_  = false;
-                    pass_comma_ = true;
-                } else { // Key
-                    obj_value_ = &((*obj_)[static_cast<VString &&>(
-                        VString(str, tmp_length))]);
-                }
-
-                break;
-            }
-
-            case Type_::Curly:    // {}
-            case Type_::Square: { // []
-                if (!checkPoint() ||
-                    !checkPoint3(content, offset, start_offset)) {
-                    current_offset = end_before;
-                    Failed();
-                    return;
-                }
-
-                has_colon_   = false;
-                pass_comma_  = true;
-                next_offset_ = current_offset;
-
-                if (type_ == Type_::Curly) {
-                    // child_obj_->Compress();
-                    insert(Value<Char_T_>{child_obj_});
-                    child_obj_ = nullptr;
-                } else {
-                    // child_arr_->Compress();
-                    insert(Value<Char_T_>{child_arr_});
-                    child_arr_ = nullptr;
-                }
-
-                break;
-            }
-
-            default: {
-            }
-        }
-
-        type_ = Type_::None;
-    }
-
-    void Failed() noexcept {
-        if (child_obj_ != nullptr) {
-            HAllocator::Destruct(child_obj_);
-            HAllocator::Deallocate(child_obj_);
-            child_obj_ = nullptr;
-        }
-
-        if (child_arr_ != nullptr) {
-            HAllocator::Destruct(child_arr_);
-            HAllocator::Deallocate(child_arr_);
-            child_arr_ = nullptr;
-        }
-
-        has_error_ = true;
-    }
-
-    /*
-     * Look for anything before ] or } and after comma, as not possable to
-     * match if it was a number/false/true/null
-     */
-    inline void searchAgain(const Char_T_ *content, ULong offset,
-                            ULong length) {
-        type_ = Type_::Comma;
-        --length;
-
-        StringUtils::SoftTrim(content, offset, length);
-
-        if (length != 0) {
-            ULong fake_comma = ((offset + length) + 1);
-            Found(content, offset, fake_comma, fake_comma, fake_comma);
-        }
-    }
-
-    inline void insert(Value<Char_T_> &&val) {
-        if (obj_ != nullptr) {
-            *obj_value_ = static_cast<Value<Char_T_> &&>(val);
-            obj_value_  = nullptr;
-        } else {
-            *arr_ += static_cast<Value<Char_T_> &&>(val);
-        }
-    }
-
-    inline bool checkPoint() const noexcept {
-        if (obj_ != nullptr) {
-            return (has_colon_ && !has_error_);
-        }
-
-        return (!has_colon_ && !has_error_);
-    }
-
-    inline bool checkPoint2(const Char_T_ *content, ULong offset) noexcept {
-        if (next_offset_ < offset) {
-            StringUtils::StartTrim(content, next_offset_, offset);
-
-            if (next_offset_ != offset) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-#ifdef QENTEM_SIMD_ENABLED_
-    // TODO: Add 16 and 32-bit character
-    bool checkPoint3(const char *content, ULong offset,
-                     ULong start_offset) const noexcept {
-        if (!has_colon_) {
-            --start_offset;
-
-            while (offset < start_offset) {
-                ULong offset2;
-                ULong length = (start_offset - offset);
-
-                if (length <= QMM_SIZE_) {
-                    offset2 = offset;
-                } else {
-                    offset2 = (start_offset - QMM_SIZE_);
-                    length  = QMM_SIZE_;
-                }
-
-                const QMM_VAR_ m_content = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + offset2));
-
-                constexpr unsigned long long line     = 723401728380766730ULL;
-                constexpr unsigned long long tab      = 651061555542690057ULL;
-                constexpr unsigned long long carriage = 940422246894996749ULL;
-                constexpr unsigned long long space    = 2314885530818453536ULL;
-
-                ULong bits;
-                bits = QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(line));
-                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(tab));
-                bits |=
-                    QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(carriage));
-                bits |= QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(space));
-                bits ^= QMM_MAX_NUMBER_; // Remove any whitespace
-
-                if (length != QMM_SIZE_) {
-                    bits &= ((ULong{1} << length) - 1U); // Droping whats beyond
-                }
-
-                while (bits != 0) {
-                    switch (content[(Platform::CLZ(bits) + offset2)]) {
-                        case JSONotation_T_::OCurlyChar:
-                        case JSONotation_T_::OSquareChar:
-                        case JSONotation_T_::CommaChar:
-                            return true;
-
-                        default: {
-                            return false;
-                        }
-                    }
-                }
-
-                start_offset = offset2;
-            }
-        }
-
-        return true;
-    }
-#else
-    bool checkPoint3(const Char_T_ *content, ULong offset,
-                     ULong start_offset) const noexcept {
-        if (!has_colon_) {
-            --start_offset;
-
-            while (start_offset > offset) {
-                --start_offset;
-
-                switch (content[start_offset]) {
-                    case JSONotation_T_::TabControlChar:
-                    case JSONotation_T_::LineControlChar:
-                    case JSONotation_T_::CarriageControlChar:
-                    case JSONotation_T_::SpaceChar: {
+                    if (index >= length) {
                         break;
                     }
 
-                    case JSONotation_T_::OCurlyChar:
-                    case JSONotation_T_::OSquareChar:
-                    case JSONotation_T_::CommaChar: {
-                        return true;
+                    offset = index;
+#endif
+            switch (content[offset]) {
+                case JSONotation_T_::SCurlyChar:
+                case JSONotation_T_::SSquareChar: {
+                    const bool is_obj =
+                        (content[offset] == JSONotation_T_::SCurlyChar);
+                    StringUtils::StartTrim(content, last_offset, offset);
+
+                    if (!pass_comma && has_colon && (last_offset == offset)) {
+                        ++offset;
+
+                        if (is_obj) {
+                            *obj_value = parseObject(content, offset, length);
+                        } else {
+                            *obj_value = parseArray(content, offset, length);
+                        }
+
+                        last_offset = offset;
+                        obj_value   = nullptr;
+                        pass_comma  = true;
+                        has_colon   = false;
+
+                        if (offset != 0) {
+                            continue;
+                        }
                     }
 
-                    default: {
-                        return false;
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::QuoteChar: {
+                    StringUtils::StartTrim(content, last_offset, offset);
+
+                    if (!pass_comma && (last_offset == offset)) {
+                        ++offset;
+                        buffer_.Clear();
+                        const Char_T_ *str = (content + offset);
+                        const SizeT    str_len =
+                            UnEscapeJSON(str, length, buffer_);
+                        offset += str_len;
+                        last_offset = offset;
+
+                        if (obj_value == nullptr) {
+                            obj_value = &(obj[static_cast<VString &&>(
+                                VString{buffer_.First(), buffer_.Length()})]);
+                            if (str_len != 0) {
+                                continue;
+                            }
+                        }
+
+                        if (has_colon) {
+                            *obj_value = static_cast<VValue &&>(
+                                VValue{HAllocator::AllocateInit<VString>(
+                                    buffer_.First(), buffer_.Length())});
+                            obj_value  = nullptr;
+                            pass_comma = true;
+                            has_colon  = false;
+
+                            if (str_len != 0) {
+                                continue;
+                            }
+                        }
                     }
+
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::CommaChar: {
+                    SizeT len = (offset - last_offset);
+                    StringUtils::SoftTrim(content, last_offset, len);
+
+                    if (pass_comma && (len == 0)) {
+                        pass_comma = false;
+                        ++offset;
+                        last_offset = offset;
+                        continue;
+                    }
+
+                    if ((obj_value == nullptr) || !has_colon) {
+                        value.Reset();
+                        return value;
+                    }
+
+                    *obj_value = trueFalseNullNumber(is_valid, content,
+                                                     last_offset, len);
+                    obj_value  = nullptr;
+                    has_colon  = false;
+                    ++offset;
+                    last_offset = offset;
+
+                    if (is_valid) {
+                        continue;
+                    }
+
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::ColonChar: {
+                    StringUtils::StartTrim(content, last_offset, offset);
+
+                    if (!has_colon && (last_offset == offset)) {
+                        has_colon = true;
+                        ++offset;
+                        last_offset = offset;
+
+                        if (obj_value != nullptr) {
+                            continue;
+                        }
+                    }
+
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::ECurlyChar: {
+                    const bool has_comma =
+                        (content[last_offset - 1] == JSONotation_T_::CommaChar);
+
+                    SizeT len = (offset - last_offset);
+                    StringUtils::SoftTrim(content, last_offset, len);
+
+                    if ((obj_value != nullptr) || has_comma || (len != 0)) {
+                        if (obj_value != nullptr) {
+                            *obj_value = trueFalseNullNumber(is_valid, content,
+                                                             last_offset, len);
+                        }
+
+                        if (!is_valid || !has_colon) {
+                            offset = 0;
+                            value.Reset();
+                            return value;
+                        }
+                    }
+
+                    ++offset;
+                    return value;
+                }
+            }
+#ifndef QENTEM_SIMD_ENABLED_
+            ++offset;
+        }
+#else
+                }
+                // Remove the current offset.
+                find_cache_.Bits &= (find_cache_.Bits - 1);
+            }
+
+            if ((find_cache_.Bits == 0) && (offset < length)) {
+                SIMDFind(content, offset, length);
+            }
+        } while (find_cache_.Bits != 0);
+#endif
+
+        value.Reset();
+        return value;
+    }
+
+    VValue parseArray(const Char_T_ *content, SizeT &offset, SizeT length) {
+        VValue  value       = VValue{ValueType::Array};
+        VArray &arr         = *(value.GetArray());
+        SizeT   last_offset = offset;
+        bool    pass_comma  = false;
+        bool    is_valid;
+
+#ifndef QENTEM_SIMD_ENABLED_
+        while (offset < length) {
+#else
+        do {
+            if (find_cache_.Bits != 0) {
+                SizeT index =
+                    (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+
+                if (index >= offset) {
+                    if (index >= length) {
+                        break;
+                    }
+
+                    offset = index;
+#endif
+            switch (content[offset]) {
+                case JSONotation_T_::SCurlyChar:
+                case JSONotation_T_::SSquareChar: {
+                    const bool is_obj =
+                        (content[offset] == JSONotation_T_::SCurlyChar);
+                    StringUtils::StartTrim(content, last_offset, offset);
+
+                    if (!pass_comma && (last_offset == offset)) {
+                        ++offset;
+
+                        if (is_obj) {
+                            arr += parseObject(content, offset, length);
+                        } else {
+                            arr += parseArray(content, offset, length);
+                        }
+
+                        pass_comma  = true;
+                        last_offset = offset;
+
+                        if (offset != 0) {
+                            continue;
+                        }
+                    }
+
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::QuoteChar: {
+                    ++offset;
+
+                    if (!pass_comma) {
+                        buffer_.Clear();
+                        const SizeT len =
+                            UnEscapeJSON((content + offset), length, buffer_);
+
+                        arr += static_cast<VValue &&>(
+                            VValue{HAllocator::AllocateInit<VString>(
+                                buffer_.First(), buffer_.Length())});
+
+                        offset += len;
+                        last_offset = offset;
+                        pass_comma  = true;
+
+                        if (len != 0) {
+                            continue;
+                        }
+                    }
+
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::CommaChar: {
+                    SizeT len = (offset - last_offset);
+                    StringUtils::SoftTrim(content, last_offset, len);
+
+                    if (pass_comma && (len == 0)) {
+                        pass_comma = false;
+                        ++offset;
+                        last_offset = offset;
+                        continue;
+                    }
+
+                    arr += trueFalseNullNumber(is_valid, content, last_offset,
+                                               len);
+                    ++offset;
+                    last_offset = offset;
+
+                    if (is_valid) {
+                        continue;
+                    }
+
+                    offset = 0;
+                    value.Reset();
+                    return value;
+                }
+
+                case JSONotation_T_::ESquareChar: {
+                    const bool has_comma =
+                        ((last_offset != 0) ? (content[last_offset - 1] ==
+                                               JSONotation_T_::CommaChar)
+                                            : false);
+                    SizeT len = (offset - last_offset);
+                    StringUtils::SoftTrim(content, last_offset, len);
+
+                    if (has_comma || (len != 0)) {
+                        arr += trueFalseNullNumber(is_valid, content,
+                                                   last_offset, len);
+
+                        if (!is_valid || pass_comma) {
+                            offset = 0;
+                            value.Reset();
+                            return value;
+                        }
+                    }
+
+                    ++offset;
+                    return value;
+                }
+            }
+#ifndef QENTEM_SIMD_ENABLED_
+            ++offset;
+        }
+#else
+                }
+                // Remove the current offset.
+                find_cache_.Bits &= (find_cache_.Bits - 1);
+            }
+
+            if ((find_cache_.Bits == 0) && (offset < length)) {
+                SIMDFind(content, offset, length);
+            }
+        } while (find_cache_.Bits != 0);
+#endif
+
+        value.Reset();
+        return value;
+    }
+
+    static VValue trueFalseNullNumber(bool &is_valid, const Char_T_ *content,
+                                      SizeT offset, SizeT len) noexcept {
+        static const Char_T_ *true_string  = JSONotation_T_::GetTrueString();
+        static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
+        static const Char_T_ *null_string  = JSONotation_T_::GetNullString();
+        SizeT                 tmp_offset   = 0;
+
+        switch (content[offset]) {
+            case JSONotation_T_::T_Char: {
+                if (len == JSONotation_T_::TrueStringLength) {
+                    do {
+                        ++offset;
+                        ++tmp_offset;
+                    } while ((content[offset] == true_string[tmp_offset]));
+
+                    if (tmp_offset == JSONotation_T_::TrueStringLength) {
+                        is_valid = true;
+                        return VValue{true};
+                    }
+                }
+
+                break;
+            }
+
+            case JSONotation_T_::F_Char: {
+                if (len == JSONotation_T_::FalseStringLength) {
+                    do {
+                        ++offset;
+                        ++tmp_offset;
+                    } while ((content[offset] == false_string[tmp_offset]));
+
+                    if (tmp_offset == JSONotation_T_::FalseStringLength) {
+                        is_valid = true;
+                        return VValue{false};
+                    }
+                }
+
+                break;
+            }
+
+            case JSONotation_T_::N_Char: {
+                if (len == JSONotation_T_::NullStringLength) {
+                    do {
+                        ++offset;
+                        ++tmp_offset;
+                    } while ((content[offset] == null_string[tmp_offset]));
+
+                    if (tmp_offset == JSONotation_T_::NullStringLength) {
+                        is_valid = true;
+                        return VValue{nullptr};
+                    }
+                }
+
+                break;
+            }
+
+            default: {
+                double num;
+
+                if (Digit<Char_T_>::StringToNumber(num, (content + offset),
+                                                   len)) {
+                    is_valid = true;
+                    return VValue{num};
                 }
             }
         }
 
-        return true;
-    }
-#endif
-
-    JSONParser(VHArray *obj, VArray *arr, Value<Char_T_> *obj_value,
-               bool pass_comma) noexcept
-        : obj_(obj), arr_(arr), obj_value_(obj_value), pass_comma_(pass_comma) {
+        is_valid = false;
+        return VValue();
     }
 
-    enum class Type_ { None = 0, Curly, Square, Quote, QuoteEnd, Comma };
-
-    ULong    next_offset_{0};
-    VHArray *obj_{nullptr};
-    VArray * arr_{nullptr};
-
-    VHArray *child_obj_{nullptr};
-    VArray * child_arr_{nullptr};
-
-    Value<Char_T_> *child_obj_value_{nullptr};
-    Value<Char_T_> *obj_value_{nullptr};
-
+    StringStream<Char_T_> buffer_{};
 #ifdef QENTEM_SIMD_ENABLED_
     struct FindCache_T_ {
-        ULong        Offset{0};
-        ULong        NextOffset{0};
+        SizeT        Offset{0};
+        SizeT        NextOffset{0};
         QMM_Number_T Bits{0};
-    };
-
-    FindCache_T_ *find_cache_{nullptr};
+    } find_cache_{};
 #endif
-
-    Type_ type_{Type_::None};
-
-    bool has_colon_{false};
-    bool pass_comma_{false};
-    bool has_error_{false};
 };
 
 } // namespace JSON
