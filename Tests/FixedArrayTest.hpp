@@ -127,6 +127,17 @@ static int TestFixedArray() {
 
     SHOULD_EQUAL_TRUE(did_throw, "did_throw");
 
+    unsigned int uii = 5;
+
+    try {
+        did_throw = false;
+        arr3 += static_cast<unsigned int &>(uii);
+    } catch (...) {
+        did_throw = true;
+    }
+
+    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+
     arr1.Clear();
     arr2.Clear();
     arr3.Clear();
