@@ -134,6 +134,18 @@ inline static unsigned long CLZ(unsigned long value) noexcept {
     return ((_BitScanReverse(&index, value) != 0) ? index : 0);
 }
 
+inline static unsigned int CTZ(unsigned int value) noexcept {
+    unsigned long index = 0;
+    return ((_BitScanForward(&index, value) != 0)
+                ? static_cast<unsigned int>(index)
+                : 32U);
+}
+
+inline static unsigned long CLZ(unsigned int value) noexcept {
+    unsigned long index = 0;
+    return ((_BitScanReverse(&index, value) != 0) ? index : 0);
+}
+
 #else
 
 #ifdef QENTEM_64BIT_
