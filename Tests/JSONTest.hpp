@@ -295,7 +295,12 @@ static int TestParse1() {
     value = JSON::Parse(R"([{},[],"a",1.5,null,false,true])");
     SHOULD_EQUAL_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])",
                        "Stringify()");
-    ///////////////////////////////////////
+
+    value = JSON::Parse(R"([["]"],["]"]])");
+    SHOULD_EQUAL_VALUE(value.Stringify(), R"([["]"],["]"]])", "Stringify()");
+
+    value = JSON::Parse(R"([["[]"],["[]"]])");
+    SHOULD_EQUAL_VALUE(value.Stringify(), R"([["[]"],["[]"]])", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -606,6 +611,14 @@ static int TestParse2() {
         value.Stringify(),
         R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
         "Stringify()");
+
+    value = JSON::Parse(R"({"a":{"c":"}"},"b":{"d":"}"}})");
+    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"a":{"c":"}"},"b":{"d":"}"}})",
+                       "Stringify()");
+
+    value = JSON::Parse(R"({"a":{"c":"{}"},"b":{"d":"{}"}})");
+    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"a":{"c":"{}"},"b":{"d":"{}"}})",
+                       "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1005,10 +1018,14 @@ static int TestParse4() {
     END_SUB_TEST;
 }
 
-static int TestParse6() {
+QENTEM_MAYBE_UNUSED_
+static int TestParse5() {
     Value<char> value;
 
     value = JSON::Parse(R"([1   ]    ])");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"a":1   }    })");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
     value = JSON::Parse(R"([f])");
@@ -1074,6 +1091,9 @@ static int TestParse6() {
     value = JSON::Parse(R"(["w" o  , 1])");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse(R"({"w": "a" o  , "b": "x"})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     value = JSON::Parse(R"(["w" ] ,1])");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
@@ -1116,6 +1136,9 @@ static int TestParse6() {
     value = JSON::Parse(R"([[[[[[[[[001]]]]]]]]])");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse(R"({"a":{"b":{"c":001}}})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     value = JSON::Parse(R"([w])");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
@@ -1135,6 +1158,15 @@ static int TestParse6() {
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
     value = JSON::Parse(R"({"x" 4})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"x" "4"})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"x" {}})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"x" []})");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
     value = JSON::Parse(R"({"x",4})");
@@ -1230,6 +1262,15 @@ static int TestParse6() {
     value = JSON::Parse(R"([4    {}])");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse(R"({a "a":[]})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"a":a []})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"a"a :[]})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     value = JSON::Parse(R"({"x":"w" "w"})");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
@@ -1276,11 +1317,7 @@ static int RunJSONTests() {
     START_TEST("Parse Test 2", TestParse2);
     START_TEST("Parse Test 3", TestParse3);
     START_TEST("Parse Test 4", TestParse4);
-    START_TEST("Parse Test 6", TestParse6);
-
-    // convertTo4Hex(0x10A7B);
-    // convertTo4Hex(0x1F859);
-    // convertTo4Hex(0x10283);
+    START_TEST("Parse Test 5", TestParse5);
 
     END_TEST("JSON.hpp");
 }

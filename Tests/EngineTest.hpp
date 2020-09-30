@@ -37,8 +37,8 @@ struct Engine1 {
         return true;
     }
 
-    virtual UInt FindH(const char *content, UInt offset,
-                       UInt end_before) noexcept {
+    virtual SizeT FindH(const char *content, SizeT offset,
+                        SizeT end_before) noexcept {
         while (offset < end_before) {
             if (content[offset] == '(') {
                 return ++offset;
@@ -50,13 +50,13 @@ struct Engine1 {
         return 0U; // No match.
     }
 
-    virtual UInt FindT(const char *content, UInt offset,
-                       UInt end_before) const noexcept {
+    virtual SizeT FindT(const char *content, SizeT offset,
+                        SizeT end_before) const noexcept {
         return Engine::Find(")", 1U, content, offset, end_before);
     }
 
-    virtual UInt Nest(const char *content, UInt offset, UInt end_before,
-                      UInt max_end_before) {
+    virtual SizeT Nest(const char *content, SizeT offset, SizeT end_before,
+                       SizeT max_end_before) {
         (void)content;
         (void)offset;
         (void)end_before;
@@ -65,8 +65,8 @@ struct Engine1 {
         return 0U;
     }
 
-    virtual void Found(const char *content, UInt offset, UInt end_before,
-                       UInt start_offset, UInt &current_offset) {
+    virtual void Found(const char *content, SizeT offset, SizeT end_before,
+                       SizeT start_offset, SizeT &current_offset) {
         (void)content;
         (void)offset;
         (void)end_before;
@@ -79,9 +79,9 @@ struct Engine1 {
 };
 
 static int TestEngine1() {
-    UInt        ret;
-    UInt        content_len = 0U;
-    UInt        find_len    = 3U;
+    SizeT       ret;
+    SizeT       content_len = 0U;
+    SizeT       find_len    = 3U;
     const char *content     = "";
     const char *find_       = "ABC";
 
@@ -306,9 +306,9 @@ static int TestEngine1() {
 }
 
 static int TestEngine2() {
-    UInt        ret;
-    UInt        content_len = 16U;
-    UInt        find_len    = 3U;
+    SizeT       ret;
+    SizeT       content_len = 16U;
+    SizeT       find_len    = 3U;
     const char *content     = "ABABABABABAAABAB";
     const char *find_       = "ABC";
 
@@ -349,8 +349,8 @@ static int TestEngine2() {
 }
 
 static int TestEngine3() {
-    UInt        ret;
-    UInt        content_len = 0U;
+    SizeT       ret;
+    SizeT       content_len = 0U;
     const char *content     = "";
 
     Engine1 eng1;
@@ -411,13 +411,13 @@ static int TestEngine3() {
 }
 
 static int TestEngine4() {
-    UInt        ret;
-    UInt        content_len = 0U;
+    SizeT       ret;
+    SizeT       content_len = 0U;
     const char *content     = "";
 
     struct Engine2 : Engine1 {
-        UInt FindT(const char *content, UInt offset,
-                   UInt end_before) const noexcept override {
+        SizeT FindT(const char *content, SizeT offset,
+                    SizeT end_before) const noexcept override {
             return Engine::Find("))", 2U, content, offset, end_before);
         }
     };
@@ -439,8 +439,8 @@ static int TestEngine4() {
     SHOULD_EQUAL_VALUE(ret, 2U, "return");
 
     struct Engine3 : Engine2 {
-        UInt FindH(const char *content, UInt offset,
-                   UInt end_before) noexcept override {
+        SizeT FindH(const char *content, SizeT offset,
+                    SizeT end_before) noexcept override {
             while (offset < end_before) {
 
                 if ((content[offset] == '(') &&
@@ -509,19 +509,19 @@ static int TestEngine4() {
     SHOULD_EQUAL_TRUE(eng4.getError(), "has_error");
 
     struct Item__ {
-        UInt Offset;
-        UInt Length;
+        SizeT Offset;
+        SizeT Length;
     };
 
     struct VARS__ {
         const char *Content{nullptr};
-        UInt        Offset{0};
-        UInt        EndBefore{0};
+        SizeT       Offset{0};
+        SizeT       EndBefore{0};
     };
 
     struct Engine5 : Engine1 {
-        void Found(const char *content, UInt offset, UInt end_before,
-                   UInt start_offset, UInt &current_offset) override {
+        void Found(const char *content, SizeT offset, SizeT end_before,
+                   SizeT start_offset, SizeT &current_offset) override {
             --start_offset;
             items += {start_offset, (current_offset - start_offset)};
 
@@ -621,8 +621,8 @@ static int TestEngine4() {
     SHOULD_EQUAL_VALUE(eng5.getItems()[2].Length, 4U, "items[2].Length");
 
     struct Engine6 : Engine4 {
-        void Found(const char *content, UInt offset, UInt end_before,
-                   UInt start_offset, UInt &current_offset) override {
+        void Found(const char *content, SizeT offset, SizeT end_before,
+                   SizeT start_offset, SizeT &current_offset) override {
             start_offset -= 2U;
             items += {start_offset, (current_offset - start_offset)};
 
@@ -742,9 +742,9 @@ static int TestEngine4() {
 }
 
 static int TestEngine5() {
-    UInt        ret1;
-    UInt        ret2;
-    UInt        content_len = 12U;
+    SizeT       ret1;
+    SizeT       ret2;
+    SizeT       content_len = 12U;
     const char *content     = "{{{{{{}}}}}}";
 
     ret1 = Engine::Find("}", 1U, content, 0U, content_len);
@@ -814,8 +814,8 @@ static int TestEngine5() {
 }
 
 struct Item2__ {
-    UInt           Offset{0};
-    UInt           Length{0};
+    SizeT          Offset{0};
+    SizeT          Length{0};
     Array<Item2__> SubItems;
 };
 
@@ -827,7 +827,7 @@ static void toJSON(StringStream<char> &ss, const Array<Item2__> &items,
 
     ss += '{';
 
-    for (UInt i = 0U; i < items.Size(); i++) {
+    for (SizeT i = 0U; i < items.Size(); i++) {
         if (i != 0) {
             ss += ',';
         }
@@ -855,7 +855,7 @@ static void toJSON(StringStream<char> &ss, const Array<Item2__> &items,
 static int TestEngine6() {
     Array<Item2__>     items;
     const char *       content;
-    UInt               content_len;
+    SizeT              content_len;
     const char *       result;
     StringStream<char> toJSON_ss;
 
@@ -863,8 +863,8 @@ static int TestEngine6() {
         explicit Engine7(Array<Item2__> *items) noexcept : items_(items) {
         }
 
-        UInt FindH(const char *content, UInt offset,
-                   UInt end_before) noexcept override {
+        SizeT FindH(const char *content, SizeT offset,
+                    SizeT end_before) noexcept override {
             while (offset < end_before) {
 
                 if ((content[offset] == '[') &&
@@ -880,24 +880,24 @@ static int TestEngine6() {
             return 0U;
         }
 
-        UInt FindT(const char *content, UInt offset,
-                   UInt end_before) const noexcept override {
+        SizeT FindT(const char *content, SizeT offset,
+                    SizeT end_before) const noexcept override {
             return Engine::Find("]]]", 3U, content, offset, end_before);
         }
 
-        UInt Nest(const char *content, UInt offset, UInt end_before,
-                  UInt max_end_before) override {
+        SizeT Nest(const char *content, SizeT offset, SizeT end_before,
+                   SizeT max_end_before) override {
             Engine7 eng7{&sub_items};
             return Engine::FindNest(content, offset, end_before, max_end_before,
                                     &eng7);
         }
 
-        virtual UInt length() noexcept {
+        virtual SizeT length() noexcept {
             return 3U;
         }
 
-        void Found(const char *content, UInt offset, UInt end_before,
-                   UInt start_offset, UInt &current_offset) override {
+        void Found(const char *content, SizeT offset, SizeT end_before,
+                   SizeT start_offset, SizeT &current_offset) override {
 
             Item2__ item;
 
@@ -936,8 +936,8 @@ static int TestEngine6() {
         explicit Engine8(Array<Item2__> *items) noexcept : Engine7(items) {
         }
 
-        UInt FindH(const char *content, UInt offset,
-                   UInt end_before) noexcept override {
+        SizeT FindH(const char *content, SizeT offset,
+                    SizeT end_before) noexcept override {
             while (offset < end_before) {
                 if (content[offset] == '{') {
                     return ++offset;
@@ -949,17 +949,17 @@ static int TestEngine6() {
             return 0U; // No match
         }
 
-        UInt FindT(const char *content, UInt offset,
-                   UInt end_before) const noexcept override {
+        SizeT FindT(const char *content, SizeT offset,
+                    SizeT end_before) const noexcept override {
             return Engine::FindOne('}', content, offset, end_before);
         }
 
-        UInt length() noexcept override {
+        SizeT length() noexcept override {
             return 1U;
         }
 
-        UInt Nest(const char *content, UInt offset, UInt end_before,
-                  UInt max_end_before) override {
+        SizeT Nest(const char *content, SizeT offset, SizeT end_before,
+                   SizeT max_end_before) override {
             Engine8 eng8{getsubItems()};
             return Engine::FindNest(content, offset, end_before, max_end_before,
                                     &eng8);
@@ -974,7 +974,7 @@ static int TestEngine6() {
     // content = R"({....})";
     items.Clear();
     Engine8 eng8(&items);
-    content_len = StringUtils::Count<char, UInt>(content);
+    content_len = StringUtils::Count<char, SizeT>(content);
     Engine::FindNest(content, 0U, content_len, content_len, &eng8);
     toJSON_ss.Reset();
     toJSON(toJSON_ss, items, content);

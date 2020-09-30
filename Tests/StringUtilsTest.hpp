@@ -30,7 +30,7 @@ namespace Qentem {
 namespace Test {
 
 static int TestCount() {
-    ULong length = StringUtils::Count("");
+    SizeT length = StringUtils::Count("");
     SHOULD_EQUAL_VALUE(length, 0, "length");
 
     length = StringUtils::Count("a");
@@ -198,8 +198,8 @@ static int TestLeftTrim() {
 }
 
 static int TestSoftTrim() {
-    ULong offset = 0;
-    ULong length = 0;
+    SizeT offset = 0;
+    SizeT length = 0;
 
     StringUtils::SoftTrim("", offset, length);
     SHOULD_EQUAL_VALUE(offset, 0, "offset");

@@ -31,9 +31,9 @@ namespace Qentem {
 namespace Test {
 
 static int TestArray1() {
-    const UInt *storage;
-    Array<UInt> numbers1;
-    Array<UInt> numbers2(8);
+    const SizeT *storage;
+    Array<SizeT> numbers1;
+    Array<SizeT> numbers2(8);
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_TRUE(numbers1.IsEmpty(), "IsEmpty");
@@ -50,12 +50,12 @@ static int TestArray1() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
-    numbers1.SetCapacity(5);
+    numbers1.Reserve(5);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 5, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
-    numbers1.SetCapacity(10);
+    numbers1.Reserve(10);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 10, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
@@ -87,7 +87,7 @@ static int TestArray1() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
-    numbers1.SetCapacity(0);
+    numbers1.Reserve(0);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
@@ -128,7 +128,7 @@ static int TestArray1() {
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
     SHOULD_NOT_EQUAL(numbers2.First(), storage, "First()", "storage");
 
-    numbers2 = static_cast<Array<UInt> &&>(numbers1);
+    numbers2 = static_cast<Array<SizeT> &&>(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 16, "Capacity");
     SHOULD_EQUAL_VALUE(numbers2.First(), storage, "First()");
@@ -138,14 +138,14 @@ static int TestArray1() {
     SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
 
     storage  = numbers1.First();
-    numbers1 = Array<UInt>(numbers2);
+    numbers1 = Array<SizeT>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
 
     storage  = numbers2.First();
-    numbers1 = Array<UInt>(static_cast<Array<UInt> &&>(numbers2));
+    numbers1 = Array<SizeT>(static_cast<Array<SizeT> &&>(numbers2));
     SHOULD_EQUAL_VALUE(numbers1.Size(), 16, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 16, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
@@ -170,7 +170,7 @@ static int TestArray1() {
     SHOULD_NOT_EQUAL(numbers1.First(), storage, "First()", "storage");
 
     storage = numbers1.First();
-    numbers1 += static_cast<Array<UInt> &&>(numbers2);
+    numbers1 += static_cast<Array<SizeT> &&>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 13, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 13, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
@@ -182,20 +182,20 @@ static int TestArray1() {
     numbers2.ResizeAndInitialize(5);
     numbers1.Resize(18);
     storage = numbers1.First();
-    numbers1 += static_cast<Array<UInt> &&>(numbers2);
+    numbers1 += static_cast<Array<SizeT> &&>(numbers2);
     SHOULD_EQUAL_VALUE(numbers1.Size(), 18, "Size");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 18, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers1.First(), storage, "First()");
 
     storage = numbers1.First();
-    numbers2 += static_cast<Array<UInt> &&>(numbers1);
+    numbers2 += static_cast<Array<SizeT> &&>(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 18, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 18, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers2.First(), storage, "First()");
 
-    UInt *tmp = numbers2.Eject();
+    SizeT *tmp = numbers2.Eject();
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers2.First(), nullptr, "First()", "null");
@@ -207,11 +207,11 @@ static int TestArray1() {
 }
 
 static int TestArray2() {
-    const UInt *storage;
-    Array<UInt> numbers1;
-    Array<UInt> numbers2;
+    const SizeT *storage;
+    Array<SizeT> numbers1;
+    Array<SizeT> numbers2;
 
-    numbers2.SetCapacity(4);
+    numbers2.Reserve(4);
     numbers1.ResizeAndInitialize(4);
     storage = numbers2.First();
     numbers2.Insert(numbers1);
@@ -220,7 +220,7 @@ static int TestArray2() {
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
     SHOULD_EQUAL(numbers2.First(), storage, "First()", "storage");
 
-    numbers1.SetCapacity(10);
+    numbers1.Reserve(10);
     numbers2.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 4, "Size");
@@ -234,7 +234,7 @@ static int TestArray2() {
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     storage = numbers1.First();
-    numbers2.Insert(static_cast<Array<UInt> &&>(numbers1));
+    numbers2.Insert(static_cast<Array<SizeT> &&>(numbers1));
     SHOULD_EQUAL_VALUE(numbers2.Size(), 12, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 12, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
@@ -266,11 +266,11 @@ static int TestArray2() {
 }
 
 static int TestArray3() {
-    Array<UInt>         numbers1;
-    Array<UInt>         numbers2(8);
+    Array<SizeT>        numbers1;
+    Array<SizeT>        numbers2(8);
     Array<String<char>> strings;
 
-    for (UInt i = 0; i < 8; i++) {
+    for (SizeT i = 0; i < 8; i++) {
         numbers1 += i;
     }
 
@@ -308,7 +308,7 @@ static int TestArray3() {
     SHOULD_EQUAL_TRUE(did_throw, "did_throw");
 
     numbers2.Insert(numbers1[0]).Insert(numbers1[1]);
-    for (UInt i = 2; i < 8; i++) {
+    for (SizeT i = 2; i < 8; i++) {
         numbers2.Insert(numbers1[i]);
         SHOULD_EQUAL_VALUE(numbers2[i], numbers1[i], "numbers2[i]");
     }
@@ -348,7 +348,7 @@ static int TestArray3() {
                      "str2_cstr");
 
     // Checking move after expanding.
-    for (UInt i = 0; i < 16; i++) {
+    for (SizeT i = 0; i < 16; i++) {
         strings += String<char>("");
     }
 
@@ -382,7 +382,7 @@ static int TestArray4() {
     SHOULD_NOT_EQUAL(strings2[1].First(), str2_cstr, "strings[1].First()",
                      "str2_cstr");
 
-    strings2.SetCapacity(2);
+    strings2.Reserve(2);
     strings2 += static_cast<Array<String<char>> &&>(strings1);
     SHOULD_EQUAL_VALUE(strings2.Size(), 2, "Size");
     SHOULD_NOT_EQUAL(strings2.First(), nullptr, "First()", "null");

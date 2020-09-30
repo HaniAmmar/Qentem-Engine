@@ -30,15 +30,16 @@ namespace Qentem {
 namespace Test {
 
 struct aleHelper {
-    static bool ALESetNumber(double &number, const char *content, UInt length) {
-        static const char *   a_val     = "{A}";
-        static constexpr UInt a_val_len = 3;
+    static bool ALESetNumber(double &number, const char *content,
+                             SizeT length) {
+        static const char *    a_val     = "{A}";
+        static constexpr SizeT a_val_len = 3;
 
-        static const char *   ab_val     = "{AB}";
-        static constexpr UInt ab_val_len = 4;
+        static const char *    ab_val     = "{AB}";
+        static constexpr SizeT ab_val_len = 4;
 
-        static const char *   abc_val     = "{ABC}";
-        static constexpr UInt abc_val_len = 5;
+        static const char *    abc_val     = "{ABC}";
+        static constexpr SizeT abc_val_len = 5;
 
         if ((a_val_len == length) &&
             StringUtils::IsEqual(a_val, content, length)) {
@@ -61,24 +62,24 @@ struct aleHelper {
         return false;
     }
 
-    static bool ALEIsEqual(bool &result, const char *left, UInt left_length,
-                           const char *right, UInt right_length) {
+    static bool ALEIsEqual(bool &result, const char *left, SizeT left_length,
+                           const char *right, SizeT right_length) {
         static const char *a_str = "{1}";
-        static const ULong a_len = 3;
+        static const SizeT a_len = 3;
 
         static const char *ab_str = "{20}";
-        static const ULong ab_len = 4;
+        static const SizeT ab_len = 4;
 
         static const char *a_val     = "Qentem";
-        static const ULong a_val_len = 6;
+        static const SizeT a_val_len = 6;
 
         static const char *ab_val     = "Qentem ALE";
-        static const ULong ab_val_len = 10;
+        static const SizeT ab_val_len = 10;
 
         const char *str_left;
         const char *str_right;
-        ULong       str_left_length;
-        ULong       str_right_length;
+        SizeT       str_left_length;
+        SizeT       str_right_length;
 
         if (left[0] == '{') {
             if ((left_length == a_len) &&

@@ -99,7 +99,7 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1, "abc", "StringStream");
     ss1.Reset();
 
-    ULong lss = ss1.Capacity();
+    SizeT lss = ss1.Capacity();
 
     ss1.Clear();
     SHOULD_EQUAL_VALUE(ss1.Length(), 0, "Length");

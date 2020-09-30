@@ -32,7 +32,7 @@ namespace Test {
 using String8 = String<char>;
 
 static int TestString1() {
-    ULong length;
+    SizeT length;
     char *strptr;
 
     String8 str1;

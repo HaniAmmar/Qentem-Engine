@@ -36,7 +36,7 @@ static int TestEmptyValue1() {
     StringStream<char> ss_var;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -352,7 +352,7 @@ static int TestTrueValue1() {
     StringStream<char> ss_var;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -593,7 +593,7 @@ static int TestFalseValue1() {
     StringStream<char> ss_var;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -834,7 +834,7 @@ static int TestNullValue1() {
     StringStream<char> ss_var;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -1075,7 +1075,7 @@ static int TestNumberValue1() {
     StringStream<char> ss_var;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -1326,7 +1326,7 @@ static int TestStringValue1() {
     StringStream<char> ss_var;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -1608,7 +1608,7 @@ static int TestArrayValue1() {
     const Value<char> *storage;
     String<char>       str_var;
     const char *       c_str_var;
-    ULong              c_str_len;
+    SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
 
@@ -2001,7 +2001,7 @@ static int TestArrayValue4() {
     SHOULD_EQUAL_VALUE(value2.GetArray()->Size(), 1, "Size()");
 
     arr_var.Reset();
-    arr_var.SetCapacity(10);
+    arr_var.Reserve(10);
     value2 = static_cast<Array<Value<char>> &&>(arr_var);
     value2.Compress();
     SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
@@ -2022,7 +2022,7 @@ static int TestObjectValue1() {
     StringStream<char>        ss_var;
     String<char>              str_var;
     const char *              c_str_var;
-    ULong                     c_str_len;
+    SizeT                     c_str_len;
     double                    num_var;
     bool                      bool_var;
 
@@ -2168,7 +2168,7 @@ static int TestObjectValue2() {
     double                    num_var;
     bool                      bool_var;
 
-    for (ULong i = 0; i < 7; i++) {
+    for (SizeT i = 0; i < 7; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -2489,7 +2489,7 @@ static int TestObjectValue4() {
     SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
     ////////////////////
 
-    h_arr_var.SetCapacity(10);
+    h_arr_var.Reserve(10);
     h_arr_var[String<char>("w1")] = 10;
     h_arr_var[String<char>("w2")] = 20;
     h_arr_var[String<char>("w3")] = 30;

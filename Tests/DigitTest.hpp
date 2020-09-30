@@ -31,9 +31,8 @@ namespace Test {
 
 using DigitC = Digit<char>;
 
-static UInt HexStringToNumber(const char *str) noexcept {
-    return Digit<char>::HexStringToNumber(
-        str, Qentem::StringUtils::Count<char, UInt>(str));
+static SizeT HexStringToNumber(const char *str) noexcept {
+    return Digit<char>::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
 static int TestHexConv() {
@@ -96,12 +95,11 @@ static int TestHexConv() {
 
 template <typename Number_T_>
 bool StringToNumberCount(Number_T_ &num, const char *str) {
-    return DigitC::StringToNumber(num, str,
-                                  static_cast<UInt>(StringUtils::Count(str)));
+    return DigitC::StringToNumber(num, str, StringUtils::Count(str));
 }
 
 static int TestStringToNumber1() {
-    UInt        number = 0;
+    SizeT       number = 0;
     const char *str    = "";
     bool        valid;
 
