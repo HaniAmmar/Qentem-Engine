@@ -1307,6 +1307,18 @@ static int TestParse5() {
     value = JSON::Parse(R"({"x":"w" 5})");
     SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse(R"({1)");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"([2)");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"a":h, "b": a})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
+    value = JSON::Parse(R"({"a":{})");
+    SHOULD_EQUAL_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     END_SUB_TEST;
 }
 

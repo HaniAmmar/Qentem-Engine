@@ -40,6 +40,7 @@ static int TestArray1() {
     SHOULD_NOT_EQUAL_TRUE(numbers1.IsNotEmpty(), "IsNotEmpty");
     SHOULD_EQUAL_VALUE(numbers1.Capacity(), 0, "Capacity");
     SHOULD_EQUAL(numbers1.First(), nullptr, "First()", "null");
+    SHOULD_EQUAL(numbers1.Last(), nullptr, "Last()", "null");
 
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
@@ -219,6 +220,8 @@ static int TestArray2() {
     SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
     SHOULD_EQUAL(numbers2.First(), storage, "First()", "storage");
+    SHOULD_EQUAL(numbers2.Last(), (storage + 3), "Last()", "(storage + 3)");
+    SHOULD_NOT_EQUAL(numbers1.Last(), nullptr, "First()", "null");
 
     numbers1.Reserve(10);
     numbers2.ResizeAndInitialize(4);

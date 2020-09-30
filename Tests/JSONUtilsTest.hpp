@@ -925,6 +925,17 @@ static int TestUnEscapeJSON2() {
     SHOULD_EQUAL_TRUE((buffer == str2), "buffer == str2");
     buffer.Clear();
 
+    str1 = R"(\uD83E\uFC5)";
+    len1 = StringUtils::Count(str1);
+    len2 = JSON::UnEscapeJSON(str1, len1, buffer);
+    SHOULD_EQUAL_VALUE(len2, 0, "len1");
+    buffer.Clear();
+
+    str1 = R"(\u00a)";
+    len1 = StringUtils::Count(str1);
+    len2 = JSON::UnEscapeJSON(str1, len1, buffer);
+    SHOULD_EQUAL_VALUE(len2, 0, "len1");
+
     END_SUB_TEST;
 }
 

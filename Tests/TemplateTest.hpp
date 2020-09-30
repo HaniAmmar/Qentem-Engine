@@ -2082,6 +2082,29 @@ static int TestRender1() {
         (Template::Render(content.First(), content.Length(), &value) == output),
         "Render()");
 
+    content.Clear();
+    output.Clear();
+
+    constexpr UInt size_2_1 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 2) - 1;
+
+    for (UInt i = 0; i < size_2_1; i++) {
+        value += i;
+    }
+
+    content += R"(<loop repeat="1">)";
+    for (UInt i = 0; i < size_2_1; i++) {
+        content += "{var:";
+        str = Digit<char>::NumberToString(i);
+        content += str;
+        output += str;
+        content += "}";
+    }
+    content += R"(</loop>)";
+
+    SHOULD_EQUAL_TRUE(
+        (Template::Render(content.First(), content.Length(), &value) == output),
+        "Render()");
+
     END_SUB_TEST;
 }
 

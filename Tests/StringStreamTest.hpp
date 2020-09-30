@@ -230,6 +230,10 @@ static int TestStringStream() {
     SHOULD_EQUAL_VALUE(ss1.Length(), 5, "Length");
     SHOULD_EQUAL_VALUE(ss1, "abcde", "StringStream");
 
+    ss2 = ss1;
+    SHOULD_EQUAL_VALUE(ss2.Length(), 5, "Length");
+    SHOULD_EQUAL_VALUE(ss2, "abcde", "StringStream");
+
     END_SUB_TEST;
 }
 
