@@ -45,8 +45,8 @@ class FixedArray {
     FixedArray &operator=(const FixedArray &) = delete;
 
     void operator+=(const Type_ &item) {
-        if (Size() != Capacity()) {
-            storage_[Size()] = item;
+        if (index_ != Size_T_) {
+            storage_[index_] = item;
             ++index_;
             return;
         }
@@ -54,12 +54,22 @@ class FixedArray {
         throw 1;
     }
 
-    inline const Type_ *First() const noexcept {
+    void operator+=(Type_ &&item) {
+        if (index_ != Size_T_) {
+            storage_[index_] = static_cast<Type_ &&>(item);
+            ++index_;
+            return;
+        }
+
+        throw 1;
+    }
+
+    inline Type_ *First() noexcept {
         return &(storage_[0]);
     }
 
     inline const Type_ *End() const noexcept {
-        return (&(storage_[0]) + Size());
+        return (&(storage_[0]) + index_);
     }
 
     inline void Clear() noexcept {
@@ -83,7 +93,7 @@ class FixedArray {
     }
 
     inline bool IsFull() const noexcept {
-        return (Size() == Capacity());
+        return (index_ == Size_T_);
     }
 };
 
