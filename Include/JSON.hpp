@@ -177,7 +177,7 @@ class JSONParser {
         SizeT    last_offset = offset;
         bool     pass_comma  = false;
         bool     has_colon   = false;
-        bool     is_valid;
+        bool     is_valid    = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
@@ -362,7 +362,7 @@ class JSONParser {
         VArray &arr         = *(value.GetArray());
         SizeT   last_offset = offset;
         bool    pass_comma  = false;
-        bool    is_valid;
+        bool    is_valid    = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {

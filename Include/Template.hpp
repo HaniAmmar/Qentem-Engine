@@ -822,7 +822,7 @@ class Template_T_ {
         Tags_T_       loop_tags;
         const Tag_T_ *tag_first = nullptr;
         const Tag_T_ *tag_last  = nullptr;
-        const Tag_T_ *tag_end;
+        const Tag_T_ *tag_end   = nullptr;
 
         SizeT loop_ss_len = loop_ss.Length();
         SizeT loop_offset = 0U;
