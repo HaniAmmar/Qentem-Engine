@@ -47,14 +47,14 @@ int RunTests() {
     ((Qentem::Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunFixedArrayTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunDigitTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunEngineTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunALETests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunUnicodeTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
@@ -73,7 +73,7 @@ int RunTests() {
 }
 
 int main() {
-    // for (UInt i = 0; i < 100000; i++) {
+    // for (int i = 0; i < 100000; i++) {
     //     Qentem::Test::RunTestHelperTests();
     //     Qentem::Test::RunMemoryTests();
     //     Qentem::Test::RunStringUtilsTests();
@@ -85,8 +85,8 @@ int main() {
     //     Qentem::Test::RunHArrayTests();
     //     Qentem::Test::RunEngineTests();
     //     Qentem::Test::RunALETests();
-    //     Qentem::Test::RunJSONUtilsTests();
     //     Qentem::Test::RunUnicodeTests();
+    //     Qentem::Test::RunJSONUtilsTests();
     //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
     //     Qentem::Test::RunTemplateTests();
