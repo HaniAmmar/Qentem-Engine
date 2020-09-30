@@ -143,27 +143,27 @@ struct TemplatePatterns<Char_T_, 1> {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    // static constexpr UInt InLineSuffixLength = 1U;
-    // static constexpr UInt InLinePrefixLength = 1U;
+    // static constexpr SizeT InLineSuffixLength = 1U;
+    // static constexpr SizeT InLinePrefixLength = 1U;
 
-    static constexpr UInt VariablePrefixLength = 5U;
-    static constexpr UInt VariableFulllength =
+    static constexpr SizeT VariablePrefixLength = 5U;
+    static constexpr SizeT VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt MathPrefixLength = 6U;
-    static constexpr UInt MathFulllength =
+    static constexpr SizeT MathPrefixLength = 6U;
+    static constexpr SizeT MathFulllength =
         (MathPrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt InLineIfPrefixLength = 3U;
+    static constexpr SizeT InLineIfPrefixLength = 3U;
 
-    static constexpr UInt LoopPrefixLength = 5U;
-    static constexpr UInt LoopSuffixLength = 7U;
+    static constexpr SizeT LoopPrefixLength = 5U;
+    static constexpr SizeT LoopSuffixLength = 7U;
 
-    static constexpr UInt IfPrefixLength = 3U;
-    static constexpr UInt IfSuffixLength = 5U;
+    static constexpr SizeT IfPrefixLength = 3U;
+    static constexpr SizeT IfSuffixLength = 5U;
 
-    static constexpr UInt ElsePrefixLength = 5U;
-    static constexpr UInt ElseSuffixLength = 2U;
+    static constexpr SizeT ElsePrefixLength = 5U;
+    static constexpr SizeT ElseSuffixLength = 2U;
 
     static constexpr Char_T_ InLinePrefix = '{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
@@ -255,27 +255,27 @@ struct TemplatePatterns<Char_T_, 2> {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    // static constexpr UInt InLineSuffixLength = 1U;
-    // static constexpr UInt InLinePrefixLength = 1U;
+    // static constexpr SizeT InLineSuffixLength = 1U;
+    // static constexpr SizeT InLinePrefixLength = 1U;
 
-    static constexpr UInt VariablePrefixLength = 5U;
-    static constexpr UInt VariableFulllength =
+    static constexpr SizeT VariablePrefixLength = 5U;
+    static constexpr SizeT VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt MathPrefixLength = 6U;
-    static constexpr UInt MathFulllength =
+    static constexpr SizeT MathPrefixLength = 6U;
+    static constexpr SizeT MathFulllength =
         (MathPrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt InLineIfPrefixLength = 3U;
+    static constexpr SizeT InLineIfPrefixLength = 3U;
 
-    static constexpr UInt LoopPrefixLength = 5U;
-    static constexpr UInt LoopSuffixLength = 7U;
+    static constexpr SizeT LoopPrefixLength = 5U;
+    static constexpr SizeT LoopSuffixLength = 7U;
 
-    static constexpr UInt IfPrefixLength = 3U;
-    static constexpr UInt IfSuffixLength = 5U;
+    static constexpr SizeT IfPrefixLength = 3U;
+    static constexpr SizeT IfSuffixLength = 5U;
 
-    static constexpr UInt ElsePrefixLength = 5U;
-    static constexpr UInt ElseSuffixLength = 2U;
+    static constexpr SizeT ElsePrefixLength = 5U;
+    static constexpr SizeT ElseSuffixLength = 2U;
 
     static constexpr Char_T_ InLinePrefix = u'{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
@@ -368,27 +368,27 @@ struct TemplatePatterns<Char_T_, 4> {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    // static constexpr UInt InLineSuffixLength = 1U;
-    // static constexpr UInt InLinePrefixLength = 1U;
+    // static constexpr SizeT InLineSuffixLength = 1U;
+    // static constexpr SizeT InLinePrefixLength = 1U;
 
-    static constexpr UInt VariablePrefixLength = 5U;
-    static constexpr UInt VariableFulllength =
+    static constexpr SizeT VariablePrefixLength = 5U;
+    static constexpr SizeT VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt MathPrefixLength = 6U;
-    static constexpr UInt MathFulllength =
+    static constexpr SizeT MathPrefixLength = 6U;
+    static constexpr SizeT MathFulllength =
         (MathPrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt InLineIfPrefixLength = 3U;
+    static constexpr SizeT InLineIfPrefixLength = 3U;
 
-    static constexpr UInt LoopPrefixLength = 5U;
-    static constexpr UInt LoopSuffixLength = 7U;
+    static constexpr SizeT LoopPrefixLength = 5U;
+    static constexpr SizeT LoopSuffixLength = 7U;
 
-    static constexpr UInt IfPrefixLength = 3U;
-    static constexpr UInt IfSuffixLength = 5U;
+    static constexpr SizeT IfPrefixLength = 3U;
+    static constexpr SizeT IfSuffixLength = 5U;
 
-    static constexpr UInt ElsePrefixLength = 5U;
-    static constexpr UInt ElseSuffixLength = 2U;
+    static constexpr SizeT ElsePrefixLength = 5U;
+    static constexpr SizeT ElseSuffixLength = 2U;
 
     static constexpr Char_T_ InLinePrefix = U'{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
@@ -481,27 +481,27 @@ struct TemplatePatterns<wchar_t> {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    // static constexpr UInt InLineSuffixLength = 1U;
-    // static constexpr UInt InLinePrefixLength = 1U;
+    // static constexpr SizeT InLineSuffixLength = 1U;
+    // static constexpr SizeT InLinePrefixLength = 1U;
 
-    static constexpr UInt VariablePrefixLength = 5U;
-    static constexpr UInt VariableFulllength =
+    static constexpr SizeT VariablePrefixLength = 5U;
+    static constexpr SizeT VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt MathPrefixLength = 6U;
-    static constexpr UInt MathFulllength =
+    static constexpr SizeT MathPrefixLength = 6U;
+    static constexpr SizeT MathFulllength =
         (MathPrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr UInt InLineIfPrefixLength = 3U;
+    static constexpr SizeT InLineIfPrefixLength = 3U;
 
-    static constexpr UInt LoopPrefixLength = 5U;
-    static constexpr UInt LoopSuffixLength = 7U;
+    static constexpr SizeT LoopPrefixLength = 5U;
+    static constexpr SizeT LoopSuffixLength = 7U;
 
-    static constexpr UInt IfPrefixLength = 3U;
-    static constexpr UInt IfSuffixLength = 5U;
+    static constexpr SizeT IfPrefixLength = 3U;
+    static constexpr SizeT IfSuffixLength = 5U;
 
-    static constexpr UInt ElsePrefixLength = 5U;
-    static constexpr UInt ElseSuffixLength = 2U;
+    static constexpr SizeT ElsePrefixLength = 5U;
+    static constexpr SizeT ElseSuffixLength = 2U;
 
     static constexpr wchar_t InLinePrefix = L'{';
     static const wchar_t *   GetInLineSuffix() noexcept {

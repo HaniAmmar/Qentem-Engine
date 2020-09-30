@@ -80,7 +80,7 @@ class Engine {
      */
     template <typename Number_T_>
     QENTEM_NOINLINE static Number_T_
-    Find(const char *pattern, UInt pattern_length, const char *content,
+    Find(const char *pattern, SizeT pattern_length, const char *content,
          Number_T_ offset, Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
@@ -88,7 +88,7 @@ class Engine {
 
         if (offset < end_before) {
             const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(*pattern);
-            const UInt     len_less_one    = (pattern_length - 1);
+            const SizeT    len_less_one    = (pattern_length - 1);
             const QMM_VAR_ m_pattern_last =
                 QMM_SETONE_8_(pattern[len_less_one]);
 
@@ -148,7 +148,7 @@ class Engine {
      */
     template <typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static Number_T_
-    Find(const Char_T_ *pattern, UInt pattern_length, const Char_T_ *content,
+    Find(const Char_T_ *pattern, SizeT pattern_length, const Char_T_ *content,
          Number_T_ offset, Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
@@ -302,8 +302,8 @@ class Engine {
      * See Template::nest(...)
      */
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ SkipInnerPatterns(const Char_T_ *start, UInt start_length,
-                                       const Char_T_ *end, UInt end_length,
+    static Number_T_ SkipInnerPatterns(const Char_T_ *start, SizeT start_length,
+                                       const Char_T_ *end, SizeT end_length,
                                        const Char_T_ *content, Number_T_ offset,
                                        Number_T_ end_before,
                                        Number_T_ max_end_before) noexcept {

@@ -33,15 +33,15 @@ namespace Qentem {
 template <typename Char_T_>
 struct ALEHelper {
     bool ALESetNumber(double &number, const Char_T_ *content,
-                      UInt length) const {
+                      SizeT length) const {
         (void)number;
         (void)content;
         (void)length;
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const Char_T_ *left, UInt left_length,
-                    const Char_T_ *right, UInt right_length) const {
+    bool ALEIsEqual(bool &result, const Char_T_ *left, SizeT left_length,
+                    const Char_T_ *right, SizeT right_length) const {
         (void)result;
         (void)left;
         (void)left_length;
@@ -69,7 +69,7 @@ class ALE {
     struct Item_;
 
     template <typename Char_T_, typename Helper_T_>
-    static bool Evaluate(double &number, const Char_T_ *content, UInt length,
+    static bool Evaluate(double &number, const Char_T_ *content, SizeT length,
                          const Helper_T_ *callback) {
         number = 0;
 
@@ -85,7 +85,7 @@ class ALE {
                     number, items, content, 0, length, callback);
             }
 
-            UInt offset = 0;
+            SizeT offset = 0;
             StringUtils::SoftTrim(content, offset, length);
             return Digit<Char_T_>::StringToNumber(number, (content + offset),
                                                   length);
@@ -97,12 +97,11 @@ class ALE {
     template <typename Char_T_, typename Helper_T_>
     inline static bool Evaluate(double &number, const Char_T_ *content,
                                 const Helper_T_ *callback) {
-        return Evaluate(number, content,
-                        StringUtils::Count<Char_T_, UInt>(content), callback);
+        return Evaluate(number, content, StringUtils::Count(content), callback);
     }
 
     template <typename Char_T_, typename Helper_T_>
-    static double Evaluate(const Char_T_ *content, UInt length,
+    static double Evaluate(const Char_T_ *content, SizeT length,
                            const Helper_T_ *callback) {
         double number;
 
@@ -116,14 +115,13 @@ class ALE {
     template <typename Char_T_, typename Helper_T_>
     inline static double Evaluate(const Char_T_ *  content,
                                   const Helper_T_ *callback) {
-        return Evaluate(content, StringUtils::Count<Char_T_, UInt>(content),
-                        callback);
+        return Evaluate(content, StringUtils::Count(content), callback);
     }
 
     ///////////////////////////////////////////////////////////////////////
 
     template <typename Char_T_>
-    static bool Evaluate(double &number, const Char_T_ *content, UInt length) {
+    static bool Evaluate(double &number, const Char_T_ *content, SizeT length) {
         ALEHelper<Char_T_> helper;
         return Evaluate(number, content, length, &helper);
     }
@@ -135,7 +133,7 @@ class ALE {
     }
 
     template <typename Char_T_>
-    static double Evaluate(const Char_T_ *content, UInt length) {
+    static double Evaluate(const Char_T_ *content, SizeT length) {
         ALEHelper<Char_T_> helper;
         return Evaluate(content, length, &helper);
     }
@@ -147,7 +145,7 @@ class ALE {
     }
 
     enum class Operation_ {
-        Brackets = 0,
+        Brackets = 0U,
         Parentheses,
         Exponent,
         Remainder,
@@ -166,9 +164,9 @@ class ALE {
     };
 
     struct Item_ {
+        Array<Item_> SubItems{};
         UInt         Offset{0};
         UInt         Length{0};
-        Array<Item_> SubItems{};
         Operation_   Op{Operation_::Parentheses};
     };
 };
@@ -195,8 +193,8 @@ class ALE_T_ {
                 (item_.Op == Operation_::Parentheses));
     }
 
-    UInt Nest(const Char_T_ *content, UInt offset, UInt end_before,
-              UInt max_end_before) {
+    SizeT Nest(const Char_T_ *content, SizeT offset, SizeT end_before,
+               SizeT max_end_before) {
         if ((offset + 1) != end_before) {
             ALE_T_<Char_T_, Helper_T_> ale{&(item_.SubItems), callback_};
             return Engine::FindNest(content, offset, end_before, max_end_before,
@@ -206,8 +204,8 @@ class ALE_T_ {
         return 0;
     }
 
-    inline UInt FindH(const Char_T_ *content, UInt offset,
-                      UInt end_before) noexcept {
+    inline SizeT FindH(const Char_T_ *content, SizeT offset,
+                       SizeT end_before) noexcept {
         bool found   = false;
         item_.Length = 1;
 
@@ -349,8 +347,8 @@ class ALE_T_ {
         return 0; // No match
     }
 
-    UInt FindT(const Char_T_ *content, UInt offset,
-               UInt end_before) const noexcept {
+    SizeT FindT(const Char_T_ *content, SizeT offset,
+                SizeT end_before) const noexcept {
         if (item_.Op == Operation_::Parentheses) {
             return Engine::FindOne(ALEOperations_T_::Parenthes2Op, content,
                                    offset, end_before);
@@ -360,8 +358,8 @@ class ALE_T_ {
                                end_before);
     }
 
-    void Found(const Char_T_ *content, UInt offset, UInt end_before,
-               UInt start_offset, const UInt &current_offset) {
+    void Found(const Char_T_ *content, SizeT offset, SizeT end_before,
+               SizeT start_offset, const SizeT &current_offset) {
         item_.Offset = (start_offset - item_.Length);
 
         switch (item_.Op) {
@@ -432,7 +430,7 @@ class ALE_T_ {
     }
 
     static void sortOperations(Array<Item_> &items, const Char_T_ *content,
-                               UInt offset, UInt length) {
+                               SizeT offset, SizeT length) {
         // Determine the highest operation.
         Operation_ highest = Operation_::Parentheses;
 
@@ -458,7 +456,7 @@ class ALE_T_ {
                 Item_ *item2 = items.First();
 
                 if (item2->Op == Operation_::Parentheses) {
-                    const UInt len = (item2->Length + 2U);
+                    const SizeT len = (item2->Length + 2U);
 
                     if (length != len) {
                         // Cheking for anything extra.
@@ -531,14 +529,14 @@ class ALE_T_ {
             }
         }
 
-        ULong       id      = 0;
-        const ULong size    = items.Size();
+        SizeT       id      = 0;
+        const SizeT size    = items.Size();
         Item_ *     match   = (items.First() - 1);
         Item_ *     n_match = items.First();
         Item_       n_item;
-        const UInt  endOffset = (offset + length);
+        const SizeT endOffset = (offset + length);
 
-        for (ULong i = 0; i <= size; i++) {
+        for (SizeT i = 0; i <= size; i++) {
             if (i < size) {
                 ++match;
 
@@ -578,7 +576,7 @@ class ALE_T_ {
     }
 
     static bool process(double &left_number, const Array<Item_> &items,
-                        const Char_T_ *content, UInt offset, UInt length,
+                        const Char_T_ *content, SizeT offset, SizeT length,
                         const Helper_T_ *callback) {
         if (items.IsEmpty()) {
             return Digit<Char_T_>::StringToNumber(left_number,

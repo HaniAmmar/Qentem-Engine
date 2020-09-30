@@ -36,30 +36,32 @@ class String {
   public:
     String() = default;
 
-    String(Char_T_ *str, ULong len) noexcept : length_(len), storage_(str) {
+    String(Char_T_ *str, SizeT len) noexcept : storage_(str), length_(len) {
     }
 
-    String(const Char_T_ *str, ULong len) : length_(len) {
-        if (str != nullptr) {
-            ++len;
-            storage_ = HAllocator::Allocate<Char_T_>(len);
+    String(const Char_T_ *str, SizeT len) : length_(len) {
+        ++len;
+        storage_ = HAllocator::Allocate<Char_T_>(len);
+
+        if (len != 1) {
             Memory::Copy(storage_, str, (length_ * sizeof(Char_T_)));
-            storage_[length_] = 0;
         }
+
+        storage_[length_] = 0;
     }
 
     explicit String(const Char_T_ *str) : String(str, StringUtils::Count(str)) {
     }
 
     String(String &&src) noexcept
-        : length_(src.length_), storage_(src.storage_) {
+        : storage_(src.storage_), length_(src.length_) {
         src.length_  = 0;
         src.storage_ = nullptr;
     }
 
     String(const String &src) : length_(src.length_) {
         if (length_ != 0) {
-            const ULong len = (length_ + 1);
+            const SizeT len = (length_ + 1);
             storage_        = HAllocator::Allocate<Char_T_>(len);
             Memory::Copy(storage_, src.storage_, (len * sizeof(Char_T_)));
         }
@@ -69,7 +71,7 @@ class String {
         HAllocator::Deallocate(storage_);
     }
 
-    // inline Char_T_ &operator[](ULong index) const {
+    // inline Char_T_ &operator[](SizeT index) const {
     //     if (index < length_) {
     //         return storage_[index];
     //     }
@@ -103,13 +105,13 @@ class String {
     }
 
     String &operator=(const Char_T_ *str) {
-        ULong len = StringUtils::Count(str);
+        SizeT len = StringUtils::Count(str);
 
         HAllocator::Deallocate(storage_);
         length_  = len;
         storage_ = HAllocator::Allocate<Char_T_>(len + 1);
 
-        if (str != nullptr) {
+        if (len != 0) {
             Memory::Copy(storage_, str, (len * sizeof(Char_T_)));
         }
 
@@ -153,12 +155,17 @@ class String {
     }
 
     String operator+(const Char_T_ *str) const {
-        const ULong len         = StringUtils::Count(str);
-        const ULong ns_len      = (length_ + len);
+        const SizeT len         = StringUtils::Count(str);
+        const SizeT ns_len      = (length_ + len);
         Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
 
-        Memory::Copy(ns_storage_, storage_, (length_ * sizeof(Char_T_)));
-        Memory::Copy((ns_storage_ + length_), str, (len * sizeof(Char_T_)));
+        if (length_ != 0) {
+            Memory::Copy(ns_storage_, storage_, (length_ * sizeof(Char_T_)));
+        }
+
+        if (len != 0) {
+            Memory::Copy((ns_storage_ + length_), str, (len * sizeof(Char_T_)));
+        }
 
         ns_storage_[ns_len] = 0;
         return String(ns_storage_, ns_len);
@@ -173,7 +180,7 @@ class String {
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
-        const ULong len = StringUtils::Count(str);
+        const SizeT len = StringUtils::Count(str);
 
         if (length_ != len) {
             return false;
@@ -190,7 +197,7 @@ class String {
         return (!(*this == str));
     }
 
-    inline bool IsEqual(const Char_T_ *str, ULong length) const noexcept {
+    inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
         if (length_ != length) {
             return false;
         }
@@ -216,38 +223,47 @@ class String {
         return storage_;
     }
 
-    inline ULong Length() const noexcept {
+    inline SizeT Length() const noexcept {
         return length_;
     }
 
     static String Insert(const String &src1, const String &src2) {
-        const ULong ns_len      = (src1.length_ + src2.length_);
+        const SizeT ns_len      = (src1.length_ + src2.length_);
         Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
 
-        Memory::Copy(ns_storage_, src1.storage_,
-                     (src1.length_ * sizeof(Char_T_)));
-        Memory::Copy((ns_storage_ + src1.length_), src2.storage_,
-                     (src2.length_ * sizeof(Char_T_)));
+        if (src1.length_ != 0) {
+            Memory::Copy(ns_storage_, src1.storage_,
+                         (src1.length_ * sizeof(Char_T_)));
+        }
+
+        if (src2.length_ != 0) {
+            Memory::Copy((ns_storage_ + src1.length_), src2.storage_,
+                         (src2.length_ * sizeof(Char_T_)));
+        }
 
         ns_storage_[ns_len] = 0;
         return String(ns_storage_, ns_len);
     }
 
-    void Insert(const Char_T_ *str, ULong len) {
+    void Insert(const Char_T_ *str, SizeT len) {
         if ((str != nullptr) && (len != 0)) {
             Char_T_ *old_str = storage_;
             storage_         = HAllocator::Allocate<Char_T_>(length_ + len + 1);
-            Memory::Copy(storage_, old_str, (length_ * sizeof(Char_T_)));
+
+            if (old_str != nullptr) {
+                Memory::Copy(storage_, old_str, (length_ * sizeof(Char_T_)));
+                HAllocator::Deallocate(old_str);
+            }
+
             Memory::Copy((storage_ + length_), str, (len * sizeof(Char_T_)));
-            HAllocator::Deallocate(old_str);
             length_ += len;
             storage_[length_] = 0;
         }
     }
 
     static String Trim(const String &str) {
-        ULong length = str.length_;
-        ULong offset = 0;
+        SizeT length = str.length_;
+        SizeT offset = 0;
 
         StringUtils::SoftTrim(str.storage_, offset, length);
 
@@ -256,8 +272,8 @@ class String {
     }
 
   private:
-    ULong    length_{0};
     Char_T_ *storage_{nullptr};
+    SizeT    length_{0};
 };
 
 } // namespace Qentem

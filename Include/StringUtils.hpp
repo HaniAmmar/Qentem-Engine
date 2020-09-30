@@ -69,7 +69,7 @@ struct WhiteSpaceChars<wchar_t> {
 } // namespace SubStringUtils
 
 struct StringUtils {
-    template <typename Char_T_, typename NumberType = ULong>
+    template <typename Char_T_, typename NumberType = SizeT>
     static NumberType Count(const Char_T_ *str) noexcept {
         NumberType len = 0;
 
@@ -102,24 +102,25 @@ struct StringUtils {
         using WhiteSpaceChars_T_ = SubStringUtils::WhiteSpaceChars<Char_T_>;
 
         if (length != 0) {
-            Type_ end = (length + offset);
-            StartTrim(str, offset, end);
+            Type_ end_before = (length + offset);
+            StartTrim(str, offset, end_before);
 
-            while ((--end > offset) &&
-                   ((str[end] == WhiteSpaceChars_T_::SpaceChar) ||
-                    (str[end] == WhiteSpaceChars_T_::LineControlChar) ||
-                    (str[end] == WhiteSpaceChars_T_::TabControlChar) ||
-                    (str[end] == WhiteSpaceChars_T_::CarriageControlChar))) {
+            while ((--end_before > offset) &&
+                   ((str[end_before] == WhiteSpaceChars_T_::SpaceChar) ||
+                    (str[end_before] == WhiteSpaceChars_T_::LineControlChar) ||
+                    (str[end_before] == WhiteSpaceChars_T_::TabControlChar) ||
+                    (str[end_before] ==
+                     WhiteSpaceChars_T_::CarriageControlChar))) {
             }
 
-            ++end;
-            length = (end - offset);
+            ++end_before;
+            length = (end_before - offset);
         }
     }
 
     template <typename Char_T_>
     static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
-                        ULong length) noexcept {
+                        SizeT length) noexcept {
         if ((left != nullptr) && (right != nullptr)) {
             while ((length != 0) && (*left == *right)) {
                 ++left;

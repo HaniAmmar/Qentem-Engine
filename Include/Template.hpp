@@ -36,42 +36,6 @@
 
 namespace Qentem {
 
-template <typename, typename>
-class Template_T_;
-
-class Template {
-  public:
-    Template()                 = delete;
-    Template(Template &&)      = delete;
-    Template(const Template &) = delete;
-    Template &operator=(Template &&) = delete;
-    Template &operator=(const Template &) = delete;
-    ~Template()                           = delete;
-
-    template <typename Char_T_, typename Value_T_, typename Number_T_>
-    inline static void Render(const Char_T_ *content, Number_T_ length,
-                              const Value_T_ *       root_value,
-                              StringStream<Char_T_> *ss) {
-        Template_T_<Char_T_, Value_T_>{ss, root_value}.process(
-            content, static_cast<UInt>(length));
-    }
-
-    template <typename Char_T_, typename Value_T_, typename Number_T_>
-    inline static StringStream<Char_T_> Render(const Char_T_ * content,
-                                               Number_T_       length,
-                                               const Value_T_ *root_value) {
-        StringStream<Char_T_> ss;
-        Render(content, length, root_value, &ss);
-        return ss;
-    }
-
-    template <typename Char_T_, typename Value_T_>
-    inline static StringStream<Char_T_> Render(const Char_T_ * content,
-                                               const Value_T_ *root_value) {
-        return Render(content, StringUtils::Count(content), root_value);
-    }
-};
-
 template <typename Char_T_, typename Value_T_>
 class Template_T_ {
     using TemplatePatterns_T_ = TemplatePatterns<Char_T_>;
@@ -79,31 +43,35 @@ class Template_T_ {
   public:
     Template_T_() = delete;
 
+    static void Process(const Char_T_ *content, SizeT length,
+                        const Value_T_ *root_value, StringStream<Char_T_> *ss) {
+        Template_T_{ss, root_value}.process(content, length);
+    }
+
   private:
-    enum class TagType_ : UInt {
-        Variable = 0U, // {var:x}
-        Math,          // {math:x}
-        InLineIf,      // {if:x}
-        Loop,          // <loop set="..." key="..." value="...">
-        If,            // <if case="...">
+    enum class TagType_ : SizeT {
+        Variable = 0, // {var:x}
+        Math,         // {math:x}
+        InLineIf,     // {if:x}
+        Loop,         // <loop set="..." key="..." value="...">
+        If,           // <if case="...">
     };
 
     struct Tag_T_ {
+        SizeT    Offset;
+        SizeT    ContentOffset;
+        SizeT    EndOffset;
         TagType_ Type;
-        UInt     Offset;
-        UInt     ContentOffset;
-        UInt     EndOffset;
     };
 
     using Tags_T_ = FixedArray<Tag_T_, QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_>;
 
     template <typename, typename>
     friend class Qentem::ALE_T_;
-    friend class Qentem::Template;
 
-    QENTEM_NOINLINE void process(const Char_T_ *content, UInt length) const {
+    QENTEM_NOINLINE void process(const Char_T_ *content, SizeT length) const {
         Tags_T_ tags;
-        UInt    offset = 0U;
+        SizeT   offset = 0U;
 
         while (offset != length) {
             parse(tags, content, offset, length);
@@ -127,9 +95,9 @@ class Template_T_ {
     }
 
     QENTEM_NOINLINE static void parse(Tags_T_ &tags, const Char_T_ *content,
-                                      UInt offset, UInt length) {
-        UInt current_offset;
-        UInt tmp_offset;
+                                      SizeT offset, SizeT length) {
+        SizeT current_offset;
+        SizeT tmp_offset;
 
         static const Char_T_ *variable_prefix =
             TemplatePatterns_T_::GetVariablePrefix();
@@ -165,14 +133,15 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::VariablePrefixLength) {
-                                    UInt end_offset = Engine::FindOne(
+                                    const SizeT end_offset = Engine::FindOne(
                                         TemplatePatterns_T_::GetInLineSuffix()
                                             [0U],
                                         content, current_offset, length);
 
                                     if (end_offset != 0U) {
-                                        tags += {TagType_::Variable, offset,
-                                                 current_offset, end_offset};
+                                        tags +=
+                                            {offset, current_offset, end_offset,
+                                             TagType_::Variable};
 
                                         if (tags.IsFull()) {
                                             return;
@@ -206,7 +175,7 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::MathPrefixLength) {
-                                    UInt end_offset = Engine::FindOne(
+                                    SizeT end_offset = Engine::FindOne(
                                         TemplatePatterns_T_::GetInLineSuffix()
                                             [0U],
                                         content, current_offset, length);
@@ -222,8 +191,8 @@ class Template_T_ {
                                             1U, content, current_offset,
                                             end_offset, length);
 
-                                        tags += {TagType_::Math, offset,
-                                                 current_offset, end_offset};
+                                        tags += {offset, current_offset,
+                                                 end_offset, TagType_::Math};
 
                                         if (tags.IsFull()) {
                                             return;
@@ -257,7 +226,7 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::InLineIfPrefixLength) {
-                                    UInt end_offset = Engine::FindOne(
+                                    SizeT end_offset = Engine::FindOne(
                                         TemplatePatterns_T_::GetInLineSuffix()
                                             [0U],
                                         content, current_offset, length);
@@ -273,8 +242,9 @@ class Template_T_ {
                                             1U, content, current_offset,
                                             end_offset, length);
 
-                                        tags += {TagType_::InLineIf, offset,
-                                                 current_offset, end_offset};
+                                        tags +=
+                                            {offset, current_offset, end_offset,
+                                             TagType_::InLineIf};
 
                                         if (tags.IsFull()) {
                                             return;
@@ -318,7 +288,7 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::LoopPrefixLength) {
-                                    UInt end_offset = Engine::Find(
+                                    SizeT end_offset = Engine::Find(
                                         TemplatePatterns_T_::GetLoopSuffix(),
                                         TemplatePatterns_T_::LoopSuffixLength,
                                         content, current_offset, length);
@@ -336,8 +306,8 @@ class Template_T_ {
                                             content, current_offset, end_offset,
                                             length);
 
-                                        tags += {TagType_::Loop, offset,
-                                                 current_offset, end_offset};
+                                        tags += {offset, current_offset,
+                                                 end_offset, TagType_::Loop};
 
                                         if (tags.IsFull()) {
                                             return;
@@ -370,7 +340,7 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::IfPrefixLength) {
-                                    UInt end_offset = Engine::Find(
+                                    SizeT end_offset = Engine::Find(
                                         TemplatePatterns_T_::GetIfSuffix(),
                                         TemplatePatterns_T_::IfSuffixLength,
                                         content, current_offset, length);
@@ -384,8 +354,8 @@ class Template_T_ {
                                             content, current_offset, end_offset,
                                             length);
 
-                                        tags += {TagType_::If, offset,
-                                                 current_offset, end_offset};
+                                        tags += {offset, current_offset,
+                                                 end_offset, TagType_::If};
 
                                         if (tags.IsFull()) {
                                             return;
@@ -414,8 +384,8 @@ class Template_T_ {
     }
 
     QENTEM_NOINLINE void render(const Tag_T_ *tag, const Tag_T_ *end,
-                                const Char_T_ *content, UInt offset) const {
-        UInt last_offset = offset;
+                                const Char_T_ *content, SizeT offset) const {
+        SizeT last_offset = offset;
 
         while (tag != end) {
             ss_->Insert((content + last_offset), (tag->Offset - last_offset));
@@ -466,7 +436,7 @@ class Template_T_ {
         }
     }
 
-    void renderVariable(const Char_T_ *content, UInt length) const {
+    void renderVariable(const Char_T_ *content, SizeT length) const {
         bool            loop_var = (*content == TemplatePatterns_T_::TildeChar);
         const Value_T_ *value    = findValue(content, length);
 
@@ -477,7 +447,8 @@ class Template_T_ {
         }
     }
 
-    QENTEM_NOINLINE void renderMath(const Char_T_ *content, UInt length) const {
+    QENTEM_NOINLINE void renderMath(const Char_T_ *content,
+                                    SizeT          length) const {
         double number;
 
         if (ALE::Evaluate(number, content, length, this)) {
@@ -489,9 +460,9 @@ class Template_T_ {
         }
     }
 
-    void parseVariables(const Char_T_ *content, UInt length) const {
-        UInt offset = 0U;
-        UInt last_offset;
+    void parseVariables(const Char_T_ *content, SizeT length) const {
+        SizeT offset = 0U;
+        SizeT last_offset;
 
         do {
             last_offset = offset;
@@ -511,7 +482,7 @@ class Template_T_ {
                      last_offset));
             }
 
-            const UInt start_offset = offset;
+            const SizeT start_offset = offset;
             offset = Engine::FindOne(TemplatePatterns_T_::GetInLineSuffix()[0U],
                                      content, offset, length);
 
@@ -530,13 +501,13 @@ class Template_T_ {
     /*
      * Gets anything between "..."
      */
-    bool getQuoted(UInt &offset, UInt &end_offset, const Char_T_ *content,
-                   const UInt length) const noexcept {
+    bool getQuoted(SizeT &offset, SizeT &end_offset, const Char_T_ *content,
+                   const SizeT length) const noexcept {
         offset = Engine::FindOne(TemplatePatterns_T_::QuoteChar, content,
                                  offset, length);
 
         if (offset != 0U) {
-            const UInt start_offset = Engine::FindOne(
+            const SizeT start_offset = Engine::FindOne(
                 TemplatePatterns_T_::QuoteChar, content, offset, length);
 
             if (start_offset != 0U) {
@@ -549,12 +520,12 @@ class Template_T_ {
     }
 
     QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content,
-                                        const UInt     length) const {
-        UInt offset      = 0U;
-        UInt last_offset = 0U;
-        UInt len         = 0U;
-        UInt times       = 3U;
-        bool case_value  = false;
+                                        const SizeT    length) const {
+        SizeT offset      = 0U;
+        SizeT last_offset = 0U;
+        SizeT len         = 0U;
+        SizeT times       = 3U;
+        bool  case_value  = false;
 
         do {
             ++len;
@@ -569,8 +540,8 @@ class Template_T_ {
             }
 
             // = + " + a Char_T_ == 3 + the Char_T_ before it == 4
-            UInt tmp_offset   = offset - 4U;
-            bool iif_not_done = true;
+            SizeT tmp_offset   = offset - 4U;
+            bool  iif_not_done = true;
 
             do {
                 switch (content[tmp_offset]) {
@@ -619,16 +590,16 @@ class Template_T_ {
         } while (--times != 0U);
     }
 
-    bool parseNumber(UInt &number, const Char_T_ *content,
-                     const UInt length) const noexcept {
+    bool parseNumber(SizeT &number, const Char_T_ *content,
+                     const SizeT length) const noexcept {
         if (length > TemplatePatterns_T_::VariableFulllength) {
-            UInt offset = 0U;
-            offset      = Engine::Find(TemplatePatterns_T_::GetVariablePrefix(),
+            SizeT offset = 0U;
+            offset = Engine::Find(TemplatePatterns_T_::GetVariablePrefix(),
                                   TemplatePatterns_T_::VariablePrefixLength,
                                   content, offset, length);
 
             if (offset != 0U) {
-                const UInt end_offset =
+                const SizeT end_offset =
                     Engine::FindOne(TemplatePatterns_T_::GetInLineSuffix()[0U],
                                     content, offset, length);
 
@@ -644,7 +615,7 @@ class Template_T_ {
                     double num;
 
                     if (value->SetNumber(num)) {
-                        number = static_cast<UInt>(num);
+                        number = static_cast<SizeT>(num);
                         return true;
                     }
                 }
@@ -656,8 +627,9 @@ class Template_T_ {
         return Digit<Char_T_>::StringToNumber(number, content, length);
     }
 
-    QENTEM_NOINLINE void renderLoop(const Char_T_ *content, UInt length) const {
-        const UInt start_offset = Engine::FindOne(
+    QENTEM_NOINLINE void renderLoop(const Char_T_ *content,
+                                    SizeT          length) const {
+        const SizeT start_offset = Engine::FindOne(
             TemplatePatterns_T_::MultiLineSuffix, content, 0U, length);
 
         if (start_offset == 0U) {
@@ -667,15 +639,15 @@ class Template_T_ {
 
         const Value_T_ *loop_set          = root_value_;
         const Char_T_ * loop_value        = nullptr;
-        UInt            loop_value_length = 0U;
-        UInt            loop_index        = 0U;
-        UInt            loop_size         = 0U;
-        UInt            len               = 0U;
-        UInt            offset            = 0U;
-        UInt            last_offset       = 0U;
+        SizeT           loop_value_length = 0;
+        SizeT           loop_index        = 0;
+        SizeT           loop_size         = 0;
+        SizeT           len               = 0;
+        SizeT           offset            = 0;
+        SizeT           last_offset       = 0;
 
-        UInt options    = 4; // set, value, times, index
-        bool break_loop = false;
+        SizeT options    = 4; // set, value, times, index
+        bool  break_loop = false;
 
         ///// Stage 1
 
@@ -695,7 +667,7 @@ class Template_T_ {
             // X="|
             // 3: Goes back to X
             // |X="
-            UInt tmp_offset = (offset - 4U);
+            SizeT tmp_offset = (offset - 4U);
 
             do {
                 switch (content[tmp_offset]) {
@@ -766,7 +738,7 @@ class Template_T_ {
         } while (--options != 0U);
 
         if (loop_size == 0U) {
-            loop_size = static_cast<UInt>(loop_set->Size());
+            loop_size = loop_set->Size();
 
             if (loop_size <= loop_index) {
                 return;
@@ -798,13 +770,13 @@ class Template_T_ {
                 loop_ss.Insert(TemplatePatterns_T_::GetVariablePrefix(),
                                TemplatePatterns_T_::VariablePrefixLength);
 
-                UInt lvl = 0U;
+                SizeT lvl = 0U;
                 while (lvl <= level_) {
                     loop_ss += TemplatePatterns_T_::TildeChar;
                     ++lvl;
                 }
 
-                UInt sub_offset = offset;
+                SizeT sub_offset = offset;
 
                 while (content[sub_offset] ==
                        TemplatePatterns_T_::VariableIndexPrefix) {
@@ -842,15 +814,18 @@ class Template_T_ {
 
     QENTEM_NOINLINE void
     generateLoopContent(const Value_T_ *loop_set, const Char_T_ *content,
-                        UInt length, StringStream<Char_T_> &&loop_ss,
-                        UInt loop_size, UInt loop_index) const {
+                        SizeT length, StringStream<Char_T_> &&loop_ss,
+                        SizeT loop_size, SizeT loop_index) const {
 
         Template_T_   loop_template{ss_, loop_set, this, (level_ + 1U)};
-        Tags_T_       loop_tags;
         Array<Tag_T_> all_tags;
+        Tags_T_       loop_tags;
+        const Tag_T_ *tag_first = nullptr;
+        const Tag_T_ *tag_last  = nullptr;
+        const Tag_T_ *tag_end;
 
-        UInt loop_ss_len = static_cast<UInt>(loop_ss.Length());
-        UInt loop_offset = 0U;
+        SizeT loop_ss_len = loop_ss.Length();
+        SizeT loop_offset = 0U;
 
         ss_->Expect(loop_ss.Length() * loop_size);
 
@@ -861,17 +836,22 @@ class Template_T_ {
                 break;
             }
 
+            const bool is_full = loop_tags.IsFull();
+            if (all_tags.IsEmpty() && !is_full) {
+                break;
+            }
+
             all_tags.Expect(loop_tags.Size());
 
-            const Tag_T_ *tag = loop_tags.First();
+            Tag_T_ *      tag = loop_tags.First();
             const Tag_T_ *end = loop_tags.End();
 
             while (tag != end) {
-                all_tags += *tag;
+                all_tags += static_cast<Tag_T_ &&>(*tag);
                 ++tag;
             }
 
-            if (!(loop_tags.IsFull())) {
+            if (!is_full) {
                 break;
             }
 
@@ -879,18 +859,29 @@ class Template_T_ {
             loop_tags.Clear();
         } while (true);
 
-        if (all_tags.Last() != nullptr) {
+        if (all_tags.IsEmpty()) {
+            if (loop_tags.IsNotEmpty()) {
+                tag_first = loop_tags.First();
+                tag_last  = (loop_tags.First() + (loop_tags.Size() - 1));
+                tag_end   = loop_tags.End();
+            }
+        } else {
+            tag_first = all_tags.First();
+            tag_last  = all_tags.Last();
+            tag_end   = all_tags.End();
+        }
+
+        if (tag_last != nullptr) {
             // TODO: Split the loop on 4 threads.
             do {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
-                loop_template.render(all_tags.First(), all_tags.End(),
-                                     loop_ss.First(), 0U);
+                loop_template.render(tag_first, tag_end, loop_ss.First(), 0);
 
-                const UInt t_offset = all_tags.Last()->EndOffset;
+                const SizeT tag_offset = tag_last->EndOffset;
                 // // Add the remaining string.
-                ss_->Insert((loop_ss.First() + t_offset),
-                            (loop_ss_len - t_offset));
+                ss_->Insert((loop_ss.First() + tag_offset),
+                            (loop_ss_len - tag_offset));
 
                 ++loop_index;
                 --loop_size;
@@ -903,11 +894,11 @@ class Template_T_ {
         }
     }
 
-    QENTEM_NOINLINE void renderIf(const Char_T_ *content, UInt length) const {
+    QENTEM_NOINLINE void renderIf(const Char_T_ *content, SizeT length) const {
         double result      = 0U;
-        UInt   offset      = 0U;
-        UInt   case_offset = 0U;
-        UInt   case_length = 0U;
+        SizeT  offset      = 0U;
+        SizeT  case_offset = 0U;
+        SizeT  case_length = 0U;
 
         // TODO: Optimize
 
@@ -960,9 +951,9 @@ class Template_T_ {
         }
     }
 
-    static UInt findNextElse(const Char_T_ *content, UInt offset,
-                             UInt length) noexcept {
-        UInt else_offset = 0U;
+    static SizeT findNextElse(const Char_T_ *content, SizeT offset,
+                              SizeT length) noexcept {
+        SizeT else_offset = 0U;
 
         do {
             else_offset = Engine::Find(TemplatePatterns_T_::GetElsePrefix(),
@@ -974,7 +965,7 @@ class Template_T_ {
                 return 0U;
             }
 
-            const UInt next_if = Engine::Find(
+            const SizeT next_if = Engine::Find(
                 TemplatePatterns_T_::GetIfPrefix(),
                 TemplatePatterns_T_::IfPrefixLength, content, offset, length);
 
@@ -1002,8 +993,8 @@ class Template_T_ {
      * is stored in "keys_". "id" is the index that starts with 0: values_[id]
      */
     const Value_T_ *findLoopValue(const Char_T_ *key,
-                                  UInt           length) const noexcept {
-        UInt lvl = 0U;
+                                  SizeT          length) const noexcept {
+        SizeT lvl = 0U;
         do {
             ++lvl;
             ++key;
@@ -1021,9 +1012,9 @@ class Template_T_ {
         value = obj->loop_value_;
 
         if (length != 0U) { // ~[]
-            UInt offset = 1U;
-            UInt tmp    = 1U;
-            UInt id;
+            SizeT offset = 1U;
+            SizeT tmp    = 1U;
+            SizeT id;
 
             do {
                 while (key[tmp] != TemplatePatterns_T_::VariableIndexSuffix) {
@@ -1061,7 +1052,7 @@ class Template_T_ {
     }
 
     QENTEM_NOINLINE const Value_T_ *findValue(const Char_T_ *key,
-                                              UInt length) const noexcept {
+                                              SizeT length) const noexcept {
         const Value_T_ *value = root_value_;
 
         if (length != 0U) {
@@ -1069,14 +1060,14 @@ class Template_T_ {
                 return findLoopValue(key, length);
             }
 
-            UInt id;
+            SizeT id;
 
             if ((key[(length - 1U)] ==
                  TemplatePatterns_T_::VariableIndexSuffix)) {
                 // String followed by [...]
 
-                UInt offset = 0U;
-                UInt tmp    = 1U;
+                SizeT offset = 0U;
+                SizeT tmp    = 1U;
 
                 while ((key[tmp] != TemplatePatterns_T_::VariableIndexPrefix) &&
                        (tmp < length)) {
@@ -1123,7 +1114,7 @@ class Template_T_ {
     }
 
     bool ALESetNumber(double &number, const Char_T_ *content,
-                      UInt length) const noexcept {
+                      SizeT length) const noexcept {
         if (length > TemplatePatterns_T_::VariableFulllength) {
             content += TemplatePatterns_T_::VariablePrefixLength;
             length -= TemplatePatterns_T_::VariableFulllength;
@@ -1135,7 +1126,7 @@ class Template_T_ {
                 }
 
                 const Char_T_ *str;
-                UInt           len;
+                SizeT          len;
 
                 if (value->SetCharAndLength(str, len)) {
                     return ALE::Evaluate(number, str, len, this);
@@ -1148,14 +1139,14 @@ class Template_T_ {
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const Char_T_ *left, UInt left_length,
-                    const Char_T_ *right, UInt right_length) const noexcept {
+    bool ALEIsEqual(bool &result, const Char_T_ *left, SizeT left_length,
+                    const Char_T_ *right, SizeT right_length) const noexcept {
         const Value_T_ *value_left{nullptr};
         const Value_T_ *value_right{nullptr};
         const Char_T_ * str_left;
         const Char_T_ * str_right;
-        UInt            str_length_left;
-        UInt            str_length_right;
+        SizeT           str_length_left;
+        SizeT           str_length_right;
 
         bool is_number = false;
 
@@ -1242,7 +1233,7 @@ class Template_T_ {
     }
 
     Template_T_(StringStream<Char_T_> *ss, const Value_T_ *root_value,
-                const Template_T_ *parent = nullptr, UInt level = 0U) noexcept
+                const Template_T_ *parent = nullptr, SizeT level = 0U) noexcept
         : ss_(ss), root_value_(root_value), parent_(parent), level_(level) {
     }
 
@@ -1251,7 +1242,32 @@ class Template_T_ {
     const Value_T_ *       loop_value_{nullptr};
     const Template_T_ *    parent_;
 
-    const UInt level_;
+    const SizeT level_;
+};
+
+struct Template {
+    template <typename Char_T_, typename Value_T_, typename Number_T_>
+    inline static void Render(const Char_T_ *content, Number_T_ length,
+                              const Value_T_ *       root_value,
+                              StringStream<Char_T_> *ss) {
+        Template_T_<Char_T_, Value_T_>::Process(
+            content, static_cast<SizeT>(length), root_value, ss);
+    }
+
+    template <typename Char_T_, typename Value_T_, typename Number_T_>
+    inline static StringStream<Char_T_> Render(const Char_T_ * content,
+                                               Number_T_       length,
+                                               const Value_T_ *root_value) {
+        StringStream<Char_T_> ss;
+        Render(content, length, root_value, &ss);
+        return ss;
+    }
+
+    template <typename Char_T_, typename Value_T_>
+    inline static StringStream<Char_T_> Render(const Char_T_ * content,
+                                               const Value_T_ *root_value) {
+        return Render(content, StringUtils::Count(content), root_value);
+    }
 };
 
 } // namespace Qentem

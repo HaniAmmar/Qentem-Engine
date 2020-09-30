@@ -126,7 +126,7 @@ struct DigitChars<wchar_t> {
 template <typename Char_T_>
 class Digit {
   public:
-    static UInt HexStringToNumber(const Char_T_ *str, UInt length) noexcept {
+    static UInt HexStringToNumber(const Char_T_ *str, SizeT length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         UInt value = 0;
@@ -223,7 +223,7 @@ class Digit {
 
     template <typename Number_T_>
     inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
-                                      UInt length) noexcept {
+                                      SizeT length) noexcept {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
         constexpr bool is_float =
             (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
@@ -238,7 +238,7 @@ class Digit {
     template <typename Number_T_, bool IS_UNSIGNED, bool IS_FLOAT>
     struct S_StringToNumber {
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
-                                          UInt length) noexcept {
+                                          SizeT length) noexcept {
             return stringToSignedFloat(number, str, length);
         }
     };
@@ -246,7 +246,7 @@ class Digit {
     template <typename Number_T_>
     struct S_StringToNumber<Number_T_, true, false> {
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
-                                          UInt length) noexcept {
+                                          SizeT length) noexcept {
             return stringToUnsignedInt(number, str, length);
         }
     };
@@ -254,14 +254,14 @@ class Digit {
     template <typename Number_T_>
     struct S_StringToNumber<Number_T_, false, false> {
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
-                                          UInt length) noexcept {
+                                          SizeT length) noexcept {
             return stringToSignedInt(number, str, length);
         }
     };
 
     template <typename Number_T_>
     static bool stringToInt(Number_T_ &number, const Char_T_ *str,
-                            UInt length) noexcept {
+                            SizeT length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         Number_T_ postion = 1;
@@ -286,7 +286,7 @@ class Digit {
 
     template <typename Number_T_>
     static bool stringToUnsignedInt(Number_T_ &number, const Char_T_ *str,
-                                    UInt length) noexcept {
+                                    SizeT length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         number = 0;
@@ -297,7 +297,7 @@ class Digit {
             }
 
             if (str[0] == DigitChars_T_::PlusChar) {
-                UInt offset = 1;
+                SizeT offset = 1;
                 StringUtils::SoftTrim(str, offset, --length);
 
                 if (length != 0) {
@@ -315,7 +315,7 @@ class Digit {
 
     template <typename Number_T_>
     static bool stringToSignedInt(Number_T_ &number, const Char_T_ *s_str,
-                                  UInt length) noexcept {
+                                  SizeT length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         number = 0;
@@ -327,7 +327,7 @@ class Digit {
 
             switch (s_str[0]) {
                 case DigitChars_T_::MinusChar: {
-                    UInt ni_offset = 1;
+                    SizeT ni_offset = 1;
                     StringUtils::SoftTrim(s_str, ni_offset, --length);
 
                     if ((length != 0) &&
@@ -341,7 +341,7 @@ class Digit {
                 }
 
                 case DigitChars_T_::PlusChar: {
-                    UInt offset = 1;
+                    SizeT offset = 1;
                     StringUtils::SoftTrim(s_str, offset, --length);
 
                     if (length != 0) {
@@ -417,7 +417,7 @@ class Digit {
 
     template <typename Number_T_>
     static bool stringToSignedFloat(Number_T_ &number, const Char_T_ *str,
-                                    UInt length) noexcept {
+                                    SizeT length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         number = 0;
@@ -431,7 +431,7 @@ class Digit {
 
             switch (str[0]) {
                 case DigitChars_T_::MinusChar: {
-                    UInt n_offset = 1;
+                    SizeT n_offset = 1;
                     StringUtils::SoftTrim(str, n_offset, --length);
 
                     if ((length != 0) &&
@@ -444,7 +444,7 @@ class Digit {
                 }
 
                 case DigitChars_T_::PlusChar: {
-                    UInt offset = 1;
+                    SizeT offset = 1;
                     StringUtils::SoftTrim(str, offset, --length);
 
                     if (length != 0) {
@@ -472,15 +472,15 @@ class Digit {
     }
 
     QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str,
-                                              UInt &length) noexcept {
+                                              SizeT &length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
-        UInt offset = (length - 1);
+        SizeT offset = (length - 1);
 
         if (offset != 0) {
-            UInt offset2    = 0;
-            UInt MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
-            int  sign       = 0;
+            SizeT offset2    = 0;
+            SizeT MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
+            int   sign       = 0;
 
             do {
                 const Char_T_ c = str[offset];
@@ -551,11 +551,11 @@ class Digit {
     template <typename Number_T_>
     QENTEM_NOINLINE static bool stringToFloat(Number_T_ &number, int exponent,
                                               const Char_T_ *str,
-                                              UInt           length) noexcept {
+                                              SizeT          length) noexcept {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         unsigned long long w_number = 0;
-        UInt               len      = ((length < 18) ? length : 17);
+        SizeT              len      = ((length < 18) ? length : 17);
         UInt               offset   = 0;
         Char_T_            c;
         bool               has_dot = false;
@@ -654,7 +654,7 @@ class Digit {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
         Char_T_ tmp[QENTEM_INT_NUMBER_MAX_SIZE_];
-        UInt    offset = 0;
+        SizeT   offset = 0;
 
         /*
          *  18446744073709551615 MAX unsigned long long 20
@@ -940,7 +940,7 @@ class Digit {
     }
 
     inline static Char_T_ *getCharForNumber(String<Char_T_> &dstring,
-                                            UInt             length) {
+                                            SizeT            length) {
         Char_T_ *str = HAllocator::Allocate<Char_T_>(length + 1U);
         str[length]  = 0;
         dstring      = String<Char_T_>{str, length};
@@ -948,7 +948,7 @@ class Digit {
     }
 
     inline static Char_T_ *getCharForNumber(StringStream<Char_T_> &dstring,
-                                            UInt                   length) {
+                                            SizeT                  length) {
         return dstring.Buffer(length);
     }
 

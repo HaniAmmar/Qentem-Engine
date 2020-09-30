@@ -44,9 +44,9 @@ class StringStream {
         HAllocator::Deallocate(storage_);
     }
 
-    explicit StringStream(ULong size) : capacity_(size) {
+    explicit StringStream(SizeT size) : capacity_(size) {
         if (size != 0) {
-            capacity_ = (ULong{1} << Platform::CLZ(capacity_));
+            capacity_ = (SizeT{1} << Platform::CLZ(capacity_));
 
             if (capacity_ < size) {
                 capacity_ <<= 1U;
@@ -57,38 +57,36 @@ class StringStream {
     }
 
     StringStream(StringStream &&ss) noexcept
-        : length_(ss.length_), capacity_(ss.capacity_), storage_(ss.storage_) {
+        : storage_(ss.storage_), length_(ss.length_), capacity_(ss.capacity_) {
+        ss.storage_  = nullptr;
         ss.length_   = 0;
         ss.capacity_ = 0;
-        ss.storage_  = nullptr;
     }
 
     StringStream(const StringStream &ss) {
         if (ss.length_ != 0) {
             capacity_ = ss.length_;
-
-            capacity_ = (ULong{1} << Platform::CLZ(capacity_));
+            capacity_ = (SizeT{1} << Platform::CLZ(capacity_));
 
             if (capacity_ < ss.length_) {
                 capacity_ <<= 1U;
             }
 
             storage_ = HAllocator::Allocate<Char_T_>(capacity_);
-
             insert(ss.storage_, ss.length_);
         }
     }
 
     StringStream &operator=(StringStream &&ss) noexcept {
         if (this != &ss) {
-            length_      = ss.length_;
-            capacity_    = ss.capacity_;
+            HAllocator::Deallocate(storage_);
+            storage_  = ss.storage_;
+            length_   = ss.length_;
+            capacity_ = ss.capacity_;
+
+            ss.storage_  = nullptr;
             ss.length_   = 0;
             ss.capacity_ = 0;
-
-            HAllocator::Deallocate(storage_);
-            storage_    = ss.storage_;
-            ss.storage_ = nullptr;
         }
 
         return *this;
@@ -96,10 +94,12 @@ class StringStream {
 
     StringStream &operator=(const StringStream &ss) {
         if (this != &ss) {
-            length_   = 0;
-            capacity_ = 0;
-            HAllocator::Deallocate(storage_);
-            storage_ = nullptr;
+            if (storage_ != nullptr) {
+                HAllocator::Deallocate(storage_);
+                storage_  = nullptr;
+                length_   = 0;
+                capacity_ = 0;
+            }
 
             Insert(ss.storage_, ss.length_);
         }
@@ -109,7 +109,7 @@ class StringStream {
 
     void operator+=(Char_T_ one_char) {
         if (capacity_ == length_) {
-            ULong n_size = capacity_;
+            SizeT n_size = capacity_;
 
             if (n_size == 0) {
                 n_size = QENTEM_STRINGSTREAM_INITIALSIZE_;
@@ -151,7 +151,7 @@ class StringStream {
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
-        const ULong len = StringUtils::Count(str);
+        const SizeT len = StringUtils::Count(str);
 
         if (length_ != len) {
             return false;
@@ -172,7 +172,7 @@ class StringStream {
         return (!(*this == str));
     }
 
-    inline bool IsEqual(const Char_T_ *str, ULong length) const noexcept {
+    inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
         if (length_ != length) {
             return false;
         }
@@ -180,7 +180,7 @@ class StringStream {
         return StringUtils::IsEqual(storage_, str, length);
     }
 
-    inline void Insert(const Char_T_ *str, ULong length) {
+    inline void Insert(const Char_T_ *str, SizeT length) {
         insert(str, length);
     }
 
@@ -189,35 +189,37 @@ class StringStream {
     }
 
     void Reset() noexcept {
-        length_   = 0;
-        capacity_ = 0;
-        HAllocator::Deallocate(storage_);
-        storage_ = nullptr;
+        if (storage_ != nullptr) {
+            HAllocator::Deallocate(storage_);
+            storage_  = nullptr;
+            length_   = 0;
+            capacity_ = 0;
+        }
     }
 
-    inline void StepBack(ULong length) noexcept {
+    inline void StepBack(SizeT length) noexcept {
         if (length <= length_) {
             length_ -= length;
         }
     }
 
     // To write directly to the buffer, set the needed length.
-    Char_T_ *Buffer(ULong len) noexcept {
-        const ULong current_offset = length_;
+    Char_T_ *Buffer(SizeT len) noexcept {
+        const SizeT current_offset = length_;
         length_ += len;
 
         if (length_ > capacity_) {
-            expand((ULong{2} << Platform::CLZ(length_)));
+            expand((SizeT{2} << Platform::CLZ(length_)));
         }
 
         return (storage_ + current_offset);
     }
 
-    inline void Expect(ULong len) {
-        const ULong new_len = (length_ + len);
+    inline void Expect(SizeT len) {
+        const SizeT new_len = (length_ + len);
 
         if (new_len > capacity_) {
-            expand((ULong{2} << Platform::CLZ(new_len)));
+            expand((SizeT{2} << Platform::CLZ(new_len)));
         }
     }
 
@@ -225,27 +227,27 @@ class StringStream {
         return storage_;
     }
 
-    inline ULong Length() const noexcept {
+    inline SizeT Length() const noexcept {
         return length_;
     }
 
-    inline ULong Capacity() const noexcept {
+    inline SizeT Capacity() const noexcept {
         return capacity_;
     }
 
     Char_T_ *Eject() noexcept {
-        length_      = 0;
-        capacity_    = 0;
         Char_T_ *str = storage_;
         storage_     = nullptr;
+        length_      = 0;
+        capacity_    = 0;
 
         return str;
     }
 
-    String<Char_T_> GetString() {
+    QENTEM_NOINLINE String<Char_T_> GetString() {
         if (capacity_ > length_) {
             storage_[length_] = 0;
-            const ULong len   = length_;
+            const SizeT len   = length_;
             return String<Char_T_>(Eject(), len);
         }
 
@@ -258,13 +260,13 @@ class StringStream {
     //////////// Private ////////////
 
   private:
-    void insert(const Char_T_ *str, const ULong len) {
+    void insert(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
-            const ULong current_offset = length_;
+            const SizeT current_offset = length_;
             length_ += len;
 
             if (capacity_ < length_) {
-                expand((ULong{2} << Platform::CLZ(length_)));
+                expand((SizeT{2} << Platform::CLZ(length_)));
             }
 
             Memory::Copy((storage_ + current_offset), str,
@@ -272,12 +274,12 @@ class StringStream {
         }
     }
 
-    void expand(ULong capacity) {
+    void expand(SizeT capacity) {
         Char_T_ *old_str = storage_;
         storage_         = HAllocator::Allocate<Char_T_>(capacity);
 
         if (capacity_ != 0) {
-            const ULong c_size = (capacity_ * sizeof(Char_T_));
+            const SizeT c_size = (capacity_ * sizeof(Char_T_));
             Memory::Copy(storage_, old_str, c_size);
             HAllocator::Deallocate(old_str);
         }
@@ -285,9 +287,9 @@ class StringStream {
         capacity_ = capacity;
     }
 
-    ULong    length_{0};
-    ULong    capacity_{0};
     Char_T_ *storage_{nullptr};
+    SizeT    length_{0};
+    SizeT    capacity_{0};
 };
 
 } // namespace Qentem

@@ -43,7 +43,7 @@ enum class ValueType {
 template <typename Char_T_>
 class Value {
     using JSONotation_T_ = JSON::JSONotation<Char_T_>;
-    using VHArray        = HArray<Value, Char_T_>;
+    using VObject        = HArray<Value, Char_T_>;
     using VArray         = Array<Value>;
     using VString        = String<Char_T_>;
 
@@ -61,7 +61,7 @@ class Value {
     explicit Value(ValueType type) noexcept : type_(type) {
         switch (type) {
             case ValueType::Object: {
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                value_.object_ = HAllocator::AllocateInit<VObject>();
                 break;
             }
 
@@ -80,7 +80,7 @@ class Value {
         }
     }
 
-    explicit Value(VHArray *obj) noexcept
+    explicit Value(VObject *obj) noexcept
         : value_(obj), type_(ValueType::Object) {
     }
 
@@ -122,7 +122,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                value_.object_ = HAllocator::AllocateInit<VObject>();
                 return (*(value_.object_))[key];
             }
 
@@ -141,7 +141,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                value_.object_ = HAllocator::AllocateInit<VObject>();
                 return (*(value_.object_))[static_cast<VString &&>(key)];
             }
 
@@ -160,7 +160,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_          = ValueType::Object;
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
+                value_.object_ = HAllocator::AllocateInit<VObject>();
                 return (*(value_.object_))[key];
             }
 
@@ -171,7 +171,7 @@ class Value {
         throw 3;
     }
 
-    Value &operator[](ULong index) {
+    Value &operator[](SizeT index) {
         switch (type_) {
             case ValueType::Array: {
                 if (value_.array_->Size() > index) {
@@ -216,7 +216,7 @@ class Value {
 
     template <typename Type_T_>
     Value &operator[](Type_T_ index) {
-        return (*this)[static_cast<ULong>(index)];
+        return (*this)[static_cast<SizeT>(index)];
     }
 
     Value &operator=(Value &&val) noexcept {
@@ -276,10 +276,11 @@ class Value {
         return *this;
     }
 
-    Value &operator=(VHArray &&obj) {
+    Value &operator=(VObject &&obj) {
         switch (type_) {
             case ValueType::Object: {
-                break;
+                *(value_.object_) = static_cast<VObject &&>(obj);
+                return *this;
             }
 
             case ValueType::Number:
@@ -287,31 +288,31 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
-                type_          = ValueType::Object;
+                type_ = ValueType::Object;
                 break;
             }
 
             default: {
                 Reset();
-                value_.object_ = HAllocator::AllocateInit<VHArray>();
-                type_          = ValueType::Object;
+                type_ = ValueType::Object;
             }
         }
 
-        *(value_.object_) = static_cast<VHArray &&>(obj);
+        value_.object_ =
+            HAllocator::AllocateInit<VObject>(static_cast<VObject &&>(obj));
         return *this;
     }
 
-    Value &operator=(const VHArray &obj) {
-        *this = static_cast<VHArray &&>(VHArray(obj));
+    Value &operator=(const VObject &obj) {
+        *this = static_cast<VObject &&>(VObject(obj));
         return *this;
     }
 
     Value &operator=(VArray &&arr) {
         switch (type_) {
             case ValueType::Array: {
-                break;
+                *(value_.array_) = static_cast<VArray &&>(arr);
+                return *this;
             }
 
             case ValueType::Number:
@@ -319,19 +320,18 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                value_.array_ = HAllocator::AllocateInit<VArray>();
-                type_         = ValueType::Array;
+                type_ = ValueType::Array;
                 break;
             }
 
             default: {
                 Reset();
-                value_.array_ = HAllocator::AllocateInit<VArray>();
-                type_         = ValueType::Array;
+                type_ = ValueType::Array;
             }
         }
 
-        *(value_.array_) = static_cast<VArray &&>(arr);
+        value_.array_ =
+            HAllocator::AllocateInit<VArray>(static_cast<VArray &&>(arr));
         return *this;
     }
 
@@ -343,7 +343,8 @@ class Value {
     Value &operator=(VString &&str) {
         switch (type_) {
             case ValueType::String: {
-                break;
+                *(value_.string_) = static_cast<VString &&>(str);
+                return *this;
             }
 
             case ValueType::Number:
@@ -351,46 +352,23 @@ class Value {
             case ValueType::True:
             case ValueType::False:
             case ValueType::Null: {
-                value_.string_ = HAllocator::AllocateInit<VString>();
-                type_          = ValueType::String;
+                type_ = ValueType::String;
                 break;
             }
 
             default: {
                 Reset();
-                value_.string_ = HAllocator::AllocateInit<VString>();
-                type_          = ValueType::String;
+                type_ = ValueType::String;
             }
         }
 
-        *(value_.string_) = static_cast<VString &&>(str);
+        value_.string_ =
+            HAllocator::AllocateInit<VString>(static_cast<VString &&>(str));
         return *this;
     }
 
     Value &operator=(const VString &str) {
         *this = static_cast<VString &&>(VString(str));
-        return *this;
-    }
-
-    Value &operator=(NullType) {
-        switch (type_) {
-            case ValueType::Null: {
-                break;
-            }
-
-            case ValueType::Undefined:
-            case ValueType::True:
-            case ValueType::False: {
-                type_ = ValueType::Null;
-                break;
-            }
-
-            default: {
-                Reset();
-                type_ = ValueType::Null;
-            }
-        }
-
         return *this;
     }
 
@@ -426,6 +404,28 @@ class Value {
     template <typename Type_T_>
     inline Value &operator=(Type_T_ num) {
         *this = static_cast<double>(num);
+        return *this;
+    }
+
+    Value &operator=(NullType) {
+        switch (type_) {
+            case ValueType::Null: {
+                break;
+            }
+
+            case ValueType::Undefined:
+            case ValueType::True:
+            case ValueType::False: {
+                type_ = ValueType::Null;
+                break;
+            }
+
+            default: {
+                Reset();
+                type_ = ValueType::Null;
+            }
+        }
+
         return *this;
     }
 
@@ -472,7 +472,7 @@ class Value {
                 *(value_.array_) += static_cast<Value &&>(val);
             }
         } else if ((type_ == ValueType::Object) && (val.type_ == type_)) {
-            *(value_.object_) += static_cast<VHArray &&>(*(val.value_.object_));
+            *(value_.object_) += static_cast<VObject &&>(*(val.value_.object_));
         }
 
         val.Reset();
@@ -507,7 +507,7 @@ class Value {
         }
     }
 
-    void operator+=(VHArray &&obj) {
+    void operator+=(VObject &&obj) {
         if (type_ == ValueType::Undefined) {
             value_.array_ = HAllocator::AllocateInit<VArray>();
             type_         = ValueType::Array;
@@ -515,25 +515,24 @@ class Value {
 
         if (type_ == ValueType::Array) {
             *(value_.array_) +=
-                static_cast<Value &&>(Value{HAllocator::AllocateInit<VHArray>(
-                    static_cast<VHArray &&>(obj))});
+                static_cast<Value &&>(Value{HAllocator::AllocateInit<VObject>(
+                    static_cast<VObject &&>(obj))});
         } else if (type_ == ValueType::Object) {
-            *(value_.object_) += static_cast<VHArray &&>(obj);
+            *(value_.object_) += static_cast<VObject &&>(obj);
         }
     }
 
-    void operator+=(const VHArray &obj) {
-        *this += static_cast<VHArray &&>(VHArray(obj));
+    void operator+=(const VObject &obj) {
+        *this += static_cast<VObject &&>(VObject(obj));
     }
 
     void operator+=(VArray &&arr) {
-        if (type_ == ValueType::Undefined) {
-            value_.array_ = HAllocator::AllocateInit<VArray>();
-            type_         = ValueType::Array;
-        }
-
         if (type_ == ValueType::Array) {
             *(value_.array_) += static_cast<VArray &&>(arr);
+        } else if (type_ == ValueType::Undefined) {
+            value_.array_ =
+                HAllocator::AllocateInit<VArray>(static_cast<VArray &&>(arr));
+            type_ = ValueType::Array;
         }
     }
 
@@ -542,16 +541,15 @@ class Value {
     }
 
     void operator+=(VString &&str) {
-        Value s_value = Value{
-            HAllocator::AllocateInit<VString>(static_cast<VString &&>(str))};
-
         if (type_ == ValueType::Undefined) {
             value_.array_ = HAllocator::AllocateInit<VArray>();
             type_         = ValueType::Array;
         }
 
         if (type_ == ValueType::Array) {
-            *(value_.array_) += static_cast<Value &&>(s_value);
+            *(value_.array_) +=
+                static_cast<Value &&>(Value{HAllocator::AllocateInit<VString>(
+                    static_cast<VString &&>(str))});
         }
     }
 
@@ -637,7 +635,7 @@ class Value {
         return type_;
     }
 
-    ULong Size() const noexcept {
+    SizeT Size() const noexcept {
         switch (type_) {
             case ValueType::Object: {
                 return value_.object_->Size();
@@ -654,7 +652,7 @@ class Value {
         return 0;
     }
 
-    Value *GetValue(ULong index) const noexcept {
+    Value *GetValue(SizeT index) const noexcept {
         if (type_ == ValueType::Array) {
             if (index < value_.array_->Size()) {
                 Value *val = (value_.array_->First() + index);
@@ -674,7 +672,7 @@ class Value {
         return nullptr;
     }
 
-    Value *GetValue(const Char_T_ *key, ULong length) const noexcept {
+    Value *GetValue(const Char_T_ *key, SizeT length) const noexcept {
         if (type_ == ValueType::Object) {
             Value *val = (value_.object_->Find(key, length));
 
@@ -686,7 +684,7 @@ class Value {
         return nullptr;
     }
 
-    const VString *GetKey(ULong index) const noexcept {
+    const VString *GetKey(SizeT index) const noexcept {
         if (type_ == ValueType::Object) {
             return value_.object_->GetKey(index);
         }
@@ -694,7 +692,7 @@ class Value {
         return nullptr;
     }
 
-    VHArray *GetObject() const noexcept {
+    VObject *GetObject() const noexcept {
         if (type_ == ValueType::Object) {
             return value_.object_;
         }
@@ -726,7 +724,7 @@ class Value {
         return nullptr;
     }
 
-    ULong Length() const noexcept {
+    SizeT Length() const noexcept {
         if (type_ == ValueType::String) {
             return value_.string_->Length();
         }
@@ -844,7 +842,7 @@ class Value {
         return false;
     }
 
-    bool InsertKey(StringStream<Char_T_> &ss, ULong index) const {
+    bool InsertKey(StringStream<Char_T_> &ss, SizeT index) const {
         if (type_ == ValueType::Object) {
             const VString *key = value_.object_->GetKey(index);
 
@@ -875,8 +873,7 @@ class Value {
 
             case ValueType::String: {
                 return Digit<Char_T_>::StringToNumber(
-                    value, value_.string_->First(),
-                    static_cast<UInt>(value_.string_->Length()));
+                    value, value_.string_->First(), value_.string_->Length());
             }
 
             case ValueType::True: {
@@ -952,7 +949,7 @@ class Value {
         }
     }
 
-    void Remove(ULong index) const noexcept {
+    void Remove(SizeT index) const noexcept {
         if (type_ == ValueType::Object) {
             value_.object_->RemoveIndex(index);
         } else if ((type_ == ValueType::Array) &&
@@ -963,10 +960,10 @@ class Value {
 
     template <typename Type_T_>
     inline void Remove(Type_T_ index) const noexcept {
-        Remove(static_cast<ULong>(index));
+        Remove(static_cast<SizeT>(index));
     }
 
-    void Reset() noexcept {
+    QENTEM_NOINLINE void Reset() noexcept {
         switch (type_) {
             case ValueType::Object: {
                 HAllocator::Destruct(value_.object_);
@@ -998,7 +995,7 @@ class Value {
         if (type_ == ValueType::Object) {
             value_.object_->Compress();
         } else if (type_ == ValueType::Array) {
-            const ULong size = value_.array_->Size();
+            const SizeT size = value_.array_->Size();
 
             if (size != value_.array_->Capacity()) {
                 if (size == 0) {
@@ -1024,7 +1021,7 @@ class Value {
     }
 
     void Stringify(StringStream<Char_T_> &ss) const {
-        const ULong size   = Size();
+        const SizeT size   = Size();
         const bool  is_obj = (type_ == ValueType::Object);
 
         const HAItem<Value, Char_T_> *ha_item = nullptr;
@@ -1032,16 +1029,16 @@ class Value {
 
         if (is_obj) {
             ha_item = (value_.object_->First() - 1);
-            ss += JSONotation_T_::OCurlyChar;
+            ss += JSONotation_T_::SCurlyChar;
         } else if (type_ == ValueType::Array) {
             item = (value_.array_->First() - 1);
-            ss += JSONotation_T_::OSquareChar;
+            ss += JSONotation_T_::SSquareChar;
         } else {
             return;
         }
 
         if (size != 0) {
-            ULong id = 0;
+            SizeT id = 0;
 
             do {
                 if (is_obj) {
@@ -1120,9 +1117,9 @@ class Value {
         }
 
         if (is_obj) {
-            ss += JSONotation_T_::CCurlyChar;
+            ss += JSONotation_T_::ECurlyChar;
         } else {
-            ss += JSONotation_T_::CSquareChar;
+            ss += JSONotation_T_::ESquareChar;
         }
     }
 
@@ -1136,7 +1133,7 @@ class Value {
     void copyValue(const Value &val) {
         switch (val.type_) {
             case ValueType::Object: {
-                value_.object_    = HAllocator::AllocateInit<VHArray>();
+                value_.object_    = HAllocator::AllocateInit<VObject>();
                 *(value_.object_) = *(val.value_.object_);
                 break;
             }
@@ -1167,7 +1164,7 @@ class Value {
         Value_U_() : object_(nullptr) {
         }
 
-        explicit Value_U_(VHArray *object) noexcept : object_(object) {
+        explicit Value_U_(VObject *object) noexcept : object_(object) {
         }
         explicit Value_U_(VArray *array) noexcept : array_(array) {
         }
@@ -1176,7 +1173,7 @@ class Value {
         explicit Value_U_(double number) noexcept : number_(number) {
         }
 
-        VHArray *object_;
+        VObject *object_;
         VArray * array_;
         VString *string_;
         double   number_;
