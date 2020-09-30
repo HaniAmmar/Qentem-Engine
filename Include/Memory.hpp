@@ -21,13 +21,12 @@
  */
 
 #include "Common.hpp"
+#include "Platform.hpp"
 
-#ifndef _MALLOC_H
 #ifdef __APPLE__
 #include <malloc/malloc.h>
 #else
 #include <malloc.h>
-#endif
 #endif
 
 #include <new>
@@ -38,9 +37,33 @@
 namespace Qentem {
 namespace Memory {
 
-static void SetToZero(void *ptr, ULong size) noexcept {
+QENTEM_NOINLINE
+static void SetToZero(void *ptr, SizeT size) noexcept {
+#ifdef QENTEM_SIMD_ENABLED_
+    const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
+    const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
+
+    if (m_size != 0) {
+        QMM_VAR_ *      m_ptr  = static_cast<QMM_VAR_ *>(ptr);
+        const QMM_VAR_ *end    = (m_ptr + m_size);
+        const QMM_VAR_  m_zero = QMM_SETZERO_();
+
+        do {
+            QMM_STOREU_(m_ptr, m_zero);
+            ++m_ptr;
+        } while (m_ptr != end);
+
+        if (remaining == 0) {
+            return;
+        }
+    }
+
+    char *      des = (static_cast<char *>(ptr) + (size - remaining));
+    const char *end = (des + remaining);
+#else
     char *      des = static_cast<char *>(ptr);
     const char *end = (des + size);
+#endif
 
     while (des != end) {
         *des = 0;
@@ -48,10 +71,37 @@ static void SetToZero(void *ptr, ULong size) noexcept {
     }
 }
 
-static void Copy(void *to, const void *form, ULong size) noexcept {
+QENTEM_NOINLINE
+static void Copy(void *to, const void *form, SizeT size) noexcept {
+#ifdef QENTEM_SIMD_ENABLED_
+    const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
+    const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
+
+    if (m_size != 0) {
+        QMM_VAR_ *      m_to   = static_cast<QMM_VAR_ *>(to);
+        const QMM_VAR_ *m_form = static_cast<const QMM_VAR_ *>(form);
+        const QMM_VAR_ *end    = (m_form + m_size);
+
+        do {
+            QMM_STOREU_(m_to, QMM_LOAD_(m_form));
+            ++m_form;
+            ++m_to;
+        } while (m_form != end);
+
+        if (remaining == 0) {
+            return;
+        }
+    }
+
+    const SizeT start = (size - remaining);
+    const char *src   = static_cast<const char *>(form) + start;
+    const char *end   = (src + remaining);
+    char *      des   = static_cast<char *>(to) + start;
+#else
     const char *src = static_cast<const char *>(form);
     const char *end = (src + size);
     char *      des = static_cast<char *>(to);
+#endif
 
     while (src != end) {
         *des = *src;
@@ -65,7 +115,7 @@ static void Copy(void *to, const void *form, ULong size) noexcept {
 class HAllocator {
   public:
     template <typename Type_>
-    inline static Type_ *Allocate(ULong size) {
+    QENTEM_NOINLINE static Type_ *Allocate(SizeT size) {
         return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
     }
 
@@ -84,8 +134,8 @@ class HAllocator {
     }
 
     template <typename Type_>
-    inline static Type_ *AllocatePointers(ULong size) noexcept {
-        const ULong c_size = (size * sizeof(void *));
+    QENTEM_NOINLINE static Type_ *AllocatePointers(SizeT size) noexcept {
+        const SizeT c_size = (size * sizeof(void *));
         void *      vptr   = malloc(c_size);
         Memory::SetToZero(vptr, c_size);
 
