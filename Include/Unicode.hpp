@@ -21,7 +21,7 @@
  */
 
 #include <Common.hpp>
-#include <Platform.hpp>
+#include <StringStream.hpp>
 
 #ifndef QENTEM_UNICODE_H_
 #define QENTEM_UNICODE_H_
@@ -35,71 +35,58 @@ struct UnicodeToUTF {};
 // UTF8
 template <typename Char_T_>
 struct UnicodeToUTF<Char_T_, 1> {
-    static UInt ToUTF(UInt unicode, Char_T_ *str) noexcept {
+    static void ToUTF(UInt unicode, StringStream<Char_T_> &ss) noexcept {
         /*
-         * Char_T_ str[5];
-         * ULong len = ToUTF8(0xC3D, str);
-         * ULong len = ToUTF8(0x00A1, str);
-         * ULong len = ToUTF8(0x08A7, str);
-         * ULong len = ToUTF8(0x10A7B, str);
-         * str[len] = 0;
+         * ToUTF8(0xC3D, ss);
+         * ToUTF8(0x00A1, ss);
+         * ToUTF8(0x08A7, ss);
+         * ToUTF8(0x10A7B, ss);
          */
 
         if (unicode < 0x80U) {
-            *str = static_cast<Char_T_>(unicode);
-            return 1;
-        }
-
-        UInt length;
-
-        if (unicode < 0x800U) {
-            *str   = static_cast<Char_T_>(0xC0U | (unicode >> 6U));
-            length = 2;
-        } else if (unicode < 0x10000U) {
-            *str     = static_cast<Char_T_>(0xE0U | (unicode >> 12U));
-            *(++str) = static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
-            length   = 3;
+            ss += static_cast<Char_T_>(unicode);
         } else {
-            *str     = static_cast<Char_T_>(0xF0U | (unicode >> 18U));
-            *(++str) = static_cast<Char_T_>(0x80U | ((unicode >> 12U) & 0x3FU));
-            *(++str) = static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
-            length   = 4;
+            if (unicode < 0x800U) {
+                ss += static_cast<Char_T_>(0xC0U | (unicode >> 6U));
+            } else if (unicode < 0x10000U) {
+                ss += static_cast<Char_T_>(0xE0U | (unicode >> 12U));
+                ss += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
+            } else {
+                ss += static_cast<Char_T_>(0xF0U | (unicode >> 18U));
+                ss += static_cast<Char_T_>(0x80U | ((unicode >> 12U) & 0x3FU));
+                ss += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
+            }
+
+            ss += static_cast<Char_T_>(0x80U | (unicode & 0x3FU));
         }
-
-        *(++str) = static_cast<Char_T_>(0x80U | (unicode & 0x3FU));
-
-        return length;
     }
 };
 
 // UTF16
 template <typename Char_T_>
 struct UnicodeToUTF<Char_T_, 2> {
-    static UInt ToUTF(UInt unicode, Char_T_ *str) noexcept {
+    static void ToUTF(UInt unicode, StringStream<Char_T_> &ss) noexcept {
         if (unicode < 0x10000U) {
-            *str = static_cast<Char_T_>(unicode);
-            return 1;
+            ss += static_cast<Char_T_>(unicode);
+        } else {
+            unicode -= 0x10000;
+            ss += static_cast<Char_T_>(0xD800U | (unicode >> 10U));
+            ss += static_cast<Char_T_>(0xDC00U | (unicode & 0x3FFU));
         }
-
-        unicode -= 0x10000;
-        *str     = static_cast<Char_T_>(0xD800U | (unicode >> 10U));
-        *(++str) = static_cast<Char_T_>(0xDC00U | (unicode & 0x3FFU));
-        return 2;
     }
 };
 
 // UTF32
 template <typename Char_T_>
 struct UnicodeToUTF<Char_T_, 4> {
-    static UInt ToUTF(UInt unicode, Char_T_ *str) noexcept {
-        *str = static_cast<Char_T_>(unicode);
-        return 1;
+    static void ToUTF(UInt unicode, StringStream<Char_T_> &ss) noexcept {
+        ss += static_cast<Char_T_>(unicode);
     }
 };
 
 template <typename Char_T_>
-static UInt ToUTF(UInt unicode, Char_T_ *str) noexcept {
-    return UnicodeToUTF<Char_T_, sizeof(Char_T_)>::ToUTF(unicode, str);
+static void ToUTF(UInt unicode, StringStream<Char_T_> &ss) noexcept {
+    UnicodeToUTF<Char_T_, sizeof(Char_T_)>::ToUTF(unicode, ss);
 }
 
 } // namespace Unicode
