@@ -27,15 +27,9 @@
 #define QENTEM_DOUBLE_PRECISION_ 14
 #endif
 
-////////// 64 bit
-#if _WIN64
-#define QENTEM_64BIT_ 1
+#if _WIN64 || __x86_64__ || __ppc64__
+#define QENTEM_64BIT_
 #endif
-
-#if __x86_64__ || __ppc64__
-#define QENTEM_64BIT_ 1
-#endif
-////////// end 64 bit
 
 #ifndef _WIN64
 #ifndef QENTEM_AVX512BW_
@@ -65,14 +59,10 @@
 
 #ifdef _MSC_VER
 #define QENTEM_NOINLINE __declspec(noinline)
+#define QENTEM_MAYBE_UNUSED_
 #else
 #define QENTEM_NOINLINE __attribute__((noinline))
-#endif
-
-#ifndef _MSC_VER
 #define QENTEM_MAYBE_UNUSED_ __attribute__((unused))
-#else
-#define QENTEM_MAYBE_UNUSED_
 #endif
 
 namespace Qentem {
@@ -82,6 +72,11 @@ using UInt = unsigned int;
 using ULong = unsigned long long;
 #else
 using ULong = unsigned long;
+#endif
+
+#ifndef QENTEM_SIZE_T_
+#define QENTEM_SIZE_T_
+using SizeT = UInt;
 #endif
 
 using NullType = decltype(nullptr);
