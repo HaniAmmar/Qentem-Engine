@@ -27,7 +27,7 @@
 
 namespace Qentem {
 
-// C Array for primitive types only.
+// C Array.
 
 template <typename Type_, UInt Size_T_>
 class FixedArray {
@@ -44,16 +44,6 @@ class FixedArray {
     FixedArray &operator=(FixedArray &&) = delete;
     FixedArray &operator=(const FixedArray &) = delete;
 
-    void operator+=(const Type_ &item) {
-        if (index_ != Size_T_) {
-            storage_[index_] = item;
-            ++index_;
-            return;
-        }
-
-        throw 1;
-    }
-
     void operator+=(Type_ &&item) {
         if (index_ != Size_T_) {
             storage_[index_] = static_cast<Type_ &&>(item);
@@ -62,6 +52,10 @@ class FixedArray {
         }
 
         throw 1;
+    }
+
+    void operator+=(const Type_ &item) {
+        *this += static_cast<Type_ &&>(Type_(item));
     }
 
     inline Type_ *First() noexcept {
@@ -73,6 +67,9 @@ class FixedArray {
     }
 
     inline void Clear() noexcept {
+        // C Arrays inside c++ invoke destructor on every element once they are
+        // destructed. Copy and move operators of 'Type_' should handel reseting
+        // their struct.
         index_ = 0;
     }
 
