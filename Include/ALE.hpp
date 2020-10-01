@@ -32,21 +32,12 @@ namespace Qentem {
 
 template <typename Char_T_>
 struct ALEHelper {
-    bool ALESetNumber(double &number, const Char_T_ *content,
-                      SizeT length) const {
-        (void)number;
-        (void)content;
-        (void)length;
+    static constexpr bool ALESetNumber(double &, const Char_T_ *, SizeT) {
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const Char_T_ *left, SizeT left_length,
-                    const Char_T_ *right, SizeT right_length) const {
-        (void)result;
-        (void)left;
-        (void)left_length;
-        (void)right;
-        (void)right_length;
+    static constexpr bool ALEIsEqual(bool &, const Char_T_ *, SizeT,
+                                     const Char_T_ *, SizeT) {
         return false;
     }
 };
@@ -66,13 +57,28 @@ class ALE {
     ALE &operator=(const ALE &) = delete;
     ~ALE()                      = delete;
 
-    struct ALEItem_T_;
+    template <typename, typename>
+    friend class ALE_T_;
+    struct MathBit;
 
     template <typename Char_T_, typename Helper_T_>
     static bool Evaluate(double &number, const Char_T_ *content, SizeT length,
                          const Helper_T_ *callback) {
-        return ALE_T_<Char_T_, Helper_T_>::Process(number, content, length,
-                                                   callback);
+        Array<MathBit> items;
+
+        if (parse(items, content, 0, length)) {
+            if (items.IsNotEmpty()) {
+                sortOperations(items, content, 0, length);
+                return process(number, content, 0, length, items, callback);
+            }
+
+            SizeT offset = 0;
+            StringUtils::SoftTrim(content, offset, length);
+            return Digit<Char_T_>::StringToNumber(number, (content + offset),
+                                                  length);
+        }
+
+        return false;
     }
 
     template <typename Char_T_, typename Helper_T_>
@@ -99,49 +105,36 @@ class ALE {
         return Evaluate(content, StringUtils::Count(content), callback);
     }
 
-    ///////////////////////////////////////////////////////////////////////
-
+    //////////////////////////// For testing //////////////////////////////////
     template <typename Char_T_>
-    static bool Evaluate(double &number, const Char_T_ *content, SizeT length) {
-        ALEHelper<Char_T_> helper;
+    inline static bool Evaluate(double &number, const Char_T_ *content,
+                                SizeT length) {
+        static ALEHelper<Char_T_> helper;
         return Evaluate(number, content, length, &helper);
     }
 
     template <typename Char_T_>
     inline static bool Evaluate(double &number, const Char_T_ *content) {
-        ALEHelper<Char_T_> helper;
-        return Evaluate(number, content, &helper);
+        return Evaluate(number, content, StringUtils::Count(content));
     }
 
     template <typename Char_T_>
-    static double Evaluate(const Char_T_ *content, SizeT length) {
-        ALEHelper<Char_T_> helper;
-        return Evaluate(content, length, &helper);
+    inline static double Evaluate(const Char_T_ *content, SizeT length) {
+        double number;
+
+        if (Evaluate(number, content, length)) {
+            return number;
+        }
+
+        return 0;
     }
 
     template <typename Char_T_>
     inline static double Evaluate(const Char_T_ *content) {
-        ALEHelper<Char_T_> helper;
-        return Evaluate(content, &helper);
-    }
-};
-
-template <typename Char_T_, typename Helper_T_>
-class ALE_T_ {
-    friend class ALE;
-    friend class Qentem::Engine;
-    using ALEOperations_T_ = ALEOperations<Char_T_>;
-
-  public:
-    struct ALEItem_T_;
-
-    ALE_T_() = delete;
-
-    ALE_T_(Array<ALEItem_T_> *items, const Helper_T_ *callback)
-    noexcept : items_(items), callback_(callback) {
+        return Evaluate(content, StringUtils::Count(content));
     }
 
-    enum class Operation_ {
+    enum class Operation {
         Brackets = 0,
         Parentheses,
         Exponent,
@@ -160,295 +153,235 @@ class ALE_T_ {
         Or
     };
 
-    struct ALEItem_T_ {
-        Array<ALEItem_T_> SubItems{};
-        UInt              Offset{0};
-        UInt              Length{0};
-        Operation_        Op{Operation_::Parentheses};
+    struct MathBit {
+        MathBit() = default;
+
+        MathBit(Array<MathBit> sub_items, UInt offset, UInt length,
+                Operation op) noexcept
+            : SubItems(sub_items), Offset(offset), Length(length), Op(op) {
+        }
+
+        Array<MathBit> SubItems{};
+        UInt           Offset{0};
+        UInt           Length{0};
+        Operation      Op{Operation::Parentheses};
     };
 
-    static bool Process(double &number, const Char_T_ *content, SizeT length,
-                        const Helper_T_ *callback) {
-        if ((content != nullptr) && (length != 0)) {
-            Array<ALEItem_T_>          items;
-            ALE_T_<Char_T_, Helper_T_> ale{&items, callback};
-            Engine::FindNest(content, 0U, length, length, &ale);
-
-            if (items.IsNotEmpty()) {
-                ALE_T_<Char_T_, Helper_T_>::sortOperations(items, content, 0,
-                                                           length);
-                return ALE_T_<Char_T_, Helper_T_>::process(
-                    number, content, 0, length, items, callback);
-            }
-
-            SizeT offset = 0;
-            StringUtils::SoftTrim(content, offset, length);
-            return Digit<Char_T_>::StringToNumber(number, (content + offset),
-                                                  length);
-        }
-
-        return false;
-    }
-
   private:
-    inline bool HasTail() const noexcept {
-        return ((item_.Op == Operation_::Brackets) ||
-                (item_.Op == Operation_::Parentheses));
-    }
+    template <typename Char_T_>
+    static bool parse(Array<MathBit> &items, const Char_T_ *content,
+                      SizeT offset, SizeT length) {
+        using ALEOperations_T_ = ALEOperations<Char_T_>;
 
-    SizeT Nest(const Char_T_ *content, SizeT offset, SizeT end_before,
-               SizeT max_end_before) {
-        if ((offset + 1) != end_before) {
-            ALE_T_<Char_T_, Helper_T_> ale{&(item_.SubItems), callback_};
-            return Engine::FindNest(content, offset, end_before, max_end_before,
-                                    &ale);
-        }
-
-        return 0;
-    }
-
-    inline SizeT FindH(const Char_T_ *content, SizeT offset,
-                       SizeT end_before) noexcept {
-        bool found   = false;
-        item_.Length = 1;
-
-        while (offset < end_before) {
+        while (offset < length) {
             switch (content[offset]) {
-                case ALEOperations_T_::BracketOp: {
-                    found    = true;
-                    item_.Op = Operation_::Brackets;
-                    break;
+                case ALEOperations_T_::StartParenthesOp: {
+                    ++offset;
+
+                    SizeT end_offset = Engine::SkipInnerPatterns(
+                        ALEOperations_T_::StartParenthesOp,
+                        ALEOperations_T_::EndParenthesOp, content, offset,
+                        length);
+
+                    if (end_offset != 0) {
+                        items += MathBit{{},
+                                         offset,
+                                         ((end_offset - 1) - offset),
+                                         Operation::Parentheses};
+
+                        MathBit &item = items[(items.Size() - 1)];
+
+                        if (parse(item.SubItems, content, offset, end_offset)) {
+                            offset = end_offset;
+                            continue;
+                        }
+                    }
+
+                    return false;
                 }
 
-                case ALEOperations_T_::ParenthesOp: {
-                    found    = true;
-                    item_.Op = Operation_::Parentheses;
-                    break;
+                case ALEOperations_T_::StartBracketOp: {
+                    SizeT end_offset =
+                        Engine::FindOne(ALEOperations_T_::EndBracketOp, content,
+                                        (offset + 1), length);
+
+                    if (end_offset != 0) {
+                        items += MathBit{{},
+                                         offset,
+                                         (end_offset - offset),
+                                         Operation::Brackets};
+                        offset = end_offset;
+                        continue;
+                    }
+
+                    return false;
                 }
 
                 case ALEOperations_T_::ExponentOp: {
-                    found    = true;
-                    item_.Op = Operation_::Exponent;
+                    items += MathBit{{}, offset, 1, Operation::Exponent};
                     break;
                 }
 
                 case ALEOperations_T_::RemainderOp: {
-                    found    = true;
-                    item_.Op = Operation_::Remainder;
+                    items += MathBit{{}, offset, 1, Operation::Remainder};
                     break;
                 }
 
                 case ALEOperations_T_::MultipleOp: {
-                    found    = true;
-                    item_.Op = Operation_::Multiplication;
+                    items += MathBit{{}, offset, 1, Operation::Multiplication};
                     break;
                 }
 
                 case ALEOperations_T_::DivideOp: {
-                    found    = true;
-                    item_.Op = Operation_::Division;
+                    items += MathBit{{}, offset, 1, Operation::Division};
                     break;
                 }
 
                 case ALEOperations_T_::AddOp: {
-                    found    = true;
-                    item_.Op = Operation_::Addition;
+                    if (isItOP(content, offset)) {
+                        items += MathBit{{}, offset, 1, Operation::Addition};
+                    }
+
                     break;
                 }
 
                 case ALEOperations_T_::SubtractOp: {
-                    found    = true;
-                    item_.Op = Operation_::Subtraction;
+                    if (isItOP(content, offset)) {
+                        items += MathBit{{}, offset, 1, Operation::Subtraction};
+                    }
+
                     break;
                 }
 
                 case ALEOperations_T_::EqualOp: { // ==
+                    const SizeT current_offset = offset;
                     ++offset;
 
                     if (content[offset] == ALEOperations_T_::EqualOp) {
-                        found        = true;
-                        item_.Op     = Operation_::Equal;
-                        item_.Length = 2;
+                        items +=
+                            MathBit{{}, current_offset, 2, Operation::Equal};
+                        break;
                     }
 
-                    break;
+                    return false;
                 }
 
                 case ALEOperations_T_::NotOp: { // !=
+                    const SizeT current_offset = offset;
                     ++offset;
 
                     if (content[offset] == ALEOperations_T_::EqualOp) {
-                        found        = true;
-                        item_.Op     = Operation_::NotEqual;
-                        item_.Length = 2;
+                        items +=
+                            MathBit{{}, current_offset, 2, Operation::NotEqual};
+                        break;
                     }
 
-                    break;
+                    return false;
                 }
 
                 case ALEOperations_T_::LessOp: { // < or <=
-                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
-                        found        = true;
-                        item_.Op     = Operation_::LessOrEqual;
-                        item_.Length = 2;
-                        ++offset;
+                    SizeT current_offset = offset;
+                    ++current_offset;
+
+                    if (content[current_offset] == ALEOperations_T_::EqualOp) {
+                        items += MathBit{{}, offset, 2, Operation::LessOrEqual};
+                        offset = current_offset;
                     } else {
-                        found    = true;
-                        item_.Op = Operation_::Less;
+                        items += MathBit{{}, offset, 1, Operation::Less};
                     }
 
                     break;
                 }
 
                 case ALEOperations_T_::BiggerOp: { // > or >=
-                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
-                        found        = true;
-                        item_.Op     = Operation_::BiggerOrEqual;
-                        item_.Length = 2;
-                        ++offset;
+                    SizeT current_offset = offset;
+                    ++current_offset;
+
+                    if (content[current_offset] == ALEOperations_T_::EqualOp) {
+                        items +=
+                            MathBit{{}, offset, 2, Operation::BiggerOrEqual};
+                        offset = current_offset;
                     } else {
-                        found    = true;
-                        item_.Op = Operation_::Bigger;
+                        items += MathBit{{}, offset, 1, Operation::Bigger};
                     }
 
                     break;
                 }
 
                 case ALEOperations_T_::AndOp: { // &&
+                    const SizeT current_offset = offset;
                     ++offset;
 
                     if (content[offset] == ALEOperations_T_::AndOp) {
-                        found        = true;
-                        item_.Op     = Operation_::And;
-                        item_.Length = 2;
+                        items += MathBit{{}, current_offset, 2, Operation::And};
+                        break;
                     }
 
-                    break;
+                    return false;
                 }
 
                 case ALEOperations_T_::OrOp: { // ||
+                    const SizeT current_offset = offset;
                     ++offset;
 
                     if (content[offset] == ALEOperations_T_::OrOp) {
-                        found        = true;
-                        item_.Op     = Operation_::Or;
-                        item_.Length = 2;
+                        items += MathBit{{}, current_offset, 2, Operation::Or};
+                        break;
                     }
-                }
 
-                default: {
+                    return false;
                 }
             }
 
             ++offset;
-
-            if (found && (offset < end_before)) {
-                return offset;
-            }
         }
 
-        return 0; // No match
+        return true;
     }
 
-    SizeT FindT(const Char_T_ *content, SizeT offset,
-                SizeT end_before) const noexcept {
-        if (item_.Op == Operation_::Parentheses) {
-            return Engine::FindOne(ALEOperations_T_::Parenthes2Op, content,
-                                   offset, end_before);
-        }
+    template <typename Char_T_>
+    static bool isItOP(const Char_T_ *content, SizeT offset) noexcept {
+        using ALEOperations_T_ = ALEOperations<Char_T_>;
 
-        return Engine::FindOne(ALEOperations_T_::Bracket2Op, content, offset,
-                               end_before);
-    }
+        while (offset != 0) {
+            --offset;
+            const Char_T_ c = content[offset];
 
-    void Found(const Char_T_ *content, SizeT offset, SizeT end_before,
-               SizeT start_offset, const SizeT &current_offset) {
-        item_.Offset = (start_offset - item_.Length);
-
-        switch (item_.Op) {
-            case Operation_::Brackets: {
-                item_.Length = ((current_offset + 1) - start_offset);
-                break;
-            }
-
-            case Operation_::Parentheses: {
-                // Set the length and drop )
-                item_.Length = (current_offset - (start_offset + 1));
-
-                // Drop (
-                ++item_.Offset;
-
-                break;
-            }
-
-            case Operation_::Addition:
-            case Operation_::Subtraction: {
-                /*
-                 * If there is a number before - + or ) or } then add it as
-                 * an operation not a sign.
-                 */
-                --start_offset; // Going back to the sign.
-
-                if (start_offset != offset) {
-                    do {
-                        --start_offset;
-                        const Char_T_ tmp_c = content[start_offset];
-
-                        if (tmp_c != ALEOperations_T_::SpaceChar) {
-                            switch (tmp_c) {
-                                case ALEOperations_T_::Parenthes2Op:
-                                case ALEOperations_T_::Bracket2Op: {
-                                    (*items_) +=
-                                        static_cast<ALEItem_T_ &&>(item_);
-                                    return;
-                                }
-
-                                default: {
-                                    if ((tmp_c < ALEOperations_T_::ColonChar) &&
-                                        (tmp_c > ALEOperations_T_::SlashChar)) {
-                                        (*items_) +=
-                                            static_cast<ALEItem_T_ &&>(item_);
-                                    }
-                                }
-                            }
-
-                            break;
-                        }
-                    } while (start_offset != 0);
-                } else if (items_->IsNotEmpty()) {
-                    // An OP.
+            switch (c) {
+                case ALEOperations_T_::SpaceChar: {
                     break;
                 }
 
-                return;
-            }
+                case ALEOperations_T_::EndParenthesOp:
+                case ALEOperations_T_::EndBracketOp: {
+                    return true;
+                }
 
-            default: {
+                default: {
+                    // Number
+                    return ((c < ALEOperations_T_::ColonChar) &&
+                            (c > ALEOperations_T_::SlashChar));
+                }
             }
         }
 
-        (*items_) += static_cast<ALEItem_T_ &&>(item_);
-        (void)end_before;
+        return false;
     }
 
-    void Failed() const noexcept {
-        items_->Reset();
-    }
-
-    static void sortOperations(Array<ALEItem_T_> &items, const Char_T_ *content,
+    template <typename Char_T_>
+    static void sortOperations(Array<MathBit> &items, const Char_T_ *content,
                                SizeT offset, SizeT length) {
         // Determine the highest operation.
-        Operation_ highest = Operation_::Parentheses;
+        Operation highest = Operation::Parentheses;
 
-        const ALEItem_T_ *item = items.First();
-        const ALEItem_T_ *end  = items.End();
+        const MathBit *item = items.First();
+        const MathBit *end  = items.End();
 
         while (item != end) {
             if (item->Op > highest) {
                 highest = item->Op;
 
-                if ((highest == Operation_::And) ||
-                    (highest == Operation_::Or)) {
+                if ((highest == Operation::And) || (highest == Operation::Or)) {
                     break;
                 }
             }
@@ -457,11 +390,11 @@ class ALE_T_ {
         }
 
         // If it is just (...)
-        if (highest < Operation_::Exponent) {
+        if (highest < Operation::Exponent) {
             if (items.Size() == 1) {
-                ALEItem_T_ *item2 = items.First();
+                MathBit *item2 = items.First();
 
-                if (item2->Op == Operation_::Parentheses) {
+                if (item2->Op == Operation::Parentheses) {
                     const SizeT len = (item2->Length + 2U);
 
                     if (length != len) {
@@ -502,32 +435,32 @@ class ALE_T_ {
          */
 
         switch (highest) {
-            case Operation_::Remainder: {
-                highest = Operation_::Exponent;
+            case Operation::Remainder: {
+                highest = Operation::Exponent;
                 break;
             }
 
-            case Operation_::Division: {
-                highest = Operation_::Multiplication;
+            case Operation::Division: {
+                highest = Operation::Multiplication;
                 break;
             }
 
-            case Operation_::Subtraction: {
-                highest = Operation_::Addition;
+            case Operation::Subtraction: {
+                highest = Operation::Addition;
                 break;
             }
 
-            case Operation_::NotEqual:
-            case Operation_::Less:
-            case Operation_::LessOrEqual:
-            case Operation_::Bigger:
-            case Operation_::BiggerOrEqual: {
-                highest = Operation_::Equal;
+            case Operation::NotEqual:
+            case Operation::Less:
+            case Operation::LessOrEqual:
+            case Operation::Bigger:
+            case Operation::BiggerOrEqual: {
+                highest = Operation::Equal;
                 break;
             }
 
-            case Operation_::Or: {
-                highest = Operation_::And;
+            case Operation::Or: {
+                highest = Operation::And;
                 break;
             }
 
@@ -537,9 +470,9 @@ class ALE_T_ {
 
         SizeT       id      = 0;
         const SizeT size    = items.Size();
-        ALEItem_T_ *match   = (items.First() - 1);
-        ALEItem_T_ *n_match = items.First();
-        ALEItem_T_  n_item;
+        MathBit *   match   = (items.First() - 1);
+        MathBit *   n_match = items.First();
+        MathBit     n_item;
         const SizeT endOffset = (offset + length);
 
         for (SizeT i = 0; i <= size; i++) {
@@ -547,17 +480,22 @@ class ALE_T_ {
                 ++match;
 
                 if (match->Op < highest) {
-                    n_item.SubItems += static_cast<ALEItem_T_ &&>(*match);
+                    n_item.SubItems += static_cast<MathBit &&>(*match);
                     continue;
                 }
 
-                n_item.Length = (match->Offset - offset);
                 n_item.Offset = offset;
+                n_item.Length = (match->Offset - offset);
                 n_item.Op     = match->Op;
                 offset += (n_item.Length + match->Length);
             } else {
                 n_item.Offset = offset;
                 n_item.Length = (endOffset - offset);
+            }
+
+            if (n_item.Length == 0) {
+                items.Reset();
+                return;
             }
 
             StringUtils::SoftTrim(content, n_item.Offset, n_item.Length);
@@ -568,11 +506,11 @@ class ALE_T_ {
             }
 
             if (id < size) {
-                (*n_match) = static_cast<ALEItem_T_ &&>(n_item);
+                (*n_match) = static_cast<MathBit &&>(n_item);
                 ++n_match;
                 ++id;
             } else {
-                items += static_cast<ALEItem_T_ &&>(n_item);
+                items += static_cast<MathBit &&>(n_item);
             }
         }
 
@@ -581,29 +519,32 @@ class ALE_T_ {
         }
     }
 
+    template <typename Char_T_, typename Helper_T_>
     static bool process(double &left_number, const Char_T_ *content,
-                        SizeT offset, SizeT length,
-                        const Array<ALEItem_T_> &items,
-                        const Helper_T_ *        callback) {
+                        SizeT offset, SizeT length, const Array<MathBit> &items,
+                        const Helper_T_ *callback) {
+        using ALEOperations_T_ = ALEOperations<Char_T_>;
+
         if (items.IsEmpty()) {
             return Digit<Char_T_>::StringToNumber(left_number,
                                                   (content + offset), length);
         }
 
-        const ALEItem_T_ *item  = items.First();
-        const ALEItem_T_ *item2 = (item + 1);
-        Operation_        op    = item->Op;
+        const MathBit *item = items.First();
+        // Every Op. is splitied into two (left and tight).
+        const MathBit *item2 = (item + 1);
+        Operation      op    = item->Op;
 
         switch (op) {
-            case Operation_::Equal:
-            case Operation_::NotEqual: {
+            case Operation::Equal:
+            case Operation::NotEqual: {
                 bool is_equal;
 
                 const Char_T_ *l_item = (content + item->Offset);
                 const Char_T_ *r_item = (content + item2->Offset);
 
-                if ((*l_item == ALEOperations_T_::BracketOp) ||
-                    (*r_item == ALEOperations_T_::BracketOp)) {
+                if ((*l_item == ALEOperations_T_::StartBracketOp) ||
+                    (*r_item == ALEOperations_T_::StartBracketOp)) {
                     if (!(callback->ALEIsEqual(is_equal, l_item, item->Length,
                                                r_item, item2->Length))) {
                         return false;
@@ -617,7 +558,7 @@ class ALE_T_ {
                          StringUtils::IsEqual(l_item, r_item, item2->Length));
                 }
 
-                if (op == Operation_::NotEqual) {
+                if (op == Operation::NotEqual) {
                     is_equal = !is_equal;
                 }
 
@@ -625,7 +566,7 @@ class ALE_T_ {
                 return true;
             }
 
-            case Operation_::Brackets: {
+            case Operation::Brackets: {
                 return (callback->ALESetNumber(
                     left_number, (content + item->Offset), item->Length));
             }
@@ -638,7 +579,7 @@ class ALE_T_ {
             }
         }
 
-        const ALEItem_T_ *end = items.End();
+        const MathBit *end = items.End();
 
         while (item2 != end) {
             double right_number;
@@ -648,7 +589,7 @@ class ALE_T_ {
             }
 
             switch (op) {
-                case Operation_::Exponent: { // ^
+                case Operation::Exponent: { // ^
                     if (right_number != 0.0) {
                         // NOTE: Needs more work.
                         const bool neg = (right_number < 0);
@@ -684,19 +625,19 @@ class ALE_T_ {
                     break;
                 }
 
-                case Operation_::Remainder: { // %
+                case Operation::Remainder: { // %
                     left_number =
                         static_cast<double>(static_cast<ULong>(left_number) %
                                             static_cast<ULong>(right_number));
                     break;
                 }
 
-                case Operation_::Multiplication: { // *
+                case Operation::Multiplication: { // *
                     left_number *= right_number;
                     break;
                 }
 
-                case Operation_::Division: { // /
+                case Operation::Division: { // /
                     if (right_number == 0.0) {
                         return false;
                     }
@@ -705,53 +646,53 @@ class ALE_T_ {
                     break;
                 }
 
-                case Operation_::Addition: { // +
+                case Operation::Addition: { // +
                     left_number += right_number;
                     break;
                 }
 
-                case Operation_::Subtraction: { // -
+                case Operation::Subtraction: { // -
                     left_number -= right_number;
                     break;
                 }
 
-                case Operation_::Equal: { // ==
+                case Operation::Equal: { // ==
                     left_number = (left_number == right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::NotEqual: { // !=
+                case Operation::NotEqual: { // !=
                     left_number = (left_number != right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::Less: { // <
+                case Operation::Less: { // <
                     left_number = (left_number < right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::LessOrEqual: { // <=
+                case Operation::LessOrEqual: { // <=
                     left_number = (left_number <= right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::Bigger: { // >
+                case Operation::Bigger: { // >
                     left_number = (left_number > right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::BiggerOrEqual: { // >=
+                case Operation::BiggerOrEqual: { // >=
                     left_number = (left_number >= right_number) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::And: { // &&
+                case Operation::And: { // &&
                     left_number =
                         ((left_number > 0) && (right_number > 0)) ? 1 : 0;
                     break;
                 }
 
-                case Operation_::Or: { // ||
+                case Operation::Or: { // ||
                     left_number =
                         ((left_number > 0) || (right_number > 0)) ? 1 : 0;
                     break;
@@ -768,10 +709,6 @@ class ALE_T_ {
 
         return true;
     }
-
-    Array<ALEItem_T_> *items_;
-    const Helper_T_ *  callback_;
-    ALEItem_T_         item_;
 };
 
 } // namespace Qentem
