@@ -2133,7 +2133,7 @@ static int TestRender2() {
     content = R"(<loop value="loop1_val">loop1_val[0 </loop>)";
     SHOULD_EQUAL_VALUE(
         Template::Render(content, &value),
-        R"(loop1_val[0 loop1_val[0 loop1_val[0 loop1_val[0 loop1_val[0 )",
+        R"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
         "Render()");
 
     value.Reset();
