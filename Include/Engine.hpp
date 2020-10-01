@@ -49,11 +49,12 @@ class Engine {
                              Number_T_ offset, Number_T_ end_before) noexcept {
         // TODO: Add 16 and 32-bit char
         if (offset < end_before) {
+            content += offset;
             const QMM_VAR_ m_pattern = QMM_SETONE_8_(one_char);
 
             do {
-                const QMM_VAR_ m_content = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
+                const QMM_VAR_ m_content =
+                    QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content));
 
                 const QMM_Number_T bits =
                     QMM_COMPARE_8_MASK_(m_pattern, m_content);
@@ -69,6 +70,7 @@ class Engine {
                 }
 
                 offset += QMM_SIZE_;
+                content += QMM_SIZE_;
             } while (offset < end_before);
         }
 
@@ -87,24 +89,27 @@ class Engine {
         }
 
         if (offset < end_before) {
+            content += offset;
+
             const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(*pattern);
             const SizeT    len_less_one    = (pattern_length - 1);
             const QMM_VAR_ m_pattern_last =
                 QMM_SETONE_8_(pattern[len_less_one]);
 
             do {
-                QMM_VAR_ m_content = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + offset));
+                QMM_VAR_ m_content =
+                    QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content));
                 QMM_Number_T bits =
                     QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
 
-                m_content = QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(
-                    content + offset + len_less_one));
+                m_content = QMM_LOAD_(
+                    reinterpret_cast<const QMM_VAR_ *>(content + len_less_one));
                 bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
 
                 while (bits != 0) {
-                    const Number_T_ index = (Platform::CTZ(bits) + offset);
-                    const Number_T_ pattern_index = (index + pattern_length);
+                    const Number_T_ index = Platform::CTZ(bits);
+                    const Number_T_ pattern_index =
+                        (index + offset + pattern_length);
 
                     if (pattern_index > end_before) {
                         return 0;
@@ -120,6 +125,7 @@ class Engine {
                 }
 
                 offset += QMM_SIZE_;
+                content += QMM_SIZE_;
             } while (offset < end_before);
         }
 
@@ -309,37 +315,20 @@ class Engine {
                                        Number_T_ max_end_before) noexcept {
         Number_T_ last_offset = end_before;
 
-        while (end_before < max_end_before) {
-            UInt times = 0;
+        while (true) {
+            offset = Find(start, start_length, content, offset, end_before);
 
-            do {
-                offset = Find(start, start_length, content, offset, end_before);
+            if (offset != 0) {
+                end_before =
+                    Find(end, end_length, content, end_before, max_end_before);
 
-                if (offset == 0) {
-                    break;
+                if (end_before != 0) {
+                    last_offset = end_before;
+                    continue;
                 }
-
-                ++times;
-            } while (true);
-
-            if (times == 0) {
-                return end_before;
             }
 
-            offset = end_before;
-            // TODO: Use FindAll
-
-            do {
-                end_before =
-                    Find(end, end_length, content, last_offset, max_end_before);
-
-                if (end_before == 0) {
-                    return last_offset;
-                }
-
-                last_offset = end_before;
-                --times;
-            } while (times != 0);
+            break;
         }
 
         return last_offset;
