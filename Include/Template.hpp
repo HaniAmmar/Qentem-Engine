@@ -38,8 +38,6 @@ namespace Qentem {
 
 template <typename Char_T_, typename Value_T_>
 class Template_T_ {
-    using TemplatePatterns_T_ = TemplatePatterns<Char_T_>;
-
   public:
     Template_T_() = delete;
 
@@ -59,11 +57,10 @@ class Template_T_ {
 
     struct Tag_T_;
     struct LoopData_T_;
+    friend class Qentem::ALE;
 
+    using TemplatePatterns_T_ = TemplatePatterns<Char_T_>;
     using Tags_T_ = FixedArray<Tag_T_, QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_>;
-
-    template <typename, typename>
-    friend class Qentem::ALE_T_;
 
     QENTEM_NOINLINE void process(const Char_T_ *content, SizeT length) const {
         Tags_T_ tags;
@@ -175,22 +172,17 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::MathPrefixLength) {
-                                    SizeT end_offset = Engine::FindOne(
-                                        TemplatePatterns_T_::GetInLineSuffix()
-                                            [0],
-                                        content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        end_offset = Engine::SkipInnerPatterns(
+                                    SizeT end_offset =
+                                        Engine::SkipInnerPatterns(
                                             TemplatePatterns_T_::
                                                 GetVariablePrefix(),
                                             TemplatePatterns_T_::
                                                 VariablePrefixLength,
                                             TemplatePatterns_T_::
                                                 GetInLineSuffix(),
-                                            1, content, current_offset,
-                                            end_offset, length);
+                                            1, content, current_offset, length);
 
+                                    if (end_offset != 0) {
                                         tags += Tag_T_{
                                             nullptr, offset, current_offset,
                                             end_offset, TagType_::Math};
@@ -227,22 +219,17 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::InLineIfPrefixLength) {
-                                    SizeT end_offset = Engine::FindOne(
-                                        TemplatePatterns_T_::GetInLineSuffix()
-                                            [0],
-                                        content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        end_offset = Engine::SkipInnerPatterns(
+                                    SizeT end_offset =
+                                        Engine::SkipInnerPatterns(
                                             TemplatePatterns_T_::
                                                 GetVariablePrefix(),
                                             TemplatePatterns_T_::
                                                 VariablePrefixLength,
                                             TemplatePatterns_T_::
                                                 GetInLineSuffix(),
-                                            1, content, current_offset,
-                                            end_offset, length);
+                                            1, content, current_offset, length);
 
+                                    if (end_offset != 0) {
                                         tags += Tag_T_{
                                             nullptr, offset, current_offset,
                                             end_offset, TagType_::InLineIf};
@@ -286,13 +273,8 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::LoopPrefixLength) {
-                                    SizeT end_offset = Engine::Find(
-                                        TemplatePatterns_T_::GetLoopSuffix(),
-                                        TemplatePatterns_T_::LoopSuffixLength,
-                                        content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        end_offset = Engine::SkipInnerPatterns(
+                                    SizeT end_offset =
+                                        Engine::SkipInnerPatterns(
                                             TemplatePatterns_T_::
                                                 GetLoopPrefix(),
                                             TemplatePatterns_T_::
@@ -301,9 +283,9 @@ class Template_T_ {
                                                 GetLoopSuffix(),
                                             TemplatePatterns_T_::
                                                 LoopSuffixLength,
-                                            content, current_offset, end_offset,
-                                            length);
+                                            content, current_offset, length);
 
+                                    if (end_offset != 0) {
                                         tags +=
                                             Tag_T_{HAllocator::AllocateInit<
                                                        LoopData_T_>(),
@@ -341,20 +323,15 @@ class Template_T_ {
 
                                 if (tmp_offset ==
                                     TemplatePatterns_T_::IfPrefixLength) {
-                                    SizeT end_offset = Engine::Find(
-                                        TemplatePatterns_T_::GetIfSuffix(),
-                                        TemplatePatterns_T_::IfSuffixLength,
-                                        content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        end_offset = Engine::SkipInnerPatterns(
+                                    SizeT end_offset =
+                                        Engine::SkipInnerPatterns(
                                             TemplatePatterns_T_::GetIfPrefix(),
                                             TemplatePatterns_T_::IfPrefixLength,
                                             TemplatePatterns_T_::GetIfSuffix(),
                                             TemplatePatterns_T_::IfSuffixLength,
-                                            content, current_offset, end_offset,
-                                            length);
+                                            content, current_offset, length);
 
+                                    if (end_offset != 0) {
                                         tags += Tag_T_{
                                             nullptr, offset, current_offset,
                                             end_offset, TagType_::If};
