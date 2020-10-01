@@ -195,109 +195,6 @@ class Engine {
 #endif
 
     /*
-     * finds the head and the tail of a match and search aging inside the match
-     * to see if it's Nested by itself or a custom expression.
-     */
-    template <typename Char_T_, typename Number_T_, typename Class_T_>
-    static Number_T_ FindNest(const Char_T_ *content, Number_T_ offset,
-                              Number_T_ end_before, Number_T_ max_end_before,
-                              Class_T_ *caller) {
-        Number_T_ current_offset = offset;
-
-        while (current_offset < end_before) {
-            /*
-             * Number_T_ FindH(const Class_T_ *content, Number_T_ offset,
-             * Number_T_ end_before)
-             *
-             * For finding the head
-             */
-            current_offset = caller->FindH(content, current_offset, end_before);
-
-            if (current_offset == 0) {
-                // The head hasn't been found
-                break;
-            }
-
-            // Save the current offset for Found().
-            const Number_T_ start_offset = current_offset;
-            // Makes sub-matching easy.
-            Number_T_ sub_offset = current_offset;
-
-            /*
-             * bool HasTail();
-             *
-             * This is invoked to check if the match has a second part/tail.
-             * Like head: { and the tail is } or () or "" or < > ...etc.
-             */
-            if (caller->HasTail()) {
-                do {
-                    /*
-                     * Number_T_ FindT(const Class_T_ *content, Number_T_
-                     * offset, Number_T_ end_before)
-                     *
-                     * For finding the tail
-                     */
-                    current_offset =
-                        caller->FindT(content, current_offset, max_end_before);
-
-                    if (current_offset == 0) {
-                        /*
-                         * void Failed()
-                         *
-                         * If the head of the match is found but not the tail,
-                         * this function will be invoked.
-                         */
-                        caller->Failed();
-                        return sub_offset;
-                    }
-
-                    /*
-                     * Number_T_ Nest(const Class_T_ *content, Number_T_ offset,
-                     * Number_T_ end_before, Number_T_ max_end_before)
-                     *
-                     * This function is invoked everytime a match found, and
-                     * should look like the first line that started the search.
-                     * with the exception of setting different values; like
-                     * passing a sub-container.
-                     */
-                    sub_offset = caller->Nest(content, sub_offset,
-                                              current_offset, max_end_before);
-
-                    if (current_offset > sub_offset) {
-                        /*
-                         * No sub-matches or none of them breaking this match,
-                         * So stop and call this a match.
-                         */
-                        break;
-                    }
-
-                    /*
-                     * If nest() returns a bigger offset than current_offset,
-                     * then this match is not complete. Adjust the offset and
-                     * keep looking.
-                     */
-                    current_offset = sub_offset;
-                } while (current_offset != max_end_before);
-            }
-
-            /*
-             * void Found(const Class_T_ *content, Number_T_ offset, Number_T_
-             *            end_before, Number_T_ start_offset, Number_T_
-             * &current_offset)
-             *
-             * Once a full match is found (head & tail), the function will be
-             * invoked. "current_offset" is referenced: it can be adjusted to
-             * set the starting offset of the next search.
-             */
-            caller->Found(content, offset, end_before, start_offset,
-                          current_offset);
-        }
-
-        // Return the location of the last match.
-        return current_offset;
-    }
-
-    /*
      * If a search is about { ... }, and nest itself like:
      * {.{..{...}..}.}; then this function can be invoked from nest() to skip
      * inner brackets:
@@ -311,27 +208,48 @@ class Engine {
     static Number_T_ SkipInnerPatterns(const Char_T_ *start, SizeT start_length,
                                        const Char_T_ *end, SizeT end_length,
                                        const Char_T_ *content, Number_T_ offset,
-                                       Number_T_ end_before,
                                        Number_T_ max_end_before) noexcept {
-        Number_T_ last_offset = end_before;
+        Number_T_ end_before = offset;
 
-        while (true) {
-            offset = Find(start, start_length, content, offset, end_before);
+        do {
+            end_before =
+                Find(end, end_length, content, end_before, max_end_before);
 
-            if (offset != 0) {
-                end_before =
-                    Find(end, end_length, content, end_before, max_end_before);
+            if (end_before != 0) {
+                offset = Find(start, start_length, content, offset, end_before);
 
-                if (end_before != 0) {
-                    last_offset = end_before;
+                if (offset != 0) {
                     continue;
                 }
             }
 
             break;
-        }
+        } while (true);
 
-        return last_offset;
+        return end_before;
+    }
+
+    template <typename Char_T_, typename Number_T_>
+    static Number_T_ SkipInnerPatterns(const Char_T_ start, const Char_T_ end,
+                                       const Char_T_ *content, Number_T_ offset,
+                                       Number_T_ max_end_before) noexcept {
+        Number_T_ end_before = offset;
+
+        do {
+            end_before = FindOne(end, content, end_before, max_end_before);
+
+            if (end_before != 0) {
+                offset = FindOne(start, content, offset, end_before);
+
+                if (offset != 0) {
+                    continue;
+                }
+            }
+
+            break;
+        } while (true);
+
+        return end_before;
     }
 };
 
