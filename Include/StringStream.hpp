@@ -235,6 +235,10 @@ class StringStream {
         return capacity_;
     }
 
+    inline bool IsEmpty() const noexcept {
+        return (length_ == 0);
+    }
+
     Char_T_ *Eject() noexcept {
         Char_T_ *str = storage_;
         storage_     = nullptr;
