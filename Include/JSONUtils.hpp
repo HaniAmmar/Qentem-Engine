@@ -214,15 +214,9 @@ static void EscapeJSON(const Char_T_ *content, SizeT length,
                         buffer.Insert(JSONotation_T_::GetEscapedTab(), 2);
                         break;
                     }
-
-                    default: {
-                    }
                 }
 
                 break;
-            }
-
-            default: {
             }
         }
 

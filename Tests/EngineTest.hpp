@@ -742,73 +742,72 @@ static int TestEngine4() {
 }
 
 static int TestEngine5() {
-    SizeT       ret1;
-    SizeT       ret2;
+    SizeT       ret;
     SizeT       content_len = 12U;
     const char *content     = "{{{{{{}}}}}}";
 
-    ret1 = Engine::Find("}", 1U, content, 0U, content_len);
-    SHOULD_EQUAL_VALUE(ret1, 7U, "return1");
+    SHOULD_EQUAL_VALUE(Engine::Find("}", 1U, content, 0U, content_len), 7U,
+                       "return1");
 
     /*
      * The offset has to start after the head (one), because zero is the match
      * that is being searched for its tail.
      */
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 12U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 12U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 0U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 0U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 0U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 0U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("x", 1U, "y", 1U, content, 1U, 7U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 7U, "return2");
+    ret = Engine::SkipInnerPatterns("x", 1U, "y", 1U, content, 1U, 7U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 7U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 5U, 6U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 7U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 5U, 6U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 7U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 4U, 6U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 8U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 4U, 6U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 8U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 3U, 6U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 9U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 3U, 6U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 9U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 3U, 7U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 10U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 3U, 7U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 10U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 7U);
-    SHOULD_EQUAL_VALUE(ret2, 7U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 7U);
+    SHOULD_EQUAL_VALUE(ret, 7U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 8U);
-    SHOULD_EQUAL_VALUE(ret2, 8U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 8U);
+    SHOULD_EQUAL_VALUE(ret, 8U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 9U);
-    SHOULD_EQUAL_VALUE(ret2, 9U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 9U);
+    SHOULD_EQUAL_VALUE(ret, 9U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 10U);
-    SHOULD_EQUAL_VALUE(ret2, 10U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 10U);
+    SHOULD_EQUAL_VALUE(ret, 10U, "return2");
 
-    ret2 = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 12U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 12U, "return2");
+    ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 12U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 12U, "return2");
 
     content     = "{}";
     content_len = 2U;
-    ret2        = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 0U, 2U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 2U, "return2");
+    ret         = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 0U, 2U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 2U, "return2");
 
     content     = "{   }";
     content_len = 5U;
-    ret2        = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 5U,
-                                     content_len);
-    SHOULD_EQUAL_VALUE(ret2, 5U, "return2");
+    ret         = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 5U,
+                                    content_len);
+    SHOULD_EQUAL_VALUE(ret, 5U, "return2");
 
     END_SUB_TEST;
 }

@@ -66,32 +66,13 @@ class ALE {
     ALE &operator=(const ALE &) = delete;
     ~ALE()                      = delete;
 
-    struct Item_;
+    struct ALEItem_T_;
 
     template <typename Char_T_, typename Helper_T_>
     static bool Evaluate(double &number, const Char_T_ *content, SizeT length,
                          const Helper_T_ *callback) {
-        number = 0;
-
-        if ((content != nullptr) && (length != 0)) {
-            Array<Item_>               items;
-            ALE_T_<Char_T_, Helper_T_> ale{&items, callback};
-            Engine::FindNest(content, 0U, length, length, &ale);
-
-            if (items.IsNotEmpty()) {
-                ALE_T_<Char_T_, Helper_T_>::sortOperations(items, content, 0,
-                                                           length);
-                return ALE_T_<Char_T_, Helper_T_>::process(
-                    number, items, content, 0, length, callback);
-            }
-
-            SizeT offset = 0;
-            StringUtils::SoftTrim(content, offset, length);
-            return Digit<Char_T_>::StringToNumber(number, (content + offset),
-                                                  length);
-        }
-
-        return false;
+        return ALE_T_<Char_T_, Helper_T_>::Process(number, content, length,
+                                                   callback);
     }
 
     template <typename Char_T_, typename Helper_T_>
@@ -143,9 +124,25 @@ class ALE {
         ALEHelper<Char_T_> helper;
         return Evaluate(content, &helper);
     }
+};
+
+template <typename Char_T_, typename Helper_T_>
+class ALE_T_ {
+    friend class ALE;
+    friend class Qentem::Engine;
+    using ALEOperations_T_ = ALEOperations<Char_T_>;
+
+  public:
+    struct ALEItem_T_;
+
+    ALE_T_() = delete;
+
+    ALE_T_(Array<ALEItem_T_> *items, const Helper_T_ *callback)
+    noexcept : items_(items), callback_(callback) {
+    }
 
     enum class Operation_ {
-        Brackets = 0U,
+        Brackets = 0,
         Parentheses,
         Exponent,
         Remainder,
@@ -163,31 +160,37 @@ class ALE {
         Or
     };
 
-    struct Item_ {
-        Array<Item_> SubItems{};
-        UInt         Offset{0};
-        UInt         Length{0};
-        Operation_   Op{Operation_::Parentheses};
+    struct ALEItem_T_ {
+        Array<ALEItem_T_> SubItems{};
+        UInt              Offset{0};
+        UInt              Length{0};
+        Operation_        Op{Operation_::Parentheses};
     };
-};
 
-template <typename Char_T_, typename Helper_T_>
-class ALE_T_ {
-    friend class ALE;
-    friend class Qentem::Engine;
+    static bool Process(double &number, const Char_T_ *content, SizeT length,
+                        const Helper_T_ *callback) {
+        if ((content != nullptr) && (length != 0)) {
+            Array<ALEItem_T_>          items;
+            ALE_T_<Char_T_, Helper_T_> ale{&items, callback};
+            Engine::FindNest(content, 0U, length, length, &ale);
 
-    using Item_            = ALE::Item_;
-    using Operation_       = ALE::Operation_;
-    using ALEOperations_T_ = ALEOperations<Char_T_>;
+            if (items.IsNotEmpty()) {
+                ALE_T_<Char_T_, Helper_T_>::sortOperations(items, content, 0,
+                                                           length);
+                return ALE_T_<Char_T_, Helper_T_>::process(
+                    number, content, 0, length, items, callback);
+            }
 
-  public:
-    ALE_T_() = delete;
+            SizeT offset = 0;
+            StringUtils::SoftTrim(content, offset, length);
+            return Digit<Char_T_>::StringToNumber(number, (content + offset),
+                                                  length);
+        }
 
-  private:
-    ALE_T_(Array<Item_> *items, const Helper_T_ *callback)
-    noexcept : items_(items), callback_(callback) {
+        return false;
     }
 
+  private:
     inline bool HasTail() const noexcept {
         return ((item_.Op == Operation_::Brackets) ||
                 (item_.Op == Operation_::Parentheses));
@@ -394,16 +397,19 @@ class ALE_T_ {
                         if (tmp_c != ALEOperations_T_::SpaceChar) {
                             switch (tmp_c) {
                                 case ALEOperations_T_::Parenthes2Op:
-                                case ALEOperations_T_::Bracket2Op:
-                                    (*items_) += static_cast<Item_ &&>(item_);
+                                case ALEOperations_T_::Bracket2Op: {
+                                    (*items_) +=
+                                        static_cast<ALEItem_T_ &&>(item_);
                                     return;
+                                }
 
-                                default:
+                                default: {
                                     if ((tmp_c < ALEOperations_T_::ColonChar) &&
                                         (tmp_c > ALEOperations_T_::SlashChar)) {
                                         (*items_) +=
-                                            static_cast<Item_ &&>(item_);
+                                            static_cast<ALEItem_T_ &&>(item_);
                                     }
+                                }
                             }
 
                             break;
@@ -421,7 +427,7 @@ class ALE_T_ {
             }
         }
 
-        (*items_) += static_cast<Item_ &&>(item_);
+        (*items_) += static_cast<ALEItem_T_ &&>(item_);
         (void)end_before;
     }
 
@@ -429,13 +435,13 @@ class ALE_T_ {
         items_->Reset();
     }
 
-    static void sortOperations(Array<Item_> &items, const Char_T_ *content,
+    static void sortOperations(Array<ALEItem_T_> &items, const Char_T_ *content,
                                SizeT offset, SizeT length) {
         // Determine the highest operation.
         Operation_ highest = Operation_::Parentheses;
 
-        const Item_ *item = items.First();
-        const Item_ *end  = items.End();
+        const ALEItem_T_ *item = items.First();
+        const ALEItem_T_ *end  = items.End();
 
         while (item != end) {
             if (item->Op > highest) {
@@ -453,7 +459,7 @@ class ALE_T_ {
         // If it is just (...)
         if (highest < Operation_::Exponent) {
             if (items.Size() == 1) {
-                Item_ *item2 = items.First();
+                ALEItem_T_ *item2 = items.First();
 
                 if (item2->Op == Operation_::Parentheses) {
                     const SizeT len = (item2->Length + 2U);
@@ -531,9 +537,9 @@ class ALE_T_ {
 
         SizeT       id      = 0;
         const SizeT size    = items.Size();
-        Item_ *     match   = (items.First() - 1);
-        Item_ *     n_match = items.First();
-        Item_       n_item;
+        ALEItem_T_ *match   = (items.First() - 1);
+        ALEItem_T_ *n_match = items.First();
+        ALEItem_T_  n_item;
         const SizeT endOffset = (offset + length);
 
         for (SizeT i = 0; i <= size; i++) {
@@ -541,7 +547,7 @@ class ALE_T_ {
                 ++match;
 
                 if (match->Op < highest) {
-                    n_item.SubItems += static_cast<Item_ &&>(*match);
+                    n_item.SubItems += static_cast<ALEItem_T_ &&>(*match);
                     continue;
                 }
 
@@ -562,11 +568,11 @@ class ALE_T_ {
             }
 
             if (id < size) {
-                (*n_match) = static_cast<Item_ &&>(n_item);
+                (*n_match) = static_cast<ALEItem_T_ &&>(n_item);
                 ++n_match;
                 ++id;
             } else {
-                items += static_cast<Item_ &&>(n_item);
+                items += static_cast<ALEItem_T_ &&>(n_item);
             }
         }
 
@@ -575,17 +581,18 @@ class ALE_T_ {
         }
     }
 
-    static bool process(double &left_number, const Array<Item_> &items,
-                        const Char_T_ *content, SizeT offset, SizeT length,
-                        const Helper_T_ *callback) {
+    static bool process(double &left_number, const Char_T_ *content,
+                        SizeT offset, SizeT length,
+                        const Array<ALEItem_T_> &items,
+                        const Helper_T_ *        callback) {
         if (items.IsEmpty()) {
             return Digit<Char_T_>::StringToNumber(left_number,
                                                   (content + offset), length);
         }
 
-        const Item_ *item  = items.First();
-        const Item_ *item2 = (item + 1);
-        Operation_   op    = item->Op;
+        const ALEItem_T_ *item  = items.First();
+        const ALEItem_T_ *item2 = (item + 1);
+        Operation_        op    = item->Op;
 
         switch (op) {
             case Operation_::Equal:
@@ -601,8 +608,8 @@ class ALE_T_ {
                                                r_item, item2->Length))) {
                         return false;
                     }
-                } else if (process(left_number, item->SubItems, content,
-                                   item->Offset, item->Length, callback)) {
+                } else if (process(left_number, content, item->Offset,
+                                   item->Length, item->SubItems, callback)) {
                     break;
                 } else {
                     is_equal =
@@ -624,19 +631,19 @@ class ALE_T_ {
             }
 
             default: {
-                if (!process(left_number, item->SubItems, content, item->Offset,
-                             item->Length, callback)) {
+                if (!process(left_number, content, item->Offset, item->Length,
+                             item->SubItems, callback)) {
                     return false;
                 }
             }
         }
 
-        const Item_ *end = items.End();
+        const ALEItem_T_ *end = items.End();
 
         while (item2 != end) {
             double right_number;
-            if (!process(right_number, item2->SubItems, content, item2->Offset,
-                         item2->Length, callback)) {
+            if (!process(right_number, content, item2->Offset, item2->Length,
+                         item2->SubItems, callback)) {
                 return false;
             }
 
@@ -762,9 +769,9 @@ class ALE_T_ {
         return true;
     }
 
-    Array<Item_> *   items_;
-    const Helper_T_ *callback_;
-    Item_            item_;
+    Array<ALEItem_T_> *items_;
+    const Helper_T_ *  callback_;
+    ALEItem_T_         item_;
 };
 
 } // namespace Qentem

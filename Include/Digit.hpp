@@ -298,7 +298,8 @@ class Digit {
 
             if (str[0] == DigitChars_T_::PlusChar) {
                 SizeT offset = 1;
-                StringUtils::SoftTrim(str, offset, --length);
+                --length;
+                StringUtils::SoftTrim(str, offset, length);
 
                 if (length != 0) {
                     return stringToUnsignedInt(number, &(str[offset]), length);
@@ -327,12 +328,12 @@ class Digit {
 
             switch (s_str[0]) {
                 case DigitChars_T_::MinusChar: {
-                    SizeT ni_offset = 1;
-                    StringUtils::SoftTrim(s_str, ni_offset, --length);
+                    SizeT offset = 1;
+                    --length;
+                    StringUtils::SoftTrim(s_str, offset, length);
 
                     if ((length != 0) &&
-                        stringToSignedInt(number, &(s_str[ni_offset]),
-                                          length)) {
+                        stringToSignedInt(number, &(s_str[offset]), length)) {
                         number *= -1;
                         return true;
                     }
@@ -342,7 +343,8 @@ class Digit {
 
                 case DigitChars_T_::PlusChar: {
                     SizeT offset = 1;
-                    StringUtils::SoftTrim(s_str, offset, --length);
+                    --length;
+                    StringUtils::SoftTrim(s_str, offset, length);
 
                     if (length != 0) {
                         return stringToSignedInt(number, &(s_str[offset]),

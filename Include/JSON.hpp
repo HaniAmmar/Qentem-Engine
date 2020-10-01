@@ -20,8 +20,7 @@
  * SOFTWARE.
  */
 
-#include "Engine.hpp"
-#include "FixedArray.hpp"
+#include "Platform.hpp"
 #include "Value.hpp"
 
 #ifndef QENTEM_JSON_H_
@@ -132,7 +131,7 @@ class JSONParser {
     // TODO: Add 16 and 32-bit character
     QENTEM_NOINLINE void SIMDFind(const Char_T_ *content, SizeT offset,
                                   SizeT length) noexcept {
-        do {
+        while ((offset < length) && (find_cache_.Bits == 0)) {
             find_cache_.Offset     = offset;
             find_cache_.NextOffset = (find_cache_.Offset + QMM_SIZE_);
             offset                 = find_cache_.NextOffset;
@@ -166,7 +165,7 @@ class JSONParser {
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(e_curly));
             find_cache_.Bits |=
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(e_square));
-        } while ((find_cache_.Bits == 0) && (find_cache_.NextOffset < length));
+        }
     }
 #endif
 
@@ -183,16 +182,23 @@ class JSONParser {
         while (offset < length) {
 #else
         do {
-            if (find_cache_.Bits != 0) {
-                SizeT index =
-                    (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+            if (find_cache_.Bits == 0) {
+                SIMDFind(content, offset, length);
 
-                if (index >= offset) {
-                    if (index >= length) {
-                        break;
-                    }
+                if (find_cache_.Bits == 0) {
+                    break;
+                }
+            }
 
-                    offset = index;
+            SizeT index =
+                (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+
+            if (index >= length) {
+                break;
+            }
+
+            if (index >= offset) {
+                offset = index;
 #endif
             switch (content[offset]) {
                 case JSONotation_T_::SCurlyChar:
@@ -342,17 +348,13 @@ class JSONParser {
             ++offset;
         }
 #else
-                }
-                // Remove the current offset.
-                find_cache_.Bits &= (find_cache_.Bits - 1);
             }
 
-            if ((find_cache_.Bits == 0) && (offset < length)) {
-                SIMDFind(content, offset, length);
-            }
-        } while (find_cache_.Bits != 0);
+            find_cache_.Bits &= (find_cache_.Bits - 1);
+        } while (true);
 #endif
 
+        offset = 0;
         value.Reset();
         return value;
     }
@@ -368,16 +370,23 @@ class JSONParser {
         while (offset < length) {
 #else
         do {
-            if (find_cache_.Bits != 0) {
-                SizeT index =
-                    (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+            if (find_cache_.Bits == 0) {
+                SIMDFind(content, offset, length);
 
-                if (index >= offset) {
-                    if (index >= length) {
-                        break;
-                    }
+                if (find_cache_.Bits == 0) {
+                    break;
+                }
+            }
 
-                    offset = index;
+            SizeT index =
+                (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+
+            if (index >= length) {
+                break;
+            }
+
+            if (index >= offset) {
+                offset = index;
 #endif
             switch (content[offset]) {
                 case JSONotation_T_::SCurlyChar:
@@ -486,17 +495,13 @@ class JSONParser {
             ++offset;
         }
 #else
-                }
-                // Remove the current offset.
-                find_cache_.Bits &= (find_cache_.Bits - 1);
             }
 
-            if ((find_cache_.Bits == 0) && (offset < length)) {
-                SIMDFind(content, offset, length);
-            }
-        } while (find_cache_.Bits != 0);
+            find_cache_.Bits &= (find_cache_.Bits - 1);
+        } while (true);
 #endif
 
+        offset = 0;
         value.Reset();
         return value;
     }
