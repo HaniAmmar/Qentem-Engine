@@ -30,23 +30,12 @@
 
 namespace Qentem {
 
-template <typename Char_T_>
-struct ALEHelper {
-    static constexpr bool ALESetNumber(double &, const Char_T_ *, SizeT) {
-        return false;
-    }
-
-    static constexpr bool ALEIsEqual(bool &, const Char_T_ *, SizeT,
-                                     const Char_T_ *, SizeT) {
-        return false;
-    }
-};
+template <typename>
+struct ALEHelper;
 
 /*
  * Arithmetic and logic evaluator
  */
-template <typename, typename>
-class ALE_T_;
 
 class ALE {
   public:
@@ -395,7 +384,7 @@ class ALE {
                 MathBit *item2 = items.First();
 
                 if (item2->Op == Operation::Parentheses) {
-                    const SizeT len = (item2->Length + 2U);
+                    const SizeT len = (item2->Length + 2);
 
                     if (length != len) {
                         // Cheking for anything extra.
@@ -468,12 +457,12 @@ class ALE {
             }
         }
 
-        SizeT       id      = 0;
-        const SizeT size    = items.Size();
-        MathBit *   match   = (items.First() - 1);
-        MathBit *   n_match = items.First();
         MathBit     n_item;
+        MathBit *   match     = (items.First() - 1);
+        MathBit *   n_match   = items.First();
+        const SizeT size      = items.Size();
         const SizeT endOffset = (offset + length);
+        SizeT       id        = 0;
 
         for (SizeT i = 0; i <= size; i++) {
             if (i < size) {
@@ -699,7 +688,6 @@ class ALE {
                 }
 
                 default: {
-                    // Should not get to here.
                 }
             }
 
@@ -708,6 +696,18 @@ class ALE {
         }
 
         return true;
+    }
+};
+
+template <typename Char_T_>
+struct ALEHelper {
+    static constexpr bool ALESetNumber(double &, const Char_T_ *, SizeT) {
+        return false;
+    }
+
+    static constexpr bool ALEIsEqual(bool &, const Char_T_ *, SizeT,
+                                     const Char_T_ *, SizeT) {
+        return false;
     }
 };
 
