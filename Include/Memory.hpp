@@ -72,14 +72,14 @@ static void SetToZero(void *ptr, SizeT size) noexcept {
 }
 
 QENTEM_NOINLINE
-static void Copy(void *to, const void *form, SizeT size) noexcept {
+static void Copy(void *to, const void *from, SizeT size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED_
     const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
     const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
 
     if (m_size != 0) {
         QMM_VAR_ *      m_to   = static_cast<QMM_VAR_ *>(to);
-        const QMM_VAR_ *m_form = static_cast<const QMM_VAR_ *>(form);
+        const QMM_VAR_ *m_form = static_cast<const QMM_VAR_ *>(from);
         const QMM_VAR_ *end    = (m_form + m_size);
 
         do {
@@ -94,11 +94,11 @@ static void Copy(void *to, const void *form, SizeT size) noexcept {
     }
 
     const SizeT start = (size - remaining);
-    const char *src   = static_cast<const char *>(form) + start;
+    const char *src   = static_cast<const char *>(from) + start;
     const char *end   = (src + remaining);
     char *      des   = static_cast<char *>(to) + start;
 #else
-    const char *src = static_cast<const char *>(form);
+    const char *src = static_cast<const char *>(from);
     const char *end = (src + size);
     char *      des = static_cast<char *>(to);
 #endif
