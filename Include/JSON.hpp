@@ -170,13 +170,13 @@ class JSONParser {
 #endif
 
     VValue parseObject(const Char_T_ *content, SizeT &offset, SizeT length) {
-        VValue   value       = VValue{ValueType::Object};
-        VObject &obj         = *(value.GetObject());
-        VValue * obj_value   = nullptr;
-        SizeT    last_offset = offset;
-        bool     pass_comma  = false;
-        bool     has_colon   = false;
-        bool     is_valid    = false;
+        VValue   value           = VValue{ValueType::Object};
+        VObject &obj             = *(value.GetObject());
+        VValue * obj_value       = nullptr;
+        SizeT    previous_offset = offset;
+        bool     pass_comma      = false;
+        bool     has_colon       = false;
+        bool     is_valid        = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
@@ -205,9 +205,10 @@ class JSONParser {
                 case JSONotation_T_::SSquareChar: {
                     const bool is_obj =
                         (content[offset] == JSONotation_T_::SCurlyChar);
-                    StringUtils::StartTrim(content, last_offset, offset);
+                    StringUtils::StartTrim(content, previous_offset, offset);
 
-                    if (!pass_comma && has_colon && (last_offset == offset)) {
+                    if (!pass_comma && has_colon &&
+                        (previous_offset == offset)) {
                         ++offset;
 
                         if (is_obj) {
@@ -216,10 +217,10 @@ class JSONParser {
                             *obj_value = parseArray(content, offset, length);
                         }
 
-                        last_offset = offset;
-                        obj_value   = nullptr;
-                        pass_comma  = true;
-                        has_colon   = false;
+                        previous_offset = offset;
+                        obj_value       = nullptr;
+                        pass_comma      = true;
+                        has_colon       = false;
 
                         if (offset != 0) {
                             continue;
@@ -232,16 +233,16 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::QuoteChar: {
-                    StringUtils::StartTrim(content, last_offset, offset);
+                    StringUtils::StartTrim(content, previous_offset, offset);
 
-                    if (!pass_comma && (last_offset == offset)) {
+                    if (!pass_comma && (previous_offset == offset)) {
                         ++offset;
                         buffer_.Clear();
                         const Char_T_ *str = (content + offset);
                         const SizeT    str_len =
                             UnEscapeJSON(str, length, buffer_);
                         offset += str_len;
-                        last_offset = offset;
+                        previous_offset = offset;
 
                         if (obj_value == nullptr) {
                             obj_value = &(obj[static_cast<VString &&>(
@@ -271,13 +272,13 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::CommaChar: {
-                    SizeT len = (offset - last_offset);
-                    StringUtils::SoftTrim(content, last_offset, len);
+                    SizeT len = (offset - previous_offset);
+                    StringUtils::SoftTrim(content, previous_offset, len);
 
                     if (pass_comma && (len == 0)) {
                         pass_comma = false;
                         ++offset;
-                        last_offset = offset;
+                        previous_offset = offset;
                         continue;
                     }
 
@@ -287,11 +288,11 @@ class JSONParser {
                     }
 
                     *obj_value = trueFalseNullNumber(is_valid, content,
-                                                     last_offset, len);
+                                                     previous_offset, len);
                     obj_value  = nullptr;
                     has_colon  = false;
                     ++offset;
-                    last_offset = offset;
+                    previous_offset = offset;
 
                     if (is_valid) {
                         continue;
@@ -303,12 +304,12 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::ColonChar: {
-                    StringUtils::StartTrim(content, last_offset, offset);
+                    StringUtils::StartTrim(content, previous_offset, offset);
 
-                    if (!has_colon && (last_offset == offset)) {
+                    if (!has_colon && (previous_offset == offset)) {
                         has_colon = true;
                         ++offset;
-                        last_offset = offset;
+                        previous_offset = offset;
 
                         if (obj_value != nullptr) {
                             continue;
@@ -321,16 +322,16 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::ECurlyChar: {
-                    const bool has_comma =
-                        (content[last_offset - 1] == JSONotation_T_::CommaChar);
+                    const bool has_comma = (content[previous_offset - 1] ==
+                                            JSONotation_T_::CommaChar);
 
-                    SizeT len = (offset - last_offset);
-                    StringUtils::SoftTrim(content, last_offset, len);
+                    SizeT len = (offset - previous_offset);
+                    StringUtils::SoftTrim(content, previous_offset, len);
 
                     if ((obj_value != nullptr) || has_comma || (len != 0)) {
                         if (obj_value != nullptr) {
-                            *obj_value = trueFalseNullNumber(is_valid, content,
-                                                             last_offset, len);
+                            *obj_value = trueFalseNullNumber(
+                                is_valid, content, previous_offset, len);
                         }
 
                         if (!is_valid || !has_colon) {
@@ -360,11 +361,11 @@ class JSONParser {
     }
 
     VValue parseArray(const Char_T_ *content, SizeT &offset, SizeT length) {
-        VValue  value       = VValue{ValueType::Array};
-        VArray &arr         = *(value.GetArray());
-        SizeT   last_offset = offset;
-        bool    pass_comma  = false;
-        bool    is_valid    = false;
+        VValue  value           = VValue{ValueType::Array};
+        VArray &arr             = *(value.GetArray());
+        SizeT   previous_offset = offset;
+        bool    pass_comma      = false;
+        bool    is_valid        = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
@@ -393,9 +394,9 @@ class JSONParser {
                 case JSONotation_T_::SSquareChar: {
                     const bool is_obj =
                         (content[offset] == JSONotation_T_::SCurlyChar);
-                    StringUtils::StartTrim(content, last_offset, offset);
+                    StringUtils::StartTrim(content, previous_offset, offset);
 
-                    if (!pass_comma && (last_offset == offset)) {
+                    if (!pass_comma && (previous_offset == offset)) {
                         ++offset;
 
                         if (is_obj) {
@@ -404,8 +405,8 @@ class JSONParser {
                             arr += parseArray(content, offset, length);
                         }
 
-                        pass_comma  = true;
-                        last_offset = offset;
+                        pass_comma      = true;
+                        previous_offset = offset;
 
                         if (offset != 0) {
                             continue;
@@ -430,8 +431,8 @@ class JSONParser {
                                 buffer_.First(), buffer_.Length())});
 
                         offset += len;
-                        last_offset = offset;
-                        pass_comma  = true;
+                        previous_offset = offset;
+                        pass_comma      = true;
 
                         if (len != 0) {
                             continue;
@@ -444,20 +445,20 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::CommaChar: {
-                    SizeT len = (offset - last_offset);
-                    StringUtils::SoftTrim(content, last_offset, len);
+                    SizeT len = (offset - previous_offset);
+                    StringUtils::SoftTrim(content, previous_offset, len);
 
                     if (pass_comma && (len == 0)) {
                         pass_comma = false;
                         ++offset;
-                        last_offset = offset;
+                        previous_offset = offset;
                         continue;
                     }
 
-                    arr += trueFalseNullNumber(is_valid, content, last_offset,
-                                               len);
+                    arr += trueFalseNullNumber(is_valid, content,
+                                               previous_offset, len);
                     ++offset;
-                    last_offset = offset;
+                    previous_offset = offset;
 
                     if (is_valid) {
                         continue;
@@ -470,15 +471,16 @@ class JSONParser {
 
                 case JSONotation_T_::ESquareChar: {
                     const bool has_comma =
-                        ((last_offset != 0) ? (content[last_offset - 1] ==
-                                               JSONotation_T_::CommaChar)
-                                            : false);
-                    SizeT len = (offset - last_offset);
-                    StringUtils::SoftTrim(content, last_offset, len);
+                        ((previous_offset != 0)
+                             ? (content[previous_offset - 1] ==
+                                JSONotation_T_::CommaChar)
+                             : false);
+                    SizeT len = (offset - previous_offset);
+                    StringUtils::SoftTrim(content, previous_offset, len);
 
                     if (has_comma || (len != 0)) {
                         arr += trueFalseNullNumber(is_valid, content,
-                                                   last_offset, len);
+                                                   previous_offset, len);
 
                         if (!is_valid || pass_comma) {
                             offset = 0;
