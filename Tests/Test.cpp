@@ -60,7 +60,7 @@ int RunTests() {
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
 
     if (failed == 0) {
-        std::cout << "\x1B[32mAll good.\x1B[0m\n";
+        std::wcout << "\x1B[32mAll good.\x1B[0m" << std::endl;
         return 0;
     }
 
