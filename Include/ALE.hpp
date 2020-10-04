@@ -147,7 +147,7 @@ class ALE {
   private:
     struct Value_T_ {
         union {
-            double number;
+            double number{0};
             UInt   str[2]; // 0 for the offset and 1 for the length.
         };
     };
