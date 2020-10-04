@@ -3111,10 +3111,15 @@ static int TestALE13() {
     is_valid = ALE::Evaluate(number, content);
     SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
 
-    number = ALE::Evaluate(content);
+    content = "a";
+    number  = ALE::Evaluate(content);
     SHOULD_EQUAL_VALUE(number, 0, "number");
 
     aleHelper ale;
+
+    content = "a";
+    number  = ALE::Evaluate(content, &ale);
+    SHOULD_EQUAL_VALUE(number, 0, "number");
 
     content = "{A}+10";
     number  = ALE::Evaluate(content, &ale);
