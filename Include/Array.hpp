@@ -253,6 +253,22 @@ class Array {
         index_ = capacity_;
     }
 
+    inline Type_ *First() const noexcept {
+        return storage_;
+    }
+
+    inline const Type_ *Last() const noexcept {
+        if (index_ != 0) {
+            return (storage_ + (index_ - 1));
+        }
+
+        return nullptr;
+    }
+
+    inline const Type_ *End() const noexcept {
+        return (storage_ + index_);
+    }
+
     inline SizeT Size() const noexcept {
         return index_;
     }
@@ -267,26 +283,6 @@ class Array {
 
     inline bool IsNotEmpty() const noexcept {
         return (index_ != 0);
-    }
-
-    inline Type_ *First() const noexcept {
-        return storage_;
-    }
-
-    inline const Type_ *Last() const noexcept {
-        if (index_ != 0) {
-            return (storage_ + (index_ - 1));
-        }
-
-        return nullptr;
-    }
-
-    inline const Type_ *End() const noexcept {
-        if (storage_ != nullptr) {
-            return (storage_ + index_);
-        }
-
-        return nullptr;
     }
 
     //////////// Private ////////////
