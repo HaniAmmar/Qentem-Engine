@@ -37,7 +37,7 @@
 namespace Qentem {
 namespace Memory {
 
-static void SetToZero(void *ptr, SizeT size) noexcept {
+inline static void SetToZero(void *ptr, SizeT size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED_
     const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
     const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
@@ -70,7 +70,7 @@ static void SetToZero(void *ptr, SizeT size) noexcept {
     }
 }
 
-static void Copy(void *to, const void *from, SizeT size) noexcept {
+inline static void Copy(void *to, const void *from, SizeT size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED_
     const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
     const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
