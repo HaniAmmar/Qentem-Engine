@@ -21,7 +21,6 @@
  */
 
 #include "ALEOperations.hpp"
-#include "Array.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
 
@@ -30,12 +29,15 @@
 
 namespace Qentem {
 
-template <typename>
-struct ALEHelper;
-
 /*
  * Arithmetic and logic evaluator
+ *
+ * Time complexity:  O(n)
+ * Space complexity: O(1)
  */
+
+template <typename>
+struct ALEHelper;
 
 class ALE {
   public:
@@ -46,25 +48,16 @@ class ALE {
     ALE &operator=(const ALE &) = delete;
     ~ALE()                      = delete;
 
-    template <typename, typename>
-    friend class ALE_T_;
-    struct MathBit;
-
     template <typename Char_T_, typename Helper_T_>
     static bool Evaluate(double &number, const Char_T_ *content, SizeT length,
-                         const Helper_T_ *callback) {
-        Array<MathBit> items;
+                         const Helper_T_ *callback) noexcept {
+        Value_T_  num;
+        Operation current_op = Operation::None;
+        SizeT     offset     = 0;
 
-        if (parse(items, content, 0, length)) {
-            if (items.IsNotEmpty()) {
-                sortOperations(items, content, 0, length);
-                return process(number, content, 0, length, items, callback);
-            }
-
-            SizeT offset = 0;
-            StringUtils::SoftTrim(content, offset, length);
-            return Digit<Char_T_>::StringToNumber(number, (content + offset),
-                                                  length);
+        if (parse(current_op, num, content, offset, length, callback)) {
+            number = num.number;
+            return true;
         }
 
         return false;
@@ -72,13 +65,13 @@ class ALE {
 
     template <typename Char_T_, typename Helper_T_>
     inline static bool Evaluate(double &number, const Char_T_ *content,
-                                const Helper_T_ *callback) {
+                                const Helper_T_ *callback) noexcept {
         return Evaluate(number, content, StringUtils::Count(content), callback);
     }
 
     template <typename Char_T_, typename Helper_T_>
     static double Evaluate(const Char_T_ *content, SizeT length,
-                           const Helper_T_ *callback) {
+                           const Helper_T_ *callback) noexcept {
         double number;
 
         if (Evaluate(number, content, length, callback)) {
@@ -90,25 +83,28 @@ class ALE {
 
     template <typename Char_T_, typename Helper_T_>
     inline static double Evaluate(const Char_T_ *  content,
-                                  const Helper_T_ *callback) {
+                                  const Helper_T_ *callback) noexcept {
         return Evaluate(content, StringUtils::Count(content), callback);
     }
 
     //////////////////////////// For testing //////////////////////////////////
+
     template <typename Char_T_>
     inline static bool Evaluate(double &number, const Char_T_ *content,
-                                SizeT length) {
+                                SizeT length) noexcept {
         static ALEHelper<Char_T_> helper;
         return Evaluate(number, content, length, &helper);
     }
 
     template <typename Char_T_>
-    inline static bool Evaluate(double &number, const Char_T_ *content) {
+    inline static bool Evaluate(double &       number,
+                                const Char_T_ *content) noexcept {
         return Evaluate(number, content, StringUtils::Count(content));
     }
 
     template <typename Char_T_>
-    inline static double Evaluate(const Char_T_ *content, SizeT length) {
+    inline static double Evaluate(const Char_T_ *content,
+                                  SizeT          length) noexcept {
         double number;
 
         if (Evaluate(number, content, length)) {
@@ -119,237 +115,289 @@ class ALE {
     }
 
     template <typename Char_T_>
-    inline static double Evaluate(const Char_T_ *content) {
+    inline static double Evaluate(const Char_T_ *content) noexcept {
         return Evaluate(content, StringUtils::Count(content));
     }
 
     enum class Operation {
-        Brackets = 0,
-        Parentheses,
-        Exponent,
-        Remainder,
-        Multiplication,
-        Division,
-        Addition,
-        Subtraction,
-        Equal,
-        NotEqual,
-        Less,
-        LessOrEqual,
-        Bigger,
-        BiggerOrEqual,
+        None = 0,
+        Or,
         And,
-        Or
-    };
+        BiggerOrEqual,
+        Bigger,
+        LessOrEqual,
+        Less,
 
-    struct MathBit {
-        MathBit() = default;
+        NotEqual,
+        Equal,
+        NumberNotEqual,
+        NumberEqual,
+        HelperIsNotEqual,
+        HelperIsEqual,
 
-        MathBit(Array<MathBit> sub_items, UInt offset, UInt length,
-                Operation op) noexcept
-            : SubItems(sub_items), Offset(offset), Length(length), Op(op) {
-        }
-
-        Array<MathBit> SubItems{};
-        UInt           Offset{0};
-        UInt           Length{0};
-        Operation      Op{Operation::Parentheses};
+        Subtraction,
+        Addition,
+        Division,
+        Multiplication,
+        Remainder,
+        Exponent,
+        Error
     };
 
   private:
-    template <typename Char_T_>
-    static bool parse(Array<MathBit> &items, const Char_T_ *content,
-                      SizeT offset, SizeT length) {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
+    struct Value_T_ {
+        union {
+            double number;
+            UInt   str[2]; // 0 for the offset and 1 for the length.
+        };
+    };
 
-        while (offset < length) {
-            switch (content[offset]) {
-                case ALEOperations_T_::StartParenthesOp: {
-                    ++offset;
+    template <typename Char_T_, typename Helper_T_>
+    static bool parse(Operation &current_op, Value_T_ &left,
+                      const Char_T_ *content, SizeT &offset, SizeT end_offset,
+                      const Helper_T_ *callback) noexcept {
+        SizeT     previous_offset = offset;
+        Operation op_w;
+        Operation op = nextOperation(op_w, content, offset, end_offset);
 
-                    SizeT end_offset = Engine::SkipInnerPatterns(
-                        ALEOperations_T_::StartParenthesOp,
-                        ALEOperations_T_::EndParenthesOp, content, offset,
-                        length);
+        if (getNumber(left, content, previous_offset,
+                      (offset - previous_offset), callback, op)) {
+            advance(op, offset);
+            previous_offset = offset;
 
-                    if (end_offset != 0) {
-                        items += MathBit{{},
-                                         offset,
-                                         ((end_offset - 1) - offset),
-                                         Operation::Parentheses};
+            while (offset < end_offset) {
+                Value_T_        right;
+                Operation       next_op_w;
+                const Operation next_op =
+                    nextOperation(next_op_w, content, offset, end_offset);
 
-                        MathBit &item = items[(items.Size() - 1)];
+                if (next_op_w > op_w) {
+                    Operation tmp_op = op;
 
-                        if (parse(item.SubItems, content, offset, end_offset)) {
-                            offset = end_offset;
-                            continue;
-                        }
-                    }
-
-                    return false;
-                }
-
-                case ALEOperations_T_::StartBracketOp: {
-                    SizeT end_offset =
-                        Engine::FindOne(ALEOperations_T_::EndBracketOp, content,
-                                        (offset + 1), length);
-
-                    if (end_offset != 0) {
-                        items += MathBit{{},
-                                         offset,
-                                         (end_offset - offset),
-                                         Operation::Brackets};
-                        offset = end_offset;
+                    if (parse(tmp_op, right, content, previous_offset,
+                              end_offset, callback) &&
+                        process(content, left, right, op, callback)) {
+                        op     = tmp_op;
+                        offset = previous_offset;
                         continue;
                     }
+                } else if (getNumber(right, content, previous_offset,
+                                     (offset - previous_offset), callback,
+                                     op) &&
+                           process(content, left, right, op, callback)) {
+                    advance(next_op, offset);
 
-                    return false;
+                    if (next_op_w < current_op) {
+                        current_op = next_op;
+                        return true;
+                    }
+
+                    op              = next_op;
+                    op_w            = next_op_w;
+                    previous_offset = offset;
+                    continue;
                 }
 
-                case ALEOperations_T_::ExponentOp: {
-                    items += MathBit{{}, offset, 1, Operation::Exponent};
-                    break;
+                return false;
+            }
+
+            return (op == Operation::None);
+        }
+
+        return false;
+    }
+
+    static void advance(Operation op, SizeT &offset) {
+        switch (op) {
+            case Operation::Equal:
+            case Operation::NotEqual:
+            case Operation::NumberEqual:
+            case Operation::NumberNotEqual:
+            case Operation::HelperIsEqual:
+            case Operation::HelperIsNotEqual:
+            case Operation::LessOrEqual:
+            case Operation::BiggerOrEqual:
+            case Operation::And:
+            case Operation::Or: {
+                offset += 2;
+                break;
+            }
+
+            default: {
+                ++offset;
+            }
+        }
+    }
+
+    template <typename Char_T_>
+    static Operation nextOperation(Operation &weight, const Char_T_ *content,
+                                   SizeT &offset, SizeT end_offset) noexcept {
+        using ALEOperations_T_ = ALEOperations<Char_T_>;
+
+        while (offset < end_offset) {
+            switch (content[offset]) {
+                case ALEOperations_T_::OrOp: { // ||
+                    if (content[(offset + 1)] == ALEOperations_T_::OrOp) {
+                        weight = Operation::And;
+                        return Operation::Or;
+                    }
+
+                    weight = Operation::None;
+                    return Operation::Error;
                 }
 
-                case ALEOperations_T_::RemainderOp: {
-                    items += MathBit{{}, offset, 1, Operation::Remainder};
-                    break;
+                case ALEOperations_T_::AndOp: { // &&
+                    if (content[(offset + 1)] == ALEOperations_T_::AndOp) {
+                        weight = Operation::And;
+                        return Operation::And;
+                    }
+
+                    weight = Operation::None;
+                    return Operation::Error;
                 }
 
-                case ALEOperations_T_::MultipleOp: {
-                    items += MathBit{{}, offset, 1, Operation::Multiplication};
-                    break;
+                case ALEOperations_T_::BiggerOp: { // > or >=
+                    weight = Operation::BiggerOrEqual;
+
+                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
+                        return Operation::BiggerOrEqual;
+                    }
+
+                    return Operation::Bigger;
                 }
 
-                case ALEOperations_T_::DivideOp: {
-                    items += MathBit{{}, offset, 1, Operation::Division};
+                case ALEOperations_T_::LessOp: { // < or <=
+                    weight = Operation::LessOrEqual;
+
+                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
+                        return Operation::LessOrEqual;
+                    }
+
+                    return Operation::Less;
+                }
+
+                case ALEOperations_T_::NotOp: { // !=
+                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
+                        weight = Operation::Equal;
+                        return Operation::NotEqual;
+                    }
+
+                    weight = Operation::None;
+                    return Operation::Error;
+                }
+
+                case ALEOperations_T_::EqualOp: { // ==
+                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
+                        weight = Operation::Equal;
+                        return Operation::Equal;
+                    }
+
+                    weight = Operation::None;
+                    return Operation::Error;
+                }
+
+                case ALEOperations_T_::SubtractOp: {
+                    if (isOperation(content, offset)) {
+                        weight = Operation::Addition;
+                        return Operation::Subtraction;
+                    }
+
                     break;
                 }
 
                 case ALEOperations_T_::AddOp: {
-                    if (isItOP(content, offset)) {
-                        items += MathBit{{}, offset, 1, Operation::Addition};
+                    if (isOperation(content, offset)) {
+                        weight = Operation::Addition;
+                        return Operation::Addition;
                     }
 
                     break;
                 }
 
-                case ALEOperations_T_::SubtractOp: {
-                    if (isItOP(content, offset)) {
-                        items += MathBit{{}, offset, 1, Operation::Subtraction};
-                    }
-
-                    break;
+                case ALEOperations_T_::DivideOp: {
+                    weight = Operation::Multiplication;
+                    return Operation::Division;
                 }
 
-                case ALEOperations_T_::EqualOp: { // ==
-                    const SizeT current_offset = offset;
+                case ALEOperations_T_::MultipleOp: {
+                    weight = Operation::Multiplication;
+                    return Operation::Multiplication;
+                }
+
+                case ALEOperations_T_::RemainderOp: {
+                    weight = Operation::Remainder;
+                    return Operation::Remainder;
+                }
+
+                case ALEOperations_T_::ExponentOp: {
+                    weight = Operation::Exponent;
+                    return Operation::Exponent;
+                }
+
+                case ALEOperations_T_::ParenthesStart: {
+                    // (...) are evaluated to numbers.
+
                     ++offset;
+                    offset = Engine::SkipInnerPatterns(
+                        ALEOperations_T_::ParenthesStart,
+                        ALEOperations_T_::ParenthesEnd, content, offset,
+                        end_offset);
 
-                    if (content[offset] == ALEOperations_T_::EqualOp) {
-                        items +=
-                            MathBit{{}, current_offset, 2, Operation::Equal};
-                        break;
+                    if (offset != 0) {
+                        continue;
                     }
 
-                    return false;
+                    offset = end_offset;
+                    weight = Operation::None;
+                    return Operation::Error;
                 }
 
-                case ALEOperations_T_::NotOp: { // !=
-                    const SizeT current_offset = offset;
+                case ALEOperations_T_::BracketStart: {
+                    // {...} are evaluated to numbers or strings.
+
                     ++offset;
+                    offset = Engine::FindOne(ALEOperations_T_::BracketEnd,
+                                             content, offset, end_offset);
 
-                    if (content[offset] == ALEOperations_T_::EqualOp) {
-                        items +=
-                            MathBit{{}, current_offset, 2, Operation::NotEqual};
-                        break;
+                    if (offset != 0) {
+                        continue;
                     }
 
-                    return false;
-                }
-
-                case ALEOperations_T_::LessOp: { // < or <=
-                    SizeT current_offset = offset;
-                    ++current_offset;
-
-                    if (content[current_offset] == ALEOperations_T_::EqualOp) {
-                        items += MathBit{{}, offset, 2, Operation::LessOrEqual};
-                        offset = current_offset;
-                    } else {
-                        items += MathBit{{}, offset, 1, Operation::Less};
-                    }
-
-                    break;
-                }
-
-                case ALEOperations_T_::BiggerOp: { // > or >=
-                    SizeT current_offset = offset;
-                    ++current_offset;
-
-                    if (content[current_offset] == ALEOperations_T_::EqualOp) {
-                        items +=
-                            MathBit{{}, offset, 2, Operation::BiggerOrEqual};
-                        offset = current_offset;
-                    } else {
-                        items += MathBit{{}, offset, 1, Operation::Bigger};
-                    }
-
-                    break;
-                }
-
-                case ALEOperations_T_::AndOp: { // &&
-                    const SizeT current_offset = offset;
-                    ++offset;
-
-                    if (content[offset] == ALEOperations_T_::AndOp) {
-                        items += MathBit{{}, current_offset, 2, Operation::And};
-                        break;
-                    }
-
-                    return false;
-                }
-
-                case ALEOperations_T_::OrOp: { // ||
-                    const SizeT current_offset = offset;
-                    ++offset;
-
-                    if (content[offset] == ALEOperations_T_::OrOp) {
-                        items += MathBit{{}, current_offset, 2, Operation::Or};
-                        break;
-                    }
-
-                    return false;
+                    offset = end_offset;
+                    weight = Operation::None;
+                    return Operation::Error;
                 }
             }
 
             ++offset;
         }
 
-        return true;
+        weight = Operation::None;
+        return Operation::None;
     }
 
     template <typename Char_T_>
-    static bool isItOP(const Char_T_ *content, SizeT offset) noexcept {
+    static bool isOperation(const Char_T_ *content, SizeT offset) noexcept {
         using ALEOperations_T_ = ALEOperations<Char_T_>;
 
         while (offset != 0) {
             --offset;
-            const Char_T_ c = content[offset];
 
-            switch (c) {
+            switch (content[offset]) {
                 case ALEOperations_T_::SpaceChar: {
                     break;
                 }
 
-                case ALEOperations_T_::EndParenthesOp:
-                case ALEOperations_T_::EndBracketOp: {
+                case ALEOperations_T_::ParenthesEnd:
+                case ALEOperations_T_::BracketEnd: {
+                    // (...) and {} are numbers.
                     return true;
                 }
 
                 default: {
-                    // Number
-                    return ((c < ALEOperations_T_::ColonChar) &&
-                            (c > ALEOperations_T_::SlashChar));
+                    // A number
+                    return ((content[offset] < ALEOperations_T_::ColonChar) &&
+                            (content[offset] > ALEOperations_T_::SlashChar));
                 }
             }
         }
@@ -357,342 +405,235 @@ class ALE {
         return false;
     }
 
-    template <typename Char_T_>
-    static void sortOperations(Array<MathBit> &items, const Char_T_ *content,
-                               SizeT offset, SizeT length) {
-        // Determine the highest operation.
-        Operation highest = Operation::Parentheses;
+    template <typename Char_T_, typename Helper_T_>
+    static bool getNumber(Value_T_ &val, const Char_T_ *content, SizeT offset,
+                          SizeT length, const Helper_T_ *callback,
+                          Operation &op) noexcept {
+        if (op != Operation::Error) {
+            StringUtils::SoftTrim(content, offset, length);
 
-        const MathBit *item = items.First();
-        const MathBit *end  = items.End();
+            switch (content[offset]) {
+                case ALEOperations<Char_T_>::ParenthesStart: {
+                    length += offset;
+                    ++offset;
+                    --length;
 
-        while (item != end) {
-            if (item->Op > highest) {
-                highest = item->Op;
+                    Operation current_op = Operation::None;
+                    return parse(current_op, val, content, offset, length,
+                                 callback);
+                }
 
-                if ((highest == Operation::And) || (highest == Operation::Or)) {
-                    break;
+                case ALEOperations<Char_T_>::BracketStart: {
+                    val.str[0] = offset;
+                    val.str[1] = length;
+
+                    switch (op) {
+                        case Operation::HelperIsEqual:
+                        case Operation::HelperIsNotEqual: {
+                            return true;
+                        }
+
+                        case Operation::Equal: {
+                            op = Operation::HelperIsEqual;
+                            return true;
+                        }
+
+                        case Operation::NotEqual: {
+                            op = Operation::HelperIsNotEqual;
+                            return true;
+                        }
+
+                        default: {
+                            return (callback->ALESetNumber(
+                                val.number, (content + offset), length));
+                        }
+                    }
+                }
+
+                default: {
+                    switch (op) {
+                        case Operation::HelperIsEqual:
+                        case Operation::HelperIsNotEqual: {
+                            val.str[0] = offset;
+                            val.str[1] = length;
+                            return true;
+                        }
+
+                        case Operation::Equal:
+                        case Operation::NotEqual: {
+                            bool bool_val = Digit<Char_T_>::StringToNumber(
+                                val.number, (content + offset), length);
+
+                            if (!bool_val) {
+                                val.str[0] = offset;
+                                val.str[1] = length;
+
+                                if (op == Operation::Equal) {
+                                    op = Operation::HelperIsEqual;
+                                } else {
+                                    op = Operation::HelperIsNotEqual;
+                                }
+                            } else if (op == Operation::Equal) {
+                                op = Operation::NumberEqual;
+                            } else {
+                                op = Operation::NumberNotEqual;
+                            }
+
+                            return true;
+                        }
+
+                        default: {
+                            return (Digit<Char_T_>::StringToNumber(
+                                val.number, (content + offset), length));
+                        }
+                    }
                 }
             }
-
-            ++item;
         }
 
-        // If it is just (...)
-        if (highest < Operation::Exponent) {
-            if (items.Size() == 1) {
-                MathBit *item2 = items.First();
+        return false;
+    }
 
-                if (item2->Op == Operation::Parentheses) {
-                    const SizeT len = (item2->Length + 2);
+    template <typename Char_T_, typename Helper_T_>
+    static bool process(const Char_T_ *content, Value_T_ &left, Value_T_ right,
+                        Operation op, const Helper_T_ *callback) noexcept {
+        switch (op) {
+            case Operation::Exponent: { // ^
+                if (right.number != 0.0) {
+                    // NOTE: Needs more work.
+                    if (left.number != 0.0) {
+                        const bool neg = (right.number < 0);
 
-                    if (length != len) {
-                        // Cheking for anything extra.
-                        StringUtils::SoftTrim(content, offset, length);
+                        if (neg) {
+                            right.number *= -1;
+                        }
 
-                        if (length != len) {
-                            items.Reset();
-                            return;
+                        if (right.number < 1) {
+                            return false;
+                        }
+
+                        UInt         times = static_cast<UInt>(right.number);
+                        const double num   = left.number;
+
+                        while (--times != 0) {
+                            left.number *= num;
+                        }
+
+                        if (neg) {
+                            left.number = (1 / left.number);
                         }
                     }
 
-                    // Sort ops inside (...)
-                    StringUtils::SoftTrim(content, item2->Offset,
-                                          item2->Length);
-                    sortOperations(item2->SubItems, content, item2->Offset,
-                                   item2->Length);
-                } else if (length != item2->Length) { // Brackets
-                    // Cheking for anything extra.
-                    StringUtils::SoftTrim(content, offset, length);
-
-                    if (length != item2->Length) {
-                        items.Reset();
-                    }
+                    break;
                 }
-            }
 
-            return;
-        }
-
-        /*
-         * Less than Exponent        : No operation; could be (...) or {...}
-         * Less than Multiplication  : ^ %
-         * Less than Addition        : * /
-         * Less than Equal           : + -
-         * Less than And             : == != < <= > >=
-         * The top                   : && ||
-         */
-
-        switch (highest) {
-            case Operation::Remainder: {
-                highest = Operation::Exponent;
+                left.number = 1;
                 break;
             }
 
-            case Operation::Division: {
-                highest = Operation::Multiplication;
+            case Operation::Remainder: { // %
+                left.number =
+                    static_cast<double>(static_cast<ULong>(left.number) %
+                                        static_cast<ULong>(right.number));
                 break;
             }
 
-            case Operation::Subtraction: {
-                highest = Operation::Addition;
+            case Operation::Multiplication: { // *
+                left.number *= right.number;
+                break;
+            }
+
+            case Operation::Division: { // /
+                if (right.number != 0.0) {
+                    left.number /= right.number;
+                    break;
+                }
+
+                return false;
+            }
+
+            case Operation::Addition: { // +
+                left.number += right.number;
+                break;
+            }
+
+            case Operation::Subtraction: { // -
+                left.number -= right.number;
+                break;
+            }
+
+            case Operation::Equal:
+            case Operation::NumberEqual: { // ==
+                left.number = (left.number == right.number) ? 1 : 0;
                 break;
             }
 
             case Operation::NotEqual:
-            case Operation::Less:
-            case Operation::LessOrEqual:
-            case Operation::Bigger:
-            case Operation::BiggerOrEqual: {
-                highest = Operation::Equal;
+            case Operation::NumberNotEqual: { // !=
+                left.number = (left.number != right.number) ? 1 : 0;
                 break;
             }
 
-            case Operation::Or: {
-                highest = Operation::And;
+            case Operation::Less: { // <
+                left.number = (left.number < right.number) ? 1 : 0;
                 break;
             }
 
-            default: {
-            }
-        }
-
-        MathBit     n_item;
-        MathBit *   match     = (items.First() - 1);
-        MathBit *   n_match   = items.First();
-        const SizeT size      = items.Size();
-        const SizeT endOffset = (offset + length);
-        SizeT       id        = 0;
-
-        for (SizeT i = 0; i <= size; i++) {
-            if (i < size) {
-                ++match;
-
-                if (match->Op < highest) {
-                    n_item.SubItems += static_cast<MathBit &&>(*match);
-                    continue;
-                }
-
-                n_item.Offset = offset;
-                n_item.Length = (match->Offset - offset);
-                n_item.Op     = match->Op;
-                offset += (n_item.Length + match->Length);
-            } else {
-                n_item.Offset = offset;
-                n_item.Length = (endOffset - offset);
+            case Operation::LessOrEqual: { // <=
+                left.number = (left.number <= right.number) ? 1 : 0;
+                break;
             }
 
-            if (n_item.Length == 0) {
-                items.Reset();
-                return;
+            case Operation::Bigger: { // >
+                left.number = (left.number > right.number) ? 1 : 0;
+                break;
             }
 
-            StringUtils::SoftTrim(content, n_item.Offset, n_item.Length);
-
-            if (n_item.SubItems.IsNotEmpty()) {
-                sortOperations(n_item.SubItems, content, n_item.Offset,
-                               n_item.Length);
+            case Operation::BiggerOrEqual: { // >=
+                left.number = (left.number >= right.number) ? 1 : 0;
+                break;
             }
 
-            if (id < size) {
-                (*n_match) = static_cast<MathBit &&>(n_item);
-                ++n_match;
-                ++id;
-            } else {
-                items += static_cast<MathBit &&>(n_item);
+            case Operation::And: { // &&
+                left.number = ((left.number > 0) && (right.number > 0)) ? 1 : 0;
+                break;
             }
-        }
 
-        if (id != size) {
-            items.GoBackTo(id);
-        }
-    }
+            case Operation::Or: { // ||
+                left.number = ((left.number > 0) || (right.number > 0)) ? 1 : 0;
+                break;
+            }
 
-    template <typename Char_T_, typename Helper_T_>
-    static bool process(double &left_number, const Char_T_ *content,
-                        SizeT offset, SizeT length, const Array<MathBit> &items,
-                        const Helper_T_ *callback) {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
-
-        if (items.IsEmpty()) {
-            return Digit<Char_T_>::StringToNumber(left_number,
-                                                  (content + offset), length);
-        }
-
-        const MathBit *item = items.First();
-        // Every Op. is splitied into two (left and tight).
-        const MathBit *item2 = (item + 1);
-        Operation      op    = item->Op;
-
-        switch (op) {
-            case Operation::Equal:
-            case Operation::NotEqual: {
+            case Operation::HelperIsEqual: { // ==
                 bool is_equal;
 
-                const Char_T_ *l_item = (content + item->Offset);
-                const Char_T_ *r_item = (content + item2->Offset);
+                if (callback->ALEIsEqual(is_equal, (content + left.str[0]),
+                                         left.str[1], (content + right.str[0]),
+                                         right.str[1])) {
 
-                if ((*l_item == ALEOperations_T_::StartBracketOp) ||
-                    (*r_item == ALEOperations_T_::StartBracketOp)) {
-                    if (!(callback->ALEIsEqual(is_equal, l_item, item->Length,
-                                               r_item, item2->Length))) {
-                        return false;
-                    }
-                } else if (process(left_number, content, item->Offset,
-                                   item->Length, item->SubItems, callback)) {
+                    left.number = (is_equal ? 1 : 0);
                     break;
-                } else {
-                    is_equal =
-                        ((item->Length == item2->Length) &&
-                         StringUtils::IsEqual(l_item, r_item, item2->Length));
                 }
 
-                if (op == Operation::NotEqual) {
-                    is_equal = !is_equal;
-                }
-
-                left_number = (is_equal ? 1 : 0);
-                return true;
-            }
-
-            case Operation::Brackets: {
-                return (callback->ALESetNumber(
-                    left_number, (content + item->Offset), item->Length));
-            }
-
-            default: {
-                if (!process(left_number, content, item->Offset, item->Length,
-                             item->SubItems, callback)) {
-                    return false;
-                }
-            }
-        }
-
-        const MathBit *end = items.End();
-
-        while (item2 != end) {
-            double right_number;
-            if (!process(right_number, content, item2->Offset, item2->Length,
-                         item2->SubItems, callback)) {
                 return false;
             }
 
-            switch (op) {
-                case Operation::Exponent: { // ^
-                    if (right_number != 0.0) {
-                        // NOTE: Needs more work.
-                        const bool neg = (right_number < 0);
+            case Operation::HelperIsNotEqual: { // !=
+                bool is_equal;
 
-                        if (neg) {
-                            right_number *= -1;
-                        }
+                if (callback->ALEIsEqual(is_equal, (content + left.str[0]),
+                                         left.str[1], (content + right.str[0]),
+                                         right.str[1])) {
 
-                        if (right_number < 1) {
-                            return false;
-                        }
-
-                        if (left_number == 0.0) {
-                            break;
-                        }
-
-                        UInt         times = static_cast<UInt>(right_number);
-                        const double num   = left_number;
-
-                        while (--times != 0) {
-                            // NOTE: Optimize.
-                            left_number *= num;
-                        }
-
-                        if (neg) {
-                            left_number = (1 / left_number);
-                        }
-
-                        break;
-                    }
-
-                    left_number = 1;
+                    left.number = (is_equal ? 0 : 1);
                     break;
                 }
 
-                case Operation::Remainder: { // %
-                    left_number =
-                        static_cast<double>(static_cast<ULong>(left_number) %
-                                            static_cast<ULong>(right_number));
-                    break;
-                }
-
-                case Operation::Multiplication: { // *
-                    left_number *= right_number;
-                    break;
-                }
-
-                case Operation::Division: { // /
-                    if (right_number == 0.0) {
-                        return false;
-                    }
-
-                    left_number /= right_number;
-                    break;
-                }
-
-                case Operation::Addition: { // +
-                    left_number += right_number;
-                    break;
-                }
-
-                case Operation::Subtraction: { // -
-                    left_number -= right_number;
-                    break;
-                }
-
-                case Operation::Equal: { // ==
-                    left_number = (left_number == right_number) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::NotEqual: { // !=
-                    left_number = (left_number != right_number) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::Less: { // <
-                    left_number = (left_number < right_number) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::LessOrEqual: { // <=
-                    left_number = (left_number <= right_number) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::Bigger: { // >
-                    left_number = (left_number > right_number) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::BiggerOrEqual: { // >=
-                    left_number = (left_number >= right_number) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::And: { // &&
-                    left_number =
-                        ((left_number > 0) && (right_number > 0)) ? 1 : 0;
-                    break;
-                }
-
-                case Operation::Or: { // ||
-                    left_number =
-                        ((left_number > 0) || (right_number > 0)) ? 1 : 0;
-                    break;
-                }
-
-                default: {
-                }
+                return false;
             }
 
-            op = item2->Op;
-            ++item2;
+            default: {
+            }
         }
 
         return true;
@@ -701,12 +642,13 @@ class ALE {
 
 template <typename Char_T_>
 struct ALEHelper {
-    static constexpr bool ALESetNumber(double &, const Char_T_ *, SizeT) {
+    static constexpr bool ALESetNumber(double &, const Char_T_ *,
+                                       SizeT) noexcept {
         return false;
     }
 
     static constexpr bool ALEIsEqual(bool &, const Char_T_ *, SizeT,
-                                     const Char_T_ *, SizeT) {
+                                     const Char_T_ *, SizeT) noexcept {
         return false;
     }
 };
