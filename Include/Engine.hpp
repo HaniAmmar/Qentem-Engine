@@ -81,9 +81,9 @@ class Engine {
      * Returns an the index of a pattern + the length of it.
      */
     template <typename Number_T_>
-    QENTEM_NOINLINE static Number_T_
-    Find(const char *pattern, SizeT pattern_length, const char *content,
-         Number_T_ offset, Number_T_ end_before) noexcept {
+    static Number_T_ Find(const char *pattern, SizeT pattern_length,
+                          const char *content, Number_T_ offset,
+                          Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
