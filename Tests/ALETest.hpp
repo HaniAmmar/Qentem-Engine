@@ -316,11 +316,6 @@ static int TestALE1() {
     is_valid = ALE::Evaluate(number, content);
     SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
 
-    // NOTE: Implement power of fraction.
-    content  = "2^0.2";
-    is_valid = ALE::Evaluate(number, content);
-    SHOULD_NOT_EQUAL_TRUE(is_valid, "is_valid");
-
     END_SUB_TEST;
 }
 
@@ -333,6 +328,12 @@ static int TestALE2() {
     is_valid = ALE::Evaluate(number, content);
     SHOULD_EQUAL_VALUE(number, 1, "number");
     SHOULD_EQUAL_TRUE(is_valid, "is_valid");
+
+    // NOTE: Implement power of fraction.
+    // content  = "2^0.2";
+    // is_valid = ALE::Evaluate(number, content);
+    // SHOULD_EQUAL_VALUE(number, 1.148698355, "number");
+    // SHOULD_EQUAL_TRUE(is_valid, "is_valid");
 
     content  = " 4";
     is_valid = ALE::Evaluate(number, content);
