@@ -298,11 +298,11 @@ class Digit {
 
             if (str[0] == DigitChars_T_::PlusChar) {
                 SizeT offset = 1;
-                --length;
-                StringUtils::SoftTrim(str, offset, length);
+                StringUtils::StartTrim(str, offset, length);
 
                 if (length != 0) {
-                    return stringToUnsignedInt(number, &(str[offset]), length);
+                    return stringToUnsignedInt(number, &(str[offset]),
+                                               (length - offset));
                 }
             } else if (stringToInt(number, str, length)) {
                 return true;
@@ -329,11 +329,11 @@ class Digit {
             switch (s_str[0]) {
                 case DigitChars_T_::MinusChar: {
                     SizeT offset = 1;
-                    --length;
-                    StringUtils::SoftTrim(s_str, offset, length);
+                    StringUtils::StartTrim(s_str, offset, length);
 
                     if ((length != 0) &&
-                        stringToSignedInt(number, &(s_str[offset]), length)) {
+                        stringToSignedInt(number, &(s_str[offset]),
+                                          (length - offset))) {
                         number *= -1;
                         return true;
                     }
@@ -343,12 +343,11 @@ class Digit {
 
                 case DigitChars_T_::PlusChar: {
                     SizeT offset = 1;
-                    --length;
-                    StringUtils::SoftTrim(s_str, offset, length);
+                    StringUtils::StartTrim(s_str, offset, length);
 
                     if (length != 0) {
                         return stringToSignedInt(number, &(s_str[offset]),
-                                                 length);
+                                                 (length - offset));
                     }
 
                     break;
@@ -434,10 +433,11 @@ class Digit {
             switch (str[0]) {
                 case DigitChars_T_::MinusChar: {
                     SizeT n_offset = 1;
-                    StringUtils::SoftTrim(str, n_offset, --length);
+                    StringUtils::StartTrim(str, n_offset, length);
 
                     if ((length != 0) &&
-                        stringToSignedFloat(number, &(str[n_offset]), length)) {
+                        stringToSignedFloat(number, &(str[n_offset]),
+                                            (length - n_offset))) {
                         number *= -1;
                         return true;
                     }
@@ -447,11 +447,11 @@ class Digit {
 
                 case DigitChars_T_::PlusChar: {
                     SizeT offset = 1;
-                    StringUtils::SoftTrim(str, offset, --length);
+                    StringUtils::StartTrim(str, offset, length);
 
                     if (length != 0) {
                         return stringToSignedFloat(number, &(str[offset]),
-                                                   length);
+                                                   (length - offset));
                     }
 
                     break;
