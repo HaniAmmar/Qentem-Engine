@@ -56,17 +56,19 @@ class Value {
 
         switch (type_) {
             case ValueType::Object: {
-                new (&object_) VObject(static_cast<VObject &&>(val.object_));
+                Memory::Construct(&object_,
+                                  static_cast<VObject &&>(val.object_));
                 break;
             }
 
             case ValueType::Array: {
-                new (&array_) VArray(static_cast<VArray &&>(val.array_));
+                Memory::Construct(&array_, static_cast<VArray &&>(val.array_));
                 break;
             }
 
             case ValueType::String: {
-                new (&string_) VString(static_cast<VString &&>(val.string_));
+                Memory::Construct(&string_,
+                                  static_cast<VString &&>(val.string_));
                 break;
             }
 
@@ -87,17 +89,17 @@ class Value {
     explicit Value(ValueType type) noexcept : type_(type) {
         switch (type) {
             case ValueType::Object: {
-                new (&object_) VObject();
+                Memory::Construct(&object_, VObject());
                 break;
             }
 
             case ValueType::Array: {
-                new (&array_) VArray();
+                Memory::Construct(&array_, VArray());
                 break;
             }
 
             case ValueType::String: {
-                new (&string_) VString();
+                Memory::Construct(&string_, VString());
                 break;
             }
 
@@ -167,7 +169,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_ = ValueType::Object;
-                new (&object_) VObject();
+                Memory::Construct(&object_, VObject());
                 return (object_)[key];
             }
 
@@ -186,7 +188,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_ = ValueType::Object;
-                new (&object_) VObject();
+                Memory::Construct(&object_, VObject());
                 return (object_)[static_cast<VString &&>(key)];
             }
 
@@ -205,7 +207,7 @@ class Value {
 
             case ValueType::Undefined: {
                 type_ = ValueType::Object;
-                new (&object_) VObject();
+                Memory::Construct(&object_, VObject());
                 return (object_)[key];
             }
 
@@ -244,7 +246,7 @@ class Value {
             case ValueType::Undefined: {
                 if (index == 0) {
                     type_ = ValueType::Array;
-                    new (&array_) VArray();
+                    Memory::Construct(&array_, VArray());
                     array_.ResizeAndInitialize(1);
                     return *(array_.First());
                 }
@@ -272,19 +274,20 @@ class Value {
 
             switch (type_) {
                 case ValueType::Object: {
-                    new (&object_)
-                        VObject(static_cast<VObject &&>(val.object_));
+                    Memory::Construct(&object_,
+                                      static_cast<VObject &&>(val.object_));
                     break;
                 }
 
                 case ValueType::Array: {
-                    new (&array_) VArray(static_cast<VArray &&>(val.array_));
+                    Memory::Construct(&array_,
+                                      static_cast<VArray &&>(val.array_));
                     break;
                 }
 
                 case ValueType::String: {
-                    new (&string_)
-                        VString(static_cast<VString &&>(val.string_));
+                    Memory::Construct(&string_,
+                                      static_cast<VString &&>(val.string_));
                     break;
                 }
 
@@ -341,7 +344,7 @@ class Value {
         if (type_ != ValueType::Object) {
             reset();
             type_ = ValueType::Object;
-            new (&object_) VObject();
+            Memory::Construct(&object_, VObject());
         }
 
         object_ = static_cast<VObject &&>(obj);
@@ -357,7 +360,7 @@ class Value {
         if (type_ != ValueType::Array) {
             reset();
             type_ = ValueType::Array;
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
         }
 
         array_ = static_cast<VArray &&>(arr);
@@ -373,7 +376,7 @@ class Value {
         if (type_ != ValueType::String) {
             reset();
             type_ = ValueType::String;
-            new (&string_) VString();
+            Memory::Construct(&string_, VString());
         }
 
         string_ = static_cast<VString &&>(str);
@@ -420,7 +423,7 @@ class Value {
 
     void operator+=(Value &&val) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 
@@ -451,7 +454,7 @@ class Value {
 
     void operator+=(const Value &val) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 
@@ -480,7 +483,7 @@ class Value {
 
     void operator+=(VObject &&obj) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 
@@ -511,7 +514,7 @@ class Value {
 
     void operator+=(VString &&str) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 
@@ -530,7 +533,7 @@ class Value {
 
     void operator+=(double num) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 
@@ -546,7 +549,7 @@ class Value {
 
     void operator+=(NullType) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 
@@ -557,7 +560,7 @@ class Value {
 
     void operator+=(bool is_true) {
         if (type_ == ValueType::Undefined) {
-            new (&array_) VArray();
+            Memory::Construct(&array_, VArray());
             type_ = ValueType::Array;
         }
 

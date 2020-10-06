@@ -41,7 +41,7 @@ class StringStream {
     StringStream() = default;
 
     ~StringStream() {
-        HAllocator::Deallocate(storage_);
+        Memory::Deallocate(storage_);
     }
 
     explicit StringStream(SizeT size) : capacity_(size) {
@@ -52,7 +52,7 @@ class StringStream {
                 capacity_ <<= 1U;
             }
 
-            storage_ = HAllocator::Allocate<Char_T_>(capacity_);
+            storage_ = Memory::Allocate<Char_T_>(capacity_);
         }
     }
 
@@ -72,14 +72,14 @@ class StringStream {
                 capacity_ <<= 1U;
             }
 
-            storage_ = HAllocator::Allocate<Char_T_>(capacity_);
+            storage_ = Memory::Allocate<Char_T_>(capacity_);
             insert(ss.storage_, ss.length_);
         }
     }
 
     StringStream &operator=(StringStream &&ss) noexcept {
         if (this != &ss) {
-            HAllocator::Deallocate(storage_);
+            Memory::Deallocate(storage_);
             storage_  = ss.storage_;
             length_   = ss.length_;
             capacity_ = ss.capacity_;
@@ -95,7 +95,7 @@ class StringStream {
     StringStream &operator=(const StringStream &ss) {
         if (this != &ss) {
             if (storage_ != nullptr) {
-                HAllocator::Deallocate(storage_);
+                Memory::Deallocate(storage_);
                 storage_  = nullptr;
                 length_   = 0;
                 capacity_ = 0;
@@ -190,7 +190,7 @@ class StringStream {
 
     void Reset() noexcept {
         if (storage_ != nullptr) {
-            HAllocator::Deallocate(storage_);
+            Memory::Deallocate(storage_);
             storage_  = nullptr;
             length_   = 0;
             capacity_ = 0;
@@ -280,12 +280,12 @@ class StringStream {
 
     void expand(SizeT capacity) {
         Char_T_ *old_str = storage_;
-        storage_         = HAllocator::Allocate<Char_T_>(capacity);
+        storage_         = Memory::Allocate<Char_T_>(capacity);
 
         if (capacity_ != 0) {
             const SizeT c_size = (capacity_ * sizeof(Char_T_));
             Memory::Copy(storage_, old_str, c_size);
-            HAllocator::Deallocate(old_str);
+            Memory::Deallocate(old_str);
         }
 
         capacity_ = capacity;

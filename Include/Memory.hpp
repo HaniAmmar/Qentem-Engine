@@ -108,86 +108,81 @@ inline static void Copy(void *to, const void *from, SizeT size) noexcept {
     }
 }
 
+template <typename Type_>
+inline static Type_ *Allocate(SizeT size) {
+    return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
+}
+
+template <typename Type_, typename... Values_T_>
+inline static Type_ *AllocateInit(Values_T_ &&... values) {
+    Type_ *ptr = Allocate<Type_>(1);
+    new (ptr) Type_(static_cast<Values_T_ &&>(values)...);
+    return ptr;
+}
+
+template <typename Type_, typename... Values_T_>
+inline static Type_ *AllocateInit(const Values_T_ &... values) {
+    Type_ *ptr = Allocate<Type_>(1);
+    new (ptr) Type_(values...);
+    return ptr;
+}
+
+template <typename Type_>
+inline static Type_ *AllocateInit() {
+    Type_ *ptr = Allocate<Type_>(1);
+    new (ptr) Type_();
+    return ptr;
+}
+
+template <typename Type_>
+inline static void Construct(Type_ *ptr, const Type_ &value) noexcept {
+    new (ptr) Type_{value};
+}
+
+template <typename Type_>
+inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
+    new (ptr) Type_{static_cast<Type_ &&>(value)};
+}
+
+template <typename Type_>
+inline static void Construct(Type_ *start, const Type_ *end,
+                             const Type_ &value) noexcept {
+    while (start < end) {
+        new (start) Type_{value};
+        ++start;
+    }
+}
+
+template <typename Type_, typename... Values_T_>
+inline static void ConstructValues(Type_ *ptr, Values_T_ &&... values) {
+    new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
+}
+
+template <typename Type_, typename... Values_T_>
+inline static void ConstructValues(Type_ *ptr, const Values_T_ &... values) {
+    new (ptr) Type_{values...};
+}
+
+template <typename Type_>
+inline static void Destruct(Type_ *ptr) noexcept {
+    ptr->~Type_();
+}
+
+template <typename Type_>
+inline static void Destruct(Type_ *start, const Type_ *end) noexcept {
+    while (start < end) {
+        start->~Type_();
+        ++start;
+    }
+}
+
+inline static void Deallocate(void *ptr) noexcept {
+    if (ptr != nullptr) {
+        free(ptr);
+    }
+}
+
 } // namespace Memory
-
-class HAllocator {
-  public:
-    template <typename Type_>
-    QENTEM_NOINLINE static Type_ *Allocate(SizeT size) {
-        return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
-    }
-
-    template <typename Type_, typename... Values_T_>
-    inline static Type_ *AllocateInit(Values_T_ &&... values) {
-        Type_ *ptr = Allocate<Type_>(1);
-        new (ptr) Type_(static_cast<Values_T_ &&>(values)...);
-        return ptr;
-    }
-
-    template <typename Type_, typename... Values_T_>
-    inline static Type_ *AllocateInit(const Values_T_ &... values) {
-        Type_ *ptr = Allocate<Type_>(1);
-        new (ptr) Type_(values...);
-        return ptr;
-    }
-
-    template <typename Type_>
-    inline static Type_ *AllocateInit() {
-        Type_ *ptr = Allocate<Type_>(1);
-        new (ptr) Type_();
-        return ptr;
-    }
-
-    template <typename Type_>
-    inline static void Construct(Type_ *ptr, const Type_ &value) noexcept {
-        new (ptr) Type_{value};
-    }
-
-    template <typename Type_>
-    inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
-        new (ptr) Type_{static_cast<Type_ &&>(value)};
-    }
-
-    template <typename Type_>
-    inline static void Construct(Type_ *start, const Type_ *end,
-                                 const Type_ &value) noexcept {
-        while (start < end) {
-            new (start) Type_{value};
-            ++start;
-        }
-    }
-
-    template <typename Type_, typename... Values_T_>
-    inline static void ConstructValues(Type_ *ptr, Values_T_ &&... values) {
-        new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
-    }
-
-    template <typename Type_, typename... Values_T_>
-    inline static void ConstructValues(Type_ *ptr,
-                                       const Values_T_ &... values) {
-        new (ptr) Type_{values...};
-    }
-
-    template <typename Type_>
-    inline static void Destruct(Type_ *ptr) noexcept {
-        ptr->~Type_();
-    }
-
-    template <typename Type_>
-    inline static void Destruct(Type_ *start, const Type_ *end) noexcept {
-        while (start < end) {
-            start->~Type_();
-            ++start;
-        }
-    }
-
-    inline static void Deallocate(void *ptr) noexcept {
-        if (ptr != nullptr) {
-            free(ptr);
-        }
-    }
-};
-
 } // namespace Qentem
 
 #endif

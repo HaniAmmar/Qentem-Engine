@@ -202,7 +202,7 @@ static int TestArray1() {
     EQ_TO(numbers2.First(), nullptr, "First()", "null");
     EQ_VALUE(tmp, storage, "First()");
 
-    HAllocator::Deallocate(tmp);
+    Memory::Deallocate(tmp);
 
     END_SUB_TEST;
 }

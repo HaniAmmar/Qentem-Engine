@@ -161,7 +161,7 @@ static int TestStringStream() {
 
     char *e_str    = ss2.Eject();
     bool  is_equal = StringUtils::IsEqual(e_str, "abc", 3);
-    HAllocator::Deallocate(e_str);
+    Memory::Deallocate(e_str);
 
     EQ_TRUE(is_equal, "is_equal");
 

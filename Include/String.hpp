@@ -41,7 +41,7 @@ class String {
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
         ++len;
-        storage_ = HAllocator::Allocate<Char_T_>(len);
+        storage_ = Memory::Allocate<Char_T_>(len);
 
         if (len != 1) {
             Memory::Copy(storage_, str, (length_ * sizeof(Char_T_)));
@@ -62,13 +62,13 @@ class String {
     String(const String &src) : length_(src.length_) {
         if (length_ != 0) {
             const SizeT len = (length_ + 1);
-            storage_        = HAllocator::Allocate<Char_T_>(len);
+            storage_        = Memory::Allocate<Char_T_>(len);
             Memory::Copy(storage_, src.storage_, (len * sizeof(Char_T_)));
         }
     }
 
     ~String() {
-        HAllocator::Deallocate(storage_);
+        Memory::Deallocate(storage_);
     }
 
     // inline Char_T_ &operator[](SizeT index) const {
@@ -81,7 +81,7 @@ class String {
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
-            HAllocator::Deallocate(storage_);
+            Memory::Deallocate(storage_);
 
             length_      = src.length_;
             src.length_  = 0;
@@ -94,9 +94,9 @@ class String {
 
     String &operator=(const String &src) {
         if (this != &src) {
-            HAllocator::Deallocate(storage_);
+            Memory::Deallocate(storage_);
             length_  = src.length_;
-            storage_ = HAllocator::Allocate<Char_T_>(length_ + 1);
+            storage_ = Memory::Allocate<Char_T_>(length_ + 1);
             Memory::Copy(storage_, src.storage_, (length_ * sizeof(Char_T_)));
             storage_[length_] = 0;
         }
@@ -107,9 +107,9 @@ class String {
     String &operator=(const Char_T_ *str) {
         SizeT len = StringUtils::Count(str);
 
-        HAllocator::Deallocate(storage_);
+        Memory::Deallocate(storage_);
         length_  = len;
-        storage_ = HAllocator::Allocate<Char_T_>(len + 1);
+        storage_ = Memory::Allocate<Char_T_>(len + 1);
 
         if (len != 0) {
             Memory::Copy(storage_, str, (len * sizeof(Char_T_)));
@@ -124,7 +124,7 @@ class String {
         Insert(src.storage_, src.length_);
         src.length_ = 0;
 
-        HAllocator::Deallocate(src.storage_);
+        Memory::Deallocate(src.storage_);
         src.storage_ = nullptr;
 
         return *this;
@@ -144,7 +144,7 @@ class String {
         String ns(Insert(*this, src));
 
         src.length_ = 0;
-        HAllocator::Deallocate(src.storage_);
+        Memory::Deallocate(src.storage_);
         src.storage_ = nullptr;
 
         return ns;
@@ -157,7 +157,7 @@ class String {
     String operator+(const Char_T_ *str) const {
         const SizeT len         = StringUtils::Count(str);
         const SizeT ns_len      = (length_ + len);
-        Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
+        Char_T_ *   ns_storage_ = Memory::Allocate<Char_T_>(ns_len + 1);
 
         if (length_ != 0) {
             Memory::Copy(ns_storage_, storage_, (length_ * sizeof(Char_T_)));
@@ -206,7 +206,7 @@ class String {
     }
 
     void Reset() noexcept {
-        HAllocator::Deallocate(storage_);
+        Memory::Deallocate(storage_);
         storage_ = nullptr;
         length_  = 0;
     }
@@ -229,7 +229,7 @@ class String {
 
     static String Insert(const String &src1, const String &src2) {
         const SizeT ns_len      = (src1.length_ + src2.length_);
-        Char_T_ *   ns_storage_ = HAllocator::Allocate<Char_T_>(ns_len + 1);
+        Char_T_ *   ns_storage_ = Memory::Allocate<Char_T_>(ns_len + 1);
 
         if (src1.length_ != 0) {
             Memory::Copy(ns_storage_, src1.storage_,
@@ -248,11 +248,11 @@ class String {
     void Insert(const Char_T_ *str, SizeT len) {
         if ((str != nullptr) && (len != 0)) {
             Char_T_ *old_str = storage_;
-            storage_         = HAllocator::Allocate<Char_T_>(length_ + len + 1);
+            storage_         = Memory::Allocate<Char_T_>(length_ + len + 1);
 
             if (old_str != nullptr) {
                 Memory::Copy(storage_, old_str, (length_ * sizeof(Char_T_)));
-                HAllocator::Deallocate(old_str);
+                Memory::Deallocate(old_str);
             }
 
             Memory::Copy((storage_ + length_), str, (len * sizeof(Char_T_)));

@@ -945,7 +945,7 @@ class Digit {
 
     inline static Char_T_ *getCharForNumber(String<Char_T_> &dstring,
                                             SizeT            length) {
-        Char_T_ *str = HAllocator::Allocate<Char_T_>(length + 1U);
+        Char_T_ *str = Memory::Allocate<Char_T_>(length + 1U);
         str[length]  = 0;
         dstring      = String<Char_T_>{str, length};
         return str;

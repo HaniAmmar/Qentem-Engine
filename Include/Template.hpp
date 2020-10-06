@@ -283,11 +283,10 @@ class Template_T_ {
                                             content, current_offset, length);
 
                                     if (end_offset != 0) {
-                                        tags +=
-                                            Tag_T_{HAllocator::AllocateInit<
-                                                       LoopData_T_>(),
-                                                   offset, current_offset,
-                                                   end_offset, TagType_::Loop};
+                                        tags += Tag_T_{
+                                            Memory::AllocateInit<LoopData_T_>(),
+                                            offset, current_offset, end_offset,
+                                            TagType_::Loop};
 
                                         if (tags.IsFull()) {
                                             return;
@@ -1254,8 +1253,8 @@ class Template_T_ {
 
         void Reset() {
             if (LoopData != nullptr) {
-                HAllocator::Destruct(LoopData);
-                HAllocator::Deallocate(LoopData);
+                Memory::Destruct(LoopData);
+                Memory::Deallocate(LoopData);
                 LoopData = nullptr;
             }
         }

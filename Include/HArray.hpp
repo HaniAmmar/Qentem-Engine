@@ -53,8 +53,8 @@ class HArray {
 
     ~HArray() {
         if (storage_ != nullptr) {
-            HAllocator::Destruct(storage_, (storage_ + index_));
-            HAllocator::Deallocate(storage_);
+            Memory::Destruct(storage_, (storage_ + index_));
+            Memory::Deallocate(storage_);
         }
     }
 
@@ -73,8 +73,8 @@ class HArray {
     HArray &operator=(HArray &&h_arr) noexcept {
         if (this != &h_arr) {
             if (storage_ != nullptr) {
-                HAllocator::Destruct(storage_, (storage_ + index_));
-                HAllocator::Deallocate(storage_);
+                Memory::Destruct(storage_, (storage_ + index_));
+                Memory::Deallocate(storage_);
             }
 
             storage_  = h_arr.storage_;
@@ -128,7 +128,7 @@ class HArray {
             ++src_item;
         }
 
-        HAllocator::Deallocate(h_arr.storage_);
+        Memory::Deallocate(h_arr.storage_);
         h_arr.storage_  = nullptr;
         h_arr.capacity_ = 0;
         h_arr.index_    = 0;
@@ -218,9 +218,9 @@ class HArray {
 
         if (*item == nullptr) {
             *item = (storage_ + index_);
-            HAllocator::ConstructValues(*item, hash, nullptr,
-                                        static_cast<String<Char_T_> &&>(key),
-                                        static_cast<Value_ &&>(val));
+            Memory::ConstructValues(*item, hash, nullptr,
+                                    static_cast<String<Char_T_> &&>(key),
+                                    static_cast<Value_ &&>(val));
             ++index_;
             return;
         }
@@ -372,8 +372,8 @@ class HArray {
 
     void Reset() noexcept {
         if (storage_ != nullptr) {
-            HAllocator::Destruct(storage_, (storage_ + index_));
-            HAllocator::Deallocate(storage_);
+            Memory::Destruct(storage_, (storage_ + index_));
+            Memory::Deallocate(storage_);
             storage_  = nullptr;
             capacity_ = 0;
             index_    = 0;
@@ -388,7 +388,7 @@ class HArray {
 
         if (index_ > new_size) {
             // Shrink
-            HAllocator::Destruct((storage_ + new_size), (storage_ + index_));
+            Memory::Destruct((storage_ + new_size), (storage_ + index_));
             index_ = new_size;
         }
 
@@ -523,9 +523,8 @@ class HArray {
                           ULong hash) noexcept {
         *item = (storage_ + index_);
 
-        HAllocator::ConstructValues(*item, (*item)->Anchor, hash, nullptr,
-                                    static_cast<String<Char_T_> &&>(key),
-                                    Value_());
+        Memory::ConstructValues(*item, (*item)->Anchor, hash, nullptr,
+                                static_cast<String<Char_T_> &&>(key), Value_());
         ++index_;
     }
 
@@ -568,7 +567,7 @@ class HArray {
     }
 
     void allocate() {
-        storage_ = HAllocator::Allocate<HAItem_T>(capacity_);
+        storage_ = Memory::Allocate<HAItem_T>(capacity_);
 
         for (size_t i = 0; i < capacity_; i++) {
             storage_[i].Anchor = nullptr;
@@ -586,7 +585,7 @@ class HArray {
 
         while (src_item != end) {
             if (src_item->Hash != 0) {
-                HAllocator::ConstructValues(
+                Memory::ConstructValues(
                     des_item, nullptr, src_item->Hash, nullptr,
                     static_cast<String<Char_T_> &&>(src_item->Key),
                     static_cast<Value_ &&>(src_item->Value));
@@ -598,7 +597,7 @@ class HArray {
 
         index_ = static_cast<SizeT>(des_item - storage_);
 
-        HAllocator::Deallocate(src);
+        Memory::Deallocate(src);
         generateHash();
     }
 
@@ -631,9 +630,9 @@ class HArray {
 
             do {
                 if (src_item->Hash != 0) {
-                    HAllocator::ConstructValues(des_item, nullptr,
-                                                src_item->Hash, nullptr,
-                                                src_item->Key, src_item->Value);
+                    Memory::ConstructValues(des_item, nullptr, src_item->Hash,
+                                            nullptr, src_item->Key,
+                                            src_item->Value);
                     ++des_item;
                 }
             } while (++src_item != end);

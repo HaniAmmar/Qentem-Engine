@@ -37,7 +37,7 @@ class Array {
 
     explicit Array(SizeT size) : capacity_(size) {
         if (size != 0) {
-            storage_ = HAllocator::Allocate<Type_>(capacity_);
+            storage_ = Memory::Allocate<Type_>(capacity_);
         }
     }
 
@@ -50,11 +50,10 @@ class Array {
 
     Array(const Array &arr) : capacity_(arr.index_) {
         if (capacity_ != 0) {
-            storage_ = HAllocator::Allocate<Type_>(capacity_);
+            storage_ = Memory::Allocate<Type_>(capacity_);
 
             do {
-                HAllocator::Construct((storage_ + index_),
-                                      arr.storage_[index_]);
+                Memory::Construct((storage_ + index_), arr.storage_[index_]);
                 ++index_;
             } while (index_ != capacity_);
         }
@@ -62,8 +61,8 @@ class Array {
 
     ~Array() {
         if (storage_ != nullptr) {
-            HAllocator::Destruct(storage_, (storage_ + index_));
-            HAllocator::Deallocate(storage_);
+            Memory::Destruct(storage_, (storage_ + index_));
+            Memory::Deallocate(storage_);
         }
     }
 
@@ -77,8 +76,8 @@ class Array {
 
     Array &operator=(Array &&arr) noexcept {
         if (this != &arr) {
-            HAllocator::Destruct(storage_, (storage_ + index_));
-            HAllocator::Deallocate(storage_);
+            Memory::Destruct(storage_, (storage_ + index_));
+            Memory::Deallocate(storage_);
 
             storage_  = arr.storage_;
             index_    = arr.index_;
@@ -97,8 +96,7 @@ class Array {
             Reserve(arr.index_);
 
             while (index_ != capacity_) {
-                HAllocator::Construct((storage_ + index_),
-                                      arr.storage_[index_]);
+                Memory::Construct((storage_ + index_), arr.storage_[index_]);
                 ++index_;
             }
         }
@@ -126,7 +124,7 @@ class Array {
             }
 
             index_ = n_size;
-            HAllocator::Deallocate(arr.storage_);
+            Memory::Deallocate(arr.storage_);
         }
 
         arr.storage_  = nullptr;
@@ -147,7 +145,7 @@ class Array {
             resize(capacity_ << 1U);
         }
 
-        HAllocator::Construct((storage_ + index_), static_cast<Type_ &&>(item));
+        Memory::Construct((storage_ + index_), static_cast<Type_ &&>(item));
         ++index_;
     }
 
@@ -176,8 +174,8 @@ class Array {
     }
 
     void Reset() noexcept {
-        HAllocator::Destruct(storage_, (storage_ + index_));
-        HAllocator::Deallocate(storage_);
+        Memory::Destruct(storage_, (storage_ + index_));
+        Memory::Deallocate(storage_);
 
         storage_  = nullptr;
         index_    = 0;
@@ -185,7 +183,7 @@ class Array {
     }
 
     void Clear() noexcept {
-        HAllocator::Destruct(storage_, (storage_ + index_));
+        Memory::Destruct(storage_, (storage_ + index_));
         index_ = 0;
     }
 
@@ -205,7 +203,7 @@ class Array {
 
         if (size != 0) {
             capacity_ = size;
-            storage_  = HAllocator::Allocate<Type_>(capacity_);
+            storage_  = Memory::Allocate<Type_>(capacity_);
         }
     }
 
@@ -235,7 +233,7 @@ class Array {
 
     void GoBackTo(SizeT index) noexcept {
         if (index < index_) {
-            HAllocator::Destruct((storage_ + index), (storage_ + index_));
+            Memory::Destruct((storage_ + index), (storage_ + index_));
             index_ = index;
         }
     }
@@ -244,8 +242,7 @@ class Array {
         Resize(size);
 
         if (size > index_) {
-            HAllocator::Construct((storage_ + index_), (storage_ + size),
-                                  Type_());
+            Memory::Construct((storage_ + index_), (storage_ + size), Type_());
         }
 
         index_ = capacity_;
@@ -289,11 +286,11 @@ class Array {
     void resize(SizeT new_size) {
         capacity_  = new_size;
         Type_ *tmp = storage_;
-        storage_   = HAllocator::Allocate<Type_>(new_size);
+        storage_   = Memory::Allocate<Type_>(new_size);
 
         if (index_ > new_size) {
             // Shrink
-            HAllocator::Destruct((storage_ + new_size), (storage_ + index_));
+            Memory::Destruct((storage_ + new_size), (storage_ + index_));
             index_ = new_size;
         }
 
@@ -301,7 +298,7 @@ class Array {
             Memory::Copy(storage_, tmp, (index_ * sizeof(Type_)));
         }
 
-        HAllocator::Deallocate(tmp);
+        Memory::Deallocate(tmp);
     }
 
     QENTEM_NOINLINE void copyArray(const Array &arr) {
@@ -314,7 +311,7 @@ class Array {
         SizeT n = 0;
 
         while (n != arr.index_) {
-            HAllocator::Construct((storage_ + index_), arr.storage_[n]);
+            Memory::Construct((storage_ + index_), arr.storage_[n]);
             ++index_;
             ++n;
         }
