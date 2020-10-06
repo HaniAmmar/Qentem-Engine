@@ -124,6 +124,13 @@ class HAllocator {
         return ptr;
     }
 
+    template <typename Type_, typename... Values_T_>
+    inline static Type_ *AllocateInit(const Values_T_ &... values) {
+        Type_ *ptr = Allocate<Type_>(1);
+        new (ptr) Type_(values...);
+        return ptr;
+    }
+
     template <typename Type_>
     inline static Type_ *AllocateInit() {
         Type_ *ptr = Allocate<Type_>(1);
@@ -132,26 +139,33 @@ class HAllocator {
     }
 
     template <typename Type_>
-    QENTEM_NOINLINE static Type_ *AllocatePointers(SizeT size) noexcept {
-        const SizeT c_size = (size * sizeof(void *));
-        void *      vptr   = malloc(c_size);
-        Memory::SetToZero(vptr, c_size);
-
-        return static_cast<Type_ *>(vptr);
+    inline static void Construct(Type_ *ptr, const Type_ &value) noexcept {
+        new (ptr) Type_{value};
     }
 
     template <typename Type_>
     inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
-        new (ptr) Type_(static_cast<Type_ &&>(value));
+        new (ptr) Type_{static_cast<Type_ &&>(value)};
     }
 
     template <typename Type_>
     inline static void Construct(Type_ *start, const Type_ *end,
                                  const Type_ &value) noexcept {
         while (start < end) {
-            new (start) Type_(value);
+            new (start) Type_{value};
             ++start;
         }
+    }
+
+    template <typename Type_, typename... Values_T_>
+    inline static void ConstructValues(Type_ *ptr, Values_T_ &&... values) {
+        new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
+    }
+
+    template <typename Type_, typename... Values_T_>
+    inline static void ConstructValues(Type_ *ptr,
+                                       const Values_T_ &... values) {
+        new (ptr) Type_{values...};
     }
 
     template <typename Type_>
