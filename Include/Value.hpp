@@ -109,9 +109,11 @@ class Value {
     }
 
     ~Value() {
-        if (type_ != ValueType::Undefined) {
-            Reset();
+        if (type_ == ValueType::Undefined) {
+            return;
         }
+
+        reset();
     }
 
     Value &operator[](const Char_T_ *key) {
@@ -221,9 +223,7 @@ class Value {
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            if (type_ != ValueType::Undefined) {
-                Reset();
-            }
+            reset();
 
             value_ = val.value_;
             type_  = val.type_;
@@ -262,13 +262,11 @@ class Value {
                     }
                 }
             } else {
-                if (type_ != ValueType::Undefined) {
-                    Reset();
-                }
+                reset();
+                type_ = val.type_;
 
-                if (val.type_ != ValueType::Undefined) {
+                if (type_ != ValueType::Undefined) {
                     copyValue(val);
-                    type_ = val.type_;
                 }
             }
         }
@@ -293,7 +291,7 @@ class Value {
             }
 
             default: {
-                Reset();
+                reset();
                 type_ = ValueType::Object;
             }
         }
@@ -325,7 +323,7 @@ class Value {
             }
 
             default: {
-                Reset();
+                reset();
                 type_ = ValueType::Array;
             }
         }
@@ -357,7 +355,7 @@ class Value {
             }
 
             default: {
-                Reset();
+                reset();
                 type_ = ValueType::String;
             }
         }
@@ -392,7 +390,7 @@ class Value {
             }
 
             default: {
-                Reset();
+                reset();
                 type_ = ValueType::Number;
             }
         }
@@ -408,41 +406,13 @@ class Value {
     }
 
     Value &operator=(NullType) {
-        switch (type_) {
-            case ValueType::Null: {
-                break;
-            }
-
-            case ValueType::Undefined:
-            case ValueType::True:
-            case ValueType::False: {
-                type_ = ValueType::Null;
-                break;
-            }
-
-            default: {
-                Reset();
-                type_ = ValueType::Null;
-            }
-        }
-
+        reset();
+        type_ = ValueType::Null;
         return *this;
     }
 
     Value &operator=(bool is_true) noexcept {
-        switch (type_) {
-            case ValueType::Undefined:
-            case ValueType::True:
-            case ValueType::False:
-            case ValueType::Null: {
-                break;
-            }
-
-            default: {
-                Reset();
-            }
-        }
-
+        reset();
         type_ = (is_true ? ValueType::True : ValueType::False);
         return *this;
     }
@@ -963,32 +933,9 @@ class Value {
         Remove(static_cast<SizeT>(index));
     }
 
-    QENTEM_NOINLINE void Reset() noexcept {
-        switch (type_) {
-            case ValueType::Object: {
-                HAllocator::Destruct(value_.object_);
-                HAllocator::Deallocate(value_.object_);
-                break;
-            }
-
-            case ValueType::Array: {
-                HAllocator::Destruct(value_.array_);
-                HAllocator::Deallocate(value_.array_);
-                break;
-            }
-
-            case ValueType::String: {
-                HAllocator::Destruct(value_.string_);
-                HAllocator::Deallocate(value_.string_);
-                break;
-            }
-
-            default: {
-            }
-        }
-
-        value_.object_ = nullptr;
-        type_          = ValueType::Undefined;
+    void Reset() noexcept {
+        reset();
+        type_ = ValueType::Undefined;
     }
 
     void Compress() {
@@ -1130,6 +1077,31 @@ class Value {
     }
 
   private:
+    QENTEM_NOINLINE void reset() noexcept {
+        switch (type_) {
+            case ValueType::Object: {
+                HAllocator::Destruct(value_.object_);
+                HAllocator::Deallocate(value_.object_);
+                break;
+            }
+
+            case ValueType::Array: {
+                HAllocator::Destruct(value_.array_);
+                HAllocator::Deallocate(value_.array_);
+                break;
+            }
+
+            case ValueType::String: {
+                HAllocator::Destruct(value_.string_);
+                HAllocator::Deallocate(value_.string_);
+                break;
+            }
+
+            default: {
+            }
+        }
+    }
+
     void copyValue(const Value &val) {
         switch (val.type_) {
             case ValueType::Object: {
