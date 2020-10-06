@@ -103,11 +103,6 @@ class Value {
                 break;
             }
 
-            case ValueType::Number: {
-                number_ = 0;
-                break;
-            }
-
             default: {
             }
         }
@@ -1127,7 +1122,7 @@ class Value {
         VObject object_;
         VArray  array_;
         VString string_;
-        double  number_;
+        double  number_{0};
     };
 
     ValueType type_{ValueType::Undefined};
