@@ -170,13 +170,13 @@ class JSONParser {
 #endif
 
     VValue parseObject(const Char_T_ *content, SizeT &offset, SizeT length) {
-        VValue   value           = VValue{ValueType::Object};
-        VObject &obj             = *(value.GetObject());
-        VValue * obj_value       = nullptr;
-        SizeT    previous_offset = offset;
-        bool     pass_comma      = false;
-        bool     has_colon       = false;
-        bool     is_valid        = false;
+        VValue  value;
+        VObject obj;
+        VValue *obj_value       = nullptr;
+        SizeT   previous_offset = offset;
+        bool    pass_comma      = false;
+        bool    has_colon       = false;
+        bool    is_valid        = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
@@ -228,7 +228,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -253,9 +252,8 @@ class JSONParser {
                         }
 
                         if (has_colon) {
-                            *obj_value = static_cast<VValue &&>(
-                                VValue{HAllocator::AllocateInit<VString>(
-                                    buffer_.First(), buffer_.Length())});
+                            *obj_value =
+                                VString{buffer_.First(), buffer_.Length()};
                             obj_value  = nullptr;
                             pass_comma = true;
                             has_colon  = false;
@@ -267,7 +265,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -283,7 +280,6 @@ class JSONParser {
                     }
 
                     if ((obj_value == nullptr) || !has_colon) {
-                        value.Reset();
                         return value;
                     }
 
@@ -299,7 +295,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -317,7 +312,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -336,12 +330,12 @@ class JSONParser {
 
                         if (!is_valid || !has_colon) {
                             offset = 0;
-                            value.Reset();
                             return value;
                         }
                     }
 
                     ++offset;
+                    value = static_cast<VObject &&>(obj);
                     return value;
                 }
             }
@@ -356,16 +350,15 @@ class JSONParser {
 #endif
 
         offset = 0;
-        value.Reset();
         return value;
     }
 
     VValue parseArray(const Char_T_ *content, SizeT &offset, SizeT length) {
-        VValue  value           = VValue{ValueType::Array};
-        VArray &arr             = *(value.GetArray());
-        SizeT   previous_offset = offset;
-        bool    pass_comma      = false;
-        bool    is_valid        = false;
+        VValue value;
+        VArray arr;
+        SizeT  previous_offset = offset;
+        bool   pass_comma      = false;
+        bool   is_valid        = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
@@ -414,7 +407,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -426,9 +418,8 @@ class JSONParser {
                         const SizeT len =
                             UnEscapeJSON((content + offset), length, buffer_);
 
-                        arr += static_cast<VValue &&>(
-                            VValue{HAllocator::AllocateInit<VString>(
-                                buffer_.First(), buffer_.Length())});
+                        arr +=
+                            VValue{VString{buffer_.First(), buffer_.Length()}};
 
                         offset += len;
                         previous_offset = offset;
@@ -440,7 +431,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -465,7 +455,6 @@ class JSONParser {
                     }
 
                     offset = 0;
-                    value.Reset();
                     return value;
                 }
 
@@ -484,12 +473,13 @@ class JSONParser {
 
                         if (!is_valid || pass_comma) {
                             offset = 0;
-                            value.Reset();
                             return value;
                         }
                     }
 
                     ++offset;
+                    value = static_cast<VArray &&>(arr);
+
                     return value;
                 }
             }
@@ -504,7 +494,6 @@ class JSONParser {
 #endif
 
         offset = 0;
-        value.Reset();
         return value;
     }
 
