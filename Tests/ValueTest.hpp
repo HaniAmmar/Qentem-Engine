@@ -40,96 +40,96 @@ static int TestEmptyValue1() {
     double             num_var;
     bool               bool_var;
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value1.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
-                 "SetCharAndLength()", "false");
-    SHOULD_EQUAL(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value1.IsObject(), "IsObject()");
+    EQ_FALSE(value1.IsArray(), "IsArray()");
+    EQ_FALSE(value1.IsString(), "IsString()");
+    EQ_FALSE(value1.IsNumber(), "IsNumber()");
+    EQ_FALSE(value1.IsTrue(), "IsTrue()");
+    EQ_FALSE(value1.IsFalse(), "IsFalse()");
+    EQ_FALSE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value1.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
+          "SetCharAndLength()", "false");
+    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value1.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value1.IsObject(), "IsObject()");
+    EQ_FALSE(value1.IsArray(), "IsArray()");
+    EQ_FALSE(value1.IsString(), "IsString()");
+    EQ_FALSE(value1.IsNumber(), "IsNumber()");
+    EQ_FALSE(value1.IsTrue(), "IsTrue()");
+    EQ_FALSE(value1.IsFalse(), "IsFalse()");
+    EQ_FALSE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value1.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value2.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value2.IsObject(), "IsObject()");
+    EQ_FALSE(value2.IsArray(), "IsArray()");
+    EQ_FALSE(value2.IsString(), "IsString()");
+    EQ_FALSE(value2.IsNumber(), "IsNumber()");
+    EQ_FALSE(value2.IsTrue(), "IsTrue()");
+    EQ_FALSE(value2.IsFalse(), "IsFalse()");
+    EQ_FALSE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value2.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -143,122 +143,122 @@ static int TestEmptyValue2() {
     bool         bool_var;
 
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value1.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value1.IsObject(), "IsObject()");
+    EQ_FALSE(value1.IsArray(), "IsArray()");
+    EQ_FALSE(value1.IsString(), "IsString()");
+    EQ_FALSE(value1.IsNumber(), "IsNumber()");
+    EQ_FALSE(value1.IsTrue(), "IsTrue()");
+    EQ_FALSE(value1.IsFalse(), "IsFalse()");
+    EQ_FALSE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value1.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value2.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value2.IsObject(), "IsObject()");
+    EQ_FALSE(value2.IsArray(), "IsArray()");
+    EQ_FALSE(value2.IsString(), "IsString()");
+    EQ_FALSE(value2.IsNumber(), "IsNumber()");
+    EQ_FALSE(value2.IsTrue(), "IsTrue()");
+    EQ_FALSE(value2.IsFalse(), "IsFalse()");
+    EQ_FALSE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value2.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     Value<char> value3(value1);
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value1.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value1.IsObject(), "IsObject()");
+    EQ_FALSE(value1.IsArray(), "IsArray()");
+    EQ_FALSE(value1.IsString(), "IsString()");
+    EQ_FALSE(value1.IsNumber(), "IsNumber()");
+    EQ_FALSE(value1.IsTrue(), "IsTrue()");
+    EQ_FALSE(value1.IsFalse(), "IsFalse()");
+    EQ_FALSE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value1.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value3.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value3.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value3.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value3.Size(), 0, "Type()");
-    SHOULD_EQUAL(value3.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value3.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value3.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value3.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value3.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value3.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value3.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value3.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value3.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value3.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value3.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value3.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value3.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value3.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value3.Stringify(), "", "Stringify()");
+    EQ_TRUE(value3.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value3.IsObject(), "IsObject()");
+    EQ_FALSE(value3.IsArray(), "IsArray()");
+    EQ_FALSE(value3.IsString(), "IsString()");
+    EQ_FALSE(value3.IsNumber(), "IsNumber()");
+    EQ_FALSE(value3.IsTrue(), "IsTrue()");
+    EQ_FALSE(value3.IsFalse(), "IsFalse()");
+    EQ_FALSE(value3.IsNull(), "IsNull()");
+    EQ_TO(value3.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value3.Size(), 0, "Type()");
+    EQ_TO(value3.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value3.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value3.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value3.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value3.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value3.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value3.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value3.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value3.Length(), 0, "Length()");
+    EQ_FALSE(value3.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value3.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value3.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value3.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value3.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -272,75 +272,75 @@ static int TestEmptyValue3() {
     bool               bool_var;
 
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value1.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "isUndefined()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_NOT_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetValue(10), nullptr, "GetValue(10)", "null");
-    SHOULD_EQUAL(value2.GetValue("", 0), nullptr,
-                 "GetValue("
-                 ", 0)",
-                 "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value1.IsObject(), "IsObject()");
+    EQ_FALSE(value1.IsArray(), "IsArray()");
+    EQ_FALSE(value1.IsString(), "IsString()");
+    EQ_FALSE(value1.IsNumber(), "IsNumber()");
+    EQ_FALSE(value1.IsTrue(), "IsTrue()");
+    EQ_FALSE(value1.IsFalse(), "IsFalse()");
+    EQ_FALSE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value1.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_FALSE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsUndefined(), "isUndefined()");
+    EQ_FALSE(value2.IsObject(), "IsObject()");
+    EQ_FALSE(value2.IsArray(), "IsArray()");
+    EQ_FALSE(value2.IsString(), "IsString()");
+    EQ_FALSE(value2.IsNumber(), "IsNumber()");
+    EQ_FALSE(value2.IsTrue(), "IsTrue()");
+    EQ_FALSE(value2.IsFalse(), "IsFalse()");
+    EQ_FALSE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetValue(10), nullptr, "GetValue(10)", "null");
+    EQ_TO(value2.GetValue("", 0), nullptr,
+          "GetValue("
+          ", 0)",
+          "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     value2 = Value<char>{ValueType::Object};
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
 
     value2 = Value<char>{ValueType::Array};
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
 
     value2 = Value<char>{ValueType::String};
-    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
+    EQ_TRUE(value2.IsString(), "IsString()");
 
     value2 = Value<char>{ValueType::Number};
-    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
+    EQ_TRUE(value2.IsNumber(), "IsNumber()");
 
     END_SUB_TEST;
 }
@@ -357,90 +357,90 @@ static int TestTrueValue1() {
     bool               bool_var;
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value1.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), true,
-                 "SetCharAndLength()", "true");
-    SHOULD_EQUAL(StringUtils::IsEqual("true", c_str_var, c_str_len), true,
-                 "true", "value1.SetCharAndLength()");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    SHOULD_EQUAL_VALUE(ss_var, "true", "ss_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TO(value1.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
+          "SetCharAndLength()", "true");
+    EQ_TO(StringUtils::IsEqual("true", c_str_var, c_str_len), true, "true",
+          "value1.SetCharAndLength()");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_VALUE(ss_var, "true", "ss_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = true;
     value2 = true;
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value2.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value1.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TO(value1.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -455,80 +455,80 @@ static int TestTrueValue2() {
 
     value1 = true;
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value2.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value1.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TO(value1.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value2.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -542,46 +542,46 @@ static int TestTrueValue3() {
 
     value1 = true;
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
-    SHOULD_EQUAL(value2.Type(), ValueType::True, "Type()", "True");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 1, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 1, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     value2 = true;
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
+    EQ_TRUE(value2.IsTrue(), "IsTrue()");
 
     value2 = Value<char>{ValueType::True};
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "IsTrue()");
+    EQ_TRUE(value2.IsTrue(), "IsTrue()");
 
     END_SUB_TEST;
 }
@@ -598,90 +598,90 @@ static int TestFalseValue1() {
     bool               bool_var;
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value1.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), true,
-                 "SetCharAndLength()", "true");
-    SHOULD_EQUAL(StringUtils::IsEqual("false", c_str_var, c_str_len), true,
-                 "true", "value1.SetCharAndLength()");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    SHOULD_EQUAL_VALUE(ss_var, "false", "ss_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TO(value1.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
+          "SetCharAndLength()", "true");
+    EQ_TO(StringUtils::IsEqual("false", c_str_var, c_str_len), true, "true",
+          "value1.SetCharAndLength()");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_VALUE(ss_var, "false", "ss_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = false;
     value2 = false;
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value2.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value1.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TO(value1.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -696,80 +696,80 @@ static int TestFalseValue2() {
 
     value1 = false;
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value2.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value1.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TO(value1.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value2.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -783,46 +783,46 @@ static int TestFalseValue3() {
 
     value1 = false;
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
-    SHOULD_EQUAL(value2.Type(), ValueType::False, "Type()", "False");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     value2 = false;
-    SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
+    EQ_TRUE(value2.IsFalse(), "IsFalse()");
 
     value2 = Value<char>{ValueType::False};
-    SHOULD_EQUAL_TRUE(value2.IsFalse(), "IsFalse()");
+    EQ_TRUE(value2.IsFalse(), "IsFalse()");
 
     END_SUB_TEST;
 }
@@ -839,90 +839,90 @@ static int TestNullValue1() {
     bool               bool_var;
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), true,
-                 "SetCharAndLength()", "true");
-    SHOULD_EQUAL(StringUtils::IsEqual("null", c_str_var, c_str_len), true,
-                 "true", "value1.SetCharAndLength()");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    SHOULD_EQUAL_VALUE(ss_var, "null", "ss_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
+          "SetCharAndLength()", "true");
+    EQ_TO(StringUtils::IsEqual("null", c_str_var, c_str_len), true, "true",
+          "value1.SetCharAndLength()");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_VALUE(ss_var, "null", "ss_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = nullptr;
     value2 = nullptr;
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -937,80 +937,80 @@ static int TestNullValue2() {
 
     value1 = nullptr;
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TO(value1.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1024,46 +1024,46 @@ static int TestNullValue3() {
 
     value1 = nullptr;
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Null, "Type()", "Null");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "null", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNull(), "IsNull()");
+    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "null", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     value2 = nullptr;
-    SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
+    EQ_TRUE(value2.IsNull(), "IsNull()");
 
     value2 = Value<char>{ValueType::Null};
-    SHOULD_EQUAL_TRUE(value2.IsNull(), "IsNull()");
+    EQ_TRUE(value2.IsNull(), "IsNull()");
 
     END_SUB_TEST;
 }
@@ -1080,88 +1080,88 @@ static int TestNumberValue1() {
     bool               bool_var;
 
     value1 = 33;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
-                 "SetCharAndLength()", "false");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "33", "str_var");
-    SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    SHOULD_EQUAL_VALUE(ss_var, "33", "ss_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 33, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_TO(value1.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
+          "SetCharAndLength()", "false");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "33", "str_var");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_VALUE(ss_var, "33", "ss_var");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 33, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = 45;
     value2 = -10;
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 45, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNumber(), "IsNumber()");
+    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "45", "str_var");
+    EQ_VALUE(value2.GetNumber(), 45, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 45, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 45, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_TO(value1.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "45", "str_var");
+    EQ_VALUE(value1.GetNumber(), 45, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 45, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1176,80 +1176,80 @@ static int TestNumberValue2() {
 
     value1 = 10;
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "10", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 10, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNumber(), "IsNumber()");
+    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "10", "str_var");
+    EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 10, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "10", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 10, "num_var");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_TO(value1.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "10", "str_var");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 10, "num_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "10", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 10, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNumber(), "IsNumber()");
+    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "10", "str_var");
+    EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 10, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1263,58 +1263,58 @@ static int TestNumberValue3() {
 
     value1 = ULong{13};
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Number, "Type()", "Number");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "13", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 13, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 13, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsNumber(), "IsNumber()");
+    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "13", "str_var");
+    EQ_VALUE(value2.GetNumber(), 13, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 13, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     value2 = 1213;
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 1213, "GetNumber()");
+    EQ_VALUE(value2.GetNumber(), 1213, "GetNumber()");
 
     value2 = 785;
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 785, "GetNumber()");
+    EQ_VALUE(value2.GetNumber(), 785, "GetNumber()");
 
     value2 = UInt{0};
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
 
     value2 = int{-8};
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
 
     value2 = Value<char>{double{3.75}};
-    SHOULD_EQUAL_TRUE(value2.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 3.75, "GetNumber()");
+    EQ_TRUE(value2.IsNumber(), "IsNumber()");
+    EQ_VALUE(value2.GetNumber(), 3.75, "GetNumber()");
 
     END_SUB_TEST;
 }
@@ -1331,101 +1331,95 @@ static int TestStringValue1() {
     bool               bool_var;
 
     value1 = "Qentem";
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), true,
-                 "SetCharAndLength()", "true");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len),
-        true, "value1.StringStorage()", "value1.SetCharAndLength()");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value1.GetString()), "Qentem", "GetString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value1.StringStorage(), "Qentem", 6),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value1.Length(), 6, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "Qentem", "str_var");
-    SHOULD_EQUAL_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    SHOULD_EQUAL_VALUE(ss_var, "Qentem", "ss_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
+          "SetCharAndLength()", "true");
+    EQ_TO(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len),
+          true, "value1.StringStorage()", "value1.SetCharAndLength()");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value1.GetString()), "Qentem", "GetString()");
+    NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "Qentem", 6),
+            "IsEqual()");
+    EQ_VALUE(value1.Length(), 6, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "Qentem", "str_var");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_VALUE(ss_var, "Qentem", "ss_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
-                 "SetCharAndLength()", "false");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
+          "SetCharAndLength()", "false");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = "45";
     value2 = "-50";
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value1.GetString()), "45", "GetString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value1.StringStorage(), "45", 2),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value1.Length(), 2, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value1.GetString()), "45", "GetString()");
+    NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "45", 2), "IsEqual()");
+    EQ_VALUE(value1.Length(), 2, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "45", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 45, "num_var");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_EQUAL(value2.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value2.GetString()), "45", "GetString()");
-    SHOULD_NOT_EQUAL(value2.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value2.StringStorage(), "45", 2),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value2.Length(), 2, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "45", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 45, "num_var");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsString(), "IsString()");
+    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value2.GetString()), "45", "GetString()");
+    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "45", 2), "IsEqual()");
+    EQ_VALUE(value2.Length(), 2, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "45", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 45, "num_var");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1440,90 +1434,87 @@ static int TestStringValue2() {
 
     value1 = "true";
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_EQUAL(value2.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value2.GetString()), "true", "GetString()");
-    SHOULD_NOT_EQUAL(value2.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value2.StringStorage(), "true", 4),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value2.Length(), 4, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.IsString(), "IsString()");
+    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value2.GetString()), "true", "GetString()");
+    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "true", 4),
+            "IsEqual()");
+    EQ_VALUE(value2.Length(), 4, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
     bool_var = false;
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value1.GetString()), "true", "GetString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value1.StringStorage(), "true", 4),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value1.Length(), 4, "Length()");
-    SHOULD_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value1.GetString()), "true", "GetString()");
+    NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "true", 4),
+            "IsEqual()");
+    EQ_VALUE(value1.Length(), 4, "Length()");
+    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_EQUAL(value2.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value2.GetString()), "true", "GetString()");
-    SHOULD_NOT_EQUAL(value2.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value2.StringStorage(), "true", 4),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value2.Length(), 4, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "true", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.IsString(), "IsString()");
+    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value2.GetString()), "true", "GetString()");
+    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "true", 4),
+            "IsEqual()");
+    EQ_VALUE(value2.Length(), 4, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "true", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1537,64 +1528,63 @@ static int TestStringValue3() {
 
     value1 = "false";
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_EQUAL(value2.Type(), ValueType::String, "Type()", "String");
-    SHOULD_EQUAL_VALUE(value2.Size(), 0, "Type()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL_VALUE(*(value2.GetString()), "false", "GetString()");
-    SHOULD_NOT_EQUAL(value2.StringStorage(), nullptr, "StringStorage()",
-                     "null");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value2.StringStorage(), "false", 5),
-                      "IsEqual()");
-    SHOULD_EQUAL_VALUE(value2.Length(), 5, "Length()");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "false", "str_var");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_EQUAL_VALUE(num_var, 0, "num_var");
+    EQ_TRUE(value2.IsString(), "IsString()");
+    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
+    EQ_VALUE(value2.Size(), 0, "Type()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_VALUE(*(value2.GetString()), "false", "GetString()");
+    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "false", 5),
+            "IsEqual()");
+    EQ_VALUE(value2.Length(), 5, "Length()");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "false", "str_var");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(num_var, 0, "num_var");
     bool_var = true;
-    SHOULD_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_NOT_EQUAL_TRUE(bool_var, "bool_var");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(bool_var, "bool_var");
+    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     str_var           = "qen";
     const char *c_str = str_var.First();
     value2            = str_var; // Copy of a string
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "qen", "str_var");
-    SHOULD_NOT_EQUAL(value2.StringStorage(), c_str, "str_var.First()", "c_str");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "qen", "str_var");
+    NOT_EQ_TO(value2.StringStorage(), c_str, "str_var.First()", "c_str");
 
     String<char> *str_p =
         HAllocator::AllocateInit<String<char>>(String<char>("ABC"));
     value2 = Value<char>{str_p};
-    SHOULD_EQUAL_TRUE(value2.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.GetString(), str_p, "GetString()", "str_p");
-    SHOULD_EQUAL_VALUE(*(value2.GetString()), "ABC", "GetString()");
+    EQ_TRUE(value2.IsString(), "IsString()");
+    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.GetString(), str_p, "GetString()", "str_p");
+    EQ_VALUE(*(value2.GetString()), "ABC", "GetString()");
 
     value2 = String<char>("123");
-    SHOULD_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(str_var, "123", "str_var");
+    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "123", "str_var");
 
     END_SUB_TEST;
 }
@@ -1616,46 +1606,46 @@ static int TestArrayValue1() {
     storage = arr_var.First();
 
     value1 = arr_var; // Copy.
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value1.Size(), 5, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(4), nullptr, "GetValue(4)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
-                 "SetCharAndLength()", "false");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), storage, "GetArray()->First()",
-                     "storage");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_TO(value1.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value1.Size(), 5, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
+          "SetCharAndLength()", "false");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
+              "storage");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     arr_var.ResizeAndInitialize(10);
     storage = arr_var.First();
@@ -1666,47 +1656,47 @@ static int TestArrayValue1() {
     value1 = static_cast<Array<Value<char>> &&>(arr_var); // Move
     value2 = static_cast<Array<Value<char>> &&>(arr_var2);
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value1.Size(), 10, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(9), nullptr, "GetValue(9)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_TO(value1.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value1.Size(), 10, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(9), nullptr, "GetValue(9)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 10, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(4), nullptr, "GetValue(4)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
-                     "storage");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 10, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+              "storage");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1726,86 +1716,86 @@ static int TestArrayValue2() {
     value1  = static_cast<Array<Value<char>> &&>(arr_var);
 
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
-                     "storage");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 7, "Size()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+              "storage");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value1.Size(), 7, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_TO(value1.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value1.Size(), 7, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 7, "Size()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -1824,77 +1814,76 @@ static int TestArrayValue3() {
     value1  = static_cast<Array<Value<char>> &&>(arr_var);
 
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Array, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
-    SHOULD_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_EQUAL(value2.GetValue(10), nullptr, "GetValue(6)", "null");
-    SHOULD_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "[]", "Stringify()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 7, "Size()");
+    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_TO(value2.GetValue(10), nullptr, "GetValue(6)", "null");
+    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     arr_var.ResizeAndInitialize(3);
     storage = arr_var.First();
     value2  = arr_var; // Copy
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
-                     "storage");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    EQ_VALUE(value2.Size(), 3, "Size()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+              "storage");
 
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
     value2  = static_cast<Array<Value<char>> &&>(arr_var); // Move
-    SHOULD_NOT_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value2.Size(), 13, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value2.GetArray()->First(), storage, "GetArray()->First()",
-                 "storage");
+    EQ_FALSE(value1.IsArray(), "IsArray()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    EQ_VALUE(value2.Size(), 13, "Size()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+          "storage");
 
     Array<Value<char>> *arr_p =
         HAllocator::AllocateInit<Array<Value<char>>>(Array<Value<char>>(3));
     value2 = Value<char>{arr_p};
-    SHOULD_EQUAL_TRUE(value2.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetArray(), arr_p, "GetArray()", "arr_p");
-    SHOULD_NOT_EQUAL(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL_VALUE(value2.GetArray()->Capacity(), 3,
-                       "GetArray()->Capacity()");
+    EQ_TRUE(value2.IsArray(), "IsArray()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetArray(), arr_p, "GetArray()", "arr_p");
+    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_VALUE(value2.GetArray()->Capacity(), 3, "GetArray()->Capacity()");
 
     END_SUB_TEST;
 }
@@ -1908,9 +1897,9 @@ static int TestArrayValue4() {
 
     value1[0] = 1;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value1[0].GetNumber(), 1, R"(value1[0].GetNumber())");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_VALUE(value1[0].GetNumber(), 1, R"(value1[0].GetNumber())");
 
     value1.Reset();
 
@@ -1918,13 +1907,13 @@ static int TestArrayValue4() {
     value1[1] = 2;
     value1[2] = 3;
 
-    SHOULD_EQUAL_VALUE(value1.Size(), 3, "value1.Size()");
+    EQ_VALUE(value1.Size(), 3, "value1.Size()");
 
     value2 = value1;
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2[0].GetNumber(), 1, "value2[0].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[1].GetNumber(), 2, "value2[1].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[2].GetNumber(), 3, "value2[2].GetNumber()");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2[0].GetNumber(), 1, "value2[0].GetNumber()");
+    EQ_VALUE(value2[1].GetNumber(), 2, "value2[1].GetNumber()");
+    EQ_VALUE(value2[2].GetNumber(), 3, "value2[2].GetNumber()");
 
     value1[0] = 11;
     value1[1] = 22;
@@ -1933,36 +1922,36 @@ static int TestArrayValue4() {
     value1[2] = static_cast<String<char> &&>(str_var);
 
     value2 = value1;
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    SHOULD_NOT_EQUAL(value2[2].StringStorage(), str_c,
-                     "value2[2].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3),
-                 true, "value2[2].StringStorage()", "Qen");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
+    EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
+    NOT_EQ_TO(value2[2].StringStorage(), str_c, "value2[2].StringStorage()",
+              "str_c");
+    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
+          "value2[2].StringStorage()", "Qen");
 
     value2[3] = 44;
     value2[4] = 55;
-    SHOULD_EQUAL_VALUE(value2.Size(), 5, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    SHOULD_NOT_EQUAL(value2[2].StringStorage(), str_c,
-                     "value2[2].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3),
-                 true, "value2[2].StringStorage()", "Qen");
-    SHOULD_EQUAL_VALUE(value2[3].GetNumber(), 44, "value2[3].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[4].GetNumber(), 55, "value2[4].GetNumber()");
+    EQ_VALUE(value2.Size(), 5, "value2.Size()");
+    EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
+    EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
+    NOT_EQ_TO(value2[2].StringStorage(), str_c, "value2[2].StringStorage()",
+              "str_c");
+    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
+          "value2[2].StringStorage()", "Qen");
+    EQ_VALUE(value2[3].GetNumber(), 44, "value2[3].GetNumber()");
+    EQ_VALUE(value2[4].GetNumber(), 55, "value2[4].GetNumber()");
 
     value2 = value1;
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    SHOULD_NOT_EQUAL(value2[2].StringStorage(), str_c,
-                     "value2[2].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3),
-                 true, "value2[2].StringStorage()", "Qen");
-    SHOULD_EQUAL(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
-    SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
+    EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
+    NOT_EQ_TO(value2[2].StringStorage(), str_c, "value2[2].StringStorage()",
+              "str_c");
+    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
+          "value2[2].StringStorage()", "Qen");
+    EQ_TO(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
+    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////////////////////
     arr_var.ResizeAndInitialize(4);
@@ -1974,15 +1963,15 @@ static int TestArrayValue4() {
     arr_var[3] = static_cast<String<char> &&>(str_var);
 
     value2 = arr_var;
-    SHOULD_EQUAL_VALUE(value2.Size(), 4, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2[0].GetNumber(), 10, "value2[0].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[1].GetNumber(), 20, "value2[1].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2[2].GetNumber(), 30, "value2[1].GetNumber()");
-    SHOULD_NOT_EQUAL(value2[3].StringStorage(), str_c,
-                     "value2[3].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2[3].StringStorage(), "Qentem", 6),
-                 true, "value2[3].StringStorage()", "Qentem");
-    SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_VALUE(value2.Size(), 4, "value2.Size()");
+    EQ_VALUE(value2[0].GetNumber(), 10, "value2[0].GetNumber()");
+    EQ_VALUE(value2[1].GetNumber(), 20, "value2[1].GetNumber()");
+    EQ_VALUE(value2[2].GetNumber(), 30, "value2[1].GetNumber()");
+    NOT_EQ_TO(value2[3].StringStorage(), str_c, "value2[3].StringStorage()",
+              "str_c");
+    EQ_TO(StringUtils::IsEqual(value2[3].StringStorage(), "Qentem", 6), true,
+          "value2[3].StringStorage()", "Qentem");
+    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////////////////////
 
@@ -1991,22 +1980,22 @@ static int TestArrayValue4() {
     arr_var.ResizeAndInitialize(10);
     arr_var.GoBackTo(5);
     value2 = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_VALUE(value2.Size(), 5, "value2.Size()");
+    EQ_VALUE(value2.Size(), 5, "value2.Size()");
 
     value2 += 1;
 
     value2.Compress();
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL_VALUE(value2.GetArray()->Capacity(), 6, "Capacity()");
-    SHOULD_EQUAL_VALUE(value2.GetArray()->Size(), 1, "Size()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_VALUE(value2.GetArray()->Capacity(), 6, "Capacity()");
+    EQ_VALUE(value2.GetArray()->Size(), 1, "Size()");
 
     arr_var.Reset();
     arr_var.Reserve(10);
     value2 = static_cast<Array<Value<char>> &&>(arr_var);
     value2.Compress();
-    SHOULD_NOT_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL_VALUE(value2.GetArray()->Capacity(), 0, "Capacity()");
-    SHOULD_EQUAL_VALUE(value2.GetArray()->Size(), 0, "Size()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_VALUE(value2.GetArray()->Capacity(), 0, "Capacity()");
+    EQ_VALUE(value2.GetArray()->Size(), 0, "Size()");
 
     END_SUB_TEST;
 }
@@ -2035,53 +2024,51 @@ static int TestObjectValue1() {
     storage = h_arr_var.First();
 
     value1 = h_arr_var; // Copy.
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value1.Size(), 5, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value1.GetValue(4), nullptr, "GetValue(4)", "null");
-    SHOULD_NOT_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value1.GetKey(4), nullptr, "GetKey(4)", "null");
-    SHOULD_NOT_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)",
-                     "false");
-    SHOULD_NOT_EQUAL(value1.InsertKey(ss_var, 4), false, "InsertKey(4)",
-                     "false");
-    SHOULD_EQUAL(value1.SetCharAndLength(c_str_var, c_str_len), false,
-                 "SetCharAndLength()", "false");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    EQ_TO(value1.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value1.Size(), 5, "Size()");
+    NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
+    NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value1.GetKey(4), nullptr, "GetKey(4)", "null");
+    NOT_EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    NOT_EQ_TO(value1.InsertKey(ss_var, 4), false, "InsertKey(4)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
+          "SetCharAndLength()", "false");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
+              "storage");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value1 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
 
     value1.Reset();
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2 = h_arr_var;
 
@@ -2096,50 +2083,50 @@ static int TestObjectValue1() {
 
     value1 = static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
     value2 = value1;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value1.Size(), 10, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value1.GetValue(9), nullptr, "GetValue(9)", "null");
-    SHOULD_NOT_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value1.GetKey(9), nullptr, "GetKey(9)", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    EQ_TO(value1.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value1.Size(), 10, "Size()");
+    NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value1.GetValue(9), nullptr, "GetValue(9)", "null");
+    NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value1.GetKey(9), nullptr, "GetKey(9)", "null");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
     value1 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 10, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetValue(9), nullptr, "GetValue(9)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(9), nullptr, "GetKey(9)", "null");
-    SHOULD_EQUAL(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
+    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 10, "Size()");
+    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value2.GetValue(9), nullptr, "GetValue(9)", "null");
+    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value2.GetKey(9), nullptr, "GetKey(9)", "null");
+    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+              "storage");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
 
     h_arr_var.Reset();
     // Testing empty values
@@ -2150,8 +2137,8 @@ static int TestObjectValue1() {
     }
 
     value2 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value2.Size(), 10, "Size()");
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value2.Size(), 10, "Size()");
+    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -2178,53 +2165,53 @@ static int TestObjectValue2() {
     value1  = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
 
     value2 = Value<char>{value1};
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(6), nullptr, "GetKey(6)", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
+    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 7, "Size()");
+    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
+    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value2.GetKey(6), nullptr, "GetKey(6)", "null");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+              "storage");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value2 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value1.Size(), 7, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value1.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_NOT_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value1.GetKey(6), nullptr, "GetKey(6)", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    EQ_TO(value1.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value1.Size(), 7, "Size()");
+    NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value1.GetValue(6), nullptr, "GetValue(6)", "null");
+    NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value1.GetKey(6), nullptr, "GetKey(6)", "null");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value1 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
 
     for (UInt i = 0; i < 7; i++) {
         String<char> key("Key_");
@@ -2237,45 +2224,45 @@ static int TestObjectValue2() {
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(6), nullptr, "GetKey(6)", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_EQUAL(value2.GetObject()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
+    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 7, "Size()");
+    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
+    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value2.GetKey(6), nullptr, "GetKey(6)", "null");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value2 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -2301,45 +2288,45 @@ static int TestObjectValue3() {
     value1  = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
 
     Value<char> value2(static_cast<Value<char> &&>(value1));
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_EQUAL(value2.Type(), ValueType::Object, "Type()", "Array");
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value2.GetKey(6), nullptr, "GetKey(6)", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_EQUAL(value2.GetObject()->First(), storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value2.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
+    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
+    EQ_VALUE(value2.Size(), 7, "Size()");
+    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
+    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value2.GetKey(6), nullptr, "GetKey(6)", "null");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+          "storage");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value2.Length(), 0, "Length()");
+    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
     h_arr_var.Reset();
     value2 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value2.Stringify(), "{}", "Stringify()");
+    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
 
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "isUndefined()");
-    SHOULD_EQUAL(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_EQUAL(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value1.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetString(), nullptr, "GetString()", "null");
-    SHOULD_EQUAL(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    SHOULD_EQUAL_VALUE(value1.Length(), 0, "Length()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    SHOULD_NOT_EQUAL_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    SHOULD_NOT_EQUAL_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    SHOULD_EQUAL_VALUE(value1.Stringify(), "", "Stringify()");
+    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
+    EQ_VALUE(value1.Length(), 0, "Length()");
+    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     h_arr_var.Reset();
     for (UInt i = 0; i < 3; i++) {
@@ -2350,12 +2337,12 @@ static int TestObjectValue3() {
 
     storage = h_arr_var.First();
     value2  = h_arr_var; // Copy
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), storage,
-                     "GetArray()->First()", "storage");
+    EQ_VALUE(value2.Size(), 3, "Size()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+              "storage");
 
     for (UInt i = 0; i < 13; i++) {
         String<char> key("Key_");
@@ -2365,25 +2352,24 @@ static int TestObjectValue3() {
 
     storage = h_arr_var.First();
     value2  = static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value2.Size(), 13, "Size()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetArray()->First()", "null");
-    SHOULD_EQUAL(value2.GetObject()->First(), storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
+    EQ_VALUE(value2.Size(), 13, "Size()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+          "storage");
 
     HArray<Value<char>, char> *h_arr_p =
         HAllocator::AllocateInit<HArray<Value<char>, char>>(
             HArray<Value<char>, char>(4));
     value2 = Value<char>{h_arr_p};
-    SHOULD_EQUAL_TRUE(value2.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_EQUAL(value2.GetObject(), h_arr_p, "GetObject()", "h_arr_p");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL_VALUE(value2.GetObject()->Capacity(), 4,
-                       "GetArray()->Capacity()");
+    EQ_TRUE(value2.IsObject(), "IsObject()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value2.GetObject(), h_arr_p, "GetObject()", "h_arr_p");
+    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_VALUE(value2.GetObject()->Capacity(), 4, "GetArray()->Capacity()");
 
     END_SUB_TEST;
 }
@@ -2397,9 +2383,9 @@ static int TestObjectValue4() {
 
     value1[""] = 1;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value1[""].GetNumber(), 1, R"(value1[""].GetNumber())");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_VALUE(value1[""].GetNumber(), 1, R"(value1[""].GetNumber())");
 
     value1.Reset();
 
@@ -2407,16 +2393,13 @@ static int TestObjectValue4() {
     value1["k2"] = 2;
     value1["k3"] = 3;
 
-    SHOULD_EQUAL_VALUE(value1.Size(), 3, "value1.Size()");
+    EQ_VALUE(value1.Size(), 3, "value1.Size()");
 
     value2 = value1;
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 1,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 2,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k3"].GetNumber(), 3,
-                       "value2[\"k3\"].GetNumber()");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2["k1"].GetNumber(), 1, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 2, "value2[\"k2\"].GetNumber()");
+    EQ_VALUE(value2["k3"].GetNumber(), 3, "value2[\"k3\"].GetNumber()");
 
     value1["k1"] = 11;
     value1["k2"] = 22;
@@ -2425,46 +2408,38 @@ static int TestObjectValue4() {
     value1["k3"] = static_cast<String<char> &&>(str_var);
 
     value2 = value1;
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["k3"].StringStorage(), str_c,
-                     "value2[\"k3\"].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c,
+              "value2[\"k3\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
 
     value2["k4"] = 44;
     value2["k5"] = 55;
-    SHOULD_EQUAL_VALUE(value2.Size(), 5, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["k3"].StringStorage(), str_c,
-                     "value2[\"k3\"].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
-    SHOULD_EQUAL_VALUE(value2["k4"].GetNumber(), 44,
-                       "value2[\"k4\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k5"].GetNumber(), 55,
-                       "value2[\"k5\"].GetNumber()");
+    EQ_VALUE(value2.Size(), 5, "value2.Size()");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c,
+              "value2[\"k3\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value2["k4"].GetNumber(), 44, "value2[\"k4\"].GetNumber()");
+    EQ_VALUE(value2["k5"].GetNumber(), 55, "value2[\"k5\"].GetNumber()");
 
     value2 = value1;
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
-    SHOULD_EQUAL(value2.GetValue("k4", 2), nullptr,
-                 "value2.GetValue(\"k4\", 2)", "null");
-    SHOULD_EQUAL(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
-    SHOULD_EQUAL(value2.GetValue("k5", 2), nullptr,
-                 "value2.GetValue(\"k5\", 2)", "null");
-    SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(value2.GetValue("k4", 2), nullptr, "value2.GetValue(\"k4\", 2)",
+          "null");
+    EQ_TO(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
+    EQ_TO(value2.GetValue("k5", 2), nullptr, "value2.GetValue(\"k5\", 2)",
+          "null");
+    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////////////////////
     h_arr_var[String<char>("w1")] = 10;
@@ -2475,18 +2450,17 @@ static int TestObjectValue4() {
     h_arr_var[String<char>("w4")] = static_cast<String<char> &&>(str_var);
 
     value2 = h_arr_var;
-    SHOULD_EQUAL_VALUE(value2.Size(), 4, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["w4"].StringStorage(), str_c,
-                     "value2[\"w4\"].StringStorage()", "str_c");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-        "value2[\"w4\"].StringStorage()", "Qen");
-    SHOULD_EQUAL(value2.GetValue("k5", 2), nullptr,
-                 "value2.GetValue(\"k5\", 2)", "null");
-    SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_VALUE(value2.Size(), 4, "value2.Size()");
+    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c,
+              "value2[\"w4\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
+          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(value2.GetValue("k5", 2), nullptr, "value2.GetValue(\"k5\", 2)",
+          "null");
+    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
     ////////////////////
 
     h_arr_var.Reserve(10);
@@ -2495,11 +2469,11 @@ static int TestObjectValue4() {
     h_arr_var[String<char>("w3")] = 30;
 
     value2 = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
 
     value2.Compress();
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL_VALUE(value2.GetObject()->Capacity(), 3, "Capacity()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
+    EQ_VALUE(value2.GetObject()->Capacity(), 3, "Capacity()");
 
     END_SUB_TEST;
 }
@@ -2525,22 +2499,22 @@ static int TestMoveValue1() {
     value1 = true;
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
     value1 = true;
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
     value1 = true;
 
     value1 = 11;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 11, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 11, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -2549,9 +2523,9 @@ static int TestMoveValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2560,12 +2534,12 @@ static int TestMoveValue1() {
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
     value1      = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -2574,12 +2548,12 @@ static int TestMoveValue1() {
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2587,22 +2561,22 @@ static int TestMoveValue1() {
     value1 = false;
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
     value1 = false;
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
     value1 = false;
 
     value1 = -90;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), -90, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), -90, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -2611,9 +2585,9 @@ static int TestMoveValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2622,12 +2596,12 @@ static int TestMoveValue1() {
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
     value1      = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -2636,12 +2610,12 @@ static int TestMoveValue1() {
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2649,22 +2623,22 @@ static int TestMoveValue1() {
     value1 = nullptr;
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
     value1 = nullptr;
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
     value1 = nullptr;
 
     value1 = 7.5;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -2673,9 +2647,9 @@ static int TestMoveValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2684,12 +2658,12 @@ static int TestMoveValue1() {
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
     value1      = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -2698,12 +2672,12 @@ static int TestMoveValue1() {
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2711,21 +2685,21 @@ static int TestMoveValue1() {
     value1 = 13;
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
     value1 = 40;
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
     value1 = 33;
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -2734,9 +2708,9 @@ static int TestMoveValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2745,12 +2719,12 @@ static int TestMoveValue1() {
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
     value1      = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -2759,12 +2733,12 @@ static int TestMoveValue1() {
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2772,29 +2746,29 @@ static int TestMoveValue1() {
     value1 = String<char>{"s"};
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
     value1 = String<char>{"s"};
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
     value1 = String<char>{"s"};
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
     value1 = String<char>{"s"};
 
     value1 = 4;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 4, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 4, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -2803,12 +2777,12 @@ static int TestMoveValue1() {
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
     value1      = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -2817,12 +2791,12 @@ static int TestMoveValue1() {
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2830,29 +2804,29 @@ static int TestMoveValue1() {
     value1 = Array<Value<char>>(1);
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
     value1 = Array<Value<char>>(1);
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
     value1 = Array<Value<char>>(1);
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
     value1 = Array<Value<char>>(1);
 
     value1 = 33;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -2861,9 +2835,9 @@ static int TestMoveValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2872,12 +2846,12 @@ static int TestMoveValue1() {
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2905,29 +2879,29 @@ static int TestMoveValue2() {
     value1 = HArray<Value<char>, char>(1);
 
     value1 = true;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
     value1 = HArray<Value<char>, char>(1);
 
     value1 = false;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
     value1 = HArray<Value<char>, char>(1);
 
     value1 = nullptr;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
     value1 = HArray<Value<char>, char>(1);
 
     value1 = 33;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -2936,9 +2910,9 @@ static int TestMoveValue2() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2947,12 +2921,12 @@ static int TestMoveValue2() {
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
     value1      = static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2983,7 +2957,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -2991,7 +2965,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -2999,8 +2973,8 @@ static int TestMoveValue3() {
 
     value2 = 11;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 11, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 11, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3010,9 +2984,9 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3022,12 +2996,12 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -3037,12 +3011,12 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3051,7 +3025,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -3059,7 +3033,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -3067,8 +3041,8 @@ static int TestMoveValue3() {
 
     value2 = -90;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), -90, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), -90, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3078,9 +3052,9 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3090,12 +3064,12 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -3105,12 +3079,12 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3119,7 +3093,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -3127,7 +3101,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -3135,8 +3109,8 @@ static int TestMoveValue3() {
 
     value2 = 7.5;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3146,9 +3120,9 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3158,12 +3132,12 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -3173,12 +3147,12 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3187,7 +3161,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -3195,7 +3169,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -3203,7 +3177,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -3213,9 +3187,9 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3225,12 +3199,12 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -3240,12 +3214,12 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3254,7 +3228,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -3262,7 +3236,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -3270,7 +3244,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -3278,8 +3252,8 @@ static int TestMoveValue3() {
 
     value2 = 4;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 4, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 4, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3289,12 +3263,12 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     /////////////
@@ -3304,12 +3278,12 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3318,7 +3292,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -3326,7 +3300,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -3334,7 +3308,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -3342,8 +3316,8 @@ static int TestMoveValue3() {
 
     value2 = 33;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3353,9 +3327,9 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3365,12 +3339,12 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                 "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3400,7 +3374,7 @@ static int TestMoveValue4() {
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -3408,7 +3382,7 @@ static int TestMoveValue4() {
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -3416,7 +3390,7 @@ static int TestMoveValue4() {
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -3424,8 +3398,8 @@ static int TestMoveValue4() {
 
     value2 = 33;
     value1 = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3435,9 +3409,9 @@ static int TestMoveValue4() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_EQUAL(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-                 "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+          "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3447,12 +3421,12 @@ static int TestMoveValue4() {
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3483,9 +3457,9 @@ static int TestCopyValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = str_var;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3494,10 +3468,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = Array<Value<char>>(1);
     value1  = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = true;
 
@@ -3506,12 +3479,12 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -3520,10 +3493,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
     value1    = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = true;
 
@@ -3536,12 +3508,12 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3551,9 +3523,9 @@ static int TestCopyValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = str_var;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3562,10 +3534,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = Array<Value<char>>(1);
     value1  = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = false;
 
@@ -3574,12 +3545,12 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -3588,10 +3559,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
     value1    = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = false;
 
@@ -3604,12 +3574,12 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3619,9 +3589,9 @@ static int TestCopyValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = str_var;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3630,10 +3600,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = Array<Value<char>>(1);
     value1  = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = nullptr;
 
@@ -3642,12 +3611,12 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -3656,10 +3625,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
     value1    = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = nullptr;
 
@@ -3672,12 +3640,12 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3687,9 +3655,9 @@ static int TestCopyValue1() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = str_var;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3698,10 +3666,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = Array<Value<char>>(1);
     value1  = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = 33;
 
@@ -3710,12 +3677,12 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -3724,10 +3691,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
     value1    = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = 34;
 
@@ -3740,12 +3706,12 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3775,10 +3741,9 @@ static int TestCopyValue2() {
     // No values
     arr_var = Array<Value<char>>(1);
     value1  = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = String<char>{"s"};
 
@@ -3787,12 +3752,12 @@ static int TestCopyValue2() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -3801,10 +3766,9 @@ static int TestCopyValue2() {
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
     value1    = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = String<char>{"s"};
 
@@ -3817,12 +3781,12 @@ static int TestCopyValue2() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3832,9 +3796,9 @@ static int TestCopyValue2() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = str_var;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3843,10 +3807,9 @@ static int TestCopyValue2() {
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
     value1    = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = Array<Value<char>>(1);
 
@@ -3859,12 +3822,12 @@ static int TestCopyValue2() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3874,9 +3837,9 @@ static int TestCopyValue2() {
     str_var   = String<char>{"s"};
     c_str_var = str_var.First();
     value1    = str_var;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3885,10 +3848,9 @@ static int TestCopyValue2() {
     // No values
     arr_var = Array<Value<char>>(1);
     value1  = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = HArray<Value<char>, char>(1);
 
@@ -3897,12 +3859,12 @@ static int TestCopyValue2() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
     ////////////////////////////////////////////
     END_SUB_TEST;
@@ -3931,7 +3893,7 @@ static int TestCopyValue3() {
 
     value2 = false;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -3939,7 +3901,7 @@ static int TestCopyValue3() {
 
     value2 = nullptr;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -3947,8 +3909,8 @@ static int TestCopyValue3() {
 
     value2 = 11;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 11, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 11, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -3958,9 +3920,9 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3970,10 +3932,9 @@ static int TestCopyValue3() {
     value2 = Array<Value<char>>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = true;
 
@@ -3984,12 +3945,12 @@ static int TestCopyValue3() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -3999,10 +3960,9 @@ static int TestCopyValue3() {
     value2 = HArray<Value<char>, char>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = true;
 
@@ -4017,12 +3977,12 @@ static int TestCopyValue3() {
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4031,7 +3991,7 @@ static int TestCopyValue3() {
 
     value2 = true;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -4039,7 +3999,7 @@ static int TestCopyValue3() {
 
     value2 = nullptr;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -4047,8 +4007,8 @@ static int TestCopyValue3() {
 
     value2 = -90;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), -90, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), -90, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -4058,9 +4018,9 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -4070,10 +4030,9 @@ static int TestCopyValue3() {
     value2 = Array<Value<char>>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = false;
 
@@ -4084,12 +4043,12 @@ static int TestCopyValue3() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -4099,10 +4058,9 @@ static int TestCopyValue3() {
     value2 = HArray<Value<char>, char>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = false;
 
@@ -4117,12 +4075,12 @@ static int TestCopyValue3() {
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4131,7 +4089,7 @@ static int TestCopyValue3() {
 
     value2 = true;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -4139,7 +4097,7 @@ static int TestCopyValue3() {
 
     value2 = false;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -4147,8 +4105,8 @@ static int TestCopyValue3() {
 
     value2 = 7.5;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -4158,9 +4116,9 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -4170,10 +4128,9 @@ static int TestCopyValue3() {
     value2 = Array<Value<char>>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = nullptr;
 
@@ -4184,12 +4141,12 @@ static int TestCopyValue3() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -4199,10 +4156,9 @@ static int TestCopyValue3() {
     value2 = HArray<Value<char>, char>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = nullptr;
 
@@ -4217,12 +4173,12 @@ static int TestCopyValue3() {
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4231,7 +4187,7 @@ static int TestCopyValue3() {
 
     value2 = true;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -4239,7 +4195,7 @@ static int TestCopyValue3() {
 
     value2 = false;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -4247,7 +4203,7 @@ static int TestCopyValue3() {
 
     value2 = nullptr;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -4257,9 +4213,9 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -4269,10 +4225,9 @@ static int TestCopyValue3() {
     value2 = Array<Value<char>>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = 10e10;
 
@@ -4283,12 +4238,12 @@ static int TestCopyValue3() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -4298,10 +4253,9 @@ static int TestCopyValue3() {
     value2 = HArray<Value<char>, char>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = 9.1;
 
@@ -4316,12 +4270,12 @@ static int TestCopyValue3() {
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4352,7 +4306,7 @@ static int TestCopyValue4() {
 
     value2 = true;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -4360,7 +4314,7 @@ static int TestCopyValue4() {
 
     value2 = false;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -4368,7 +4322,7 @@ static int TestCopyValue4() {
 
     value2 = nullptr;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -4376,8 +4330,8 @@ static int TestCopyValue4() {
 
     value2 = 4;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 4, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 4, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -4387,10 +4341,9 @@ static int TestCopyValue4() {
     value2 = Array<Value<char>>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = String<char>{"s"};
 
@@ -4401,12 +4354,12 @@ static int TestCopyValue4() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     /////////////
@@ -4416,10 +4369,9 @@ static int TestCopyValue4() {
     value2 = HArray<Value<char>, char>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = String<char>{"s"};
 
@@ -4434,12 +4386,12 @@ static int TestCopyValue4() {
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4448,7 +4400,7 @@ static int TestCopyValue4() {
 
     value2 = true;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -4456,7 +4408,7 @@ static int TestCopyValue4() {
 
     value2 = false;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -4464,7 +4416,7 @@ static int TestCopyValue4() {
 
     value2 = nullptr;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -4472,8 +4424,8 @@ static int TestCopyValue4() {
 
     value2 = 33;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -4483,9 +4435,9 @@ static int TestCopyValue4() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -4495,10 +4447,9 @@ static int TestCopyValue4() {
     value2 = HArray<Value<char>, char>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-                 "null");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
     value1 = Array<Value<char>>(1);
 
@@ -4513,12 +4464,12 @@ static int TestCopyValue4() {
     value2        = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
     value1        = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsObject(), "IsObject()");
-    SHOULD_NOT_EQUAL(value1.GetObject(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), nullptr,
-                     "GetObject()->First()", "null");
-    SHOULD_NOT_EQUAL(value1.GetObject()->First(), h_arr_storage,
-                     "GetObject()->First()", "storage");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
+    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
+              "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4527,7 +4478,7 @@ static int TestCopyValue4() {
 
     value2 = true;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsTrue(), "IsTrue()");
+    EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
@@ -4535,7 +4486,7 @@ static int TestCopyValue4() {
 
     value2 = false;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsFalse(), "IsFalse()");
+    EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
@@ -4543,7 +4494,7 @@ static int TestCopyValue4() {
 
     value2 = nullptr;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNull(), "IsNull()");
+    EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
@@ -4551,8 +4502,8 @@ static int TestCopyValue4() {
 
     value2 = 33;
     value1 = value2;
-    SHOULD_EQUAL_TRUE(value1.IsNumber(), "IsNumber()");
-    SHOULD_EQUAL_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     value1.Reset();
 
     /////////////
@@ -4562,9 +4513,9 @@ static int TestCopyValue4() {
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
-    SHOULD_EQUAL_TRUE(value1.IsString(), "IsString()");
-    SHOULD_NOT_EQUAL(value1.StringStorage(), c_str_var,
-                     "value1.StringStorage()", "c_str_var");
+    EQ_TRUE(value1.IsString(), "IsString()");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
+              "c_str_var");
     value1.Reset();
 
     /////////////
@@ -4574,10 +4525,9 @@ static int TestCopyValue4() {
     value2 = Array<Value<char>>(1);
     value1 = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
     value1 = HArray<Value<char>, char>(1);
 
@@ -4588,12 +4538,12 @@ static int TestCopyValue4() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
     value1      = value2;
 
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -4614,12 +4564,12 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     value[0] = 5;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 5, "value[0]");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 5, "value[0]");
 
     try {
         did_throw = false;
@@ -4628,7 +4578,7 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw   = false;
@@ -4637,7 +4587,7 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw                = false;
@@ -4646,7 +4596,7 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw    = false;
@@ -4655,18 +4605,18 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     value[0] = 20;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 20, "value[0]");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
 
     value[1] = 30;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 20, "value[0]");
-    SHOULD_EQUAL_VALUE(value[1].GetNumber(), 30, "value[1]");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
+    EQ_VALUE(value[1].GetNumber(), 30, "value[1]");
 
     value[0]        = 50;
     value[1]        = 100;
@@ -4675,27 +4625,27 @@ static int TestIndexOperator1() {
     value[ULong{4}] = 400;
     value[UInt{5}]  = 500;
 
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 50, "value[0]");
-    SHOULD_EQUAL_VALUE(value[1].GetNumber(), 100, "value[1]");
-    SHOULD_EQUAL_VALUE(value[2].GetNumber(), 200, "value[2]");
-    SHOULD_EQUAL_VALUE(value[3].GetNumber(), 300, "value[3]");
-    SHOULD_EQUAL_VALUE(value[4].GetNumber(), 400, "value[4]");
-    SHOULD_EQUAL_VALUE(value[5].GetNumber(), 500, "value[5]");
-    SHOULD_NOT_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(1), nullptr, "GetValue(1)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(2), nullptr, "GetValue(2)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(3), nullptr, "GetValue(3)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(4), nullptr, "GetValue(4)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(5), nullptr, "GetValue(5)", "null");
-    SHOULD_EQUAL(value.GetValue("5", 1), nullptr, "GetValue(\"5\")", "null");
-    SHOULD_EQUAL_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
-    SHOULD_EQUAL_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
-    SHOULD_EQUAL_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");
-    SHOULD_EQUAL_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
-    SHOULD_EQUAL_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
-    SHOULD_EQUAL_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 6, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 50, "value[0]");
+    EQ_VALUE(value[1].GetNumber(), 100, "value[1]");
+    EQ_VALUE(value[2].GetNumber(), 200, "value[2]");
+    EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
+    EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
+    EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
+    NOT_EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
+    NOT_EQ_TO(value.GetValue(2), nullptr, "GetValue(2)", "null");
+    NOT_EQ_TO(value.GetValue(3), nullptr, "GetValue(3)", "null");
+    NOT_EQ_TO(value.GetValue(4), nullptr, "GetValue(4)", "null");
+    NOT_EQ_TO(value.GetValue(5), nullptr, "GetValue(5)", "null");
+    EQ_TO(value.GetValue("5", 1), nullptr, "GetValue(\"5\")", "null");
+    EQ_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
+    EQ_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
+    EQ_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");
+    EQ_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
+    EQ_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
+    EQ_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
     try {
         did_throw = false;
         value[7]  = "cc";
@@ -4703,17 +4653,17 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
-    SHOULD_EQUAL(value.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_TRUE(did_throw, "did_throw");
+    EQ_TO(value.GetValue(6), nullptr, "GetValue(6)", "null");
 
     //////////////////////////////////////////
     value.Reset();
 
     value["A"] = 7.5;
-    SHOULD_EQUAL_TRUE(value.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 7.5, "value[0]");
-    SHOULD_EQUAL_VALUE(value["A"].GetNumber(), 7.5, "value[\"A\"]");
+    EQ_TRUE(value.IsObject(), "IsObject()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 7.5, "value[0]");
+    EQ_VALUE(value["A"].GetNumber(), 7.5, "value[\"A\"]");
 
     try {
         did_throw = false;
@@ -4722,7 +4672,7 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw = false;
@@ -4731,21 +4681,21 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     value["A"] = 59;
-    SHOULD_EQUAL_TRUE(value.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 59, "value[0]");
-    SHOULD_EQUAL_VALUE(value["A"].GetNumber(), 59, "value[\"A\"]");
+    EQ_TRUE(value.IsObject(), "IsObject()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 59, "value[0]");
+    EQ_VALUE(value["A"].GetNumber(), 59, "value[\"A\"]");
 
     value["B"] = 60;
-    SHOULD_EQUAL_TRUE(value.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 59, "value[0]");
-    SHOULD_EQUAL_VALUE(value["A"].GetNumber(), 59, "value[\"A\"]");
-    SHOULD_EQUAL_VALUE(value[1].GetNumber(), 60, "value[1]");
-    SHOULD_EQUAL_VALUE(value["B"].GetNumber(), 60, "value[\"B\"]");
+    EQ_TRUE(value.IsObject(), "IsObject()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 59, "value[0]");
+    EQ_VALUE(value["A"].GetNumber(), 59, "value[\"A\"]");
+    EQ_VALUE(value[1].GetNumber(), 60, "value[1]");
+    EQ_VALUE(value["B"].GetNumber(), 60, "value[\"B\"]");
 
     value[0]                        = 50;
     value["B"]                      = 100;
@@ -4754,49 +4704,46 @@ static int TestIndexOperator1() {
     value["EFEFE"]                  = 400;
     value[String<char>("FGHIGKLM")] = 500;
 
-    SHOULD_EQUAL_TRUE(value.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 50, "value[0]");
-    SHOULD_EQUAL_VALUE(value[1].GetNumber(), 100, "value[1]");
-    SHOULD_EQUAL_VALUE(value[2].GetNumber(), 200, "value[2]");
-    SHOULD_EQUAL_VALUE(value[3].GetNumber(), 300, "value[3]");
-    SHOULD_EQUAL_VALUE(value[4].GetNumber(), 400, "value[4]");
-    SHOULD_EQUAL_VALUE(value[5].GetNumber(), 500, "value[5]");
-    SHOULD_EQUAL_VALUE(value["A"].GetNumber(), 50, "value[\"A\"]");
-    SHOULD_EQUAL_VALUE(value["B"].GetNumber(), 100, "value[\"B\"]");
-    SHOULD_EQUAL_VALUE(value["C"].GetNumber(), 200, "value[\"C\"]");
-    SHOULD_EQUAL_VALUE(value["D"].GetNumber(), 300, "value[\"D\"]");
-    SHOULD_EQUAL_VALUE(value["EFEFE"].GetNumber(), 400, "value[\"EFEFE\"]");
-    SHOULD_EQUAL_VALUE(value["FGHIGKLM"].GetNumber(), 500,
-                       "value[\"FGHIGKLM\"]");
-    SHOULD_NOT_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(1), nullptr, "GetValue(1)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(2), nullptr, "GetValue(2)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(3), nullptr, "GetValue(3)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(4), nullptr, "GetValue(4)", "null");
-    SHOULD_NOT_EQUAL(value.GetValue(5), nullptr, "GetValue(5)", "null");
-    SHOULD_EQUAL_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
-    SHOULD_EQUAL_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
-    SHOULD_EQUAL_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");
-    SHOULD_EQUAL_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
-    SHOULD_EQUAL_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
-    SHOULD_EQUAL_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
+    EQ_TRUE(value.IsObject(), "IsObject()");
+    EQ_VALUE(value.Size(), 6, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 50, "value[0]");
+    EQ_VALUE(value[1].GetNumber(), 100, "value[1]");
+    EQ_VALUE(value[2].GetNumber(), 200, "value[2]");
+    EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
+    EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
+    EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
+    EQ_VALUE(value["A"].GetNumber(), 50, "value[\"A\"]");
+    EQ_VALUE(value["B"].GetNumber(), 100, "value[\"B\"]");
+    EQ_VALUE(value["C"].GetNumber(), 200, "value[\"C\"]");
+    EQ_VALUE(value["D"].GetNumber(), 300, "value[\"D\"]");
+    EQ_VALUE(value["EFEFE"].GetNumber(), 400, "value[\"EFEFE\"]");
+    EQ_VALUE(value["FGHIGKLM"].GetNumber(), 500, "value[\"FGHIGKLM\"]");
+    NOT_EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
+    NOT_EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
+    NOT_EQ_TO(value.GetValue(2), nullptr, "GetValue(2)", "null");
+    NOT_EQ_TO(value.GetValue(3), nullptr, "GetValue(3)", "null");
+    NOT_EQ_TO(value.GetValue(4), nullptr, "GetValue(4)", "null");
+    NOT_EQ_TO(value.GetValue(5), nullptr, "GetValue(5)", "null");
+    EQ_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
+    EQ_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
+    EQ_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");
+    EQ_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
+    EQ_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
+    EQ_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
 
-    SHOULD_NOT_EQUAL(value.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_NOT_EQUAL(value.GetKey(1), nullptr, "GetKey(1)", "null");
-    SHOULD_NOT_EQUAL(value.GetKey(2), nullptr, "GetKey(2)", "null");
-    SHOULD_NOT_EQUAL(value.GetKey(3), nullptr, "GetKey(3)", "null");
-    SHOULD_NOT_EQUAL(value.GetKey(4), nullptr, "GetKey(4)", "null");
-    SHOULD_NOT_EQUAL(value.GetKey(5), nullptr, "GetKey(5)", "null");
+    NOT_EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
+    NOT_EQ_TO(value.GetKey(1), nullptr, "GetKey(1)", "null");
+    NOT_EQ_TO(value.GetKey(2), nullptr, "GetKey(2)", "null");
+    NOT_EQ_TO(value.GetKey(3), nullptr, "GetKey(3)", "null");
+    NOT_EQ_TO(value.GetKey(4), nullptr, "GetKey(4)", "null");
+    NOT_EQ_TO(value.GetKey(5), nullptr, "GetKey(5)", "null");
 
-    SHOULD_EQUAL_TRUE(value.GetKey(0)->IsEqual("A", 1), "GetKey(0)->IsEqual()");
-    SHOULD_EQUAL_TRUE(value.GetKey(1)->IsEqual("B", 1), "GetKey(1)->IsEqual()");
-    SHOULD_EQUAL_TRUE(value.GetKey(2)->IsEqual("C", 1), "GetKey(2)->IsEqual()");
-    SHOULD_EQUAL_TRUE(value.GetKey(3)->IsEqual("D", 1), "GetKey(3)->IsEqual()");
-    SHOULD_EQUAL_TRUE(value.GetKey(4)->IsEqual("EFEFE", 5),
-                      "GetKey(4)->IsEqual()");
-    SHOULD_EQUAL_TRUE(value.GetKey(5)->IsEqual("FGHIGKLM", 8),
-                      "GetKey(5)->IsEqual()");
+    EQ_TRUE(value.GetKey(0)->IsEqual("A", 1), "GetKey(0)->IsEqual()");
+    EQ_TRUE(value.GetKey(1)->IsEqual("B", 1), "GetKey(1)->IsEqual()");
+    EQ_TRUE(value.GetKey(2)->IsEqual("C", 1), "GetKey(2)->IsEqual()");
+    EQ_TRUE(value.GetKey(3)->IsEqual("D", 1), "GetKey(3)->IsEqual()");
+    EQ_TRUE(value.GetKey(4)->IsEqual("EFEFE", 5), "GetKey(4)->IsEqual()");
+    EQ_TRUE(value.GetKey(5)->IsEqual("FGHIGKLM", 8), "GetKey(5)->IsEqual()");
 
     try {
         did_throw = false;
@@ -4805,24 +4752,24 @@ static int TestIndexOperator1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
-    SHOULD_EQUAL(value.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_TRUE(did_throw, "did_throw");
+    EQ_TO(value.GetValue(6), nullptr, "GetValue(6)", "null");
 
     value.Reset();
 
     value[String<char>("C")] = 4;
-    SHOULD_EQUAL_TRUE(value.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 4, "value[0]");
-    SHOULD_EQUAL_VALUE(value[String<char>("C")].GetNumber(), 4, "value[\"C\"]");
+    EQ_TRUE(value.IsObject(), "IsObject()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 4, "value[0]");
+    EQ_VALUE(value[String<char>("C")].GetNumber(), 4, "value[\"C\"]");
 
     value.Reset();
 
     value[str2] = 5;
-    SHOULD_EQUAL_TRUE(value.IsObject(), "IsObject()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 5, "value[0]");
-    SHOULD_EQUAL_VALUE(value[str2].GetNumber(), 5, "value[\"C\"]");
+    EQ_TRUE(value.IsObject(), "IsObject()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 5, "value[0]");
+    EQ_VALUE(value[str2].GetNumber(), 5, "value[\"C\"]");
 
     //////////////////////////////////////////
 
@@ -4838,30 +4785,28 @@ static int TestIndexOperator2() {
     value["CCCC"] = 30;
 
     value_ptr = value.GetValue("A", 1);
-    SHOULD_NOT_EQUAL(value_ptr, nullptr, "GetValue(\"A\", 1)", "null");
-    SHOULD_EQUAL_VALUE(value_ptr->GetNumber(), 10, "GetValue(\"A\", 1)");
+    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"A\", 1)", "null");
+    EQ_VALUE(value_ptr->GetNumber(), 10, "GetValue(\"A\", 1)");
 
     value_ptr = value.GetValue("ABCDEF", 1);
-    SHOULD_NOT_EQUAL(value_ptr, nullptr, "GetValue(\"ABCDEF\", 1)", "null");
-    SHOULD_EQUAL_VALUE(value_ptr->GetNumber(), 10, "GetValue(\"ABCDEF\", 1)");
+    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"ABCDEF\", 1)", "null");
+    EQ_VALUE(value_ptr->GetNumber(), 10, "GetValue(\"ABCDEF\", 1)");
 
     value_ptr = value.GetValue("BB", 2);
-    SHOULD_NOT_EQUAL(value_ptr, nullptr, "GetValue(\"BB\", 2)", "null");
-    SHOULD_EQUAL_VALUE(value_ptr->GetNumber(), 20, "GetValue(\"BB\", 2)");
+    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"BB\", 2)", "null");
+    EQ_VALUE(value_ptr->GetNumber(), 20, "GetValue(\"BB\", 2)");
 
     value_ptr = value.GetValue("CCCC", 4);
-    SHOULD_NOT_EQUAL(value_ptr, nullptr, "GetValue(\"CCCC\", 4)", "null");
-    SHOULD_EQUAL_VALUE(value_ptr->GetNumber(), 30, "GetValue(\"CCCC\", 4)");
+    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"CCCC\", 4)", "null");
+    EQ_VALUE(value_ptr->GetNumber(), 30, "GetValue(\"CCCC\", 4)");
     ////////////////////
-    SHOULD_EQUAL(value.GetValue("a", 1), nullptr, "GetValue(\"a\", 1)", "null");
-    SHOULD_EQUAL(value.GetValue("ABCDEF", 6), nullptr,
-                 "GetValue(\"ABCDEF\", 1)", "null");
-    SHOULD_EQUAL(value.GetValue("b", 1), nullptr, "GetValue(\"b\", 1)", "null");
-    SHOULD_EQUAL(value.GetValue("bb", 2), nullptr, "GetValue(\"bb\", 2)",
-                 "null");
+    EQ_TO(value.GetValue("a", 1), nullptr, "GetValue(\"a\", 1)", "null");
+    EQ_TO(value.GetValue("ABCDEF", 6), nullptr, "GetValue(\"ABCDEF\", 1)",
+          "null");
+    EQ_TO(value.GetValue("b", 1), nullptr, "GetValue(\"b\", 1)", "null");
+    EQ_TO(value.GetValue("bb", 2), nullptr, "GetValue(\"bb\", 2)", "null");
 
-    SHOULD_EQUAL(value.GetValue("CCC", 3), nullptr, "GetValue(\"CCCC\", 3)",
-                 "null");
+    EQ_TO(value.GetValue("CCC", 3), nullptr, "GetValue(\"CCCC\", 3)", "null");
     ////////////////////
 
     END_SUB_TEST;
@@ -4880,12 +4825,12 @@ static int TestAddition1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     value += 20;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 20, "value[0]");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
 
     try {
         did_throw = false;
@@ -4895,10 +4840,10 @@ static int TestAddition1() {
     }
 
     value += 30;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 20, "value[0]");
-    SHOULD_EQUAL_VALUE(value[1].GetNumber(), 30, "value[1]");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
+    EQ_VALUE(value[1].GetNumber(), 30, "value[1]");
 
     value[0] = 50;
     value[1] = 100;
@@ -4907,14 +4852,14 @@ static int TestAddition1() {
     value += ULong{400};
     value += double{500};
 
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
-    SHOULD_EQUAL_VALUE(value[0].GetNumber(), 50, "value[0]");
-    SHOULD_EQUAL_VALUE(value[1].GetNumber(), 100, "value[1]");
-    SHOULD_EQUAL_VALUE(value[2].GetNumber(), 200, "value[2]");
-    SHOULD_EQUAL_VALUE(value[3].GetNumber(), 300, "value[3]");
-    SHOULD_EQUAL_VALUE(value[4].GetNumber(), 400, "value[4]");
-    SHOULD_EQUAL_VALUE(value[5].GetNumber(), 500, "value[5]");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 6, "Size()");
+    EQ_VALUE(value[0].GetNumber(), 50, "value[0]");
+    EQ_VALUE(value[1].GetNumber(), 100, "value[1]");
+    EQ_VALUE(value[2].GetNumber(), 200, "value[2]");
+    EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
+    EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
+    EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
 
     try {
         did_throw = false;
@@ -4923,7 +4868,7 @@ static int TestAddition1() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     //////////////////////////////////////////
 
@@ -4938,140 +4883,132 @@ static int TestAddition2() {
     /////////////////
 
     value += true;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsTrue(), "value[0].IsTrue()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsTrue(), "value[0].IsTrue()");
 
     value += true;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsTrue(), "value[0].IsTrue()");
-    SHOULD_EQUAL_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsTrue(), "value[0].IsTrue()");
+    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
 
     value.Reset();
     /////////////////
 
     value += false;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
 
     value += false;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value[1].IsFalse(), "value[1].IsFalse()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    EQ_TRUE(value[1].IsFalse(), "value[1].IsFalse()");
 
     value.Reset();
     /////////////////
 
     value += nullptr;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsNull(), "value[0].IsNull()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsNull(), "value[0].IsNull()");
 
     value += nullptr;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsNull(), "value[0].IsNull()");
-    SHOULD_EQUAL_TRUE(value[1].IsNull(), "value[1].IsNull()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsNull(), "value[0].IsNull()");
+    EQ_TRUE(value[1].IsNull(), "value[1].IsNull()");
 
     value.Reset();
     /////////////////
 
     value += "Qentem";
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsString(), "value[0].IsString()");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     value += "Hani";
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsString(), "value[0].IsString()");
-    SHOULD_EQUAL_TRUE(value[1].IsString(), "value[1].IsString()");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
-                      "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
+    EQ_TRUE(value[1].IsString(), "value[1].IsString()");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     value.Reset();
     /////////////////
     str               = String<char>("Qentem");
     const char *c_str = str.First();
     value += static_cast<String<char> &&>(str);
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsString(), "value[0].IsString()");
-    SHOULD_EQUAL(value[0].StringStorage(), c_str, "value[0].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
+    EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     str                = String<char>("Hani");
     const char *c_str2 = str.First();
     value += static_cast<String<char> &&>(str);
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsString(), "value[0].IsString()");
-    SHOULD_EQUAL_TRUE(value[1].IsString(), "value[1].IsString()");
-    SHOULD_EQUAL(value[0].StringStorage(), c_str, "value[0].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
-                 "c_str2");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
-                      "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
+    EQ_TRUE(value[1].IsString(), "value[1].IsString()");
+    EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
+    EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
+          "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     value.Reset();
     /////////////////
 
     str   = String<char>("Qentem");
     c_str = str.First();
     value += str;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsString(), "value[0].IsString()");
-    SHOULD_NOT_EQUAL(value[0].StringStorage(), c_str,
-                     "value[0].StringStorage()", "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
+    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()",
+              "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     str    = String<char>("Hani");
     c_str2 = str.First();
     value += str;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsString(), "value[0].IsString()");
-    SHOULD_EQUAL_TRUE(value[1].IsString(), "value[1].IsString()");
-    SHOULD_NOT_EQUAL(value[0].StringStorage(), c_str,
-                     "value[0].StringStorage()", "c_str");
-    SHOULD_NOT_EQUAL(value[1].StringStorage(), c_str2,
-                     "value[1].StringStorage()", "c_str2");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
-                      "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
+    EQ_TRUE(value[1].IsString(), "value[1].IsString()");
+    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()",
+              "c_str");
+    NOT_EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
+              "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     value.Reset();
 
     //////////////
 
     value += HArray<Value<char>, char>();
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsObject(), "value[0].IsObject()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 1, "Size()");
+    EQ_TRUE(value[0].IsObject(), "value[0].IsObject()");
 
     value += HArray<Value<char>, char>();
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value[0].IsObject(), "value[0].IsObject()");
-    SHOULD_EQUAL_TRUE(value[1].IsObject(), "value[1].IsObject()");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 2, "Size()");
+    EQ_TRUE(value[0].IsObject(), "value[0].IsObject()");
+    EQ_TRUE(value[1].IsObject(), "value[1].IsObject()");
 
     //////////////////////////////////////////
 
@@ -5088,19 +5025,17 @@ static int TestAddition3() {
     /////////////////
     arr_var = Array<Value<char>>(1);
     value += arr_var;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 0, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
 
     arr_var = Array<Value<char>>(3);
     value += arr_var;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                 "null");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 0, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
 
     value.Reset();
     ///
@@ -5113,21 +5048,20 @@ static int TestAddition3() {
     arr_storage = arr_var.First();
 
     value += arr_var;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 3, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value[2].IsString(), "value[2].IsString()");
-    SHOULD_NOT_EQUAL(value[2].StringStorage(), c_str,
-                     "value[2].StringStorage()", "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 3, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
+    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
+    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()",
+              "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     arr_var.Reset();
     arr_var += Value<char>{nullptr};
@@ -5138,45 +5072,44 @@ static int TestAddition3() {
     arr_storage = arr_var.First();
 
     value += arr_var;
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value[2].IsString(), "value[2].IsString()");
-    SHOULD_NOT_EQUAL(value[2].StringStorage(), c_str,
-                     "value[2].StringStorage()", "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(value[3].IsNull(), "value[3].IsNull()");
-    SHOULD_EQUAL_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
-    SHOULD_EQUAL_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
-    SHOULD_EQUAL_TRUE(value[5].IsString(), "value[5].IsString()");
-    SHOULD_NOT_EQUAL(value[5].StringStorage(), c_str2,
-                     "value[5].StringStorage()", "c_str2");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "Hani", 4),
-                      "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 6, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
+    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
+    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()",
+              "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
+    EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
+    EQ_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
+    EQ_TRUE(value[5].IsString(), "value[5].IsString()");
+    NOT_EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()",
+              "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
 
     value.Reset();
     /////////////////
     value += Array<Value<char>>(1);
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 0, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
 
     value += Array<Value<char>>(3);
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 0, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
 
     value.Reset();
     ///
@@ -5190,21 +5123,19 @@ static int TestAddition3() {
     arr_storage = arr_var.First();
 
     value += static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 3, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_EQUAL(value.GetArray()->First(), arr_storage, "GetArray()->First()",
-                 "storage");
-    SHOULD_EQUAL_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value[2].IsString(), "value[2].IsString()");
-    SHOULD_EQUAL(value[2].StringStorage(), c_str, "value[2].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 3, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
+          "storage");
+    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
+    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
+    EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     arr_var += Value<char>{nullptr};
     arr_var += Value<char>{14};
@@ -5214,31 +5145,29 @@ static int TestAddition3() {
     arr_storage = arr_var.First();
 
     value += static_cast<Array<Value<char>> &&>(arr_var);
-    SHOULD_EQUAL(arr_var.First(), nullptr, "arr_var.First()", "null");
+    EQ_TO(arr_var.First(), nullptr, "arr_var.First()", "null");
 
-    SHOULD_EQUAL_TRUE(value.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value.Size(), 6, "Size()");
-    SHOULD_NOT_EQUAL(value.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value[2].IsString(), "value[2].IsString()");
-    SHOULD_EQUAL(value[2].StringStorage(), c_str, "value[2].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(value[3].IsNull(), "value[3].IsNull()");
-    SHOULD_EQUAL_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
-    SHOULD_EQUAL_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
-    SHOULD_EQUAL_TRUE(value[5].IsString(), "value[5].IsString()");
-    SHOULD_EQUAL(value[5].StringStorage(), c_str2, "value[5].StringStorage()",
-                 "c_str2");
-    SHOULD_EQUAL_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "Hani", 4),
-                      "StringUtils::IsEqual");
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 6, "Size()");
+    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
+    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
+    EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
+    EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
+    EQ_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
+    EQ_TRUE(value[5].IsString(), "value[5].IsString()");
+    EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()",
+          "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     //////////////////////////////////////////
 
     END_SUB_TEST;
@@ -5255,48 +5184,48 @@ static int TestAddition4() {
 
     value2 = true;
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
 
     value2 = true;
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
-    SHOULD_EQUAL_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
 
     value1.Reset();
     /////////////////
 
     value2 = false;
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
 
     value2 = false;
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value1[1].IsFalse(), "value1[1].IsFalse()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1[1].IsFalse(), "value1[1].IsFalse()");
 
     value1.Reset();
     /////////////////
 
     value2 = nullptr;
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
 
     value2 = nullptr;
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
-    SHOULD_EQUAL_TRUE(value1[1].IsNull(), "value1[1].IsNull()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
+    EQ_TRUE(value1[1].IsNull(), "value1[1].IsNull()");
 
     value1.Reset();
     /////////////////
@@ -5305,48 +5234,45 @@ static int TestAddition4() {
     value2            = static_cast<String<char> &&>(str);
 
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    SHOULD_NOT_EQUAL(value1[0].StringStorage(), c_str,
-                     "value1[0].StringStorage()", "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
+    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
+              "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     str                = String<char>("Hani");
     const char *c_str2 = str.First();
     value2             = static_cast<String<char> &&>(str);
 
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    SHOULD_EQUAL_TRUE(value1[1].IsString(), "value1[1].IsString()");
-    SHOULD_NOT_EQUAL(value1[0].StringStorage(), c_str,
-                     "value1[0].StringStorage()", "c_str");
-    SHOULD_NOT_EQUAL(value1[1].StringStorage(), c_str2,
-                     "value1[1].StringStorage()", "c_str2");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[1].StringStorage(), "Hani", 4),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
+    EQ_TRUE(value1[1].IsString(), "value1[1].IsString()");
+    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
+              "c_str");
+    NOT_EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
+              "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     value1.Reset();
     /////////////////
 
     value2 = Array<Value<char>>(1);
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
 
     value2 = Array<Value<char>>(10);
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
 
     value1.Reset();
     ///
@@ -5361,21 +5287,20 @@ static int TestAddition4() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
 
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 3, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    SHOULD_NOT_EQUAL(value1[2].StringStorage(), c_str,
-                     "value1[0].StringStorage()", "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 3, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
+    NOT_EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
+              "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     arr_var.Reset();
     arr_var += Value<char>{ValueType::Null};
@@ -5387,30 +5312,28 @@ static int TestAddition4() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
 
     value1 += value2;
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 6, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    SHOULD_NOT_EQUAL(value1[2].StringStorage(), c_str,
-                     "value1[0].StringStorage()", "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
-    SHOULD_EQUAL_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
-    SHOULD_EQUAL_VALUE(value1[4].GetNumber(), 14, "value1[4].GetNumber()");
-    SHOULD_EQUAL_TRUE(value1[5].IsString(), "value1[5].IsString()");
-    SHOULD_NOT_EQUAL(value1[5].StringStorage(), c_str2,
-                     "value1[5].StringStorage()", "c_str2");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[5].StringStorage(), "Hani", 4),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 6, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
+    NOT_EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
+              "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
+    EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
+    EQ_VALUE(value1[4].GetNumber(), 14, "value1[4].GetNumber()");
+    EQ_TRUE(value1[5].IsString(), "value1[5].IsString()");
+    NOT_EQ_TO(value1[5].StringStorage(), c_str2, "value1[5].StringStorage()",
+              "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
 
     value1.Reset();
 
@@ -5437,19 +5360,19 @@ static int TestAddition5() {
     value2 += Array<Value<char>>(1);
     value2 += HArray<Value<char>, char>(1);
 
-    SHOULD_EQUAL_TRUE(value2.IsTrue(), "value2.IsTrue()");
+    EQ_TRUE(value2.IsTrue(), "value2.IsTrue()");
 
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
 
     value2 = true;
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
-    SHOULD_EQUAL_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
 
     value1.Reset();
     /////////////////
@@ -5457,32 +5380,32 @@ static int TestAddition5() {
     value2 = false;
 
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
 
     value2 = false;
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value1[1].IsFalse(), "value1[1].IsFalse()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1[1].IsFalse(), "value1[1].IsFalse()");
 
     value1.Reset();
     /////////////////
 
     value2 = nullptr;
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
 
     value2 = nullptr;
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
-    SHOULD_EQUAL_TRUE(value1[1].IsNull(), "value1[1].IsNull()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
+    EQ_TRUE(value1[1].IsNull(), "value1[1].IsNull()");
 
     value1.Reset();
     /////////////////
@@ -5491,50 +5414,47 @@ static int TestAddition5() {
     value2            = static_cast<String<char> &&>(str);
 
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 1, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    SHOULD_EQUAL(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
+    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
+          "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     str                = String<char>("Hani");
     const char *c_str2 = str.First();
     value2             = static_cast<String<char> &&>(str);
 
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 2, "Size()");
-    SHOULD_EQUAL_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    SHOULD_EQUAL_TRUE(value1[1].IsString(), "value1[1].IsString()");
-    SHOULD_EQUAL(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
-                 "c_str2");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[1].StringStorage(), "Hani", 4),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 2, "Size()");
+    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
+    EQ_TRUE(value1[1].IsString(), "value1[1].IsString()");
+    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
+          "c_str");
+    EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
+          "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     value1.Reset();
     /////////////////
 
     value2 = Array<Value<char>>(1);
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
 
     value2 = Array<Value<char>>(1);
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 0, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_EQUAL(value2.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 0, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
 
     value1.Reset();
     ///
@@ -5548,21 +5468,20 @@ static int TestAddition5() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
 
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 3, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    SHOULD_EQUAL(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 3, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
+    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
+          "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
 
     arr_var.Reset();
     arr_var += Value<char>{ValueType::Null};
@@ -5574,31 +5493,29 @@ static int TestAddition5() {
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
 
     value1 += static_cast<Value<char> &&>(value2);
-    SHOULD_EQUAL_TRUE(value2.IsUndefined(), "value2.IsUndefined()");
-    SHOULD_EQUAL_TRUE(value1.IsArray(), "IsArray()");
-    SHOULD_EQUAL_VALUE(value1.Size(), 6, "Size()");
-    SHOULD_NOT_EQUAL(value1.GetArray(), nullptr, "GetArray()", "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-                     "null");
-    SHOULD_NOT_EQUAL(value1.GetArray()->First(), arr_storage,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    SHOULD_EQUAL_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    SHOULD_EQUAL_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    SHOULD_EQUAL(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
-                 "c_str");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
-        "StringUtils::IsEqual");
-    SHOULD_EQUAL_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
-    SHOULD_EQUAL_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
-    SHOULD_EQUAL_VALUE(value1[4].GetNumber(), 14, "value1[3].GetNumber()");
-    SHOULD_EQUAL_TRUE(value1[5].IsString(), "value1[0].IsString()");
-    SHOULD_EQUAL(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()",
-                 "c_str2");
-    SHOULD_EQUAL_TRUE(
-        StringUtils::IsEqual(value1[5].StringStorage(), "Hani", 4),
-        "StringUtils::IsEqual");
+    EQ_TRUE(value2.IsUndefined(), "value2.IsUndefined()");
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 6, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
+              "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
+              "storage");
+    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
+    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
+          "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
+            "StringUtils::IsEqual");
+    EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
+    EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
+    EQ_VALUE(value1[4].GetNumber(), 14, "value1[3].GetNumber()");
+    EQ_TRUE(value1[5].IsString(), "value1[0].IsString()");
+    EQ_TO(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()",
+          "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "Hani", 4),
+            "StringUtils::IsEqual");
     value1.Reset();
     //////////////////////////////////////////
 
@@ -5635,54 +5552,49 @@ static int TestAddition6() {
 
     value2 = HArray<Value<char>, char>(); // Setting to object type.
     value2 += value1;                     // Copy
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), h_arr_storage1,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["k3"].StringStorage(), str_c1,
-                     "value2[\"k3\"].StringStorage()", "str_c");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage1,
+              "GetArray()->First()", "storage");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
+              "value2[\"k3\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
 
     value2 =
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
     value2 += h_arr_var;             // Copy
-    SHOULD_EQUAL_VALUE(value2.Size(), 4, "value2.Size()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), h_arr_storage2,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["w4"].StringStorage(), str_c2,
-                     "value2[\"w4\"].StringStorage()", "str_c");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-        "value2[\"w4\"].StringStorage()", "Qen");
-    SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_VALUE(value2.Size(), 4, "value2.Size()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2,
+              "GetArray()->First()", "storage");
+    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
+              "value2[\"w4\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
+          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////
 
     value2 =
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
     value2 += static_cast<Value<char> &&>(value1); // Move
-    SHOULD_EQUAL_TRUE(value1.IsUndefined(), "value1.IsUndefined()");
-    SHOULD_EQUAL_VALUE(value2.Size(), 3, "value2.Size()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), h_arr_storage2,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_EQUAL(value2["k3"].StringStorage(), str_c1,
-                 "value2[\"k3\"].StringStorage()", "str_c1");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TRUE(value1.IsUndefined(), "value1.IsUndefined()");
+    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2,
+              "GetArray()->First()", "storage");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    EQ_TO(value2["k3"].StringStorage(), str_c1,
+          "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
 
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
@@ -5690,20 +5602,19 @@ static int TestAddition6() {
     value2 =
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
     value2 += static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
-    SHOULD_EQUAL(h_arr_var.First(), nullptr, "h_arr_var.First()", "null");
-    SHOULD_EQUAL_VALUE(value2.Size(), 4, "value2.Size()");
-    SHOULD_NOT_EQUAL(value2.GetObject(), nullptr, "GetObject()", "null");
-    SHOULD_NOT_EQUAL(value2.GetObject()->First(), h_arr_storage2,
-                     "GetArray()->First()", "storage");
-    SHOULD_EQUAL_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    SHOULD_EQUAL(value2["w4"].StringStorage(), str_c2,
-                 "value2[\"w4\"].StringStorage()", "str_c2");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-        "value2[\"w4\"].StringStorage()", "Qen");
-    SHOULD_EQUAL(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_TO(h_arr_var.First(), nullptr, "h_arr_var.First()", "null");
+    EQ_VALUE(value2.Size(), 4, "value2.Size()");
+    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2,
+              "GetArray()->First()", "storage");
+    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    EQ_TO(value2["w4"].StringStorage(), str_c2,
+          "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
+          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     if (value2.GetObject() != nullptr) {
         h_arr_var = *(value2.GetObject()); // Copying back the values.
@@ -5715,23 +5626,20 @@ static int TestAddition6() {
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
     value2 += value1;                // Copy
     value2 += h_arr_var;             // Copy
-    SHOULD_EQUAL_VALUE(value2.Size(), 7, "value2.Size()");
-    SHOULD_EQUAL_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["w4"].StringStorage(), str_c2,
-                     "value2[\"w4\"].StringStorage()", "str_c2");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-        "value2[\"w4\"].StringStorage()", "Qen");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["k3"].StringStorage(), str_c1,
-                     "value2[\"k3\"].StringStorage()", "str_c1");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value2.Size(), 7, "value2.Size()");
+    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
+              "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
+          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
+              "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
 
     ////
     value2 =
@@ -5745,25 +5653,22 @@ static int TestAddition6() {
     value2 += h_arr_var; // Copy
     value2 += value1;    // Copy
 
-    SHOULD_EQUAL_VALUE(value2["w0"].GetNumber(), 5, "[\"w0\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["w4"].StringStorage(), str_c2,
-                     "value2[\"w4\"].StringStorage()", "str_c2");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-        "value2[\"w4\"].StringStorage()", "Qen");
-    SHOULD_EQUAL_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_NOT_EQUAL(value2["k3"].StringStorage(), str_c1,
-                     "value2[\"k3\"].StringStorage()", "str_c1");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value2["w0"].GetNumber(), 5, "[\"w0\"].GetNumber()");
+    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
+              "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
+          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
+    EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
+              "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
 
     value2 =
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
@@ -5775,25 +5680,22 @@ static int TestAddition6() {
     value2["w6"] = 600;
     value2 += static_cast<Value<char> &&>(value1);                  // Move
     value2 += static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
-    SHOULD_EQUAL_VALUE(value2["w0"].GetNumber(), 5, "[\"w0\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    SHOULD_EQUAL(value2["w4"].StringStorage(), str_c2,
-                 "value2[\"w4\"].StringStorage()", "str_c2");
-    SHOULD_EQUAL(
-        StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-        "value2[\"w4\"].StringStorage()", "Qen");
-    SHOULD_EQUAL_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k1"].GetNumber(), 11,
-                       "value2[\"k1\"].GetNumber()");
-    SHOULD_EQUAL_VALUE(value2["k2"].GetNumber(), 22,
-                       "value2[\"k2\"].GetNumber()");
-    SHOULD_EQUAL(value2["k3"].StringStorage(), str_c1,
-                 "value2[\"k3\"].StringStorage()", "str_c1");
-    SHOULD_EQUAL(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3),
-                 true, "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value2["w0"].GetNumber(), 5, "[\"w0\"].GetNumber()");
+    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    EQ_TO(value2["w4"].StringStorage(), str_c2,
+          "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
+          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
+    EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
+    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
+    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
+    EQ_TO(value2["k3"].StringStorage(), str_c1,
+          "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
+          "value2[\"k3\"].StringStorage()", "Qen");
     /////////////////////////////
 
     END_SUB_TEST;
@@ -5804,319 +5706,319 @@ static int TestStringify1() {
 
     ///////////
     value = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[]", "Stringify()");
 
     value.Reset();
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true]", "Stringify()");
 
     value.Reset();
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false]", "Stringify()");
 
     value.Reset();
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[null]", "Stringify()");
 
     value.Reset();
     value += 0;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[0]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[0]", "Stringify()");
 
     value.Reset();
     value += "a";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a"])", "Stringify()");
 
     value.Reset();
     value += "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC"])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[]]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{}]", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,true]", "Stringify()");
 
     value.Reset();
     value += false;
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,true]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[null,true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[null,true]", "Stringify()");
 
     value.Reset();
     value += -3;
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[-3,true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[-3,true]", "Stringify()");
 
     value.Reset();
     value += "a";
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a",true])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a",true])", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",true])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",true])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],true]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},true]", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,false]", "Stringify()");
 
     value.Reset();
     value += false;
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,false]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[null,false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[null,false]", "Stringify()");
 
     value.Reset();
     value += 500;
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[500,false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[500,false]", "Stringify()");
 
     value.Reset();
     value += String<char>("a");
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a",false])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a",false])", "Stringify()");
 
     value.Reset();
     String<char> str("ABC");
     value += str;
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",false])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",false])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],false]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},false]", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,null]", "Stringify()");
 
     value.Reset();
     value += false;
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,null]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[null,null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[null,null]", "Stringify()");
 
     value.Reset();
     value += 456.5;
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[456.5,null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[456.5,null]", "Stringify()");
 
     value.Reset();
     value += "a";
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a",null])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a",null])", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",null])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",null])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],null]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},null]", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value += "A";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([true,"A"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([true,"A"])", "Stringify()");
 
     value.Reset();
     value += false;
     value += "AB";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([false,"AB"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([false,"AB"])", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value += "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([null,"ABC"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null,"ABC"])", "Stringify()");
 
     value.Reset();
     value += -8.9;
     value += "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([-8.9,"ABC"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([-8.9,"ABC"])", "Stringify()");
 
     value.Reset();
     value += "a";
     value += "ABCD";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a","ABCD"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a","ABCD"])", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value += "ABCDE";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC","ABCDE"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC","ABCDE"])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value += "ABCDEF";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([[],"ABCDEF"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[],"ABCDEF"])", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value += "ABCDEFG";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([{},"ABCDEFG"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{},"ABCDEFG"])", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,[]]", "Stringify()");
 
     value.Reset();
     value += false;
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,[]]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[null,[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[null,[]]", "Stringify()");
 
     value.Reset();
     value += 10000;
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[10000,[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[10000,[]]", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",[]])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",[]])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],[]]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value[1] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},[]]", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,{}]", "Stringify()");
 
     value.Reset();
     value += false;
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,{}]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[null,{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[null,{}]", "Stringify()");
 
     value.Reset();
     value += -1000;
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[-1000,{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[-1000,{}]", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",{}])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",{}])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],{}]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value[1] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},{}]", "Stringify()");
     ///////////
 
     value.Reset();
     value += true;
     value[1] = HArray<Value<char>, char>();
     value += false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,{},false]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,{},false]", "Stringify()");
 
     value.Reset();
     value += false;
     value[1] = Array<Value<char>>();
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,[],null]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,[],null]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value[1] = HArray<Value<char>, char>();
     value += "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([null,{},"ABC"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null,{},"ABC"])", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value[1] = 789;
     value += "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([null,789,"ABC"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null,789,"ABC"])", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value[1] = Array<Value<char>>();
     value[2] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",[],{}])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",[],{}])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value[1] = HArray<Value<char>, char>();
     value[2] = 498;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],{},498]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],{},498]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value[1] = Array<Value<char>>();
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},[],true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},[],true]", "Stringify()");
     ///////////
 
     value.Reset();
@@ -6124,44 +6026,42 @@ static int TestStringify1() {
     value[1] = HArray<Value<char>, char>();
     value += 0;
     value[3] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[true,{},0,[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[true,{},0,[]]", "Stringify()");
 
     value.Reset();
     value += false;
     value[1] = Array<Value<char>>();
     value += nullptr;
     value[3] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[false,[],null,{}]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[false,[],null,{}]", "Stringify()");
 
     value.Reset();
     value += nullptr;
     value[1] = HArray<Value<char>, char>();
     value += "ABC";
     value[3] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([null,{},"ABC",[]])",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null,{},"ABC",[]])", "Stringify()");
 
     value.Reset();
     value += "ABC";
     value[1] = Array<Value<char>>();
     value[2] = HArray<Value<char>, char>();
     value += nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["ABC",[],{},null])",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["ABC",[],{},null])", "Stringify()");
 
     value.Reset();
     value[0] = Array<Value<char>>();
     value += false;
     value[2] = HArray<Value<char>, char>();
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[[],false,{},true]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[[],false,{},true]", "Stringify()");
 
     value.Reset();
     value[0] = HArray<Value<char>, char>();
     value += nullptr;
     value[2] = Array<Value<char>>();
     value[3] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), "[{},null,[],[]]", "Stringify()");
+    EQ_VALUE(value.Stringify(), "[{},null,[],[]]", "Stringify()");
 
     ///////////
     value.Reset();
@@ -6172,8 +6072,8 @@ static int TestStringify1() {
     value += "ABC";
     value[5] = Array<Value<char>>();
     value[6] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"([true,false,null,123,"ABC",[],{}])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])",
+             "Stringify()");
 
     ///////////
     value.Reset();
@@ -6184,8 +6084,8 @@ static int TestStringify1() {
     value += nullptr;
     value += false;
     value += true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])",
+             "Stringify()");
     ///////////////////////////////////////
     END_SUB_TEST;
 }
@@ -6195,370 +6095,326 @@ static int TestStringify2() {
 
     ///////////
     value = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "Stringify()");
 
     value.Reset();
     value["A"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":true})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true})", "Stringify()");
 
     value.Reset();
     value["B"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"B":false})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"B":false})", "Stringify()");
 
     value.Reset();
     value["AA"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"AA":null})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"AA":null})", "Stringify()");
 
     value.Reset();
     value["a"] = 0;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"a":0})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"a":0})", "Stringify()");
 
     value.Reset();
     value["abc"] = "a";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"abc":"a"})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"abc":"a"})", "Stringify()");
 
     value.Reset();
     value["ab"] = "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"ab":"ABC"})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"ab":"ABC"})", "Stringify()");
 
     value.Reset();
     value["ABC"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"ABC":[]})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"ABC":[]})", "Stringify()");
 
     value.Reset();
     value["5vn7b83y98t3wrupwmwa4ataw"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})",
+             "Stringify()");
     ///////////
 
     value.Reset();
     value["A"] = true;
     value["B"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":true,"B":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"B":true})", "Stringify()");
 
     value.Reset();
     value["A"] = false;
     value["b"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"b":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"b":true})", "Stringify()");
 
     value.Reset();
     value["A"]  = nullptr;
     value["BC"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":null,"BC":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"BC":true})", "Stringify()");
 
     value.Reset();
     value["A"]  = -3;
     value["AB"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":-3,"AB":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":-3,"AB":true})", "Stringify()");
 
     value.Reset();
     value["A"]   = "a";
     value["ABC"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a","ABC":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"a","ABC":true})", "Stringify()");
 
     value.Reset();
     value["A"] = "ABC";
     value["1"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"ABC","1":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","1":true})", "Stringify()");
 
     value.Reset();
     value["X"]   = Array<Value<char>>();
     value["123"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":[],"123":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"123":true})", "Stringify()");
 
     value.Reset();
     value["x"] = HArray<Value<char>, char>();
     value["A"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"x":{},"A":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"x":{},"A":true})", "Stringify()");
     ///////////
 
     value.Reset();
     value["A2"] = true;
     value["A1"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A2":true,"A1":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A2":true,"A1":false})", "Stringify()");
 
     value.Reset();
     value["A-"]   = false;
     value["A123"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A-":false,"A123":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A-":false,"A123":false})", "Stringify()");
 
     value.Reset();
     value["A"] = nullptr;
     value["B"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":null,"B":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"B":false})", "Stringify()");
 
     value.Reset();
     value["A"] = 500;
     value["B"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":500,"B":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":500,"B":false})", "Stringify()");
 
     value.Reset();
     value["A"] = String<char>("a");
     value["B"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a","B":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"a","B":false})", "Stringify()");
 
     value.Reset();
     String<char> str("ABC");
     value["A"] = str;
     value["B"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"ABC","B":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","B":false})", "Stringify()");
 
     value.Reset();
     value["X"] = Array<Value<char>>();
     value["A"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":[],"A":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"A":false})", "Stringify()");
 
     value.Reset();
     value["X"] = HArray<Value<char>, char>();
     value["A"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":{},"A":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":{},"A":false})", "Stringify()");
     ///////////
 
     value.Reset();
     value["A"] = true;
     value["W"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":true,"W":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"W":null})", "Stringify()");
 
     value.Reset();
     value["A"] = false;
     value["@"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"@":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"@":null})", "Stringify()");
 
     value.Reset();
     value["A"] = nullptr;
     value["#"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":null,"#":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"#":null})", "Stringify()");
 
     value.Reset();
     value["A"] = 456.5;
     value["H"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":456.5,"H":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":456.5,"H":null})", "Stringify()");
 
     value.Reset();
     value["A"] = "a";
     value["Q"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a","Q":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"a","Q":null})", "Stringify()");
 
     value.Reset();
     value["A"] = "ABC";
     value["e"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"ABC","e":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","e":null})", "Stringify()");
 
     value.Reset();
     value["X"] = Array<Value<char>>();
     value["n"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":[],"n":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"n":null})", "Stringify()");
 
     value.Reset();
     value["t"] = HArray<Value<char>, char>();
     value["A"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"t":{},"A":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"t":{},"A":null})", "Stringify()");
     ///////////
 
     value.Reset();
     value["e"] = true;
     value["A"] = "A";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"e":true,"A":"A"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"e":true,"A":"A"})", "Stringify()");
 
     value.Reset();
     value["m"] = false;
     value["A"] = "AB";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"m":false,"A":"AB"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"m":false,"A":"AB"})", "Stringify()");
 
     value.Reset();
     value["i"] = nullptr;
     value["A"] = "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"i":null,"A":"ABC"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"i":null,"A":"ABC"})", "Stringify()");
 
     value.Reset();
     value["s"] = -8.9;
     value["A"] = "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"s":-8.9,"A":"ABC"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"s":-8.9,"A":"ABC"})", "Stringify()");
 
     value.Reset();
     value["-"] = "a";
     value["A"] = "ABCD";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"-":"a","A":"ABCD"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"-":"a","A":"ABCD"})", "Stringify()");
 
     value.Reset();
     value["g"] = "ABC";
     value["A"] = "ABCDE";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"g":"ABC","A":"ABCDE"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"g":"ABC","A":"ABCDE"})", "Stringify()");
 
     value.Reset();
     value["o"] = Array<Value<char>>();
     value["A"] = "ABCDEF";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"o":[],"A":"ABCDEF"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"o":[],"A":"ABCDEF"})", "Stringify()");
 
     value.Reset();
     value["A"] = HArray<Value<char>, char>();
     value["o"] = "ABCDEFG";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":{},"o":"ABCDEFG"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":{},"o":"ABCDEFG"})", "Stringify()");
     ///////////
 
     value.Reset();
     value["d"] = true;
     value["y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"d":true,"y":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"d":true,"y":[]})", "Stringify()");
 
     value.Reset();
     value["A"] = false;
     value["y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"y":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[]})", "Stringify()");
 
     value.Reset();
     value["A"] = nullptr;
     value["y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":null,"y":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"y":[]})", "Stringify()");
 
     value.Reset();
     value["A"] = 10000;
     value["y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":10000,"y":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":10000,"y":[]})", "Stringify()");
 
     value.Reset();
     value["A"] = "ABC";
     value["y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"ABC","y":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[]})", "Stringify()");
 
     value.Reset();
     value["X"] = Array<Value<char>>();
     value["y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":[],"y":[]})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"y":[]})", "Stringify()");
 
     value.Reset();
     value["X"] = HArray<Value<char>, char>();
     value["Y"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":{},"Y":[]})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":{},"Y":[]})", "Stringify()");
     ///////////
 
     value.Reset();
     value["A"] = true;
     value["y"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":true,"y":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{}})", "Stringify()");
 
     value.Reset();
     value["A"] = false;
     value["y"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"y":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"y":{}})", "Stringify()");
 
     value.Reset();
     value["A"] = nullptr;
     value["y"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":null,"y":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{}})", "Stringify()");
 
     value.Reset();
     value["A"] = -1000;
     value["y"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":-1000,"y":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":-1000,"y":{}})", "Stringify()");
 
     value.Reset();
     value["A"] = "ABC";
     value["y"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"ABC","y":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":{}})", "Stringify()");
 
     value.Reset();
     value["C"] = Array<Value<char>>();
     value["R"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"C":[],"R":{}})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"C":[],"R":{}})", "Stringify()");
 
     value.Reset();
     value["cc"] = HArray<Value<char>, char>();
     value["rr"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"cc":{},"rr":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"cc":{},"rr":{}})", "Stringify()");
     ///////////
 
     value.Reset();
     value["A"]  = true;
     value["y"]  = HArray<Value<char>, char>();
     value["AA"] = false;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})",
+             "Stringify()");
 
     value.Reset();
     value["A"] = false;
     value["y"] = Array<Value<char>>();
     value["B"] = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})",
+             "Stringify()");
 
     value.Reset();
     value["A"]   = nullptr;
     value["y"]   = HArray<Value<char>, char>();
     value["ABC"] = "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})",
+             "Stringify()");
 
     value.Reset();
     value["t"] = nullptr;
     value["Y"] = 789;
     value["A"] = "ABC";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})",
+             "Stringify()");
 
     value.Reset();
     value["A"]     = "ABC";
     value["y"]     = Array<Value<char>>();
     value["key-u"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})",
+             "Stringify()");
 
     value.Reset();
     value["X"]     = Array<Value<char>>();
     value["Y"]     = HArray<Value<char>, char>();
     value["key-u"] = 498;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})",
+             "Stringify()");
 
     value.Reset();
     value["X"] = HArray<Value<char>, char>();
     value["y"] = Array<Value<char>>();
     value["A"] = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"X":{},"y":[],"A":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":{},"y":[],"A":true})", "Stringify()");
     ///////////
 
     value.Reset();
@@ -6566,54 +6422,48 @@ static int TestStringify2() {
     value["y"]     = HArray<Value<char>, char>();
     value["AA"]    = 0;
     value["k-300"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"{}}":true,"y":{},"AA":0,"k-300":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})",
+             "Stringify()");
 
     value.Reset();
     value["B1"]    = false;
     value["y"]     = Array<Value<char>>();
     value["[A]"]   = nullptr;
     value["k-300"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"B1":false,"y":[],"[A]":null,"k-300":{}})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})",
+             "Stringify()");
 
     value.Reset();
     value["{A}"]   = nullptr;
     value["y"]     = HArray<Value<char>, char>();
     value["AA"]    = "ABC";
     value["k-300"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})",
+             "Stringify()");
 
     value.Reset();
     value["x"]     = "ABC";
     value["[]]"]   = Array<Value<char>>();
     value["key-u"] = HArray<Value<char>, char>();
     value["A"]     = nullptr;
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"x":"ABC","[]]":[],"key-u":{},"A":null})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})",
+             "Stringify()");
 
     value.Reset();
     value["X"]       = Array<Value<char>>();
     value["CCCCccc"] = false;
     value["key-u"]   = HArray<Value<char>, char>();
     value["A"]       = true;
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(),
+             R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()");
 
     value.Reset();
     value["X"]     = HArray<Value<char>, char>();
     value["A"]     = nullptr;
     value["key-u"] = Array<Value<char>>();
     value["k-300"] = Array<Value<char>>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"X":{},"A":null,"key-u":[],"k-300":[]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})",
+             "Stringify()");
 
     ///////////
     value.Reset();
@@ -6624,10 +6474,9 @@ static int TestStringify2() {
     value["E"] = "ABC";
     value["F"] = Array<Value<char>>();
     value["G"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(
-        value.Stringify(),
-        R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})",
-        "Stringify()");
+    EQ_VALUE(value.Stringify(),
+             R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})",
+             "Stringify()");
 
     ///////////
     value.Reset();
@@ -6638,7 +6487,7 @@ static int TestStringify2() {
     value["EEEEE"]   = nullptr;
     value["FFFFFF"]  = false;
     value["GGGGGGG"] = true;
-    SHOULD_EQUAL_VALUE(
+    EQ_VALUE(
         value.Stringify(),
         R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
         "Stringify()");
@@ -6657,8 +6506,8 @@ static int TestStringify3() {
     value[0] += "ABC";
     value[0][5] = Array<Value<char>>();
     value[0] += HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[true,false,null,0,"ABC",[],{}]])",
+             "Stringify()");
 
     value         = Array<Value<char>>();
     value[0]["a"] = true;
@@ -6668,10 +6517,9 @@ static int TestStringify3() {
     value[0]["B"] = "a";
     value[0]["2"] = Array<Value<char>>();
     value[0]["6"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(
-        value.Stringify(),
-        R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])",
-        "Stringify()");
+    EQ_VALUE(value.Stringify(),
+             R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])",
+             "Stringify()");
 
     value.Reset();
     value["o"] += true;
@@ -6681,9 +6529,8 @@ static int TestStringify3() {
     value["o"] += "ABC";
     value["o"][5] = Array<Value<char>>();
     value["o"] += HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"o":[true,false,null,0,"ABC",[],{}]})",
-                       "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"o":[true,false,null,0,"ABC",[],{}]})",
+             "Stringify()");
 
     value.Reset();
     value["i"]["a"] = true;
@@ -6693,7 +6540,7 @@ static int TestStringify3() {
     value["i"]["B"] = "a";
     value["i"]["2"] = Array<Value<char>>();
     value["i"]["6"] = HArray<Value<char>, char>();
-    SHOULD_EQUAL_VALUE(
+    EQ_VALUE(
         value.Stringify(),
         R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})",
         "Stringify()");
@@ -6706,14 +6553,12 @@ static int TestStringify4() {
     Value<char> value;
 
     value["\"\\/\b\f\n\r\t"] = "\t\r\n\f\b/\\\"";
-    SHOULD_EQUAL_VALUE(value.Stringify(),
-                       R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})",
+             "value.Stringify()");
 
     value.Reset();
     value += "\"\\/\b\f\n\r\t";
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["\"\\\/\b\f\n\r\t"])",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()");
 
     END_SUB_TEST;
 }
@@ -6723,140 +6568,132 @@ static int TestDeleteValue() {
 
     value[0] = 1;
     value.Remove(int{0});
-    SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "c";
     value.Remove(UInt{0});
-    SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = Array<Value<char>>();
     value.Remove(ULong{0});
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
     value.Remove(0);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([true])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([true])", "value.Stringify()");
     value.Remove(1);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "abc";
     value[1] = nullptr;
     value.Remove(1);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["abc"])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["abc"])", "value.Stringify()");
     value.Remove(0);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
     value.Remove(1);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([false,null])",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([false,null])", "value.Stringify()");
     value.Remove(0);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
 
     value.Remove(2);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
     value[1].Reset();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([false,null])",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([false,null])", "value.Stringify()");
     value[0].Reset();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
 
     value[2].Reset();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "a";
     value[1] = Array<Value<char>>();
     value[2] = HArray<Value<char>, char>();
     value.Remove(2);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a",[]])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a",[]])", "value.Stringify()");
     value.Remove(1);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"(["a"])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a"])", "value.Stringify()");
 
     value.Remove(0);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     /////////
     value.Reset();
 
     value["A"] = 1;
     value.Remove(0);
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"] = "c";
     value.Remove("A");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"] = Array<Value<char>>();
     value.Remove("A");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value.Reset();
     value["A"]  = false;
     value["bb"] = true;
     value.Remove("A");
-    SHOULD_EQUAL(value.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"bb":true})",
-                       "value.Stringify()");
+    EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_VALUE(value.Stringify(), R"({"bb":true})", "value.Stringify()");
     value.Remove(1);
-    SHOULD_EQUAL(value.GetKey(0), nullptr, "GetKey(0)", "null");
-    SHOULD_EQUAL(value.GetValue(1), nullptr, "GetValue(1)", "null");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
+    EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]  = "abc";
     value["bb"] = nullptr;
     value.Remove("bb");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"abc"})",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"abc"})", "value.Stringify()");
     value.Remove("A");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]   = false;
     value["bb"]  = true;
     value["AAA"] = nullptr;
     value.Remove("bb");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":false,"AAA":null})",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"AAA":null})",
+             "value.Stringify()");
     value.Remove("A");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"AAA":null})",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"AAA":null})", "value.Stringify()");
 
     value.Remove("AAA");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]   = "a";
     value["bb"]  = HArray<Value<char>, char>();
     value["AAA"] = Array<Value<char>>();
     value.Remove("AAA");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a","bb":{}})",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()");
     value.Remove("bb");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a"})",
-                       value.Stringify().First());
+    EQ_VALUE(value.Stringify(), R"({"A":"a"})", value.Stringify().First());
 
     value.Remove("A");
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"]   = "a";
     value["bb"]  = HArray<Value<char>, char>();
     value["AAA"] = Array<Value<char>>();
     value["AAA"].Reset();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a","bb":{}})",
-                       "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()");
     value["bb"].Reset();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({"A":"a"})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"a"})", "value.Stringify()");
 
     value["A"].Reset();
-    SHOULD_EQUAL_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     END_SUB_TEST;
 }

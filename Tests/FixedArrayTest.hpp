@@ -35,29 +35,29 @@ static int TestFixedArray() {
     FixedArray<UInt, 16> arr3;
     bool                 did_throw;
 
-    SHOULD_EQUAL_VALUE(arr1.Size(), 0, "Size()");
-    SHOULD_EQUAL_VALUE(arr2.Size(), 0, "Size()");
-    SHOULD_EQUAL_VALUE(arr3.Size(), 0, "Size()");
+    EQ_VALUE(arr1.Size(), 0, "Size()");
+    EQ_VALUE(arr2.Size(), 0, "Size()");
+    EQ_VALUE(arr3.Size(), 0, "Size()");
 
-    SHOULD_EQUAL_VALUE(arr1.Capacity(), 4, "Capacity()");
-    SHOULD_EQUAL_VALUE(arr2.Capacity(), 8, "Capacity()");
-    SHOULD_EQUAL_VALUE(arr3.Capacity(), 16, "Capacity()");
+    EQ_VALUE(arr1.Capacity(), 4, "Capacity()");
+    EQ_VALUE(arr2.Capacity(), 8, "Capacity()");
+    EQ_VALUE(arr3.Capacity(), 16, "Capacity()");
 
-    SHOULD_EQUAL_TRUE(arr1.IsEmpty(), "IsEmpty()");
-    SHOULD_EQUAL_TRUE(arr2.IsEmpty(), "IsEmpty()");
-    SHOULD_EQUAL_TRUE(arr3.IsEmpty(), "IsEmpty()");
+    EQ_TRUE(arr1.IsEmpty(), "IsEmpty()");
+    EQ_TRUE(arr2.IsEmpty(), "IsEmpty()");
+    EQ_TRUE(arr3.IsEmpty(), "IsEmpty()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsNotEmpty(), "IsNotEmpty()");
+    EQ_FALSE(arr1.IsNotEmpty(), "IsNotEmpty()");
+    EQ_FALSE(arr2.IsNotEmpty(), "IsNotEmpty()");
+    EQ_FALSE(arr3.IsNotEmpty(), "IsNotEmpty()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsFull(), "IsFull()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsFull(), "IsFull()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsFull(), "IsFull()");
+    EQ_FALSE(arr1.IsFull(), "IsFull()");
+    EQ_FALSE(arr2.IsFull(), "IsFull()");
+    EQ_FALSE(arr3.IsFull(), "IsFull()");
 
-    SHOULD_EQUAL_VALUE(arr1.First(), arr1.End(), "First()");
-    SHOULD_EQUAL_VALUE(arr2.First(), arr2.End(), "First()");
-    SHOULD_EQUAL_VALUE(arr3.First(), arr3.End(), "First()");
+    EQ_VALUE(arr1.First(), arr1.End(), "First()");
+    EQ_VALUE(arr2.First(), arr2.End(), "First()");
+    EQ_VALUE(arr3.First(), arr3.End(), "First()");
 
     for (UInt i = 0; i < arr1.Capacity(); i++) {
         arr1 += i;
@@ -71,25 +71,25 @@ static int TestFixedArray() {
         arr3 += i;
     }
 
-    SHOULD_EQUAL_VALUE(arr1.Size(), arr1.Capacity(), "Size()");
-    SHOULD_EQUAL_VALUE(arr2.Size(), arr2.Capacity(), "Size()");
-    SHOULD_EQUAL_VALUE(arr3.Size(), arr3.Capacity(), "Size()");
+    EQ_VALUE(arr1.Size(), arr1.Capacity(), "Size()");
+    EQ_VALUE(arr2.Size(), arr2.Capacity(), "Size()");
+    EQ_VALUE(arr3.Size(), arr3.Capacity(), "Size()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsEmpty(), "IsEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsEmpty(), "IsEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsEmpty(), "IsEmpty()");
+    EQ_FALSE(arr1.IsEmpty(), "IsEmpty()");
+    EQ_FALSE(arr2.IsEmpty(), "IsEmpty()");
+    EQ_FALSE(arr3.IsEmpty(), "IsEmpty()");
 
-    SHOULD_EQUAL_TRUE(arr1.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_EQUAL_TRUE(arr2.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_EQUAL_TRUE(arr3.IsNotEmpty(), "IsNotEmpty()");
+    EQ_TRUE(arr1.IsNotEmpty(), "IsNotEmpty()");
+    EQ_TRUE(arr2.IsNotEmpty(), "IsNotEmpty()");
+    EQ_TRUE(arr3.IsNotEmpty(), "IsNotEmpty()");
 
-    SHOULD_EQUAL_TRUE(arr1.IsFull(), "IsFull()");
-    SHOULD_EQUAL_TRUE(arr2.IsFull(), "IsFull()");
-    SHOULD_EQUAL_TRUE(arr3.IsFull(), "IsFull()");
+    EQ_TRUE(arr1.IsFull(), "IsFull()");
+    EQ_TRUE(arr2.IsFull(), "IsFull()");
+    EQ_TRUE(arr3.IsFull(), "IsFull()");
 
-    SHOULD_NOT_EQUAL_VALUE(arr1.First(), arr1.End(), "First()");
-    SHOULD_NOT_EQUAL_VALUE(arr2.First(), arr2.End(), "First()");
-    SHOULD_NOT_EQUAL_VALUE(arr3.First(), arr3.End(), "First()");
+    NOT_EQ_VALUE(arr1.First(), arr1.End(), "First()");
+    NOT_EQ_VALUE(arr2.First(), arr2.End(), "First()");
+    NOT_EQ_VALUE(arr3.First(), arr3.End(), "First()");
 
     try {
         did_throw = false;
@@ -98,7 +98,7 @@ static int TestFixedArray() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw = false;
@@ -107,7 +107,7 @@ static int TestFixedArray() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw = false;
@@ -116,7 +116,7 @@ static int TestFixedArray() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     try {
         did_throw = false;
@@ -125,7 +125,7 @@ static int TestFixedArray() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     unsigned int uii = 5;
 
@@ -136,54 +136,54 @@ static int TestFixedArray() {
         did_throw = true;
     }
 
-    SHOULD_EQUAL_TRUE(did_throw, "did_throw");
+    EQ_TRUE(did_throw, "did_throw");
 
     arr1.Clear();
     arr2.Clear();
     arr3.Clear();
 
-    SHOULD_EQUAL_VALUE(arr1.Size(), 0, "Size()");
-    SHOULD_EQUAL_VALUE(arr2.Size(), 0, "Size()");
-    SHOULD_EQUAL_VALUE(arr3.Size(), 0, "Size()");
+    EQ_VALUE(arr1.Size(), 0, "Size()");
+    EQ_VALUE(arr2.Size(), 0, "Size()");
+    EQ_VALUE(arr3.Size(), 0, "Size()");
 
-    SHOULD_EQUAL_TRUE(arr1.IsEmpty(), "IsEmpty()");
-    SHOULD_EQUAL_TRUE(arr2.IsEmpty(), "IsEmpty()");
-    SHOULD_EQUAL_TRUE(arr3.IsEmpty(), "IsEmpty()");
+    EQ_TRUE(arr1.IsEmpty(), "IsEmpty()");
+    EQ_TRUE(arr2.IsEmpty(), "IsEmpty()");
+    EQ_TRUE(arr3.IsEmpty(), "IsEmpty()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsNotEmpty(), "IsNotEmpty()");
+    EQ_FALSE(arr1.IsNotEmpty(), "IsNotEmpty()");
+    EQ_FALSE(arr2.IsNotEmpty(), "IsNotEmpty()");
+    EQ_FALSE(arr3.IsNotEmpty(), "IsNotEmpty()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsFull(), "IsFull()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsFull(), "IsFull()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsFull(), "IsFull()");
+    EQ_FALSE(arr1.IsFull(), "IsFull()");
+    EQ_FALSE(arr2.IsFull(), "IsFull()");
+    EQ_FALSE(arr3.IsFull(), "IsFull()");
 
     arr1 += 5U;
     arr2 += 5U;
     arr3 += 5U;
 
-    SHOULD_EQUAL_VALUE(arr1.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(arr2.Size(), 1, "Size()");
-    SHOULD_EQUAL_VALUE(arr3.Size(), 1, "Size()");
+    EQ_VALUE(arr1.Size(), 1, "Size()");
+    EQ_VALUE(arr2.Size(), 1, "Size()");
+    EQ_VALUE(arr3.Size(), 1, "Size()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsEmpty(), "IsEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsEmpty(), "IsEmpty()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsEmpty(), "IsEmpty()");
+    EQ_FALSE(arr1.IsEmpty(), "IsEmpty()");
+    EQ_FALSE(arr2.IsEmpty(), "IsEmpty()");
+    EQ_FALSE(arr3.IsEmpty(), "IsEmpty()");
 
-    SHOULD_EQUAL_TRUE(arr1.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_EQUAL_TRUE(arr2.IsNotEmpty(), "IsNotEmpty()");
-    SHOULD_EQUAL_TRUE(arr3.IsNotEmpty(), "IsNotEmpty()");
+    EQ_TRUE(arr1.IsNotEmpty(), "IsNotEmpty()");
+    EQ_TRUE(arr2.IsNotEmpty(), "IsNotEmpty()");
+    EQ_TRUE(arr3.IsNotEmpty(), "IsNotEmpty()");
 
-    SHOULD_NOT_EQUAL_TRUE(arr1.IsFull(), "IsFull()");
-    SHOULD_NOT_EQUAL_TRUE(arr2.IsFull(), "IsFull()");
-    SHOULD_NOT_EQUAL_TRUE(arr3.IsFull(), "IsFull()");
+    EQ_FALSE(arr1.IsFull(), "IsFull()");
+    EQ_FALSE(arr2.IsFull(), "IsFull()");
+    EQ_FALSE(arr3.IsFull(), "IsFull()");
 
-    SHOULD_EQUAL_VALUE(*(arr1.First()), 5U, "First()");
+    EQ_VALUE(*(arr1.First()), 5U, "First()");
 
     arr1 += 10U;
     arr1 += 100U;
 
-    SHOULD_EQUAL_VALUE(arr1.End(), (arr1.First() + arr1.Size()), "End()");
+    EQ_VALUE(arr1.End(), (arr1.First() + arr1.Size()), "End()");
 
     END_SUB_TEST;
 }

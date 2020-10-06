@@ -29,6 +29,7 @@
 #define QENTEM_TESTHELPER_H_
 
 namespace Qentem {
+namespace Test {
 
 class TestHelper {
   public:
@@ -93,7 +94,7 @@ class TestHelper {
         }                                                                      \
     } while (false)
 
-#define SHOULD_EQUAL(left, right, name, value)                                 \
+#define EQ_TO(left, right, name, value)                                        \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((left) != (right)) {                                               \
@@ -102,16 +103,7 @@ class TestHelper {
         }                                                                      \
     } while (false)
 
-#define SHOULD_EQUAL_VALUE(left, right, name)                                  \
-    do {                                                                       \
-        TestHelper::LineNumber() = __LINE__;                                   \
-        if ((left) != (right)) {                                               \
-            TestHelper::PrintErrorMessage(false, name, right);                 \
-            return 1;                                                          \
-        }                                                                      \
-    } while (false)
-
-#define SHOULD_NOT_EQUAL(left, right, name, value)                             \
+#define NOT_EQ_TO(left, right, name, value)                                    \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((left) == (right)) {                                               \
@@ -120,7 +112,16 @@ class TestHelper {
         }                                                                      \
     } while (false)
 
-#define SHOULD_NOT_EQUAL_VALUE(left, right, name)                              \
+#define EQ_VALUE(left, right, name)                                            \
+    do {                                                                       \
+        TestHelper::LineNumber() = __LINE__;                                   \
+        if ((left) != (right)) {                                               \
+            TestHelper::PrintErrorMessage(false, name, right);                 \
+            return 1;                                                          \
+        }                                                                      \
+    } while (false)
+
+#define NOT_EQ_VALUE(left, right, name)                                        \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((left) == (right)) {                                               \
@@ -129,7 +130,7 @@ class TestHelper {
         }                                                                      \
     } while (false)
 
-#define SHOULD_EQUAL_TRUE(condition, name)                                     \
+#define EQ_TRUE(condition, name)                                               \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if (!(condition)) {                                                    \
@@ -138,7 +139,7 @@ class TestHelper {
         }                                                                      \
     } while (false)
 
-#define SHOULD_NOT_EQUAL_TRUE(condition, name)                                 \
+#define EQ_FALSE(condition, name)                                              \
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if (condition) {                                                       \
@@ -155,8 +156,6 @@ class TestHelper {
         return 0;                                                              \
     } while (false)
 
-namespace Test {
-
 QENTEM_MAYBE_UNUSED_
 static int TestThrow1_1() {
     return 1;
@@ -167,7 +166,7 @@ static int TestThrow1() {
     std::wstringstream ss;
 
     TestHelper::StartTest("Test Throw 1", TestThrow1_1, ss);
-    SHOULD_EQUAL_VALUE(ss.str(), L"Test Throw 1", "Test Throw 1");
+    EQ_VALUE(ss.str(), L"Test Throw 1", "Test Throw 1");
 
     END_SUB_TEST;
 }
@@ -183,8 +182,8 @@ static int TestThrow2() {
 
     TestHelper::PrintErrorMessage(false, "", 0, ss);
 
-    SHOULD_EQUAL_VALUE(TestHelper::StartTest("Test Throw 2", TestThrow2_2, ss),
-                       false, "Test Throw 2");
+    EQ_VALUE(TestHelper::StartTest("Test Throw 2", TestThrow2_2, ss), false,
+             "Test Throw 2");
 
     END_SUB_TEST;
 }
