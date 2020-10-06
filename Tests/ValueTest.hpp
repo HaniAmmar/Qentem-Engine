@@ -29,9 +29,8 @@
 namespace Qentem {
 namespace Test {
 
-static int TestEmptyValue1() {
+static int TestEmptyValue() {
     Value<char> value1;
-    Value<char> value2;
 
     StringStream<char> ss_var;
     String<char>       str_var;
@@ -57,9 +56,9 @@ static int TestEmptyValue1() {
           ", 0)",
           "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
-          "SetCharAndLength()", "false");
+    EQ_FALSE(value1.InsertKey(ss_var, 0), "InsertKey(0)");
+    EQ_FALSE(value1.SetCharAndLength(c_str_var, c_str_len),
+             "SetCharAndLength()");
     EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
@@ -72,280 +71,22 @@ static int TestEmptyValue1() {
     EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    value2 = value1;
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value1.IsObject(), "IsObject()");
-    EQ_FALSE(value1.IsArray(), "IsArray()");
-    EQ_FALSE(value1.IsString(), "IsString()");
-    EQ_FALSE(value1.IsNumber(), "IsNumber()");
-    EQ_FALSE(value1.IsTrue(), "IsTrue()");
-    EQ_FALSE(value1.IsFalse(), "IsFalse()");
-    EQ_FALSE(value1.IsNull(), "IsNull()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value1.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    value1 = Value<char>{ValueType::Object};
+    EQ_TRUE(value1.IsObject(), "IsObject()");
 
-    EQ_TRUE(value2.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value2.IsObject(), "IsObject()");
-    EQ_FALSE(value2.IsArray(), "IsArray()");
-    EQ_FALSE(value2.IsString(), "IsString()");
-    EQ_FALSE(value2.IsNumber(), "IsNumber()");
-    EQ_FALSE(value2.IsTrue(), "IsTrue()");
-    EQ_FALSE(value2.IsFalse(), "IsFalse()");
-    EQ_FALSE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value2.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
+    value1 = Value<char>{ValueType::Array};
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+
+    value1 = Value<char>{ValueType::String};
+    EQ_TRUE(value1.IsString(), "IsString()");
+
+    value1 = Value<char>{ValueType::Number};
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
 
     END_SUB_TEST;
 }
 
-static int TestEmptyValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
-
-    value2 = static_cast<Value<char> &&>(value1);
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value1.IsObject(), "IsObject()");
-    EQ_FALSE(value1.IsArray(), "IsArray()");
-    EQ_FALSE(value1.IsString(), "IsString()");
-    EQ_FALSE(value1.IsNumber(), "IsNumber()");
-    EQ_FALSE(value1.IsTrue(), "IsTrue()");
-    EQ_FALSE(value1.IsFalse(), "IsFalse()");
-    EQ_FALSE(value1.IsNull(), "IsNull()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value1.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value2.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value2.IsObject(), "IsObject()");
-    EQ_FALSE(value2.IsArray(), "IsArray()");
-    EQ_FALSE(value2.IsString(), "IsString()");
-    EQ_FALSE(value2.IsNumber(), "IsNumber()");
-    EQ_FALSE(value2.IsTrue(), "IsTrue()");
-    EQ_FALSE(value2.IsFalse(), "IsFalse()");
-    EQ_FALSE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value2.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    Value<char> value3(value1);
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value1.IsObject(), "IsObject()");
-    EQ_FALSE(value1.IsArray(), "IsArray()");
-    EQ_FALSE(value1.IsString(), "IsString()");
-    EQ_FALSE(value1.IsNumber(), "IsNumber()");
-    EQ_FALSE(value1.IsTrue(), "IsTrue()");
-    EQ_FALSE(value1.IsFalse(), "IsFalse()");
-    EQ_FALSE(value1.IsNull(), "IsNull()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value1.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value3.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value3.IsObject(), "IsObject()");
-    EQ_FALSE(value3.IsArray(), "IsArray()");
-    EQ_FALSE(value3.IsString(), "IsString()");
-    EQ_FALSE(value3.IsNumber(), "IsNumber()");
-    EQ_FALSE(value3.IsTrue(), "IsTrue()");
-    EQ_FALSE(value3.IsFalse(), "IsFalse()");
-    EQ_FALSE(value3.IsNull(), "IsNull()");
-    EQ_TO(value3.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value3.Size(), 0, "Type()");
-    EQ_TO(value3.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value3.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value3.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value3.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value3.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value3.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value3.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value3.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value3.Length(), 0, "Length()");
-    EQ_FALSE(value3.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value3.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value3.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value3.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value3.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestEmptyValue3() {
-    Value<char> value1;
-
-    StringStream<char> ss_var;
-    String<char>       str_var;
-    double             num_var;
-    bool               bool_var;
-
-    Value<char> value2(static_cast<Value<char> &&>(value1));
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value1.IsObject(), "IsObject()");
-    EQ_FALSE(value1.IsArray(), "IsArray()");
-    EQ_FALSE(value1.IsString(), "IsString()");
-    EQ_FALSE(value1.IsNumber(), "IsNumber()");
-    EQ_FALSE(value1.IsTrue(), "IsTrue()");
-    EQ_FALSE(value1.IsFalse(), "IsFalse()");
-    EQ_FALSE(value1.IsNull(), "IsNull()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value1.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_FALSE(value1.InsertString(ss_var), "InsertString(ss_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-    EQ_TRUE(value2.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value2.IsObject(), "IsObject()");
-    EQ_FALSE(value2.IsArray(), "IsArray()");
-    EQ_FALSE(value2.IsString(), "IsString()");
-    EQ_FALSE(value2.IsNumber(), "IsNumber()");
-    EQ_FALSE(value2.IsTrue(), "IsTrue()");
-    EQ_FALSE(value2.IsFalse(), "IsFalse()");
-    EQ_FALSE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value2.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    value2 = Value<char>{ValueType::Object};
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-
-    value2 = Value<char>{ValueType::Array};
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-
-    value2 = Value<char>{ValueType::String};
-    EQ_TRUE(value2.IsString(), "IsString()");
-
-    value2 = Value<char>{ValueType::Number};
-    EQ_TRUE(value2.IsNumber(), "IsNumber()");
-
-    END_SUB_TEST;
-}
-
-static int TestTrueValue1() {
+static int TestTrueValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -362,11 +103,11 @@ static int TestTrueValue1() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
-          "SetCharAndLength()", "true");
-    EQ_TO(StringUtils::IsEqual("true", c_str_var, c_str_len), true, "true",
-          "value1.SetCharAndLength()");
+    EQ_FALSE(value1.InsertKey(ss_var, 0), "InsertKey(0)");
+    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len),
+            "SetCharAndLength()");
+    EQ_TRUE(StringUtils::IsEqual("true", c_str_var, c_str_len),
+            "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -386,207 +127,38 @@ static int TestTrueValue1() {
 
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = true;
     value2 = true;
     value2 = value1;
     EQ_TRUE(value2.IsTrue(), "IsTrue()");
-    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
     EQ_TRUE(value1.IsTrue(), "IsTrue()");
-    EQ_TO(value1.Type(), ValueType::True, "Type()", "True");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestTrueValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = true;
     value2 = Value<char>{value1};
     EQ_TRUE(value2.IsTrue(), "IsTrue()");
-    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
-    EQ_TO(value1.Type(), ValueType::True, "Type()", "True");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
     EQ_TRUE(value2.IsTrue(), "IsTrue()");
-    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestTrueValue3() {
-    Value<char> value1;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = true;
-    Value<char> value2(static_cast<Value<char> &&>(value1));
+    Value<char> value3(static_cast<Value<char> &&>(value1));
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    EQ_TRUE(value2.IsTrue(), "IsTrue()");
-    EQ_TO(value2.Type(), ValueType::True, "Type()", "True");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value3.IsTrue(), "IsTrue()");
 
-    value2 = true;
-    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    value3 = true;
+    EQ_TRUE(value3.IsTrue(), "IsTrue()");
 
-    value2 = Value<char>{ValueType::True};
-    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    value3 = Value<char>{ValueType::True};
+    EQ_TRUE(value3.IsTrue(), "IsTrue()");
 
     END_SUB_TEST;
 }
 
-static int TestFalseValue1() {
+static int TestFalseValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -603,11 +175,11 @@ static int TestFalseValue1() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
-          "SetCharAndLength()", "true");
-    EQ_TO(StringUtils::IsEqual("false", c_str_var, c_str_len), true, "true",
-          "value1.SetCharAndLength()");
+    EQ_FALSE(value1.InsertKey(ss_var, 0), "InsertKey(0)");
+    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len),
+            "SetCharAndLength()");
+    EQ_TRUE(StringUtils::IsEqual("false", c_str_var, c_str_len),
+            "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -627,207 +199,38 @@ static int TestFalseValue1() {
 
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = false;
     value2 = false;
     value2 = value1;
     EQ_TRUE(value2.IsFalse(), "IsFalse()");
-    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
     EQ_TRUE(value1.IsFalse(), "IsFalse()");
-    EQ_TO(value1.Type(), ValueType::False, "Type()", "False");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestFalseValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = false;
     value2 = Value<char>{value1};
     EQ_TRUE(value2.IsFalse(), "IsFalse()");
-    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
-    EQ_TO(value1.Type(), ValueType::False, "Type()", "False");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
     EQ_TRUE(value2.IsFalse(), "IsFalse()");
-    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestFalseValue3() {
-    Value<char> value1;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = false;
-    Value<char> value2(static_cast<Value<char> &&>(value1));
+    Value<char> value3(static_cast<Value<char> &&>(value1));
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    EQ_TRUE(value2.IsFalse(), "IsFalse()");
-    EQ_TO(value2.Type(), ValueType::False, "Type()", "False");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value3.IsFalse(), "IsFalse()");
 
-    value2 = false;
-    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    value3 = false;
+    EQ_TRUE(value3.IsFalse(), "IsFalse()");
 
-    value2 = Value<char>{ValueType::False};
-    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    value3 = Value<char>{ValueType::False};
+    EQ_TRUE(value3.IsFalse(), "IsFalse()");
 
     END_SUB_TEST;
 }
 
-static int TestNullValue1() {
+static int TestNullValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -844,11 +247,11 @@ static int TestNullValue1() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
-          "SetCharAndLength()", "true");
-    EQ_TO(StringUtils::IsEqual("null", c_str_var, c_str_len), true, "true",
-          "value1.SetCharAndLength()");
+    EQ_FALSE(value1.InsertKey(ss_var, 0), "InsertKey(0)");
+    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len),
+            "SetCharAndLength()");
+    EQ_TRUE(StringUtils::IsEqual("null", c_str_var, c_str_len),
+            "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -868,207 +271,38 @@ static int TestNullValue1() {
 
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = nullptr;
     value2 = nullptr;
     value2 = value1;
     EQ_TRUE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
     EQ_TRUE(value1.IsNull(), "IsNull()");
-    EQ_TO(value1.Type(), ValueType::Null, "Type()", "Null");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestNullValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = nullptr;
     value2 = Value<char>{value1};
     EQ_TRUE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value1.IsNull(), "IsNull()");
-    EQ_TO(value1.Type(), ValueType::Null, "Type()", "Null");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
     EQ_TRUE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestNullValue3() {
-    Value<char> value1;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = nullptr;
-    Value<char> value2(static_cast<Value<char> &&>(value1));
+    Value<char> value3(static_cast<Value<char> &&>(value1));
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    EQ_TRUE(value2.IsNull(), "IsNull()");
-    EQ_TO(value2.Type(), ValueType::Null, "Type()", "Null");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
+    EQ_TRUE(value3.IsNull(), "IsNull()");
 
-    value2 = nullptr;
-    EQ_TRUE(value2.IsNull(), "IsNull()");
+    value3 = nullptr;
+    EQ_TRUE(value3.IsNull(), "IsNull()");
 
-    value2 = Value<char>{ValueType::Null};
-    EQ_TRUE(value2.IsNull(), "IsNull()");
+    value3 = Value<char>{ValueType::Null};
+    EQ_TRUE(value3.IsNull(), "IsNull()");
 
     END_SUB_TEST;
 }
 
-static int TestNumberValue1() {
+static int TestNumberValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -1107,34 +341,11 @@ static int TestNumberValue1() {
 
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = 45;
     value2 = -10;
     value2 = value1;
     EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
     EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "45", "str_var");
     EQ_VALUE(value2.GetNumber(), 45, "GetNumber()");
@@ -1142,161 +353,19 @@ static int TestNumberValue1() {
     EQ_VALUE(num_var, 45, "num_var");
     EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_TO(value1.Type(), ValueType::Number, "Type()", "Number");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "45", "str_var");
     EQ_VALUE(value1.GetNumber(), 45, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 45, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    END_SUB_TEST;
-}
-
-static int TestNumberValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
+    value1.Reset();
 
     value1 = 10;
     value2 = Value<char>{value1};
-    EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "10", "str_var");
     EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 10, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_TO(value1.Type(), ValueType::Number, "Type()", "Number");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "10", "str_var");
     EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 10, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "10", "str_var");
     EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 10, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestNumberValue3() {
-    Value<char> value1;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
-
-    value1 = ULong{13};
-    Value<char> value2(static_cast<Value<char> &&>(value1));
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_TO(value2.Type(), ValueType::Number, "Type()", "Number");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(str_var, "13", "str_var");
-    EQ_VALUE(value2.GetNumber(), 13, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 13, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     value2 = 1213;
     EQ_VALUE(value2.GetNumber(), 1213, "GetNumber()");
@@ -1319,7 +388,7 @@ static int TestNumberValue3() {
     END_SUB_TEST;
 }
 
-static int TestStringValue1() {
+static int TestStringValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -1361,33 +430,11 @@ static int TestStringValue1() {
 
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
-          "SetCharAndLength()", "false");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = "45";
     value2 = "-50";
     value2 = value1;
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.Type(), ValueType::String, "Type()", "String");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_VALUE(*(value1.GetString()), "45", "GetString()");
     NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
@@ -1395,201 +442,64 @@ static int TestStringValue1() {
     EQ_VALUE(value1.Length(), 2, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "45", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
     EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
     EQ_VALUE(num_var, 45, "num_var");
     EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    EQ_TRUE(value2.IsString(), "IsString()");
-    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value2.GetString()), "45", "GetString()");
-    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "45", 2), "IsEqual()");
-    EQ_VALUE(value2.Length(), 2, "Length()");
     EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "45", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 45, "num_var");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestStringValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = "true";
     value2 = Value<char>{value1};
-    EQ_TRUE(value2.IsString(), "IsString()");
-    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value2.GetString()), "true", "GetString()");
-    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "true", 4),
-            "IsEqual()");
-    EQ_VALUE(value2.Length(), 4, "Length()");
     EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "true", "str_var");
     EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
     bool_var = false;
     EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
     EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.Type(), ValueType::String, "Type()", "String");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value1.GetString()), "true", "GetString()");
-    NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "true", 4),
-            "IsEqual()");
-    EQ_VALUE(value1.Length(), 4, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    EQ_TRUE(value2.IsString(), "IsString()");
-    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value2.GetString()), "true", "GetString()");
-    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "true", 4),
-            "IsEqual()");
-    EQ_VALUE(value2.Length(), 4, "Length()");
     EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
 
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
-
-    END_SUB_TEST;
-}
-
-static int TestStringValue3() {
-    Value<char> value1;
-
-    String<char> str_var;
-    double       num_var;
-    bool         bool_var;
 
     value1 = "false";
-    Value<char> value2(static_cast<Value<char> &&>(value1));
-    EQ_TRUE(value2.IsString(), "IsString()");
-    EQ_TO(value2.Type(), ValueType::String, "Type()", "String");
-    EQ_VALUE(value2.Size(), 0, "Type()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value2.GetString()), "false", "GetString()");
-    NOT_EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value2.StringStorage(), "false", 5),
-            "IsEqual()");
-    EQ_VALUE(value2.Length(), 5, "Length()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    Value<char> value3(static_cast<Value<char> &&>(value1));
+    EQ_VALUE(value3.Length(), 5, "Length()");
+    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "false", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_VALUE(num_var, 0, "num_var");
     bool_var = true;
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value3.GetBool(bool_var), "GetBool(bool_var)");
     EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value2.Stringify(), "", "Stringify()");
-
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     str_var           = "qen";
     const char *c_str = str_var.First();
-    value2            = str_var; // Copy of a string
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    value3            = str_var; // Copy of a string
+    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "qen", "str_var");
-    NOT_EQ_TO(value2.StringStorage(), c_str, "str_var.First()", "c_str");
+    NOT_EQ_TO(value3.StringStorage(), c_str, "str_var.First()", "c_str");
 
     String<char> *str_p =
         HAllocator::AllocateInit<String<char>>(String<char>("ABC"));
-    value2 = Value<char>{str_p};
-    EQ_TRUE(value2.IsString(), "IsString()");
-    NOT_EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.GetString(), str_p, "GetString()", "str_p");
-    EQ_VALUE(*(value2.GetString()), "ABC", "GetString()");
+    value3 = Value<char>{str_p};
+    EQ_TRUE(value3.IsString(), "IsString()");
+    NOT_EQ_TO(value3.GetString(), nullptr, "GetString()", "null");
+    EQ_TO(value3.GetString(), str_p, "GetString()", "str_p");
+    EQ_VALUE(*(value3.GetString()), "ABC", "GetString()");
 
-    value2 = String<char>("123");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    value3 = String<char>("123");
+    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "123", "str_var");
 
     END_SUB_TEST;
 }
 
-static int TestArrayValue1() {
+static int TestArrayValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -1630,23 +540,14 @@ static int TestArrayValue1() {
     EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
     EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
+    arr_var.Reset();
+    value1 = arr_var;
+    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
+
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
+    arr_var.Reset();
     arr_var.ResizeAndInitialize(10);
     storage = arr_var.First();
 
@@ -1657,243 +558,78 @@ static int TestArrayValue1() {
     value2 = static_cast<Array<Value<char>> &&>(arr_var2);
     value2 = value1;
     EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_TO(value1.Type(), ValueType::Array, "Type()", "Array");
     EQ_VALUE(value1.Size(), 10, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetValue(9), nullptr, "GetValue(9)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
               "null");
     EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
     EQ_VALUE(value2.Size(), 10, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
     NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
               "storage");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
-    END_SUB_TEST;
-}
-
-static int TestArrayValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    Array<Value<char>> arr_var;
-    const Value<char> *storage;
-    String<char>       str_var;
-    double             num_var;
-    bool               bool_var;
-
+    arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
     storage = arr_var.First();
     value1  = static_cast<Array<Value<char>> &&>(arr_var);
 
     value2 = Value<char>{value1};
     EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
     EQ_VALUE(value2.Size(), 7, "Size()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
     NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
               "storage");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_TO(value1.Type(), ValueType::Array, "Type()", "Array");
     EQ_VALUE(value1.Size(), 7, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(6), nullptr, "GetValue(6)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
     EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
-    EQ_VALUE(value2.Size(), 7, "Size()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
     EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    END_SUB_TEST;
-}
-
-static int TestArrayValue3() {
-    Value<char> value1;
-
-    Array<Value<char>> arr_var;
-    const Value<char> *storage;
-    String<char>       str_var;
-    double             num_var;
-    bool               bool_var;
-
+    arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
     storage = arr_var.First();
     value1  = static_cast<Array<Value<char>> &&>(arr_var);
 
-    Value<char> value2(static_cast<Value<char> &&>(value1));
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_TO(value2.Type(), ValueType::Array, "Type()", "Array");
-    EQ_VALUE(value2.Size(), 7, "Size()");
-    EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    EQ_TO(value2.GetValue(10), nullptr, "GetValue(6)", "null");
-    EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+    Value<char> value3(static_cast<Value<char> &&>(value1));
+    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value2.Stringify(), "[]", "Stringify()");
 
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
+    arr_var.Reset();
     arr_var.ResizeAndInitialize(3);
     storage = arr_var.First();
-    value2  = arr_var; // Copy
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_VALUE(value2.Size(), 3, "Size()");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+    value3  = arr_var; // Copy
+    EQ_VALUE(value3.Size(), 3, "Size()");
+    NOT_EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
               "storage");
 
+    arr_var.Reset();
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
-    value2  = static_cast<Array<Value<char>> &&>(arr_var); // Move
-    EQ_FALSE(value1.IsArray(), "IsArray()");
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_VALUE(value2.Size(), 13, "Size()");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
+    value3  = static_cast<Array<Value<char>> &&>(arr_var); // Move
+    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
 
     Array<Value<char>> *arr_p =
         HAllocator::AllocateInit<Array<Value<char>>>(Array<Value<char>>(3));
-    value2 = Value<char>{arr_p};
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetArray(), arr_p, "GetArray()", "arr_p");
-    NOT_EQ_TO(value2.GetArray()->First(), nullptr, "GetArray()->First()",
+    value3 = Value<char>{arr_p};
+    EQ_TRUE(value3.IsArray(), "IsArray()");
+    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
+    EQ_TO(value3.GetArray(), arr_p, "GetArray()", "arr_p");
+    NOT_EQ_TO(value3.GetArray()->First(), nullptr, "GetArray()->First()",
               "null");
-    EQ_VALUE(value2.GetArray()->Capacity(), 3, "GetArray()->Capacity()");
-
-    END_SUB_TEST;
-}
-
-static int TestArrayValue4() {
-    Value<char>        value1;
-    Value<char>        value2;
-    String<char>       str_var;
-    const char *       str_c;
-    Array<Value<char>> arr_var;
+    EQ_VALUE(value3.GetArray()->Capacity(), 3, "GetArray()->Capacity()");
 
     value1[0] = 1;
 
@@ -1918,15 +654,15 @@ static int TestArrayValue4() {
     value1[0] = 11;
     value1[1] = 22;
     str_var   = "Qen";
-    str_c     = str_var.First();
+    c_str_var = str_var.First();
     value1[2] = static_cast<String<char> &&>(str_var);
 
     value2 = value1;
     EQ_VALUE(value2.Size(), 3, "value2.Size()");
     EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), str_c, "value2[2].StringStorage()",
-              "str_c");
+    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()",
+              "c_str_var");
     EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
           "value2[2].StringStorage()", "Qen");
 
@@ -1935,8 +671,8 @@ static int TestArrayValue4() {
     EQ_VALUE(value2.Size(), 5, "value2.Size()");
     EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), str_c, "value2[2].StringStorage()",
-              "str_c");
+    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()",
+              "c_str_var");
     EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
           "value2[2].StringStorage()", "Qen");
     EQ_VALUE(value2[3].GetNumber(), 44, "value2[3].GetNumber()");
@@ -1946,8 +682,8 @@ static int TestArrayValue4() {
     EQ_VALUE(value2.Size(), 3, "value2.Size()");
     EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), str_c, "value2[2].StringStorage()",
-              "str_c");
+    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()",
+              "c_str_var");
     EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
           "value2[2].StringStorage()", "Qen");
     EQ_TO(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
@@ -1959,7 +695,7 @@ static int TestArrayValue4() {
     arr_var[1] = 20;
     arr_var[2] = 30;
     str_var    = "Qentem";
-    str_c      = str_var.First();
+    c_str_var  = str_var.First();
     arr_var[3] = static_cast<String<char> &&>(str_var);
 
     value2 = arr_var;
@@ -1967,8 +703,8 @@ static int TestArrayValue4() {
     EQ_VALUE(value2[0].GetNumber(), 10, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 20, "value2[1].GetNumber()");
     EQ_VALUE(value2[2].GetNumber(), 30, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[3].StringStorage(), str_c, "value2[3].StringStorage()",
-              "str_c");
+    NOT_EQ_TO(value2[3].StringStorage(), c_str_var, "value2[3].StringStorage()",
+              "c_str_var");
     EQ_TO(StringUtils::IsEqual(value2[3].StringStorage(), "Qentem", 6), true,
           "value2[3].StringStorage()", "Qentem");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
@@ -1976,7 +712,6 @@ static int TestArrayValue4() {
     ////////////////////
 
     arr_var.Clear();
-
     arr_var.ResizeAndInitialize(10);
     arr_var.GoBackTo(5);
     value2 = static_cast<Array<Value<char>> &&>(arr_var);
@@ -2000,7 +735,7 @@ static int TestArrayValue4() {
     END_SUB_TEST;
 }
 
-static int TestObjectValue1() {
+static int TestObjectValue() {
     Value<char> value1;
     Value<char> value2;
 
@@ -2048,27 +783,13 @@ static int TestObjectValue1() {
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
     EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
     EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+
     h_arr_var.Reset();
     value1 = h_arr_var;
     EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
 
     value1.Reset();
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKey(ss_var, 0), false, "InsertKey(0)", "false");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value2 = h_arr_var;
 
@@ -2084,49 +805,17 @@ static int TestObjectValue1() {
     value1 = static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
     value2 = value1;
     EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_TO(value1.Type(), ValueType::Object, "Type()", "Array");
     EQ_VALUE(value1.Size(), 10, "Size()");
-    NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value1.GetValue(9), nullptr, "GetValue(9)", "null");
-    NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value1.GetKey(9), nullptr, "GetKey(9)", "null");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
     EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+
     value1 = h_arr_var;
+    EQ_TRUE(value1.IsObject(), "IsObject()");
     EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
 
     EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
-    EQ_VALUE(value2.Size(), 10, "Size()");
-    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value2.GetValue(9), nullptr, "GetValue(9)", "null");
-    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value2.GetKey(9), nullptr, "GetKey(9)", "null");
-    EQ_TO(value2.GetKey(10), nullptr, "GetKey(10)", "null");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
     NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
               "storage");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
 
     h_arr_var.Reset();
     // Testing empty values
@@ -2138,23 +827,8 @@ static int TestObjectValue1() {
 
     value2 = h_arr_var;
     EQ_VALUE(value2.Size(), 10, "Size()");
-    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
 
-    END_SUB_TEST;
-}
-
-static int TestObjectValue2() {
-    Value<char> value1;
-    Value<char> value2;
-
-    using ObjectItem_ = HAItem<Value<char>, char>;
-
-    HArray<Value<char>, char> h_arr_var;
-    const ObjectItem_ *       storage;
-    String<char>              str_var;
-    double                    num_var;
-    bool                      bool_var;
-
+    h_arr_var.Reset();
     for (SizeT i = 0; i < 7; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
@@ -2166,52 +840,20 @@ static int TestObjectValue2() {
 
     value2 = Value<char>{value1};
     EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
     EQ_VALUE(value2.Size(), 7, "Size()");
-    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value2.GetKey(6), nullptr, "GetKey(6)", "null");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
     NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
               "storage");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+
     h_arr_var.Reset();
     value2 = h_arr_var;
-    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
-
+    EQ_TRUE(value2.IsObject(), "IsObject()");
     EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_TO(value1.Type(), ValueType::Object, "Type()", "Array");
-    EQ_VALUE(value1.Size(), 7, "Size()");
-    NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value1.GetValue(6), nullptr, "GetValue(6)", "null");
-    NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value1.GetKey(6), nullptr, "GetKey(6)", "null");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
     EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+
     h_arr_var.Reset();
     value1 = h_arr_var;
-    EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
+    EQ_TRUE(value1.IsObject(), "IsObject()");
 
     for (UInt i = 0; i < 7; i++) {
         String<char> key("Key_");
@@ -2225,59 +867,15 @@ static int TestObjectValue2() {
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
     EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
-    EQ_VALUE(value2.Size(), 7, "Size()");
-    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value2.GetKey(6), nullptr, "GetKey(6)", "null");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
     EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
+
     h_arr_var.Reset();
     value2 = h_arr_var;
     EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
-
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
-    END_SUB_TEST;
-}
-
-static int TestObjectValue3() {
-    Value<char> value1;
-
-    using ObjectItem_ = HAItem<Value<char>, char>;
-
-    HArray<Value<char>, char> h_arr_var;
-    const ObjectItem_ *       storage;
-    String<char>              str_var;
-    double                    num_var;
-    bool                      bool_var;
-
+    h_arr_var.Reset();
     for (UInt i = 0; i < 7; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
@@ -2287,46 +885,16 @@ static int TestObjectValue3() {
     storage = h_arr_var.First();
     value1  = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
 
-    Value<char> value2(static_cast<Value<char> &&>(value1));
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TO(value2.Type(), ValueType::Object, "Type()", "Array");
-    EQ_VALUE(value2.Size(), 7, "Size()");
-    NOT_EQ_TO(value2.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value2.GetValue(6), nullptr, "GetValue(6)", "null");
-    NOT_EQ_TO(value2.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value2.GetKey(6), nullptr, "GetKey(6)", "null");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+    Value<char> value3(static_cast<Value<char> &&>(value1));
+    EQ_TRUE(value3.IsObject(), "IsObject()");
+    EQ_VALUE(value3.Size(), 7, "Size()");
+    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
           "storage");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value2.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value2.Length(), 0, "Length()");
-    EQ_FALSE(value2.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value2.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value2.GetBool(bool_var), "GetBool(bool_var)");
-    h_arr_var.Reset();
-    value2 = h_arr_var;
-    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
 
+    h_arr_var.Reset();
+    value3 = h_arr_var;
+    EQ_VALUE(value3.Stringify(), "{}", "Stringify()");
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TO(value1.Type(), ValueType::Undefined, "Type()", "Undefined");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     h_arr_var.Reset();
     for (UInt i = 0; i < 3; i++) {
@@ -2336,12 +904,12 @@ static int TestObjectValue3() {
     }
 
     storage = h_arr_var.First();
-    value2  = h_arr_var; // Copy
-    EQ_VALUE(value2.Size(), 3, "Size()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+    value3  = h_arr_var; // Copy
+    EQ_VALUE(value3.Size(), 3, "Size()");
+    NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()",
               "null");
-    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+    NOT_EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
               "storage");
 
     for (UInt i = 0; i < 13; i++) {
@@ -2351,36 +919,27 @@ static int TestObjectValue3() {
     }
 
     storage = h_arr_var.First();
-    value2  = static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_VALUE(value2.Size(), 13, "Size()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetArray()->First()",
+    value3  = static_cast<HArray<Value<char>, char> &&>(h_arr_var); // Move
+    EQ_TRUE(value3.IsObject(), "IsObject()");
+    EQ_VALUE(value3.Size(), 13, "Size()");
+    NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
+    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()",
               "null");
-    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
+    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
           "storage");
 
     HArray<Value<char>, char> *h_arr_p =
         HAllocator::AllocateInit<HArray<Value<char>, char>>(
             HArray<Value<char>, char>(4));
-    value2 = Value<char>{h_arr_p};
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value2.GetObject(), h_arr_p, "GetObject()", "h_arr_p");
-    NOT_EQ_TO(value2.GetObject()->First(), nullptr, "GetObject()->First()",
+    value3 = Value<char>{h_arr_p};
+    EQ_TRUE(value3.IsObject(), "IsObject()");
+    NOT_EQ_TO(value3.GetObject(), nullptr, "GetObject()", "null");
+    EQ_TO(value3.GetObject(), h_arr_p, "GetObject()", "h_arr_p");
+    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetObject()->First()",
               "null");
-    EQ_VALUE(value2.GetObject()->Capacity(), 4, "GetArray()->Capacity()");
+    EQ_VALUE(value3.GetObject()->Capacity(), 4, "GetArray()->Capacity()");
 
-    END_SUB_TEST;
-}
-
-static int TestObjectValue4() {
-    Value<char>               value1;
-    Value<char>               value2;
-    String<char>              str_var;
-    const char *              str_c;
-    HArray<Value<char>, char> h_arr_var;
-
+    value1.Reset();
     value1[""] = 1;
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
@@ -2395,72 +954,72 @@ static int TestObjectValue4() {
 
     EQ_VALUE(value1.Size(), 3, "value1.Size()");
 
-    value2 = value1;
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    EQ_VALUE(value2["k1"].GetNumber(), 1, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 2, "value2[\"k2\"].GetNumber()");
-    EQ_VALUE(value2["k3"].GetNumber(), 3, "value2[\"k3\"].GetNumber()");
+    value3 = value1;
+    EQ_VALUE(value3.Size(), 3, "value3.Size()");
+    EQ_VALUE(value3["k1"].GetNumber(), 1, "value3[\"k1\"].GetNumber()");
+    EQ_VALUE(value3["k2"].GetNumber(), 2, "value3[\"k2\"].GetNumber()");
+    EQ_VALUE(value3["k3"].GetNumber(), 3, "value3[\"k3\"].GetNumber()");
 
     value1["k1"] = 11;
     value1["k2"] = 22;
     str_var      = "Qen";
-    str_c        = str_var.First();
+    c_str_var    = str_var.First();
     value1["k3"] = static_cast<String<char> &&>(str_var);
 
-    value2 = value1;
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c,
-              "value2[\"k3\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
+    value3 = value1;
+    EQ_VALUE(value3.Size(), 3, "value3.Size()");
+    EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
+    EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var,
+              "value3[\"k3\"].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true,
+          "value3[\"k3\"].StringStorage()", "Qen");
 
-    value2["k4"] = 44;
-    value2["k5"] = 55;
-    EQ_VALUE(value2.Size(), 5, "value2.Size()");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c,
-              "value2[\"k3\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
-    EQ_VALUE(value2["k4"].GetNumber(), 44, "value2[\"k4\"].GetNumber()");
-    EQ_VALUE(value2["k5"].GetNumber(), 55, "value2[\"k5\"].GetNumber()");
+    value3["k4"] = 44;
+    value3["k5"] = 55;
+    EQ_VALUE(value3.Size(), 5, "value3.Size()");
+    EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
+    EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
+    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var,
+              "value3[\"k3\"].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true,
+          "value3[\"k3\"].StringStorage()", "Qen");
+    EQ_VALUE(value3["k4"].GetNumber(), 44, "value3[\"k4\"].GetNumber()");
+    EQ_VALUE(value3["k5"].GetNumber(), 55, "value3[\"k5\"].GetNumber()");
 
-    value2 = value1;
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
-    EQ_TO(value2.GetValue("k4", 2), nullptr, "value2.GetValue(\"k4\", 2)",
+    value3 = value1;
+    EQ_VALUE(value3.Size(), 3, "value3.Size()");
+    EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
+    EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
+    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true,
+          "value3[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(value3.GetValue("k4", 2), nullptr, "value3.GetValue(\"k4\", 2)",
           "null");
-    EQ_TO(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
-    EQ_TO(value2.GetValue("k5", 2), nullptr, "value2.GetValue(\"k5\", 2)",
+    EQ_TO(value3.GetValue(3), nullptr, "value3.GetValue(3)", "null");
+    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)",
           "null");
-    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_TO(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null");
 
     ////////////////////
     h_arr_var[String<char>("w1")] = 10;
     h_arr_var[String<char>("w2")] = 20;
     h_arr_var[String<char>("w3")] = 30;
     str_var                       = "Qentem";
-    str_c                         = str_var.First();
+    c_str_var                     = str_var.First();
     h_arr_var[String<char>("w4")] = static_cast<String<char> &&>(str_var);
 
-    value2 = h_arr_var;
-    EQ_VALUE(value2.Size(), 4, "value2.Size()");
-    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c,
-              "value2[\"w4\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-          "value2[\"w4\"].StringStorage()", "Qen");
-    EQ_TO(value2.GetValue("k5", 2), nullptr, "value2.GetValue(\"k5\", 2)",
+    value3 = h_arr_var;
+    EQ_VALUE(value3.Size(), 4, "value3.Size()");
+    EQ_VALUE(value3["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
+    EQ_VALUE(value3["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
+    EQ_VALUE(value3["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
+    NOT_EQ_TO(value3["w4"].StringStorage(), c_str_var,
+              "value3[\"w4\"].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value3["w4"].StringStorage(), "Qentem", 6), true,
+          "value3[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)",
           "null");
-    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    EQ_TO(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null");
     ////////////////////
 
     h_arr_var.Reserve(10);
@@ -2468,12 +1027,12 @@ static int TestObjectValue4() {
     h_arr_var[String<char>("w2")] = 20;
     h_arr_var[String<char>("w3")] = 30;
 
-    value2 = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
+    value3 = static_cast<HArray<Value<char>, char> &&>(h_arr_var);
+    EQ_VALUE(value3.Size(), 3, "value3.Size()");
 
-    value2.Compress();
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value2.GetObject()->Capacity(), 3, "Capacity()");
+    value3.Compress();
+    NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
+    EQ_VALUE(value3.GetObject()->Capacity(), 3, "Capacity()");
 
     END_SUB_TEST;
 }
@@ -6701,39 +5260,14 @@ static int TestDeleteValue() {
 static int RunValueTests() {
     STARTING_TEST("Value.hpp");
 
-    START_TEST("Empty Value Test 1", TestEmptyValue1);
-    START_TEST("Empty Value Test 2", TestEmptyValue2);
-    START_TEST("Empty Value Test 3", TestEmptyValue3);
-
-    START_TEST("True Value Test 1", TestTrueValue1);
-    START_TEST("True Value Test 2", TestTrueValue2);
-    START_TEST("True Value Test 3", TestTrueValue3);
-
-    START_TEST("False Value Test 1", TestFalseValue1);
-    START_TEST("False Value Test 2", TestFalseValue2);
-    START_TEST("False Value Test 3", TestFalseValue3);
-
-    START_TEST("Null Value Test 1", TestNullValue1);
-    START_TEST("Null Value Test 2", TestNullValue2);
-    START_TEST("Null Value Test 3", TestNullValue3);
-
-    START_TEST("Number Value Test 1", TestNumberValue1);
-    START_TEST("Number Value Test 2", TestNumberValue2);
-    START_TEST("Number Value Test 3", TestNumberValue3);
-
-    START_TEST("String Value Test 1", TestStringValue1);
-    START_TEST("String Value Test 2", TestStringValue2);
-    START_TEST("String Value Test 3", TestStringValue3);
-
-    START_TEST("Array Value Test 1", TestArrayValue1);
-    START_TEST("Array Value Test 2", TestArrayValue2);
-    START_TEST("Array Value Test 3", TestArrayValue3);
-    START_TEST("Array Value Test 4", TestArrayValue4);
-
-    START_TEST("Object Value Test 1", TestObjectValue1);
-    START_TEST("Object Value Test 2", TestObjectValue2);
-    START_TEST("Object Value Test 3", TestObjectValue3);
-    START_TEST("Object Value Test 4", TestObjectValue4);
+    START_TEST("Empty Value Test", TestEmptyValue);
+    START_TEST("True Value Test", TestTrueValue);
+    START_TEST("False Value Test", TestFalseValue);
+    START_TEST("Null Value Test", TestNullValue);
+    START_TEST("Number Value Test", TestNumberValue);
+    START_TEST("String Value Test", TestStringValue);
+    START_TEST("Array Value Test", TestArrayValue);
+    START_TEST("Object Value Test", TestObjectValue);
 
     START_TEST("Move Value Test 1", TestMoveValue1);
     START_TEST("Move Value Test 2", TestMoveValue2);
