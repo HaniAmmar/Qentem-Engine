@@ -291,7 +291,7 @@ class Digit {
 
         number = 0;
 
-        if ((str != nullptr) && (length != 0)) {
+        if (length != 0) {
             if ((length > 1) && (str[0] == DigitChars_T_::ZeroChar)) {
                 return false; // No leanding zeros.
             }
@@ -299,10 +299,10 @@ class Digit {
             if (str[0] == DigitChars_T_::PlusChar) {
                 SizeT offset = 1;
                 StringUtils::StartTrim(str, offset, length);
+                length -= offset;
 
                 if (length != 0) {
-                    return stringToUnsignedInt(number, &(str[offset]),
-                                               (length - offset));
+                    return stringToUnsignedInt(number, &(str[offset]), length);
                 }
             } else if (stringToInt(number, str, length)) {
                 return true;
@@ -321,7 +321,7 @@ class Digit {
 
         number = 0;
 
-        if ((s_str != nullptr) && (length != 0)) {
+        if (length != 0) {
             if ((length > 1) && (s_str[0] == DigitChars_T_::ZeroChar)) {
                 return false; // No leanding zeros.
             }
@@ -330,10 +330,10 @@ class Digit {
                 case DigitChars_T_::MinusChar: {
                     SizeT offset = 1;
                     StringUtils::StartTrim(s_str, offset, length);
+                    length -= offset;
 
                     if ((length != 0) &&
-                        stringToSignedInt(number, &(s_str[offset]),
-                                          (length - offset))) {
+                        stringToSignedInt(number, &(s_str[offset]), length)) {
                         number *= -1;
                         return true;
                     }
@@ -344,10 +344,11 @@ class Digit {
                 case DigitChars_T_::PlusChar: {
                     SizeT offset = 1;
                     StringUtils::StartTrim(s_str, offset, length);
+                    length -= offset;
 
                     if (length != 0) {
                         return stringToSignedInt(number, &(s_str[offset]),
-                                                 (length - offset));
+                                                 length);
                     }
 
                     break;
@@ -423,7 +424,7 @@ class Digit {
 
         number = 0;
 
-        if ((str != nullptr) && (length != 0)) {
+        if (length != 0) {
             if (((length > 1) && ((str[0] == DigitChars_T_::ZeroChar) &&
                                   (str[1] != DigitChars_T_::DotChar)))) {
                 number = 0;
@@ -434,10 +435,10 @@ class Digit {
                 case DigitChars_T_::MinusChar: {
                     SizeT n_offset = 1;
                     StringUtils::StartTrim(str, n_offset, length);
+                    length -= n_offset;
 
                     if ((length != 0) &&
-                        stringToSignedFloat(number, &(str[n_offset]),
-                                            (length - n_offset))) {
+                        stringToSignedFloat(number, &(str[n_offset]), length)) {
                         number *= -1;
                         return true;
                     }
@@ -448,10 +449,11 @@ class Digit {
                 case DigitChars_T_::PlusChar: {
                     SizeT offset = 1;
                     StringUtils::StartTrim(str, offset, length);
+                    length -= offset;
 
                     if (length != 0) {
                         return stringToSignedFloat(number, &(str[offset]),
-                                                   (length - offset));
+                                                   length);
                     }
 
                     break;
