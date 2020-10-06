@@ -330,10 +330,10 @@ static int TestALE2() {
     SHOULD_EQUAL_TRUE(is_valid, "is_valid");
 
     // NOTE: Implement power of fraction.
-    // content  = "2^0.2";
-    // is_valid = ALE::Evaluate(number, content);
-    // SHOULD_EQUAL_VALUE(number, 1.148698355, "number");
-    // SHOULD_EQUAL_TRUE(is_valid, "is_valid");
+    content  = "2^0.2";
+    is_valid = ALE::Evaluate(number, content);
+    SHOULD_EQUAL_VALUE(number, 1.148698355, "number");
+    SHOULD_EQUAL_TRUE(is_valid, "is_valid");
 
     content  = " 4";
     is_valid = ALE::Evaluate(number, content);
