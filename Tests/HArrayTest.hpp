@@ -85,7 +85,7 @@ static int TestHArray1() {
     SHOULD_EQUAL(numbers1.End(), nullptr, "End()", "null");
 
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
-    SHOULD_EQUAL_VALUE(numbers2.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_TRUE(numbers2.Capacity() >= 8, "Capacity>= 8");
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers2.Reset();
@@ -110,7 +110,7 @@ static int TestHArray1() {
 
     numbers2.Resize(4);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
-    SHOULD_EQUAL_VALUE(numbers2.Capacity(), 4, "Capacity");
+    SHOULD_EQUAL_TRUE(numbers2.Capacity() >= 4, "Capacity>= 4");
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers2.Resize(5);
@@ -120,7 +120,7 @@ static int TestHArray1() {
 
     numbers2.Resize(2);
     SHOULD_EQUAL_VALUE(numbers2.Size(), 0, "Size");
-    SHOULD_EQUAL_VALUE(numbers2.Capacity(), 2, "Capacity");
+    SHOULD_EQUAL_TRUE(numbers2.Capacity() >= 2, "Capacity>= 2");
     SHOULD_NOT_EQUAL(numbers2.First(), nullptr, "First()", "null");
 
     numbers1.Reserve(0);
@@ -144,32 +144,33 @@ static int TestHArray2() {
 
     numbers1["key1"] = 1;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
-    SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_TRUE(numbers1.Capacity() >= 8, "Capacity>= 8");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL(numbers1.End(), (numbers1.First() + 1), "End()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 1, "key1");
 
+    SizeT cap        = numbers1.Capacity();
     numbers1["key1"] = 20;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
-    SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_VALUE(numbers1.Capacity(), cap, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 20, "key1");
 
     numbers1["key1"] = 300;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
-    SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_VALUE(numbers1.Capacity(), cap, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 300, "key1");
 
     numbers1["key1"] = 4000;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
-    SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_VALUE(numbers1.Capacity(), cap, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 4000, "key1");
 
     numbers1["key1"] = 10000;
     SHOULD_EQUAL_VALUE(numbers1.Size(), 1, "Size");
-    SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_VALUE(numbers1.Capacity(), cap, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 10000, "key1");
 
@@ -189,7 +190,7 @@ static int TestHArray2() {
     numbers1["key7"] = 70;
 
     SHOULD_EQUAL_VALUE(numbers1.Size(), 7, "Size");
-    SHOULD_EQUAL_VALUE(numbers1.Capacity(), 8, "Capacity");
+    SHOULD_EQUAL_VALUE(numbers1.Capacity(), cap, "Capacity");
     SHOULD_NOT_EQUAL(numbers1.First(), nullptr, "First()", "null");
     SHOULD_EQUAL_VALUE(numbers1["key1"], 10, "key1");
     SHOULD_EQUAL_VALUE(numbers1["key2"], 20, "key2");
