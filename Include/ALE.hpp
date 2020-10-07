@@ -145,11 +145,9 @@ class ALE {
     };
 
   private:
-    struct Value_T_ {
-        union {
-            double number{0};
-            UInt   str[2]; // 0 for the offset and 1 for the length.
-        };
+    union Value_T_ {
+        double number;
+        UInt   str[2]{0, 0}; // 0 for the offset and 1 for the length.
     };
 
     template <typename Char_T_, typename Helper_T_>
