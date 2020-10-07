@@ -729,7 +729,7 @@ static int TestArrayValue() {
     END_SUB_TEST;
 }
 
-static int TestObjectValue() {
+static int TestObjectValue1() {
     Value<char> value1;
     Value<char> value2;
 
@@ -868,6 +868,21 @@ static int TestObjectValue() {
     value2 = h_arr_var;
     EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+
+    END_SUB_TEST;
+}
+
+static int TestObjectValue2() {
+    Value<char> value1;
+    Value<char> value2;
+
+    using ObjectItem_ = HAItem<Value<char>, char>;
+
+    HArray<Value<char>, char> h_arr_var;
+    const ObjectItem_ *       storage;
+    StringStream<char>        ss_var;
+    String<char>              str_var;
+    const char *              c_str_var;
 
     h_arr_var.Reset();
     for (UInt i = 0; i < 7; i++) {
@@ -5249,7 +5264,9 @@ static int RunValueTests() {
     START_TEST("Number Value Test", TestNumberValue);
     START_TEST("String Value Test", TestStringValue);
     START_TEST("Array Value Test", TestArrayValue);
-    START_TEST("Object Value Test", TestObjectValue);
+
+    START_TEST("Object Value Test 1", TestObjectValue1);
+    START_TEST("Object Value Test 2", TestObjectValue2);
 
     START_TEST("Move Value Test 1", TestMoveValue1);
     START_TEST("Move Value Test 2", TestMoveValue2);
