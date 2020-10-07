@@ -48,7 +48,7 @@ class Value {
     using VString        = String<Char_T_>;
 
   public:
-    Value() noexcept : object_(VObject()) {
+    Value() noexcept : number_(ULong(0)) {
     }
 
     Value(Value &&val) noexcept : type_(val.type_) {
@@ -740,7 +740,7 @@ class Value {
 
             case ValueType::Number: {
                 value = Digit<Char_T_>::NumberToString(
-                    number_, 1, 0, QENTEM_DOUBLE_PRECISION_);
+                    number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION_);
                 return true;
             }
 
@@ -777,8 +777,8 @@ class Value {
             }
 
             case ValueType::Number: {
-                Digit<Char_T_>::NumberToStringStream(ss, number_, 1, 0,
-                                                     QENTEM_DOUBLE_PRECISION_);
+                Digit<Char_T_>::NumberToStringStream(
+                    ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION_);
                 return true;
             }
 
@@ -823,7 +823,7 @@ class Value {
 
     double GetNumber() const noexcept {
         if (type_ == ValueType::Number) {
-            return number_;
+            return number_.GetDouble();
         }
 
         return 0;
@@ -832,7 +832,7 @@ class Value {
     bool SetNumber(double &value) const noexcept {
         switch (type_) {
             case ValueType::Number: {
-                value = number_;
+                value = number_.GetDouble();
                 return true;
             }
 
@@ -874,7 +874,7 @@ class Value {
             }
 
             case ValueType::Number: {
-                value = (number_ > 0);
+                value = (number_.GetDouble() > 0);
                 return true;
             }
 
@@ -1021,7 +1021,8 @@ class Value {
                     }
 
                     case ValueType::Number: {
-                        Digit<Char_T_>::NumberToStringStream(ss, item->number_);
+                        Digit<Char_T_>::NumberToStringStream(
+                            ss, item->number_.GetDouble());
                         break;
                     }
 
@@ -1069,7 +1070,7 @@ class Value {
     }
 
   private:
-    QENTEM_NOINLINE void reset() noexcept {
+    void reset() {
         switch (type_) {
             case ValueType::Object: {
                 object_.Reset();
@@ -1118,11 +1119,66 @@ class Value {
         }
     }
 
+    struct VNumber {
+        union Number_T_ {
+            explicit Number_T_() noexcept : ULNumber(0) {
+            }
+
+            explicit Number_T_(double num) noexcept : DNumber(num) {
+            }
+
+            explicit Number_T_(ULong num) noexcept : ULNumber(num) {
+            }
+
+            explicit Number_T_(SLong num) noexcept : SLNumber(num) {
+            }
+
+            double DNumber;
+            ULong  ULNumber;
+            SLong  SLNumber;
+        };
+
+        VNumber() = default;
+
+        explicit VNumber(double num) noexcept : Number(num) {
+        }
+
+        inline VNumber &operator=(double num) noexcept {
+            Number.DNumber = num;
+            return *this;
+        }
+
+        inline VNumber &operator=(ULong num) noexcept {
+            Number.ULNumber = num;
+            return *this;
+        }
+
+        inline VNumber &operator=(SLong num) noexcept {
+            Number.SLNumber = num;
+            return *this;
+        }
+
+        inline double GetDouble() const noexcept {
+            return Number.DNumber;
+        }
+
+        inline ULong GetULong() const noexcept {
+            return Number.ULNumber;
+        }
+
+        inline SLong GetSLong() const noexcept {
+            return Number.SLNumber;
+        }
+
+        const Char_T_ *Storage{nullptr}; // Padding
+        Number_T_      Number;
+    };
+
     union {
         VObject object_;
         VArray  array_;
         VString string_;
-        double  number_{0};
+        VNumber number_;
     };
 
     ValueType type_{ValueType::Undefined};
