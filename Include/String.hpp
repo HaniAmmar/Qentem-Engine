@@ -55,8 +55,8 @@ class String {
 
     String(String &&src) noexcept
         : storage_(src.storage_), length_(src.length_) {
-        src.length_  = 0;
         src.storage_ = nullptr;
+        src.length_  = 0;
     }
 
     String(const String &src) : length_(src.length_) {
@@ -83,10 +83,10 @@ class String {
         if (this != &src) {
             Memory::Deallocate(storage_);
 
-            length_      = src.length_;
-            src.length_  = 0;
             storage_     = src.storage_;
+            length_      = src.length_;
             src.storage_ = nullptr;
+            src.length_  = 0;
         }
 
         return *this;
@@ -108,8 +108,8 @@ class String {
         SizeT len = StringUtils::Count(str);
 
         Memory::Deallocate(storage_);
-        length_  = len;
         storage_ = Memory::Allocate<Char_T_>(len + 1);
+        length_  = len;
 
         if (len != 0) {
             Memory::Copy(storage_, str, (len * sizeof(Char_T_)));
@@ -122,10 +122,10 @@ class String {
 
     String &operator+=(String &&src) {
         Insert(src.storage_, src.length_);
-        src.length_ = 0;
 
         Memory::Deallocate(src.storage_);
         src.storage_ = nullptr;
+        src.length_  = 0;
 
         return *this;
     }
@@ -143,9 +143,9 @@ class String {
     String operator+(String &&src) const {
         String ns(Insert(*this, src));
 
-        src.length_ = 0;
         Memory::Deallocate(src.storage_);
         src.storage_ = nullptr;
+        src.length_  = 0;
 
         return ns;
     }
@@ -212,9 +212,9 @@ class String {
     }
 
     Char_T_ *Eject() noexcept {
-        length_      = 0;
         Char_T_ *str = storage_;
         storage_     = nullptr;
+        length_      = 0;
 
         return str;
     }
