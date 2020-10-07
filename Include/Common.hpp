@@ -70,8 +70,10 @@ using UInt = unsigned int;
 
 #ifdef QENTEM_64BIT_
 using ULong = unsigned long long;
+using SLong = long long;
 #else
 using ULong = unsigned long;
+using SLong = long;
 #endif
 
 #ifndef QENTEM_SIZE_T_
