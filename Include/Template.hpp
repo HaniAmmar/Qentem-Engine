@@ -604,7 +604,7 @@ class Template_T_ {
             return;
         }
 
-        if (loop_data->SS.IsEmpty()) {
+        if (loop_data->Content.IsEmpty()) {
             const Char_T_ *loop_value        = nullptr;
             SizeT          loop_value_length = 0;
             SizeT          len               = 0;
@@ -688,16 +688,16 @@ class Template_T_ {
                         break;
                     }
 
-                    loop_data->SS.Insert(
+                    loop_data->Content.Insert(
                         (content + previous_offset),
                         ((offset - loop_value_length) - previous_offset));
-                    loop_data->SS.Insert(
+                    loop_data->Content.Insert(
                         TemplatePatterns_T_::GetVariablePrefix(),
                         TemplatePatterns_T_::VariablePrefixLength);
 
                     SizeT lvl = 0;
                     while (lvl <= level_) {
-                        loop_data->SS += TemplatePatterns_T_::TildeChar;
+                        loop_data->Content += TemplatePatterns_T_::TildeChar;
                         ++lvl;
                     }
 
@@ -721,17 +721,18 @@ class Template_T_ {
 
                     if ((content[(sub_offset - 1)] ==
                          TemplatePatterns_T_::VariableIndexSuffix)) {
-                        loop_data->SS.Insert((content + offset),
-                                             (sub_offset - offset));
+                        loop_data->Content.Insert((content + offset),
+                                                  (sub_offset - offset));
                     }
 
                     previous_offset = sub_offset;
-                    loop_data->SS += TemplatePatterns_T_::GetInLineSuffix()[0];
+                    loop_data->Content +=
+                        TemplatePatterns_T_::GetInLineSuffix()[0];
                 } while (true);
             }
 
-            loop_data->SS.Insert((content + previous_offset),
-                                 (length - previous_offset));
+            loop_data->Content.Insert((content + previous_offset),
+                                      (length - previous_offset));
         }
 
         // Stage 3
@@ -795,24 +796,24 @@ class Template_T_ {
         Tags_T_     tags_buffer;
         SizeT       loop_offset = 0;
 
-        ss_->Expect(loop_data->SS.Length() * loop_size);
+        ss_->Expect(loop_data->Content.Length() * loop_size);
 
-        if (loop_data->Tags.IsEmpty()) {
+        if (loop_data->SubTags.IsEmpty()) {
             do {
-                parse(tags_buffer, loop_data->SS.First(), loop_offset,
-                      loop_data->SS.Length());
+                parse(tags_buffer, loop_data->Content.First(), loop_offset,
+                      loop_data->Content.Length());
 
                 if (tags_buffer.IsEmpty()) {
                     break;
                 }
 
-                loop_data->Tags.Expect(tags_buffer.Size());
+                loop_data->SubTags.Expect(tags_buffer.Size());
 
                 Tag_T_ *      tag = tags_buffer.First();
                 const Tag_T_ *end = tags_buffer.End();
 
                 while (tag != end) {
-                    loop_data->Tags += static_cast<Tag_T_ &&>(*tag);
+                    loop_data->SubTags += static_cast<Tag_T_ &&>(*tag);
                     ++tag;
                 }
 
@@ -826,18 +827,19 @@ class Template_T_ {
             } while (true);
         }
 
-        if (loop_data->Tags.Last() != nullptr) {
-            const SizeT    tag_offset = loop_data->Tags.Last()->EndOffset;
-            const Char_T_ *remain_str = (loop_data->SS.First() + tag_offset);
-            const SizeT    remain_len = (loop_data->SS.Length() - tag_offset);
+        if (loop_data->SubTags.Last() != nullptr) {
+            const SizeT    tag_offset = loop_data->SubTags.Last()->EndOffset;
+            const Char_T_ *remain_str =
+                (loop_data->Content.First() + tag_offset);
+            const SizeT remain_len = (loop_data->Content.Length() - tag_offset);
 
             // TODO: Split the loop on 4 threads.
             do {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
-                loop_template.render(loop_data->Tags.First(),
-                                     loop_data->Tags.End(),
-                                     loop_data->SS.First(), 0);
+                loop_template.render(loop_data->SubTags.First(),
+                                     loop_data->SubTags.End(),
+                                     loop_data->Content.First(), 0);
 
                 // Add the remaining string.
                 ss_->Insert(remain_str, remain_len);
@@ -847,7 +849,8 @@ class Template_T_ {
             } while (loop_size != 0);
         } else {
             do {
-                ss_->Insert(loop_data->SS.First(), loop_data->SS.Length());
+                ss_->Insert(loop_data->Content.First(),
+                            loop_data->Content.Length());
                 --loop_size;
             } while (loop_size != 0);
         }
@@ -1197,8 +1200,8 @@ class Template_T_ {
     }
 
     struct LoopData_T_ {
-        StringStream<Char_T_> SS{};
-        Array<Tag_T_>         Tags{};
+        StringStream<Char_T_> Content{};
+        Array<Tag_T_>         SubTags{};
         SizeT                 SetOffset{0};
         SizeT                 SetLength{0};
         SizeT                 IndexOffset{0};
