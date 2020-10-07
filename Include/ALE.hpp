@@ -640,14 +640,23 @@ class ALE {
 
 template <typename Char_T_>
 struct ALEHelper {
-    static constexpr bool ALESetNumber(double &, const Char_T_ *,
-                                       SizeT) noexcept {
+    static bool ALESetNumber(double &number, const Char_T_ *content,
+                             SizeT length) noexcept {
         return false;
+
+        (void)number;
+        (void)content;
+        (void)length;
     }
 
-    static constexpr bool ALEIsEqual(bool &, const Char_T_ *, SizeT,
-                                     const Char_T_ *, SizeT) noexcept {
+    static bool ALEIsEqual(bool &result, const Char_T_ *left, SizeT left_length,
+                           const Char_T_ *right, SizeT right_length) noexcept {
         return false;
+        (void)result;
+        (void)left;
+        (void)left_length;
+        (void)right;
+        (void)right_length;
     }
 };
 
