@@ -77,12 +77,13 @@ class JSONParser {
 
                             case JSONotation_T_::ECurlyChar:
                             case JSONotation_T_::ESquareChar: {
-                                const bool is_obj =
+                                const bool obj_child =
                                     (content[offset] ==
                                      JSONotation_T_::SCurlyChar);
 
-                                if ((is_obj && (content[length] ==
-                                                JSONotation_T_::ECurlyChar)) ||
+                                if ((obj_child &&
+                                     (content[length] ==
+                                      JSONotation_T_::ECurlyChar)) ||
                                     ((content[offset] ==
                                       JSONotation_T_::SSquareChar) &&
                                      (content[length] ==
@@ -93,7 +94,7 @@ class JSONParser {
 
                                     JSONParser jp;
 
-                                    if (is_obj) {
+                                    if (obj_child) {
                                         value = jp.parseObject(content, offset,
                                                                length);
                                     } else {
@@ -203,7 +204,7 @@ class JSONParser {
             switch (content[offset]) {
                 case JSONotation_T_::SCurlyChar:
                 case JSONotation_T_::SSquareChar: {
-                    const bool is_obj =
+                    const bool obj_child =
                         (content[offset] == JSONotation_T_::SCurlyChar);
                     StringUtils::StartTrim(content, previous_offset, offset);
 
@@ -211,7 +212,7 @@ class JSONParser {
                         (previous_offset == offset)) {
                         ++offset;
 
-                        if (is_obj) {
+                        if (obj_child) {
                             *obj_value = parseObject(content, offset, length);
                         } else {
                             *obj_value = parseArray(content, offset, length);
@@ -238,15 +239,14 @@ class JSONParser {
                         ++offset;
                         buffer_.Clear();
                         const Char_T_ *str = (content + offset);
-                        const SizeT    str_len =
-                            UnEscapeJSON(str, length, buffer_);
-                        offset += str_len;
+                        const SizeT    len = UnEscapeJSON(str, length, buffer_);
+                        offset += len;
                         previous_offset = offset;
 
                         if (obj_value == nullptr) {
                             obj_value = &(obj[static_cast<VString &&>(
                                 VString{buffer_.First(), buffer_.Length()})]);
-                            if (str_len != 0) {
+                            if (len != 0) {
                                 continue;
                             }
                         }
@@ -258,7 +258,7 @@ class JSONParser {
                             pass_comma = true;
                             has_colon  = false;
 
-                            if (str_len != 0) {
+                            if (len != 0) {
                                 continue;
                             }
                         }
@@ -385,14 +385,14 @@ class JSONParser {
             switch (content[offset]) {
                 case JSONotation_T_::SCurlyChar:
                 case JSONotation_T_::SSquareChar: {
-                    const bool is_obj =
+                    const bool obj_child =
                         (content[offset] == JSONotation_T_::SCurlyChar);
                     StringUtils::StartTrim(content, previous_offset, offset);
 
                     if (!pass_comma && (previous_offset == offset)) {
                         ++offset;
 
-                        if (is_obj) {
+                        if (obj_child) {
                             arr += parseObject(content, offset, length);
                         } else {
                             arr += parseArray(content, offset, length);
@@ -411,12 +411,11 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::QuoteChar: {
-                    ++offset;
-
                     if (!pass_comma) {
+                        ++offset;
                         buffer_.Clear();
-                        const SizeT len =
-                            UnEscapeJSON((content + offset), length, buffer_);
+                        const Char_T_ *str = (content + offset);
+                        const SizeT    len = UnEscapeJSON(str, length, buffer_);
 
                         arr +=
                             VValue{VString{buffer_.First(), buffer_.Length()}};
@@ -459,11 +458,9 @@ class JSONParser {
                 }
 
                 case JSONotation_T_::ESquareChar: {
-                    const bool has_comma =
-                        ((previous_offset != 0)
-                             ? (content[previous_offset - 1] ==
-                                JSONotation_T_::CommaChar)
-                             : false);
+                    const bool has_comma = (content[previous_offset - 1] ==
+                                            JSONotation_T_::CommaChar);
+
                     SizeT len = (offset - previous_offset);
                     StringUtils::SoftTrim(content, previous_offset, len);
 
@@ -479,7 +476,6 @@ class JSONParser {
 
                     ++offset;
                     value = static_cast<VArray &&>(arr);
-
                     return value;
                 }
             }
