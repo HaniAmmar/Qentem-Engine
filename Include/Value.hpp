@@ -51,15 +51,12 @@ class Value {
     Value() noexcept : number_{} {
     }
 
-    Value(Value &&val) noexcept : number_{val.number_} {
-        setType(val.Type());
-        val.number_ = VNumber{ULong{0}};
-        val.setType(ValueType::Undefined);
+    Value(Value &&val) noexcept : number_{val.number_}, type_{val.type_} {
+        val.type_ = ValueType::Undefined;
     }
 
-    Value(const Value &val) {
+    Value(const Value &val) : type_{val.type_} {
         copyValue(val);
-        setType(val.Type());
     }
 
     explicit Value(ValueType type) noexcept {
@@ -83,7 +80,7 @@ class Value {
             }
         }
 
-        setType(type);
+        type_ = type;
     }
 
     explicit Value(VObject &&obj) noexcept
@@ -127,7 +124,7 @@ class Value {
     }
 
     ~Value() {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             return;
         }
 
@@ -139,10 +136,10 @@ class Value {
             reset();
 
             number_ = val.number_;
-            setType(val.Type());
+            type_   = val.type_;
 
             val.number_ = VNumber{ULong{0}};
-            val.setType(ValueType::Undefined);
+            val.type_   = ValueType::Undefined;
         }
 
         return *this;
@@ -150,8 +147,8 @@ class Value {
 
     Value &operator=(const Value &val) {
         if (this != &val) {
-            if (Type() == val.Type()) {
-                switch (Type()) {
+            if (type_ == val.type_) {
+                switch (type_) {
                     case ValueType::Object: {
                         object_ = val.object_;
                         break;
@@ -178,11 +175,11 @@ class Value {
             } else {
                 reset();
 
-                if (val.Type() != ValueType::Undefined) {
+                if (val.type_ != ValueType::Undefined) {
                     copyValue(val);
                 }
 
-                setType(val.Type());
+                type_ = val.type_;
             }
         }
 
@@ -190,134 +187,134 @@ class Value {
     }
 
     Value &operator=(VObject &&obj) {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             object_ = static_cast<VObject &&>(obj);
             return *this;
         }
 
         reset();
         Memory::Construct(&object_, static_cast<VObject &&>(obj));
-        setType(ValueType::Object);
+        type_ = ValueType::Object;
         return *this;
     }
 
     Value &operator=(const VObject &obj) {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             object_ = obj;
             return *this;
         }
 
         reset();
         Memory::Construct(&object_, obj);
-        setType(ValueType::Object);
+        type_ = ValueType::Object;
         return *this;
     }
 
     Value &operator=(VArray &&arr) {
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ = static_cast<VArray &&>(arr);
             return *this;
         }
 
         reset();
         Memory::Construct(&array_, static_cast<VArray &&>(arr));
-        setType(ValueType::Array);
+        type_ = ValueType::Array;
         return *this;
     }
 
     Value &operator=(const VArray &arr) {
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ = arr;
             return *this;
         }
 
         reset();
         Memory::Construct(&array_, arr);
-        setType(ValueType::Array);
+        type_ = ValueType::Array;
         return *this;
     }
 
     Value &operator=(VString &&str) {
-        if (Type() == ValueType::String) {
+        if (type_ == ValueType::String) {
             string_ = static_cast<VString &&>(str);
             return *this;
         }
 
         reset();
         Memory::Construct(&string_, static_cast<VString &&>(str));
-        setType(ValueType::String);
+        type_ = ValueType::String;
         return *this;
     }
 
     Value &operator=(const VString &str) {
-        if (Type() == ValueType::String) {
+        if (type_ == ValueType::String) {
             string_ = str;
             return *this;
         }
 
         reset();
         Memory::Construct(&string_, str);
-        setType(ValueType::String);
+        type_ = ValueType::String;
         return *this;
     }
 
     Value &operator=(const Char_T_ *str) {
-        if (Type() == ValueType::String) {
+        if (type_ == ValueType::String) {
             string_ = VString{str};
             return *this;
         }
 
         reset();
         Memory::Construct(&string_, VString{str});
-        setType(ValueType::String);
+        type_ = ValueType::String;
         return *this;
     }
 
     Value &operator=(double num) noexcept {
-        if (Type() == ValueType::Number) {
+        if (type_ == ValueType::Number) {
             number_ = num;
             return *this;
         }
 
         reset();
         number_ = num;
-        setType(ValueType::Number);
+        type_   = ValueType::Number;
         return *this;
     }
 
     template <typename Type_T_>
     inline Value &operator=(Type_T_ num) {
-        if (Type() == ValueType::Number) {
+        if (type_ == ValueType::Number) {
             number_ = static_cast<double>(num);
             return *this;
         }
 
         reset();
         number_ = static_cast<double>(num);
-        setType(ValueType::Number);
+        type_   = ValueType::Number;
         return *this;
     }
 
     Value &operator=(NullType) {
         reset();
-        setType(ValueType::Null);
+        type_ = ValueType::Null;
         return *this;
     }
 
     Value &operator=(bool is_true) noexcept {
         reset();
-        setType(is_true ? ValueType::True : ValueType::False);
+        type_ = (is_true ? ValueType::True : ValueType::False);
         return *this;
     }
 
     void operator+=(Value &&val) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
-            if (val.Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
+            if (val.type_ == ValueType::Array) {
                 const VArray &src_arr = val.array_;
                 VArray &      des_arr = array_;
 
@@ -325,16 +322,16 @@ class Value {
                 const Value *src_end = src_arr.End();
 
                 while (src_val != src_end) {
-                    if (src_val->Type() != ValueType::Undefined) {
+                    if (src_val->type_ != ValueType::Undefined) {
                         des_arr += static_cast<Value &&>(*src_val);
                     }
 
                     ++src_val;
                 }
-            } else if (val.Type() != ValueType::Undefined) {
+            } else if (val.type_ != ValueType::Undefined) {
                 array_ += static_cast<Value &&>(val);
             }
-        } else if ((Type() == ValueType::Object) && (val.Type() == Type())) {
+        } else if ((type_ == ValueType::Object) && (val.type_ == type_)) {
             object_ += static_cast<VObject &&>(val.object_);
         }
 
@@ -342,13 +339,13 @@ class Value {
     }
 
     void operator+=(const Value &val) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
-            if (val.Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
+            if (val.type_ == ValueType::Array) {
                 const VArray &src_arr = val.array_;
                 VArray &      des_arr = array_;
 
@@ -356,30 +353,30 @@ class Value {
                 const Value *src_end = src_arr.End();
 
                 while (src_val != src_end) {
-                    if (src_val->Type() != ValueType::Undefined) {
+                    if (src_val->type_ != ValueType::Undefined) {
                         des_arr += *src_val;
                     }
 
                     ++src_val;
                 }
-            } else if (val.Type() != ValueType::Undefined) {
+            } else if (val.type_ != ValueType::Undefined) {
                 array_ += val;
             }
-        } else if ((Type() == ValueType::Object) && (val.Type() == Type())) {
+        } else if ((type_ == ValueType::Object) && (val.type_ == type_)) {
             object_ += val.object_;
         }
     }
 
     void operator+=(VObject &&obj) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ +=
                 static_cast<Value &&>(Value{static_cast<VObject &&>(obj)});
-        } else if (Type() == ValueType::Object) {
+        } else if (type_ == ValueType::Object) {
             object_ += static_cast<VObject &&>(obj);
         }
     }
@@ -389,11 +386,11 @@ class Value {
     }
 
     void operator+=(VArray &&arr) {
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ += static_cast<VArray &&>(arr);
-        } else if (Type() == ValueType::Undefined) {
+        } else if (type_ == ValueType::Undefined) {
             new (&array_) VArray(static_cast<VArray &&>(arr));
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
     }
 
@@ -402,12 +399,12 @@ class Value {
     }
 
     void operator+=(VString &&str) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ += Value{static_cast<VString &&>(str)};
         }
     }
@@ -421,12 +418,12 @@ class Value {
     }
 
     void operator+=(double num) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ += static_cast<Value &&>(Value{num});
         }
     }
@@ -437,36 +434,36 @@ class Value {
     }
 
     void operator+=(NullType) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ += static_cast<Value &&>(Value{nullptr});
         }
     }
 
     void operator+=(bool is_true) {
-        if (Type() == ValueType::Undefined) {
+        if (type_ == ValueType::Undefined) {
             Memory::Construct(&array_, VArray());
-            setType(ValueType::Array);
+            type_ = ValueType::Array;
         }
 
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             array_ += static_cast<Value &&>(Value{is_true});
         }
     }
 
     Value &operator[](const Char_T_ *key) {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Object: {
                 return (object_)[key];
             }
 
             case ValueType::Undefined: {
                 Memory::Construct(&object_, VObject());
-                setType(ValueType::Object);
+                type_ = ValueType::Object;
                 return (object_)[key];
             }
 
@@ -478,14 +475,14 @@ class Value {
     }
 
     Value &operator[](VString &&key) {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Object: {
                 return (object_)[static_cast<VString &&>(key)];
             }
 
             case ValueType::Undefined: {
                 Memory::Construct(&object_, VObject());
-                setType(ValueType::Object);
+                type_ = ValueType::Object;
                 return (object_)[static_cast<VString &&>(key)];
             }
 
@@ -497,14 +494,14 @@ class Value {
     }
 
     Value &operator[](const VString &key) {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Object: {
                 return (object_)[key];
             }
 
             case ValueType::Undefined: {
                 Memory::Construct(&object_, VObject());
-                setType(ValueType::Object);
+                type_ = ValueType::Object;
                 return (object_)[key];
             }
 
@@ -516,7 +513,7 @@ class Value {
     }
 
     Value &operator[](SizeT index) {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Array: {
                 if (array_.Size() > index) {
                     return *(array_.First() + index);
@@ -544,7 +541,7 @@ class Value {
                 if (index == 0) {
                     Memory::Construct(&array_, VArray());
                     array_.ResizeAndInitialize(1);
-                    setType(ValueType::Array);
+                    type_ = ValueType::Array;
                     return *(array_.First());
                 }
 
@@ -564,43 +561,43 @@ class Value {
     }
 
     inline bool IsUndefined() const noexcept {
-        return (Type() == ValueType::Undefined);
+        return (type_ == ValueType::Undefined);
     }
 
     inline bool IsObject() const noexcept {
-        return (Type() == ValueType::Object);
+        return (type_ == ValueType::Object);
     }
 
     inline bool IsArray() const noexcept {
-        return (Type() == ValueType::Array);
+        return (type_ == ValueType::Array);
     }
 
     inline bool IsString() const noexcept {
-        return (Type() == ValueType::String);
+        return (type_ == ValueType::String);
     }
 
     inline bool IsNumber() const noexcept {
-        return (Type() == ValueType::Number);
+        return (type_ == ValueType::Number);
     }
 
     inline bool IsTrue() const noexcept {
-        return (Type() == ValueType::True);
+        return (type_ == ValueType::True);
     }
 
     inline bool IsFalse() const noexcept {
-        return (Type() == ValueType::False);
+        return (type_ == ValueType::False);
     }
 
     inline bool IsNull() const noexcept {
-        return (Type() == ValueType::Null);
+        return (type_ == ValueType::Null);
     }
 
     inline ValueType Type() const noexcept {
-        return type_.GetType();
+        return type_;
     }
 
     SizeT Size() const noexcept {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Object: {
                 return object_.Size();
             }
@@ -617,7 +614,7 @@ class Value {
     }
 
     Value *GetValue(SizeT index) const noexcept {
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             if (index < array_.Size()) {
                 Value *val = (array_.First() + index);
 
@@ -625,7 +622,7 @@ class Value {
                     return val;
                 }
             }
-        } else if (Type() == ValueType::Object) {
+        } else if (type_ == ValueType::Object) {
             Value *val = object_.GetValue(index);
 
             if ((val != nullptr) && (!(val->IsUndefined()))) {
@@ -637,7 +634,7 @@ class Value {
     }
 
     Value *GetValue(const Char_T_ *key, SizeT length) const noexcept {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             Value *val = (object_.Find(key, length));
 
             if ((val != nullptr) && !(val->IsUndefined())) {
@@ -649,7 +646,7 @@ class Value {
     }
 
     const VString *GetKey(SizeT index) const noexcept {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             return object_.GetKey(index);
         }
 
@@ -657,7 +654,7 @@ class Value {
     }
 
     const VObject *GetObject() const noexcept {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             return &object_;
         }
 
@@ -665,7 +662,7 @@ class Value {
     }
 
     const VArray *GetArray() const noexcept {
-        if (Type() == ValueType::Array) {
+        if (type_ == ValueType::Array) {
             return &array_;
         }
 
@@ -673,7 +670,7 @@ class Value {
     }
 
     const VString *GetString() const noexcept {
-        if (Type() == ValueType::String) {
+        if (type_ == ValueType::String) {
             return &string_;
         }
 
@@ -681,7 +678,7 @@ class Value {
     }
 
     const Char_T_ *StringStorage() const noexcept {
-        if (Type() == ValueType::String) {
+        if (type_ == ValueType::String) {
             return string_.First();
         }
 
@@ -689,7 +686,7 @@ class Value {
     }
 
     SizeT Length() const noexcept {
-        if (Type() == ValueType::String) {
+        if (type_ == ValueType::String) {
             return string_.Length();
         }
 
@@ -699,7 +696,7 @@ class Value {
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key,
                           Number_T_ &     length) const noexcept {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::String: {
                 key    = string_.First();
                 length = static_cast<Number_T_>(string_.Length());
@@ -731,7 +728,7 @@ class Value {
     }
 
     bool SetString(VString &value) const {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::String: {
                 value = string_;
                 return true;
@@ -769,7 +766,7 @@ class Value {
     }
 
     bool InsertString(StringStream<Char_T_> &ss) const {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::String: {
                 ss += string_;
                 return true;
@@ -807,7 +804,7 @@ class Value {
     }
 
     bool InsertKey(StringStream<Char_T_> &ss, SizeT index) const {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             const VString *key = object_.GetKey(index);
 
             if (key != nullptr) {
@@ -821,7 +818,7 @@ class Value {
     }
 
     double GetNumber() const noexcept {
-        if (Type() == ValueType::Number) {
+        if (type_ == ValueType::Number) {
             return number_.GetDouble();
         }
 
@@ -829,7 +826,7 @@ class Value {
     }
 
     bool SetNumber(double &value) const noexcept {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Number: {
                 value = number_.GetDouble();
                 return true;
@@ -860,7 +857,7 @@ class Value {
     }
 
     bool GetBool(bool &value) const noexcept {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::True: {
                 value = true;
                 return true;
@@ -901,21 +898,21 @@ class Value {
     }
 
     inline void Remove(const Char_T_ *key) const noexcept {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             object_.Remove(key);
         }
     }
 
     inline void Remove(const VString &key) const noexcept {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             object_.Remove(key);
         }
     }
 
     void Remove(SizeT index) const noexcept {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             object_.RemoveIndex(index);
-        } else if ((Type() == ValueType::Array) && (index < array_.Size())) {
+        } else if ((type_ == ValueType::Array) && (index < array_.Size())) {
             (array_.First() + index)->Reset();
         }
     }
@@ -927,13 +924,13 @@ class Value {
 
     void Reset() noexcept {
         reset();
-        setType(ValueType::Undefined);
+        type_ = ValueType::Undefined;
     }
 
     void Compress() {
-        if (Type() == ValueType::Object) {
+        if (type_ == ValueType::Object) {
             object_.Compress();
-        } else if (Type() == ValueType::Array) {
+        } else if (type_ == ValueType::Array) {
             const SizeT size = array_.Size();
 
             if (size != array_.Capacity()) {
@@ -947,7 +944,7 @@ class Value {
                 const Value *src_end = array_.End();
 
                 do {
-                    if (src_val->Type() != ValueType::Undefined) {
+                    if (src_val->type_ != ValueType::Undefined) {
                         new_array += static_cast<Value &&>(*src_val);
                     }
 
@@ -961,7 +958,7 @@ class Value {
 
     void Stringify(StringStream<Char_T_> &ss) const {
         const SizeT size   = Size();
-        const bool  is_obj = (Type() == ValueType::Object);
+        const bool  is_obj = (type_ == ValueType::Object);
 
         const HAItem<Value, Char_T_> *ha_item = nullptr;
         const Value *                 item    = nullptr;
@@ -969,7 +966,7 @@ class Value {
         if (is_obj) {
             ha_item = (object_.First() - 1);
             ss += JSONotation_T_::SCurlyChar;
-        } else if (Type() == ValueType::Array) {
+        } else if (type_ == ValueType::Array) {
             item = (array_.First() - 1);
             ss += JSONotation_T_::SSquareChar;
         } else {
@@ -985,7 +982,7 @@ class Value {
 
                     if ((ha_item == nullptr) ||
                         (ha_item->Key.First() == nullptr) ||
-                        (ha_item->Value.Type() == ValueType::Undefined)) {
+                        (ha_item->Value.type_ == ValueType::Undefined)) {
                         continue; // Deleted item.
                     }
 
@@ -999,12 +996,12 @@ class Value {
                 } else {
                     ++item;
 
-                    if (item->Type() == ValueType::Undefined) {
+                    if (item->type_ == ValueType::Undefined) {
                         continue; // Unset or deleted value
                     }
                 }
 
-                switch (item->Type()) {
+                switch (item->type_) {
                     case ValueType::Object:
                     case ValueType::Array: {
                         item->Stringify(ss);
@@ -1069,12 +1066,8 @@ class Value {
     }
 
   private:
-    void setType(ValueType type) noexcept {
-        type_ = type;
-    }
-
     void reset() {
-        switch (Type()) {
+        switch (type_) {
             case ValueType::Object: {
                 object_.Reset();
                 break;
@@ -1096,7 +1089,7 @@ class Value {
     }
 
     void copyValue(const Value &val) {
-        switch (val.Type()) {
+        switch (val.type_) {
             case ValueType::Object: {
                 Memory::Construct(&object_, val.object_);
                 break;
@@ -1173,31 +1166,11 @@ class Value {
             double DNumber;
             ULong  ULNumber;
             SLong  SLNumber;
-            SizeT  Padding[2]; // Just incase SizeT is set to long
+            SizeT  Padding[2]; // Just in case SizeT is set to long
         };
 
         const Char_T_ *padding_{nullptr};
         Number_T_      number_;
-    };
-
-    struct VType {
-      public:
-        VType() = default;
-
-        explicit VType(ValueType type) noexcept : type_(type) {
-        }
-
-        inline VType &operator=(ValueType type) noexcept {
-            type_ = type;
-            return *this;
-        }
-
-        ValueType GetType() const noexcept {
-            return type_;
-        }
-
-      private:
-        ValueType type_{ValueType::Undefined};
     };
 
     union {
@@ -1207,7 +1180,7 @@ class Value {
         VNumber number_;
     };
 
-    VType type_;
+    ValueType type_{ValueType::Undefined};
 };
 
 } // namespace Qentem
