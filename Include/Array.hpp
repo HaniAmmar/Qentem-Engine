@@ -277,7 +277,7 @@ class Array {
     }
 
     inline bool IsNotEmpty() const noexcept {
-        return (index_ != 0);
+        return !(IsEmpty());
     }
 
     //////////// Private ////////////
