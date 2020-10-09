@@ -75,7 +75,7 @@ class Template_T_ {
             }
 
             render(tags.First(), tags.End(), content, offset);
-            offset = (tags.First() + tags.Size() - 1)->GetEndOffset();
+            offset = (tags.First() + tags.Size() - 1)->EndOffset();
 
             if (!(tags.IsFull())) {
                 break;
@@ -358,22 +358,21 @@ class Template_T_ {
 
         while (tag != end) {
             ss_->Insert((content + previous_offset),
-                        (tag->GetOffset() - previous_offset));
+                        (tag->Offset() - previous_offset));
 
-            switch (tag->GetType()) {
+            switch (tag->Type()) {
                 case TagType_::Variable: {
                     renderVariable(
-                        (content + tag->GetContentOffset()),
-                        ((tag->GetEndOffset() - 1) - tag->GetContentOffset()));
+                        (content + tag->ContentOffset()),
+                        ((tag->EndOffset() - 1) - tag->ContentOffset()));
 
                     // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                     break;
                 }
 
                 case TagType_::Math: {
-                    renderMath(
-                        (content + tag->GetContentOffset()),
-                        ((tag->GetEndOffset() - 1) - tag->GetContentOffset()));
+                    renderMath((content + tag->ContentOffset()),
+                               ((tag->EndOffset() - 1) - tag->ContentOffset()));
 
                     // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                     break;
@@ -381,29 +380,29 @@ class Template_T_ {
 
                 case TagType_::InLineIf: {
                     renderInLineIf(
-                        (content + tag->GetContentOffset()),
-                        ((tag->GetEndOffset() - 1) - tag->GetContentOffset()));
+                        (content + tag->ContentOffset()),
+                        ((tag->EndOffset() - 1) - tag->ContentOffset()));
 
                     // - 1 is - TemplatePatterns_T_::InLineSuffixLength
                     break;
                 }
 
                 case TagType_::Loop: {
-                    renderLoop(tag->GetLoopData(),
-                               (content + tag->GetContentOffset()),
-                               ((tag->GetEndOffset() -
+                    renderLoop(tag->LoopData(),
+                               (content + tag->ContentOffset()),
+                               ((tag->EndOffset() -
                                  TemplatePatterns_T_::LoopSuffixLength) -
-                                tag->GetContentOffset()));
+                                tag->ContentOffset()));
                     break;
                 }
 
                 case TagType_::If: {
-                    renderIf((content + tag->GetContentOffset()),
-                             (tag->GetEndOffset() - tag->GetContentOffset()));
+                    renderIf((content + tag->ContentOffset()),
+                             (tag->EndOffset() - tag->ContentOffset()));
                 }
             }
 
-            previous_offset = tag->GetEndOffset();
+            previous_offset = tag->EndOffset();
             ++tag;
         }
     }
@@ -825,14 +824,14 @@ class Template_T_ {
                     break;
                 }
 
-                loop_offset = (tags_buffer.First() + tags_buffer.Size() - 1)
-                                  ->GetEndOffset();
+                loop_offset =
+                    (tags_buffer.First() + tags_buffer.Size() - 1)->EndOffset();
                 tags_buffer.Clear();
             } while (true);
         }
 
         if (loop_data->SubTags.Last() != nullptr) {
-            const SizeT tag_offset = loop_data->SubTags.Last()->GetEndOffset();
+            const SizeT    tag_offset = loop_data->SubTags.Last()->EndOffset();
             const Char_T_ *remain_str =
                 (loop_data->Content.First() + tag_offset);
             const SizeT remain_len = (loop_data->Content.Length() - tag_offset);
@@ -1263,23 +1262,23 @@ class Template_T_ {
             }
         }
 
-        LoopData_T_ *GetLoopData() const noexcept {
+        inline LoopData_T_ *LoopData() const noexcept {
             return loop_data_;
         }
 
-        SizeT GetOffset() const noexcept {
+        inline SizeT Offset() const noexcept {
             return offset_;
         }
 
-        SizeT GetContentOffset() const noexcept {
+        inline SizeT ContentOffset() const noexcept {
             return content_offset_;
         }
 
-        SizeT GetEndOffset() const noexcept {
+        inline SizeT EndOffset() const noexcept {
             return end_offset_;
         }
 
-        TagType_ GetType() const noexcept {
+        inline TagType_ Type() const noexcept {
             return type_;
         }
 
