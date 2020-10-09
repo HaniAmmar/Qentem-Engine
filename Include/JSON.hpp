@@ -335,7 +335,6 @@ class JSONParser {
                     }
 
                     ++offset;
-                    obj.Compress();
                     value = static_cast<VObject &&>(obj);
                     return value;
                 }
