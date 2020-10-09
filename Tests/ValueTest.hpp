@@ -1037,7 +1037,9 @@ static int TestObjectValue2() {
 
     value3.Compress();
     NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value3.GetObject()->Capacity(), 3, "Capacity()");
+    EQ_VALUE(value3.GetObject()->Size(), 3, "Size()");
+    EQ_TRUE(value3.GetObject()->Capacity() >= 3,
+            "GetObject()->Capacity() >= 3");
 
     END_SUB_TEST;
 }
