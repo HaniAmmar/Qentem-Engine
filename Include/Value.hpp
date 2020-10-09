@@ -128,21 +128,21 @@ class Value {
     }
 
     ~Value() {
-        if (type_ == ValueType::Undefined) {
-            return;
+        if (type_ != ValueType::Undefined) {
+            reset();
         }
-
-        reset();
     }
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            reset();
+            if (type_ != ValueType::Undefined) {
+                reset();
+            }
 
             number_ = val.number_;
             type_   = val.type_;
 
-            val.number_ = VNumber{ULong{0}};
+            val.number_ = VNumber{SLong{0}};
             val.type_   = ValueType::Undefined;
         }
 
