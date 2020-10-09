@@ -575,7 +575,8 @@ static int TestHArray5() {
     numbers1.Reserve(16);
     numbers1["a"] = 1;
     numbers1.Compress();
-    EQ_VALUE(numbers1.Capacity(), 1, "Capacity");
+    EQ_VALUE(numbers1.Size(), 1, "Size");
+    EQ_TRUE(numbers1.Capacity() >= 1, "Capacity() >= 1");
 
     END_SUB_TEST;
 }

@@ -418,10 +418,10 @@ class HArray {
                 return;
             }
 
-            algine_size(n_size);
+            const SizeT n_cap = algine_size(n_size);
 
-            if (n_size != capacity_) {
-                resize(n_size);
+            if ((n_size < index_) || (n_cap < capacity_)) {
+                resize(n_cap);
             }
         }
     }
