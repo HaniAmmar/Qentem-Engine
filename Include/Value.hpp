@@ -1123,7 +1123,8 @@ class Value {
       public:
         VNumber() = default;
 
-        explicit VNumber(double num) noexcept : number_(num) {
+        template <typename Number_T_>
+        explicit VNumber(Number_T_ num) noexcept : number_(num) {
         }
 
         inline VNumber &operator=(double num) noexcept {
