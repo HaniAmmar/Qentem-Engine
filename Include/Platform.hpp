@@ -25,21 +25,7 @@
 #ifndef QENTEM_PLATFORM_H_
 #define QENTEM_PLATFORM_H_
 
-#if QENTEM_AVX512BW_ == 1
-using QMM_Number_T = unsigned long long;
-#define QMM_SIZE_ 64U
-#define QMM_SHIFTSIZE_ 6U
-#define QMM_MAX_NUMBER_ 0xFFFFFFFFFFFFFFFFULL
-#define QMM_VAR_ __m512i
-#define QMM_LOAD_ _mm512_loadu_si512
-#define QMM_SETZERO_ _mm512_setzero_si512
-#define QMM_SETONE_8_ _mm512_set1_epi8
-#define QMM_SETONE_16_ _mm512_set1_epi16
-#define QMM_SETONE_32_ _mm512_set1_epi32
-#define QMM_SETONE_64_ _mm512_set1_epi64
-#define QMM_STOREU_ _mm512_storeu_si512
-#define QMM_COMPARE_8_MASK_ _mm512_cmpeq_epi8_mask
-#elif QENTEM_AVX2_ == 1
+#if QENTEM_AVX2_ == 1
 using QMM_Number_T = unsigned int;
 #define QMM_SIZE_ 32U
 #define QMM_SHIFTSIZE_ 5U
@@ -81,7 +67,7 @@ using QMM_Number_T = unsigned int;
     static_cast<QMM_Number_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
 #endif
 
-#if QENTEM_AVX512BW_ == 1 || QENTEM_AVX2_ == 1 || QENTEM_SSE2_ == 1
+#if QENTEM_AVX2_ == 1 || QENTEM_SSE2_ == 1
 #include <immintrin.h>
 #define QENTEM_SIMD_ENABLED_
 #endif

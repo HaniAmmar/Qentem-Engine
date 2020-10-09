@@ -31,22 +31,12 @@
 #define QENTEM_64BIT_
 #endif
 
-#ifndef _WIN64
-#ifndef QENTEM_AVX512BW_
-#define QENTEM_AVX512BW_ 0
-#endif
-
 #ifndef QENTEM_AVX2_
 #define QENTEM_AVX2_ 0
-#endif
 #endif
 
 #ifndef QENTEM_SSE2_
 #define QENTEM_SSE2_ 0
-#endif
-
-#ifndef __AVX512BW__
-#undef QENTEM_AVX512BW_
 #endif
 
 #ifndef __AVX2__
