@@ -370,7 +370,8 @@ static int TestNumberValue() {
     value2 = 1213;
     EQ_VALUE(value2.GetNumber(), 1213, "GetNumber()");
 
-    value2 = 785;
+    value2 = 10;
+    value2 = double(785);
     EQ_VALUE(value2.GetNumber(), 785, "GetNumber()");
 
     value2 = UInt{0};
