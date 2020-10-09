@@ -223,7 +223,7 @@ With variables:
 ```
 
 ### ALE Note
-ALE treats anything inside parentheses `( )`; true is one, false and null is 0. if the operation is equal, Template will try the following:
+ALE treats anything inside parentheses `( )`; true is one, false and null are 0. if the operation is equal, Template will try the following:
 -   If one of the variables is a number, it will convert the other part to a number: ({var:one} == 1)
 -   If none of the variables is a number, it will convert the other part to a string: ({var:bool} == true)
 
