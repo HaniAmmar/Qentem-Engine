@@ -142,13 +142,13 @@ class JSONParser {
                     content + find_cache_.Offset));
 
             // The value of 8 characters:
-            constexpr unsigned long long colon    = 4195730024608447034ULL;
             constexpr unsigned long long curly    = 8897841259083430779ULL;
             constexpr unsigned long long square   = 6582955728264977243ULL;
-            constexpr unsigned long long e_curly  = 9042521604759584125ULL;
-            constexpr unsigned long long e_square = 6727636073941130589ULL;
+            constexpr unsigned long long colon    = 4195730024608447034ULL;
             constexpr unsigned long long quote    = 2459565876494606882ULL;
             constexpr unsigned long long comma    = 3182967604875373612ULL;
+            constexpr unsigned long long e_curly  = 9042521604759584125ULL;
+            constexpr unsigned long long e_square = 6727636073941130589ULL;
 
             find_cache_.Bits =
                 QMM_COMPARE_8_MASK_(m_content, QMM_SETONE_64_(curly));
@@ -173,15 +173,18 @@ class JSONParser {
     VValue parseObject(const Char_T_ *content, SizeT &offset, SizeT length) {
         VValue  value;
         VObject obj;
-        VValue *obj_value       = nullptr;
-        SizeT   previous_offset = offset;
-        bool    pass_comma      = false;
-        bool    has_colon       = false;
-        bool    is_valid        = false;
+        VValue *obj_value = nullptr;
+
+        SizeT previous_offset = offset;
+        bool  pass_comma      = false;
+        bool  has_colon       = false;
+        bool  is_valid        = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
 #else
+        constexpr QMM_Number_T simd_one = 1;
+
         do {
             if (find_cache_.Bits == 0) {
                 SIMDFind(content, offset, length);
@@ -191,8 +194,9 @@ class JSONParser {
                 }
             }
 
-            SizeT index =
-                (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+            SizeT index = Platform::CTZ(find_cache_.Bits);
+            find_cache_.Bits ^= (simd_one << index);
+            index += find_cache_.Offset;
 
             if (index >= length) {
                 break;
@@ -237,30 +241,27 @@ class JSONParser {
 
                     if (!pass_comma && (previous_offset == offset)) {
                         ++offset;
-                        buffer_.Clear();
+
                         const Char_T_ *str = (content + offset);
                         const SizeT    len = UnEscapeJSON(str, length, buffer_);
                         offset += len;
                         previous_offset = offset;
 
                         if (obj_value == nullptr) {
-                            obj_value = &(obj[static_cast<VString &&>(
-                                VString{buffer_.First(), buffer_.Length()})]);
-                            if (len != 0) {
-                                continue;
-                            }
-                        }
-
-                        if (has_colon) {
+                            obj_value = &(obj[VString{buffer_.First(),
+                                                      buffer_.Length()}]);
+                        } else if (has_colon) {
                             *obj_value =
-                                VString{buffer_.First(), buffer_.Length()};
+                                VValue{buffer_.First(), buffer_.Length()};
                             obj_value  = nullptr;
                             pass_comma = true;
                             has_colon  = false;
+                        }
 
-                            if (len != 0) {
-                                continue;
-                            }
+                        buffer_.Clear();
+
+                        if (len != 0) {
+                            continue;
                         }
                     }
 
@@ -344,8 +345,6 @@ class JSONParser {
         }
 #else
             }
-
-            find_cache_.Bits &= (find_cache_.Bits - 1);
         } while (true);
 #endif
 
@@ -356,13 +355,16 @@ class JSONParser {
     VValue parseArray(const Char_T_ *content, SizeT &offset, SizeT length) {
         VValue value;
         VArray arr;
-        SizeT  previous_offset = offset;
-        bool   pass_comma      = false;
-        bool   is_valid        = false;
+
+        SizeT previous_offset = offset;
+        bool  pass_comma      = false;
+        bool  is_valid        = false;
 
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
 #else
+        constexpr QMM_Number_T simd_one = 1;
+
         do {
             if (find_cache_.Bits == 0) {
                 SIMDFind(content, offset, length);
@@ -372,8 +374,9 @@ class JSONParser {
                 }
             }
 
-            SizeT index =
-                (Platform::CTZ(find_cache_.Bits) + find_cache_.Offset);
+            SizeT index = Platform::CTZ(find_cache_.Bits);
+            find_cache_.Bits ^= (simd_one << index);
+            index += find_cache_.Offset;
 
             if (index >= length) {
                 break;
@@ -417,8 +420,7 @@ class JSONParser {
                         const Char_T_ *str = (content + offset);
                         const SizeT    len = UnEscapeJSON(str, length, buffer_);
 
-                        arr +=
-                            VValue{VString{buffer_.First(), buffer_.Length()}};
+                        arr += VValue{buffer_.First(), buffer_.Length()};
 
                         offset += len;
                         previous_offset = offset;
@@ -485,8 +487,6 @@ class JSONParser {
         }
 #else
             }
-
-            find_cache_.Bits &= (find_cache_.Bits - 1);
         } while (true);
 #endif
 
