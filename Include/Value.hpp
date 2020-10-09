@@ -107,6 +107,10 @@ class Value {
         : string_{str}, type_{ValueType::String} {
     }
 
+    explicit Value(const Char_T_ *str, SizeT length) noexcept
+        : string_{str, length}, type_{ValueType::String} {
+    }
+
     explicit Value(double num) noexcept
         : number_{num}, type_{ValueType::Number} {
     }
