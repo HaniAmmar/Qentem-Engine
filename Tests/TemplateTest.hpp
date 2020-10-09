@@ -1376,10 +1376,6 @@ static int TestLoopTag2() {
     content = R"(<loop set="numbers" value="t">t[0]</loop>)";
     EQ_VALUE(Template::Render(content, &value3), "", "Render()");
 
-    content =
-        R"(<loop set="numbers" value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
-    EQ_VALUE(Template::Render(content, &value3), "1357", "Render()");
-
     END_SUB_TEST;
 }
 
@@ -1975,6 +1971,10 @@ static int TestRender2() {
     value[2] = 2;
     value[3] = 5;
     value[4] = 10;
+
+    content =
+        R"(<loop set="numbers" value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
+    EQ_VALUE(Template::Render(content, &value), "15", "Render()");
 
     content =
         R"(<loop value="loop1_val">{if case="loop1_val < 5", true="loop1_val"}</loop>)";
