@@ -62,39 +62,34 @@ class JSONParser {
         VValue     value;
 
         while (offset < length) {
-            switch (content[offset]) {
-                case JSONotation_T_::SCurlyChar:
-                case JSONotation_T_::SSquareChar: {
-                    while (offset != length) {
-                        --length;
+            if ((content[offset] == JSONotation_T_::SCurlyChar) ||
+                (content[offset] == JSONotation_T_::SSquareChar)) {
+                while (offset != length) {
+                    --length;
 
-                        switch (content[length]) {
-                            case JSONotation_T_::CommaChar:
-                            case JSONotation_T_::QuoteChar: {
-                                return value;
+                    switch (content[length]) {
+                        case JSONotation_T_::CommaChar:
+                        case JSONotation_T_::QuoteChar: {
+                            return value;
+                        }
+
+                        case JSONotation_T_::ECurlyChar:
+                        case JSONotation_T_::ESquareChar: {
+                            const bool obj_child =
+                                (content[offset] == JSONotation_T_::SCurlyChar);
+                            ++length;
+
+                            if (obj_child) {
+                                value = jp.parseObject(content, offset, length);
+                            } else {
+                                value = jp.parseArray(content, offset, length);
                             }
 
-                            case JSONotation_T_::ECurlyChar:
-                            case JSONotation_T_::ESquareChar: {
-                                const bool obj_child =
-                                    (content[offset] ==
-                                     JSONotation_T_::SCurlyChar);
-                                ++length;
-
-                                if (obj_child) {
-                                    value =
-                                        jp.parseObject(content, offset, length);
-                                } else {
-                                    value =
-                                        jp.parseArray(content, offset, length);
-                                }
-
-                                if (offset == length) {
-                                    break;
-                                }
-
-                                return VValue{};
+                            if (offset == length) {
+                                break;
                             }
+
+                            return VValue{};
                         }
                     }
                 }
