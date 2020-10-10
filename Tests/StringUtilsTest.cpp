@@ -1,5 +1,3 @@
 #include "StringUtilsTest.hpp"
 
-int main() {
-    return Qentem::Test::RunStringUtilsTests();
-}
+int main() { return Qentem::Test::RunStringUtilsTests(); }

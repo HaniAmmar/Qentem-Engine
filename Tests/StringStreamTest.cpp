@@ -1,5 +1,3 @@
 #include "StringStreamTest.hpp"
 
-int main() {
-    return Qentem::Test::RunStringStreamTests();
-}
+int main() { return Qentem::Test::RunStringStreamTests(); }

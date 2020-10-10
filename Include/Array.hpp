@@ -132,9 +132,7 @@ class Array {
         arr.capacity_ = 0;
     }
 
-    void operator+=(const Array &arr) {
-        copyArray(arr);
-    }
+    void operator+=(const Array &arr) { copyArray(arr); }
 
     void operator+=(Type_ &&item) {
         if (index_ == capacity_) {
@@ -248,9 +246,7 @@ class Array {
         index_ = capacity_;
     }
 
-    inline Type_ *First() const noexcept {
-        return storage_;
-    }
+    inline Type_ *First() const noexcept { return storage_; }
 
     inline const Type_ *Last() const noexcept {
         if (index_ != 0) {
@@ -260,25 +256,15 @@ class Array {
         return nullptr;
     }
 
-    inline const Type_ *End() const noexcept {
-        return (storage_ + index_);
-    }
+    inline const Type_ *End() const noexcept { return (storage_ + index_); }
 
-    inline SizeT Size() const noexcept {
-        return index_;
-    }
+    inline SizeT Size() const noexcept { return index_; }
 
-    inline SizeT Capacity() const noexcept {
-        return capacity_;
-    }
+    inline SizeT Capacity() const noexcept { return capacity_; }
 
-    inline bool IsEmpty() const noexcept {
-        return (index_ == 0);
-    }
+    inline bool IsEmpty() const noexcept { return (index_ == 0); }
 
-    inline bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
-    }
+    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
     //////////// Private ////////////
 

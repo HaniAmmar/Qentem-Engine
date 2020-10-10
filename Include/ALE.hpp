@@ -608,7 +608,6 @@ class ALE {
                 if (callback->ALEIsEqual(is_equal, (content + left.str[0]),
                                          left.str[1], (content + right.str[0]),
                                          right.str[1])) {
-
                     left.number = (is_equal ? 1 : 0);
                     break;
                 }
@@ -622,7 +621,6 @@ class ALE {
                 if (callback->ALEIsEqual(is_equal, (content + left.str[0]),
                                          left.str[1], (content + right.str[0]),
                                          right.str[1])) {
-
                     left.number = (is_equal ? 0 : 1);
                     break;
                 }

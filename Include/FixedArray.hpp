@@ -58,9 +58,7 @@ class FixedArray {
         *this += static_cast<Type_ &&>(Type_(item));
     }
 
-    inline Type_ *First() noexcept {
-        return &(storage_[0]);
-    }
+    inline Type_ *First() noexcept { return &(storage_[0]); }
 
     inline const Type_ *End() const noexcept {
         return (&(storage_[0]) + index_);
@@ -73,25 +71,15 @@ class FixedArray {
         index_ = 0;
     }
 
-    inline UInt Size() const noexcept {
-        return index_;
-    }
+    inline UInt Size() const noexcept { return index_; }
 
-    inline UInt Capacity() const noexcept {
-        return Size_T_;
-    }
+    inline UInt Capacity() const noexcept { return Size_T_; }
 
-    inline bool IsEmpty() const noexcept {
-        return (index_ == 0);
-    }
+    inline bool IsEmpty() const noexcept { return (index_ == 0); }
 
-    inline bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
-    }
+    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
-    inline bool IsFull() const noexcept {
-        return (index_ == Size_T_);
-    }
+    inline bool IsFull() const noexcept { return (index_ == Size_T_); }
 };
 
 } // namespace Qentem

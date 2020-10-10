@@ -1199,8 +1199,7 @@ class Template_T_ {
 
     Template_T_(StringStream<Char_T_> *ss, const Value_T_ *root_value,
                 const Template_T_ *parent = nullptr, SizeT level = 0) noexcept
-        : ss_(ss), root_value_(root_value), parent_(parent), level_(level) {
-    }
+        : ss_(ss), root_value_(root_value), parent_(parent), level_(level) {}
 
     struct LoopData_T_ {
         StringStream<Char_T_> Content{};
@@ -1224,8 +1223,7 @@ class Template_T_ {
                SizeT end_offset, TagType_ type) noexcept
             : loop_data_(loop_data), offset_(offset),
               content_offset_(content_offset), end_offset_(end_offset),
-              type_(type) {
-        }
+              type_(type) {}
 
         Tag_T_(Tag_T_ &&tag) noexcept
             : loop_data_(tag.loop_data_), offset_(tag.offset_),
@@ -1234,9 +1232,7 @@ class Template_T_ {
             tag.loop_data_ = nullptr;
         }
 
-        ~Tag_T_() {
-            Reset();
-        }
+        ~Tag_T_() { Reset(); }
 
         Tag_T_ &operator=(Tag_T_ &&tag) noexcept {
             if (this != &tag) {
@@ -1262,25 +1258,15 @@ class Template_T_ {
             }
         }
 
-        inline LoopData_T_ *LoopData() const noexcept {
-            return loop_data_;
-        }
+        inline LoopData_T_ *LoopData() const noexcept { return loop_data_; }
 
-        inline SizeT Offset() const noexcept {
-            return offset_;
-        }
+        inline SizeT Offset() const noexcept { return offset_; }
 
-        inline SizeT ContentOffset() const noexcept {
-            return content_offset_;
-        }
+        inline SizeT ContentOffset() const noexcept { return content_offset_; }
 
-        inline SizeT EndOffset() const noexcept {
-            return end_offset_;
-        }
+        inline SizeT EndOffset() const noexcept { return end_offset_; }
 
-        inline TagType_ Type() const noexcept {
-            return type_;
-        }
+        inline TagType_ Type() const noexcept { return type_; }
 
       private:
         LoopData_T_ *loop_data_{nullptr};

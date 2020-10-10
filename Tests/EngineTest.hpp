@@ -33,9 +33,7 @@ namespace Qentem {
 namespace Test {
 
 struct Engine1 {
-    static constexpr bool HasTail() noexcept {
-        return true;
-    }
+    static constexpr bool HasTail() noexcept { return true; }
 
     virtual SizeT FindH(const char *content, SizeT offset,
                         SizeT end_before) noexcept {
@@ -74,8 +72,7 @@ struct Engine1 {
         (void)current_offset;
     }
 
-    virtual void Failed() {
-    }
+    virtual void Failed() {}
 };
 
 static int TestEngine1() {
@@ -442,7 +439,6 @@ static int TestEngine4() {
         SizeT FindH(const char *content, SizeT offset,
                     SizeT end_before) noexcept override {
             while (offset < end_before) {
-
                 if ((content[offset] == '(') &&
                     (content[(offset + 1)] == '(')) {
                     return (offset + 2);
@@ -488,13 +484,9 @@ static int TestEngine4() {
     EQ_VALUE(ret, content_len, "return");
 
     struct Engine4 : Engine3 {
-        void Failed() noexcept override {
-            has_error = true;
-        }
+        void Failed() noexcept override { has_error = true; }
 
-        bool getError() const {
-            return has_error;
-        }
+        bool getError() const { return has_error; }
 
       private:
         bool has_error = false;
@@ -530,13 +522,9 @@ static int TestEngine4() {
             vars.EndBefore = end_before;
         }
 
-        Array<Item__> &getItems() {
-            return items;
-        }
+        Array<Item__> &getItems() { return items; }
 
-        VARS__ &getVARS() {
-            return vars;
-        }
+        VARS__ &getVARS() { return vars; }
 
       private:
         Array<Item__> items;
@@ -631,13 +619,9 @@ static int TestEngine4() {
             vars.EndBefore = end_before;
         }
 
-        Array<Item__> &getItems() {
-            return items;
-        }
+        Array<Item__> &getItems() { return items; }
 
-        VARS__ &getVARS() {
-            return vars;
-        }
+        VARS__ &getVARS() { return vars; }
 
       private:
         Array<Item__> items;
@@ -861,13 +845,11 @@ static int TestEngine6() {
     StringStream<char> toJSON_ss;
 
     struct Engine7 : Engine1 {
-        explicit Engine7(Array<Item2__> *items) noexcept : items_(items) {
-        }
+        explicit Engine7(Array<Item2__> *items) noexcept : items_(items) {}
 
         SizeT FindH(const char *content, SizeT offset,
                     SizeT end_before) noexcept override {
             while (offset < end_before) {
-
                 if ((content[offset] == '[') &&
                     (content[(offset + 1)] == '[') &&
                     (content[(offset + 2)] == '[')) {
@@ -893,13 +875,10 @@ static int TestEngine6() {
                                     &eng7);
         }
 
-        virtual SizeT length() noexcept {
-            return 3U;
-        }
+        virtual SizeT length() noexcept { return 3U; }
 
         void Found(const char *content, SizeT offset, SizeT end_before,
                    SizeT start_offset, SizeT &current_offset) override {
-
             Item2__ item;
 
             item.Offset   = (start_offset - length());
@@ -913,9 +892,7 @@ static int TestEngine6() {
             (void)end_before;
         }
 
-        Array<Item2__> *getsubItems() {
-            return &sub_items;
-        }
+        Array<Item2__> *getsubItems() { return &sub_items; }
 
       private:
         Array<Item2__> *items_;
@@ -934,8 +911,7 @@ static int TestEngine6() {
     EQ_VALUE(toJSON_ss, result, "toJSON_ss");
 
     struct Engine8 : Engine7 {
-        explicit Engine8(Array<Item2__> *items) noexcept : Engine7(items) {
-        }
+        explicit Engine8(Array<Item2__> *items) noexcept : Engine7(items) {}
 
         SizeT FindH(const char *content, SizeT offset,
                     SizeT end_before) noexcept override {
@@ -955,9 +931,7 @@ static int TestEngine6() {
             return Engine::FindOne('}', content, offset, end_before);
         }
 
-        SizeT length() noexcept override {
-            return 1U;
-        }
+        SizeT length() noexcept override { return 1U; }
 
         SizeT Nest(const char *content, SizeT offset, SizeT end_before,
                    SizeT max_end_before) override {

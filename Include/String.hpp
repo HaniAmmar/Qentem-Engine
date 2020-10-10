@@ -36,8 +36,7 @@ class String {
   public:
     String() = default;
 
-    String(Char_T_ *str, SizeT len) noexcept : storage_(str), length_(len) {
-    }
+    String(Char_T_ *str, SizeT len) noexcept : storage_(str), length_(len) {}
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
         ++len;
@@ -50,8 +49,8 @@ class String {
         storage_[length_] = 0;
     }
 
-    explicit String(const Char_T_ *str) : String(str, StringUtils::Count(str)) {
-    }
+    explicit String(const Char_T_ *str)
+        : String(str, StringUtils::Count(str)) {}
 
     String(String &&src) noexcept
         : storage_(src.storage_), length_(src.length_) {
@@ -67,9 +66,7 @@ class String {
         }
     }
 
-    ~String() {
-        Memory::Deallocate(storage_);
-    }
+    ~String() { Memory::Deallocate(storage_); }
 
     // inline Char_T_ &operator[](SizeT index) const {
     //     if (index < length_) {
@@ -219,13 +216,9 @@ class String {
         return str;
     }
 
-    inline Char_T_ *First() const noexcept {
-        return storage_;
-    }
+    inline Char_T_ *First() const noexcept { return storage_; }
 
-    inline SizeT Length() const noexcept {
-        return length_;
-    }
+    inline SizeT Length() const noexcept { return length_; }
 
     static String Insert(const String &src1, const String &src2) {
         const SizeT ns_len      = (src1.length_ + src2.length_);

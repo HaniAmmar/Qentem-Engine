@@ -157,9 +157,7 @@ class TestHelper {
     } while (false)
 
 QENTEM_MAYBE_UNUSED_
-static int TestThrow1_1() {
-    return 1;
-}
+static int TestThrow1_1() { return 1; }
 
 QENTEM_MAYBE_UNUSED_
 static int TestThrow1() {
@@ -172,9 +170,7 @@ static int TestThrow1() {
 }
 
 QENTEM_MAYBE_UNUSED_
-static int TestThrow2_2() {
-    throw 1;
-}
+static int TestThrow2_2() { throw 1; }
 
 QENTEM_MAYBE_UNUSED_
 static int TestThrow2() {

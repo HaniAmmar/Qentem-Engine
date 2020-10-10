@@ -1,5 +1,3 @@
 #include "UnicodeTest.hpp"
 
-int main() {
-    return Qentem::Test::RunUnicodeTests();
-}
+int main() { return Qentem::Test::RunUnicodeTests(); }

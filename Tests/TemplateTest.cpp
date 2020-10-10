@@ -1,5 +1,3 @@
 #include "TemplateTest.hpp"
 
-int main() {
-    return Qentem::Test::RunTemplateTests();
-}
+int main() { return Qentem::Test::RunTemplateTests(); }

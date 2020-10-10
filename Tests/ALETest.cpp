@@ -1,5 +1,3 @@
 #include "ALETest.hpp"
 
-int main() {
-    return Qentem::Test::RunALETests();
-}
+int main() { return Qentem::Test::RunALETests(); }

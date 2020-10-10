@@ -66,9 +66,7 @@ class HArray {
         h_arr.capacity_ = 0;
     }
 
-    HArray(const HArray &h_arr) {
-        copyArray(h_arr);
-    }
+    HArray(const HArray &h_arr) { copyArray(h_arr); }
 
     HArray &operator=(HArray &&h_arr) noexcept {
         if (this != &h_arr) {
@@ -456,17 +454,11 @@ class HArray {
         return hash;
     }
 
-    inline SizeT Size() const noexcept {
-        return index_;
-    }
+    inline SizeT Size() const noexcept { return index_; }
 
-    inline SizeT Capacity() const noexcept {
-        return capacity_;
-    }
+    inline SizeT Capacity() const noexcept { return capacity_; }
 
-    inline const HAItem_T *First() const noexcept {
-        return storage_;
-    }
+    inline const HAItem_T *First() const noexcept { return storage_; }
 
     inline const HAItem_T *Last() const noexcept {
         if (storage_ != nullptr) {

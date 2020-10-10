@@ -48,16 +48,13 @@ class Value {
     using VString        = String<Char_T_>;
 
   public:
-    Value() noexcept : number_{} {
-    }
+    Value() noexcept : number_{} {}
 
     Value(Value &&val) noexcept : number_{val.number_}, type_{val.type_} {
         val.type_ = ValueType::Undefined;
     }
 
-    Value(const Value &val) : type_{val.type_} {
-        copyValue(val);
-    }
+    Value(const Value &val) : type_{val.type_} { copyValue(val); }
 
     explicit Value(ValueType type) noexcept {
         switch (type) {
@@ -84,48 +81,37 @@ class Value {
     }
 
     explicit Value(VObject &&obj) noexcept
-        : object_{static_cast<VObject &&>(obj)}, type_{ValueType::Object} {
-    }
+        : object_{static_cast<VObject &&>(obj)}, type_{ValueType::Object} {}
 
     explicit Value(VArray &&arr) noexcept
-        : array_{static_cast<VArray &&>(arr)}, type_{ValueType::Array} {
-    }
+        : array_{static_cast<VArray &&>(arr)}, type_{ValueType::Array} {}
 
     explicit Value(VString &&str) noexcept
-        : string_{static_cast<VString &&>(str)}, type_{ValueType::String} {
-    }
+        : string_{static_cast<VString &&>(str)}, type_{ValueType::String} {}
 
     explicit Value(const VObject &obj) noexcept
-        : object_{obj}, type_{ValueType::Object} {
-    }
+        : object_{obj}, type_{ValueType::Object} {}
 
     explicit Value(const VArray &arr) noexcept
-        : array_{arr}, type_{ValueType::Array} {
-    }
+        : array_{arr}, type_{ValueType::Array} {}
 
     explicit Value(const VString &str) noexcept
-        : string_{str}, type_{ValueType::String} {
-    }
+        : string_{str}, type_{ValueType::String} {}
 
     explicit Value(const Char_T_ *str, SizeT length) noexcept
-        : string_{str, length}, type_{ValueType::String} {
-    }
+        : string_{str, length}, type_{ValueType::String} {}
 
     explicit Value(double num) noexcept
-        : number_{num}, type_{ValueType::Number} {
-    }
+        : number_{num}, type_{ValueType::Number} {}
 
     template <typename Type_T_>
     explicit Value(Type_T_ num) noexcept
-        : number_{static_cast<double>(num)}, type_{ValueType::Number} {
-    }
+        : number_{static_cast<double>(num)}, type_{ValueType::Number} {}
 
-    explicit Value(NullType) noexcept : type_{ValueType::Null} {
-    }
+    explicit Value(NullType) noexcept : type_{ValueType::Null} {}
 
     explicit Value(bool bl) noexcept
-        : type_{bl ? ValueType::True : ValueType::False} {
-    }
+        : type_{bl ? ValueType::True : ValueType::False} {}
 
     ~Value() {
         if (type_ != ValueType::Undefined) {
@@ -572,9 +558,7 @@ class Value {
         return (type_ == ValueType::Object);
     }
 
-    inline bool IsArray() const noexcept {
-        return (type_ == ValueType::Array);
-    }
+    inline bool IsArray() const noexcept { return (type_ == ValueType::Array); }
 
     inline bool IsString() const noexcept {
         return (type_ == ValueType::String);
@@ -584,21 +568,13 @@ class Value {
         return (type_ == ValueType::Number);
     }
 
-    inline bool IsTrue() const noexcept {
-        return (type_ == ValueType::True);
-    }
+    inline bool IsTrue() const noexcept { return (type_ == ValueType::True); }
 
-    inline bool IsFalse() const noexcept {
-        return (type_ == ValueType::False);
-    }
+    inline bool IsFalse() const noexcept { return (type_ == ValueType::False); }
 
-    inline bool IsNull() const noexcept {
-        return (type_ == ValueType::Null);
-    }
+    inline bool IsNull() const noexcept { return (type_ == ValueType::Null); }
 
-    inline ValueType Type() const noexcept {
-        return type_;
-    }
+    inline ValueType Type() const noexcept { return type_; }
 
     SizeT Size() const noexcept {
         switch (type_) {
@@ -1124,8 +1100,7 @@ class Value {
         VNumber() = default;
 
         template <typename Number_T_>
-        explicit VNumber(Number_T_ num) noexcept : number_(num) {
-        }
+        explicit VNumber(Number_T_ num) noexcept : number_(num) {}
 
         inline VNumber &operator=(double num) noexcept {
             number_.DNumber = num;
@@ -1142,31 +1117,21 @@ class Value {
             return *this;
         }
 
-        inline double GetDouble() const noexcept {
-            return number_.DNumber;
-        }
+        inline double GetDouble() const noexcept { return number_.DNumber; }
 
-        inline ULong GetULong() const noexcept {
-            return number_.ULNumber;
-        }
+        inline ULong GetULong() const noexcept { return number_.ULNumber; }
 
-        inline SLong GetSLong() const noexcept {
-            return number_.SLNumber;
-        }
+        inline SLong GetSLong() const noexcept { return number_.SLNumber; }
 
       private:
         union Number_T_ {
-            explicit Number_T_() noexcept : Padding{0, 0} {
-            }
+            explicit Number_T_() noexcept : Padding{0, 0} {}
 
-            explicit Number_T_(double num) noexcept : DNumber(num) {
-            }
+            explicit Number_T_(double num) noexcept : DNumber(num) {}
 
-            explicit Number_T_(ULong num) noexcept : ULNumber(num) {
-            }
+            explicit Number_T_(ULong num) noexcept : ULNumber(num) {}
 
-            explicit Number_T_(SLong num) noexcept : SLNumber(num) {
-            }
+            explicit Number_T_(SLong num) noexcept : SLNumber(num) {}
 
             double DNumber;
             ULong  ULNumber;

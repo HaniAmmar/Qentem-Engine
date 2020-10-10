@@ -1,5 +1,3 @@
 #include "JSONTest.hpp"
 
-int main() {
-    return Qentem::Test::RunJSONTests();
-}
+int main() { return Qentem::Test::RunJSONTests(); }
