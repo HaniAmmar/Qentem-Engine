@@ -1098,6 +1098,9 @@ static int TestParse5() {
     value = JSON::Parse(R"({"x",4})");
     EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse(R"([4,])");
+    EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     value = JSON::Parse(R"({"x":4,})");
     EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
