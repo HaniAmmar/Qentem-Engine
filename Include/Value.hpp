@@ -446,57 +446,42 @@ class Value {
     }
 
     Value &operator[](const Char_T_ *key) {
-        switch (type_) {
-            case ValueType::Object: {
-                return (object_)[key];
-            }
+        if (type_ == ValueType::Object) {
+            return (object_)[key];
+        }
 
-            case ValueType::Undefined: {
-                Memory::Construct(&object_, VObject());
-                type_ = ValueType::Object;
-                return (object_)[key];
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Undefined) {
+            Memory::Construct(&object_, VObject());
+            type_ = ValueType::Object;
+            return (object_)[key];
         }
 
         throw 3;
     }
 
     Value &operator[](VString &&key) {
-        switch (type_) {
-            case ValueType::Object: {
-                return (object_)[static_cast<VString &&>(key)];
-            }
+        if (type_ == ValueType::Object) {
+            return (object_)[static_cast<VString &&>(key)];
+        }
 
-            case ValueType::Undefined: {
-                Memory::Construct(&object_, VObject());
-                type_ = ValueType::Object;
-                return (object_)[static_cast<VString &&>(key)];
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Undefined) {
+            Memory::Construct(&object_, VObject());
+            type_ = ValueType::Object;
+            return (object_)[static_cast<VString &&>(key)];
         }
 
         throw 3;
     }
 
     Value &operator[](const VString &key) {
-        switch (type_) {
-            case ValueType::Object: {
-                return (object_)[key];
-            }
+        if (type_ == ValueType::Object) {
+            return (object_)[key];
+        }
 
-            case ValueType::Undefined: {
-                Memory::Construct(&object_, VObject());
-                type_ = ValueType::Object;
-                return (object_)[key];
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Undefined) {
+            Memory::Construct(&object_, VObject());
+            type_ = ValueType::Object;
+            return (object_)[key];
         }
 
         throw 3;
@@ -577,30 +562,23 @@ class Value {
     inline ValueType Type() const noexcept { return type_; }
 
     SizeT Size() const noexcept {
-        switch (type_) {
-            case ValueType::Object: {
-                return object_.Size();
-            }
+        if (type_ == ValueType::Object) {
+            return object_.Size();
+        }
 
-            case ValueType::Array: {
-                return array_.Size();
-            }
-
-            default: {
-            }
+        if (type_ == ValueType::Array) {
+            return array_.Size();
         }
 
         return 0;
     }
 
     Value *GetValue(SizeT index) const noexcept {
-        if (type_ == ValueType::Array) {
-            if (index < array_.Size()) {
-                Value *val = (array_.First() + index);
+        if ((type_ == ValueType::Array) && (index < array_.Size())) {
+            Value *val = (array_.First() + index);
 
-                if (!(val->IsUndefined())) {
-                    return val;
-                }
+            if (!(val->IsUndefined())) {
+                return val;
             }
         } else if (type_ == ValueType::Object) {
             Value *val = object_.GetValue(index);
