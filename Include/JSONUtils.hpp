@@ -129,7 +129,9 @@ UnEscapeJSON(const Char_T_ *content, SizeT length,
             }
 
             case JSONotation_T_::QuoteChar: {
-                buffer.Insert((content + offset2), (offset - offset2));
+                if (buffer.IsNotEmpty()) {
+                    buffer.Insert((content + offset2), (offset - offset2));
+                }
 
                 ++offset;
                 return offset;
@@ -145,7 +147,9 @@ UnEscapeJSON(const Char_T_ *content, SizeT length,
         ++offset;
     }
 
-    buffer.Insert((content + offset2), (offset - offset2));
+    if (buffer.IsNotEmpty()) {
+        buffer.Insert((content + offset2), (offset - offset2));
+    }
 
     return offset;
 }

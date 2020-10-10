@@ -88,7 +88,6 @@ class JSONParser {
                                       JSONotation_T_::SSquareChar) &&
                                      (content[length] ==
                                       JSONotation_T_::ESquareChar))) {
-
                                     ++offset;
                                     ++length;
 
@@ -183,8 +182,6 @@ class JSONParser {
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
 #else
-        constexpr QMM_Number_T simd_one = 1;
-
         do {
             if (find_cache_.Bits == 0) {
                 SIMDFind(content, offset, length);
@@ -195,7 +192,7 @@ class JSONParser {
             }
 
             SizeT index = Platform::CTZ(find_cache_.Bits);
-            find_cache_.Bits ^= (simd_one << index);
+            find_cache_.Bits ^= (QMM_Number_T{1} << index);
             index += find_cache_.Offset;
 
             if (index >= length) {
@@ -243,24 +240,29 @@ class JSONParser {
                         ++offset;
 
                         const Char_T_ *str = (content + offset);
-                        const SizeT    len = UnEscapeJSON(str, length, buffer_);
-                        offset += len;
-                        previous_offset = offset;
-
-                        if (obj_value == nullptr) {
-                            obj_value = &(obj[VString{buffer_.First(),
-                                                      buffer_.Length()}]);
-                        } else if (has_colon) {
-                            *obj_value =
-                                VValue{buffer_.First(), buffer_.Length()};
-                            obj_value  = nullptr;
-                            pass_comma = true;
-                            has_colon  = false;
-                        }
-
-                        buffer_.Clear();
+                        SizeT          len = UnEscapeJSON(str, length, buffer_);
 
                         if (len != 0) {
+                            offset += len;
+                            previous_offset = offset;
+
+                            if (buffer_.IsEmpty()) {
+                                --len;
+                            } else {
+                                str = buffer_.First();
+                                len = buffer_.Length();
+                                buffer_.Clear();
+                            }
+
+                            if (obj_value == nullptr) {
+                                obj_value = &(obj[VString{str, len}]);
+                            } else if (has_colon) {
+                                *obj_value = VValue{str, len};
+                                obj_value  = nullptr;
+                                pass_comma = true;
+                                has_colon  = false;
+                            }
+
                             continue;
                         }
                     }
@@ -363,7 +365,6 @@ class JSONParser {
 #ifndef QENTEM_SIMD_ENABLED_
         while (offset < length) {
 #else
-        constexpr QMM_Number_T simd_one = 1;
 
         do {
             if (find_cache_.Bits == 0) {
@@ -375,7 +376,7 @@ class JSONParser {
             }
 
             SizeT index = Platform::CTZ(find_cache_.Bits);
-            find_cache_.Bits ^= (simd_one << index);
+            find_cache_.Bits ^= (QMM_Number_T{1} << index);
             index += find_cache_.Offset;
 
             if (index >= length) {
@@ -416,17 +417,21 @@ class JSONParser {
                 case JSONotation_T_::QuoteChar: {
                     if (!pass_comma) {
                         ++offset;
-                        buffer_.Clear();
                         const Char_T_ *str = (content + offset);
                         const SizeT    len = UnEscapeJSON(str, length, buffer_);
 
-                        arr += VValue{buffer_.First(), buffer_.Length()};
-
-                        offset += len;
-                        previous_offset = offset;
-                        pass_comma      = true;
-
                         if (len != 0) {
+                            if (buffer_.IsEmpty()) {
+                                arr += VValue{str, (len - 1)};
+                            } else {
+                                arr +=
+                                    VValue{buffer_.First(), buffer_.Length()};
+                                buffer_.Clear();
+                            }
+
+                            offset += len;
+                            previous_offset = offset;
+                            pass_comma      = true;
                             continue;
                         }
                     }
