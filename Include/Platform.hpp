@@ -27,17 +27,14 @@
 
 #if QENTEM_AVX2_ == 1
 using QMM_Number_T = unsigned int;
+// #define QMM_TABLE_
 #define QMM_SIZE_ 32U
 #define QMM_SHIFTSIZE_ 5U
 #define QMM_MAX_NUMBER_ 0xFFFFFFFFU
-#define QMM_BIT_ONE_ 0x55555555U
-#define QMM_BIT_TWO_ 0xAAAAAAAAU
 #define QMM_VAR_ __m256i
 #define QMM_LOAD_ _mm256_loadu_si256
 #define QMM_SETZERO_ _mm256_setzero_si256
 #define QMM_SETONE_8_ _mm256_set1_epi8
-#define QMM_SETONE_16_ _mm256_set1_epi16
-#define QMM_SETONE_32_ _mm256_set1_epi32
 #define QMM_SETONE_64_ _mm256_set1_epi64x
 #define QMM_STOREU_ _mm256_storeu_si256
 #define QMM_COMPARE_8_MASK_(a, b)                                              \
@@ -51,14 +48,10 @@ using QMM_Number_T = unsigned int;
 #define QMM_SIZE_ 16U
 #define QMM_SHIFTSIZE_ 4U
 #define QMM_MAX_NUMBER_ 0xFFFFU
-#define QMM_BIT_ONE_ 0x5555U
-#define QMM_BIT_TWO_ 0xAAAAU
 #define QMM_VAR_ __m128i
 #define QMM_LOAD_ _mm_loadu_si128
 #define QMM_SETZERO_ _mm_setzero_si128
 #define QMM_SETONE_8_ _mm_set1_epi8
-#define QMM_SETONE_16_ _mm_set1_epi16
-#define QMM_SETONE_32_ _mm_set1_epi32
 #define QMM_SETONE_64_ _mm_set1_epi64x
 #define QMM_STOREU_ _mm_storeu_si128
 #define QMM_COMPARE_8_MASK_(a, b)                                              \

@@ -84,8 +84,6 @@ class Engine {
     static Number_T_ Find(const char *pattern, SizeT pattern_length,
                           const char *content, Number_T_ offset,
                           Number_T_ end_before) noexcept {
-        constexpr QMM_Number_T simd_one = 1;
-
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
@@ -123,7 +121,7 @@ class Engine {
                         return pattern_index;
                     }
 
-                    bits ^= (simd_one << index);
+                    bits ^= (QMM_Number_T{1} << index);
                 }
 
                 offset += QMM_SIZE_;
