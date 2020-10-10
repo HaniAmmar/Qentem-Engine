@@ -40,9 +40,7 @@ class StringStream {
   public:
     StringStream() = default;
 
-    ~StringStream() {
-        Memory::Deallocate(storage_);
-    }
+    ~StringStream() { Memory::Deallocate(storage_); }
 
     explicit StringStream(SizeT size) : capacity_(size) {
         if (size != 0) {
@@ -184,9 +182,7 @@ class StringStream {
         insert(str, length);
     }
 
-    inline void Clear() noexcept {
-        length_ = 0;
-    }
+    inline void Clear() noexcept { length_ = 0; }
 
     void Reset() noexcept {
         if (storage_ != nullptr) {
@@ -223,21 +219,15 @@ class StringStream {
         }
     }
 
-    inline const Char_T_ *First() const noexcept {
-        return storage_;
-    }
+    inline const Char_T_ *First() const noexcept { return storage_; }
 
-    inline SizeT Length() const noexcept {
-        return length_;
-    }
+    inline SizeT Length() const noexcept { return length_; }
 
-    inline SizeT Capacity() const noexcept {
-        return capacity_;
-    }
+    inline SizeT Capacity() const noexcept { return capacity_; }
 
-    inline bool IsEmpty() const noexcept {
-        return (length_ == 0);
-    }
+    inline bool IsEmpty() const noexcept { return (length_ == 0); }
+
+    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
     Char_T_ *Eject() noexcept {
         Char_T_ *str = storage_;
