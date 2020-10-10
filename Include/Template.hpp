@@ -104,245 +104,218 @@ class Template_T_ {
         static const Char_T_ *if_prefix = TemplatePatterns_T_::GetIfPrefix();
 
         while (offset < length) {
-            switch (content[offset]) {
-                case TemplatePatterns_T_::InLinePrefix: {
-                    current_offset = offset;
-                    ++current_offset;
+            if (content[offset] == TemplatePatterns_T_::InLinePrefix) {
+                current_offset = offset;
+                ++current_offset;
 
-                    switch (content[current_offset]) {
-                        case TemplatePatterns_T_::Var_2ND_Char: {
-                            if ((TemplatePatterns_T_::VariablePrefixLength +
-                                 current_offset) < length) {
+                switch (content[current_offset]) {
+                    case TemplatePatterns_T_::Var_2ND_Char: {
+                        if ((TemplatePatterns_T_::VariablePrefixLength +
+                             current_offset) < length) {
+                            ++current_offset;
+                            tmp_offset = 2;
+
+                            while (
+                                (tmp_offset !=
+                                 TemplatePatterns_T_::VariablePrefixLength) &&
+                                (content[current_offset] ==
+                                 variable_prefix[tmp_offset])) {
                                 ++current_offset;
-                                tmp_offset = 2;
-
-                                while ((tmp_offset !=
-                                        TemplatePatterns_T_::
-                                            VariablePrefixLength) &&
-                                       (content[current_offset] ==
-                                        variable_prefix[tmp_offset])) {
-                                    ++current_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    TemplatePatterns_T_::VariablePrefixLength) {
-                                    const SizeT end_offset = Engine::FindOne(
-                                        TemplatePatterns_T_::GetInLineSuffix()
-                                            [0],
-                                        content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        tags += Tag_T_{
-                                            nullptr, offset, current_offset,
-                                            end_offset, TagType_::Variable};
-
-                                        if (tags.IsFull()) {
-                                            return;
-                                        }
-
-                                        offset = end_offset;
-                                        continue;
-                                    }
-
-                                    offset = current_offset;
-                                }
+                                ++tmp_offset;
                             }
 
-                            break;
-                        }
+                            if (tmp_offset ==
+                                TemplatePatterns_T_::VariablePrefixLength) {
+                                const SizeT end_offset = Engine::FindOne(
+                                    TemplatePatterns_T_::GetInLineSuffix()[0],
+                                    content, current_offset, length);
 
-                        case TemplatePatterns_T_::Math_2ND_Char: {
-                            if ((TemplatePatterns_T_::MathPrefixLength +
-                                 current_offset) < length) {
-                                ++current_offset;
-                                tmp_offset = 2;
+                                if (end_offset != 0) {
+                                    tags += Tag_T_{TagType_::Variable, offset,
+                                                   current_offset, end_offset,
+                                                   nullptr};
 
-                                while (
-                                    (tmp_offset !=
-                                     TemplatePatterns_T_::MathPrefixLength) &&
-                                    (content[current_offset] ==
-                                     math_prefix[tmp_offset])) {
-                                    ++current_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    TemplatePatterns_T_::MathPrefixLength) {
-                                    SizeT end_offset =
-                                        Engine::SkipInnerPatterns(
-                                            TemplatePatterns_T_::
-                                                GetVariablePrefix(),
-                                            TemplatePatterns_T_::
-                                                VariablePrefixLength,
-                                            TemplatePatterns_T_::
-                                                GetInLineSuffix(),
-                                            1, content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        tags += Tag_T_{
-                                            nullptr, offset, current_offset,
-                                            end_offset, TagType_::Math};
-
-                                        if (tags.IsFull()) {
-                                            return;
-                                        }
-
-                                        offset = end_offset;
-                                        continue;
+                                    if (tags.IsFull()) {
+                                        return;
                                     }
 
-                                    offset = current_offset;
+                                    offset = end_offset;
+                                    continue;
                                 }
+
+                                offset = current_offset;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TemplatePatterns_T_::Math_2ND_Char: {
+                        if ((TemplatePatterns_T_::MathPrefixLength +
+                             current_offset) < length) {
+                            ++current_offset;
+                            tmp_offset = 2;
+
+                            while ((tmp_offset !=
+                                    TemplatePatterns_T_::MathPrefixLength) &&
+                                   (content[current_offset] ==
+                                    math_prefix[tmp_offset])) {
+                                ++current_offset;
+                                ++tmp_offset;
                             }
 
-                            break;
-                        }
+                            if (tmp_offset ==
+                                TemplatePatterns_T_::MathPrefixLength) {
+                                SizeT end_offset = Engine::SkipInnerPatterns(
+                                    TemplatePatterns_T_::GetVariablePrefix(),
+                                    TemplatePatterns_T_::VariablePrefixLength,
+                                    TemplatePatterns_T_::GetInLineSuffix(), 1,
+                                    content, current_offset, length);
 
-                        case TemplatePatterns_T_::InlineIf_2ND_Char: {
-                            if ((TemplatePatterns_T_::InLineIfPrefixLength +
-                                 current_offset) < length) {
-                                ++current_offset;
-                                tmp_offset = 2;
+                                if (end_offset != 0) {
+                                    tags += Tag_T_{TagType_::Math, offset,
+                                                   current_offset, end_offset,
+                                                   nullptr};
 
-                                while ((tmp_offset !=
-                                        TemplatePatterns_T_::
-                                            InLineIfPrefixLength) &&
-                                       (content[current_offset] ==
-                                        inLine_if_prefix[tmp_offset])) {
-                                    ++current_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    TemplatePatterns_T_::InLineIfPrefixLength) {
-                                    SizeT end_offset =
-                                        Engine::SkipInnerPatterns(
-                                            TemplatePatterns_T_::
-                                                GetVariablePrefix(),
-                                            TemplatePatterns_T_::
-                                                VariablePrefixLength,
-                                            TemplatePatterns_T_::
-                                                GetInLineSuffix(),
-                                            1, content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        tags += Tag_T_{
-                                            nullptr, offset, current_offset,
-                                            end_offset, TagType_::InLineIf};
-
-                                        if (tags.IsFull()) {
-                                            return;
-                                        }
-
-                                        offset = end_offset;
-                                        continue;
+                                    if (tags.IsFull()) {
+                                        return;
                                     }
 
-                                    offset = current_offset;
+                                    offset = end_offset;
+                                    continue;
                                 }
+
+                                offset = current_offset;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TemplatePatterns_T_::InlineIf_2ND_Char: {
+                        if ((TemplatePatterns_T_::InLineIfPrefixLength +
+                             current_offset) < length) {
+                            ++current_offset;
+                            tmp_offset = 2;
+
+                            while (
+                                (tmp_offset !=
+                                 TemplatePatterns_T_::InLineIfPrefixLength) &&
+                                (content[current_offset] ==
+                                 inLine_if_prefix[tmp_offset])) {
+                                ++current_offset;
+                                ++tmp_offset;
+                            }
+
+                            if (tmp_offset ==
+                                TemplatePatterns_T_::InLineIfPrefixLength) {
+                                SizeT end_offset = Engine::SkipInnerPatterns(
+                                    TemplatePatterns_T_::GetVariablePrefix(),
+                                    TemplatePatterns_T_::VariablePrefixLength,
+                                    TemplatePatterns_T_::GetInLineSuffix(), 1,
+                                    content, current_offset, length);
+
+                                if (end_offset != 0) {
+                                    tags += Tag_T_{TagType_::InLineIf, offset,
+                                                   current_offset, end_offset,
+                                                   nullptr};
+
+                                    if (tags.IsFull()) {
+                                        return;
+                                    }
+
+                                    offset = end_offset;
+                                    continue;
+                                }
+
+                                offset = current_offset;
                             }
                         }
                     }
-
-                    break;
                 }
+            } else if (content[offset] ==
+                       TemplatePatterns_T_::MultiLinePrefix) {
+                current_offset = offset;
+                ++current_offset;
 
-                case TemplatePatterns_T_::MultiLinePrefix: {
-                    current_offset = offset;
-                    ++current_offset;
+                if (content[current_offset] ==
+                    TemplatePatterns_T_::Loop_2ND_Char) { // <loop
+                    if ((TemplatePatterns_T_::LoopPrefixLength +
+                         current_offset) < length) {
+                        ++current_offset;
+                        tmp_offset = 2;
 
-                    switch (content[current_offset]) {
-                        case TemplatePatterns_T_::Loop_2ND_Char: { // <loop
-                            if ((TemplatePatterns_T_::LoopPrefixLength +
-                                 current_offset) < length) {
-                                ++current_offset;
-                                tmp_offset = 2;
-
-                                while (
-                                    (tmp_offset <
-                                     TemplatePatterns_T_::LoopPrefixLength) &&
-                                    (content[current_offset] ==
-                                     loop_prefix[tmp_offset])) {
-                                    ++current_offset;
-                                    ++tmp_offset;
-                                }
-
-                                if (tmp_offset ==
-                                    TemplatePatterns_T_::LoopPrefixLength) {
-                                    SizeT end_offset =
-                                        Engine::SkipInnerPatterns(
-                                            TemplatePatterns_T_::
-                                                GetLoopPrefix(),
-                                            TemplatePatterns_T_::
-                                                LoopPrefixLength,
-                                            TemplatePatterns_T_::
-                                                GetLoopSuffix(),
-                                            TemplatePatterns_T_::
-                                                LoopSuffixLength,
-                                            content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        tags += Tag_T_{
-                                            Memory::AllocateInit<LoopData_T_>(),
-                                            offset, current_offset, end_offset,
-                                            TagType_::Loop};
-
-                                        if (tags.IsFull()) {
-                                            return;
-                                        }
-
-                                        offset = end_offset;
-                                        continue;
-                                    }
-
-                                    offset = current_offset;
-                                }
-                            }
-
-                            break;
+                        while ((tmp_offset <
+                                TemplatePatterns_T_::LoopPrefixLength) &&
+                               (content[current_offset] ==
+                                loop_prefix[tmp_offset])) {
+                            ++current_offset;
+                            ++tmp_offset;
                         }
 
-                        case TemplatePatterns_T_::If_2ND_Char: { // <if
-                            if ((TemplatePatterns_T_::IfPrefixLength +
-                                 current_offset) < length) {
-                                ++current_offset;
-                                tmp_offset = 2;
+                        if (tmp_offset ==
+                            TemplatePatterns_T_::LoopPrefixLength) {
+                            SizeT end_offset = Engine::SkipInnerPatterns(
+                                TemplatePatterns_T_::GetLoopPrefix(),
+                                TemplatePatterns_T_::LoopPrefixLength,
+                                TemplatePatterns_T_::GetLoopSuffix(),
+                                TemplatePatterns_T_::LoopSuffixLength, content,
+                                current_offset, length);
 
-                                while ((tmp_offset !=
-                                        TemplatePatterns_T_::IfPrefixLength) &&
-                                       (content[current_offset] ==
-                                        if_prefix[tmp_offset])) {
-                                    ++current_offset;
-                                    ++tmp_offset;
+                            if (end_offset != 0) {
+                                tags +=
+                                    Tag_T_{TagType_::Loop, offset,
+                                           current_offset, end_offset,
+                                           Memory::AllocateInit<LoopData_T_>()};
+
+                                if (tags.IsFull()) {
+                                    return;
                                 }
 
-                                if (tmp_offset ==
-                                    TemplatePatterns_T_::IfPrefixLength) {
-                                    SizeT end_offset =
-                                        Engine::SkipInnerPatterns(
-                                            TemplatePatterns_T_::GetIfPrefix(),
-                                            TemplatePatterns_T_::IfPrefixLength,
-                                            TemplatePatterns_T_::GetIfSuffix(),
-                                            TemplatePatterns_T_::IfSuffixLength,
-                                            content, current_offset, length);
-
-                                    if (end_offset != 0) {
-                                        tags += Tag_T_{
-                                            nullptr, offset, current_offset,
-                                            end_offset, TagType_::If};
-
-                                        if (tags.IsFull()) {
-                                            return;
-                                        }
-
-                                        offset = end_offset;
-                                        continue;
-                                    }
-
-                                    offset = current_offset;
-                                }
+                                offset = end_offset;
+                                continue;
                             }
+
+                            offset = current_offset;
+                        }
+                    }
+                } else if (content[current_offset] ==
+                           TemplatePatterns_T_::If_2ND_Char) { // <if
+                    if ((TemplatePatterns_T_::IfPrefixLength + current_offset) <
+                        length) {
+                        ++current_offset;
+                        tmp_offset = 2;
+
+                        while ((tmp_offset !=
+                                TemplatePatterns_T_::IfPrefixLength) &&
+                               (content[current_offset] ==
+                                if_prefix[tmp_offset])) {
+                            ++current_offset;
+                            ++tmp_offset;
+                        }
+
+                        if (tmp_offset == TemplatePatterns_T_::IfPrefixLength) {
+                            SizeT end_offset = Engine::SkipInnerPatterns(
+                                TemplatePatterns_T_::GetIfPrefix(),
+                                TemplatePatterns_T_::IfPrefixLength,
+                                TemplatePatterns_T_::GetIfSuffix(),
+                                TemplatePatterns_T_::IfSuffixLength, content,
+                                current_offset, length);
+
+                            if (end_offset != 0) {
+                                tags +=
+                                    Tag_T_{TagType_::If, offset, current_offset,
+                                           end_offset, nullptr};
+
+                                if (tags.IsFull()) {
+                                    return;
+                                }
+
+                                offset = end_offset;
+                                continue;
+                            }
+
+                            offset = current_offset;
                         }
                     }
                 }
@@ -1219,16 +1192,15 @@ class Template_T_ {
         Tag_T_(const Tag_T_ &tag) = delete;
         Tag_T_ &operator=(const Tag_T_ &tag) = delete;
 
-        Tag_T_(LoopData_T_ *loop_data, SizeT offset, SizeT content_offset,
-               SizeT end_offset, TagType_ type) noexcept
-            : loop_data_(loop_data), offset_(offset),
-              content_offset_(content_offset), end_offset_(end_offset),
-              type_(type) {}
+        Tag_T_(TagType_ type, SizeT offset, SizeT content_offset,
+               SizeT end_offset, LoopData_T_ *loop_data) noexcept
+            : type_(type), offset_(offset), content_offset_(content_offset),
+              end_offset_(end_offset), loop_data_(loop_data) {}
 
         Tag_T_(Tag_T_ &&tag) noexcept
-            : loop_data_(tag.loop_data_), offset_(tag.offset_),
+            : type_(tag.type_), offset_(tag.offset_),
               content_offset_(tag.content_offset_),
-              end_offset_(tag.end_offset_), type_(tag.type_) {
+              end_offset_(tag.end_offset_), loop_data_(tag.loop_data_) {
             tag.loop_data_ = nullptr;
         }
 
@@ -1238,11 +1210,11 @@ class Template_T_ {
             if (this != &tag) {
                 Reset();
 
-                loop_data_      = tag.loop_data_;
+                type_           = tag.type_;
                 offset_         = tag.offset_;
                 content_offset_ = tag.content_offset_;
                 end_offset_     = tag.end_offset_;
-                type_           = tag.type_;
+                loop_data_      = tag.loop_data_;
 
                 tag.loop_data_ = nullptr;
             }
@@ -1259,21 +1231,17 @@ class Template_T_ {
         }
 
         inline LoopData_T_ *LoopData() const noexcept { return loop_data_; }
-
-        inline SizeT Offset() const noexcept { return offset_; }
-
+        inline TagType_     Type() const noexcept { return type_; }
+        inline SizeT        Offset() const noexcept { return offset_; }
         inline SizeT ContentOffset() const noexcept { return content_offset_; }
-
         inline SizeT EndOffset() const noexcept { return end_offset_; }
 
-        inline TagType_ Type() const noexcept { return type_; }
-
       private:
-        LoopData_T_ *loop_data_{nullptr};
+        TagType_     type_{TagType_::Variable};
         SizeT        offset_{0};
         SizeT        content_offset_{0};
         SizeT        end_offset_{0};
-        TagType_     type_{TagType_::Variable};
+        LoopData_T_ *loop_data_{nullptr};
     };
 
     StringStream<Char_T_> *ss_;
