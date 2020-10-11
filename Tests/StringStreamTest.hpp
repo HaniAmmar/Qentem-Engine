@@ -37,10 +37,12 @@ static int TestStringStream() {
     EQ_VALUE(ss1.Length(), 0, "Length");
     EQ_VALUE(ss1.Capacity(), 0, "Capacity");
     EQ_TO(ss1.First(), nullptr, "First()", "null");
+    EQ_TO(ss1.Last(), nullptr, "Last()", "null");
 
     EQ_VALUE((ss2.Capacity() >= 10), true, "Capacity() >= 10");
     EQ_VALUE(ss2.Length(), 0, "Length");
     NOT_EQ_TO(ss2.First(), nullptr, "First()", "null");
+    NOT_EQ_TO(ss2.Last(), nullptr, "Last()", "null");
 
     ss2.Reset();
     EQ_VALUE(ss2.Length(), 0, "Length");
