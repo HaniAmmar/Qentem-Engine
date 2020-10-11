@@ -494,6 +494,12 @@ static int TestStringValue() {
     EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
     EQ_VALUE(str_var, "123", "str_var");
 
+    value3 = 321;
+    value3 = "321";
+    EQ_TRUE(value3.IsString(), "IsString()");
+    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(str_var, "321", "str_var");
+
     END_SUB_TEST;
 }
 
