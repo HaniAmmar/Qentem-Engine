@@ -54,7 +54,7 @@ class HArray {
     ~HArray() {
         if (Storage() != nullptr) {
             Memory::Destruct(Storage(), End());
-            Memory::Deallocate(Storage());
+            deallocate(Storage());
         }
     }
 
@@ -72,7 +72,7 @@ class HArray {
         if (this != &h_arr) {
             if (Storage() != nullptr) {
                 Memory::Destruct(Storage(), End());
-                Memory::Deallocate(Storage());
+                deallocate(Storage());
             }
 
             setStorage(h_arr.Storage());
@@ -126,7 +126,7 @@ class HArray {
             ++src_item;
         }
 
-        Memory::Deallocate(h_arr.Storage());
+        h_arr.deallocate(h_arr.Storage());
         h_arr.clearStorage();
         h_arr.setCapacity(0);
         h_arr.setSize(0);
@@ -371,7 +371,7 @@ class HArray {
     void Reset() noexcept {
         if (Storage() != nullptr) {
             Memory::Destruct(Storage(), End());
-            Memory::Deallocate(Storage());
+            deallocate(Storage());
             clearStorage();
             setCapacity(0);
             setSize(0);
@@ -587,7 +587,7 @@ class HArray {
         }
 
         setSize(static_cast<SizeT>(des_item - Storage()));
-        Memory::Deallocate(src);
+        deallocate(src);
         generateHash();
     }
 

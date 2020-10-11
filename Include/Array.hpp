@@ -125,7 +125,7 @@ class Array {
             }
 
             setSize(n_size);
-            deallocate(arr.Storage());
+            arr.deallocate(arr.Storage());
         }
 
         arr.clearStorage();
