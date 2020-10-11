@@ -219,15 +219,20 @@ class StringStream {
         }
     }
 
-    inline const Char_T_ *First() const noexcept { return storage_; }
+    inline const Char_T_ *Storage() const noexcept { return storage_; }
+    inline const Char_T_ *First() const noexcept { return Storage(); }
+    inline SizeT          Length() const noexcept { return length_; }
+    inline SizeT          Capacity() const noexcept { return capacity_; }
+    inline bool           IsEmpty() const noexcept { return (length_ == 0); }
+    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
-    inline SizeT Length() const noexcept { return length_; }
+    inline const Char_T_ *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (Storage() + (Length() - 1));
+        }
 
-    inline SizeT Capacity() const noexcept { return capacity_; }
-
-    inline bool IsEmpty() const noexcept { return (length_ == 0); }
-
-    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
+        return nullptr;
+    }
 
     Char_T_ *Eject() noexcept {
         Char_T_ *str = storage_;

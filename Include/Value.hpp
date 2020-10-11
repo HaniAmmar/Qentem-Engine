@@ -936,7 +936,9 @@ class Value {
             ++h_item;
         }
 
-        if (ss.First()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
+        const Char_T_ *last = ss.Last();
+
+        if (*last == JSONotation_T_::CommaChar) {
             ss.StepBack(1);
         }
 
@@ -958,7 +960,9 @@ class Value {
             ++item;
         }
 
-        if (ss.First()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
+        const Char_T_ *last = ss.Last();
+
+        if (*last == JSONotation_T_::CommaChar) {
             ss.StepBack(1);
         }
 
