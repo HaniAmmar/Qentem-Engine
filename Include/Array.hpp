@@ -77,8 +77,10 @@ class Array {
 
     Array &operator=(Array &&arr) noexcept {
         if (this != &arr) {
-            Memory::Destruct(Storage(), End());
-            deallocate(Storage());
+            if (Storage() != nullptr) {
+                Memory::Destruct(Storage(), End());
+                deallocate(Storage());
+            }
 
             setStorage(arr.Storage());
             setSize(arr.Size());
@@ -173,12 +175,14 @@ class Array {
     }
 
     void Reset() noexcept {
-        Memory::Destruct(Storage(), End());
-        deallocate(Storage());
+        if (Storage() != nullptr) {
+            Memory::Destruct(Storage(), End());
+            deallocate(Storage());
 
-        clearStorage();
-        setSize(0);
-        setCapacity(0);
+            clearStorage();
+            setSize(0);
+            setCapacity(0);
+        }
     }
 
     void Clear() noexcept {
@@ -196,9 +200,7 @@ class Array {
     }
 
     void Reserve(SizeT size) {
-        if (Storage() != nullptr) {
-            Reset();
-        }
+        Reset();
 
         if (size != 0) {
             setCapacity(size);
