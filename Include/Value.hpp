@@ -914,114 +914,113 @@ class Value {
         }
     }
 
-    void Stringify(StringStream<Char_T_> &ss) const {
-        const SizeT size   = Size();
-        const bool  is_obj = IsObject();
+    static void StringifyObject(const VObject *obj, StringStream<Char_T_> &ss) {
+        using V_item_ = HAItem<Value, Char_T_>;
 
-        const HAItem<Value, Char_T_> *ha_item = nullptr;
-        const Value *                 item    = nullptr;
+        ss += JSONotation_T_::SCurlyChar;
 
-        // TODO: Split to   obj arr val
+        const V_item_ *h_item = obj->First();
+        const V_item_ *end    = obj->End();
 
-        if (is_obj) {
-            ha_item = (object_.First() - 1);
-            ss += JSONotation_T_::SCurlyChar;
-        } else if (IsArray()) {
-            item = (array_.First() - 1);
-            ss += JSONotation_T_::SSquareChar;
-        } else {
-            return;
-        }
+        while (h_item != end) {
+            if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
+                ss += JSONotation_T_::QuoteChar;
+                JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), ss);
+                ss += JSONotation_T_::QuoteChar;
+                ss += JSONotation_T_::ColonChar;
 
-        if (size != 0) {
-            SizeT id = 0;
-
-            do {
-                if (is_obj) {
-                    ++ha_item;
-
-                    if ((ha_item == nullptr) ||
-                        (ha_item->Key.First() == nullptr) ||
-                        ha_item->Value.IsUndefined()) {
-                        continue; // Deleted item.
-                    }
-
-                    ss += JSONotation_T_::QuoteChar;
-                    JSON::EscapeJSON(ha_item->Key.First(),
-                                     ha_item->Key.Length(), ss);
-                    ss += JSONotation_T_::QuoteChar;
-                    ss += JSONotation_T_::ColonChar;
-
-                    item = &(ha_item->Value);
-                } else {
-                    ++item;
-
-                    if (item->IsUndefined()) {
-                        continue; // Unset or deleted value
-                    }
-                }
-
-                switch (item->type_) {
-                    case ValueType::Object:
-                    case ValueType::Array: {
-                        item->Stringify(ss);
-                        break;
-                    }
-
-                    case ValueType::String: {
-                        ss += JSONotation_T_::QuoteChar;
-                        JSON::EscapeJSON(item->string_.First(),
-                                         item->string_.Length(), ss);
-                        ss += JSONotation_T_::QuoteChar;
-                        break;
-                    }
-
-                    case ValueType::Number: {
-                        Digit<Char_T_>::NumberToStringStream(
-                            ss, item->number_.GetDouble());
-                        break;
-                    }
-
-                    case ValueType::False: {
-                        ss.Insert(JSONotation_T_::GetFalseString(),
-                                  JSONotation_T_::FalseStringLength);
-                        break;
-                    }
-
-                    case ValueType::True: {
-                        ss.Insert(JSONotation_T_::GetTrueString(),
-                                  JSONotation_T_::TrueStringLength);
-                        break;
-                    }
-
-                    case ValueType::Null: {
-                        ss.Insert(JSONotation_T_::GetNullString(),
-                                  JSONotation_T_::NullStringLength);
-                        break;
-                    }
-
-                    default: {
-                    }
-                }
-
+                StringifyValue(h_item->Value, ss);
                 ss += JSONotation_T_::CommaChar;
-            } while (++id != size);
-
-            if (ss.First()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
-                ss.StepBack(1);
             }
+
+            ++h_item;
         }
 
-        if (is_obj) {
-            ss += JSONotation_T_::ECurlyChar;
-        } else {
-            ss += JSONotation_T_::ESquareChar;
+        if (ss.First()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
+            ss.StepBack(1);
+        }
+
+        ss += JSONotation_T_::ECurlyChar;
+    }
+
+    static void StringifyArray(const VArray *arr, StringStream<Char_T_> &ss) {
+        ss += JSONotation_T_::SSquareChar;
+
+        const Value *item = arr->First();
+        const Value *end  = arr->End();
+
+        while (item != end) {
+            if (!(item->IsUndefined())) {
+                StringifyValue(*item, ss);
+                ss += JSONotation_T_::CommaChar;
+            }
+
+            ++item;
+        }
+
+        if (ss.First()[(ss.Length() - 1)] == JSONotation_T_::CommaChar) {
+            ss.StepBack(1);
+        }
+
+        ss += JSONotation_T_::ESquareChar;
+    }
+
+    static void StringifyValue(const Value &val, StringStream<Char_T_> &ss) {
+        switch (val.type_) {
+            case ValueType::Object: {
+                StringifyObject(val.GetObject(), ss);
+                break;
+            }
+            case ValueType::Array: {
+                StringifyArray(val.GetArray(), ss);
+                break;
+            }
+
+            case ValueType::String: {
+                ss += JSONotation_T_::QuoteChar;
+                JSON::EscapeJSON(val.string_.First(), val.string_.Length(), ss);
+                ss += JSONotation_T_::QuoteChar;
+                break;
+            }
+
+            case ValueType::Number: {
+                Digit<Char_T_>::NumberToStringStream(ss,
+                                                     val.number_.GetDouble());
+                break;
+            }
+
+            case ValueType::False: {
+                ss.Insert(JSONotation_T_::GetFalseString(),
+                          JSONotation_T_::FalseStringLength);
+                break;
+            }
+
+            case ValueType::True: {
+                ss.Insert(JSONotation_T_::GetTrueString(),
+                          JSONotation_T_::TrueStringLength);
+                break;
+            }
+
+            case ValueType::Null: {
+                ss.Insert(JSONotation_T_::GetNullString(),
+                          JSONotation_T_::NullStringLength);
+                break;
+            }
+
+            default: {
+            }
         }
     }
 
     inline VString Stringify() const {
         StringStream<Char_T_> ss;
-        Stringify(ss);
+
+        if (IsObject()) {
+            StringifyObject(this->GetObject(), ss);
+        } else if (IsArray()) {
+            StringifyArray(this->GetArray(), ss);
+        }
+
         return ss.GetString();
     }
 
