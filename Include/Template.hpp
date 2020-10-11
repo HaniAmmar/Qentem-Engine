@@ -110,22 +110,21 @@ class Template_T_ {
 
                 switch (content[current_offset]) {
                     case TemplatePatterns_T_::Var_2ND_Char: {
-                        if ((TemplatePatterns_T_::VariablePrefixLength +
+                        if ((TemplatePatternsSize::VariablePrefixLength +
                              current_offset) < length) {
-                            ++current_offset;
-                            tmp_offset = 2;
+                            tmp_offset = 1;
 
-                            while (
-                                (tmp_offset !=
-                                 TemplatePatterns_T_::VariablePrefixLength) &&
-                                (content[current_offset] ==
-                                 variable_prefix[tmp_offset])) {
+                            do {
                                 ++current_offset;
                                 ++tmp_offset;
-                            }
+                            } while (
+                                (tmp_offset !=
+                                 TemplatePatternsSize::VariablePrefixLength) &&
+                                (content[current_offset] ==
+                                 variable_prefix[tmp_offset]));
 
                             if (tmp_offset ==
-                                TemplatePatterns_T_::VariablePrefixLength) {
+                                TemplatePatternsSize::VariablePrefixLength) {
                                 const SizeT end_offset = Engine::FindOne(
                                     TemplatePatterns_T_::GetInLineSuffix()[0],
                                     content, current_offset, length);
@@ -151,24 +150,23 @@ class Template_T_ {
                     }
 
                     case TemplatePatterns_T_::Math_2ND_Char: {
-                        if ((TemplatePatterns_T_::MathPrefixLength +
+                        if ((TemplatePatternsSize::MathPrefixLength +
                              current_offset) < length) {
-                            ++current_offset;
-                            tmp_offset = 2;
+                            tmp_offset = 1;
 
-                            while ((tmp_offset !=
-                                    TemplatePatterns_T_::MathPrefixLength) &&
-                                   (content[current_offset] ==
-                                    math_prefix[tmp_offset])) {
+                            do {
                                 ++current_offset;
                                 ++tmp_offset;
-                            }
+                            } while ((tmp_offset !=
+                                      TemplatePatternsSize::MathPrefixLength) &&
+                                     (content[current_offset] ==
+                                      math_prefix[tmp_offset]));
 
                             if (tmp_offset ==
-                                TemplatePatterns_T_::MathPrefixLength) {
+                                TemplatePatternsSize::MathPrefixLength) {
                                 SizeT end_offset = Engine::SkipInnerPatterns(
                                     TemplatePatterns_T_::GetVariablePrefix(),
-                                    TemplatePatterns_T_::VariablePrefixLength,
+                                    TemplatePatternsSize::VariablePrefixLength,
                                     TemplatePatterns_T_::GetInLineSuffix(), 1,
                                     content, current_offset, length);
 
@@ -193,25 +191,24 @@ class Template_T_ {
                     }
 
                     case TemplatePatterns_T_::InlineIf_2ND_Char: {
-                        if ((TemplatePatterns_T_::InLineIfPrefixLength +
+                        if ((TemplatePatternsSize::InLineIfPrefixLength +
                              current_offset) < length) {
-                            ++current_offset;
-                            tmp_offset = 2;
+                            tmp_offset = 1;
 
-                            while (
-                                (tmp_offset !=
-                                 TemplatePatterns_T_::InLineIfPrefixLength) &&
-                                (content[current_offset] ==
-                                 inLine_if_prefix[tmp_offset])) {
+                            do {
                                 ++current_offset;
                                 ++tmp_offset;
-                            }
+                            } while (
+                                (tmp_offset !=
+                                 TemplatePatternsSize::InLineIfPrefixLength) &&
+                                (content[current_offset] ==
+                                 inLine_if_prefix[tmp_offset]));
 
                             if (tmp_offset ==
-                                TemplatePatterns_T_::InLineIfPrefixLength) {
+                                TemplatePatternsSize::InLineIfPrefixLength) {
                                 SizeT end_offset = Engine::SkipInnerPatterns(
                                     TemplatePatterns_T_::GetVariablePrefix(),
-                                    TemplatePatterns_T_::VariablePrefixLength,
+                                    TemplatePatternsSize::VariablePrefixLength,
                                     TemplatePatterns_T_::GetInLineSuffix(), 1,
                                     content, current_offset, length);
 
@@ -240,26 +237,25 @@ class Template_T_ {
 
                 if (content[current_offset] ==
                     TemplatePatterns_T_::Loop_2ND_Char) { // <loop
-                    if ((TemplatePatterns_T_::LoopPrefixLength +
+                    if ((TemplatePatternsSize::LoopPrefixLength +
                          current_offset) < length) {
-                        ++current_offset;
-                        tmp_offset = 2;
+                        tmp_offset = 1;
 
-                        while ((tmp_offset <
-                                TemplatePatterns_T_::LoopPrefixLength) &&
-                               (content[current_offset] ==
-                                loop_prefix[tmp_offset])) {
+                        do {
                             ++current_offset;
                             ++tmp_offset;
-                        }
+                        } while ((tmp_offset <
+                                  TemplatePatternsSize::LoopPrefixLength) &&
+                                 (content[current_offset] ==
+                                  loop_prefix[tmp_offset]));
 
                         if (tmp_offset ==
-                            TemplatePatterns_T_::LoopPrefixLength) {
+                            TemplatePatternsSize::LoopPrefixLength) {
                             SizeT end_offset = Engine::SkipInnerPatterns(
                                 TemplatePatterns_T_::GetLoopPrefix(),
-                                TemplatePatterns_T_::LoopPrefixLength,
+                                TemplatePatternsSize::LoopPrefixLength,
                                 TemplatePatterns_T_::GetLoopSuffix(),
-                                TemplatePatterns_T_::LoopSuffixLength, content,
+                                TemplatePatternsSize::LoopSuffixLength, content,
                                 current_offset, length);
 
                             if (end_offset != 0) {
@@ -281,25 +277,25 @@ class Template_T_ {
                     }
                 } else if (content[current_offset] ==
                            TemplatePatterns_T_::If_2ND_Char) { // <if
-                    if ((TemplatePatterns_T_::IfPrefixLength + current_offset) <
-                        length) {
-                        ++current_offset;
-                        tmp_offset = 2;
+                    if ((TemplatePatternsSize::IfPrefixLength +
+                         current_offset) < length) {
+                        tmp_offset = 1;
 
-                        while ((tmp_offset !=
-                                TemplatePatterns_T_::IfPrefixLength) &&
-                               (content[current_offset] ==
-                                if_prefix[tmp_offset])) {
+                        do {
                             ++current_offset;
                             ++tmp_offset;
-                        }
+                        } while (
+                            (tmp_offset !=
+                             TemplatePatternsSize::IfPrefixLength) &&
+                            (content[current_offset] == if_prefix[tmp_offset]));
 
-                        if (tmp_offset == TemplatePatterns_T_::IfPrefixLength) {
+                        if (tmp_offset ==
+                            TemplatePatternsSize::IfPrefixLength) {
                             SizeT end_offset = Engine::SkipInnerPatterns(
                                 TemplatePatterns_T_::GetIfPrefix(),
-                                TemplatePatterns_T_::IfPrefixLength,
+                                TemplatePatternsSize::IfPrefixLength,
                                 TemplatePatterns_T_::GetIfSuffix(),
-                                TemplatePatterns_T_::IfSuffixLength, content,
+                                TemplatePatternsSize::IfSuffixLength, content,
                                 current_offset, length);
 
                             if (end_offset != 0) {
@@ -361,11 +357,17 @@ class Template_T_ {
                 }
 
                 case TagType_::Loop: {
-                    renderLoop(tag->LoopData(),
-                               (content + tag->ContentOffset()),
-                               ((tag->EndOffset() -
-                                 TemplatePatterns_T_::LoopSuffixLength) -
-                                tag->ContentOffset()));
+                    if (tag->LoopData()->Content.IsNotEmpty()) { // Cached
+                        generateLoopContent((content + tag->ContentOffset()),
+                                            tag->LoopData());
+                    } else {
+                        renderLoop(tag->LoopData(),
+                                   (content + tag->ContentOffset()),
+                                   ((tag->EndOffset() -
+                                     TemplatePatternsSize::LoopSuffixLength) -
+                                    tag->ContentOffset()));
+                    }
+
                     break;
                 }
 
@@ -385,8 +387,8 @@ class Template_T_ {
         const Value_T_ *value    = findValue(content, length);
 
         if (((value == nullptr) || !(value->InsertString(*ss_))) && !loop_var) {
-            length += TemplatePatterns_T_::VariableFulllength;
-            ss_->Insert((content - TemplatePatterns_T_::VariablePrefixLength),
+            length += TemplatePatternsSize::VariableFulllength;
+            ss_->Insert((content - TemplatePatternsSize::VariablePrefixLength),
                         length);
         }
     }
@@ -398,8 +400,8 @@ class Template_T_ {
         if (ALE::Evaluate(number, content, length, this)) {
             Digit<Char_T_>::NumberToStringStream(*ss_, number, 1, 0, 3);
         } else {
-            length += TemplatePatterns_T_::MathFulllength;
-            ss_->Insert((content - TemplatePatterns_T_::MathPrefixLength),
+            length += TemplatePatternsSize::MathFulllength;
+            ss_->Insert((content - TemplatePatternsSize::MathPrefixLength),
                         length);
         }
     }
@@ -411,7 +413,7 @@ class Template_T_ {
         do {
             previous_offset = offset;
             offset = Engine::Find(TemplatePatterns_T_::GetVariablePrefix(),
-                                  TemplatePatterns_T_::VariablePrefixLength,
+                                  TemplatePatternsSize::VariablePrefixLength,
                                   content, offset, length);
 
             if (offset == 0) {
@@ -422,7 +424,7 @@ class Template_T_ {
                 // Add any content that comes before any {var:x}
                 ss_->Insert(
                     (content + previous_offset),
-                    ((offset - TemplatePatterns_T_::VariablePrefixLength) -
+                    ((offset - TemplatePatternsSize::VariablePrefixLength) -
                      previous_offset));
             }
 
@@ -534,10 +536,10 @@ class Template_T_ {
 
     bool parseNumber(SizeT &number, const Char_T_ *content,
                      const SizeT length) const noexcept {
-        if (length > TemplatePatterns_T_::VariableFulllength) {
+        if (length > TemplatePatternsSize::VariableFulllength) {
             SizeT offset = 0;
             offset = Engine::Find(TemplatePatterns_T_::GetVariablePrefix(),
-                                  TemplatePatterns_T_::VariablePrefixLength,
+                                  TemplatePatternsSize::VariablePrefixLength,
                                   content, offset, length);
 
             if (offset != 0) {
@@ -669,7 +671,7 @@ class Template_T_ {
                         ((offset - loop_value_length) - previous_offset));
                     loop_data->Content.Insert(
                         TemplatePatterns_T_::GetVariablePrefix(),
-                        TemplatePatterns_T_::VariablePrefixLength);
+                        TemplatePatternsSize::VariablePrefixLength);
 
                     SizeT lvl = 0;
                     while (lvl <= level_) {
@@ -728,11 +730,11 @@ class Template_T_ {
 
             if ((*content_set == TemplatePatterns_T_::InLinePrefix) &&
                 (loop_data->SetLength >
-                 TemplatePatterns_T_::VariableFulllength)) {
+                 TemplatePatternsSize::VariableFulllength)) {
                 loop_set = findValue(
-                    (content_set + TemplatePatterns_T_::VariablePrefixLength),
+                    (content_set + TemplatePatternsSize::VariablePrefixLength),
                     (loop_data->SetLength -
-                     TemplatePatterns_T_::VariableFulllength)); // {var:x}
+                     TemplatePatternsSize::VariableFulllength)); // {var:x}
             } else {
                 loop_set = findValue(content_set, loop_data->SetLength);
             }
@@ -875,7 +877,7 @@ class Template_T_ {
 
             // Find the end of else/elseif
             offset = Engine::Find(TemplatePatterns_T_::GetElseSuffix(),
-                                  TemplatePatterns_T_::ElseSuffixLength,
+                                  TemplatePatternsSize::ElseSuffixLength,
                                   content, (case_offset + case_length), length);
         } while (true);
 
@@ -885,7 +887,7 @@ class Template_T_ {
             }
 
             process((content + offset),
-                    ((length - TemplatePatterns_T_::IfSuffixLength)) - offset);
+                    ((length - TemplatePatternsSize::IfSuffixLength)) - offset);
         }
     }
 
@@ -895,7 +897,7 @@ class Template_T_ {
 
         do {
             else_offset = Engine::Find(TemplatePatterns_T_::GetElsePrefix(),
-                                       TemplatePatterns_T_::ElsePrefixLength,
+                                       TemplatePatternsSize::ElsePrefixLength,
                                        content, offset, length);
 
             if (else_offset == 0) {
@@ -905,7 +907,7 @@ class Template_T_ {
 
             const SizeT next_if = Engine::Find(
                 TemplatePatterns_T_::GetIfPrefix(),
-                TemplatePatterns_T_::IfPrefixLength, content, offset, length);
+                TemplatePatternsSize::IfPrefixLength, content, offset, length);
 
             if ((next_if == 0) || (else_offset < next_if)) {
                 // No nesting <ifs or <else is before the child <if.
@@ -913,7 +915,7 @@ class Template_T_ {
             }
 
             offset = Engine::Find(TemplatePatterns_T_::GetIfSuffix(),
-                                  TemplatePatterns_T_::IfSuffixLength, content,
+                                  TemplatePatternsSize::IfSuffixLength, content,
                                   next_if, length);
 
             if (else_offset > offset) {
@@ -1053,9 +1055,9 @@ class Template_T_ {
 
     bool ALESetNumber(double &number, const Char_T_ *content,
                       SizeT length) const noexcept {
-        if (length > TemplatePatterns_T_::VariableFulllength) {
-            content += TemplatePatterns_T_::VariablePrefixLength;
-            length -= TemplatePatterns_T_::VariableFulllength;
+        if (length > TemplatePatternsSize::VariableFulllength) {
+            content += TemplatePatternsSize::VariablePrefixLength;
+            length -= TemplatePatternsSize::VariableFulllength;
             const Value_T_ *value = findValue(content, length);
 
             if (value != nullptr) {
@@ -1090,11 +1092,11 @@ class Template_T_ {
 
         // If the left side is a variable
         if ((*left == TemplatePatterns_T_::InLinePrefix) &&
-            (left_length > TemplatePatterns_T_::VariableFulllength)) {
-            value_left =
-                findValue((left + TemplatePatterns_T_::VariablePrefixLength),
-                          (left_length -
-                           TemplatePatterns_T_::VariableFulllength)); // {var:x}
+            (left_length > TemplatePatternsSize::VariableFulllength)) {
+            value_left = findValue(
+                (left + TemplatePatternsSize::VariablePrefixLength),
+                (left_length -
+                 TemplatePatternsSize::VariableFulllength)); // {var:x}
 
             if (value_left == nullptr) {
                 return false;
@@ -1105,11 +1107,11 @@ class Template_T_ {
 
         // If the right side is a variable
         if ((*right == TemplatePatterns_T_::InLinePrefix) &&
-            (right_length > TemplatePatterns_T_::VariableFulllength)) {
-            value_right =
-                findValue((right + TemplatePatterns_T_::VariablePrefixLength),
-                          (right_length -
-                           TemplatePatterns_T_::VariableFulllength)); // {var:x}
+            (right_length > TemplatePatternsSize::VariableFulllength)) {
+            value_right = findValue(
+                (right + TemplatePatternsSize::VariablePrefixLength),
+                (right_length -
+                 TemplatePatternsSize::VariableFulllength)); // {var:x}
 
             if (value_right == nullptr) {
                 return false;
