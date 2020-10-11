@@ -45,7 +45,7 @@ class FixedArray {
     FixedArray &operator=(const FixedArray &) = delete;
 
     void operator+=(Type_ &&item) {
-        if (index_ != Size_T_) {
+        if (!(IsFull())) {
             storage_[index_] = static_cast<Type_ &&>(item);
             ++index_;
             return;
@@ -61,7 +61,7 @@ class FixedArray {
     inline Type_ *First() noexcept { return &(storage_[0]); }
 
     inline const Type_ *End() const noexcept {
-        return (&(storage_[0]) + index_);
+        return (&(storage_[0]) + Size());
     }
 
     inline void Clear() noexcept {
@@ -75,11 +75,11 @@ class FixedArray {
 
     inline UInt Capacity() const noexcept { return Size_T_; }
 
-    inline bool IsEmpty() const noexcept { return (index_ == 0); }
+    inline bool IsEmpty() const noexcept { return (Size() == 0); }
 
     inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
-    inline bool IsFull() const noexcept { return (index_ == Size_T_); }
+    inline bool IsFull() const noexcept { return (Size() == Capacity()); }
 };
 
 } // namespace Qentem

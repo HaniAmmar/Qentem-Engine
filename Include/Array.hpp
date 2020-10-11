@@ -37,38 +37,39 @@ class Array {
 
     explicit Array(SizeT size) : capacity_(size) {
         if (size != 0) {
-            storage_ = Memory::Allocate<Type_>(capacity_);
+            allocate(Capacity());
         }
     }
 
     Array(Array &&arr) noexcept
-        : storage_(arr.storage_), index_(arr.index_), capacity_(arr.capacity_) {
-        arr.storage_  = nullptr;
-        arr.index_    = 0;
-        arr.capacity_ = 0;
+        : storage_(arr.Storage()), index_(arr.Size()),
+          capacity_(arr.Capacity()) {
+        arr.clearStorage();
+        arr.setSize(0);
+        arr.setCapacity(0);
     }
 
-    Array(const Array &arr) : capacity_(arr.index_) {
-        if (capacity_ != 0) {
-            storage_ = Memory::Allocate<Type_>(capacity_);
+    Array(const Array &arr) : capacity_(arr.Size()) {
+        if (Capacity() != 0) {
+            allocate(Capacity());
 
             do {
-                Memory::Construct((storage_ + index_), arr.storage_[index_]);
+                Memory::Construct((Storage() + Size()), arr.Storage()[Size()]);
                 ++index_;
-            } while (index_ != capacity_);
+            } while (Size() != Capacity());
         }
     }
 
     ~Array() {
-        if (storage_ != nullptr) {
-            Memory::Destruct(storage_, (storage_ + index_));
-            Memory::Deallocate(storage_);
+        if (Storage() != nullptr) {
+            Memory::Destruct(Storage(), (Storage() + Size()));
+            Memory::Deallocate(Storage());
         }
     }
 
     Type_ &operator[](SizeT index) const {
-        if (index < index_) {
-            return storage_[index];
+        if (index < Size()) {
+            return Storage()[index];
         }
 
         throw 1; // Index out of range
@@ -76,16 +77,16 @@ class Array {
 
     Array &operator=(Array &&arr) noexcept {
         if (this != &arr) {
-            Memory::Destruct(storage_, (storage_ + index_));
-            Memory::Deallocate(storage_);
+            Memory::Destruct(Storage(), (Storage() + Size()));
+            Memory::Deallocate(Storage());
 
-            storage_  = arr.storage_;
-            index_    = arr.index_;
-            capacity_ = arr.capacity_;
+            setStorage(arr.Storage());
+            setSize(arr.Size());
+            setCapacity(arr.Capacity());
 
-            arr.storage_  = nullptr;
-            arr.index_    = 0;
-            arr.capacity_ = 0;
+            arr.clearStorage();
+            arr.setSize(0);
+            arr.setCapacity(0);
         }
 
         return *this;
@@ -93,10 +94,10 @@ class Array {
 
     Array &operator=(const Array &arr) {
         if (this != &arr) {
-            Reserve(arr.index_);
+            Reserve(arr.Size());
 
-            while (index_ != capacity_) {
-                Memory::Construct((storage_ + index_), arr.storage_[index_]);
+            while (Size() != Capacity()) {
+                Memory::Construct((Storage() + Size()), arr.Storage()[Size()]);
                 ++index_;
             }
         }
@@ -105,45 +106,45 @@ class Array {
     }
 
     void operator+=(Array &&arr) {
-        if (capacity_ == 0) {
+        if (Capacity() == 0) {
             // If the array hasn't allocated any memory, then there is no need
-            // for the rest.
-            storage_  = arr.storage_;
-            index_    = arr.index_;
-            capacity_ = arr.capacity_;
+            // for rest.
+            setStorage(arr.Storage());
+            setSize(arr.Size());
+            setCapacity(arr.Capacity());
         } else {
-            const SizeT n_size = (index_ + arr.index_);
+            const SizeT n_size = (Size() + arr.Size());
 
-            if (n_size > capacity_) {
+            if (n_size > Capacity()) {
                 resize(n_size);
             }
 
-            if (arr.index_ != 0) {
-                Memory::Copy((storage_ + index_), arr.storage_,
-                             arr.index_ * sizeof(Type_));
+            if (arr.IsNotEmpty()) {
+                Memory::Copy((Storage() + Size()), arr.Storage(),
+                             arr.Size() * sizeof(Type_));
             }
 
-            index_ = n_size;
-            Memory::Deallocate(arr.storage_);
+            setSize(n_size);
+            Memory::Deallocate(arr.Storage());
         }
 
-        arr.storage_  = nullptr;
-        arr.index_    = 0;
-        arr.capacity_ = 0;
+        arr.clearStorage();
+        arr.setSize(0);
+        arr.setCapacity(0);
     }
 
     void operator+=(const Array &arr) { copyArray(arr); }
 
     void operator+=(Type_ &&item) {
-        if (index_ == capacity_) {
-            if (capacity_ == 0) {
-                capacity_ = 1;
+        if (Size() == Capacity()) {
+            if (Capacity() == 0) {
+                setCapacity(1);
             }
 
-            resize(capacity_ << 1U);
+            resize(Capacity() << 1U);
         }
 
-        Memory::Construct((storage_ + index_), static_cast<Type_ &&>(item));
+        Memory::Construct((Storage() + Size()), static_cast<Type_ &&>(item));
         ++index_;
     }
 
@@ -172,36 +173,36 @@ class Array {
     }
 
     void Reset() noexcept {
-        Memory::Destruct(storage_, (storage_ + index_));
-        Memory::Deallocate(storage_);
+        Memory::Destruct(Storage(), (Storage() + Size()));
+        Memory::Deallocate(Storage());
 
-        storage_  = nullptr;
-        index_    = 0;
-        capacity_ = 0;
+        clearStorage();
+        setSize(0);
+        setCapacity(0);
     }
 
     void Clear() noexcept {
-        Memory::Destruct(storage_, (storage_ + index_));
-        index_ = 0;
+        Memory::Destruct(Storage(), (Storage() + Size()));
+        setSize(0);
     }
 
     Type_ *Eject() noexcept {
-        Type_ *tmp = storage_;
-        storage_   = nullptr;
-        index_     = 0;
-        capacity_  = 0;
+        Type_ *tmp = Storage();
+        clearStorage();
+        setSize(0);
+        setCapacity(0);
 
         return tmp;
     }
 
     void Reserve(SizeT size) {
-        if (storage_ != nullptr) {
+        if (Storage() != nullptr) {
             Reset();
         }
 
         if (size != 0) {
-            capacity_ = size;
-            storage_  = Memory::Allocate<Type_>(capacity_);
+            setCapacity(size);
+            allocate(Capacity());
         }
     }
 
@@ -211,93 +212,99 @@ class Array {
             return;
         }
 
+        if (Size() > new_size) {
+            // Shrink
+            Memory::Destruct((Storage() + new_size), (Storage() + Size()));
+            setSize(new_size);
+        }
+
         resize(new_size);
     }
 
     inline void Expect(SizeT size) {
-        const SizeT n_size = (size + index_);
+        const SizeT n_size = (size + Size());
 
-        if (n_size > capacity_) {
+        if (n_size > Capacity()) {
             resize(n_size);
         }
     }
 
     void Compress() {
         // Remove excess storage;
-        if (index_ != capacity_) {
-            Resize(index_);
+        if (Size() != Capacity()) {
+            Resize(Size());
         }
     }
 
     void GoBackTo(SizeT index) noexcept {
-        if (index < index_) {
-            Memory::Destruct((storage_ + index), (storage_ + index_));
-            index_ = index;
+        if (index < Size()) {
+            Memory::Destruct((Storage() + index), (Storage() + Size()));
+            setSize(index);
         }
     }
 
     void ResizeAndInitialize(SizeT size) {
         Resize(size);
 
-        if (size > index_) {
-            Memory::Construct((storage_ + index_), (storage_ + size), Type_());
+        if (size > Size()) {
+            Memory::Construct((Storage() + Size()), (Storage() + size),
+                              Type_());
         }
 
-        index_ = capacity_;
+        setSize(Capacity());
     }
 
-    inline Type_ *First() const noexcept { return storage_; }
-
     inline const Type_ *Last() const noexcept {
-        if (index_ != 0) {
-            return (storage_ + (index_ - 1));
+        if (IsNotEmpty()) {
+            return (Storage() + (Size() - 1));
         }
 
         return nullptr;
     }
 
-    inline const Type_ *End() const noexcept { return (storage_ + index_); }
-
-    inline SizeT Size() const noexcept { return index_; }
-
-    inline SizeT Capacity() const noexcept { return capacity_; }
-
-    inline bool IsEmpty() const noexcept { return (index_ == 0); }
-
-    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline Type_ *      First() const noexcept { return Storage(); }
+    inline Type_ *      Storage() const noexcept { return storage_; }
+    inline SizeT        Size() const noexcept { return index_; }
+    inline SizeT        Capacity() const noexcept { return capacity_; }
+    inline const Type_ *End() const noexcept { return (Storage() + Size()); }
+    inline bool         IsEmpty() const noexcept { return (Size() == 0); }
+    inline bool         IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
     //////////// Private ////////////
 
   private:
+    void setStorage(Type_ *new_storage) noexcept { storage_ = new_storage; }
+    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+    void setSize(SizeT new_size) noexcept { index_ = new_size; }
+
+    void clearStorage() noexcept { storage_ = nullptr; }
+    void allocate(SizeT new_size) {
+        setStorage(Memory::Allocate<Type_>(new_size));
+    }
+
     void resize(SizeT new_size) {
-        capacity_  = new_size;
-        Type_ *tmp = storage_;
-        storage_   = Memory::Allocate<Type_>(new_size);
+        Type_ *tmp = Storage();
+        setCapacity(new_size);
+        allocate(new_size);
 
-        if (index_ > new_size) {
-            // Shrink
-            Memory::Destruct((storage_ + new_size), (storage_ + index_));
-            index_ = new_size;
-        }
-
-        if (index_ != 0) {
-            Memory::Copy(storage_, tmp, (index_ * sizeof(Type_)));
+        if (IsNotEmpty()) {
+            Memory::Copy(Storage(), tmp, (Size() * sizeof(Type_)));
         }
 
         Memory::Deallocate(tmp);
     }
 
     QENTEM_NOINLINE void copyArray(const Array &arr) {
-        const SizeT n_size = (index_ + arr.index_);
+        const SizeT n_size = (Size() + arr.Size());
 
-        if (n_size > capacity_) {
+        if (n_size > Capacity()) {
             resize(n_size);
         }
 
         SizeT n = 0;
 
-        while (n != arr.index_) {
-            Memory::Construct((storage_ + index_), arr.storage_[n]);
+        while (n != arr.Size()) {
+            Memory::Construct((Storage() + Size()), arr.Storage()[n]);
             ++index_;
             ++n;
         }
