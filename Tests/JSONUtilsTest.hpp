@@ -878,7 +878,6 @@ static int TestUnEscapeJSON2() {
     buffer.Clear();
 
     str1 = "abcd";
-    str2 = "abcd";
     len1 = StringUtils::Count(str1);
     len2 = JSON::UnEscapeJSON(str1, len1, buffer);
     EQ_VALUE(len2, len1, "len2");
