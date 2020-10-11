@@ -42,7 +42,6 @@ static int TestStringStream() {
     EQ_VALUE((ss2.Capacity() >= 10), true, "Capacity() >= 10");
     EQ_VALUE(ss2.Length(), 0, "Length");
     NOT_EQ_TO(ss2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(ss2.Last(), nullptr, "Last()", "null");
 
     ss2.Reset();
     EQ_VALUE(ss2.Length(), 0, "Length");
@@ -54,6 +53,7 @@ static int TestStringStream() {
     EQ_VALUE(ss1.Length(), 1, "Length");
     EQ_TRUE((ss1.Capacity() >= 1), "(ss1.Capacity() >= 1)");
     NOT_EQ_TO(ss1.First(), nullptr, "First()", "null");
+    NOT_EQ_TO(ss1.Last(), nullptr, "Last()", "null");
     EQ_VALUE(ss1.First()[0], 'a', "First()[0]");
     EQ_VALUE(ss1.GetString(), "a", "GetString()");
     EQ_VALUE(ss1.Length(), 0, "Length");
