@@ -56,6 +56,12 @@ class Value {
 
     Value(const Value &val) : type_{val.type_} { copyValue(val); }
 
+    ~Value() {
+        if (!IsUndefined()) {
+            reset();
+        }
+    }
+
     explicit Value(ValueType type) noexcept {
         switch (type) {
             case ValueType::Object: {
@@ -82,42 +88,26 @@ class Value {
 
     explicit Value(VObject &&obj) noexcept
         : object_{static_cast<VObject &&>(obj)}, type_{ValueType::Object} {}
-
     explicit Value(VArray &&arr) noexcept
         : array_{static_cast<VArray &&>(arr)}, type_{ValueType::Array} {}
-
     explicit Value(VString &&str) noexcept
         : string_{static_cast<VString &&>(str)}, type_{ValueType::String} {}
-
     explicit Value(const VObject &obj) noexcept
         : object_{obj}, type_{ValueType::Object} {}
-
     explicit Value(const VArray &arr) noexcept
         : array_{arr}, type_{ValueType::Array} {}
-
     explicit Value(const VString &str) noexcept
         : string_{str}, type_{ValueType::String} {}
-
     explicit Value(const Char_T_ *str, SizeT length) noexcept
         : string_{str, length}, type_{ValueType::String} {}
-
     explicit Value(double num) noexcept
         : number_{num}, type_{ValueType::Number} {}
-
     template <typename Type_T_>
     explicit Value(Type_T_ num) noexcept
         : number_{static_cast<double>(num)}, type_{ValueType::Number} {}
-
     explicit Value(NullType) noexcept : type_{ValueType::Null} {}
-
     explicit Value(bool bl) noexcept
         : type_{bl ? ValueType::True : ValueType::False} {}
-
-    ~Value() {
-        if (!IsUndefined()) {
-            reset();
-        }
-    }
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
@@ -182,7 +172,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&object_, static_cast<VObject &&>(obj));
         type_ = ValueType::Object;
         return *this;
@@ -194,7 +187,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&object_, obj);
         type_ = ValueType::Object;
         return *this;
@@ -206,7 +202,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&array_, static_cast<VArray &&>(arr));
         type_ = ValueType::Array;
         return *this;
@@ -218,7 +217,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&array_, arr);
         type_ = ValueType::Array;
         return *this;
@@ -230,7 +232,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&string_, static_cast<VString &&>(str));
         type_ = ValueType::String;
         return *this;
@@ -242,7 +247,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&string_, str);
         type_ = ValueType::String;
         return *this;
@@ -254,7 +262,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         Memory::Construct(&string_, VString{str});
         type_ = ValueType::String;
         return *this;
@@ -266,7 +277,10 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         number_ = num;
         type_   = ValueType::Number;
         return *this;
@@ -279,20 +293,29 @@ class Value {
             return *this;
         }
 
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         number_ = static_cast<double>(num);
         type_   = ValueType::Number;
         return *this;
     }
 
     Value &operator=(NullType) {
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         type_ = ValueType::Null;
         return *this;
     }
 
     Value &operator=(bool is_true) noexcept {
-        reset();
+        if (!IsUndefined()) {
+            reset();
+        }
+
         type_ = (is_true ? ValueType::True : ValueType::False);
         return *this;
     }
@@ -538,27 +561,21 @@ class Value {
     inline bool IsUndefined() const noexcept {
         return (type_ == ValueType::Undefined);
     }
-
     inline bool IsObject() const noexcept {
         return (type_ == ValueType::Object);
     }
 
     inline bool IsArray() const noexcept { return (type_ == ValueType::Array); }
-
     inline bool IsString() const noexcept {
         return (type_ == ValueType::String);
     }
-
     inline bool IsNumber() const noexcept {
         return (type_ == ValueType::Number);
     }
 
     inline bool IsTrue() const noexcept { return (type_ == ValueType::True); }
-
     inline bool IsFalse() const noexcept { return (type_ == ValueType::False); }
-
     inline bool IsNull() const noexcept { return (type_ == ValueType::Null); }
-
     inline ValueType Type() const noexcept { return type_; }
 
     SizeT Size() const noexcept {
@@ -1101,19 +1118,14 @@ class Value {
         }
 
         inline double GetDouble() const noexcept { return number_.DNumber; }
-
-        inline ULong GetULong() const noexcept { return number_.ULNumber; }
-
-        inline SLong GetSLong() const noexcept { return number_.SLNumber; }
+        inline ULong  GetULong() const noexcept { return number_.ULNumber; }
+        inline SLong  GetSLong() const noexcept { return number_.SLNumber; }
 
       private:
         union Number_T_ {
             explicit Number_T_() noexcept : Padding{0, 0} {}
-
             explicit Number_T_(double num) noexcept : DNumber(num) {}
-
             explicit Number_T_(ULong num) noexcept : ULNumber(num) {}
-
             explicit Number_T_(SLong num) noexcept : SLNumber(num) {}
 
             double DNumber;
