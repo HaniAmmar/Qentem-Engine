@@ -37,7 +37,7 @@ class Array {
 
     explicit Array(SizeT size) : capacity_(size) {
         if (size != 0) {
-            allocate(Capacity());
+            allocate();
         }
     }
 
@@ -51,7 +51,7 @@ class Array {
 
     Array(const Array &arr) : capacity_(arr.Size()) {
         if (Capacity() != 0) {
-            allocate(Capacity());
+            allocate();
 
             do {
                 Memory::Construct((Storage() + Size()), arr.Storage()[Size()]);
@@ -62,8 +62,8 @@ class Array {
 
     ~Array() {
         if (Storage() != nullptr) {
-            Memory::Destruct(Storage(), (Storage() + Size()));
-            Memory::Deallocate(Storage());
+            Memory::Destruct(Storage(), End());
+            deallocate(Storage());
         }
     }
 
@@ -77,8 +77,8 @@ class Array {
 
     Array &operator=(Array &&arr) noexcept {
         if (this != &arr) {
-            Memory::Destruct(Storage(), (Storage() + Size()));
-            Memory::Deallocate(Storage());
+            Memory::Destruct(Storage(), End());
+            deallocate(Storage());
 
             setStorage(arr.Storage());
             setSize(arr.Size());
@@ -120,12 +120,12 @@ class Array {
             }
 
             if (arr.IsNotEmpty()) {
-                Memory::Copy((Storage() + Size()), arr.Storage(),
+                Memory::Copy((Storage() + Size()), arr.First(),
                              arr.Size() * sizeof(Type_));
             }
 
             setSize(n_size);
-            Memory::Deallocate(arr.Storage());
+            deallocate(arr.Storage());
         }
 
         arr.clearStorage();
@@ -173,8 +173,8 @@ class Array {
     }
 
     void Reset() noexcept {
-        Memory::Destruct(Storage(), (Storage() + Size()));
-        Memory::Deallocate(Storage());
+        Memory::Destruct(Storage(), End());
+        deallocate(Storage());
 
         clearStorage();
         setSize(0);
@@ -182,7 +182,7 @@ class Array {
     }
 
     void Clear() noexcept {
-        Memory::Destruct(Storage(), (Storage() + Size()));
+        Memory::Destruct(Storage(), End());
         setSize(0);
     }
 
@@ -202,7 +202,7 @@ class Array {
 
         if (size != 0) {
             setCapacity(size);
-            allocate(Capacity());
+            allocate();
         }
     }
 
@@ -214,7 +214,7 @@ class Array {
 
         if (Size() > new_size) {
             // Shrink
-            Memory::Destruct((Storage() + new_size), (Storage() + Size()));
+            Memory::Destruct((Storage() + new_size), End());
             setSize(new_size);
         }
 
@@ -238,7 +238,7 @@ class Array {
 
     void GoBackTo(SizeT index) noexcept {
         if (index < Size()) {
-            Memory::Destruct((Storage() + index), (Storage() + Size()));
+            Memory::Destruct((Storage() + index), End());
             setSize(index);
         }
     }
@@ -254,11 +254,11 @@ class Array {
         setSize(Capacity());
     }
 
-    inline Type_ *      First() const noexcept { return Storage(); }
     inline Type_ *      Storage() const noexcept { return storage_; }
     inline SizeT        Size() const noexcept { return index_; }
     inline SizeT        Capacity() const noexcept { return capacity_; }
-    inline const Type_ *End() const noexcept { return (Storage() + Size()); }
+    inline const Type_ *First() const noexcept { return Storage(); }
+    inline const Type_ *End() const noexcept { return (First() + Size()); }
     inline bool         IsEmpty() const noexcept { return (Size() == 0); }
     inline bool         IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
@@ -274,24 +274,22 @@ class Array {
 
   private:
     void setStorage(Type_ *new_storage) noexcept { storage_ = new_storage; }
-    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+    void allocate() { setStorage(Memory::Allocate<Type_>(Capacity())); }
+    void deallocate(Type_ *old_storage) { Memory::Deallocate(old_storage); }
+    void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
-
-    void clearStorage() noexcept { storage_ = nullptr; }
-    void allocate(SizeT new_size) {
-        setStorage(Memory::Allocate<Type_>(new_size));
-    }
+    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     void resize(SizeT new_size) {
         Type_ *tmp = Storage();
         setCapacity(new_size);
-        allocate(new_size);
+        allocate();
 
         if (IsNotEmpty()) {
             Memory::Copy(Storage(), tmp, (Size() * sizeof(Type_)));
         }
 
-        Memory::Deallocate(tmp);
+        deallocate(tmp);
     }
 
     QENTEM_NOINLINE void copyArray(const Array &arr) {

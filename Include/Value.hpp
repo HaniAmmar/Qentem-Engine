@@ -308,7 +308,7 @@ class Value {
                 const VArray &src_arr = val.array_;
                 VArray &      des_arr = array_;
 
-                Value *      src_val = src_arr.First();
+                Value *      src_val = src_arr.Storage();
                 const Value *src_end = src_arr.End();
 
                 while (src_val != src_end) {
@@ -491,12 +491,12 @@ class Value {
         switch (type_) {
             case ValueType::Array: {
                 if (array_.Size() > index) {
-                    return *(array_.First() + index);
+                    return (array_.Storage()[index]);
                 }
 
                 if (array_.Size() == index) {
                     array_ += Value();
-                    return *(array_.First() + index);
+                    return (array_.Storage()[index]);
                 }
 
                 break;
@@ -517,7 +517,7 @@ class Value {
                     Memory::Construct(&array_, VArray());
                     array_.ResizeAndInitialize(1);
                     type_ = ValueType::Array;
-                    return *(array_.First());
+                    return *(array_.Storage());
                 }
 
                 break;
@@ -575,7 +575,7 @@ class Value {
 
     Value *GetValue(SizeT index) const noexcept {
         if (IsArray() && (index < array_.Size())) {
-            Value *val = (array_.First() + index);
+            Value *val = (array_.Storage() + index);
 
             if (!(val->IsUndefined())) {
                 return val;
@@ -871,7 +871,7 @@ class Value {
         if (IsObject()) {
             object_.RemoveIndex(index);
         } else if (IsArray() && (index < array_.Size())) {
-            (array_.First() + index)->Reset();
+            (array_.Storage() + index)->Reset();
         }
     }
 
@@ -898,7 +898,7 @@ class Value {
                 }
 
                 VArray       new_array(size);
-                Value *      src_val = array_.First();
+                Value *      src_val = array_.Storage();
                 const Value *src_end = array_.End();
 
                 do {

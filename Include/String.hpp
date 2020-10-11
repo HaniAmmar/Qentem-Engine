@@ -36,54 +36,50 @@ class String {
   public:
     String() = default;
 
+    explicit String(SizeT len) : length_(len) {
+        allocate(len + 1);
+        Storage()[Length()] = 0;
+    }
+
     String(Char_T_ *str, SizeT len) noexcept : storage_(str), length_(len) {}
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
-        ++len;
-        storage_ = Memory::Allocate<Char_T_>(len);
+        allocate(len + 1);
 
-        if (len != 1) {
-            Memory::Copy(storage_, str, (length_ * sizeof(Char_T_)));
+        if (len != 0) {
+            Memory::Copy(Storage(), str, (Length() * sizeof(Char_T_)));
         }
 
-        storage_[length_] = 0;
+        Storage()[Length()] = 0;
     }
 
     explicit String(const Char_T_ *str)
         : String(str, StringUtils::Count(str)) {}
 
     String(String &&src) noexcept
-        : storage_(src.storage_), length_(src.length_) {
-        src.storage_ = nullptr;
-        src.length_  = 0;
+        : storage_(src.Storage()), length_(src.Length()) {
+        src.clearStorage();
+        src.setLength(0);
     }
 
-    String(const String &src) : length_(src.length_) {
-        if (length_ != 0) {
-            const SizeT len = (length_ + 1);
-            storage_        = Memory::Allocate<Char_T_>(len);
-            Memory::Copy(storage_, src.storage_, (len * sizeof(Char_T_)));
+    String(const String &src) : length_(src.Length()) {
+        if (IsNotEmpty()) {
+            allocate(Length() + 1);
+            Memory::Copy(Storage(), src.First(), (Length() * sizeof(Char_T_)));
+            Storage()[Length()] = 0;
         }
     }
 
-    ~String() { Memory::Deallocate(storage_); }
-
-    // inline Char_T_ &operator[](SizeT index) const {
-    //     if (index < length_) {
-    //         return storage_[index];
-    //     }
-
-    //     throw 1; // Index out of range
-    // }
+    ~String() { deallocate(Storage()); }
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
-            Memory::Deallocate(storage_);
+            deallocate(Storage());
 
-            storage_     = src.storage_;
-            length_      = src.length_;
-            src.storage_ = nullptr;
-            src.length_  = 0;
+            setStorage(src.Storage());
+            setLength(src.Length());
+            src.clearStorage();
+            src.setLength(0);
         }
 
         return *this;
@@ -91,11 +87,11 @@ class String {
 
     String &operator=(const String &src) {
         if (this != &src) {
-            Memory::Deallocate(storage_);
-            length_  = src.length_;
-            storage_ = Memory::Allocate<Char_T_>(length_ + 1);
-            Memory::Copy(storage_, src.storage_, (length_ * sizeof(Char_T_)));
-            storage_[length_] = 0;
+            deallocate(Storage());
+            setLength(src.Length());
+            allocate(Length() + 1);
+            Memory::Copy(Storage(), src.First(), (Length() * sizeof(Char_T_)));
+            Storage()[Length()] = 0;
         }
 
         return *this;
@@ -104,31 +100,30 @@ class String {
     String &operator=(const Char_T_ *str) {
         SizeT len = StringUtils::Count(str);
 
-        Memory::Deallocate(storage_);
-        storage_ = Memory::Allocate<Char_T_>(len + 1);
-        length_  = len;
+        deallocate(Storage());
+        allocate(len + 1);
+        setLength(len);
 
         if (len != 0) {
-            Memory::Copy(storage_, str, (len * sizeof(Char_T_)));
+            Memory::Copy(Storage(), str, (len * sizeof(Char_T_)));
         }
 
-        storage_[len] = 0;
+        Storage()[len] = 0;
 
         return *this;
     }
 
     String &operator+=(String &&src) {
-        Insert(src.storage_, src.length_);
-
-        Memory::Deallocate(src.storage_);
-        src.storage_ = nullptr;
-        src.length_  = 0;
+        Insert(src.First(), src.Length());
+        deallocate(src.Storage());
+        src.clearStorage();
+        src.setLength(0);
 
         return *this;
     }
 
     String &operator+=(const String &src) {
-        Insert(src.storage_, src.length_);
+        Insert(src.First(), src.Length());
         return *this;
     }
 
@@ -138,11 +133,11 @@ class String {
     }
 
     String operator+(String &&src) const {
-        String ns(Insert(*this, src));
+        String ns{Insert(*this, src)};
 
-        Memory::Deallocate(src.storage_);
-        src.storage_ = nullptr;
-        src.length_  = 0;
+        src.deallocate(src.Storage());
+        src.clearStorage();
+        src.setLength(0);
 
         return ns;
     }
@@ -152,38 +147,37 @@ class String {
     }
 
     String operator+(const Char_T_ *str) const {
-        const SizeT len         = StringUtils::Count(str);
-        const SizeT ns_len      = (length_ + len);
-        Char_T_ *   ns_storage_ = Memory::Allocate<Char_T_>(ns_len + 1);
+        const SizeT len = StringUtils::Count(str);
+        String      ns  = String{Length() + len};
 
-        if (length_ != 0) {
-            Memory::Copy(ns_storage_, storage_, (length_ * sizeof(Char_T_)));
+        if (IsNotEmpty()) {
+            Memory::Copy(ns.Storage(), First(), (Length() * sizeof(Char_T_)));
         }
 
         if (len != 0) {
-            Memory::Copy((ns_storage_ + length_), str, (len * sizeof(Char_T_)));
+            Memory::Copy((ns.Storage() + Length()), str,
+                         (len * sizeof(Char_T_)));
         }
 
-        ns_storage_[ns_len] = 0;
-        return String(ns_storage_, ns_len);
+        return ns;
     }
 
     inline bool operator==(const String &string) const noexcept {
-        if (length_ != string.length_) {
+        if (Length() != string.Length()) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, string.storage_, length_);
+        return StringUtils::IsEqual(First(), string.First(), Length());
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
         const SizeT len = StringUtils::Count(str);
 
-        if (length_ != len) {
+        if (Length() != len) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, str, len);
+        return StringUtils::IsEqual(First(), str, len);
     }
 
     inline bool operator!=(const String &string) const noexcept {
@@ -195,76 +189,92 @@ class String {
     }
 
     inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
-        if (length_ != length) {
+        if (Length() != length) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, str, length);
+        return StringUtils::IsEqual(First(), str, length);
     }
 
     void Reset() noexcept {
-        Memory::Deallocate(storage_);
-        storage_ = nullptr;
-        length_  = 0;
+        deallocate(Storage());
+        clearStorage();
+        setLength(0);
     }
 
     Char_T_ *Eject() noexcept {
-        Char_T_ *str = storage_;
-        storage_     = nullptr;
-        length_      = 0;
+        Char_T_ *str = Storage();
+        clearStorage();
+        setLength(0);
 
         return str;
     }
 
-    inline Char_T_ *First() const noexcept { return storage_; }
+    inline Char_T_ *      Storage() const noexcept { return storage_; }
+    inline SizeT          Length() const noexcept { return length_; }
+    inline const Char_T_ *First() const noexcept { return Storage(); }
+    inline bool           IsEmpty() const noexcept { return (Length() == 0); }
+    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
-    inline SizeT Length() const noexcept { return length_; }
+    inline const Char_T_ *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (First() + (Length() - 1));
+        }
+
+        return nullptr;
+    }
 
     static String Insert(const String &src1, const String &src2) {
-        const SizeT ns_len      = (src1.length_ + src2.length_);
-        Char_T_ *   ns_storage_ = Memory::Allocate<Char_T_>(ns_len + 1);
+        const SizeT ns_len = (src1.Length() + src2.Length());
+        String      ns     = String{ns_len};
 
-        if (src1.length_ != 0) {
-            Memory::Copy(ns_storage_, src1.storage_,
-                         (src1.length_ * sizeof(Char_T_)));
+        if (src1.IsNotEmpty()) {
+            Memory::Copy(ns.Storage(), src1.First(),
+                         (src1.Length() * sizeof(Char_T_)));
         }
 
-        if (src2.length_ != 0) {
-            Memory::Copy((ns_storage_ + src1.length_), src2.storage_,
-                         (src2.length_ * sizeof(Char_T_)));
+        if (src2.IsNotEmpty()) {
+            Memory::Copy((ns.Storage() + src1.Length()), src2.First(),
+                         (src2.Length() * sizeof(Char_T_)));
         }
 
-        ns_storage_[ns_len] = 0;
-        return String(ns_storage_, ns_len);
+        return ns;
     }
 
     void Insert(const Char_T_ *str, SizeT len) {
         if ((str != nullptr) && (len != 0)) {
-            Char_T_ *old_str = storage_;
-            storage_         = Memory::Allocate<Char_T_>(length_ + len + 1);
+            Char_T_ *old_str = Storage();
+            allocate(Length() + len + 1);
 
             if (old_str != nullptr) {
-                Memory::Copy(storage_, old_str, (length_ * sizeof(Char_T_)));
-                Memory::Deallocate(old_str);
+                Memory::Copy(Storage(), old_str, (Length() * sizeof(Char_T_)));
+                deallocate(old_str);
             }
 
-            Memory::Copy((storage_ + length_), str, (len * sizeof(Char_T_)));
+            Memory::Copy((Storage() + Length()), str, (len * sizeof(Char_T_)));
             length_ += len;
-            storage_[length_] = 0;
+            Storage()[Length()] = 0;
         }
     }
 
     static String Trim(const String &str) {
-        SizeT length = str.length_;
+        SizeT length = str.Length();
         SizeT offset = 0;
-
-        StringUtils::SoftTrim(str.storage_, offset, length);
-
-        const Char_T_ *n_str = (str.storage_ + offset);
-        return String(n_str, length);
+        StringUtils::SoftTrim(str.First(), offset, length);
+        return String((str.First() + offset), length);
     }
 
+    //////////// Private ////////////
+
   private:
+    void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
+    void allocate(SizeT new_size) {
+        setStorage(Memory::Allocate<Char_T_>(new_size));
+    }
+    void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
+    void clearStorage() noexcept { setStorage(nullptr); }
+    void setLength(SizeT new_length) noexcept { length_ = new_length; }
+
     Char_T_ *storage_{nullptr};
     SizeT    length_{0};
 };

@@ -31,10 +31,6 @@ namespace Qentem {
 
 template <typename Type_, UInt Size_T_>
 class FixedArray {
-  private:
-    Type_ storage_[Size_T_]{};
-    UInt  index_{0};
-
   public:
     FixedArray()  = default;
     ~FixedArray() = default;
@@ -46,7 +42,7 @@ class FixedArray {
 
     void operator+=(Type_ &&item) {
         if (!(IsFull())) {
-            storage_[index_] = static_cast<Type_ &&>(item);
+            storage_[Size()] = static_cast<Type_ &&>(item);
             ++index_;
             return;
         }
@@ -58,12 +54,6 @@ class FixedArray {
         *this += static_cast<Type_ &&>(Type_(item));
     }
 
-    inline Type_ *First() noexcept { return &(storage_[0]); }
-
-    inline const Type_ *End() const noexcept {
-        return (&(storage_[0]) + Size());
-    }
-
     inline void Clear() noexcept {
         // C Arrays inside c++ invoke destructor on every element once they are
         // destructed. Copy and move operators of 'Type_' should handel reseting
@@ -71,15 +61,22 @@ class FixedArray {
         index_ = 0;
     }
 
-    inline UInt Size() const noexcept { return index_; }
+    inline Type_ *Storage() noexcept { return &(storage_[0]); }
+    inline UInt   Size() const noexcept { return index_; }
+    inline UInt   Capacity() const noexcept { return Size_T_; }
+    inline bool   IsEmpty() const noexcept { return (Size() == 0); }
+    inline bool   IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline bool   IsFull() const noexcept { return (Size() == Capacity()); }
+    inline const Type_ *First() const noexcept { return &(storage_[0]); }
+    inline const Type_ *End() const noexcept {
+        return (&(storage_[0]) + Size());
+    }
 
-    inline UInt Capacity() const noexcept { return Size_T_; }
+    //////////// Private ////////////
 
-    inline bool IsEmpty() const noexcept { return (Size() == 0); }
-
-    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
-
-    inline bool IsFull() const noexcept { return (Size() == Capacity()); }
+  private:
+    Type_ storage_[Size_T_]{};
+    UInt  index_{0};
 };
 
 } // namespace Qentem

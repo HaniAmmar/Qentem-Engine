@@ -74,7 +74,7 @@ class Template_T_ {
                 break;
             }
 
-            render(tags.First(), tags.End(), content, offset);
+            render(tags.Storage(), tags.End(), content, offset);
             offset = (tags.First() + tags.Size() - 1)->EndOffset();
 
             if (!(tags.IsFull())) {
@@ -787,7 +787,7 @@ class Template_T_ {
 
                 loop_data->SubTags.Expect(tags_buffer.Size());
 
-                Tag_T_ *      tag = tags_buffer.First();
+                Tag_T_ *      tag = tags_buffer.Storage();
                 const Tag_T_ *end = tags_buffer.End();
 
                 while (tag != end) {
@@ -815,7 +815,7 @@ class Template_T_ {
             do {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
-                loop_template.render(loop_data->SubTags.First(),
+                loop_template.render(loop_data->SubTags.Storage(),
                                      loop_data->SubTags.End(),
                                      loop_data->Content.First(), 0);
 

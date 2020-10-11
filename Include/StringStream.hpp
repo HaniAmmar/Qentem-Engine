@@ -40,51 +40,41 @@ class StringStream {
   public:
     StringStream() = default;
 
-    ~StringStream() { Memory::Deallocate(storage_); }
+    ~StringStream() { deallocate(Storage()); }
 
-    explicit StringStream(SizeT size) : capacity_(size) {
+    explicit StringStream(SizeT size) {
         if (size != 0) {
-            capacity_ = (SizeT{1} << Platform::CLZ(capacity_));
-
-            if (capacity_ < size) {
-                capacity_ <<= 1U;
-            }
-
-            storage_ = Memory::Allocate<Char_T_>(capacity_);
+            setCapacity(SizeT{2} << Platform::CLZ(size));
+            allocate();
         }
     }
 
     StringStream(StringStream &&ss) noexcept
-        : storage_(ss.storage_), length_(ss.length_), capacity_(ss.capacity_) {
-        ss.storage_  = nullptr;
-        ss.length_   = 0;
-        ss.capacity_ = 0;
+        : storage_(ss.Storage()), length_(ss.Length()),
+          capacity_(ss.Capacity()) {
+        ss.clearStorage();
+        ss.setLength(0);
+        ss.setCapacity(0);
     }
 
     StringStream(const StringStream &ss) {
-        if (ss.length_ != 0) {
-            capacity_ = ss.length_;
-            capacity_ = (SizeT{1} << Platform::CLZ(capacity_));
-
-            if (capacity_ < ss.length_) {
-                capacity_ <<= 1U;
-            }
-
-            storage_ = Memory::Allocate<Char_T_>(capacity_);
-            insert(ss.storage_, ss.length_);
+        if (ss.Length() != 0) {
+            setCapacity(SizeT{2} << Platform::CLZ(ss.Length()));
+            allocate();
+            insert(ss.First(), ss.Length());
         }
     }
 
     StringStream &operator=(StringStream &&ss) noexcept {
         if (this != &ss) {
-            Memory::Deallocate(storage_);
-            storage_  = ss.storage_;
-            length_   = ss.length_;
-            capacity_ = ss.capacity_;
+            deallocate(Storage());
+            setStorage(ss.Storage());
+            setLength(ss.Length());
+            setCapacity(ss.Capacity());
 
-            ss.storage_  = nullptr;
-            ss.length_   = 0;
-            ss.capacity_ = 0;
+            ss.clearStorage();
+            ss.setLength(0);
+            ss.setCapacity(0);
         }
 
         return *this;
@@ -92,22 +82,22 @@ class StringStream {
 
     StringStream &operator=(const StringStream &ss) {
         if (this != &ss) {
-            if (storage_ != nullptr) {
-                Memory::Deallocate(storage_);
-                storage_  = nullptr;
-                length_   = 0;
-                capacity_ = 0;
+            if (First() != nullptr) {
+                deallocate(Storage());
+                clearStorage();
+                setLength(0);
+                setCapacity(0);
             }
 
-            Insert(ss.storage_, ss.length_);
+            Insert(ss.First(), ss.Length());
         }
 
         return *this;
     }
 
     void operator+=(Char_T_ one_char) {
-        if (capacity_ == length_) {
-            SizeT n_size = capacity_;
+        if (Capacity() == Length()) {
+            SizeT n_size = Capacity();
 
             if (n_size == 0) {
                 n_size = QENTEM_STRINGSTREAM_INITIALSIZE_;
@@ -116,7 +106,7 @@ class StringStream {
             expand(n_size << 1U);
         }
 
-        storage_[length_] = one_char;
+        Storage()[Length()] = one_char;
         ++length_;
     }
 
@@ -133,29 +123,29 @@ class StringStream {
     }
 
     inline bool operator==(const StringStream &ss) const noexcept {
-        if (length_ != ss.length_) {
+        if (Length() != ss.Length()) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, ss.storage_, length_);
+        return StringUtils::IsEqual(First(), ss.First(), Length());
     }
 
     inline bool operator==(const String<Char_T_> &string) const noexcept {
-        if (length_ != string.Length()) {
+        if (Length() != string.Length()) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, string.First(), length_);
+        return StringUtils::IsEqual(First(), string.First(), Length());
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
         const SizeT len = StringUtils::Count(str);
 
-        if (length_ != len) {
+        if (Length() != len) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, str, len);
+        return StringUtils::IsEqual(First(), str, len);
     }
 
     inline bool operator!=(const StringStream &ss) const noexcept {
@@ -171,119 +161,125 @@ class StringStream {
     }
 
     inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
-        if (length_ != length) {
+        if (Length() != length) {
             return false;
         }
 
-        return StringUtils::IsEqual(storage_, str, length);
+        return StringUtils::IsEqual(First(), str, length);
     }
 
     inline void Insert(const Char_T_ *str, SizeT length) {
         insert(str, length);
     }
 
-    inline void Clear() noexcept { length_ = 0; }
+    inline void Clear() noexcept { setLength(0); }
 
     void Reset() noexcept {
-        if (storage_ != nullptr) {
-            Memory::Deallocate(storage_);
-            storage_  = nullptr;
-            length_   = 0;
-            capacity_ = 0;
+        if (First() != nullptr) {
+            deallocate(Storage());
+            clearStorage();
+            setLength(0);
+            setCapacity(0);
         }
     }
 
     inline void StepBack(SizeT length) noexcept {
-        if (length <= length_) {
+        if (length <= Length()) {
             length_ -= length;
         }
     }
 
-    // To write directly to the buffer, set the needed length.
+    // Set the needed length to write directly to the buffer,
     Char_T_ *Buffer(SizeT len) noexcept {
-        const SizeT current_offset = length_;
+        const SizeT current_offset = Length();
         length_ += len;
 
-        if (length_ > capacity_) {
-            expand((SizeT{2} << Platform::CLZ(length_)));
+        if (Length() > Capacity()) {
+            expand((SizeT{2} << Platform::CLZ(Length())));
         }
 
-        return (storage_ + current_offset);
+        return (Storage() + current_offset);
     }
 
     inline void Expect(SizeT len) {
-        const SizeT new_len = (length_ + len);
+        const SizeT new_len = (Length() + len);
 
-        if (new_len > capacity_) {
+        if (new_len > Capacity()) {
             expand((SizeT{2} << Platform::CLZ(new_len)));
         }
     }
 
-    inline const Char_T_ *Storage() const noexcept { return storage_; }
-    inline const Char_T_ *First() const noexcept { return Storage(); }
-    inline SizeT          Length() const noexcept { return length_; }
-    inline SizeT          Capacity() const noexcept { return capacity_; }
-    inline bool           IsEmpty() const noexcept { return (length_ == 0); }
-    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
-
-    inline const Char_T_ *Last() const noexcept {
-        if (IsNotEmpty()) {
-            return (Storage() + (Length() - 1));
-        }
-
-        return nullptr;
-    }
-
     Char_T_ *Eject() noexcept {
-        Char_T_ *str = storage_;
-        storage_     = nullptr;
-        length_      = 0;
-        capacity_    = 0;
+        Char_T_ *str = Storage();
+        clearStorage();
+        setLength(0);
+        setCapacity(0);
 
         return str;
     }
 
-    QENTEM_NOINLINE String<Char_T_> GetString() {
-        if (capacity_ > length_) {
-            storage_[length_] = 0;
-            const SizeT len   = length_;
+    String<Char_T_> GetString() {
+        if (Capacity() > Length()) {
+            Storage()[Length()] = 0;
+            const SizeT len     = Length();
             return String<Char_T_>(Eject(), len);
         }
 
-        String<Char_T_> str{First(), length_};
+        String<Char_T_> str{First(), Length()};
         Reset();
 
         return str;
     }
 
+    inline Char_T_ *      Storage() const noexcept { return storage_; }
+    inline SizeT          Length() const noexcept { return length_; }
+    inline SizeT          Capacity() const noexcept { return capacity_; }
+    inline const Char_T_ *First() const noexcept { return Storage(); }
+    inline bool           IsEmpty() const noexcept { return (Length() == 0); }
+    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
+
+    inline const Char_T_ *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (First() + (Length() - 1));
+        }
+
+        return nullptr;
+    }
+
     //////////// Private ////////////
 
   private:
+    void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
+    void allocate() { setStorage(Memory::Allocate<Char_T_>(Capacity())); }
+    void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
+    void clearStorage() noexcept { setStorage(nullptr); }
+    void setLength(SizeT new_length) noexcept { length_ = new_length; }
+    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+
     void insert(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
-            const SizeT current_offset = length_;
+            const SizeT current_offset = Length();
             length_ += len;
 
-            if (capacity_ < length_) {
-                expand((SizeT{2} << Platform::CLZ(length_)));
+            if (Capacity() < Length()) {
+                expand((SizeT{2} << Platform::CLZ(Length())));
             }
 
-            Memory::Copy((storage_ + current_offset), str,
+            Memory::Copy((Storage() + current_offset), str,
                          (len * sizeof(Char_T_)));
         }
     }
 
-    void expand(SizeT capacity) {
-        Char_T_ *old_str = storage_;
-        storage_         = Memory::Allocate<Char_T_>(capacity);
+    void expand(SizeT new_capacity) {
+        SizeT    old_cap = Capacity();
+        Char_T_ *old_str = Storage();
+        setCapacity(new_capacity);
+        allocate();
 
-        if (capacity_ != 0) {
-            const SizeT c_size = (capacity_ * sizeof(Char_T_));
-            Memory::Copy(storage_, old_str, c_size);
-            Memory::Deallocate(old_str);
+        if (IsNotEmpty()) {
+            Memory::Copy(Storage(), old_str, (old_cap * sizeof(Char_T_)));
+            deallocate(old_str);
         }
-
-        capacity_ = capacity;
     }
 
     Char_T_ *storage_{nullptr};
