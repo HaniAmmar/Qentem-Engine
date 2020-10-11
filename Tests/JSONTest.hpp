@@ -944,7 +944,6 @@ static int TestParse4() {
     END_SUB_TEST;
 }
 
-QENTEM_MAYBE_UNUSED_
 static int TestParse5() {
     Value<char> value;
 
@@ -1125,6 +1124,12 @@ static int TestParse5() {
     value = JSON::Parse(R"([""]")");
     EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    END_SUB_TEST;
+}
+
+static int TestParse6() {
+    Value<char> value;
+
     value = JSON::Parse(R"(["\"])");
     EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
@@ -1248,6 +1253,9 @@ static int TestParse5() {
     value = JSON::Parse(R"({"a":{})");
     EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse("{\"\na\":{}");
+    EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     END_SUB_TEST;
 }
 
@@ -1259,6 +1267,7 @@ static int RunJSONTests() {
     START_TEST("Parse Test 3", TestParse3);
     START_TEST("Parse Test 4", TestParse4);
     START_TEST("Parse Test 5", TestParse5);
+    START_TEST("Parse Test 6", TestParse6);
 
     END_TEST("JSON.hpp");
 }
