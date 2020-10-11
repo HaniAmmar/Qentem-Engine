@@ -49,8 +49,6 @@ inline static Value<Char_T_> Parse(const Char_T_ *content) {
 
 template <typename Char_T_>
 class JSONParser {
-    struct FindCache_T_;
-
     using VValue = Value<Char_T_>;
 
   public:
@@ -305,13 +303,6 @@ class JSONParser {
     }
 
     StringStream<Char_T_> buffer_{};
-#ifdef QENTEM_SIMD_ENABLED_
-    struct FindCache_T_ {
-        SizeT        Offset{0};
-        SizeT        NextOffset{0};
-        QMM_Number_T Bits{0};
-    } find_cache_{};
-#endif
 };
 
 } // namespace JSON
