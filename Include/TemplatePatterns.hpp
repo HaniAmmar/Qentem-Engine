@@ -136,9 +136,7 @@ struct TemplatePatterns {};
  * <if case="{case}">...<if case="{case2}" />...</if></if>
  */
 
-// One byte character.
-template <typename Char_T_>
-struct TemplatePatterns<Char_T_, 1> {
+struct TemplatePatternsSize {
     /*
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
@@ -164,7 +162,11 @@ struct TemplatePatterns<Char_T_, 1> {
 
     static constexpr SizeT ElsePrefixLength = 5U;
     static constexpr SizeT ElseSuffixLength = 2U;
+};
 
+// One byte character.
+template <typename Char_T_>
+struct TemplatePatterns<Char_T_, 1> {
     static constexpr Char_T_ InLinePrefix = '{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
         static constexpr Char_T_ val[] = {'}'};
@@ -251,32 +253,6 @@ struct TemplatePatterns<Char_T_, 1> {
 // Two bytes character.
 template <typename Char_T_>
 struct TemplatePatterns<Char_T_, 2> {
-    /*
-     *InLineSuffixLength and InLinePrefixLength should not be more than 1
-     */
-
-    // static constexpr SizeT InLineSuffixLength = 1U;
-    // static constexpr SizeT InLinePrefixLength = 1U;
-
-    static constexpr SizeT VariablePrefixLength = 5U;
-    static constexpr SizeT VariableFulllength =
-        (VariablePrefixLength + 1U); // + InLineSuffixLength
-
-    static constexpr SizeT MathPrefixLength = 6U;
-    static constexpr SizeT MathFulllength =
-        (MathPrefixLength + 1U); // + InLineSuffixLength
-
-    static constexpr SizeT InLineIfPrefixLength = 3U;
-
-    static constexpr SizeT LoopPrefixLength = 5U;
-    static constexpr SizeT LoopSuffixLength = 7U;
-
-    static constexpr SizeT IfPrefixLength = 3U;
-    static constexpr SizeT IfSuffixLength = 5U;
-
-    static constexpr SizeT ElsePrefixLength = 5U;
-    static constexpr SizeT ElseSuffixLength = 2U;
-
     static constexpr Char_T_ InLinePrefix = u'{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
         static constexpr Char_T_ val[] = {u'}'};
@@ -364,32 +340,6 @@ struct TemplatePatterns<Char_T_, 2> {
 // Four bytes character.
 template <typename Char_T_>
 struct TemplatePatterns<Char_T_, 4> {
-    /*
-     *InLineSuffixLength and InLinePrefixLength should not be more than 1
-     */
-
-    // static constexpr SizeT InLineSuffixLength = 1U;
-    // static constexpr SizeT InLinePrefixLength = 1U;
-
-    static constexpr SizeT VariablePrefixLength = 5U;
-    static constexpr SizeT VariableFulllength =
-        (VariablePrefixLength + 1U); // + InLineSuffixLength
-
-    static constexpr SizeT MathPrefixLength = 6U;
-    static constexpr SizeT MathFulllength =
-        (MathPrefixLength + 1U); // + InLineSuffixLength
-
-    static constexpr SizeT InLineIfPrefixLength = 3U;
-
-    static constexpr SizeT LoopPrefixLength = 5U;
-    static constexpr SizeT LoopSuffixLength = 7U;
-
-    static constexpr SizeT IfPrefixLength = 3U;
-    static constexpr SizeT IfSuffixLength = 5U;
-
-    static constexpr SizeT ElsePrefixLength = 5U;
-    static constexpr SizeT ElseSuffixLength = 2U;
-
     static constexpr Char_T_ InLinePrefix = U'{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
         static constexpr Char_T_ val[] = {U'}'};
