@@ -56,7 +56,7 @@ class Value {
         val.setTypeToUndefined();
     }
 
-    Value(const Value &val) : type_{val.Type()} { copyValue(val); }
+    Value(const Value &val) { copyValue(val); }
 
     ~Value() {
         if (!IsUndefined()) {
@@ -1242,6 +1242,7 @@ class Value {
 
             default: {
                 number_ = val.number_;
+                setType(val.Type());
             }
         }
     }
