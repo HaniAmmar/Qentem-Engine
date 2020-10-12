@@ -42,7 +42,7 @@ class Array {
     }
 
     Array(Array &&arr) noexcept
-        : storage_(arr.Storage()), index_(arr.Size()),
+        : storage_(arr.storage_), index_(arr.Size()),
           capacity_(arr.Capacity()) {
         arr.clearStorage();
         arr.setSize(0);
