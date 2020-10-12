@@ -56,8 +56,8 @@
 #endif
 
 #ifdef QENTEM_64BIT_
-// We only use the lower 48 bits for pointers on 64bit arch
-// the upper 16 bits can be used to taging.
+// 64bit arch only uses the lower 48 bits for pointers,
+// the upper 16 bits can be used for taging.
 #ifndef QENTEM_TAGGED_POINTER_
 #define QENTEM_TAGGED_POINTER_ 1
 #endif
