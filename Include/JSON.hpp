@@ -298,7 +298,7 @@ class JSONParser {
                         case JSONotation_T_::ESquareChar: {
                             const SizeT len = (offset - num_offset);
 
-                            if (is_float || len > 20) {
+                            if (is_float || len > 19) {
                                 double num;
 
                                 if (Digit<Char_T_>::StringToNumber(
