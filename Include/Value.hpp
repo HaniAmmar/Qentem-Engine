@@ -1254,8 +1254,10 @@ class Value {
         explicit VNumber(Number_T_ num) noexcept : number_{num} {}
 
         inline void SetNumber(double num) noexcept { number_.d = num; }
-        inline void SetNumber(ULong num) noexcept { number_.ull = num; }
-        inline void SetNumber(SLong num) noexcept { number_.sll = num; }
+        inline void SetNumber(unsigned long long num) noexcept {
+            number_.ull = num;
+        }
+        inline void SetNumber(long long num) noexcept { number_.sll = num; }
 
         inline unsigned long long GetUInt64() const noexcept {
             return number_.ull;
