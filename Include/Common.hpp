@@ -55,6 +55,14 @@
 #define QENTEM_MAYBE_UNUSED_ __attribute__((unused))
 #endif
 
+#ifdef QENTEM_64BIT_
+// We only use the lower 48 bits for pointers on 64bit arch
+// the upper 16 bits can be used to taging.
+#ifndef QENTEM_TAGGED_POINTER_
+#define QENTEM_TAGGED_POINTER_ 1
+#endif
+#endif
+
 namespace Qentem {
 // 1 == 0x00000001; // little;
 // 1 == 0x01000000; // big
