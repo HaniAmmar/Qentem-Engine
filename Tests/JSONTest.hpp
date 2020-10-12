@@ -1256,6 +1256,9 @@ static int TestParse6() {
     value = JSON::Parse("{\"\na\":{}");
     EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
 
+    value = JSON::Parse("[\"WHAT?\"}");
+    EQ_TRUE(value.IsUndefined(), "value.IsUndefined()");
+
     END_SUB_TEST;
 }
 
