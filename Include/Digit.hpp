@@ -170,8 +170,8 @@ class Digit {
     inline static String<Char_T_> NumberToString(Number_T_ number,
                                                  UInt      min = 1) noexcept {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        return S_NumberToString<Number_T_, is_unsigned>::NumberToString(number,
-                                                                        min);
+        return NumberToStringHelper<Number_T_, is_unsigned>::NumberToString(
+            number, min);
     }
 
     template <typename Number_T_>
@@ -179,8 +179,10 @@ class Digit {
                                             Number_T_              number,
                                             UInt min = 1) noexcept {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        S_NumberToStringStream<Number_T_, is_unsigned>::NumberToStringStream(
-            ss, number, min);
+        NumberToStringStreamHelper<Number_T_,
+                                   is_unsigned>::NumberToStringStream(ss,
+                                                                      number,
+                                                                      min);
     }
 
     /*
@@ -228,15 +230,16 @@ class Digit {
         constexpr bool is_float =
             (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
 
-        return S_StringToNumber<Number_T_, is_unsigned,
-                                is_float>::StringToNumber(number, str, length);
+        return StringToNumberHelper<Number_T_, is_unsigned,
+                                    is_float>::StringToNumber(number, str,
+                                                              length);
     }
 
     //////////// Private ////////////
 
   private:
     template <typename Number_T_, bool IS_UNSIGNED, bool IS_FLOAT>
-    struct S_StringToNumber {
+    struct StringToNumberHelper {
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
                                           SizeT length) noexcept {
             return stringToSignedFloat(number, str, length);
@@ -244,7 +247,7 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct S_StringToNumber<Number_T_, true, false> {
+    struct StringToNumberHelper<Number_T_, true, false> {
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
                                           SizeT length) noexcept {
             return stringToUnsignedInt(number, str, length);
@@ -252,7 +255,7 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct S_StringToNumber<Number_T_, false, false> {
+    struct StringToNumberHelper<Number_T_, false, false> {
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
                                           SizeT length) noexcept {
             return stringToSignedInt(number, str, length);
@@ -368,7 +371,7 @@ class Digit {
     }
 
     template <typename Number_T_, bool IS_UNSIGNED>
-    struct S_NumberToString {
+    struct NumberToStringHelper {
         inline static String<Char_T_> NumberToString(Number_T_ number,
                                                      UInt      min = 1) {
             String<Char_T_> str;
@@ -378,7 +381,7 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct S_NumberToString<Number_T_, false> {
+    struct NumberToStringHelper<Number_T_, false> {
         inline static String<Char_T_> NumberToString(Number_T_ number,
                                                      UInt      min = 1) {
             String<Char_T_> str;
@@ -395,7 +398,7 @@ class Digit {
     };
 
     template <typename Number_T_, bool IS_UNSIGNED>
-    struct S_NumberToStringStream {
+    struct NumberToStringStreamHelper {
         inline static void NumberToStringStream(StringStream<Char_T_> &ss,
                                                 Number_T_              number,
                                                 UInt min = 1) {
@@ -404,7 +407,7 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct S_NumberToStringStream<Number_T_, false> {
+    struct NumberToStringStreamHelper<Number_T_, false> {
         inline static void NumberToStringStream(StringStream<Char_T_> &ss,
                                                 Number_T_              number,
                                                 UInt min = 1) {
