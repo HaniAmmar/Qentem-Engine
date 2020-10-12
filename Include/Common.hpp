@@ -24,7 +24,7 @@
 #define QENTEM_COMMON_H_
 
 #ifndef QENTEM_DOUBLE_PRECISION_
-#define QENTEM_DOUBLE_PRECISION_ 14
+#define QENTEM_DOUBLE_PRECISION_ 15
 #endif
 
 #if _WIN64 || __x86_64__ || __ppc64__
