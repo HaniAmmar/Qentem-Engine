@@ -65,10 +65,10 @@ static int TestEmptyValue() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_FALSE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
 
     value1 = Value<char>{ValueType::Object};
@@ -80,8 +80,17 @@ static int TestEmptyValue() {
     value1 = Value<char>{ValueType::String};
     EQ_TRUE(value1.IsString(), "IsString()");
 
-    value1 = Value<char>{ValueType::Number};
+    value1 = Value<char>{ValueType::UInt64};
     EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+
+    value1 = Value<char>{ValueType::Int64};
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+
+    value1 = Value<char>{ValueType::Double};
+    EQ_TRUE(value1.IsNumber(), "IsNumber()");
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
 
     END_SUB_TEST;
 }
@@ -113,14 +122,14 @@ static int TestTrueValue() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "true", "str_var");
-    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString()");
     EQ_VALUE(ss_var, "true", "ss_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_VALUE(value1.GetNumber(), 1, "GetNumber()");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
     EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
     EQ_TRUE(bool_var, "bool_var");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
@@ -185,14 +194,14 @@ static int TestFalseValue() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "false", "str_var");
-    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString()");
     EQ_VALUE(ss_var, "false", "ss_var");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
     EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
@@ -257,14 +266,14 @@ static int TestNullValue() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "null", "str_var");
-    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString()");
     EQ_VALUE(ss_var, "null", "ss_var");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
     EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
@@ -302,7 +311,7 @@ static int TestNullValue() {
     END_SUB_TEST;
 }
 
-static int TestNumberValue() {
+static int TestNumberValue1() {
     Value<char> value1;
     Value<char> value2;
 
@@ -315,7 +324,6 @@ static int TestNumberValue() {
 
     value1 = 33;
     EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_TO(value1.Type(), ValueType::Number, "Type()", "Number");
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
@@ -327,14 +335,14 @@ static int TestNumberValue() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "33", "str_var");
-    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString()");
     EQ_VALUE(ss_var, "33", "ss_var");
     EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
     EQ_VALUE(num_var, 33, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
     EQ_TRUE(bool_var, "bool_var");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
@@ -346,18 +354,18 @@ static int TestNumberValue() {
     value2 = -10;
     value2 = value1;
     EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value2.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "45", "str_var");
     EQ_VALUE(value2.GetNumber(), 45, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber()");
     EQ_VALUE(num_var, 45, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
     EQ_TRUE(bool_var, "bool_var");
     EQ_VALUE(value1.GetNumber(), 45, "GetNumber()");
 
     value1.Reset();
 
-    value1 = 10;
+    value1 = UInt{10};
     value2 = Value<char>{value1};
     EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
     EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
@@ -375,16 +383,397 @@ static int TestNumberValue() {
     EQ_VALUE(value2.GetNumber(), 785, "GetNumber()");
 
     value2 = UInt{0};
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
 
     value2 = int{-8};
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
 
     value2 = Value<char>{double{3.75}};
     EQ_TRUE(value2.IsNumber(), "IsNumber()");
     EQ_VALUE(value2.GetNumber(), 3.75, "GetNumber()");
+
+    END_SUB_TEST;
+}
+
+static int TestNumberValue2() {
+    using vu_short     = unsigned short;
+    using vu_int       = unsigned int;
+    using vu_long      = unsigned long;
+    using vu_long_long = unsigned long long;
+
+    using v_long_long = long long;
+
+    Value<char>  value1;
+    String<char> str_var;
+    bool         bool_var;
+
+    double        double_var;
+    long          long_var;
+    unsigned long ulong_var;
+
+    /////////////////// unsigned
+
+    value1 = Value<char>{vu_short{10}};
+    EQ_TO(value1.Type(), ValueType::UInt64, "Type()", "UInt64");
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_FALSE(value1.IsInt64(), "IsInt64()");
+    EQ_FALSE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "10", "str_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
+    EQ_TRUE(bool_var, "bool_var");
+    value1.Reset();
+
+    value1 = Value<char>{vu_int{10}};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    value1 = Value<char>{vu_long{10}};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    value1 = Value<char>{vu_long_long{10}};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    /////////////////// signed
+
+    value1 = Value<char>{short{-10}};
+    EQ_TO(value1.Type(), ValueType::Int64, "Type()", "Int64");
+    EQ_FALSE(value1.IsUInt64(), "IsUInt64()");
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_FALSE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "-10", "str_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
+    EQ_FALSE(bool_var, "bool_var");
+    value1.Reset();
+
+    value1 = Value<char>{short{10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "10", "str_var");
+    value1.Reset();
+
+    value1 = Value<char>{int{-10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    value1.Reset();
+
+    value1 = Value<char>{int{10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    value1 = Value<char>{long{-10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    value1.Reset();
+
+    value1 = Value<char>{long{10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    value1 = Value<char>{long{-10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    value1.Reset();
+
+    value1 = Value<char>{v_long_long{10}};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    /////////////////// float
+
+    value1 = Value<char>{float{10.5}};
+    EQ_TO(value1.Type(), ValueType::Double, "Type()", "Double");
+    EQ_FALSE(value1.IsUInt64(), "IsUInt64()");
+    EQ_FALSE(value1.IsInt64(), "IsInt64()");
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), 10.5, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10.5, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10.5, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "10.5", "str_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
+    EQ_TRUE(bool_var, "bool_var");
+    value1.Reset();
+
+    value1 = Value<char>{float{-10.5}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10.5, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10.5, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10.5, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "-10.5", "str_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
+    EQ_FALSE(bool_var, "bool_var");
+    value1.Reset();
+
+    value1 = Value<char>{float{10}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    value1 = Value<char>{float{-10}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    value1.Reset();
+
+    value1 = Value<char>{double{10.5}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), 10.5, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10.5, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10.5, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    value1.Reset();
+
+    value1 = Value<char>{double{-10.5}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10.5, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10.5, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10.5, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    value1.Reset();
+
+    value1 = Value<char>{double{10}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
+    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, 10, "double_var");
+    EQ_VALUE(long_var, 10, "long_var");
+    EQ_VALUE(ulong_var, 10, "ulong_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "10", "str_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
+    EQ_TRUE(bool_var, "bool_var");
+    value1.Reset();
+
+    value1 = Value<char>{double{-10}};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
+    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
+    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
+    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
+    EQ_VALUE(double_var, -10, "double_var");
+    EQ_VALUE(long_var, -10, "long_var");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
+    EQ_VALUE(str_var, "-10", "str_var");
+    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
+    EQ_FALSE(bool_var, "bool_var");
+    value1.Reset();
+
+    END_SUB_TEST;
+}
+
+static int TestNumberValue3() {
+    using vu_short     = unsigned short;
+    using vu_int       = unsigned int;
+    using vu_long      = unsigned long;
+    using vu_long_long = unsigned long long;
+
+    using v_long_long = long long;
+
+    Value<char> value1;
+
+    value1 = vu_short{10};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+
+    value1 = -10;
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+
+    value1 = -10.5;
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10.5, "GetNumber()");
+
+    value1 = vu_int{10};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+
+    value1 = float{10};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+
+    value1 = int{10};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+
+    value1 = vu_long{10};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+
+    value1 = long{-10};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+
+    value1 = vu_long_long{10};
+    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+
+    value1 = double{-10};
+    EQ_TRUE(value1.IsDouble(), "IsDouble()");
+    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+
+    value1 = v_long_long{10};
+    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
 
     END_SUB_TEST;
 }
@@ -419,13 +808,13 @@ static int TestStringValue() {
     EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "Qentem", 6),
             "IsEqual()");
     EQ_VALUE(value1.Length(), 6, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "Qentem", "str_var");
-    EQ_TRUE(value1.InsertString(ss_var), "InsertString(ss_var)");
+    EQ_TRUE(value1.InsertString(ss_var), "InsertString()");
     EQ_VALUE(ss_var, "Qentem", "ss_var");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
     EQ_VALUE(value1.Stringify(), "", "Stringify()");
     ss_var.Reset();
 
@@ -434,6 +823,10 @@ static int TestStringValue() {
 
     value1 = "45";
     value2 = "-50";
+    EQ_TRUE(value2.SetNumber(num_var), "SetNumber()");
+    EQ_VALUE(num_var, -50, "num_var");
+    EQ_VALUE(value2.GetNumber(), -50, "GetNumber()");
+
     value2 = value1;
     EQ_TRUE(value1.IsString(), "IsString()");
     NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -441,30 +834,30 @@ static int TestStringValue() {
     NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "45", 2), "IsEqual()");
     EQ_VALUE(value1.Length(), 2, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "45", "str_var");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber(num_var)");
+    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
     EQ_VALUE(num_var, 45, "num_var");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
-
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_VALUE(value1.GetNumber(), 45, "GetNumber()");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
+    EQ_TRUE(value2.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "45", "str_var");
 
     value1 = "true";
     value2 = Value<char>{value1};
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value2.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "true", "str_var");
     EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
     bool_var = false;
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
     EQ_TRUE(bool_var, "bool_var");
 
-    EQ_TRUE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "true", "str_var");
 
     value2.Reset();
     value2 = static_cast<Value<char> &&>(value1);
-    EQ_TRUE(value2.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value2.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "true", "str_var");
 
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
@@ -472,16 +865,16 @@ static int TestStringValue() {
     value1 = "false";
     Value<char> value3(static_cast<Value<char> &&>(value1));
     EQ_VALUE(value3.Length(), 5, "Length()");
-    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value3.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "false", "str_var");
     bool_var = true;
-    EQ_TRUE(value3.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_TRUE(value3.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
 
     str_var           = "qen";
     const char *c_str = str_var.First();
     value3            = str_var; // Copy of a string
-    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value3.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "qen", "str_var");
     NOT_EQ_TO(value3.StringStorage(), c_str, "str_var.First()", "c_str");
 
@@ -491,13 +884,13 @@ static int TestStringValue() {
     EQ_VALUE(*(value3.GetString()), "ABC", "GetString()");
 
     value3 = String<char>("123");
-    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value3.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "123", "str_var");
 
     value3 = 321;
     value3 = "321";
     EQ_TRUE(value3.IsString(), "IsString()");
-    EQ_TRUE(value3.SetString(str_var), "SetString(str_var)");
+    EQ_TRUE(value3.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "321", "str_var");
 
     END_SUB_TEST;
@@ -538,10 +931,10 @@ static int TestArrayValue() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_FALSE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
     EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
 
     arr_var.Reset();
@@ -780,10 +1173,10 @@ static int TestObjectValue1() {
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString(str_var)");
+    EQ_FALSE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber(num_var)");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool(bool_var)");
+    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
+    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
 
     h_arr_var.Reset();
     value1 = h_arr_var;
@@ -5270,7 +5663,9 @@ static int RunValueTests() {
     START_TEST("True Value Test", TestTrueValue);
     START_TEST("False Value Test", TestFalseValue);
     START_TEST("Null Value Test", TestNullValue);
-    START_TEST("Number Value Test", TestNumberValue);
+    START_TEST("Number Value Test 1", TestNumberValue1);
+    START_TEST("Number Value Test 2", TestNumberValue2);
+    START_TEST("Number Value Test 3", TestNumberValue3);
     START_TEST("String Value Test", TestStringValue);
     START_TEST("Array Value Test", TestArrayValue);
 
