@@ -275,10 +275,10 @@ class JSONParser {
             }
 
             default: {
-                const SizeT    num_offset  = offset;
-                const Char_T_ *num_content = (content + num_offset);
-                const bool     is_negative = (content[offset] == '-');
-                bool           is_float    = false;
+                const SizeT    num_offset      = offset;
+                const Char_T_ *num_content     = (content + num_offset);
+                const bool     is_not_negative = (content[offset] != '-');
+                bool           is_float        = false;
 
                 while (offset < length) {
                     switch (content[offset]) {
@@ -306,8 +306,8 @@ class JSONParser {
                                         (offset - num_offset))) {
                                     return VValue{num};
                                 }
-                            } else if (is_negative) {
-                                long long num;
+                            } else if (is_not_negative) {
+                                unsigned long long num;
 
                                 if (Digit<Char_T_>::StringToNumber(
                                         num, num_content,
@@ -315,7 +315,7 @@ class JSONParser {
                                     return VValue{num};
                                 }
                             } else {
-                                unsigned long long num;
+                                long long num;
 
                                 if (Digit<Char_T_>::StringToNumber(
                                         num, num_content,
