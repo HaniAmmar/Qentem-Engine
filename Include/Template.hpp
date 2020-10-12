@@ -556,10 +556,9 @@ class Template_T_ {
                 // -1 is - TemplatePatterns_T_::InLineSuffixLength
 
                 if (value != nullptr) {
-                    double num;
+                    SizeT num;
 
                     if (value->SetNumber(num)) {
-                        number = static_cast<SizeT>(num);
                         return true;
                     }
                 }
@@ -1061,7 +1060,7 @@ class Template_T_ {
             const Value_T_ *value = findValue(content, length);
 
             if (value != nullptr) {
-                if (value->SetNumber(number)) {
+                if (value->IsNumber() && value->SetNumber(number)) {
                     return true;
                 }
 
@@ -1071,8 +1070,6 @@ class Template_T_ {
                 if (value->SetCharAndLength(str, len)) {
                     return ALE::Evaluate(number, str, len, this);
                 }
-
-                return value->SetNumber(number);
             }
         }
 
