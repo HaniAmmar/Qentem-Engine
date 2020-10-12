@@ -30,10 +30,10 @@ namespace Qentem {
 namespace Test {
 
 static int TestFixedArray() {
-    FixedArray<UInt, 4>  arr1;
-    FixedArray<UInt, 8>  arr2;
-    FixedArray<UInt, 16> arr3;
-    bool                 did_throw;
+    FixedArray<unsigned int, 4>  arr1;
+    FixedArray<unsigned int, 8>  arr2;
+    FixedArray<unsigned int, 16> arr3;
+    bool                         did_throw;
 
     EQ_VALUE(arr1.Size(), 0, "Size()");
     EQ_VALUE(arr2.Size(), 0, "Size()");
@@ -59,15 +59,15 @@ static int TestFixedArray() {
     EQ_VALUE(arr2.First(), arr2.End(), "First()");
     EQ_VALUE(arr3.First(), arr3.End(), "First()");
 
-    for (UInt i = 0; i < arr1.Capacity(); i++) {
+    for (unsigned int i = 0; i < arr1.Capacity(); i++) {
         arr1 += i;
     }
 
-    for (UInt i = 0; i < arr2.Capacity(); i++) {
+    for (unsigned int i = 0; i < arr2.Capacity(); i++) {
         arr2 += i;
     }
 
-    for (UInt i = 0; i < arr3.Capacity(); i++) {
+    for (unsigned int i = 0; i < arr3.Capacity(); i++) {
         arr3 += i;
     }
 

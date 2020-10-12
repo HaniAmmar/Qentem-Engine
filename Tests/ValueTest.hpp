@@ -312,6 +312,8 @@ static int TestNullValue() {
 }
 
 static int TestNumberValue1() {
+    using vu_int = unsigned int;
+
     Value<char> value1;
     Value<char> value2;
 
@@ -365,7 +367,7 @@ static int TestNumberValue1() {
 
     value1.Reset();
 
-    value1 = UInt{10};
+    value1 = vu_int{10};
     value2 = Value<char>{value1};
     EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
     EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
@@ -382,7 +384,7 @@ static int TestNumberValue1() {
     value2 = double(785);
     EQ_VALUE(value2.GetNumber(), 785, "GetNumber()");
 
-    value2 = UInt{0};
+    value2 = vu_int{0};
     EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
 
@@ -1144,7 +1146,7 @@ static int TestObjectValue1() {
     double                    num_var;
     bool                      bool_var;
 
-    for (UInt i = 0; i < 5; i++) {
+    for (unsigned int i = 0; i < 5; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -1188,7 +1190,7 @@ static int TestObjectValue1() {
     value2 = h_arr_var;
 
     h_arr_var.Reset();
-    for (UInt i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < 10; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -1213,7 +1215,7 @@ static int TestObjectValue1() {
 
     h_arr_var.Reset();
     // Testing empty values
-    for (UInt i = 0; i < 10; i++) {
+    for (unsigned int i = 0; i < 10; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key];
@@ -1249,7 +1251,7 @@ static int TestObjectValue1() {
     value1 = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
 
-    for (UInt i = 0; i < 7; i++) {
+    for (unsigned int i = 0; i < 7; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -1285,7 +1287,7 @@ static int TestObjectValue2() {
     const char *              c_str_var;
 
     h_arr_var.Reset();
-    for (UInt i = 0; i < 7; i++) {
+    for (unsigned int i = 0; i < 7; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -1306,7 +1308,7 @@ static int TestObjectValue2() {
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
 
     h_arr_var.Reset();
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -1321,7 +1323,7 @@ static int TestObjectValue2() {
     NOT_EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
               "storage");
 
-    for (UInt i = 0; i < 13; i++) {
+    for (unsigned int i = 0; i < 13; i++) {
         String<char> key("Key_");
         key += Digit<char>::NumberToString(i);
         h_arr_var[key] = i;
@@ -2468,7 +2470,7 @@ static int TestCopyValue1() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -2534,7 +2536,7 @@ static int TestCopyValue1() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -2600,7 +2602,7 @@ static int TestCopyValue1() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -2666,7 +2668,7 @@ static int TestCopyValue1() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -2741,7 +2743,7 @@ static int TestCopyValue2() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -2782,7 +2784,7 @@ static int TestCopyValue2() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -2935,7 +2937,7 @@ static int TestCopyValue3() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -3033,7 +3035,7 @@ static int TestCopyValue3() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -3131,7 +3133,7 @@ static int TestCopyValue3() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -3228,7 +3230,7 @@ static int TestCopyValue3() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -3344,7 +3346,7 @@ static int TestCopyValue4() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -3422,7 +3424,7 @@ static int TestCopyValue4() {
     // Has values
     h_arr_var = HArray<Value<char>, char>();
 
-    for (UInt i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
         h_arr_var[Digit<char>::NumberToString(i)] = i;
     }
 
@@ -3518,6 +3520,8 @@ static int TestCopyValue4() {
 }
 
 static int TestIndexOperator1() {
+    using vu_int = unsigned int;
+
     Value<char>  value;
     String<char> str1("D");
     String<char> str2("DEFG");
@@ -3584,12 +3588,12 @@ static int TestIndexOperator1() {
     EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
     EQ_VALUE(value[1].GetNumber(), 30, "value[1]");
 
-    value[0]        = 50;
-    value[1]        = 100;
-    value[2]        = 200;
-    value[int{3}]   = 300;
-    value[ULong{4}] = 400;
-    value[UInt{5}]  = 500;
+    value[0]         = 50;
+    value[1]         = 100;
+    value[2]         = 200;
+    value[int{3}]    = 300;
+    value[ULong{4}]  = 400;
+    value[vu_int{5}] = 500;
 
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 6, "Size()");
@@ -3779,6 +3783,8 @@ static int TestIndexOperator2() {
 }
 
 static int TestAddition1() {
+    using vu_int = unsigned int;
+
     Value<char>  value;
     String<char> str1("D");
     String<char> str2("DEFG");
@@ -3814,7 +3820,7 @@ static int TestAddition1() {
     value[0] = 50;
     value[1] = 100;
     value += int{200};
-    value += UInt{300};
+    value += vu_int{300};
     value += ULong{400};
     value += double{500};
 
@@ -5523,6 +5529,7 @@ static int TestStringify4() {
 
 static int TestDeleteValue() {
     Value<char> value;
+    using vu_int = unsigned int;
 
     value[0] = 1;
     value.Remove(int{0});
@@ -5530,7 +5537,7 @@ static int TestDeleteValue() {
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "c";
-    value.Remove(UInt{0});
+    value.Remove(vu_int{0});
     EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 

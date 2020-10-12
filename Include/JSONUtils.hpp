@@ -89,8 +89,9 @@ QENTEM_MAYBE_UNUSED_ static SizeT UnEscapeJSON(const Char_T_ *        content,
                         ++offset;
 
                         if ((length - offset) > 3) {
-                            UInt code = Digit<Char_T_>::HexStringToNumber(
-                                (content + offset), 4);
+                            unsigned int code =
+                                Digit<Char_T_>::HexStringToNumber(
+                                    (content + offset), 4);
                             offset += 4;
                             offset2 = offset;
 

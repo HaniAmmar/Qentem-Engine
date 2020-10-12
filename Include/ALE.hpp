@@ -146,8 +146,8 @@ class ALE {
 
   private:
     union Value_T_ {
-        double number;
-        UInt   str[2]{0, 0}; // 0 for the offset and 1 for the length.
+        double       number;
+        unsigned int str[2]{0, 0}; // 0 for the offset and 1 for the length.
     };
 
     template <typename Char_T_, typename Helper_T_>
@@ -510,8 +510,9 @@ class ALE {
                             return false;
                         }
 
-                        UInt         times = static_cast<UInt>(right.number);
-                        const double num   = left.number;
+                        unsigned int times =
+                            static_cast<unsigned int>(right.number);
+                        const double num = left.number;
 
                         while (--times != 0) {
                             left.number *= num;

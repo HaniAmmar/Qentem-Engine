@@ -1525,19 +1525,19 @@ static int TestLoopTag3() {
 }
 
 static int TestLoopTag4() {
-    constexpr UInt size_4 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 4);
+    constexpr unsigned int size_4 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 4);
 
     StringStream<char> content;
     StringStream<char> output;
     String<char>       str;
     Value<char>        value;
 
-    for (UInt i = 0; i < size_4; i++) {
+    for (unsigned int i = 0; i < size_4; i++) {
         value += i;
     }
 
     content += R"(<loop repeat="1">)";
-    for (UInt i = 0; i < size_4; i++) {
+    for (unsigned int i = 0; i < size_4; i++) {
         content += "{var:";
         str = Digit<char>::NumberToString(i);
         content += str;
@@ -1557,7 +1557,7 @@ static int TestLoopTag4() {
     output.Clear();
 
     content += R"(<loop value="loop1-value">A loop1-value B</loop>)";
-    for (UInt i = 0; i < size_4; i++) {
+    for (unsigned int i = 0; i < size_4; i++) {
         output += "A ";
         Digit<char>::NumberToStringStream(output, i);
         output += " B";
@@ -1810,18 +1810,18 @@ static int TestIfTag2() {
 }
 
 static int TestRender1() {
-    constexpr UInt size_4 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 4);
+    constexpr unsigned int size_4 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 4);
 
     StringStream<char> content;
     StringStream<char> output;
     String<char>       str;
     Value<char>        value;
 
-    for (UInt i = 0; i < size_4; i++) {
+    for (unsigned int i = 0; i < size_4; i++) {
         value += i;
     }
 
-    for (UInt i = 0; i < size_4; i++) {
+    for (unsigned int i = 0; i < size_4; i++) {
         content += "{var:";
         str = Digit<char>::NumberToString(i);
         content += str;
@@ -1836,8 +1836,8 @@ static int TestRender1() {
     content.Clear();
     output.Clear();
 
-    UInt size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_;
-    for (UInt i = 0, x = 1; i < size_4; i++, x++) {
+    unsigned int size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_;
+    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += "{var:";
             str = Digit<char>::NumberToString(i);
@@ -1865,7 +1865,7 @@ static int TestRender1() {
     output.Clear();
 
     size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_;
-    for (UInt i = 0, x = 1; i < size_4; i++, x++) {
+    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += "{var:";
             str = Digit<char>::NumberToString(i);
@@ -1894,7 +1894,7 @@ static int TestRender1() {
     output.Clear();
 
     size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_;
-    for (UInt i = 0, x = 1; i < size_4; i++, x++) {
+    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += "{var:";
             str = Digit<char>::NumberToString(i);
@@ -1917,7 +1917,7 @@ static int TestRender1() {
     output.Clear();
 
     size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_;
-    for (UInt i = 0, x = 1; i < size_4; i++, x++) {
+    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += "{var:";
             str = Digit<char>::NumberToString(i);
@@ -1939,14 +1939,15 @@ static int TestRender1() {
     content.Clear();
     output.Clear();
 
-    constexpr UInt size_2_1 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 2) - 1;
+    constexpr unsigned int size_2_1 =
+        (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ * 2) - 1;
 
-    for (UInt i = 0; i < size_2_1; i++) {
+    for (unsigned int i = 0; i < size_2_1; i++) {
         value += i;
     }
 
     content += R"(<loop repeat="1">)";
-    for (UInt i = 0; i < size_2_1; i++) {
+    for (unsigned int i = 0; i < size_2_1; i++) {
         content += "{var:";
         str = Digit<char>::NumberToString(i);
         content += str;
