@@ -170,24 +170,30 @@ class JSONParser {
         ++offset;
         StringUtils::StartTrim(content, offset, length);
 
-        if (content[offset] != JSONotation_T_::ESquareChar) {
-            while (offset < length) {
-                arr += parseValue(content, offset, length);
-                StringUtils::StartTrim(content, offset, length);
-
-                if ((content[offset] != JSONotation_T_::CommaChar) ||
-                    (content[offset] == JSONotation_T_::ESquareChar)) {
-                    break;
-                }
-
-                ++offset;
-                StringUtils::StartTrim(content, offset, length);
-            }
+        if (content[offset] == JSONotation_T_::ESquareChar) {
+            ++offset;
+            return VValue{ValueType::Array};
         }
 
-        ++offset;
-        arr.Compress();
-        return VValue{static_cast<VArray &&>(arr)};
+        while (offset < length) {
+            arr += parseValue(content, offset, length);
+            StringUtils::StartTrim(content, offset, length);
+
+            if (content[offset] == JSONotation_T_::ESquareChar) {
+                ++offset;
+                arr.Compress();
+                return VValue{static_cast<VArray &&>(arr)};
+            }
+
+            if (content[offset] != JSONotation_T_::CommaChar) {
+                break;
+            }
+
+            ++offset;
+            StringUtils::StartTrim(content, offset, length);
+        }
+
+        return VValue{};
     }
 
     VValue parseValue(const Char_T_ *content, SizeT &offset, SizeT length) {
@@ -290,7 +296,9 @@ class JSONParser {
                         case JSONotation_T_::CommaChar:
                         case JSONotation_T_::ECurlyChar:
                         case JSONotation_T_::ESquareChar: {
-                            if (is_float) {
+                            const SizeT len = (offset - num_offset);
+
+                            if (is_float || len > 20) {
                                 double num;
 
                                 if (Digit<Char_T_>::StringToNumber(
