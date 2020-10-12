@@ -876,8 +876,15 @@ class Value {
             }
 
             case ValueType::String: {
-                return Digit<Char_T_>::StringToNumber(value, string_.First(),
-                                                      string_.Length());
+                double num;
+
+                if (Digit<Char_T_>::StringToNumber(num, string_.First(),
+                                                   string_.Length())) {
+                    value = static_cast<Number_T_>(num);
+                    return true;
+                }
+
+                break;
             }
 
             case ValueType::True: {
@@ -897,8 +904,6 @@ class Value {
 
         return false;
     }
-
-    // TODO: Test StringToNumber
 
     bool GetBool(bool &value) const noexcept {
         switch (Type()) {
@@ -1071,6 +1076,7 @@ class Value {
                 StringifyObject(val.GetObject(), ss);
                 return;
             }
+
             case ValueType::Array: {
                 StringifyArray(val.GetArray(), ss);
                 return;
