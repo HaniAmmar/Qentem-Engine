@@ -595,36 +595,53 @@ class Value {
         return (*this)[static_cast<SizeT>(index)];
     }
 
-    inline ValueType Type() const noexcept { return type_; }
-    inline bool      IsUndefined() const noexcept {
+    inline ValueType Type() const noexcept {
+#if QENTEM_TAGGED_POINTER_ == 1
+        return type_.GetType();
+#else
+        return type_;
+#endif
+    }
+
+    inline bool IsUndefined() const noexcept {
         return (Type() == ValueType::Undefined);
     }
+
     inline bool IsObject() const noexcept {
         return (Type() == ValueType::Object);
     }
+
     inline bool IsArray() const noexcept {
         return (Type() == ValueType::Array);
     }
+
     inline bool IsString() const noexcept {
         return (Type() == ValueType::String);
     }
+
     inline bool IsNumber() const noexcept {
         return ((Type() == ValueType::UInt64) || (Type() == ValueType::Int64) ||
                 (Type() == ValueType::Double));
     }
+
     inline bool IsUInt64() const noexcept {
         return (Type() == ValueType::UInt64);
     }
+
     inline bool IsInt64() const noexcept {
         return (Type() == ValueType::Int64);
     }
+
     inline bool IsDouble() const noexcept {
         return (Type() == ValueType::Double);
     }
+
     inline bool IsTrue() const noexcept { return (Type() == ValueType::True); }
+
     inline bool IsFalse() const noexcept {
         return (Type() == ValueType::False);
     }
+
     inline bool IsNull() const noexcept { return (Type() == ValueType::Null); }
 
     SizeT Size() const noexcept {
@@ -1168,7 +1185,15 @@ class Value {
     }
 
   private:
-    inline void setType(ValueType new_type) noexcept { type_ = new_type; }
+    struct VType_; // For tagging pointers
+
+    inline void setType(ValueType new_type) noexcept {
+#if QENTEM_TAGGED_POINTER_ == 1
+        type_.SetType(new_type);
+#else
+        type_ = new_type;
+#endif
+    }
 
     inline void setTypeToUndefined() noexcept { setType(ValueType::Undefined); }
     inline void setTypeToObject() noexcept { setType(ValueType::Object); }
@@ -1267,7 +1292,9 @@ class Value {
 
             default: {
                 number_ = val.number_;
+#if QENTEM_TAGGED_POINTER_ == 0
                 setType(val.Type());
+#endif
             }
         }
     }
@@ -1313,9 +1340,33 @@ class Value {
         VArray  array_;
         VString string_;
         VNumber number_;
+#if QENTEM_TAGGED_POINTER_ == 1
+        VType_ type_;
+    };
+
+    struct VType_ {
+      public:
+        inline ValueType GetType() const noexcept {
+            return types_[(!(IsBigEndian()) ? 3 : 1)];
+        }
+
+        inline void SetType(ValueType new_type) noexcept {
+            types_[(!(IsBigEndian()) ? 3 : 1)] = new_type;
+        }
+
+      private:
+        union {
+            unsigned long long int_type_;
+            ValueType          types_[4];
+        };
+
+        SizeT padding_[2];
+    };
+#else
     };
 
     ValueType type_{ValueType::Undefined};
+#endif
 };
 
 } // namespace Qentem
