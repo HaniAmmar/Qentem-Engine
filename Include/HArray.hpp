@@ -463,29 +463,11 @@ class HArray {
     }
 
 #if QENTEM_TAGGED_POINTER_ == 1
-    inline unsigned short GetTag() const noexcept {
-        if (!(IsBigEndian())) {
-            return tag_[3];
-        } else {
-            return tag_[0];
-        }
-    }
-
-    inline void SetTag(unsigned short tag) noexcept {
-        if (!(IsBigEndian())) {
-            tag_[3] = tag;
-        } else {
-            tag_[0] = tag;
-        }
-    }
-
     inline HAItem_T_ *Storage() const noexcept {
-        return reinterpret_cast<HAItem_T_ *>(int_storage_ & 0xffffffffffff);
+        return reinterpret_cast<HAItem_T_ *>(int_storage_ & 281474976710655ULL);
     }
 #else
-    inline unsigned short GetTag() const noexcept { return 0; }
-    inline void           SetTag(unsigned short tag) noexcept { (void)tag; }
-    inline HAItem_T_ *    Storage() const noexcept { return storage_; }
+    inline HAItem_T_ *Storage() const noexcept { return storage_; }
 #endif
 
     inline SizeT            Size() const noexcept { return index_; }
@@ -507,10 +489,13 @@ class HArray {
 
   private:
     void setStorage(HAItem_T_ *new_storage) noexcept {
-        const unsigned short current_tag = GetTag(); // Preserve the tag
-
+#if QENTEM_TAGGED_POINTER_ == 1
+        int_storage_ &= 18446462598732840960ULL; // Preserve the tag
+        int_storage_ |= reinterpret_cast<unsigned long long>(
+            new_storage); // Restore the tag
+#else
         storage_ = new_storage;
-        SetTag(current_tag); // Restore the tag
+#endif
     }
 
     void allocate() {
@@ -651,8 +636,6 @@ class HArray {
 
     QENTEM_NOINLINE void copyArray(const HArray &h_arr) {
         // The function Reset() has to be called before this.
-        SetTag(h_arr.GetTag()); // Copy the value of the tag.
-
         if (h_arr.Size() != 0) {
             setCapacity(algineSize(h_arr.Size()));
             allocate();
@@ -678,12 +661,11 @@ class HArray {
 #if QENTEM_TAGGED_POINTER_ == 1
 
     union {
-        unsigned short     tag_[4];
         unsigned long long int_storage_;
         HAItem_T_ *        storage_{nullptr};
     };
 #else
-    HAItem_T_ *           storage_{nullptr};
+    HAItem_T_ *storage_{nullptr};
 #endif
 
     SizeT index_{0};

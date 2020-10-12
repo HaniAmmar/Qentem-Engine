@@ -50,8 +50,6 @@ class Array {
     }
 
     Array(const Array &arr) : capacity_(arr.Size()) {
-        SetTag(arr.GetTag()); // Copy the value of the tag.
-
         if (Capacity() != 0) {
             allocate();
 
@@ -98,7 +96,6 @@ class Array {
 
     Array &operator=(const Array &arr) {
         if (this != &arr) {
-            SetTag(arr.GetTag()); // Copy the value of the tag.
             Reserve(arr.Size());
 
             while (Size() != Capacity()) {
@@ -260,29 +257,11 @@ class Array {
     }
 
 #if QENTEM_TAGGED_POINTER_ == 1
-    inline unsigned short GetTag() const noexcept {
-        if (!(IsBigEndian())) {
-            return tag_[3];
-        } else {
-            return tag_[0];
-        }
-    }
-
-    inline void SetTag(unsigned short tag) noexcept {
-        if (!(IsBigEndian())) {
-            tag_[3] = tag;
-        } else {
-            tag_[0] = tag;
-        }
-    }
-
     inline Type_ *Storage() const noexcept {
-        return reinterpret_cast<Type_ *>(int_storage_ & 0xffffffffffff);
+        return reinterpret_cast<Type_ *>(int_storage_ & 281474976710655ULL);
     }
 #else
-    inline unsigned short GetTag() const noexcept { return 0; }
-    inline void           SetTag(unsigned short tag) noexcept { (void)tag; }
-    inline Type_ *        Storage() const noexcept { return storage_; }
+    inline Type_ *Storage() const noexcept { return storage_; }
 #endif
 
     inline SizeT        Size() const noexcept { return index_; }
@@ -304,10 +283,13 @@ class Array {
 
   private:
     void setStorage(Type_ *new_storage) noexcept {
-        const unsigned short current_tag = GetTag(); // Preserve the tag
-
+#if QENTEM_TAGGED_POINTER_ == 1
+        int_storage_ &= 18446462598732840960ULL; // Preserve the tag
+        int_storage_ |= reinterpret_cast<unsigned long long>(
+            new_storage); // Restore the tag
+#else
         storage_ = new_storage;
-        SetTag(current_tag); // Restore the tag
+#endif
     }
 
     void allocate() { setStorage(Memory::Allocate<Type_>(Capacity())); }
@@ -346,12 +328,11 @@ class Array {
 
 #if QENTEM_TAGGED_POINTER_ == 1
     union {
-        unsigned short     tag_[4];
         unsigned long long int_storage_;
         Type_ *            storage_{nullptr};
     };
 #else
-    Type_ *               storage_{nullptr};
+    Type_ *storage_{nullptr};
 #endif
 
     SizeT index_{0};

@@ -63,8 +63,6 @@ class String {
     }
 
     String(const String &src) : length_(src.Length()) {
-        SetTag(src.GetTag()); // Copy the value of the tag.
-
         if (IsNotEmpty()) {
             allocate(Length() + 1);
             Memory::Copy(Storage(), src.First(), (Length() * sizeof(Char_T_)));
@@ -90,7 +88,6 @@ class String {
 
     String &operator=(const String &src) {
         if (this != &src) {
-            SetTag(src.GetTag()); // Copy the value of the tag.
             deallocate(Storage());
             setLength(src.Length());
             allocate(Length() + 1);
@@ -215,29 +212,11 @@ class String {
     }
 
 #if QENTEM_TAGGED_POINTER_ == 1
-    inline unsigned short GetTag() const noexcept {
-        if (!(IsBigEndian())) {
-            return tag_[3];
-        } else {
-            return tag_[0];
-        }
-    }
-
-    inline void SetTag(unsigned short tag) noexcept {
-        if (!(IsBigEndian())) {
-            tag_[3] = tag;
-        } else {
-            tag_[0] = tag;
-        }
-    }
-
     inline Char_T_ *Storage() const noexcept {
-        return reinterpret_cast<Char_T_ *>(int_storage_ & 0xffffffffffff);
+        return reinterpret_cast<Char_T_ *>(int_storage_ & 281474976710655ULL);
     }
 #else
-    inline unsigned short GetTag() const noexcept { return 0; }
-    inline void           SetTag(unsigned short tag) noexcept { (void)tag; }
-    inline Char_T_ *      Storage() const noexcept { return storage_; }
+    inline Char_T_ *Storage() const noexcept { return storage_; }
 #endif
 
     inline SizeT          Length() const noexcept { return length_; }
@@ -296,22 +275,31 @@ class String {
     //////////// Private ////////////
 
   private:
-    void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
+    void setStorage(Char_T_ *new_storage) noexcept {
+#if QENTEM_TAGGED_POINTER_ == 1
+        int_storage_ &= 18446462598732840960ULL; // Preserve the tag
+        int_storage_ |= reinterpret_cast<unsigned long long>(
+            new_storage); // Restore the tag
+#else
+        storage_ = new_storage;
+#endif
+    }
+
     void allocate(SizeT new_size) {
         setStorage(Memory::Allocate<Char_T_>(new_size));
     }
+
     void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(SizeT new_length) noexcept { length_ = new_length; }
 
 #if QENTEM_TAGGED_POINTER_ == 1
     union {
-        unsigned short     tag_[4];
         unsigned long long int_storage_;
         Char_T_ *          storage_{nullptr};
     };
 #else
-    Char_T_ *             storage_{nullptr};
+    Char_T_ *storage_{nullptr};
 #endif
 
     SizeT length_{0};
