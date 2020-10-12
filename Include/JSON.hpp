@@ -191,6 +191,8 @@ class JSONParser {
     }
 
     VValue parseValue(const Char_T_ *content, SizeT &offset, SizeT length) {
+        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
+
         static const Char_T_ *true_string  = JSONotation_T_::GetTrueString();
         static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
         static const Char_T_ *null_string  = JSONotation_T_::GetNullString();
@@ -267,13 +269,20 @@ class JSONParser {
             }
 
             default: {
-                // bool is_float = false;
-                // bool is_negative   = false;
-
-                const SizeT num_offset = offset;
+                const SizeT    num_offset  = offset;
+                const Char_T_ *num_content = (content + num_offset);
+                const bool     is_negative = (content[offset] == '-');
+                bool           is_float    = false;
 
                 while (offset < length) {
                     switch (content[offset]) {
+                        case DigitChars_T_::DotChar:
+                        case DigitChars_T_::E_Char:
+                        case DigitChars_T_::UE_Char: {
+                            is_float = true;
+                            break;
+                        }
+
                         case JSONotation_T_::SpaceChar:
                         case JSONotation_T_::LineControlChar:
                         case JSONotation_T_::TabControlChar:
@@ -281,12 +290,30 @@ class JSONParser {
                         case JSONotation_T_::CommaChar:
                         case JSONotation_T_::ECurlyChar:
                         case JSONotation_T_::ESquareChar: {
-                            double num;
+                            if (is_float) {
+                                double num;
 
-                            if (Digit<Char_T_>::StringToNumber(
-                                    num, (content + num_offset),
-                                    (offset - num_offset))) {
-                                return VValue{num};
+                                if (Digit<Char_T_>::StringToNumber(
+                                        num, num_content,
+                                        (offset - num_offset))) {
+                                    return VValue{num};
+                                }
+                            } else if (is_negative) {
+                                long long num;
+
+                                if (Digit<Char_T_>::StringToNumber(
+                                        num, num_content,
+                                        (offset - num_offset))) {
+                                    return VValue{num};
+                                }
+                            } else {
+                                unsigned long long num;
+
+                                if (Digit<Char_T_>::StringToNumber(
+                                        num, num_content,
+                                        (offset - num_offset))) {
+                                    return VValue{num};
+                                }
                             }
 
                             offset = length;

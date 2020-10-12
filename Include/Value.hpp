@@ -34,7 +34,9 @@ enum class ValueType : unsigned short {
     Object,
     Array,
     String,
-    Number,
+    UInt64, // unsigned long long
+    Int64,  //          long long
+    Double, //          double
     True,
     False,
     Null
@@ -50,11 +52,11 @@ class Value {
   public:
     Value() noexcept : number_{} {}
 
-    Value(Value &&val) noexcept : number_{val.number_}, type_{val.type_} {
-        val.type_ = ValueType::Undefined;
+    Value(Value &&val) noexcept : number_{val.number_}, type_{val.Type()} {
+        val.setTypeToUndefined();
     }
 
-    Value(const Value &val) : type_{val.type_} { copyValue(val); }
+    Value(const Value &val) : type_{val.Type()} { copyValue(val); }
 
     ~Value() {
         if (!IsUndefined()) {
@@ -65,25 +67,24 @@ class Value {
     explicit Value(ValueType type) noexcept {
         switch (type) {
             case ValueType::Object: {
-                Memory::Construct(&object_, VObject());
-                break;
+                initObject();
+                return;
             }
 
             case ValueType::Array: {
-                Memory::Construct(&array_, VArray());
-                break;
+                initArray();
+                return;
             }
 
             case ValueType::String: {
-                Memory::Construct(&string_, VString());
-                break;
+                initString();
+                return;
             }
 
             default: {
+                setType(type);
             }
         }
-
-        type_ = type;
     }
 
     explicit Value(VObject &&obj) noexcept
@@ -100,26 +101,48 @@ class Value {
         : string_{str}, type_{ValueType::String} {}
     explicit Value(const Char_T_ *str, SizeT length) noexcept
         : string_{str, length}, type_{ValueType::String} {}
+    explicit Value(unsigned long long num) noexcept
+        : number_{num}, type_{ValueType::UInt64} {}
+    explicit Value(long long num) noexcept
+        : number_{num}, type_{ValueType::Int64} {}
     explicit Value(double num) noexcept
-        : number_{num}, type_{ValueType::Number} {}
-    template <typename Type_T_>
-    explicit Value(Type_T_ num) noexcept
-        : number_{static_cast<double>(num)}, type_{ValueType::Number} {}
+        : number_{num}, type_{ValueType::Double} {}
+
+    template <typename Number_T_>
+    explicit Value(Number_T_ num) noexcept {
+        constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
+        constexpr bool is_float =
+            (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
+
+        if (is_unsigned) {
+            number_.SetNumber(static_cast<unsigned long long>(num));
+            setTypeToUInt64();
+        } else if (!is_float) {
+            number_.SetNumber(static_cast<long long>(num));
+            setTypeToInt64();
+        } else {
+            number_.SetNumber(static_cast<double>(num));
+            setTypeToDouble();
+        }
+    }
+
     explicit Value(NullType) noexcept : type_{ValueType::Null} {}
     explicit Value(bool bl) noexcept
         : type_{bl ? ValueType::True : ValueType::False} {}
 
     Value &operator=(Value &&val) noexcept {
+        constexpr unsigned long long num = 0;
+
         if (this != &val) {
             if (!IsUndefined()) {
                 reset();
             }
 
             number_ = val.number_;
-            type_   = val.type_;
+            setType(val.Type());
 
-            val.number_ = VNumber{SLong{0}};
-            val.type_   = ValueType::Undefined;
+            val.number_ = VNumber{num};
+            val.setTypeToUndefined();
         }
 
         return *this;
@@ -127,8 +150,8 @@ class Value {
 
     Value &operator=(const Value &val) {
         if (this != &val) {
-            if (type_ == val.type_) {
-                switch (type_) {
+            if (Type() == val.Type()) {
+                switch (Type()) {
                     case ValueType::Object: {
                         object_ = val.object_;
                         break;
@@ -144,7 +167,9 @@ class Value {
                         break;
                     }
 
-                    case ValueType::Number: {
+                    case ValueType::UInt64:
+                    case ValueType::Int64:
+                    case ValueType::Double: {
                         number_ = val.number_;
                         break;
                     }
@@ -159,7 +184,7 @@ class Value {
                     copyValue(val);
                 }
 
-                type_ = val.type_;
+                setType(val.Type());
             }
         }
 
@@ -176,8 +201,8 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&object_, static_cast<VObject &&>(obj));
-        type_ = ValueType::Object;
+        initValue(static_cast<VObject &&>(obj));
+        setTypeToObject();
         return *this;
     }
 
@@ -191,8 +216,8 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&object_, obj);
-        type_ = ValueType::Object;
+        initValue(obj);
+        setTypeToObject();
         return *this;
     }
 
@@ -206,8 +231,8 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&array_, static_cast<VArray &&>(arr));
-        type_ = ValueType::Array;
+        initValue(static_cast<VArray &&>(arr));
+        setTypeToArray();
         return *this;
     }
 
@@ -221,8 +246,8 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&array_, arr);
-        type_ = ValueType::Array;
+        initValue(arr);
+        setTypeToArray();
         return *this;
     }
 
@@ -236,8 +261,8 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&string_, static_cast<VString &&>(str));
-        type_ = ValueType::String;
+        initValue(static_cast<VString &&>(str));
+        setTypeToString();
         return *this;
     }
 
@@ -251,8 +276,8 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&string_, str);
-        type_ = ValueType::String;
+        initValue(str);
+        setTypeToString();
         return *this;
     }
 
@@ -266,48 +291,41 @@ class Value {
             reset();
         }
 
-        Memory::Construct(&string_, VString{str});
-        type_ = ValueType::String;
+        initValue(VString{str});
+        setTypeToString();
         return *this;
     }
 
-    Value &operator=(double num) noexcept {
-        if (IsNumber()) {
-            number_ = num;
-            return *this;
+    template <typename Number_T_>
+    inline Value &operator=(Number_T_ num) noexcept {
+        constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
+        constexpr bool is_float =
+            (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
+
+        if (!IsNumber() && !IsUndefined()) {
+            reset();
         }
 
+        if (is_unsigned) {
+            number_.SetNumber(static_cast<unsigned long long>(num));
+            setTypeToUInt64();
+        } else if (!is_float) {
+            number_.SetNumber(static_cast<long long>(num));
+            setTypeToInt64();
+        } else {
+            number_.SetNumber(static_cast<double>(num));
+            setTypeToDouble();
+        }
+
+        return *this;
+    }
+
+    Value &operator=(NullType) noexcept {
         if (!IsUndefined()) {
             reset();
         }
 
-        number_ = num;
-        type_   = ValueType::Number;
-        return *this;
-    }
-
-    template <typename Type_T_>
-    inline Value &operator=(Type_T_ num) {
-        if (IsNumber()) {
-            number_ = static_cast<double>(num);
-            return *this;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        number_ = static_cast<double>(num);
-        type_   = ValueType::Number;
-        return *this;
-    }
-
-    Value &operator=(NullType) {
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        type_ = ValueType::Null;
+        setTypeToNull();
         return *this;
     }
 
@@ -316,14 +334,18 @@ class Value {
             reset();
         }
 
-        type_ = (is_true ? ValueType::True : ValueType::False);
+        if (is_true) {
+            setTypeToTrue();
+        } else {
+            setTypeToFalse();
+        }
+
         return *this;
     }
 
     void operator+=(Value &&val) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -344,7 +366,7 @@ class Value {
             } else if (!(val.IsUndefined())) {
                 array_ += static_cast<Value &&>(val);
             }
-        } else if (IsObject() && (val.type_ == type_)) {
+        } else if (IsObject() && val.IsObject()) {
             object_ += static_cast<VObject &&>(val.object_);
         }
 
@@ -353,8 +375,7 @@ class Value {
 
     void operator+=(const Value &val) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -375,15 +396,14 @@ class Value {
             } else if (!(val.IsUndefined())) {
                 array_ += val;
             }
-        } else if (IsObject() && (val.type_ == type_)) {
+        } else if (IsObject() && val.IsObject()) {
             object_ += val.object_;
         }
     }
 
     void operator+=(VObject &&obj) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -403,7 +423,7 @@ class Value {
             array_ += static_cast<VArray &&>(arr);
         } else if (IsUndefined()) {
             new (&array_) VArray(static_cast<VArray &&>(arr));
-            type_ = ValueType::Array;
+            setTypeToArray();
         }
     }
 
@@ -413,8 +433,7 @@ class Value {
 
     void operator+=(VString &&str) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -432,8 +451,7 @@ class Value {
 
     void operator+=(double num) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -448,8 +466,7 @@ class Value {
 
     void operator+=(NullType) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -459,8 +476,7 @@ class Value {
 
     void operator+=(bool is_true) {
         if (IsUndefined()) {
-            Memory::Construct(&array_, VArray());
-            type_ = ValueType::Array;
+            initArray();
         }
 
         if (IsArray()) {
@@ -474,8 +490,7 @@ class Value {
         }
 
         if (IsUndefined()) {
-            Memory::Construct(&object_, VObject());
-            type_ = ValueType::Object;
+            initObject();
             return (object_)[key];
         }
 
@@ -488,8 +503,7 @@ class Value {
         }
 
         if (IsUndefined()) {
-            Memory::Construct(&object_, VObject());
-            type_ = ValueType::Object;
+            initObject();
             return (object_)[static_cast<VString &&>(key)];
         }
 
@@ -502,8 +516,7 @@ class Value {
         }
 
         if (IsUndefined()) {
-            Memory::Construct(&object_, VObject());
-            type_ = ValueType::Object;
+            initObject();
             return (object_)[key];
         }
 
@@ -511,7 +524,7 @@ class Value {
     }
 
     Value &operator[](SizeT index) {
-        switch (type_) {
+        switch (Type()) {
             case ValueType::Array: {
                 if (array_.Size() > index) {
                     return (array_.Storage()[index]);
@@ -537,9 +550,8 @@ class Value {
 
             case ValueType::Undefined: {
                 if (index == 0) {
-                    Memory::Construct(&array_, VArray());
+                    initArray();
                     array_.ResizeAndInitialize(1);
-                    type_ = ValueType::Array;
                     return *(array_.Storage());
                 }
 
@@ -558,25 +570,37 @@ class Value {
         return (*this)[static_cast<SizeT>(index)];
     }
 
-    inline bool IsUndefined() const noexcept {
-        return (type_ == ValueType::Undefined);
+    inline ValueType Type() const noexcept { return type_; }
+    inline bool      IsUndefined() const noexcept {
+        return (Type() == ValueType::Undefined);
     }
     inline bool IsObject() const noexcept {
-        return (type_ == ValueType::Object);
+        return (Type() == ValueType::Object);
     }
-
-    inline bool IsArray() const noexcept { return (type_ == ValueType::Array); }
+    inline bool IsArray() const noexcept {
+        return (Type() == ValueType::Array);
+    }
     inline bool IsString() const noexcept {
-        return (type_ == ValueType::String);
+        return (Type() == ValueType::String);
     }
     inline bool IsNumber() const noexcept {
-        return (type_ == ValueType::Number);
+        return ((Type() == ValueType::UInt64) || (Type() == ValueType::Int64) ||
+                (Type() == ValueType::Double));
     }
-
-    inline bool IsTrue() const noexcept { return (type_ == ValueType::True); }
-    inline bool IsFalse() const noexcept { return (type_ == ValueType::False); }
-    inline bool IsNull() const noexcept { return (type_ == ValueType::Null); }
-    inline ValueType Type() const noexcept { return type_; }
+    inline bool IsUInt64() const noexcept {
+        return (Type() == ValueType::UInt64);
+    }
+    inline bool IsInt64() const noexcept {
+        return (Type() == ValueType::Int64);
+    }
+    inline bool IsDouble() const noexcept {
+        return (Type() == ValueType::Double);
+    }
+    inline bool IsTrue() const noexcept { return (Type() == ValueType::True); }
+    inline bool IsFalse() const noexcept {
+        return (Type() == ValueType::False);
+    }
+    inline bool IsNull() const noexcept { return (Type() == ValueType::Null); }
 
     SizeT Size() const noexcept {
         if (IsObject()) {
@@ -671,7 +695,7 @@ class Value {
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key,
                           Number_T_ &     length) const noexcept {
-        switch (type_) {
+        switch (Type()) {
             case ValueType::String: {
                 key    = string_.First();
                 length = static_cast<Number_T_>(string_.Length());
@@ -703,13 +727,23 @@ class Value {
     }
 
     bool SetString(VString &value) const {
-        switch (type_) {
+        switch (Type()) {
             case ValueType::String: {
                 value = string_;
                 return true;
             }
 
-            case ValueType::Number: {
+            case ValueType::UInt64: {
+                value = Digit<Char_T_>::NumberToString(number_.GetUInt64(), 1);
+                return true;
+            }
+
+            case ValueType::Int64: {
+                value = Digit<Char_T_>::NumberToString(number_.GetInt64(), 1);
+                return true;
+            }
+
+            case ValueType::Double: {
                 value = Digit<Char_T_>::NumberToString(
                     number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION_);
                 return true;
@@ -741,13 +775,24 @@ class Value {
     }
 
     bool InsertString(StringStream<Char_T_> &ss) const {
-        switch (type_) {
+        switch (Type()) {
             case ValueType::String: {
                 ss += string_;
                 return true;
             }
 
-            case ValueType::Number: {
+            case ValueType::UInt64: {
+                Digit<Char_T_>::NumberToStringStream(ss, number_.GetUInt64(),
+                                                     1);
+                return true;
+            }
+
+            case ValueType::Int64: {
+                Digit<Char_T_>::NumberToStringStream(ss, number_.GetInt64(), 1);
+                return true;
+            }
+
+            case ValueType::Double: {
                 Digit<Char_T_>::NumberToStringStream(
                     ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION_);
                 return true;
@@ -792,18 +837,41 @@ class Value {
         return false;
     }
 
-    double GetNumber() const noexcept {
-        if (IsNumber()) {
-            return number_.GetDouble();
-        }
-
-        return 0;
+    unsigned long long GetUInt64() const noexcept {
+        unsigned long long num = 0;
+        SetNumber(num);
+        return num;
     }
 
-    bool SetNumber(double &value) const noexcept {
-        switch (type_) {
-            case ValueType::Number: {
-                value = number_.GetDouble();
+    long long GetInt64() const noexcept {
+        long long num = 0;
+        SetNumber(num);
+        return num;
+    }
+
+    double GetDouble() const noexcept {
+        double num = 0;
+        SetNumber(num);
+        return num;
+    }
+
+    double GetNumber() const noexcept { return GetDouble(); }
+
+    template <typename Number_T_>
+    bool SetNumber(Number_T_ &value) const noexcept {
+        switch (Type()) {
+            case ValueType::UInt64: {
+                value = static_cast<Number_T_>(number_.GetUInt64());
+                return true;
+            }
+
+            case ValueType::Int64: {
+                value = static_cast<Number_T_>(number_.GetInt64());
+                return true;
+            }
+
+            case ValueType::Double: {
+                value = static_cast<Number_T_>(number_.GetDouble());
                 return true;
             }
 
@@ -813,13 +881,13 @@ class Value {
             }
 
             case ValueType::True: {
-                value = 1.0;
+                value = 1;
                 return true;
             }
 
             case ValueType::False:
             case ValueType::Null: {
-                value = 0.0;
+                value = 0;
                 return true;
             }
 
@@ -827,12 +895,13 @@ class Value {
             }
         }
 
-        value = 0.0;
         return false;
     }
 
+    // TODO: Test StringToNumber
+
     bool GetBool(bool &value) const noexcept {
-        switch (type_) {
+        switch (Type()) {
             case ValueType::True: {
                 value = true;
                 return true;
@@ -844,7 +913,17 @@ class Value {
                 return true;
             }
 
-            case ValueType::Number: {
+            case ValueType::UInt64: {
+                value = (number_.GetUInt64() > 0);
+                return true;
+            }
+
+            case ValueType::Int64: {
+                value = (number_.GetInt64() > 0);
+                return true;
+            }
+
+            case ValueType::Double: {
                 value = (number_.GetDouble() > 0);
                 return true;
             }
@@ -899,7 +978,7 @@ class Value {
 
     void Reset() noexcept {
         reset();
-        type_ = ValueType::Undefined;
+        setTypeToUndefined();
     }
 
     void Compress() {
@@ -987,45 +1066,57 @@ class Value {
     }
 
     static void StringifyValue(const Value &val, StringStream<Char_T_> &ss) {
-        switch (val.type_) {
+        switch (val.Type()) {
             case ValueType::Object: {
                 StringifyObject(val.GetObject(), ss);
-                break;
+                return;
             }
             case ValueType::Array: {
                 StringifyArray(val.GetArray(), ss);
-                break;
+                return;
             }
 
             case ValueType::String: {
                 ss += JSONotation_T_::QuoteChar;
                 JSON::EscapeJSON(val.string_.First(), val.string_.Length(), ss);
                 ss += JSONotation_T_::QuoteChar;
-                break;
+                return;
             }
 
-            case ValueType::Number: {
-                Digit<Char_T_>::NumberToStringStream(ss,
-                                                     val.number_.GetDouble());
-                break;
+            case ValueType::UInt64: {
+                Digit<Char_T_>::NumberToStringStream(
+                    ss, val.number_.GetUInt64(), 1);
+                return;
+            }
+
+            case ValueType::Int64: {
+                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(),
+                                                     1);
+                return;
+            }
+
+            case ValueType::Double: {
+                Digit<Char_T_>::NumberToStringStream(
+                    ss, val.number_.GetDouble(), 1);
+                return;
             }
 
             case ValueType::False: {
                 ss.Insert(JSONotation_T_::GetFalseString(),
                           JSONotation_T_::FalseStringLength);
-                break;
+                return;
             }
 
             case ValueType::True: {
                 ss.Insert(JSONotation_T_::GetTrueString(),
                           JSONotation_T_::TrueStringLength);
-                break;
+                return;
             }
 
             case ValueType::Null: {
                 ss.Insert(JSONotation_T_::GetNullString(),
                           JSONotation_T_::NullStringLength);
-                break;
+                return;
             }
 
             default: {
@@ -1046,21 +1137,79 @@ class Value {
     }
 
   private:
+    inline void setType(ValueType new_type) noexcept { type_ = new_type; }
+
+    inline void setTypeToUndefined() noexcept { setType(ValueType::Undefined); }
+    inline void setTypeToObject() noexcept { setType(ValueType::Object); }
+    inline void setTypeToArray() noexcept { setType(ValueType::Array); }
+    inline void setTypeToString() noexcept { setType(ValueType::String); }
+    inline void setTypeToUInt64() noexcept { setType(ValueType::UInt64); }
+    inline void setTypeToInt64() noexcept { setType(ValueType::Int64); }
+    inline void setTypeToDouble() noexcept { setType(ValueType::Double); }
+    inline void setTypeToTrue() noexcept { setType(ValueType::True); }
+    inline void setTypeToFalse() noexcept { setType(ValueType::False); }
+    inline void setTypeToNull() noexcept { setType(ValueType::Null); }
+
+    inline void initObject() {
+        Memory::Construct(&object_, VObject());
+        setTypeToObject();
+    }
+
+    inline void initArray() {
+        Memory::Construct(&array_, VArray());
+        setTypeToArray();
+    }
+
+    inline void initString() {
+        Memory::Construct(&string_, VString());
+        setTypeToString();
+    }
+
+    inline void initValue(VObject &&obj) {
+        Memory::Construct(&object_, static_cast<VObject &&>(obj));
+        setTypeToObject();
+    }
+
+    inline void initValue(const VObject &obj) {
+        Memory::Construct(&object_, obj);
+        setTypeToObject();
+    }
+
+    inline void initValue(VArray &&arr) {
+        Memory::Construct(&array_, static_cast<VArray &&>(arr));
+        setTypeToArray();
+    }
+
+    inline void initValue(const VArray &arr) {
+        Memory::Construct(&array_, arr);
+        setTypeToArray();
+    }
+
+    inline void initValue(VString &&str) {
+        Memory::Construct(&string_, static_cast<VString &&>(str));
+        setTypeToString();
+    }
+
+    inline void initValue(const VString &str) {
+        Memory::Construct(&string_, str);
+        setTypeToString();
+    }
+
     void reset() {
-        switch (type_) {
+        switch (Type()) {
             case ValueType::Object: {
                 object_.Reset();
-                break;
+                return;
             }
 
             case ValueType::Array: {
                 array_.Reset();
-                break;
+                return;
             }
 
             case ValueType::String: {
                 string_.Reset();
-                break;
+                return;
             }
 
             default: {
@@ -1069,28 +1218,24 @@ class Value {
     }
 
     void copyValue(const Value &val) {
-        switch (val.type_) {
+        switch (val.Type()) {
             case ValueType::Object: {
-                Memory::Construct(&object_, val.object_);
-                break;
+                initValue(val.object_);
+                return;
             }
 
             case ValueType::Array: {
-                Memory::Construct(&array_, val.array_);
-                break;
+                initValue(val.array_);
+                return;
             }
 
             case ValueType::String: {
-                Memory::Construct(&string_, val.string_);
-                break;
-            }
-
-            case ValueType::Number: {
-                number_ = val.number_;
-                break;
+                initValue(val.string_);
+                return;
             }
 
             default: {
+                number_ = val.number_;
             }
         }
     }
@@ -1100,38 +1245,29 @@ class Value {
         VNumber() = default;
 
         template <typename Number_T_>
-        explicit VNumber(Number_T_ num) noexcept : number_(num) {}
+        explicit VNumber(Number_T_ num) noexcept : number_{num} {}
 
-        inline VNumber &operator=(double num) noexcept {
-            number_.DNumber = num;
-            return *this;
+        inline void SetNumber(double num) noexcept { number_.d = num; }
+        inline void SetNumber(ULong num) noexcept { number_.ull = num; }
+        inline void SetNumber(SLong num) noexcept { number_.sll = num; }
+
+        inline unsigned long long GetUInt64() const noexcept {
+            return number_.ull;
         }
-
-        inline VNumber &operator=(ULong num) noexcept {
-            number_.ULNumber = num;
-            return *this;
-        }
-
-        inline VNumber &operator=(SLong num) noexcept {
-            number_.SLNumber = num;
-            return *this;
-        }
-
-        inline double GetDouble() const noexcept { return number_.DNumber; }
-        inline ULong  GetULong() const noexcept { return number_.ULNumber; }
-        inline SLong  GetSLong() const noexcept { return number_.SLNumber; }
+        inline long long GetInt64() const noexcept { return number_.sll; }
+        inline double    GetDouble() const noexcept { return number_.d; }
 
       private:
         union Number_T_ {
-            explicit Number_T_() noexcept : Padding{0, 0} {}
-            explicit Number_T_(double num) noexcept : DNumber(num) {}
-            explicit Number_T_(ULong num) noexcept : ULNumber(num) {}
-            explicit Number_T_(SLong num) noexcept : SLNumber(num) {}
+            Number_T_() noexcept : padding_{0, 0} {}
+            explicit Number_T_(unsigned long long num) noexcept : ull{num} {}
+            explicit Number_T_(long long num) noexcept : sll{num} {}
+            explicit Number_T_(double num) noexcept : d{num} {}
 
-            double DNumber;
-            ULong  ULNumber;
-            SLong  SLNumber;
-            SizeT  Padding[2]; // Just in case SizeT is set to long
+            unsigned long long ull;
+            long long          sll;
+            double             d;
+            SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
         const Char_T_ *padding_{nullptr};
