@@ -227,9 +227,7 @@ static void EscapeJSON(const Char_T_ *content, SizeT length,
         ++offset;
     }
 
-    if (offset > offset2) {
-        buffer.Insert((content + offset2), (offset - offset2));
-    }
+    buffer.Insert((content + offset2), (offset - offset2));
 }
 
 // One byte character.
