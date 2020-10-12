@@ -555,15 +555,7 @@ class Template_T_ {
                     findValue((content + offset), ((end_offset - 1) - offset));
                 // -1 is - TemplatePatterns_T_::InLineSuffixLength
 
-                if (value != nullptr) {
-                    SizeT num;
-
-                    if (value->SetNumber(num)) {
-                        return true;
-                    }
-                }
-
-                return false;
+                return ((value != nullptr) && (value->SetNumber(number)));
             }
         }
 
@@ -1060,7 +1052,7 @@ class Template_T_ {
             const Value_T_ *value = findValue(content, length);
 
             if (value != nullptr) {
-                if (value->IsNumber() && value->SetNumber(number)) {
+                if (value->SetNumber(number)) {
                     return true;
                 }
 
