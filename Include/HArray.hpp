@@ -67,7 +67,7 @@ class HArray {
     }
 
     HArray(HArray &&h_arr) noexcept
-        : storage_(h_arr.storage_), index_(h_arr.Size()),
+        : storage_(h_arr.Storage()), index_(h_arr.Size()),
           capacity_(h_arr.Capacity()) {
         h_arr.clearStorage();
         h_arr.setSize(0);
@@ -83,7 +83,7 @@ class HArray {
                 deallocate(Storage());
             }
 
-            setStorage(h_arr.storage_);
+            setStorage(h_arr.Storage());
             setSize(h_arr.Size());
             setCapacity(h_arr.Capacity());
 

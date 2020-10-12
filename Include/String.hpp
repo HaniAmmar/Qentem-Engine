@@ -57,7 +57,7 @@ class String {
         : String(str, StringUtils::Count(str)) {}
 
     String(String &&src) noexcept
-        : storage_(src.storage_), length_(src.Length()) {
+        : storage_(src.Storage()), length_(src.Length()) {
         src.clearStorage();
         src.setLength(0);
     }
@@ -77,7 +77,7 @@ class String {
             deallocate(Storage());
 
             // Do not use Storage(), or the tag will not be copied.
-            setStorage(src.storage_);
+            setStorage(src.Storage());
             setLength(src.Length());
             src.clearStorage();
             src.setLength(0);

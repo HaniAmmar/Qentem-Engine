@@ -42,7 +42,7 @@ class Array {
     }
 
     Array(Array &&arr) noexcept
-        : storage_(arr.storage_), index_(arr.Size()),
+        : storage_(arr.Storage()), index_(arr.Size()),
           capacity_(arr.Capacity()) {
         arr.clearStorage();
         arr.setSize(0);
@@ -82,7 +82,7 @@ class Array {
                 deallocate(Storage());
             }
 
-            setStorage(arr.storage_);
+            setStorage(arr.Storage());
             setSize(arr.Size());
             setCapacity(arr.Capacity());
 
