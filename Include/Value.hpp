@@ -52,7 +52,8 @@ class Value {
   public:
     Value() noexcept : number_{} {}
 
-    Value(Value &&val) noexcept : number_{val.number_}, type_{val.Type()} {
+    Value(Value &&val) noexcept : number_{val.number_} {
+        setType(val.Type());
         val.setTypeToUndefined();
     }
 
@@ -88,25 +89,44 @@ class Value {
     }
 
     explicit Value(VObject &&obj) noexcept
-        : object_{static_cast<VObject &&>(obj)}, type_{ValueType::Object} {}
+        : object_{static_cast<VObject &&>(obj)} {
+        setTypeToObject();
+    }
+
     explicit Value(VArray &&arr) noexcept
-        : array_{static_cast<VArray &&>(arr)}, type_{ValueType::Array} {}
+        : array_{static_cast<VArray &&>(arr)} {
+        setTypeToArray();
+    }
+
     explicit Value(VString &&str) noexcept
-        : string_{static_cast<VString &&>(str)}, type_{ValueType::String} {}
-    explicit Value(const VObject &obj) noexcept
-        : object_{obj}, type_{ValueType::Object} {}
-    explicit Value(const VArray &arr) noexcept
-        : array_{arr}, type_{ValueType::Array} {}
-    explicit Value(const VString &str) noexcept
-        : string_{str}, type_{ValueType::String} {}
+        : string_{static_cast<VString &&>(str)} {
+        setTypeToString();
+    }
+
+    explicit Value(const VObject &obj) noexcept : object_{obj} {
+        setTypeToObject();
+    }
+
+    explicit Value(const VArray &arr) noexcept : array_{arr} {
+        setTypeToArray();
+    }
+
+    explicit Value(const VString &str) noexcept : string_{str} {
+        setTypeToString();
+    }
+
     explicit Value(const Char_T_ *str, SizeT length) noexcept
-        : string_{str, length}, type_{ValueType::String} {}
-    explicit Value(unsigned long long num) noexcept
-        : number_{num}, type_{ValueType::UInt64} {}
-    explicit Value(long long num) noexcept
-        : number_{num}, type_{ValueType::Int64} {}
-    explicit Value(double num) noexcept
-        : number_{num}, type_{ValueType::Double} {}
+        : string_{str, length} {
+        setTypeToString();
+    }
+
+    explicit Value(unsigned long long num) noexcept : number_{num} {
+        setTypeToUInt64();
+    }
+
+    explicit Value(long long num) noexcept : number_{num} { setTypeToInt64(); }
+
+    explicit Value(double num) noexcept : number_{num} { setTypeToDouble(); }
 
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
@@ -126,9 +146,14 @@ class Value {
         }
     }
 
-    explicit Value(NullType) noexcept : type_{ValueType::Null} {}
-    explicit Value(bool bl) noexcept
-        : type_{bl ? ValueType::True : ValueType::False} {}
+    explicit Value(NullType) noexcept { setTypeToNull(); }
+    explicit Value(bool bl) noexcept {
+        if (bl) {
+            setTypeToTrue();
+        } else {
+            setTypeToFalse();
+        }
+    }
 
     Value &operator=(Value &&val) noexcept {
         constexpr unsigned long long num = 0;
