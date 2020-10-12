@@ -28,7 +28,7 @@
 namespace Qentem {
 
 /*
- * Simple resizable array.
+ * Simple resizable array, with pointer taging.
  */
 template <typename Type_>
 class Array {
@@ -50,6 +50,8 @@ class Array {
     }
 
     Array(const Array &arr) : capacity_(arr.Size()) {
+        SetTag(arr.GetTag()); // Copy the value of the tag.
+
         if (Capacity() != 0) {
             allocate();
 
@@ -82,7 +84,7 @@ class Array {
                 deallocate(Storage());
             }
 
-            setStorage(arr.Storage());
+            setStorage(arr.storage_);
             setSize(arr.Size());
             setCapacity(arr.Capacity());
 
@@ -96,6 +98,7 @@ class Array {
 
     Array &operator=(const Array &arr) {
         if (this != &arr) {
+            SetTag(arr.GetTag()); // Copy the value of the tag.
             Reserve(arr.Size());
 
             while (Size() != Capacity()) {
@@ -256,7 +259,32 @@ class Array {
         setSize(Capacity());
     }
 
-    inline Type_ *      Storage() const noexcept { return storage_; }
+#if QENTEM_TAGGED_POINTER_ == 1
+    inline unsigned short GetTag() const noexcept {
+        if (!(IsBigEndian())) {
+            return tag_[3];
+        } else {
+            return tag_[0];
+        }
+    }
+
+    inline void SetTag(unsigned short tag) noexcept {
+        if (!(IsBigEndian())) {
+            tag_[3] = tag;
+        } else {
+            tag_[0] = tag;
+        }
+    }
+
+    inline Type_ *Storage() const noexcept {
+        return reinterpret_cast<Type_ *>(int_storage_ & 0xffffffffffff);
+    }
+#else
+    inline unsigned short GetTag() const noexcept { return 0; }
+    inline void           SetTag(unsigned short tag) noexcept { (void)tag; }
+    inline Type_ *        Storage() const noexcept { return storage_; }
+#endif
+
     inline SizeT        Size() const noexcept { return index_; }
     inline SizeT        Capacity() const noexcept { return capacity_; }
     inline const Type_ *First() const noexcept { return Storage(); }
@@ -275,7 +303,13 @@ class Array {
     //////////// Private ////////////
 
   private:
-    void setStorage(Type_ *new_storage) noexcept { storage_ = new_storage; }
+    void setStorage(Type_ *new_storage) noexcept {
+        const unsigned short current_tag = GetTag(); // Preserve the tag
+
+        storage_ = new_storage;
+        SetTag(current_tag); // Restore the tag
+    }
+
     void allocate() { setStorage(Memory::Allocate<Type_>(Capacity())); }
     void deallocate(Type_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
@@ -310,9 +344,18 @@ class Array {
         }
     }
 
-    Type_ *storage_{nullptr};
-    SizeT  index_{0};
-    SizeT  capacity_{0};
+#if QENTEM_TAGGED_POINTER_ == 1
+    union {
+        unsigned short     tag_[4];
+        unsigned long long int_storage_;
+        Type_ *            storage_{nullptr};
+    };
+#else
+    Type_ *               storage_{nullptr};
+#endif
+
+    SizeT index_{0};
+    SizeT capacity_{0};
 };
 
 } // namespace Qentem
