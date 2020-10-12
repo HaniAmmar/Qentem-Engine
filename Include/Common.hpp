@@ -56,6 +56,11 @@
 #endif
 
 namespace Qentem {
+// 1 == 0x00000001; // little;
+// 1 == 0x01000000; // big
+
+static constexpr bool IsBigEndian() { return ((1 & 0x01000000) ? 1 : 0); }
+
 #ifdef QENTEM_64BIT_
 using ULong = unsigned long long;
 #else
