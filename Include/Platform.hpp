@@ -79,15 +79,6 @@ using QMM_Number_T = unsigned int;
 namespace Qentem {
 namespace Platform {
 
-// static bool IsBigEndian() noexcept {
-//     union {
-//         unsigned short c;
-//         unsigned char  n[2];
-//     } constexpr nc = {256};
-
-//     return (nc.n[0] == 1);
-// }
-
 #ifdef _MSC_VER
 #ifdef QENTEM_64BIT_
 inline static unsigned long CTZ(unsigned long long value) noexcept {
