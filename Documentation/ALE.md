@@ -36,6 +36,7 @@ Also: Parentheses `( )` and brackets `{ }`. Parentheses can have any operation, 
 
 ```cpp
 #include "ALE.hpp"
+#include "Array.hpp"
 
 #include <iostream>
 
@@ -68,7 +69,7 @@ int main() {
         (8 / 4 + 1) - 1 - -1 + 2 == ((5/5+1)*2+1)+3*3)"; // 1
     ///////////////////////////////////////////////////
 
-    for (Qentem::ULong i = 0; i < math.Size(); i++) {
+    for (unsigned int i = 0; i < math.Size(); i++) {
         std::cout << Qentem::ALE::Evaluate(math[i]) << '\n';
     }
 }
@@ -91,35 +92,16 @@ int main() {
     }
 
     if (!ALE::Evaluate(result, "abc")) {
-        std::cout << "invalid" << '\n';
+        std::cout << "Invalid" << '\n';
     }
 
     if (!ALE::Evaluate(result, "a+2")) {
-        std::cout << "invalid" << '\n';
+        std::cout << "Invalid" << '\n';
     }
 }
 ```
 
 ## Example 3
-
-```cpp
-#include "ALE.hpp"
-
-#include <iostream>
-
-using Qentem::ALE;
-
-int main() {
-    std::cout << ALE::Evaluate(" A ==   A  ") << '\n'; // 1
-    std::cout << ALE::Evaluate("A==A") << '\n';        // 1
-    std::cout << ALE::Evaluate("A!=a") << '\n';        // 1
-    std::cout << ALE::Evaluate("A==a") << '\n';        // 0
-    std::cout << ALE::Evaluate("ABCD!=BCD") << '\n';   // 1
-    std::cout << ALE::Evaluate("ABCD==abcd") << '\n';  // 0
-}
-```
-
-## Example 4 (Brackets)
 
 ```cpp
 #include "ALE.hpp"
@@ -129,15 +111,13 @@ int main() {
 
 using Qentem::ALE;
 using Qentem::ALEHelper;
-using Qentem::UInt;
-using Qentem::ULong;
 using Value = Qentem::Value<char>;
 
 struct aleHelper {
-    explicit aleHelper(const Value *value) : value_(value) {
-    }
+    explicit aleHelper(const Value *value) : value_(value) {}
 
-    bool ALESetNumber(double &number, const char *content, UInt length) const {
+    bool ALESetNumber(double &number, const char *content,
+                      unsigned int length) const {
         const Value *val = value_->GetValue(content, length);
 
         if (val != nullptr) {
@@ -147,13 +127,13 @@ struct aleHelper {
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const char *left, UInt left_length,
-                    const char *right, UInt right_length) const {
+    bool ALEIsEqual(bool &result, const char *left, unsigned int left_length,
+                    const char *right, unsigned int right_length) const {
         const Value *val;
         const char * str_left;
         const char * str_right;
-        ULong        str_left_length;
-        ULong        str_right_length;
+        unsigned int str_left_length;
+        unsigned int str_right_length;
 
         if (left[0] == '{') {
             val = value_->GetValue(left, left_length);
@@ -204,7 +184,7 @@ int main() {
     value["{bool}"] = true;
     value["{name}"] = "Qentem";
 
-    // std::cout << ALE::Evaluate("{two}", &ale) << '\n';
+    std::cout << ALE::Evaluate("{two}", &ale) << '\n';               // 2
     std::cout << ALE::Evaluate("4^{two}+{one}", &ale) << '\n';       // 17
     std::cout << ALE::Evaluate("({ten}+{one}) == 11", &ale) << '\n'; // 1
     std::cout << ALE::Evaluate("({bool}) == 1", &ale) << '\n';       // 1

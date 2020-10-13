@@ -1,4 +1,5 @@
 #include "ALE.hpp"
+#include "Array.hpp"
 
 #include <iostream>
 
@@ -31,7 +32,7 @@ int main() {
         (8 / 4 + 1) - 1 - -1 + 2 == ((5/5+1)*2+1)+3*3)"; // 1
     ///////////////////////////////////////////////////
 
-    for (Qentem::ULong i = 0; i < math.Size(); i++) {
+    for (unsigned int i = 0; i < math.Size(); i++) {
         std::cout << Qentem::ALE::Evaluate(math[i]) << '\n';
     }
 }

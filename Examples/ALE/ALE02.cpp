@@ -12,10 +12,10 @@ int main() {
     }
 
     if (!ALE::Evaluate(result, "abc")) {
-        std::cout << "invalid" << '\n';
+        std::cout << "Invalid" << '\n';
     }
 
     if (!ALE::Evaluate(result, "a+2")) {
-        std::cout << "invalid" << '\n';
+        std::cout << "Invalid" << '\n';
     }
 }
