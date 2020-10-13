@@ -19,7 +19,7 @@ int main() {
     v_arr[0] = "text"; // Overwrite
 
     v_arr[5] = abc;                           // Add sub-array
-    v_arr += JSON::Parse(R"([100,200,300])"); // Addition
+    v_arr += JSON::Parse(R"([100,200,300])"); // Merge
 
     std::cout << v_arr.Stringify().First() << '\n';
     /* Output:
