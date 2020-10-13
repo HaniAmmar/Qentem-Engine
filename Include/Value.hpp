@@ -1010,7 +1010,7 @@ class Value {
         }
     }
 
-    void Remove(SizeT index) const noexcept {
+    void RemoveIndex(SizeT index) const noexcept {
         if (IsObject()) {
             object_.RemoveIndex(index);
         } else if (IsArray() && (index < array_.Size())) {
@@ -1018,9 +1018,9 @@ class Value {
         }
     }
 
-    template <typename Type_T_>
-    inline void Remove(Type_T_ index) const noexcept {
-        Remove(static_cast<SizeT>(index));
+    template <typename Number_T_>
+    inline void RemoveIndex(Number_T_ index) const noexcept {
+        RemoveIndex(static_cast<SizeT>(index));
     }
 
     void Reset() noexcept {

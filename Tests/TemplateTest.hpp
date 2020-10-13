@@ -1459,7 +1459,7 @@ static int TestLoopTag3() {
     content = R"(<loop value="v">v</loop>)";
     EQ_VALUE(Template::Render(content, &value), "1030", "Render()");
 
-    value.Remove(1);
+    value.RemoveIndex(1);
 
     content = R"(<loop value="v">v)";
     EQ_VALUE(Template::Render(content, &value), R"(<loop value="v">v)",
@@ -1474,7 +1474,7 @@ static int TestLoopTag3() {
     value += 20;
     value += 30;
 
-    value.Remove(1);
+    value.RemoveIndex(1);
 
     content = R"(<loop value="v">v</loop>)";
     EQ_VALUE(Template::Render(content, &value), "1030", "Render()");

@@ -5532,42 +5532,42 @@ static int TestDeleteValue() {
     using vu_int = unsigned int;
 
     value[0] = 1;
-    value.Remove(int{0});
+    value.RemoveIndex(int{0});
     EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "c";
-    value.Remove(vu_int{0});
+    value.RemoveIndex(vu_int{0});
     EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = Array<Value<char>>();
-    value.Remove(ULong{0});
+    value.RemoveIndex(ULong{0});
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
-    value.Remove(0);
+    value.RemoveIndex(0);
     EQ_VALUE(value.Stringify(), R"([true])", "value.Stringify()");
-    value.Remove(1);
+    value.RemoveIndex(1);
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = "abc";
     value[1] = nullptr;
-    value.Remove(1);
+    value.RemoveIndex(1);
     EQ_VALUE(value.Stringify(), R"(["abc"])", "value.Stringify()");
-    value.Remove(0);
+    value.RemoveIndex(0);
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
-    value.Remove(1);
+    value.RemoveIndex(1);
     EQ_VALUE(value.Stringify(), R"([false,null])", "value.Stringify()");
-    value.Remove(0);
+    value.RemoveIndex(0);
     EQ_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
 
-    value.Remove(2);
+    value.RemoveIndex(2);
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;
@@ -5584,19 +5584,19 @@ static int TestDeleteValue() {
     value[0] = "a";
     value[1] = Array<Value<char>>();
     value[2] = HArray<Value<char>, char>();
-    value.Remove(2);
+    value.RemoveIndex(2);
     EQ_VALUE(value.Stringify(), R"(["a",[]])", "value.Stringify()");
-    value.Remove(1);
+    value.RemoveIndex(1);
     EQ_VALUE(value.Stringify(), R"(["a"])", "value.Stringify()");
 
-    value.Remove(0);
+    value.RemoveIndex(0);
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     /////////
     value.Reset();
 
     value["A"] = 1;
-    value.Remove(0);
+    value.RemoveIndex(0);
     EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
 
     value["A"] = "c";
@@ -5614,7 +5614,7 @@ static int TestDeleteValue() {
     EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_VALUE(value.Stringify(), R"({"bb":true})", "value.Stringify()");
-    value.Remove(1);
+    value.RemoveIndex(1);
     EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
     EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
