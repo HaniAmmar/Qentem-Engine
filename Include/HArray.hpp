@@ -60,9 +60,11 @@ class HArray {
     }
 
     ~HArray() {
-        if (Storage() != nullptr) {
-            Memory::Destruct(Storage(), End());
-            deallocate(Storage());
+        HAItem_T_ *current = Storage();
+
+        if (current != nullptr) {
+            Memory::Destruct(current, End());
+            deallocate(current);
         }
     }
 
@@ -78,9 +80,11 @@ class HArray {
 
     HArray &operator=(HArray &&h_arr) noexcept {
         if (this != &h_arr) {
-            if (Storage() != nullptr) {
-                Memory::Destruct(Storage(), End());
-                deallocate(Storage());
+            HAItem_T_ *current = Storage();
+
+            if (current != nullptr) {
+                Memory::Destruct(current, End());
+                deallocate(current);
             }
 
             setStorage(h_arr.Storage());
@@ -105,11 +109,10 @@ class HArray {
     }
 
     void operator+=(HArray &&h_arr) {
-        SizeT n_size = (Size() + h_arr.Size());
+        const SizeT n_size = (Size() + h_arr.Size());
 
         if (n_size > Capacity()) {
-            n_size = algineSize(n_size);
-            resize(n_size);
+            resize(algineSize(n_size));
         }
 
         HAItem_T_ *      src_item = h_arr.Storage();
@@ -141,11 +144,10 @@ class HArray {
     }
 
     void operator+=(const HArray &h_arr) {
-        SizeT n_size = (Size() + h_arr.Size());
+        const SizeT n_size = (Size() + h_arr.Size());
 
         if (n_size > Capacity()) {
-            n_size = algineSize(n_size);
-            resize(n_size);
+            resize(algineSize(n_size));
         }
 
         HAItem_T_ *      src_item = h_arr.Storage();
@@ -377,9 +379,11 @@ class HArray {
     }
 
     void Reset() noexcept {
-        if (Storage() != nullptr) {
-            Memory::Destruct(Storage(), End());
-            deallocate(Storage());
+        HAItem_T_ *current = Storage();
+
+        if (current != nullptr) {
+            Memory::Destruct(current, End());
+            deallocate(current);
             clearStorage();
             setCapacity(0);
             setSize(0);
@@ -500,9 +504,10 @@ class HArray {
 
     void allocate() {
         setStorage(Memory::Allocate<HAItem_T_>(Capacity()));
+        HAItem_T_ *des = Storage();
 
         for (size_t i = 0; i < Capacity(); i++) {
-            (Storage()[i]).Position = nullptr;
+            (des[i]).Position = nullptr;
         }
     }
     void deallocate(HAItem_T_ *old_storage) { Memory::Deallocate(old_storage); }
@@ -511,16 +516,13 @@ class HArray {
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
     SizeT getBase() const noexcept { return (Capacity() - 1); }
 
-    void grow() {
-        SizeT n_size = ((Capacity() != 0) ? (Capacity() << 1U) : 1);
-        resize(n_size);
-    }
+    void grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
 
     SizeT algineSize(SizeT n_size) noexcept {
-        SizeT size = (SizeT{1} << Platform::CLZ(n_size));
+        const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
 
         if (size < n_size) {
-            size <<= 1U;
+            return (size << 1U);
         }
 
         return size;
@@ -591,8 +593,8 @@ class HArray {
 
     void resize(SizeT new_size) {
         setCapacity(new_size);
-        HAItem_T_ *      src      = Storage();
-        HAItem_T_ *      src_item = Storage();
+        HAItem_T_ *      current  = Storage();
+        HAItem_T_ *      src_item = current;
         const HAItem_T_ *end      = End();
 
         allocate();
@@ -612,18 +614,18 @@ class HArray {
         }
 
         setSize(static_cast<SizeT>(des_item - Storage()));
-        deallocate(src);
+        deallocate(current);
         generateHash();
     }
 
     void generateHash() const noexcept {
-        HAItem_T_ *      item = Storage();
+        HAItem_T_ *      des  = Storage();
+        HAItem_T_ *      item = des;
         const HAItem_T_ *end  = End();
         const SizeT      base = getBase();
 
         while (item != end) {
-            HAItem_T_ **position =
-                &((Storage() + (item->Hash & base))->Position);
+            HAItem_T_ **position = &((des + (item->Hash & base))->Position);
 
             while ((*position) != nullptr) {
                 position = &((*position)->Next);

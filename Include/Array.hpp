@@ -53,17 +53,22 @@ class Array {
         if (Capacity() != 0) {
             allocate();
 
+            Type_ *des = Storage();
+            Type_ *src = arr.Storage();
+
             do {
-                Memory::Construct((Storage() + Size()), arr.Storage()[Size()]);
+                Memory::Construct((des + Size()), src[Size()]);
                 ++index_;
             } while (Size() != Capacity());
         }
     }
 
     ~Array() {
-        if (Storage() != nullptr) {
-            Memory::Destruct(Storage(), End());
-            deallocate(Storage());
+        Type_ *current = Storage();
+
+        if (current != nullptr) {
+            Memory::Destruct(current, End());
+            deallocate(current);
         }
     }
 
@@ -77,9 +82,11 @@ class Array {
 
     Array &operator=(Array &&arr) noexcept {
         if (this != &arr) {
-            if (Storage() != nullptr) {
-                Memory::Destruct(Storage(), End());
-                deallocate(Storage());
+            Type_ *current = Storage();
+
+            if (current != nullptr) {
+                Memory::Destruct(current, End());
+                deallocate(current);
             }
 
             setStorage(arr.Storage());
@@ -98,8 +105,11 @@ class Array {
         if (this != &arr) {
             Reserve(arr.Size());
 
+            Type_ *des = Storage();
+            Type_ *src = arr.Storage();
+
             while (Size() != Capacity()) {
-                Memory::Construct((Storage() + Size()), arr.Storage()[Size()]);
+                Memory::Construct((des + Size()), src[Size()]);
                 ++index_;
             }
         }
@@ -175,9 +185,11 @@ class Array {
     }
 
     void Reset() noexcept {
-        if (Storage() != nullptr) {
-            Memory::Destruct(Storage(), End());
-            deallocate(Storage());
+        Type_ *current = Storage();
+
+        if (current != nullptr) {
+            Memory::Destruct(current, End());
+            deallocate(current);
 
             clearStorage();
             setSize(0);
@@ -245,11 +257,12 @@ class Array {
         }
     }
 
-    void ResizeAndInitialize(SizeT size) {
-        Resize(size);
+    void ResizeAndInitialize(SizeT new_size) {
+        Resize(new_size);
 
-        if (size > Size()) {
-            Memory::Construct((Storage() + Size()), (Storage() + size),
+        if (new_size > Size()) {
+            Type_ *current = Storage();
+            Memory::Construct((current + Size()), (current + new_size),
                               Type_());
         }
 
@@ -299,15 +312,15 @@ class Array {
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     void resize(SizeT new_size) {
-        Type_ *tmp = Storage();
+        Type_ *old = Storage();
         setCapacity(new_size);
         allocate();
 
         if (IsNotEmpty()) {
-            Memory::Copy(Storage(), tmp, (Size() * sizeof(Type_)));
+            Memory::Copy(Storage(), old, (Size() * sizeof(Type_)));
         }
 
-        deallocate(tmp);
+        deallocate(old);
     }
 
     QENTEM_NOINLINE void copyArray(const Array &arr) {
@@ -317,10 +330,12 @@ class Array {
             resize(n_size);
         }
 
-        SizeT n = 0;
+        Type_ *des = Storage();
+        Type_ *src = arr.Storage();
+        SizeT  n   = 0;
 
         while (n != arr.Size()) {
-            Memory::Construct((Storage() + Size()), arr.Storage()[n]);
+            Memory::Construct((des + Size()), src[n]);
             ++index_;
             ++n;
         }

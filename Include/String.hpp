@@ -45,12 +45,13 @@ class String {
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
         allocate(len + 1);
+        Char_T_ *des = Storage();
 
         if (len != 0) {
-            Memory::Copy(Storage(), str, (Length() * sizeof(Char_T_)));
+            Memory::Copy(des, str, (Length() * sizeof(Char_T_)));
         }
 
-        Storage()[Length()] = 0;
+        des[Length()] = 0;
     }
 
     explicit String(const Char_T_ *str)
@@ -65,8 +66,9 @@ class String {
     String(const String &src) : length_(src.Length()) {
         if (IsNotEmpty()) {
             allocate(Length() + 1);
-            Memory::Copy(Storage(), src.First(), (Length() * sizeof(Char_T_)));
-            Storage()[Length()] = 0;
+            Char_T_ *des = Storage();
+            Memory::Copy(des, src.First(), (Length() * sizeof(Char_T_)));
+            des[Length()] = 0;
         }
     }
 
@@ -75,8 +77,6 @@ class String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());
-
-            // Do not use Storage(), or the tag will not be copied.
             setStorage(src.Storage());
             setLength(src.Length());
             src.clearStorage();
@@ -91,8 +91,9 @@ class String {
             deallocate(Storage());
             setLength(src.Length());
             allocate(Length() + 1);
-            Memory::Copy(Storage(), src.First(), (Length() * sizeof(Char_T_)));
-            Storage()[Length()] = 0;
+            Char_T_ *des = Storage();
+            Memory::Copy(des, src.First(), (Length() * sizeof(Char_T_)));
+            des[Length()] = 0;
         }
 
         return *this;
@@ -104,12 +105,13 @@ class String {
         deallocate(Storage());
         allocate(len + 1);
         setLength(len);
+        Char_T_ *des = Storage();
 
         if (len != 0) {
-            Memory::Copy(Storage(), str, (len * sizeof(Char_T_)));
+            Memory::Copy(des, str, (len * sizeof(Char_T_)));
         }
 
-        Storage()[len] = 0;
+        des[len] = 0;
 
         return *this;
     }
@@ -150,14 +152,14 @@ class String {
     String operator+(const Char_T_ *str) const {
         const SizeT len = StringUtils::Count(str);
         String      ns  = String{Length() + len};
+        Char_T_ *   des = ns.Storage();
 
         if (IsNotEmpty()) {
-            Memory::Copy(ns.Storage(), First(), (Length() * sizeof(Char_T_)));
+            Memory::Copy(des, First(), (Length() * sizeof(Char_T_)));
         }
 
         if (len != 0) {
-            Memory::Copy((ns.Storage() + Length()), str,
-                         (len * sizeof(Char_T_)));
+            Memory::Copy((des + Length()), str, (len * sizeof(Char_T_)));
         }
 
         return ns;
@@ -235,14 +237,14 @@ class String {
     static String Insert(const String &src1, const String &src2) {
         const SizeT ns_len = (src1.Length() + src2.Length());
         String      ns     = String{ns_len};
+        Char_T_ *   des    = ns.Storage();
 
         if (src1.IsNotEmpty()) {
-            Memory::Copy(ns.Storage(), src1.First(),
-                         (src1.Length() * sizeof(Char_T_)));
+            Memory::Copy(des, src1.First(), (src1.Length() * sizeof(Char_T_)));
         }
 
         if (src2.IsNotEmpty()) {
-            Memory::Copy((ns.Storage() + src1.Length()), src2.First(),
+            Memory::Copy((des + src1.Length()), src2.First(),
                          (src2.Length() * sizeof(Char_T_)));
         }
 
@@ -253,15 +255,16 @@ class String {
         if ((str != nullptr) && (len != 0)) {
             Char_T_ *old_str = Storage();
             allocate(Length() + len + 1);
+            Char_T_ *des = Storage();
 
             if (old_str != nullptr) {
-                Memory::Copy(Storage(), old_str, (Length() * sizeof(Char_T_)));
+                Memory::Copy(des, old_str, (Length() * sizeof(Char_T_)));
                 deallocate(old_str);
             }
 
-            Memory::Copy((Storage() + Length()), str, (len * sizeof(Char_T_)));
+            Memory::Copy((des + Length()), str, (len * sizeof(Char_T_)));
             length_ += len;
-            Storage()[Length()] = 0;
+            des[Length()] = 0;
         }
     }
 
