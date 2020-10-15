@@ -736,7 +736,7 @@ static int TestHArray8() {
 
         EQ_TRUE(list.Rename(key1, key2), "Rename()");
         EQ_TO(list.Find(key1), nullptr, "value", "null");
-        EQ_TRUE((list.Rename(key1, key2) == false), "Rename()");
+        EQ_FALSE(list.Rename(key1, key2), "Rename()");
 
         SizeT *y = list.Find(key2);
         SizeT  w = id + 1;
