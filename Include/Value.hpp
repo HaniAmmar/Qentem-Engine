@@ -29,7 +29,7 @@
 
 namespace Qentem {
 
-enum class ValueType : unsigned short {
+enum class ValueType : unsigned char {
     Undefined = 0,
     Object,
     Array,
@@ -1347,17 +1347,17 @@ class Value {
     struct VType_ {
       public:
         inline ValueType GetType() const noexcept {
-            return types_[(!(IsBigEndian()) ? 3 : 1)];
+            return types_[(!(IsBigEndian()) ? 7 : 1)];
         }
 
         inline void SetType(ValueType new_type) noexcept {
-            types_[(!(IsBigEndian()) ? 3 : 1)] = new_type;
+            types_[(!(IsBigEndian()) ? 7 : 1)] = new_type;
         }
 
       private:
         union {
             unsigned long long int_type_;
-            ValueType          types_[4];
+            ValueType          types_[8];
         };
 
         SizeT padding_[2];
