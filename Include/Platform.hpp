@@ -119,11 +119,13 @@ inline static unsigned long CLZ(unsigned int value) noexcept {
 #else
 
 #ifdef QENTEM_64BIT_
-inline static unsigned long CTZ(unsigned long long value) noexcept {
+template <typename Number_T>
+inline static unsigned long CTZ(Number_T value) noexcept {
     return static_cast<unsigned long>(__builtin_ctzl(value));
 }
 
-inline static unsigned long CLZ(unsigned long long value) noexcept {
+template <typename Number_T>
+inline static unsigned long CLZ(Number_T value) noexcept {
     constexpr unsigned long bits = (sizeof(long) * 8) - 1;
     return (bits - static_cast<unsigned long>(__builtin_clzl(value)));
 }
