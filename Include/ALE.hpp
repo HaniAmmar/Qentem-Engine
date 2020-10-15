@@ -422,8 +422,8 @@ class ALE {
                 }
 
                 case ALEOperations<Char_T_>::BracketStart: {
-                    val.str[0] = offset;
-                    val.str[1] = length;
+                    val.str[0] = static_cast<unsigned int>(offset);
+                    val.str[1] = static_cast<unsigned int>(length);
 
                     switch (op) {
                         case Operation::HelperIsEqual:
@@ -452,8 +452,8 @@ class ALE {
                     switch (op) {
                         case Operation::HelperIsEqual:
                         case Operation::HelperIsNotEqual: {
-                            val.str[0] = offset;
-                            val.str[1] = length;
+                            val.str[0] = static_cast<unsigned int>(offset);
+                            val.str[1] = static_cast<unsigned int>(length);
                             return true;
                         }
 
@@ -463,8 +463,8 @@ class ALE {
                                 val.number, (content + offset), length);
 
                             if (!bool_val) {
-                                val.str[0] = offset;
-                                val.str[1] = length;
+                                val.str[0] = static_cast<unsigned int>(offset);
+                                val.str[1] = static_cast<unsigned int>(length);
 
                                 if (op == Operation::Equal) {
                                     op = Operation::HelperIsEqual;

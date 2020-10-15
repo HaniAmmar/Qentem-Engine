@@ -661,7 +661,7 @@ class Digit {
 
     template <typename String_T_, typename Number_T_>
     QENTEM_NOINLINE static void intToString(String_T_ &dstring,
-                                            Number_T_ number, unsigned int min,
+                                            Number_T_ number, SizeT min,
                                             bool negative) {
         using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
 
