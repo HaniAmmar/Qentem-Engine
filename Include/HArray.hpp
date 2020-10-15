@@ -30,8 +30,8 @@ namespace Qentem {
 
 template <typename Value_, typename Char_T_>
 struct HAItem {
-    HAItem *        Position;
-    HAItem *        Next;
+    SizeT           Position; // To maintain the order of the items.
+    SizeT           Next;
     ULong           Hash;
     String<Char_T_> Key;
     Value_          Value;
@@ -115,22 +115,26 @@ class HArray {
             resize(algineSize(n_size));
         }
 
+        HAItem_T_ *      des      = Storage();
         HAItem_T_ *      src_item = h_arr.Storage();
         const HAItem_T_ *end      = h_arr.End();
 
         while (src_item != end) {
             if (src_item->Hash != 0) {
-                HAItem_T_ **item;
+                SizeT *index;
+                find(index, src_item->Key.First(), src_item->Key.Length(),
+                     src_item->Hash);
 
-                if (!find(item, src_item->Key.First(), src_item->Key.Length(),
-                          src_item->Hash)) {
-                    insert(item, static_cast<String<Char_T_> &&>(src_item->Key),
+                if (*index == 0) {
+                    insert(index,
+                           static_cast<String<Char_T_> &&>(src_item->Key),
                            src_item->Hash);
                 } else {
                     src_item->Key.~String<Char_T_>();
                 }
 
-                (*item)->Value = static_cast<Value_ &&>(src_item->Value);
+                des[(*index) - 1].Value =
+                    static_cast<Value_ &&>(src_item->Value);
             }
 
             ++src_item;
@@ -149,20 +153,22 @@ class HArray {
             resize(algineSize(n_size));
         }
 
-        HAItem_T_ *      src_item = h_arr.Storage();
+        HAItem_T_ *      des      = Storage();
+        const HAItem_T_ *src_item = h_arr.Storage();
         const HAItem_T_ *end      = h_arr.End();
 
         while (src_item != end) {
             if (src_item->Hash != 0) {
-                HAItem_T_ **item;
+                SizeT *index;
+                find(index, src_item->Key.First(), src_item->Key.Length(),
+                     src_item->Hash);
 
-                if (!find(item, src_item->Key.First(), src_item->Key.Length(),
-                          src_item->Hash)) {
-                    insert(item, String<Char_T_>(src_item->Key),
+                if (*index == 0) {
+                    insert(index, String<Char_T_>(src_item->Key),
                            src_item->Hash);
                 }
 
-                (*item)->Value = Value_(src_item->Value);
+                des[(*index) - 1].Value = Value_(src_item->Value);
             }
 
             ++src_item;
@@ -176,13 +182,14 @@ class HArray {
 
         SizeT       len  = StringUtils::Count(key);
         const ULong hash = Hash(key, len);
-        HAItem_T_ **item;
+        SizeT *     index;
+        find(index, key, len, hash);
 
-        if (!find(item, key, len, hash)) {
-            insert(item, String<Char_T_>(key, len), hash);
+        if ((*index) == 0) {
+            insert(index, String<Char_T_>(key, len), hash);
         }
 
-        return (*item)->Value;
+        return Storage()[(*index) - 1].Value;
     }
 
     Value_ &operator[](String<Char_T_> &&key) {
@@ -191,13 +198,14 @@ class HArray {
         }
 
         const ULong hash = Hash(key.First(), key.Length());
-        HAItem_T_ **item;
+        SizeT *     index;
+        find(index, key.First(), key.Length(), hash);
 
-        if (!find(item, key.First(), key.Length(), hash)) {
-            insert(item, static_cast<String<Char_T_> &&>(key), hash);
+        if ((*index) == 0) {
+            insert(index, static_cast<String<Char_T_> &&>(key), hash);
         }
 
-        return (*item)->Value;
+        return Storage()[(*index) - 1].Value;
     }
 
     Value_ &operator[](const String<Char_T_> &key) {
@@ -206,13 +214,14 @@ class HArray {
         }
 
         const ULong hash = Hash(key.First(), key.Length());
-        HAItem_T_ **item;
+        SizeT *     index;
+        find(index, key.First(), key.Length(), hash);
 
-        if (!find(item, key.First(), key.Length(), hash)) {
-            insert(item, String<Char_T_>(key), hash);
+        if ((*index) == 0) {
+            insert(index, String<Char_T_>(key), hash);
         }
 
-        return (*item)->Value;
+        return Storage()[(*index) - 1].Value;
     }
 
     void Insert(String<Char_T_> &&key, Value_ &&val) {
@@ -220,21 +229,14 @@ class HArray {
             grow();
         }
 
-        const ULong hash = Hash(key.First(), key.Length());
-        HAItem_T_ **item;
+        const ULong hash  = Hash(key.First(), key.Length());
+        SizeT *     index = find(key.First(), key.Length(), hash);
 
-        if (!find(item, key.First(), key.Length(), hash)) {
-            item       = (Storage() + Size());
-            item->Next = nullptr;
-            item->Hash = hash;
-            Memory::Construct(&(item->Key),
-                              static_cast<String<Char_T_> &&>(key));
-            Memory::Construct(&(item->Value), static_cast<Value_ &&>(val));
-            ++index_;
-            return;
+        if ((*index) == 0) {
+            insert(index, static_cast<String<Char_T_> &&>(key), hash);
         }
 
-        (*item)->Value = static_cast<Value_ &&>(val);
+        Storage()[(*index) - 1].Value = static_cast<Value_ &&>(val);
     }
 
     Value_ *GetValue(SizeT index) const noexcept {
@@ -274,18 +276,23 @@ class HArray {
     }
 
     const HAItem_T_ *GetItem(const String<Char_T_> &key) const noexcept {
-        // You can get the index of the item using (*GetItem() - *First())
-        HAItem_T_ **item;
-        find(item, key.First(), key.Length(), Hash(key.First(), key.Length()));
-        return *item;
+        SizeT *index;
+        find(index, key.First(), key.Length(), Hash(key.First(), key.Length()));
+
+        if ((*index) != 0) {
+            return (Storage() + ((*index) - 1));
+        }
+
+        return nullptr;
     }
 
     Value_ *Find(const Char_T_ *key, SizeT length) const noexcept {
         if (Size() != 0) {
-            HAItem_T_ **item;
+            SizeT *index;
+            find(index, key, length, Hash(key, length));
 
-            if (find(item, key, length, Hash(key, length))) {
-                return &((*item)->Value);
+            if ((*index) != 0) {
+                return &((Storage()[(*index) - 1]).Value);
             }
         }
 
@@ -325,37 +332,44 @@ class HArray {
     bool Rename(const String<Char_T_> &from,
                 String<Char_T_> &&     to) const noexcept {
         if (Size() != 0) {
-            const ULong hash_from = Hash(from.First(), from.Length());
-            HAItem_T_ **left_item = getItem(hash_from);
-            HAItem_T_ **previous  = nullptr;
+            const ULong hash_from     = Hash(from.First(), from.Length());
+            SizeT *     left_index    = getItem(hash_from);
+            SizeT *     left_previous = nullptr;
+            HAItem_T_ * src           = Storage();
+            HAItem_T_ * item;
 
-            while ((*left_item != nullptr) &&
-                   (((*left_item)->Hash != hash_from) ||
-                    ((*left_item)->Key.Length() != from.Length()) ||
-                    !(StringUtils::IsEqual((*left_item)->Key.First(),
-                                           from.First(), from.Length())))) {
-                previous  = left_item; // Store the previous item
-                left_item = &((*left_item)->Next);
-            }
+            if (*left_index != 0) {
+                do {
+                    item = (src + ((*left_index) - 1));
 
-            if (*left_item != nullptr) {
-                const ULong hash_to = Hash(to.First(), to.Length());
-                HAItem_T_ **right_item;
-                find(right_item, to.First(), to.Length(), hash_to);
-
-                if (*right_item == nullptr) {
-                    *right_item         = *left_item;
-                    (*right_item)->Key  = static_cast<String<Char_T_> &&>(to);
-                    (*right_item)->Hash = hash_to;
-
-                    // See remove() for the next part
-                    if ((previous == nullptr) || (*previous < *right_item)) {
-                        *left_item = (*right_item)->Next;
-                    } else {
-                        *previous = (*right_item)->Next;
+                    if ((item->Hash == hash_from) && (from == item->Key)) {
+                        break;
                     }
 
-                    (*right_item)->Next = nullptr;
+                    left_previous = left_index;
+                    left_index    = &(item->Next);
+                } while (*left_index != 0);
+            }
+
+            if (*left_index != 0) {
+                const ULong hash_to = Hash(to.First(), to.Length());
+                SizeT *     right_index;
+                find(right_index, to.First(), to.Length(), hash_to);
+
+                if ((*right_index) == 0) {
+                    *right_index = *left_index;
+                    item->Key    = static_cast<String<Char_T_> &&>(to);
+                    item->Hash   = hash_to;
+
+                    // See remove() for the next part
+                    if ((left_previous == nullptr) ||
+                        (*left_previous < *right_index)) {
+                        *left_index = item->Next;
+                    } else {
+                        *left_previous = item->Next;
+                    }
+
+                    item->Next = 0;
 
                     return true;
                 }
@@ -505,14 +519,21 @@ class HArray {
 #endif
     }
 
-    void allocate() {
-        setStorage(Memory::Allocate<HAItem_T_>(Capacity()));
-        HAItem_T_ *des = Storage();
+    void clearPosition() noexcept {
+        HAItem_T_ *      item = Storage();
+        const HAItem_T_ *end  = item + Capacity();
 
-        for (size_t i = 0; i < Capacity(); i++) {
-            (des[i]).Position = nullptr;
+        while (item != end) {
+            item->Position = 0;
+            ++item;
         }
     }
+
+    void allocate() {
+        setStorage(Memory::Allocate<HAItem_T_>(Capacity()));
+        clearPosition();
+    }
+
     void deallocate(HAItem_T_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
@@ -531,68 +552,78 @@ class HArray {
         return size;
     }
 
-    HAItem_T_ **getItem(ULong hash) const noexcept {
+    SizeT *getItem(ULong hash) const noexcept {
         return &(Storage()[hash & getBase()].Position);
     }
 
-    bool find(HAItem_T_ **&item, const Char_T_ *key, SizeT length,
+    void find(SizeT *&index, const Char_T_ *key, SizeT length,
               ULong hash) const noexcept {
-        item = getItem(hash);
+        index          = getItem(hash);
+        HAItem_T_ *src = Storage();
 
-        while ((*item != nullptr) &&
-               (((*item)->Hash != hash) || ((*item)->Key.Length() != length) ||
-                !(StringUtils::IsEqual((*item)->Key.First(), key, length)))) {
-            item = &((*item)->Next);
+        while (*index != 0) {
+            HAItem_T_ *item = (src + ((*index) - 1));
+
+            if (((item->Hash == hash) && item->Key.IsEqual(key, length))) {
+                break;
+            }
+
+            index = &(item->Next);
         }
-
-        return (*item != nullptr);
     }
 
-    inline void insert(HAItem_T_ **item, String<Char_T_> &&key,
+    inline void insert(SizeT *index, String<Char_T_> &&key,
                        ULong hash) noexcept {
-        *item         = (Storage() + Size());
-        (*item)->Next = nullptr;
-        (*item)->Hash = hash;
-        Memory::Construct(&((*item)->Key),
-                          static_cast<String<Char_T_> &&>(key));
-        Memory::Construct(&((*item)->Value), Value_());
+        HAItem_T_ *item = (Storage() + Size());
+        item->Next      = 0;
+        item->Hash      = hash;
+        Memory::Construct(&(item->Key), static_cast<String<Char_T_> &&>(key));
+        Memory::Construct(&(item->Value), Value_());
         ++index_;
+        *index = Size();
     }
 
     void remove(const Char_T_ *key, SizeT length, ULong hash) const noexcept {
         if (Size() != 0) {
-            HAItem_T_ **item     = getItem(hash);
-            HAItem_T_ **previous = nullptr;
+            SizeT *    index          = getItem(hash);
+            SizeT *    previous_index = nullptr;
+            HAItem_T_ *src            = Storage();
+            HAItem_T_ *item;
 
-            while (
-                (*item != nullptr) &&
-                (((*item)->Hash != hash) || ((*item)->Key.Length() != length) ||
-                 !(StringUtils::IsEqual((*item)->Key.First(), key, length)))) {
-                previous = item; // Store the previous item
-                item     = &((*item)->Next);
+            if (*index != 0) {
+                do {
+                    item = (src + ((*index) - 1));
+
+                    if ((item->Hash == hash) &&
+                        item->Key.IsEqual(key, length)) {
+                        break;
+                    }
+
+                    previous_index = index;
+                    index          = &(item->Next);
+                } while (*index != 0);
             }
 
-            if (*item != nullptr) {
-                HAItem_T_ *current = *item; // Current item
-                current->Key       = String<Char_T_>();
-                current->Value     = Value_();
-                current->Hash      = 0;
+            if (*index != 0) {
+                item->Key   = String<Char_T_>();
+                item->Value = Value_();
+                item->Hash  = 0;
 
-                if ((previous == nullptr) || (*previous < *item)) {
+                if ((previous_index == nullptr) || (*previous_index < *index)) {
                     /*
                      * If "previous" inserted before "item"
                      * (e.g., deleting items from n to 0).
                      */
-                    *item = (*item)->Next;
+                    *index = item->Next;
                 } else {
                     /*
                      * If "previous" inserted after "item"
                      * (e.g., deleting items from 0 to n).
                      */
-                    *previous = (*item)->Next;
+                    *previous_index = item->Next;
                 }
 
-                current->Next = nullptr;
+                item->Next = 0;
             }
         }
     }
@@ -609,13 +640,14 @@ class HArray {
 
             do {
                 if (src_item->Hash != 0) {
-                    des_item->Next = nullptr;
                     des_item->Hash = src_item->Hash;
                     Memory::Construct(&(des_item->Key), src_item->Key);
                     Memory::Construct(&(des_item->Value), src_item->Value);
                     ++des_item;
                 }
-            } while (++src_item != end);
+
+                ++src_item;
+            } while (src_item != end);
 
             setSize(static_cast<SizeT>(des_item - Storage()));
             generateHash();
@@ -634,14 +666,12 @@ class HArray {
 
         while (src_item != end) {
             if (src_item->Hash != 0) {
-                des_item->Next = nullptr;
                 des_item->Hash = src_item->Hash;
                 Memory::Construct(
                     &(des_item->Key),
                     static_cast<String<Char_T_> &&>(src_item->Key));
                 Memory::Construct(&(des_item->Value),
                                   static_cast<Value_ &&>(src_item->Value));
-
                 ++des_item;
             }
 
@@ -654,19 +684,22 @@ class HArray {
     }
 
     void generateHash() const noexcept {
-        HAItem_T_ *      des  = Storage();
-        HAItem_T_ *      item = des;
-        const HAItem_T_ *end  = End();
+        SizeT            i    = 0;
         const SizeT      base = getBase();
+        HAItem_T_ *      src  = Storage();
+        HAItem_T_ *      item = src;
+        const HAItem_T_ *end  = End();
 
         while (item != end) {
-            HAItem_T_ **position = &((des + (item->Hash & base))->Position);
+            SizeT *index = &((src + (item->Hash & base))->Position);
 
-            while (*position != nullptr) {
-                position = &((*position)->Next);
+            while (*index != 0) {
+                index = &(src[(*index) - 1].Next);
             }
 
-            *position = item;
+            ++i;
+            *index     = i;
+            item->Next = 0;
             ++item;
         }
     }
