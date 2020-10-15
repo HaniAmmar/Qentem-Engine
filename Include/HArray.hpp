@@ -349,29 +349,29 @@ class HArray {
                     left_previous = left_index;
                     left_index    = &(item->Next);
                 } while (*left_index != 0);
-            }
 
-            if (*left_index != 0) {
-                const ULong hash_to = Hash(to.First(), to.Length());
-                SizeT *     right_index;
-                find(right_index, to.First(), to.Length(), hash_to);
+                if (*left_index != 0) {
+                    const ULong hash_to = Hash(to.First(), to.Length());
+                    SizeT *     right_index;
+                    find(right_index, to.First(), to.Length(), hash_to);
 
-                if ((*right_index) == 0) {
-                    *right_index = *left_index;
-                    item->Key    = static_cast<String<Char_T_> &&>(to);
-                    item->Hash   = hash_to;
+                    if ((*right_index) == 0) {
+                        *right_index = *left_index;
+                        item->Key    = static_cast<String<Char_T_> &&>(to);
+                        item->Hash   = hash_to;
 
-                    // See remove() for the next part
-                    if ((left_previous == nullptr) ||
-                        (*left_previous < *right_index)) {
-                        *left_index = item->Next;
-                    } else {
-                        *left_previous = item->Next;
+                        // See remove() for the next part
+                        if ((left_previous == nullptr) ||
+                            (*left_previous < *right_index)) {
+                            *left_index = item->Next;
+                        } else {
+                            *left_previous = item->Next;
+                        }
+
+                        item->Next = 0;
+
+                        return true;
                     }
-
-                    item->Next = 0;
-
-                    return true;
                 }
             }
         }
@@ -602,28 +602,29 @@ class HArray {
                     previous_index = index;
                     index          = &(item->Next);
                 } while (*index != 0);
-            }
 
-            if (*index != 0) {
-                item->Key   = String<Char_T_>();
-                item->Value = Value_();
-                item->Hash  = 0;
+                if (*index != 0) {
+                    item->Key   = String<Char_T_>();
+                    item->Value = Value_();
+                    item->Hash  = 0;
 
-                if ((previous_index == nullptr) || (*previous_index < *index)) {
-                    /*
-                     * If "previous" inserted before "item"
-                     * (e.g., deleting items from n to 0).
-                     */
-                    *index = item->Next;
-                } else {
-                    /*
-                     * If "previous" inserted after "item"
-                     * (e.g., deleting items from 0 to n).
-                     */
-                    *previous_index = item->Next;
+                    if ((previous_index == nullptr) ||
+                        (*previous_index < *index)) {
+                        /*
+                         * If "previous" inserted before "item"
+                         * (e.g., deleting items from n to 0).
+                         */
+                        *index = item->Next;
+                    } else {
+                        /*
+                         * If "previous" inserted after "item"
+                         * (e.g., deleting items from 0 to n).
+                         */
+                        *previous_index = item->Next;
+                    }
+
+                    item->Next = 0;
                 }
-
-                item->Next = 0;
             }
         }
     }
