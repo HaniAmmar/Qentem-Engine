@@ -45,12 +45,12 @@ struct Engine1 {
             ++offset;
         }
 
-        return 0U; // No match.
+        return 0; // No match.
     }
 
     virtual SizeT FindT(const char *content, SizeT offset,
                         SizeT end_before) const noexcept {
-        return Engine::Find(")", 1U, content, offset, end_before);
+        return Engine::Find(")", SizeT{1}, content, offset, end_before);
     }
 
     virtual SizeT Nest(const char *content, SizeT offset, SizeT end_before,
@@ -60,7 +60,7 @@ struct Engine1 {
         (void)end_before;
         (void)max_end_before;
 
-        return 0U;
+        return 0;
     }
 
     virtual void Found(const char *content, SizeT offset, SizeT end_before,
@@ -77,363 +77,363 @@ struct Engine1 {
 
 static int TestEngine1() {
     SizeT       ret;
-    SizeT       content_len = 0U;
-    SizeT       find_len    = 3U;
+    SizeT       content_len = 0;
+    SizeT       find_len    = 3;
     const char *content     = "";
     const char *find_       = "ABC";
 
-    ret = Engine::Find(find_, find_len, content, 0U, 1U);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, SizeT{1});
+    EQ_VALUE(ret, 0, "return");
 
     content     = "A";
-    content_len = 1U;
+    content_len = 1;
     find_       = "A";
-    find_len    = 1U;
+    find_len    = 1;
 
-    ret = Engine::FindOne(*find_, content, 0U, content_len);
-    EQ_VALUE(ret, 1U, "return");
+    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 1, "return");
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 1U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 1, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "AAAAA";
-    content_len = 5U;
+    content_len = 5;
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 2U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 2, "return");
 
     ret = Engine::Find(find_, find_len, content, content_len, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::Find(find_, find_len, content, 2U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, 3U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{3}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
-    ret = Engine::Find(find_, find_len, content, 4U, content_len);
-    EQ_VALUE(ret, 5U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{4}, content_len);
+    EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::Find(find_, find_len, content, 5U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "  A A        A";
-    content_len = 14U;
+    content_len = 14;
 
-    ret = Engine::FindOne(*find_, content, 0U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::FindOne(*find_, content, 2U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::FindOne(*find_, content, 3U, content_len);
-    EQ_VALUE(ret, 5U, "return");
+    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
+    EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::FindOne(*find_, content, 7U, content_len);
-    EQ_VALUE(ret, 14U, "return");
+    ret = Engine::FindOne(*find_, content, SizeT{7}, content_len);
+    EQ_VALUE(ret, 14, "return");
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, 2U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, 3U, content_len);
-    EQ_VALUE(ret, 5U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{3}, content_len);
+    EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::Find(find_, find_len, content, 4U, content_len);
-    EQ_VALUE(ret, 5U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{4}, content_len);
+    EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::Find(find_, find_len, content, 5U, content_len);
-    EQ_VALUE(ret, 14U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    EQ_VALUE(ret, 14, "return");
 
     content     = "A";
-    content_len = 1U;
+    content_len = 1;
     find_       = "AB";
-    find_len    = 2U;
+    find_len    = 2;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content = "AA";
-    ret     = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content = "A   A   A";
-    ret     = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content = "  A   A   A  ";
-    ret     = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "AB";
-    content_len = 2U;
+    content_len = 2;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 2U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 2, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::Find(find_, find_len, content, 2U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = " AB";
-    content_len = 3U;
+    content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
     content     = "AAB";
-    content_len = 3U;
+    content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
     content     = "AAAB";
-    content_len = 4U;
+    content_len = 4;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
-    ret = Engine::Find(find_, find_len, content, 2U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
     content     = "AAAAAAAAAB";
-    content_len = 10U;
+    content_len = 10;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 10U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 10, "return");
 
-    ret = Engine::Find(find_, find_len, content, 5U, content_len);
-    EQ_VALUE(ret, 10U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    EQ_VALUE(ret, 10, "return");
 
-    ret = Engine::Find(find_, find_len, content, 8U, content_len);
-    EQ_VALUE(ret, 10U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
+    EQ_VALUE(ret, 10, "return");
 
     content     = "  AB";
-    content_len = 4U;
+    content_len = 4;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
-    ret = Engine::Find(find_, find_len, content, 1U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
-    ret = Engine::Find(find_, find_len, content, 2U, content_len);
-    EQ_VALUE(ret, 4U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    EQ_VALUE(ret, 4, "return");
 
     content     = "        AB";
-    content_len = 10U;
+    content_len = 10;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 10U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 10, "return");
 
-    ret = Engine::Find(find_, find_len, content, 5U, content_len);
-    EQ_VALUE(ret, 10U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    EQ_VALUE(ret, 10, "return");
 
-    ret = Engine::Find(find_, find_len, content, 8U, content_len);
-    EQ_VALUE(ret, 10U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
+    EQ_VALUE(ret, 10, "return");
 
     content     = "AAAAAAAAA";
-    content_len = 9U;
+    content_len = 9;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::Find(find_, find_len, content, 5U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::Find(find_, find_len, content, 8U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     ret =
         Engine::Find(find_, find_len, content, (content_len - 1), content_len);
-    EQ_VALUE(ret, 0U, "return");
+    EQ_VALUE(ret, 0, "return");
 
     find_       = "ABC";
-    find_len    = 3U;
+    find_len    = 3;
     content     = "CBA";
-    content_len = 3U;
+    content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "BCBA";
-    content_len = 4U;
+    content_len = 4;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "123456789123456CBA";
-    content_len = 18U;
+    content_len = 18;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "ADC";
-    content_len = 3U;
+    content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "123456789123456ADC";
-    content_len = 18U;
+    content_len = 18;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     END_SUB_TEST;
 }
 
 static int TestEngine2() {
     SizeT       ret;
-    SizeT       content_len = 16U;
-    SizeT       find_len    = 3U;
+    SizeT       content_len = 16;
+    SizeT       find_len    = 3;
     const char *content     = "ABABABABABAAABAB";
     const char *find_       = "ABC";
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "ABABABABABAAABABC";
-    content_len = 17U;
+    content_len = 17;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 17U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 17, "return");
 
-    ret = Engine::Find(find_, find_len, content, 15U, content_len);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{15}, content_len);
+    EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::Find(find_, find_len, content, 14U, content_len);
-    EQ_VALUE(ret, 17U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{14}, content_len);
+    EQ_VALUE(ret, 17, "return");
 
     content     = "ABABABABABCABAAAB";
-    content_len = 17U;
+    content_len = 17;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 11U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, SizeT{11}, "return");
 
     content     = "   ABC   ";
-    content_len = 9U;
+    content_len = 9;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 6U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 6, "return");
 
     content     = "ABC   ";
-    content_len = 6U;
+    content_len = 6;
 
-    ret = Engine::Find(find_, find_len, content, 0U, content_len);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    EQ_VALUE(ret, 3, "return");
 
     END_SUB_TEST;
 }
 
 static int TestEngine3() {
     SizeT       ret;
-    SizeT       content_len = 0U;
+    SizeT       content_len = 0;
     const char *content     = "";
 
     Engine1 eng1;
 
-    ret = Engine::FindNest("", 0U, 0U, 0U, &eng1);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::FindNest("", SizeT{0}, SizeT{0}, SizeT{0}, &eng1);
+    EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::FindNest("(", 0U, 0U, 1U, &eng1);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::FindNest("(", SizeT{0}, SizeT{0}, SizeT{1}, &eng1);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "   (  ";
-    content_len = 6U;
+    content_len = 6;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng1);
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng1);
     /*
      * When the engine fails to find a complete match, it returns the last
      * offset that stops at: to prevent Infinite loops from according.
      */
-    EQ_VALUE(ret, 4U, "return");
+    EQ_VALUE(ret, 4, "return");
 
     content     = "((((((((";
-    content_len = 8U;
+    content_len = 8;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 1U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, SizeT{1}, "return");
 
     content     = "()";
-    content_len = 2U;
+    content_len = 2;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 2U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, 2, "return");
 
-    ret = Engine::FindNest(content, 1U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::FindNest(content, SizeT{1}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, 0, "return");
 
     content     = " ()";
-    content_len = 3U;
+    content_len = 3;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::FindNest(content, 1U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::FindNest(content, SizeT{1}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::FindNest(content, 2U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::FindNest(content, SizeT{2}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, 0, "return");
 
     content     = " ()             ";
-    content_len = 16U;
+    content_len = 16;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng1);
-    EQ_VALUE(ret, 0U, "return"); // It called Found() already.
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng1);
+    EQ_VALUE(ret, 0, "return"); // It called Found() already.
 
-    ret = Engine::FindNest(content, 0U, 3U, 3U, &eng1);
-    EQ_VALUE(ret, 3U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, SizeT{3}, SizeT{3}, &eng1);
+    EQ_VALUE(ret, 3, "return");
 
     END_SUB_TEST;
 }
 
 static int TestEngine4() {
     SizeT       ret;
-    SizeT       content_len = 0U;
+    SizeT       content_len = 0;
     const char *content     = "";
 
     struct Engine2 : Engine1 {
         SizeT FindT(const char *content, SizeT offset,
                     SizeT end_before) const noexcept override {
-            return Engine::Find("))", 2U, content, offset, end_before);
+            return Engine::Find("))", SizeT{2}, content, offset, end_before);
         }
     };
 
     content     = "       )          ";
-    content_len = 18U;
+    content_len = 18;
 
     Engine2 eng2;
 
     // Checking for weirdness.
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng2);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng2);
+    EQ_VALUE(ret, 0, "return");
 
     content     = " ()             ";
-    content_len = 16U;
+    content_len = 16;
 
     // Checking for weirdness.
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng2);
-    EQ_VALUE(ret, 2U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng2);
+    EQ_VALUE(ret, 2, "return");
 
     struct Engine3 : Engine2 {
         SizeT FindH(const char *content, SizeT offset,
@@ -447,40 +447,40 @@ static int TestEngine4() {
                 ++offset;
             }
 
-            return 0U; // No match
+            return 0; // No match
         }
     };
 
     content     = "(())";
-    content_len = 4U;
+    content_len = 4;
 
     Engine3 eng3;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng3);
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng3);
     EQ_VALUE(ret, content_len, "return");
 
     content     = "      (())";
-    content_len = 10U;
+    content_len = 10;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng3);
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng3);
     EQ_VALUE(ret, content_len, "return");
 
     content     = "      (()) ";
-    content_len = 11U;
+    content_len = 11;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng3);
-    EQ_VALUE(ret, 0U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng3);
+    EQ_VALUE(ret, 0, "return");
 
     content     = "( (())";
-    content_len = 6U;
+    content_len = 6;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng3);
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng3);
     EQ_VALUE(ret, content_len, "return");
 
     content     = "( ( ( ( ( ( (())";
-    content_len = 16U;
+    content_len = 16;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng3);
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng3);
     EQ_VALUE(ret, content_len, "return");
 
     struct Engine4 : Engine3 {
@@ -493,11 +493,11 @@ static int TestEngine4() {
     };
 
     content     = "(()";
-    content_len = 3U;
+    content_len = 3;
     Engine4 eng4;
 
-    ret = Engine::FindNest(content, 0U, content_len, content_len, &eng4);
-    EQ_VALUE(ret, 2U, "return");
+    ret = Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng4);
+    EQ_VALUE(ret, 2, "return");
     EQ_TRUE(eng4.getError(), "has_error");
 
     struct Item__ {
@@ -533,85 +533,85 @@ static int TestEngine4() {
 
     Engine5 eng5;
     content     = "()";
-    content_len = 2U;
+    content_len = 2;
 
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng5.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng5.getItems()[0].Length, 2U, "items[0].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng5.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng5.getItems()[0].Length, 2, "items[0].Length");
     EQ_VALUE(eng5.getVARS().Content, content, "Content");
-    EQ_VALUE(eng5.getVARS().Offset, 0U, "Offset");
+    EQ_VALUE(eng5.getVARS().Offset, 0, "Offset");
     EQ_VALUE(eng5.getVARS().EndBefore, content_len, "EndBefore");
 
     content     = "()(";
-    content_len = 3U;
+    content_len = 3;
 
     eng5.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng5.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng5.getItems()[0].Length, 2U, "items[0].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng5.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng5.getItems()[0].Length, 2, "items[0].Length");
 
     content     = "()((((((";
-    content_len = 8U;
+    content_len = 8;
 
     eng5.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng5.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng5.getItems()[0].Length, 2U, "items[0].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng5.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng5.getItems()[0].Length, 2, "items[0].Length");
 
     content     = "()((((((()";
-    content_len = 10U;
+    content_len = 10;
     eng5.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 2U, "items.Size()");
-    EQ_VALUE(eng5.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng5.getItems()[0].Length, 2U, "items[0].Length");
-    EQ_VALUE(eng5.getItems()[1].Offset, 2U, "items[1].Offset");
-    EQ_VALUE(eng5.getItems()[1].Length, 8U, "items[1].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), 2, "items.Size()");
+    EQ_VALUE(eng5.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng5.getItems()[0].Length, 2, "items[0].Length");
+    EQ_VALUE(eng5.getItems()[1].Offset, 2, "items[1].Offset");
+    EQ_VALUE(eng5.getItems()[1].Length, 8, "items[1].Length");
 
     content     = "()(((()((()()(()()";
-    content_len = 18U;
+    content_len = 18;
     eng5.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 6U, "items.Size()");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), 6, "items.Size()");
 
     content     = "  ()  ()  ()( )  (  )";
-    content_len = 21U;
+    content_len = 21;
     eng5.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 5U, "items.Size()");
-    EQ_VALUE(eng5.getItems()[0].Offset, 2U, "items[0].Offset");
-    EQ_VALUE(eng5.getItems()[0].Length, 2U, "items[0].Length");
-    EQ_VALUE(eng5.getItems()[1].Offset, 6U, "items[1].Offset");
-    EQ_VALUE(eng5.getItems()[1].Length, 2U, "items[1].Length");
-    EQ_VALUE(eng5.getItems()[2].Offset, 10U, "items[2].Offset");
-    EQ_VALUE(eng5.getItems()[2].Length, 2U, "items[2].Length");
-    EQ_VALUE(eng5.getItems()[3].Offset, 12U, "items[3].Offset");
-    EQ_VALUE(eng5.getItems()[3].Length, 3U, "items[3].Length");
-    EQ_VALUE(eng5.getItems()[4].Offset, 17U, "items[4].Offset");
-    EQ_VALUE(eng5.getItems()[4].Length, 4U, "items[4].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), 5, "items.Size()");
+    EQ_VALUE(eng5.getItems()[0].Offset, 2, "items[0].Offset");
+    EQ_VALUE(eng5.getItems()[0].Length, 2, "items[0].Length");
+    EQ_VALUE(eng5.getItems()[1].Offset, 6, "items[1].Offset");
+    EQ_VALUE(eng5.getItems()[1].Length, 2, "items[1].Length");
+    EQ_VALUE(eng5.getItems()[2].Offset, 10, "items[2].Offset");
+    EQ_VALUE(eng5.getItems()[2].Length, 2, "items[2].Length");
+    EQ_VALUE(eng5.getItems()[3].Offset, 12, "items[3].Offset");
+    EQ_VALUE(eng5.getItems()[3].Length, 3, "items[3].Length");
+    EQ_VALUE(eng5.getItems()[4].Offset, 17, "items[4].Offset");
+    EQ_VALUE(eng5.getItems()[4].Length, 4, "items[4].Length");
     EQ_VALUE(eng5.getVARS().Content, content, "Content");
-    EQ_VALUE(eng5.getVARS().Offset, 0U, "Offset");
+    EQ_VALUE(eng5.getVARS().Offset, 0, "Offset");
     EQ_VALUE(eng5.getVARS().EndBefore, content_len, "EndBefore");
 
     content     = "( ) (     ) (  )";
-    content_len = 16U;
+    content_len = 16;
     eng5.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng5);
-    EQ_VALUE(eng5.getItems().Size(), 3U, "items.Size()");
-    EQ_VALUE(eng5.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng5.getItems()[0].Length, 3U, "items[0].Length");
-    EQ_VALUE(eng5.getItems()[1].Offset, 4U, "items[1].Offset");
-    EQ_VALUE(eng5.getItems()[1].Length, 7U, "items[1].Length");
-    EQ_VALUE(eng5.getItems()[2].Offset, 12U, "items[2].Offset");
-    EQ_VALUE(eng5.getItems()[2].Length, 4U, "items[2].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng5);
+    EQ_VALUE(eng5.getItems().Size(), 3, "items.Size()");
+    EQ_VALUE(eng5.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng5.getItems()[0].Length, 3, "items[0].Length");
+    EQ_VALUE(eng5.getItems()[1].Offset, 4, "items[1].Offset");
+    EQ_VALUE(eng5.getItems()[1].Length, 7, "items[1].Length");
+    EQ_VALUE(eng5.getItems()[2].Offset, 12, "items[2].Offset");
+    EQ_VALUE(eng5.getItems()[2].Length, 4, "items[2].Length");
 
     struct Engine6 : Engine4 {
         void Found(const char *content, SizeT offset, SizeT end_before,
                    SizeT start_offset, SizeT &current_offset) override {
-            start_offset -= 2U;
+            start_offset -= 2;
             items += {start_offset, (current_offset - start_offset)};
 
             vars.Content   = content;
@@ -630,96 +630,96 @@ static int TestEngine4() {
 
     Engine6 eng6;
     content     = "(())";
-    content_len = 4U;
+    content_len = 4;
 
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 4U, "items[0].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 4, "items[0].Length");
 
     content     = "(())(";
-    content_len = 5U;
+    content_len = 5;
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 4U, "items[0].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 4, "items[0].Length");
 
     content     = "(())((";
-    content_len = 6U;
+    content_len = 6;
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 0U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 4U, "items[0].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 0, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 4, "items[0].Length");
 
     content     = "(())(()";
-    content_len = 7U;
+    content_len = 7;
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 1U, "items.Size()");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), SizeT{1}, "items.Size()");
 
     content     = "(())(((()(()(()()";
-    content_len = 17U;
+    content_len = 17;
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 1U, "items.Size()");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), SizeT{1}, "items.Size()");
 
     content     = "(())(((())";
-    content_len = 10U;
+    content_len = 10;
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 2U, "items.Size()");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), 2, "items.Size()");
 
     content     = "  (())  (())  (())(())  (())";
-    content_len = 28U;
+    content_len = 28;
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 5U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 2U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 4U, "items[0].Length");
-    EQ_VALUE(eng6.getItems()[1].Offset, 8U, "items[1].Offset");
-    EQ_VALUE(eng6.getItems()[1].Length, 4U, "items[1].Length");
-    EQ_VALUE(eng6.getItems()[2].Offset, 14U, "items[2].Offset");
-    EQ_VALUE(eng6.getItems()[2].Length, 4U, "items[2].Length");
-    EQ_VALUE(eng6.getItems()[3].Offset, 18U, "items[3].Offset");
-    EQ_VALUE(eng6.getItems()[3].Length, 4U, "items[3].Length");
-    EQ_VALUE(eng6.getItems()[4].Offset, 24U, "items[4].Offset");
-    EQ_VALUE(eng6.getItems()[4].Length, 4U, "items[4].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), 5, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 2, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 4, "items[0].Length");
+    EQ_VALUE(eng6.getItems()[1].Offset, 8, "items[1].Offset");
+    EQ_VALUE(eng6.getItems()[1].Length, 4, "items[1].Length");
+    EQ_VALUE(eng6.getItems()[2].Offset, 14, "items[2].Offset");
+    EQ_VALUE(eng6.getItems()[2].Length, 4, "items[2].Length");
+    EQ_VALUE(eng6.getItems()[3].Offset, 18, "items[3].Offset");
+    EQ_VALUE(eng6.getItems()[3].Length, 4, "items[3].Length");
+    EQ_VALUE(eng6.getItems()[4].Offset, 24, "items[4].Offset");
+    EQ_VALUE(eng6.getItems()[4].Length, 4, "items[4].Length");
 
     content     = "  ((   )) (( )) ((               ))";
-    content_len = 35U;
+    content_len = 35;
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 0U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 3U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 2U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 7U, "items[0].Length");
-    EQ_VALUE(eng6.getItems()[1].Offset, 10U, "items[1].Offset");
-    EQ_VALUE(eng6.getItems()[1].Length, 5U, "items[1].Length");
-    EQ_VALUE(eng6.getItems()[2].Offset, 16U, "items[2].Offset");
-    EQ_VALUE(eng6.getItems()[2].Length, 19U, "items[2].Length");
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), 3, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 2, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 7, "items[0].Length");
+    EQ_VALUE(eng6.getItems()[1].Offset, 10, "items[1].Offset");
+    EQ_VALUE(eng6.getItems()[1].Length, 5, "items[1].Length");
+    EQ_VALUE(eng6.getItems()[2].Offset, 16, "items[2].Offset");
+    EQ_VALUE(eng6.getItems()[2].Length, 19, "items[2].Length");
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 10U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 2U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 10U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 5U, "items[0].Length");
-    EQ_VALUE(eng6.getItems()[1].Offset, 16U, "items[1].Offset");
-    EQ_VALUE(eng6.getItems()[1].Length, 19U, "items[1].Length");
-    EQ_VALUE(eng6.getVARS().Offset, 10U, "Offset");
+    Engine::FindNest(content, SizeT{10}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), 2, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 10, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 5, "items[0].Length");
+    EQ_VALUE(eng6.getItems()[1].Offset, 16, "items[1].Offset");
+    EQ_VALUE(eng6.getItems()[1].Length, 19, "items[1].Length");
+    EQ_VALUE(eng6.getVARS().Offset, 10, "Offset");
     EQ_VALUE(eng6.getVARS().EndBefore, content_len, "EndBefore");
 
     eng6.getItems().Clear();
-    Engine::FindNest(content, 15U, content_len, content_len, &eng6);
-    EQ_VALUE(eng6.getItems().Size(), 1U, "items.Size()");
-    EQ_VALUE(eng6.getItems()[0].Offset, 16U, "items[0].Offset");
-    EQ_VALUE(eng6.getItems()[0].Length, 19U, "items[0].Length");
-    EQ_VALUE(eng6.getVARS().Offset, 15U, "Offset");
+    Engine::FindNest(content, SizeT{15}, content_len, content_len, &eng6);
+    EQ_VALUE(eng6.getItems().Size(), SizeT{1}, "items.Size()");
+    EQ_VALUE(eng6.getItems()[0].Offset, 16, "items[0].Offset");
+    EQ_VALUE(eng6.getItems()[0].Length, 19, "items[0].Length");
+    EQ_VALUE(eng6.getVARS().Offset, 15, "Offset");
     EQ_VALUE(eng6.getVARS().EndBefore, content_len, "EndBefore");
 
     END_SUB_TEST;
@@ -727,73 +727,82 @@ static int TestEngine4() {
 
 static int TestEngine5() {
     // SizeT       ret;
-    SizeT       content_len = 12U;
+    SizeT       content_len = 12;
     const char *content     = "{{{{{{}}}}}}";
 
-    EQ_VALUE(Engine::Find("}", 1U, content, 0U, content_len), 7U, "return1");
+    EQ_VALUE(Engine::Find("}", SizeT{1}, content, SizeT{0}, content_len),
+             SizeT{7}, "return1");
 
     // /*
     //  * The offset has to start after the head (one), because zero is the
     //  match
     //  * that is being searched for its tail.
     //  */
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 7,
     //                                 content_len);
-    // EQ_VALUE(ret, 12U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 12, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 0U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 0,
     //                                 content_len);
-    // EQ_VALUE(ret, 0U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 0, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("x", 1U, "y", 1U, content, 1U, 7U,
+    // ret = Engine::SkipInnerPatterns("x", SizeT{1}, "y", SizeT{1}, content,
+    // SizeT{1}, 7,
     //                                 content_len);
-    // EQ_VALUE(ret, 7U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 7, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 5U, 6U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // 5, 6,
     //                                 content_len);
-    // EQ_VALUE(ret, 7U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 7, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 4U, 6U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // 4, 6,
     //                                 content_len);
-    // EQ_VALUE(ret, 8U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 8, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 3U, 6U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // 3, 6,
     //                                 content_len);
-    // EQ_VALUE(ret, 9U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 9, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 3U, 7U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // 3, 7,
     //                                 content_len);
-    // EQ_VALUE(ret, 10U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 10, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 7U);
-    // EQ_VALUE(ret, 7U, "SkipInnerPatterns()");
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 7, 7); EQ_VALUE(ret, 7, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 8U);
-    // EQ_VALUE(ret, 8U, "SkipInnerPatterns()");
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 7, 8); EQ_VALUE(ret, 8, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 9U);
-    // EQ_VALUE(ret, 9U, "SkipInnerPatterns()");
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 7, 9); EQ_VALUE(ret, 9, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 7U, 10U);
-    // EQ_VALUE(ret, 10U, "SkipInnerPatterns()");
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 7, 10); EQ_VALUE(ret, 10, "SkipInnerPatterns()");
 
-    // ret = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U, 12U,
+    // ret = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1}, content,
+    // SizeT{1}, 12,
     //                                 content_len);
-    // EQ_VALUE(ret, 12U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 12, "SkipInnerPatterns()");
 
     // content     = "{}";
-    // content_len = 2U;
-    // ret         = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 0U,
-    // 2U,
+    // content_len = 2;
+    // ret         = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1},
+    // content, 0, 2,
     //                                 content_len);
-    // EQ_VALUE(ret, 2U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 2, "SkipInnerPatterns()");
 
     // content     = "{   }";
-    // content_len = 5U;
-    // ret         = Engine::SkipInnerPatterns("{", 1U, "}", 1U, content, 1U,
-    // 5U,
+    // content_len = 5;
+    // ret         = Engine::SkipInnerPatterns("{", SizeT{1}, "}", SizeT{1},
+    // content, SizeT{1}, 5,
     //                                 content_len);
-    // EQ_VALUE(ret, 5U, "SkipInnerPatterns()");
+    // EQ_VALUE(ret, 5, "SkipInnerPatterns()");
 
     END_SUB_TEST;
 }
@@ -812,7 +821,7 @@ static void toJSON(StringStream<char> &ss, const Array<Item2__> &items,
 
     ss += '{';
 
-    for (SizeT i = 0U; i < items.Size(); i++) {
+    for (SizeT i = 0; i < items.Size(); i++) {
         if (i != 0) {
             ss += ',';
         }
@@ -860,12 +869,12 @@ static int TestEngine6() {
             }
 
             // No match.
-            return 0U;
+            return 0;
         }
 
         SizeT FindT(const char *content, SizeT offset,
                     SizeT end_before) const noexcept override {
-            return Engine::Find("]]]", 3U, content, offset, end_before);
+            return Engine::Find("]]]", 3, content, offset, end_before);
         }
 
         SizeT Nest(const char *content, SizeT offset, SizeT end_before,
@@ -875,7 +884,7 @@ static int TestEngine6() {
                                     &eng7);
         }
 
-        virtual SizeT length() noexcept { return 3U; }
+        virtual SizeT length() noexcept { return 3; }
 
         void Found(const char *content, SizeT offset, SizeT end_before,
                    SizeT start_offset, SizeT &current_offset) override {
@@ -902,8 +911,8 @@ static int TestEngine6() {
     Engine7 eng7{&items};
 
     content     = "[[[ [[[  [[[  [[[  ]]]  ]]]  ]]] ]]] [[[]]] [[[[[[]]]]]]";
-    content_len = 56U;
-    Engine::FindNest(content, 0U, content_len, content_len, &eng7);
+    content_len = 56;
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng7);
     toJSON(toJSON_ss, items, content);
 
     result =
@@ -923,7 +932,7 @@ static int TestEngine6() {
                 ++offset;
             }
 
-            return 0U; // No match
+            return 0; // No match
         }
 
         SizeT FindT(const char *content, SizeT offset,
@@ -931,7 +940,7 @@ static int TestEngine6() {
             return Engine::FindOne('}', content, offset, end_before);
         }
 
-        SizeT length() noexcept override { return 1U; }
+        SizeT length() noexcept override { return 1; }
 
         SizeT Nest(const char *content, SizeT offset, SizeT end_before,
                    SizeT max_end_before) override {
@@ -950,7 +959,7 @@ static int TestEngine6() {
     items.Clear();
     Engine8 eng8(&items);
     content_len = StringUtils::Count<char, SizeT>(content);
-    Engine::FindNest(content, 0U, content_len, content_len, &eng8);
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng8);
     toJSON_ss.Reset();
     toJSON(toJSON_ss, items, content);
 
@@ -960,24 +969,24 @@ static int TestEngine6() {
 
     content = "";
     items.Clear();
-    content_len = 0U;
-    Engine::FindNest(content, 0U, content_len, content_len, &eng8);
+    content_len = 0;
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng8);
     toJSON_ss.Reset();
     toJSON(toJSON_ss, items, content);
 
-    EQ_VALUE(toJSON_ss.Length(), 0U, "toJSON_ss");
+    EQ_VALUE(toJSON_ss.Length(), 0, "toJSON_ss");
 
     content = "{ { }";
     items.Clear();
-    content_len = 5U;
-    Engine::FindNest(content, 0U, content_len, content_len, &eng8);
-    EQ_VALUE(items.Size(), 1U, "items.Size()");
+    content_len = 5;
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng8);
+    EQ_VALUE(items.Size(), SizeT{1}, "items.Size()");
 
     content = "{ {{ }}";
     items.Clear();
-    content_len = 5U;
-    Engine::FindNest(content, 0U, content_len, content_len, &eng8);
-    EQ_VALUE(items.Size(), 0U, "items.Size()");
+    content_len = 5;
+    Engine::FindNest(content, SizeT{0}, content_len, content_len, &eng8);
+    EQ_VALUE(items.Size(), 0, "items.Size()");
 
     END_SUB_TEST;
 }

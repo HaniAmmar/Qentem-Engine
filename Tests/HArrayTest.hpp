@@ -865,7 +865,7 @@ static int TestHArray10() {
 
         list[key] = i;
 
-        const Qentem::HAItem<unsigned int, char> *item = list.GetItem(key);
+        const Qentem::HAItem<SizeT, char> *item = list.GetItem(key);
 
         NOT_EQ_TO(item, nullptr, "item", "null");
         EQ_VALUE(item->Value, i, "index");
