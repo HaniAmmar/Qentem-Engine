@@ -333,7 +333,7 @@ class HArray {
                 String<Char_T_> &&     to) const noexcept {
         if (Size() != 0) {
             const ULong hash_from     = Hash(from.First(), from.Length());
-            SizeT *     left_index    = getItem(hash_from);
+            SizeT *     left_index    = getPosition(hash_from);
             SizeT *     left_previous = nullptr;
             HAItem_T_ * src           = Storage();
             HAItem_T_ * item;
@@ -552,20 +552,20 @@ class HArray {
         return size;
     }
 
-    SizeT *getItem(ULong hash) const noexcept {
+    SizeT *getPosition(ULong hash) const noexcept {
         return &(Storage()[hash & getBase()].Position);
     }
 
     void find(SizeT *&index, const Char_T_ *key, SizeT length,
               ULong hash) const noexcept {
-        index          = getItem(hash);
+        index          = getPosition(hash);
         HAItem_T_ *src = Storage();
 
         while (*index != 0) {
             HAItem_T_ *item = (src + ((*index) - 1));
 
             if (((item->Hash == hash) && item->Key.IsEqual(key, length))) {
-                break;
+                return;
             }
 
             index = &(item->Next);
@@ -585,7 +585,7 @@ class HArray {
 
     void remove(const Char_T_ *key, SizeT length, ULong hash) const noexcept {
         if (Size() != 0) {
-            SizeT *    index          = getItem(hash);
+            SizeT *    index          = getPosition(hash);
             SizeT *    previous_index = nullptr;
             HAItem_T_ *src            = Storage();
             HAItem_T_ *item;
