@@ -29,6 +29,11 @@
 
 #if _WIN64 || __x86_64__ || __ppc64__
 #define QENTEM_64BIT_
+// 64bit arch only uses the lower 48 bits for pointers,
+// the upper 16 bits can be used for taging.
+#ifndef QENTEM_TAGGED_POINTER_
+#define QENTEM_TAGGED_POINTER_ 1
+#endif
 #endif
 
 #ifndef QENTEM_AVX2_
@@ -55,17 +60,9 @@
 #define QENTEM_MAYBE_UNUSED_ __attribute__((unused))
 #endif
 
-#ifdef QENTEM_64BIT_
-// 64bit arch only uses the lower 48 bits for pointers,
-// the upper 16 bits can be used for taging.
-#ifndef QENTEM_TAGGED_POINTER_
-#define QENTEM_TAGGED_POINTER_ 1
-#endif
-#endif
-
 namespace Qentem {
-// 1 == 0x00000001; // little;
-// 1 == 0x01000000; // big
+// 1 == 0x00000001; // little endian
+// 1 == 0x01000000; // big endian
 
 static constexpr bool IsBigEndian() { return ((1 & 0x01000000) ? 1 : 0); }
 
@@ -77,7 +74,11 @@ using ULong = unsigned long;
 
 #ifndef QENTEM_SIZE_T_
 #define QENTEM_SIZE_T_
+#ifdef QENTEM_64BIT_
 using SizeT = unsigned int;
+#else
+using SizeT = unsigned long;
+#endif
 #endif
 
 using NullType = decltype(nullptr);
