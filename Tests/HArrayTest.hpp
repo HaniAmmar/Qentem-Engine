@@ -828,6 +828,10 @@ static int TestHArray10() {
         EQ_VALUE(item->Value, i, "index");
     }
 
+    String<char> key1("k-");
+    key1 += Digit<char>::NumberToString(100);
+    EQ_TO(list.GetItem(key1), nullptr, "GetItem(k-100)", "null");
+
     END_SUB_TEST;
 }
 
