@@ -1348,11 +1348,11 @@ class Value {
     struct VType_ {
       public:
         inline ValueType GetType() const noexcept {
-            return types_[(!(Platform::Endianess::IsBigEndian()) ? 7 : 1)];
+            return types_[(!(Platform::IsBigEndian()) ? 7 : 1)];
         }
 
         inline void SetType(ValueType new_type) noexcept {
-            types_[(!(Platform::Endianess::IsBigEndian()) ? 7 : 1)] = new_type;
+            types_[(!(Platform::IsBigEndian()) ? 7 : 1)] = new_type;
         }
 
       private:

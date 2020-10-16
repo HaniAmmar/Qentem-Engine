@@ -101,7 +101,7 @@ int main() {
 
     std::wcout << "\nEndianness: ";
 
-    if (Qentem::Platform::Endianess::IsBigEndian()) {
+    if (Qentem::Platform::IsBigEndian()) {
         std::wcout << "Big-endian";
     } else {
         std::wcout << "Little-endian";

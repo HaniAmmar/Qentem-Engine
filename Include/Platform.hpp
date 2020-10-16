@@ -79,21 +79,6 @@ using QMM_Number_T = unsigned int;
 namespace Qentem {
 namespace Platform {
 
-// 1 == 0x00000001; // little endian
-// 1 == 0x01000000; // big endian
-
-struct Endianess {
-  private:
-    union {
-        char16_t      s;
-        unsigned char c[2];
-    } static const constexpr v{u'Ā'};
-
-  public:
-    inline static bool IsBigEndian() { return (v.c[0] == 1); }
-    inline static bool IsLittleEndian() { return (v.c[1] == 1); }
-};
-
 #ifdef _MSC_VER
 #ifdef QENTEM_64BIT_
 inline static unsigned long CTZ(unsigned long long value) noexcept {
