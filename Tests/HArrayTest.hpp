@@ -445,7 +445,8 @@ static int TestHArray4() {
     for (SizeT i = 0; i < 100; i++) {
         String<char> key = Digit<char>::NumberToString(i);
 
-        numbers1.Insert(Digit<char>::NumberToString(i), SizeT{i});
+        numbers1.Insert(Digit<char>::NumberToString(i),
+                        static_cast<SizeT &&>(SizeT{i}));
         value = numbers1.Find(key);
         NOT_EQ_TO(value, nullptr, "value", "null");
         EQ_VALUE(*value, i, key.First());
