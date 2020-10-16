@@ -10,7 +10,6 @@ sudo: false
 jobs:
   - os: linux
     arch: amd64
-    virt: lxd
 
     before_script:
       - mkdir Build
@@ -23,7 +22,6 @@ jobs:
 
   - os: linux
     arch: amd64
-    virt: lxd
 
     before_script:
       - mkdir Build
@@ -35,7 +33,6 @@ jobs:
 
   - os: linux
     arch: amd64
-    virt: lxd
 
     before_script:
       - mkdir Build
