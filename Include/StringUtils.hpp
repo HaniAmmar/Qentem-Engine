@@ -131,6 +131,29 @@ struct StringUtils {
 
         return (length == 0);
     }
+
+    template <typename Char_T_>
+    static ULong Hash(const Char_T_ *key, SizeT length) noexcept {
+        ULong hash   = 11;
+        SizeT base   = 33;
+        SizeT offset = 0;
+
+        while (offset != length) {
+            const unsigned int num = static_cast<unsigned int>(key[offset]);
+            ++offset;
+            hash += (base * offset * num);
+            base += offset;
+
+            if (offset != length) {
+                hash *= (length ^ offset);
+                base += offset;
+                --length;
+                hash += static_cast<ULong>(key[length]);
+            }
+        }
+
+        return hash;
+    }
 };
 
 } // namespace Qentem

@@ -181,7 +181,7 @@ class HArray {
         }
 
         SizeT       len  = StringUtils::Count(key);
-        const ULong hash = Hash(key, len);
+        const ULong hash = StringUtils::Hash(key, len);
         SizeT *     index;
         find(index, key, len, hash);
 
@@ -197,7 +197,7 @@ class HArray {
             grow();
         }
 
-        const ULong hash = Hash(key.First(), key.Length());
+        const ULong hash = StringUtils::Hash(key.First(), key.Length());
         SizeT *     index;
         find(index, key.First(), key.Length(), hash);
 
@@ -213,7 +213,7 @@ class HArray {
             grow();
         }
 
-        const ULong hash = Hash(key.First(), key.Length());
+        const ULong hash = StringUtils::Hash(key.First(), key.Length());
         SizeT *     index;
         find(index, key.First(), key.Length(), hash);
 
@@ -229,7 +229,7 @@ class HArray {
             grow();
         }
 
-        const ULong hash  = Hash(key.First(), key.Length());
+        const ULong hash  = StringUtils::Hash(key.First(), key.Length());
         SizeT *     index = find(key.First(), key.Length(), hash);
 
         if ((*index) == 0) {
@@ -277,7 +277,8 @@ class HArray {
 
     const HAItem_T_ *GetItem(const String<Char_T_> &key) const noexcept {
         SizeT *index;
-        find(index, key.First(), key.Length(), Hash(key.First(), key.Length()));
+        find(index, key.First(), key.Length(),
+             StringUtils::Hash(key.First(), key.Length()));
 
         if ((*index) != 0) {
             return (Storage() + ((*index) - 1));
@@ -289,7 +290,7 @@ class HArray {
     Value_ *Find(const Char_T_ *key, SizeT length) const noexcept {
         if (Size() != 0) {
             SizeT *index;
-            find(index, key, length, Hash(key, length));
+            find(index, key, length, StringUtils::Hash(key, length));
 
             if ((*index) != 0) {
                 return &((Storage()[(*index) - 1]).Value);
@@ -304,7 +305,7 @@ class HArray {
     }
 
     inline void Remove(const Char_T_ *key, SizeT length) const noexcept {
-        remove(key, length, Hash(key, length));
+        remove(key, length, StringUtils::Hash(key, length));
     }
 
     inline void Remove(const Char_T_ *key) const noexcept {
@@ -312,7 +313,8 @@ class HArray {
     }
 
     inline void Remove(const String<Char_T_> &key) const noexcept {
-        remove(key.First(), key.Length(), Hash(key.First(), key.Length()));
+        remove(key.First(), key.Length(),
+               StringUtils::Hash(key.First(), key.Length()));
     }
 
     void RemoveIndex(SizeT index) const noexcept {
@@ -332,11 +334,12 @@ class HArray {
     bool Rename(const String<Char_T_> &from,
                 String<Char_T_> &&     to) const noexcept {
         if (Size() != 0) {
-            const ULong hash_from     = Hash(from.First(), from.Length());
-            SizeT *     left_index    = getPosition(hash_from);
-            SizeT *     left_previous = nullptr;
-            HAItem_T_ * src           = Storage();
-            HAItem_T_ * item;
+            const ULong hash_from =
+                StringUtils::Hash(from.First(), from.Length());
+            SizeT *    left_index    = getPosition(hash_from);
+            SizeT *    left_previous = nullptr;
+            HAItem_T_ *src           = Storage();
+            HAItem_T_ *item;
 
             if (*left_index != 0) {
                 do {
@@ -351,8 +354,9 @@ class HArray {
                 } while (*left_index != 0);
 
                 if (*left_index != 0) {
-                    const ULong hash_to = Hash(to.First(), to.Length());
-                    SizeT *     right_index;
+                    const ULong hash_to =
+                        StringUtils::Hash(to.First(), to.Length());
+                    SizeT *right_index;
                     find(right_index, to.First(), to.Length(), hash_to);
 
                     if ((*right_index) == 0) {
@@ -451,36 +455,6 @@ class HArray {
                 resize(n_cap);
             }
         }
-    }
-
-    static ULong Hash(const Char_T_ *key, SizeT length) noexcept {
-        ULong hash = 0;
-
-        if (key != nullptr) {
-            constexpr ULong hash_start = 7;
-            constexpr SizeT base_start = 33;
-
-            hash         = hash_start;
-            SizeT base   = base_start;
-            SizeT offset = 0;
-
-            while (offset != length) {
-                const unsigned int num = static_cast<unsigned int>(key[offset]);
-                ++offset;
-                base <<= 2U;
-                base += offset;
-                hash += (base * (offset << 1U) * num);
-
-                if (offset != length) {
-                    hash *= (length * offset);
-                    base += offset;
-                    --length;
-                    hash += static_cast<ULong>(key[length]);
-                }
-            }
-        }
-
-        return hash;
     }
 
 #if QENTEM_TAGGED_POINTER_ == 1
