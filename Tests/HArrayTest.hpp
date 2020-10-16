@@ -440,9 +440,9 @@ static int TestHArray4() {
     numbers1[""] = 555;
     EQ_VALUE(numbers1[""], 555, "empty key");
 
-    numbers1.Reserve(100);
+    numbers1.Reset();
 
-    for (SizeT i = 0; i < 100; i++) {
+    for (SizeT i = 0; i < 10; i++) {
         String<char> key = Digit<char>::NumberToString(i);
 
         numbers1.Insert(Digit<char>::NumberToString(i),
