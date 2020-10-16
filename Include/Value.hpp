@@ -23,6 +23,7 @@
 #include "Array.hpp"
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
+#include "Platform.hpp"
 
 #ifndef QENTEM_VALUE_H_
 #define QENTEM_VALUE_H_
@@ -1347,11 +1348,11 @@ class Value {
     struct VType_ {
       public:
         inline ValueType GetType() const noexcept {
-            return types_[(!(IsBigEndian()) ? 7 : 1)];
+            return types_[(!(Platform::Endianess::IsBigEndian()) ? 7 : 1)];
         }
 
         inline void SetType(ValueType new_type) noexcept {
-            types_[(!(IsBigEndian()) ? 7 : 1)] = new_type;
+            types_[(!(Platform::Endianess::IsBigEndian()) ? 7 : 1)] = new_type;
         }
 
       private:
