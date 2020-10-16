@@ -22,8 +22,44 @@ jobs:
       - bash <(curl -s https://codecov.io/bash)
 
   - os: linux
+    arch: amd64
+    virt: lxd
+
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake -D ENABLE_AVX2=1 ..
+    script:
+      - cmake --build .
+      - ctest
+
+  - os: linux
+    arch: amd64
+    virt: lxd
+
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake -D ENABLE_SSE2=1 ..
+    script:
+      - cmake --build .
+      - ctest
+
+  - os: linux
     arch: arm64
     virt: lxd
+
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake ..
+    script:
+      - cmake --build .
+      - ctest
+
+  - os: linux
+    arch: arm64-graviton2
+    compiler: clang
 
     before_script:
       - mkdir Build
