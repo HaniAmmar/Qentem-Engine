@@ -90,3 +90,13 @@ jobs:
       - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
+
+  - os: linux
+    arch: s390x
+    group: edge
+
+    before_script:
+      - mkdir ./Build
+      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+    script:
+      - ./Build/QTest.bin
