@@ -9,9 +9,17 @@ if(MSVC)
 else()
     add_compile_options(-Wall -Wextra -march=native)
     option(ENABLE_COVERAGE "Enable Coverage for gcc/clang" FALSE)
+    option(ENABLE_AVX2 "Enable AVX2" FALSE)
+    option(ENABLE_SSE2 "Enable SSE2" FALSE)
 
     if (ENABLE_COVERAGE)
         add_compile_options(--coverage -g -O0)
+    endif()
+
+    if (ENABLE_AVX2)
+        add_compile_options(-D QENTEM_AVX2_=1)
+    elseif(ENABLE_SSE2)
+        add_compile_options(-D QENTEM_SSE2_=1)
     endif()
 endif()
 
