@@ -85,15 +85,15 @@ namespace Platform {
 struct Endianess {
   private:
     union EndianVal_ {
-        unsigned char c[2];
         char16_t      s;
+        unsigned char c[2];
     };
 
   public:
-    static constexpr EndianVal_ v{s : u'Ā'};
+    static constexpr EndianVal_ v{u'Ā'};
 
-    static constexpr bool IsBigEndian() { return (v.c[0] == 1); }
-    static constexpr bool IsLittleEndian() { return (v.c[1] == 1); }
+    static bool IsBigEndian() { return (v.c[0] == 1); }
+    static bool IsLittleEndian() { return (v.c[1] == 1); }
 };
 
 #ifdef _MSC_VER
