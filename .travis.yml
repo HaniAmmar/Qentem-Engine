@@ -80,3 +80,15 @@ jobs:
     script:
       - cmake --build .
       - ctest
+
+  - os: linux
+    arch: s390x
+    group: edge
+
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake ..
+    script:
+      - cmake --build .
+      - ctest
