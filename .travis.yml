@@ -61,25 +61,21 @@ jobs:
     arch: arm64-graviton2
     dist: focal
     virt: vm
-    compiler: clang
+    compiler: clang++
 
     before_script:
-      - mkdir Build
-      - cd Build
-      - cmake ..
+      - mkdir ./Build
+      - clang++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
-      - cmake --build .
-      - ctest
+      - ./Build/QTest.bin
 
   - os: osx
 
     before_script:
-      - mkdir Build
-      - cd Build
-      - cmake ..
+      - mkdir ./Build
+      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
-      - cmake --build .
-      - ctest
+      - ./Build/QTest.bin
 
   - os: linux
     arch: ppc64le
