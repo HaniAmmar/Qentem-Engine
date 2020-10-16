@@ -92,5 +92,23 @@ int main() {
     //     Qentem::Test::RunTemplateTests();
     // }
 
+#ifdef QENTEM_64BIT_
+    std::wcout << "Arch: 64BIT";
+#ifdef QENTEM_TAGGED_POINTER_
+    std::wcout << "\nTagged Pointers: On";
+#endif
+#endif
+
+    std::wcout << "\nEndianness: ";
+
+    if (Qentem::IsBigEndian()) {
+        std::wcout << "Big-endian";
+    } else {
+        std::wcout << "Little-endian";
+    }
+
+    std::wcout << "\nSize of SizeT: " << sizeof(Qentem::SizeT) << '\n';
+    std::wcout << std::endl;
+
     return RunTests();
 }
