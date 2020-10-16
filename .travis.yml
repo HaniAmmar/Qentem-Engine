@@ -9,6 +9,9 @@ sudo: false
 
 jobs:
   - os: linux
+    arch: amd64
+    virt: lxd
+
     before_script:
       - mkdir Build
       - cd Build
@@ -18,7 +21,20 @@ jobs:
       - ctest
       - bash <(curl -s https://codecov.io/bash)
 
+  - os: linux
+    arch: arm64
+    virt: lxd
+
+    before_script:
+      - mkdir Build
+      - cd Build
+      - cmake ..
+    script:
+      - cmake --build .
+      - ctest
+
   - os: osx
+
     before_script:
       - mkdir Build
       - cd Build
