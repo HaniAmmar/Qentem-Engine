@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-using HashArray = HArray<unsigned int, char>;
+using HashArray = HArray<SizeT, char>;
 
 static int TestHArray1() {
     HashArray numbers1;
@@ -93,11 +93,11 @@ static int TestHArray1() {
 }
 
 static int TestHArray2() {
-    HashArray                         numbers1(8);
-    HashArray                         numbers2;
-    const String<char> *              key;
-    const char *                      str_c;
-    const HAItem<unsigned int, char> *storage;
+    HashArray                  numbers1(8);
+    HashArray                  numbers2;
+    const String<char> *       key;
+    const char *               str_c;
+    const HAItem<SizeT, char> *storage;
 
     numbers1["key1"] = 1;
     EQ_VALUE(numbers1.Size(), 1, "Size");
@@ -256,11 +256,11 @@ static int TestHArray2() {
 }
 
 static int TestHArray3() {
-    HashArray                         numbers1(8);
-    HashArray                         numbers2;
-    const String<char> *              key;
-    const char *                      str_c;
-    const HAItem<unsigned int, char> *storage;
+    HashArray                  numbers1(8);
+    HashArray                  numbers2;
+    const String<char> *       key;
+    const char *               str_c;
+    const HAItem<SizeT, char> *storage;
 
     numbers2["key4"] = 40;
     numbers2["key1"] = 10;
@@ -303,11 +303,11 @@ static int TestHArray3() {
 }
 
 static int TestHArray4() {
-    HashArray                         numbers1;
-    HashArray                         numbers2;
-    HashArray                         numbers3(3);
-    const HAItem<unsigned int, char> *storage;
-    SizeT *                           value;
+    HashArray                  numbers1;
+    HashArray                  numbers2;
+    HashArray                  numbers3(3);
+    const HAItem<SizeT, char> *storage;
+    SizeT *                    value;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -346,8 +346,8 @@ static int TestHArray4() {
     EQ_VALUE(numbers1["key9"], 900, "key9");
     EQ_VALUE(numbers1["key10"], 1000, "key10");
 
-    unsigned int        index = 0;
-    const unsigned int *val   = numbers1.GetValue(index);
+    SizeT        index = 0;
+    const SizeT *val   = numbers1.GetValue(index);
     NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
     EQ_VALUE(*val, 100, "0");
 
