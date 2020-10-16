@@ -307,6 +307,7 @@ static int TestHArray4() {
     HashArray                         numbers2;
     HashArray                         numbers3(3);
     const HAItem<unsigned int, char> *storage;
+    SizeT *                           value;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -438,6 +439,17 @@ static int TestHArray4() {
     numbers1.Reset();
     numbers1[""] = 555;
     EQ_VALUE(numbers1[""], 555, "empty key");
+
+    numbers1.Reserve(100);
+
+    for (SizeT i = 0; i < 100; i++) {
+        String<char> key = Digit<char>::NumberToString(i);
+
+        numbers1.Insert(Digit<char>::NumberToString(i), SizeT{i});
+        value = numbers1.Find(key);
+        NOT_EQ_TO(value, nullptr, "value", "null");
+        EQ_VALUE(*value, i, key.First());
+    }
 
     END_SUB_TEST;
 }
