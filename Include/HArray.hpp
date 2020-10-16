@@ -349,9 +349,9 @@ class HArray {
                 if (*right_index == 0) {
                     *right_index    = *left_index;
                     HAItem_T_ *item = (Storage() + ((*left_index) - 1));
+                    *left_index     = item->Next;
                     item->Key       = static_cast<String<Char_T_> &&>(to);
                     item->Hash      = to_hash;
-                    *left_index     = item->Next;
                     item->Next      = 0;
                     return true;
                 }
@@ -542,10 +542,10 @@ class HArray {
 
             if (*index != 0) {
                 HAItem_T_ *item = (Storage() + ((*index) - 1));
+                *index          = item->Next;
                 item->Key       = String<Char_T_>();
                 item->Value     = Value_();
                 item->Hash      = 0;
-                *index          = item->Next;
                 item->Next      = 0;
             }
         }
