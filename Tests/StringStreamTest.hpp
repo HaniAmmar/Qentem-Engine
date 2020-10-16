@@ -31,7 +31,7 @@ namespace Test {
 
 static int TestStringStream() {
     StringStream<char> ss1;
-    StringStream<char> ss2(10); // Preset size
+    StringStream<char> ss2{10}; // Preset size
     String<char>       str;
 
     EQ_VALUE(ss1.Length(), 0, "Length");
@@ -39,7 +39,7 @@ static int TestStringStream() {
     EQ_TO(ss1.First(), nullptr, "First()", "null");
     EQ_TO(ss1.Last(), nullptr, "Last()", "null");
 
-    EQ_VALUE((ss2.Capacity() >= 10), true, "Capacity() >= 10");
+    EQ_TRUE((ss2.Capacity() >= 10), "Capacity() >= 10");
     EQ_VALUE(ss2.Length(), 0, "Length");
     NOT_EQ_TO(ss2.First(), nullptr, "First()", "null");
 
