@@ -137,7 +137,7 @@ inline static unsigned int CTZ(unsigned int value) noexcept {
 
 inline static unsigned int CLZ(unsigned int value) noexcept {
     constexpr unsigned int bits = (sizeof(int) * 8) - 1;
-    return (bits - static_cast<unsigned int>(__builtin_clzl(value)));
+    return (bits - static_cast<unsigned int>(__builtin_clz(value)));
 }
 #endif
 
