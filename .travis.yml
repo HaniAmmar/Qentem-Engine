@@ -82,13 +82,11 @@ jobs:
       - ctest
 
   - os: linux
-    arch: s390x
+    arch: ppc64le
     group: edge
 
     before_script:
-      - mkdir Build
-      - cd Build
-      - cmake ..
+      - mkdir ./Build
+      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
-      - cmake --build .
-      - ctest
+      - ./Build/QTest.bin
