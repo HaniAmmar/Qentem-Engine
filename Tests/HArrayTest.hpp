@@ -32,49 +32,6 @@ namespace Test {
 
 using HashArray = HArray<unsigned int, char>;
 
-static int TestHash() {
-    ULong hash;
-    ULong hash2;
-    ULong hash3;
-    ULong hash4;
-
-    hash = HashArray::Hash("", 0);
-    NOT_EQ_TO(hash, 0, "hash", "0");
-
-    hash  = HashArray::Hash("1", 1);
-    hash2 = HashArray::Hash("0", 1);
-    NOT_EQ_TO(hash, 0, "hash", "0");
-    NOT_EQ_TO(hash2, 0, "hash2", "0");
-    NOT_EQ_TO(hash, hash2, "hash", "hash2");
-
-    hash3 = HashArray::Hash("10", 2);
-    hash4 = HashArray::Hash("01", 2);
-    NOT_EQ_TO(hash3, 0, "hash3", "0");
-    NOT_EQ_TO(hash4, 0, "hash4", "0");
-    NOT_EQ_TO(hash, hash3, "hash", "hash3");
-    NOT_EQ_TO(hash2, hash3, "hash2", "hash3");
-    NOT_EQ_TO(hash, hash4, "hash", "hash4");
-    NOT_EQ_TO(hash2, hash4, "hash2", "hash4");
-    NOT_EQ_TO(hash3, hash4, "hash3", "hash4");
-
-    hash  = HashArray::Hash("100", 3);
-    hash2 = HashArray::Hash("001", 3);
-    NOT_EQ_TO(hash, 0, "hash", "0");
-    NOT_EQ_TO(hash2, 0, "hash2", "0");
-    NOT_EQ_TO(hash, hash3, "hash", "hash3");
-    NOT_EQ_TO(hash2, hash3, "hash2", "hash3");
-    NOT_EQ_TO(hash, hash4, "hash", "hash4");
-    NOT_EQ_TO(hash2, hash4, "hash2", "hash4");
-
-    hash  = HashArray::Hash("abc", 3);
-    hash2 = HashArray::Hash("cba", 3);
-    NOT_EQ_TO(hash, hash2, "hash", "hash2");
-    NOT_EQ_TO(hash, 0, "hash", "0");
-    NOT_EQ_TO(hash2, 0, "hash2", "0");
-
-    END_SUB_TEST;
-}
-
 static int TestHArray1() {
     HashArray numbers1;
     HashArray numbers2(8);
@@ -877,7 +834,6 @@ static int TestHArray10() {
 static int RunHArrayTests() {
     STARTING_TEST("HArray.hpp");
 
-    START_TEST("Hash Test", TestHash);
     START_TEST("HArray Test 1", TestHArray1);
     START_TEST("HArray Test 2", TestHArray2);
     START_TEST("HArray Test 3", TestHArray3);

@@ -29,6 +29,49 @@
 namespace Qentem {
 namespace Test {
 
+static int TestHash() {
+    ULong hash;
+    ULong hash2;
+    ULong hash3;
+    ULong hash4;
+
+    hash = StringUtils::Hash("", 0);
+    NOT_EQ_TO(hash, 0, "hash", "0");
+
+    hash  = StringUtils::Hash("1", 1);
+    hash2 = StringUtils::Hash("0", 1);
+    NOT_EQ_TO(hash, 0, "hash", "0");
+    NOT_EQ_TO(hash2, 0, "hash2", "0");
+    NOT_EQ_TO(hash, hash2, "hash", "hash2");
+
+    hash3 = StringUtils::Hash("10", 2);
+    hash4 = StringUtils::Hash("01", 2);
+    NOT_EQ_TO(hash3, 0, "hash3", "0");
+    NOT_EQ_TO(hash4, 0, "hash4", "0");
+    NOT_EQ_TO(hash, hash3, "hash", "hash3");
+    NOT_EQ_TO(hash2, hash3, "hash2", "hash3");
+    NOT_EQ_TO(hash, hash4, "hash", "hash4");
+    NOT_EQ_TO(hash2, hash4, "hash2", "hash4");
+    NOT_EQ_TO(hash3, hash4, "hash3", "hash4");
+
+    hash  = StringUtils::Hash("100", 3);
+    hash2 = StringUtils::Hash("001", 3);
+    NOT_EQ_TO(hash, 0, "hash", "0");
+    NOT_EQ_TO(hash2, 0, "hash2", "0");
+    NOT_EQ_TO(hash, hash3, "hash", "hash3");
+    NOT_EQ_TO(hash2, hash3, "hash2", "hash3");
+    NOT_EQ_TO(hash, hash4, "hash", "hash4");
+    NOT_EQ_TO(hash2, hash4, "hash2", "hash4");
+
+    hash  = StringUtils::Hash("abc", 3);
+    hash2 = StringUtils::Hash("cba", 3);
+    NOT_EQ_TO(hash, hash2, "hash", "hash2");
+    NOT_EQ_TO(hash, 0, "hash", "0");
+    NOT_EQ_TO(hash2, 0, "hash2", "0");
+
+    END_SUB_TEST;
+}
+
 static int TestCount() {
     SizeT length = StringUtils::Count("");
     EQ_VALUE(length, 0, "length");
@@ -493,6 +536,7 @@ static int TestIsEqual() {
 static int RunStringUtilsTests() {
     STARTING_TEST("StringUtils.hpp");
 
+    START_TEST("Hash Test", TestHash);
     START_TEST("Count Test", TestCount);
     START_TEST("StartTrim Test", TestLeftTrim);
     START_TEST("SoftTrim Test", TestSoftTrim);
