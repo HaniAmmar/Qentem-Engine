@@ -27,7 +27,8 @@
 #define QENTEM_DOUBLE_PRECISION_ 15
 #endif
 
-#if _WIN64 || __x86_64__ || __aarch64__ || __ppc64__
+#if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) ||          \
+    defined(__ppc64__)
 #define QENTEM_64BIT_
 // 64bit arch only uses the lower 48 bits for pointers,
 // the upper 16 bits can be used for taging.
@@ -58,6 +59,12 @@
 #else
 #define QENTEM_NOINLINE __attribute__((noinline))
 #define QENTEM_MAYBE_UNUSED_ __attribute__((unused))
+#endif
+
+#ifndef QENTEM_BIG_ENDIAN_
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define QENTEM_BIG_ENDIAN_
+#endif
 #endif
 
 namespace Qentem {

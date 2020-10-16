@@ -1347,13 +1347,25 @@ class Value {
 
     struct VType_ {
       public:
+#ifndef QENTEM_BIG_ENDIAN_
         inline ValueType GetType() const noexcept {
-            return types_[(!(Platform::IsBigEndian()) ? 7 : 1)];
+            return types_[7];
+            return types_[7];
         }
 
         inline void SetType(ValueType new_type) noexcept {
-            types_[(!(Platform::IsBigEndian()) ? 7 : 1)] = new_type;
+            types_[7] = new_type;
         }
+#else
+        inline ValueType GetType() const noexcept {
+            return types_[0];
+            return types_[0];
+        }
+
+        inline void SetType(ValueType new_type) noexcept {
+            types_[0] = new_type;
+        }
+#endif
 
       private:
         union {
