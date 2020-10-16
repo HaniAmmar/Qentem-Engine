@@ -335,48 +335,25 @@ class HArray {
     bool Rename(const String<Char_T_> &from,
                 String<Char_T_> &&     to) const noexcept {
         if (Size() != 0) {
-            const ULong hash_from =
-                StringUtils::Hash(from.First(), from.Length());
-            SizeT *    left_index    = getPosition(hash_from);
-            SizeT *    left_previous = nullptr;
-            HAItem_T_ *src           = Storage();
-            HAItem_T_ *item;
+            SizeT *left_index;
+            find(left_index, from.First(), from.Length(),
+                 StringUtils::Hash(from.First(), from.Length()));
 
             if (*left_index != 0) {
-                do {
-                    item = (src + ((*left_index) - 1));
+                const ULong to_hash =
+                    StringUtils::Hash(to.First(), to.Length());
 
-                    if ((item->Hash == hash_from) && (from == item->Key)) {
-                        break;
-                    }
+                SizeT *right_index;
+                find(right_index, to.First(), to.Length(), to_hash);
 
-                    left_previous = left_index;
-                    left_index    = &(item->Next);
-                } while (*left_index != 0);
-
-                if (*left_index != 0) {
-                    const ULong hash_to =
-                        StringUtils::Hash(to.First(), to.Length());
-                    SizeT *right_index;
-                    find(right_index, to.First(), to.Length(), hash_to);
-
-                    if ((*right_index) == 0) {
-                        *right_index = *left_index;
-                        item->Key    = static_cast<String<Char_T_> &&>(to);
-                        item->Hash   = hash_to;
-
-                        // See remove() for the next part
-                        if ((left_previous == nullptr) ||
-                            (*left_previous < *right_index)) {
-                            *left_index = item->Next;
-                        } else {
-                            *left_previous = item->Next;
-                        }
-
-                        item->Next = 0;
-
-                        return true;
-                    }
+                if (*right_index == 0) {
+                    *right_index    = *left_index;
+                    HAItem_T_ *item = (Storage() + ((*left_index) - 1));
+                    item->Key       = static_cast<String<Char_T_> &&>(to);
+                    item->Hash      = to_hash;
+                    *left_index     = item->Next;
+                    item->Next      = 0;
+                    return true;
                 }
             }
         }
@@ -560,46 +537,16 @@ class HArray {
 
     void remove(const Char_T_ *key, SizeT length, ULong hash) const noexcept {
         if (Size() != 0) {
-            SizeT *    index          = getPosition(hash);
-            SizeT *    previous_index = nullptr;
-            HAItem_T_ *src            = Storage();
-            HAItem_T_ *item;
+            SizeT *index;
+            find(index, key, length, hash);
 
             if (*index != 0) {
-                do {
-                    item = (src + ((*index) - 1));
-
-                    if ((item->Hash == hash) &&
-                        item->Key.IsEqual(key, length)) {
-                        break;
-                    }
-
-                    previous_index = index;
-                    index          = &(item->Next);
-                } while (*index != 0);
-
-                if (*index != 0) {
-                    item->Key   = String<Char_T_>();
-                    item->Value = Value_();
-                    item->Hash  = 0;
-
-                    if ((previous_index == nullptr) ||
-                        (*previous_index < *index)) {
-                        /*
-                         * If "previous" inserted before "item"
-                         * (e.g., deleting items from n to 0).
-                         */
-                        *index = item->Next;
-                    } else {
-                        /*
-                         * If "previous" inserted after "item"
-                         * (e.g., deleting items from 0 to n).
-                         */
-                        *previous_index = item->Next;
-                    }
-
-                    item->Next = 0;
-                }
+                HAItem_T_ *item = (Storage() + ((*index) - 1));
+                item->Key       = String<Char_T_>();
+                item->Value     = Value_();
+                item->Hash      = 0;
+                *index          = item->Next;
+                item->Next      = 0;
             }
         }
     }
