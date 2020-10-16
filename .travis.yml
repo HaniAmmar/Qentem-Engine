@@ -59,7 +59,8 @@ jobs:
 
   - os: linux
     arch: arm64-graviton2
-    virt: lxd
+    dist: focal
+    virt: vm
     compiler: clang
 
     before_script:
