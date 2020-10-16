@@ -229,8 +229,9 @@ class HArray {
             grow();
         }
 
-        const ULong hash  = StringUtils::Hash(key.First(), key.Length());
-        SizeT *     index = find(key.First(), key.Length(), hash);
+        const ULong hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *     index;
+        find(index, key.First(), key.Length(), hash);
 
         if ((*index) == 0) {
             insert(index, static_cast<String<Char_T_> &&>(key), hash);
