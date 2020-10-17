@@ -21,6 +21,7 @@
  */
 
 #include "ALE.hpp"
+#include "Array.hpp"
 #include "TestHelper.hpp"
 
 #ifndef QENTEM_ALE_TESTS_H_
@@ -30,102 +31,138 @@ namespace Qentem {
 namespace Test {
 
 struct aleHelper {
-    static bool ALESetNumber(double &number, const char *content,
-                             SizeT length) {
-        static const char *one_str = "{1}";
-        static const SizeT one_len = 3;
+    // See class Template_T_ for another example.
 
-        static const char *    a_val     = "{A}";
-        static constexpr SizeT a_val_len = 3;
+    struct Value_T_ {
+        const char *Name;
+        const SizeT NameLength;
 
-        static const char *    ab_val     = "{AB}";
-        static constexpr SizeT ab_val_len = 4;
+        // Number Value
+        const SizeT Number;
 
-        static const char *    abc_val     = "{ABC}";
-        static constexpr SizeT abc_val_len = 5;
+        // String Value
+        const char *Str;
+        const SizeT StrLength;
+    };
 
-        if ((one_len == length) &&
-            StringUtils::IsEqual(one_str, content, length)) {
-            number = 6;
-            return true;
+    static Array<Value_T_> &GetItems() {
+        static Array<Value_T_> items;
+
+        if (items.IsEmpty()) {
+            items += {"{1}", 3, 6, nullptr, 0};
+            items += {"{A}", 3, 6, nullptr, 0};
+            items += {"{AB}", 4, 13, nullptr, 0};
+            items += {"{ABC}", 5, 26, nullptr, 0};
+            items += {"{Q}", 3, 0, "Qentem", 6};
+            items += {"{QA}", 4, 0, "Qentem ALE", 10};
         }
 
-        if ((a_val_len == length) &&
-            StringUtils::IsEqual(a_val, content, length)) {
-            number = 6;
-            return true;
+        return items;
+    }
+    static bool FindItem(Value_T_ *&item, const char *content, SizeT length) {
+        static const Array<Value_T_> &items = GetItems();
+
+        for (SizeT i = 0; i < items.Size(); i++) {
+            item = &(items[i]);
+
+            if ((item->NameLength == length) &&
+                StringUtils::IsEqual(item->Name, content, length)) {
+                return true;
+            }
         }
 
-        if ((ab_val_len == length) &&
-            StringUtils::IsEqual(ab_val, content, length)) {
-            number = 13;
-            return true;
-        }
+        return false;
+    }
 
-        if ((abc_val_len == length) &&
-            StringUtils::IsEqual(abc_val, content, length)) {
-            number = 26;
+    bool ALESetNumber(double &number, const char *content,
+                      SizeT length) const noexcept {
+        Value_T_ *item;
+
+        if (FindItem(item, content, length) && (item->Str == nullptr)) {
+            number = item->Number;
             return true;
         }
 
         return false;
     }
 
-    static bool ALEIsEqual(bool &result, const char *left, SizeT left_length,
-                           const char *right, SizeT right_length) {
-        static const char *a_str = "{1}";
-        static const SizeT a_len = 3;
+    bool ALEIsEqual(bool &result, const char *content, ALE::Number left,
+                    ALE::Number right, bool left_evaluated,
+                    bool right_evaluated) const noexcept {
+        const char *left_content  = (content + left.Content.Offset);
+        const char *right_content = (content + right.Content.Offset);
+        Value_T_ *  item;
+        SizeT       left_length  = left.Content.Length;
+        SizeT       right_length = right.Content.Length;
 
-        static const char *ab_str = "{20}";
-        static const SizeT ab_len = 4;
+        bool is_number = (left_evaluated || right_evaluated);
 
-        static const char *a_val     = "Qentem";
-        static const SizeT a_val_len = 6;
+        if (!left_evaluated) {
+            if (*left_content == ALEOperations<char>::BracketStart) {
+                if (!FindItem(item, left_content, left_length)) {
+                    return false;
+                }
 
-        static const char *ab_val     = "Qentem ALE";
-        static const SizeT ab_val_len = 10;
-
-        const char *str_left;
-        const char *str_right;
-        SizeT       str_left_length;
-        SizeT       str_right_length;
-
-        if (left[0] == '{') {
-            if ((left_length == a_len) &&
-                StringUtils::IsEqual(left, a_str, a_len)) {
-                str_left        = a_val;
-                str_left_length = a_val_len;
-            } else if ((left_length == ab_len) &&
-                       StringUtils::IsEqual(left, ab_str, ab_len)) {
-                str_left        = ab_val;
-                str_left_length = ab_val_len;
+                if (item->Str == nullptr) {
+                    left.Number = item->Number;
+                    is_number   = true;
+                } else {
+                    left_content = item->Str;
+                    left_length  = item->StrLength;
+                }
             } else {
-                return false;
+                if (*left_content == ALEOperations<char>::ParenthesStart) {
+                    ++left_content;
+                    left_length -= 2;
+                }
+
+                left_evaluated =
+                    ALE::Evaluate(left.Number, left_content, left_length, this);
+                if (!left_evaluated && is_number) {
+                    return false;
+                }
+
+                is_number = left_evaluated;
             }
-        } else {
-            str_left        = left;
-            str_left_length = left_length;
         }
 
-        if (right[0] == '{') {
-            if ((right_length == a_len) &&
-                StringUtils::IsEqual(right, a_str, a_len)) {
-                str_right        = a_val;
-                str_right_length = a_val_len;
-            } else if ((right_length == ab_len) &&
-                       StringUtils::IsEqual(right, ab_str, ab_len)) {
-                str_right        = ab_val;
-                str_right_length = ab_val_len;
-            } else {
-                return false;
+        if (!right_evaluated) {
+            if (*right_content == ALEOperations<char>::BracketStart) {
+                if (!FindItem(item, right_content, right_length)) {
+                    return false;
+                }
+
+                if (is_number && (item->Str != nullptr)) {
+                    return false;
+                }
+
+                if (item->Str == nullptr) {
+                    right.Number = item->Number;
+                } else {
+                    right_content = item->Str;
+                    right_length  = item->StrLength;
+                }
+
+            } else if (is_number) {
+                if (*right_content == ALEOperations<char>::ParenthesStart) {
+                    ++right_content;
+                    right_length -= 2;
+                }
+
+                if (!(ALE::Evaluate(right.Number, right_content, right_length,
+                                    this))) {
+                    return false;
+                }
             }
-        } else {
-            str_right        = right;
-            str_right_length = right_length;
         }
 
-        result = ((str_left_length == str_right_length) &&
-                  StringUtils::IsEqual(str_right, str_left, str_right_length));
+        if (is_number) {
+            result = (left.Number == right.Number);
+        } else {
+            result = ((left_length == right_length) &&
+                      StringUtils::IsEqual(left_content, right_content,
+                                           right_length));
+        }
 
         return true;
     }
@@ -2852,6 +2889,10 @@ static int TestALE11() {
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 1, "number");
 
+    content = "1+2*3 == 7";
+    number  = ALE::Evaluate(content);
+    EQ_VALUE(number, 1, "number");
+
     content = "((5/5+1)*2+1)+3*3 != 12 && 1";
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 1, "number");
@@ -3340,6 +3381,10 @@ static int TestALE14() {
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
+    content = "10=={A}+4";
+    number  = ALE::Evaluate(content, &ale);
+    EQ_VALUE(number, 1, "number");
+
     content = "10==({A}+4)";
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
@@ -3356,12 +3401,21 @@ static int TestALE14() {
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
+    content = "7!={AB}+3";
+    number  = ALE::Evaluate(content, &ale);
+    EQ_VALUE(number, 1, "number");
+
     content  = "7!=({AB}-6)";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
     content  = "(4-{A})!=-2";
+    is_valid = ALE::Evaluate(number, content, &ale);
+    EQ_VALUE(number, 0, "number");
+    EQ_TRUE(is_valid, "is_valid");
+
+    content  = "4-{A}!=-2";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
@@ -3434,15 +3488,15 @@ static int TestALE14() {
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
-    content = "0||{1}==Qentem";
+    content = "0||{Q}==Qentem";
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
-    content = "1||{1}!=Qentem";
+    content = "1||{Q}!=Qentem";
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
-    content = "0||{1}!=Qen";
+    content = "0||{Q}!=Qen";
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
@@ -3454,7 +3508,11 @@ static int TestALE14() {
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
-    content = "Qentem!={20}||1";
+    content = "6=={A}||0";
+    number  = ALE::Evaluate(content, &ale);
+    EQ_VALUE(number, 1, "number");
+
+    content = "Qentem!={QA}||1";
     number  = ALE::Evaluate(content, &ale);
     EQ_VALUE(number, 1, "number");
 
@@ -3536,42 +3594,42 @@ static int TestALE15() {
     bool        is_valid;
     aleHelper   ale;
 
-    content  = "{1}   ==Qentem";
+    content  = "{Q}   ==Qentem";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{20}==     Qentem ALE";
+    content  = "{QA}==     Qentem ALE";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "        {1}   ==Qentem";
+    content  = "        {Q}   ==Qentem";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "             {20}==     Qentem ALE";
+    content  = "             {QA}==     Qentem ALE";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{1}==          Qentem";
+    content  = "{Q}==          Qentem";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{20}==Qentem ALE        ";
+    content  = "{QA}==Qentem ALE        ";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{1}==    Qentem          ";
+    content  = "{Q}==    Qentem          ";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "  {20}    ==     Qentem ALE     ";
+    content  = "  {QA}    ==     Qentem ALE     ";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
@@ -3580,12 +3638,12 @@ static int TestALE15() {
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_FALSE(is_valid, "is_valid");
 
-    content  = "{1}!=Qentem";
+    content  = "{Q}!=Qentem";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{20}!=Qentem ALE";
+    content  = "{QA}!=Qentem ALE";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
@@ -3594,62 +3652,62 @@ static int TestALE15() {
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_FALSE(is_valid, "is_valid");
 
-    content  = "{1}==Qente";
+    content  = "{Q}==Qente";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{20}==ALE";
+    content  = "{QA}==ALE";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{1}!=Qente";
+    content  = "{Q}!=Qente";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "{20}!=ALE";
+    content  = "{QA}!=ALE";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qentem   =={1}";
+    content  = "Qentem   =={Q}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qentem ALE==     {20}";
+    content  = "Qentem ALE==     {QA}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "        Qentem   =={1}";
+    content  = "        Qentem   =={Q}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "             Qentem ALE==     {20}";
+    content  = "             Qentem ALE==     {QA}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qentem==          {1}";
+    content  = "Qentem==          {Q}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qentem ALE=={20}        ";
+    content  = "Qentem ALE=={QA}        ";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qentem==    {1}          ";
+    content  = "Qentem==    {Q}          ";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "  Qentem ALE    ==     {20}     ";
+    content  = "  Qentem ALE    ==     {QA}     ";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
@@ -3658,12 +3716,12 @@ static int TestALE15() {
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_FALSE(is_valid, "is_valid");
 
-    content  = "Qentem!={1}";
+    content  = "Qentem!={Q}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qentem ALE!={20}";
+    content  = "Qentem ALE!={QA}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
@@ -3672,22 +3730,22 @@ static int TestALE15() {
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_FALSE(is_valid, "is_valid");
 
-    content  = "Qente=={1}";
+    content  = "Qente=={Q}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "ALE=={20}";
+    content  = "ALE=={QA}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 0, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "Qente!={1}";
+    content  = "Qente!={Q}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
-    content  = "ALE!={20}";
+    content  = "ALE!={QA}";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");

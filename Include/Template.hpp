@@ -1068,96 +1068,113 @@ class Template_T_ {
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const Char_T_ *left, SizeT left_length,
-                    const Char_T_ *right, SizeT right_length) const noexcept {
-        const Value_T_ *value_left{nullptr};
-        const Value_T_ *value_right{nullptr};
-        const Char_T_ * str_left;
-        const Char_T_ * str_right;
-        SizeT           str_length_left;
-        SizeT           str_length_right;
+    bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left,
+                    ALE::Number right, bool left_evaluated,
+                    bool right_evaluated) const noexcept {
+        const Value_T_ *value_left  = nullptr;
+        const Value_T_ *value_right = nullptr;
 
-        bool is_number = false;
+        const Char_T_ *left_content  = (content + left.Content.Offset);
+        const Char_T_ *right_content = (content + right.Content.Offset);
+        SizeT          left_length   = left.Content.Length;
+        SizeT          right_length  = right.Content.Length;
+
+        bool is_number = (left_evaluated || right_evaluated);
 
         // If the left side is a variable
-        if ((*left == TemplatePatterns_T_::InLinePrefix) &&
-            (left_length > TemplatePatternsSize::VariableFulllength)) {
-            value_left = findValue(
-                (left + TemplatePatternsSize::VariablePrefixLength),
-                (left_length -
-                 TemplatePatternsSize::VariableFulllength)); // {var:x}
+        if (!left_evaluated) {
+            if ((*left_content == TemplatePatterns_T_::InLinePrefix) &&
+                (left_length > TemplatePatternsSize::VariableFulllength)) {
+                value_left = findValue(
+                    (left_content + TemplatePatternsSize::VariablePrefixLength),
+                    (left_length -
+                     TemplatePatternsSize::VariableFulllength)); // {var:x}
 
-            if (value_left == nullptr) {
-                return false;
+                if (value_left == nullptr) {
+                    return false;
+                }
+
+                if (value_left->IsNumber()) {
+                    is_number = true;
+                }
+            } else {
+                if (*left_content != ALEOperations<Char_T_>::ParenthesStart) {
+                    left_evaluated = Digit<Char_T_>::StringToNumber(
+                        left.Number, left_content, left_length);
+                } else {
+                    left_evaluated =
+                        ALE::Evaluate(left.Number, (++left_content),
+                                      (left_length -= 2), this);
+                }
+
+                if (!left_evaluated && is_number) {
+                    return false;
+                }
+
+                is_number = left_evaluated;
             }
-
-            is_number = value_left->IsNumber();
         }
 
-        // If the right side is a variable
-        if ((*right == TemplatePatterns_T_::InLinePrefix) &&
-            (right_length > TemplatePatternsSize::VariableFulllength)) {
-            value_right = findValue(
-                (right + TemplatePatternsSize::VariablePrefixLength),
-                (right_length -
-                 TemplatePatternsSize::VariableFulllength)); // {var:x}
+        if (!right_evaluated) {
+            // If the right side is a variable
+            if ((*right_content == TemplatePatterns_T_::InLinePrefix) &&
+                (right_length > TemplatePatternsSize::VariableFulllength)) {
+                value_right = findValue(
+                    (right_content +
+                     TemplatePatternsSize::VariablePrefixLength),
+                    (right_length -
+                     TemplatePatternsSize::VariableFulllength)); // {var:x}
 
-            if (value_right == nullptr) {
-                return false;
-            }
+                if (value_right == nullptr) {
+                    return false;
+                }
 
-            if (!is_number) {
-                is_number = value_right->IsNumber();
+                if (value_right->IsNumber()) {
+                    is_number = true;
+                }
+            } else if (is_number) {
+                if (*right_content != ALEOperations<Char_T_>::ParenthesStart) {
+                    if (!(Digit<Char_T_>::StringToNumber(
+                            right.Number, right_content, right_length))) {
+                        return false;
+                    }
+                } else if (!(ALE::Evaluate(right.Number, (++right_content),
+                                           (right_length -= 2), this))) {
+                    return false;
+                }
             }
         }
 
         if (is_number) {
-            double num_left;
-
-            if (value_left != nullptr) {
-                if (!(value_left->SetNumber(num_left))) {
-                    return false;
-                }
-            } else if (!(Digit<Char_T_>::StringToNumber(num_left, left,
-                                                        left_length))) {
+            if (!left_evaluated && ((value_left == nullptr) ||
+                                    !(value_left->SetNumber(left.Number)))) {
                 return false;
             }
 
-            double num_right;
-
-            if (value_right != nullptr) {
-                if (!(value_right->SetNumber(num_right))) {
-                    return false;
-                }
-            } else if (!(Digit<Char_T_>::StringToNumber(num_right, right,
-                                                        right_length))) {
-                return false;
-            }
-
-            result = (num_left == num_right);
-            return true;
-        }
-
-        if (value_left != nullptr) {
-            if (!(value_left->SetCharAndLength(str_left, str_length_left))) {
+            if ((value_right != nullptr) &&
+                !(value_right->SetNumber(right.Number))) {
                 return false;
             }
         } else {
-            str_left        = left;
-            str_length_left = left_length;
-        }
-
-        if (value_right != nullptr) {
-            if (!(value_right->SetCharAndLength(str_right, str_length_right))) {
+            if ((value_left != nullptr) &&
+                !(value_left->SetCharAndLength(left_content, left_length))) {
                 return false;
             }
-        } else {
-            str_right        = right;
-            str_length_right = right_length;
+
+            if ((value_right != nullptr) &&
+                !(value_right->SetCharAndLength(right_content, right_length))) {
+                return false;
+            }
         }
 
-        result = ((str_length_left == str_length_right) &&
-                  StringUtils::IsEqual(str_left, str_right, str_length_right));
+        if (is_number) {
+            result = (left.Number == right.Number);
+        } else {
+            result = ((left_length == right_length) &&
+                      StringUtils::IsEqual(left_content, right_content,
+                                           right_length));
+        }
+
         return true;
     }
 
