@@ -24,35 +24,29 @@ jobs:
     arch: amd64
 
     before_script:
-      - mkdir Build
-      - cd Build
-      - cmake -D ENABLE_AVX2=1 ..
+      - mkdir ./Build
+      - g++ -g -O0 -Wall -march=native -D QENTEM_AVX2 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
-      - cmake --build .
-      - ctest
+      - ./Build/QTest.bin
 
   - os: linux
     arch: amd64
 
     before_script:
-      - mkdir Build
-      - cd Build
-      - cmake -D ENABLE_SSE2=1 ..
+      - mkdir ./Build
+      - g++ -g -O0 -Wall -march=native -D QENTEM_SSE2 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
-      - cmake --build .
-      - ctest
+      - ./Build/QTest.bin
 
   - os: linux
     arch: arm64
     virt: lxd
 
     before_script:
-      - mkdir Build
-      - cd Build
-      - cmake ..
+      - mkdir ./Build
+      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
-      - cmake --build .
-      - ctest
+      - ./Build/QTest.bin
 
   - os: linux
     arch: arm64-graviton2
