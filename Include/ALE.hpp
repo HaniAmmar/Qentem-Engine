@@ -442,8 +442,6 @@ class ALE {
                     val.Number, (content + offset), length));
             }
         }
-
-        return false;
     }
 
     template <typename Char_T_, typename Helper_T_>
