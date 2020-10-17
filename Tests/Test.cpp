@@ -92,16 +92,16 @@ int main() {
     //     Qentem::Test::RunTemplateTests();
     // }
 
-#ifdef QENTEM_64BIT_
+#ifdef QENTEM_64BIT_ARCH
     std::wcout << "Arch: 64BIT";
-#ifdef QENTEM_TAGGED_POINTER_
+#ifdef QENTEM_POINTER_TAGGING
     std::wcout << "\nTagged Pointers: On";
 #endif
 #endif
 
     std::wcout << "\nEndianness: ";
 
-#ifndef QENTEM_BIG_ENDIAN_
+#ifndef QENTEM_BIG_ENDIAN
     std::wcout << "Little-endian";
 #else
     std::wcout << "Big-endian";

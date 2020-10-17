@@ -25,7 +25,12 @@
 #ifndef QENTEM_PLATFORM_H_
 #define QENTEM_PLATFORM_H_
 
-#if QENTEM_AVX2_ == 1
+#if QENTEM_AVX2 == 1 || QENTEM_SSE2 == 1
+#include <immintrin.h>
+#define QENTEM_SIMD_ENABLED
+#endif
+
+#if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
 using QMM_Number_T = unsigned int;
 // #define QMM_TABLE_
 #define QMM_SIZE_ 32U
@@ -43,7 +48,7 @@ using QMM_Number_T = unsigned int;
     static_cast<QMM_Number_T>(_mm256_movemask_epi16(_mm256_cmpeq_epi16(a, b)))
 #define QMM_COMPARE_16_MASK_8_(a, b)                                           \
     static_cast<QMM_Number_T>(_mm256_movemask_epi8(_mm256_cmpeq_epi16(a, b)))
-#elif QENTEM_SSE2_ == 1
+#elif defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
 using QMM_Number_T = unsigned int;
 #define QMM_SIZE_ 16U
 #define QMM_SHIFTSIZE_ 4U
@@ -58,11 +63,6 @@ using QMM_Number_T = unsigned int;
     static_cast<QMM_Number_T>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
 #define QMM_COMPARE_16_MASK_8_(a, b)                                           \
     static_cast<QMM_Number_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
-#endif
-
-#if QENTEM_AVX2_ == 1 || QENTEM_SSE2_ == 1
-#include <immintrin.h>
-#define QENTEM_SIMD_ENABLED_
 #endif
 
 #ifdef _MSC_VER
@@ -80,7 +80,7 @@ namespace Qentem {
 namespace Platform {
 
 #ifdef _MSC_VER
-#ifdef QENTEM_64BIT_
+#ifdef QENTEM_64BIT_ARCH
 inline static unsigned long CTZ(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanForward64(&index, value) != 0) ? index : 64UL);
@@ -118,7 +118,7 @@ inline static unsigned long CLZ(unsigned int value) noexcept {
 
 #else
 
-#ifdef QENTEM_64BIT_
+#ifdef QENTEM_64BIT_ARCH
 template <typename Number_T>
 inline static unsigned long CTZ(Number_T value) noexcept {
     return static_cast<unsigned long>(__builtin_ctzl(value));

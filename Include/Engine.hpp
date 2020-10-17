@@ -39,7 +39,7 @@ class Engine {
     Engine &operator=(Engine &&) = delete;
     Engine &operator=(const Engine &) = delete;
     ~Engine()                         = delete;
-#ifdef QENTEM_SIMD_ENABLED_
+#ifdef QENTEM_SIMD_ENABLED
     /*
      * Returns an the index of a character + 1.
      */

@@ -156,10 +156,10 @@ class TestHelper {
         return 0;                                                              \
     } while (false)
 
-QENTEM_MAYBE_UNUSED_
+QENTEM_MAYBE_UNUSED
 static int TestThrow1_1() { return 1; }
 
-QENTEM_MAYBE_UNUSED_
+QENTEM_MAYBE_UNUSED
 static int TestThrow1() {
     std::wstringstream ss;
 
@@ -169,10 +169,10 @@ static int TestThrow1() {
     END_SUB_TEST;
 }
 
-QENTEM_MAYBE_UNUSED_
+QENTEM_MAYBE_UNUSED
 static int TestThrow2_2() { throw 1; }
 
-QENTEM_MAYBE_UNUSED_
+QENTEM_MAYBE_UNUSED
 static int TestThrow2() {
     std::wstringstream ss;
 
@@ -184,7 +184,7 @@ static int TestThrow2() {
     END_SUB_TEST;
 }
 
-QENTEM_MAYBE_UNUSED_
+QENTEM_MAYBE_UNUSED
 static int RunTestHelperTests() {
     STARTING_TEST("TestHelper.hpp");
 

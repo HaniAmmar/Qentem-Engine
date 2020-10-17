@@ -29,55 +29,55 @@
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) ||          \
     defined(__ppc64__) || defined(__powerpc64__) || defined(__s390__)
-#define QENTEM_64BIT_
+#define QENTEM_64BIT_ARCH
 // 64bit arch only uses the lower 48 bits for pointers,
 // the upper 16 bits can be used for taging.
-#ifndef QENTEM_TAGGED_POINTER_
-#define QENTEM_TAGGED_POINTER_ 1
+#ifndef QENTEM_POINTER_TAGGING
+#define QENTEM_POINTER_TAGGING
 #endif
 #endif
 
-#ifndef QENTEM_AVX2_
-#define QENTEM_AVX2_ 0
+#ifndef QENTEM_AVX2
+#define QENTEM_AVX2 0
 #endif
 
-#ifndef QENTEM_SSE2_
-#define QENTEM_SSE2_ 0
+#ifndef QENTEM_SSE2
+#define QENTEM_SSE2 0
 #endif
 
 #ifndef __AVX2__
-#undef QENTEM_AVX2_
+#undef QENTEM_AVX2
 #endif
 
 #ifndef __SSE2__
-#undef QENTEM_SSE2_
+#undef QENTEM_SSE2
 #endif
 
 #ifdef _MSC_VER
 #define QENTEM_NOINLINE __declspec(noinline)
-#define QENTEM_MAYBE_UNUSED_
+#define QENTEM_MAYBE_UNUSED
 #else
 #define QENTEM_NOINLINE __attribute__((noinline))
-#define QENTEM_MAYBE_UNUSED_ __attribute__((unused))
+#define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
 
-#ifndef QENTEM_BIG_ENDIAN_
+#ifndef QENTEM_BIG_ENDIAN
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define QENTEM_BIG_ENDIAN_
+#define QENTEM_BIG_ENDIAN
 #endif
 #endif
 
 namespace Qentem {
 
-#ifdef QENTEM_64BIT_
+#ifdef QENTEM_64BIT_ARCH
 using ULong = unsigned long long;
 #else
 using ULong = unsigned long;
 #endif
 
-#ifndef QENTEM_SIZE_T_
-#define QENTEM_SIZE_T_
-#ifdef QENTEM_64BIT_
+#ifndef QENTEM_SIZE_T
+#define QENTEM_SIZE_T
+#ifdef QENTEM_64BIT_ARCH
 using SizeT = unsigned int;
 #else
 using SizeT = unsigned long;

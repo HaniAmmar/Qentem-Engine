@@ -213,7 +213,7 @@ class String {
         return str;
     }
 
-#if QENTEM_TAGGED_POINTER_ == 1
+#ifdef QENTEM_POINTER_TAGGING
     inline Char_T_ *Storage() const noexcept {
         return reinterpret_cast<Char_T_ *>(int_storage_ & 0xFFFFFFFFFFFFULL);
     }
@@ -279,7 +279,7 @@ class String {
 
   private:
     void setStorage(Char_T_ *new_storage) noexcept {
-#if QENTEM_TAGGED_POINTER_ == 1
+#ifdef QENTEM_POINTER_TAGGING
         int_storage_ &= 0xFFFF000000000000ULL; // Preserve the tag
         int_storage_ |= reinterpret_cast<unsigned long long>(
             new_storage); // Restore the tag
@@ -296,7 +296,7 @@ class String {
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(SizeT new_length) noexcept { length_ = new_length; }
 
-#if QENTEM_TAGGED_POINTER_ == 1
+#ifdef QENTEM_POINTER_TAGGING
     union {
         unsigned long long int_storage_;
         Char_T_ *          storage_{nullptr};

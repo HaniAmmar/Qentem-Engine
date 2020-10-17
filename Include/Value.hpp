@@ -597,7 +597,7 @@ class Value {
     }
 
     inline ValueType Type() const noexcept {
-#if QENTEM_TAGGED_POINTER_ == 1
+#ifdef QENTEM_POINTER_TAGGING
         return type_.GetType();
 #else
         return type_;
@@ -1189,7 +1189,7 @@ class Value {
     struct VType_; // For tagging pointers
 
     inline void setType(ValueType new_type) noexcept {
-#if QENTEM_TAGGED_POINTER_ == 1
+#ifdef QENTEM_POINTER_TAGGING
         type_.SetType(new_type);
 #else
         type_ = new_type;
@@ -1293,7 +1293,7 @@ class Value {
 
             default: {
                 number_ = val.number_;
-#if QENTEM_TAGGED_POINTER_ == 0
+#ifndef QENTEM_POINTER_TAGGING
                 setType(val.Type());
 #endif
             }
@@ -1341,7 +1341,7 @@ class Value {
         VArray  array_;
         VString string_;
         VNumber number_;
-#if QENTEM_TAGGED_POINTER_ == 1
+#ifdef QENTEM_POINTER_TAGGING
         VType_ type_;
     };
 
@@ -1355,7 +1355,7 @@ class Value {
 
       private:
         struct SubType_ {
-#ifdef QENTEM_BIG_ENDIAN_
+#ifdef QENTEM_BIG_ENDIAN
             ValueType     type_;
             unsigned char padding_[7];
 #else

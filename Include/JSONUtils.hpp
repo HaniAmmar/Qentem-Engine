@@ -34,9 +34,9 @@ template <typename Char_T_, ULong S = sizeof(Char_T_)>
 struct JSONotation {};
 
 template <typename Char_T_>
-QENTEM_MAYBE_UNUSED_ static SizeT UnEscapeJSON(const Char_T_ *        content,
-                                               SizeT                  length,
-                                               StringStream<Char_T_> &buffer) {
+QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *        content,
+                                              SizeT                  length,
+                                              StringStream<Char_T_> &buffer) {
     using JSONotation_T_ = JSONotation<Char_T_>;
 
     SizeT offset  = 0;

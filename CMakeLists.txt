@@ -17,9 +17,9 @@ else()
     endif()
 
     if (ENABLE_AVX2)
-        add_compile_options(-D QENTEM_AVX2_=1 -march=native)
+        add_compile_options(-D QENTEM_AVX2 -march=native)
     elseif(ENABLE_SSE2)
-        add_compile_options(-D QENTEM_SSE2_=1 -march=native)
+        add_compile_options(-D QENTEM_SSE2 -march=native)
     endif()
 endif()
 
