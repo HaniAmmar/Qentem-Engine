@@ -49,11 +49,11 @@ class ALE {
     ~ALE()                      = delete;
 
     union Number {
-        double Number{0};
+        double Number;
         struct {
             unsigned int Offset;
             unsigned int Length;
-        } Content;
+        } Content{};
     };
 
     template <typename Char_T_, typename Helper_T_>
