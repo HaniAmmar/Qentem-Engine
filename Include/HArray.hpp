@@ -435,7 +435,7 @@ class HArray {
 
 #if QENTEM_TAGGED_POINTER_ == 1
     inline HAItem_T_ *Storage() const noexcept {
-        return reinterpret_cast<HAItem_T_ *>(int_storage_ & 281474976710655ULL);
+        return reinterpret_cast<HAItem_T_ *>(int_storage_ & 0xFFFFFFFFFFFFULL);
     }
 #else
     inline HAItem_T_ *Storage() const noexcept { return storage_; }
@@ -461,7 +461,7 @@ class HArray {
   private:
     void setStorage(HAItem_T_ *new_storage) noexcept {
 #if QENTEM_TAGGED_POINTER_ == 1
-        int_storage_ &= 18446462598732840960ULL; // Preserve the tag
+        int_storage_ &= 0xFFFF000000000000ULL; // Preserve the tag
         int_storage_ |= reinterpret_cast<unsigned long long>(
             new_storage); // Restore the tag
 #else

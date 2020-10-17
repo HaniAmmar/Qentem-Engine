@@ -271,7 +271,7 @@ class Array {
 
 #if QENTEM_TAGGED_POINTER_ == 1
     inline Type_ *Storage() const noexcept {
-        return reinterpret_cast<Type_ *>(int_storage_ & 281474976710655ULL);
+        return reinterpret_cast<Type_ *>(int_storage_ & 0xFFFFFFFFFFFFULL);
     }
 #else
     inline Type_ *Storage() const noexcept { return storage_; }
@@ -297,7 +297,7 @@ class Array {
   private:
     void setStorage(Type_ *new_storage) noexcept {
 #if QENTEM_TAGGED_POINTER_ == 1
-        int_storage_ &= 18446462598732840960ULL; // Preserve the tag
+        int_storage_ &= 0xFFFF000000000000ULL; // Preserve the tag
         int_storage_ |= reinterpret_cast<unsigned long long>(
             new_storage); // Restore the tag
 #else
