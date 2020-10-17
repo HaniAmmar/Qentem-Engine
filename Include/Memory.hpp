@@ -39,16 +39,16 @@ namespace Memory {
 
 inline static void SetToZero(void *ptr, SizeT size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED
-    const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
-    const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
+    const SizeT m_size    = (size >> QENTEM_SIMD_SHIFT_SIZE);
+    const SizeT remaining = (size ^ (m_size << QENTEM_SIMD_SHIFT_SIZE));
 
     if (m_size != 0) {
-        QMM_VAR_ *      m_ptr  = static_cast<QMM_VAR_ *>(ptr);
-        const QMM_VAR_ *end    = (m_ptr + m_size);
-        const QMM_VAR_  m_zero = QMM_SETZERO_();
+        QENTEM_SIMD_VAR *      m_ptr  = static_cast<QENTEM_SIMD_VAR *>(ptr);
+        const QENTEM_SIMD_VAR *end    = (m_ptr + m_size);
+        const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_SET_TO_ZERO();
 
         do {
-            QMM_STOREU_(m_ptr, m_zero);
+            QENTEM_SIMD_STOREU(m_ptr, m_zero);
             ++m_ptr;
         } while (m_ptr != end);
 
@@ -72,16 +72,17 @@ inline static void SetToZero(void *ptr, SizeT size) noexcept {
 
 inline static void Copy(void *to, const void *from, SizeT size) noexcept {
 #ifdef QENTEM_SIMD_ENABLED
-    const SizeT m_size    = (size >> QMM_SHIFTSIZE_);
-    const SizeT remaining = (size ^ (m_size << QMM_SHIFTSIZE_));
+    const SizeT m_size    = (size >> QENTEM_SIMD_SHIFT_SIZE);
+    const SizeT remaining = (size ^ (m_size << QENTEM_SIMD_SHIFT_SIZE));
 
     if (m_size != 0) {
-        QMM_VAR_ *      m_to   = static_cast<QMM_VAR_ *>(to);
-        const QMM_VAR_ *m_form = static_cast<const QMM_VAR_ *>(from);
-        const QMM_VAR_ *end    = (m_form + m_size);
+        QENTEM_SIMD_VAR *      m_to = static_cast<QENTEM_SIMD_VAR *>(to);
+        const QENTEM_SIMD_VAR *m_form =
+            static_cast<const QENTEM_SIMD_VAR *>(from);
+        const QENTEM_SIMD_VAR *end = (m_form + m_size);
 
         do {
-            QMM_STOREU_(m_to, QMM_LOAD_(m_form));
+            QENTEM_SIMD_STOREU(m_to, QENTEM_SIMD_LOAD(m_form));
             ++m_form;
             ++m_to;
         } while (m_form != end);

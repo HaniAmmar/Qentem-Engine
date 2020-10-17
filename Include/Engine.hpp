@@ -50,14 +50,15 @@ class Engine {
         // TODO: Add 16 and 32-bit char
         if (offset < end_before) {
             content += offset;
-            const QMM_VAR_ m_pattern = QMM_SETONE_8_(one_char);
+            const QENTEM_SIMD_VAR m_pattern =
+                QENTEM_SIMD_SET_TO_ONE_8(one_char);
 
             do {
-                const QMM_VAR_ m_content =
-                    QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content));
+                const QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
+                    reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
 
-                const QMM_Number_T bits =
-                    QMM_COMPARE_8_MASK_(m_pattern, m_content);
+                const QENTEM_SIMD_NUMBER_T bits =
+                    QENTEM_SIMD_COMPARE_8_MASK(m_pattern, m_content);
 
                 if (bits != 0) {
                     const Number_T_ index = (Platform::CTZ(bits) + offset + 1);
@@ -69,8 +70,8 @@ class Engine {
                     return index;
                 }
 
-                offset += QMM_SIZE_;
-                content += QMM_SIZE_;
+                offset += QENTEM_SIMD_SIZE;
+                content += QENTEM_SIMD_SIZE;
             } while (offset < end_before);
         }
 
@@ -91,20 +92,22 @@ class Engine {
         if (offset < end_before) {
             content += offset;
 
-            const QMM_VAR_ m_pattern_first = QMM_SETONE_8_(*pattern);
-            const SizeT    len_less_one    = (pattern_length - 1);
-            const QMM_VAR_ m_pattern_last =
-                QMM_SETONE_8_(pattern[len_less_one]);
+            const QENTEM_SIMD_VAR m_pattern_first =
+                QENTEM_SIMD_SET_TO_ONE_8(*pattern);
+            const SizeT           len_less_one = (pattern_length - 1);
+            const QENTEM_SIMD_VAR m_pattern_last =
+                QENTEM_SIMD_SET_TO_ONE_8(pattern[len_less_one]);
 
             do {
-                QMM_VAR_ m_content =
-                    QMM_LOAD_(reinterpret_cast<const QMM_VAR_ *>(content));
-                QMM_Number_T bits =
-                    QMM_COMPARE_8_MASK_(m_content, m_pattern_first);
+                QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
+                    reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
+                QENTEM_SIMD_NUMBER_T bits =
+                    QENTEM_SIMD_COMPARE_8_MASK(m_content, m_pattern_first);
 
-                m_content = QMM_LOAD_(
-                    reinterpret_cast<const QMM_VAR_ *>(content + len_less_one));
-                bits &= QMM_COMPARE_8_MASK_(m_content, m_pattern_last);
+                m_content =
+                    QENTEM_SIMD_LOAD(reinterpret_cast<const QENTEM_SIMD_VAR *>(
+                        content + len_less_one));
+                bits &= QENTEM_SIMD_COMPARE_8_MASK(m_content, m_pattern_last);
 
                 while (bits != 0) {
                     const Number_T_ index = Platform::CTZ(bits);
@@ -121,11 +124,11 @@ class Engine {
                         return pattern_index;
                     }
 
-                    bits ^= (QMM_Number_T{1} << index);
+                    bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
                 }
 
-                offset += QMM_SIZE_;
-                content += QMM_SIZE_;
+                offset += QENTEM_SIMD_SIZE;
+                content += QENTEM_SIMD_SIZE;
             } while (offset < end_before);
         }
 

@@ -31,38 +31,41 @@
 #endif
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-using QMM_Number_T = unsigned int;
+using QENTEM_SIMD_NUMBER_T = unsigned int;
 // #define QMM_TABLE_
-#define QMM_SIZE_ 32U
-#define QMM_SHIFTSIZE_ 5U
-#define QMM_MAX_NUMBER_ 0xFFFFFFFFU
-#define QMM_VAR_ __m256i
-#define QMM_LOAD_ _mm256_loadu_si256
-#define QMM_SETZERO_ _mm256_setzero_si256
-#define QMM_SETONE_8_ _mm256_set1_epi8
-#define QMM_SETONE_64_ _mm256_set1_epi64x
-#define QMM_STOREU_ _mm256_storeu_si256
-#define QMM_COMPARE_8_MASK_(a, b)                                              \
-    static_cast<QMM_Number_T>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
-#define QMM_COMPARE_16_MASK_(a, b)                                             \
-    static_cast<QMM_Number_T>(_mm256_movemask_epi16(_mm256_cmpeq_epi16(a, b)))
-#define QMM_COMPARE_16_MASK_8_(a, b)                                           \
-    static_cast<QMM_Number_T>(_mm256_movemask_epi8(_mm256_cmpeq_epi16(a, b)))
+#define QENTEM_SIMD_SIZE 32U
+#define QENTEM_SIMD_SHIFT_SIZE 5U
+#define QENTEM_SIMD_MAX_NUMBER 0xFFFFFFFFU
+#define QENTEM_SIMD_VAR __m256i
+#define QENTEM_SIMD_LOAD _mm256_loadu_si256
+#define QENTEM_SIMD_SET_TO_ZERO _mm256_setzero_si256
+#define QENTEM_SIMD_SET_TO_ONE_8 _mm256_set1_epi8
+#define QENTEM_SIMD_SET_TO_ONE_64 _mm256_set1_epi64x
+#define QENTEM_SIMD_STOREU _mm256_storeu_si256
+#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                       \
+    static_cast<QENTEM_SIMD_NUMBER_T>(                                         \
+        _mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
+#define QENTEM_SIMD_COMPARE_16_MASK(a, b)                                      \
+    static_cast<QENTEM_SIMD_NUMBER_T>(                                         \
+        _mm256_movemask_epi16(_mm256_cmpeq_epi16(a, b)))
+#define QENTEM_COMPARE_16_MASK_8(a, b)                                         \
+    static_cast<QENTEM_SIMD_NUMBER_T>(                                         \
+        _mm256_movemask_epi8(_mm256_cmpeq_epi16(a, b)))
 #elif defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-using QMM_Number_T = unsigned int;
-#define QMM_SIZE_ 16U
-#define QMM_SHIFTSIZE_ 4U
-#define QMM_MAX_NUMBER_ 0xFFFFU
-#define QMM_VAR_ __m128i
-#define QMM_LOAD_ _mm_loadu_si128
-#define QMM_SETZERO_ _mm_setzero_si128
-#define QMM_SETONE_8_ _mm_set1_epi8
-#define QMM_SETONE_64_ _mm_set1_epi64x
-#define QMM_STOREU_ _mm_storeu_si128
-#define QMM_COMPARE_8_MASK_(a, b)                                              \
-    static_cast<QMM_Number_T>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
-#define QMM_COMPARE_16_MASK_8_(a, b)                                           \
-    static_cast<QMM_Number_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
+using QENTEM_SIMD_NUMBER_T = unsigned int;
+#define QENTEM_SIMD_SIZE 16U
+#define QENTEM_SIMD_SHIFT_SIZE 4U
+#define QENTEM_SIMD_MAX_NUMBER 0xFFFFU
+#define QENTEM_SIMD_VAR __m128i
+#define QENTEM_SIMD_LOAD _mm_loadu_si128
+#define QENTEM_SIMD_SET_TO_ZERO _mm_setzero_si128
+#define QENTEM_SIMD_SET_TO_ONE_8 _mm_set1_epi8
+#define QENTEM_SIMD_SET_TO_ONE_64 _mm_set1_epi64x
+#define QENTEM_SIMD_STOREU _mm_storeu_si128
+#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                       \
+    static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
+#define QENTEM_COMPARE_16_MASK_8(a, b)                                         \
+    static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
 #endif
 
 #ifdef _MSC_VER
