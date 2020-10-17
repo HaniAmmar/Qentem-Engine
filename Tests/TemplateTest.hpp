@@ -820,12 +820,11 @@ static int TestMathTag2() {
     EQ_VALUE(Template::Render("{math:1=={var:7}}", &value), "{math:1=={var:7}}",
              "Render()");
 
-    // TODO: Fix it!
-    // EQ_VALUE(Template::Render("{math:(6-5)=={var:8}}", &value),
-    //          "{math:(6-5)=={var:8}}", "Render()");
+    EQ_VALUE(Template::Render("{math:(6-5)=={var:8}}", &value),
+             "{math:(6-5)=={var:8}}", "Render()");
 
-    // EQ_VALUE(Template::Render("{math:(6-5)=={var:0}}", &value),
-    //          "{math:(6-5)=={var:0}}", "Render()");
+    EQ_VALUE(Template::Render("{math:(6-5)=={var:0}}", &value),
+             "{math:(6-5)=={var:0}}", "Render()");
 
     EQ_VALUE(Template::Render("{math:{var:0}=={var:8}}", &value),
              "{math:{var:0}=={var:8}}", "Render()");
