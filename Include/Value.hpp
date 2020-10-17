@@ -1347,30 +1347,26 @@ class Value {
 
     struct VType_ {
       public:
-#ifndef QENTEM_BIG_ENDIAN_
-        inline ValueType GetType() const noexcept {
-            return types_[7];
-            return types_[7];
-        }
+        inline ValueType GetType() const noexcept { return sub.type_; }
 
         inline void SetType(ValueType new_type) noexcept {
-            types_[7] = new_type;
+            sub.type_ = new_type;
         }
-#else
-        inline ValueType GetType() const noexcept {
-            return types_[0];
-            return types_[0];
-        }
-
-        inline void SetType(ValueType new_type) noexcept {
-            types_[0] = new_type;
-        }
-#endif
 
       private:
+        struct SubType_ {
+#ifdef QENTEM_BIG_ENDIAN_
+            ValueType     type_;
+            unsigned char padding_[7];
+#else
+            unsigned char padding_[7];
+            ValueType     type_;
+#endif
+        };
+
         union {
             unsigned long long int_type_;
-            ValueType          types_[8];
+            SubType_           sub;
         };
 
         SizeT padding_[2];
