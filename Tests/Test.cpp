@@ -107,6 +107,15 @@ int main() {
     std::wcout << "Big-endian";
 #endif
 
+#ifdef QENTEM_SIMD_ENABLED
+#if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
+    std::wcout << "\nAVX2: On";
+#endif
+#if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
+    std::wcout << "\nSSE2: On";
+#endif
+#endif
+
     std::wcout << "\nSize of SizeT: " << sizeof(Qentem::SizeT) << '\n';
     std::wcout << std::endl;
 
