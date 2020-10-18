@@ -474,6 +474,7 @@ static int TestMathTag1() {
     value["a7"] = 6;
     value["a8"] = 1;
     value["a9"] = "1";
+    value["eq"] = "(8+1+{var:a8})";
 
     EQ_VALUE(Template::Render("{math:1+1}", &value), "2", "Render()");
 
@@ -639,6 +640,17 @@ static int TestMathTag1() {
     EQ_VALUE(
         Template::Render("{math:{var:a3}       ==       null     }", &value),
         R"(1)", "Render()");
+
+    EQ_VALUE(Template::Render("{math:{var:eq}}", &value), R"(10)", "Render()");
+
+    EQ_VALUE(Template::Render("{math:10==(8+1+{var:a8})}", &value), R"(1)",
+             "Render()");
+
+    EQ_VALUE(Template::Render("{math:{var:eq}==9+1}", &value), R"(1)",
+             "Render()");
+
+    EQ_VALUE(Template::Render("{math:(5*2)=={var:eq}}", &value), R"(1)",
+             "Render()");
 
     //////////////
     value.Reset();
