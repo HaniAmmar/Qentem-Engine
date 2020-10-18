@@ -913,6 +913,18 @@ static int TestMathXTag2() {
     EQ_VALUE(Template::Render(L"{math:4    ", &value), L"{math:4    ",
              L"Render()");
 
+    EQ_VALUE(Template::Render(L"{math:A==1+1}", &value), L"{math:A==1+1}",
+             L"Render()");
+
+    EQ_VALUE(Template::Render(L"{math:(A)!=1+1}", &value), L"{math:(A)!=1+1}",
+             L"Render()");
+
+    EQ_VALUE(Template::Render(L"{math:1+1==A}", &value), L"{math:1+1==A}",
+             L"Render()");
+
+    EQ_VALUE(Template::Render(L"{math:1+1!=(A)}", &value), L"{math:1+1!=(A)}",
+             L"Render()");
+
     END_SUB_TEST;
 }
 

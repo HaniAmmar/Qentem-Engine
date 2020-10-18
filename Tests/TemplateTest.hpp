@@ -900,6 +900,18 @@ static int TestMathTag2() {
     EQ_VALUE(Template::Render("{math:4    ", &value), "{math:4    ",
              "Render()");
 
+    EQ_VALUE(Template::Render("{math:A==1+1}", &value), "{math:A==1+1}",
+             "Render()");
+
+    EQ_VALUE(Template::Render("{math:(A)!=1+1}", &value), "{math:(A)!=1+1}",
+             "Render()");
+
+    EQ_VALUE(Template::Render("{math:1+1==A}", &value), "{math:1+1==A}",
+             "Render()");
+
+    EQ_VALUE(Template::Render("{math:1+1!=(A)}", &value), "{math:1+1!=(A)}",
+             "Render()");
+
     END_SUB_TEST;
 }
 
