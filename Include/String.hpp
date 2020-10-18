@@ -41,7 +41,9 @@ class String {
         Storage()[Length()] = 0;
     }
 
-    String(Char_T_ *str, SizeT len) noexcept : storage_(str), length_(len) {}
+    String(Char_T_ *str, SizeT len) noexcept : length_(len) {
+        storage_.ptr_ = str;
+    }
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
         allocate(len + 1);
@@ -57,8 +59,8 @@ class String {
     explicit String(const Char_T_ *str)
         : String(str, StringUtils::Count(str)) {}
 
-    String(String &&src) noexcept
-        : storage_(src.Storage()), length_(src.Length()) {
+    String(String &&src) noexcept : length_(src.Length()) {
+        storage_.ptr_ = src.Storage();
         src.clearStorage();
         src.setLength(0);
     }
@@ -215,7 +217,7 @@ class String {
 
 #ifdef QENTEM_POINTER_TAGGING
     inline Char_T_ *Storage() const noexcept {
-        return reinterpret_cast<Char_T_ *>(int_storage_ & 0xFFFFFFFFFFFFULL);
+        return reinterpret_cast<Char_T_ *>(storage_.int_ & 0xFFFFFFFFFFFFULL);
     }
 #else
     inline Char_T_ *Storage() const noexcept { return storage_; }
@@ -280,8 +282,8 @@ class String {
   private:
     void setStorage(Char_T_ *new_storage) noexcept {
 #ifdef QENTEM_POINTER_TAGGING
-        int_storage_ &= 0xFFFF000000000000ULL; // Preserve the tag
-        int_storage_ |= reinterpret_cast<unsigned long long>(
+        storage_.int_ &= 0xFFFF000000000000ULL; // Preserve the tag
+        storage_.int_ |= reinterpret_cast<unsigned long long>(
             new_storage); // Restore the tag
 #else
         storage_ = new_storage;
@@ -298,9 +300,9 @@ class String {
 
 #ifdef QENTEM_POINTER_TAGGING
     union {
-        unsigned long long int_storage_;
-        Char_T_ *          storage_{nullptr};
-    };
+        unsigned long long int_;
+        Char_T_ *          ptr_;
+    } storage_{0};
 #else
     Char_T_ *storage_{nullptr};
 #endif

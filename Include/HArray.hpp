@@ -72,8 +72,8 @@ class HArray {
     }
 
     HArray(HArray &&h_arr) noexcept
-        : storage_(h_arr.Storage()), index_(h_arr.Size()),
-          capacity_(h_arr.Capacity()) {
+        : index_(h_arr.Size()), capacity_(h_arr.Capacity()) {
+        storage_.ptr_ = h_arr.Storage();
         h_arr.clearStorage();
         h_arr.setSize(0);
         h_arr.setCapacity(0);
@@ -435,7 +435,7 @@ class HArray {
 
 #ifdef QENTEM_POINTER_TAGGING
     inline HAItem_T_ *Storage() const noexcept {
-        return reinterpret_cast<HAItem_T_ *>(int_storage_ & 0xFFFFFFFFFFFFULL);
+        return reinterpret_cast<HAItem_T_ *>(storage_.int_ & 0xFFFFFFFFFFFFULL);
     }
 #else
     inline HAItem_T_ *Storage() const noexcept { return storage_; }
@@ -461,8 +461,8 @@ class HArray {
   private:
     void setStorage(HAItem_T_ *new_storage) noexcept {
 #ifdef QENTEM_POINTER_TAGGING
-        int_storage_ &= 0xFFFF000000000000ULL; // Preserve the tag
-        int_storage_ |= reinterpret_cast<unsigned long long>(
+        storage_.int_ &= 0xFFFF000000000000ULL; // Preserve the tag
+        storage_.int_ |= reinterpret_cast<unsigned long long>(
             new_storage); // Restore the tag
 #else
         storage_ = new_storage;
@@ -656,9 +656,9 @@ class HArray {
 
 #ifdef QENTEM_POINTER_TAGGING
     union {
-        unsigned long long int_storage_;
-        HAItem_T_ *        storage_{nullptr};
-    };
+        unsigned long long int_;
+        HAItem_T_ *        ptr_;
+    } storage_{0};
 #else
     HAItem_T_ *storage_{nullptr};
 #endif

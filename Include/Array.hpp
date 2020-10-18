@@ -42,8 +42,8 @@ class Array {
     }
 
     Array(Array &&arr) noexcept
-        : storage_(arr.Storage()), index_(arr.Size()),
-          capacity_(arr.Capacity()) {
+        : index_(arr.Size()), capacity_(arr.Capacity()) {
+        storage_.ptr_ = arr.Storage();
         arr.clearStorage();
         arr.setSize(0);
         arr.setCapacity(0);
@@ -271,7 +271,7 @@ class Array {
 
 #ifdef QENTEM_POINTER_TAGGING
     inline Type_ *Storage() const noexcept {
-        return reinterpret_cast<Type_ *>(int_storage_ & 0xFFFFFFFFFFFFULL);
+        return reinterpret_cast<Type_ *>(storage_.int_ & 0xFFFFFFFFFFFFULL);
     }
 #else
     inline Type_ *Storage() const noexcept { return storage_; }
@@ -297,8 +297,8 @@ class Array {
   private:
     void setStorage(Type_ *new_storage) noexcept {
 #ifdef QENTEM_POINTER_TAGGING
-        int_storage_ &= 0xFFFF000000000000ULL; // Preserve the tag
-        int_storage_ |= reinterpret_cast<unsigned long long>(
+        storage_.int_ &= 0xFFFF000000000000ULL; // Preserve the tag
+        storage_.int_ |= reinterpret_cast<unsigned long long>(
             new_storage); // Restore the tag
 #else
         storage_ = new_storage;
@@ -343,9 +343,9 @@ class Array {
 
 #ifdef QENTEM_POINTER_TAGGING
     union {
-        unsigned long long int_storage_;
-        Type_ *            storage_{nullptr};
-    };
+        unsigned long long int_;
+        Type_ *            ptr_;
+    } storage_{0};
 #else
     Type_ *storage_{nullptr};
 #endif
