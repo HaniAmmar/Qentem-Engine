@@ -3128,6 +3128,22 @@ static int TestALE13() {
     is_valid = ALE::Evaluate(number, content);
     EQ_FALSE(is_valid, "is_valid");
 
+    content  = "10 == A";
+    is_valid = ALE::Evaluate(number, content);
+    EQ_FALSE(is_valid, "is_valid");
+
+    content  = "A == 10";
+    is_valid = ALE::Evaluate(number, content);
+    EQ_FALSE(is_valid, "is_valid");
+
+    content  = "10 == (A)";
+    is_valid = ALE::Evaluate(number, content);
+    EQ_FALSE(is_valid, "is_valid");
+
+    content  = "(A) == 10";
+    is_valid = ALE::Evaluate(number, content);
+    EQ_FALSE(is_valid, "is_valid");
+
     content  = "{A} == A";
     is_valid = ALE::Evaluate(number, content);
     EQ_FALSE(is_valid, "is_valid");
