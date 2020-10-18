@@ -119,7 +119,7 @@ struct StringUtils {
             }
         }
 
-        return hash;
+        return ((hash != 0) ? hash : 1); // Never return zero.
     }
 };
 
