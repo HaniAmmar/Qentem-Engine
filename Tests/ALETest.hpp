@@ -82,8 +82,8 @@ struct ALEHelper {
         return false;
     }
 
-    bool ALESetNumber(double &number, const char *content,
-                      SizeT length) const noexcept {
+    static bool ALESetNumber(double &number, const char *content,
+                             SizeT length) noexcept {
         const Value_T_ *item;
 
         if (FindItem(item, content, length) && (item->Str == nullptr)) {
@@ -117,6 +117,10 @@ struct ALEHelper {
                     left.Number = item->Number;
                     is_number   = true;
                 } else {
+                    if (is_number) {
+                        return false;
+                    }
+
                     left_content = item->Str;
                     left_length  = item->StrLength;
                 }
@@ -3832,6 +3836,7 @@ static int TestALE16() {
 
     content  = "{Q}=={A}+1";
     is_valid = ALE::Evaluate(number, content, &ale);
+    EQ_FALSE(is_valid, "is_valid");
 
     content  = "1U0=={A}+4";
     is_valid = ALE::Evaluate(number, content, &ale);
