@@ -21,7 +21,7 @@
  */
 
 #include "ALE.hpp"
-#include "Array.hpp"
+#include "FixedArray.hpp"
 #include "TestHelper.hpp"
 
 #ifndef QENTEM_ALE_TESTS_H_
@@ -30,40 +30,48 @@
 namespace Qentem {
 namespace Test {
 
-struct aleHelper {
+struct ALEHelper {
     // See class Template_T_ for another example.
+    static constexpr unsigned int VArraySize = 6;
 
     struct Value_T_ {
         const char *Name;
-        const SizeT NameLength;
+        SizeT       NameLength;
 
         // Number Value
-        const SizeT Number;
+        SizeT Number;
 
         // String Value
         const char *Str;
-        const SizeT StrLength;
+        SizeT       StrLength;
     };
 
-    static Array<Value_T_> &GetItems() {
-        static Array<Value_T_> items;
+    using VArray = FixedArray<Value_T_, VArraySize>;
+
+    static VArray &GetItems() noexcept {
+        static VArray items;
 
         if (items.IsEmpty()) {
-            items += {"{1}", 3, 6, nullptr, 0};
-            items += {"{A}", 3, 6, nullptr, 0};
-            items += {"{AB}", 4, 13, nullptr, 0};
-            items += {"{ABC}", 5, 26, nullptr, 0};
-            items += {"{Q}", 3, 0, "Qentem", 6};
-            items += {"{QA}", 4, 0, "Qentem ALE", 10};
+            Value_T_ *item = items.Storage();
+            items.SetSize(items.Capacity());
+
+            (*item)     = Value_T_{"{1}", 3, 6, nullptr, 0};
+            (*(++item)) = Value_T_{"{A}", 3, 6, nullptr, 0};
+            (*(++item)) = Value_T_{"{AB}", 4, 13, nullptr, 0};
+            (*(++item)) = Value_T_{"{ABC}", 5, 26, nullptr, 0};
+            (*(++item)) = Value_T_{"{Q}", 3, 0, "Qentem", 6};
+            (*(++item)) = Value_T_{"{QA}", 4, 0, "Qentem ALE", 10};
         }
 
         return items;
     }
-    static bool FindItem(Value_T_ *&item, const char *content, SizeT length) {
-        static const Array<Value_T_> &items = GetItems();
+
+    static bool FindItem(const Value_T_ *&item, const char *content,
+                         SizeT length) noexcept {
+        static const VArray &items = GetItems();
 
         for (SizeT i = 0; i < items.Size(); i++) {
-            item = &(items[i]);
+            item = (items.First() + i);
 
             if ((item->NameLength == length) &&
                 StringUtils::IsEqual(item->Name, content, length)) {
@@ -76,7 +84,7 @@ struct aleHelper {
 
     bool ALESetNumber(double &number, const char *content,
                       SizeT length) const noexcept {
-        Value_T_ *item;
+        const Value_T_ *item;
 
         if (FindItem(item, content, length) && (item->Str == nullptr)) {
             number = item->Number;
@@ -89,16 +97,18 @@ struct aleHelper {
     bool ALEIsEqual(bool &result, const char *content, ALE::Number left,
                     ALE::Number right, bool left_evaluated,
                     bool right_evaluated) const noexcept {
-        const char *left_content  = (content + left.Content.Offset);
-        const char *right_content = (content + right.Content.Offset);
-        Value_T_ *  item;
-        SizeT       left_length  = left.Content.Length;
-        SizeT       right_length = right.Content.Length;
+        using ALEOperations_T_ = ALEOperations<char>;
+
+        const char *    left_content  = (content + left.Content.Offset);
+        const char *    right_content = (content + right.Content.Offset);
+        const Value_T_ *item;
+        SizeT           left_length  = left.Content.Length;
+        SizeT           right_length = right.Content.Length;
 
         bool is_number = (left_evaluated || right_evaluated);
 
         if (!left_evaluated) {
-            if (*left_content == ALEOperations<char>::BracketStart) {
+            if (*left_content == ALEOperations_T_::BracketStart) {
                 if (!FindItem(item, left_content, left_length)) {
                     return false;
                 }
@@ -111,7 +121,7 @@ struct aleHelper {
                     left_length  = item->StrLength;
                 }
             } else {
-                if (*left_content == ALEOperations<char>::ParenthesStart) {
+                if (*left_content == ALEOperations_T_::ParenthesStart) {
                     ++left_content;
                     left_length -= 2;
                 }
@@ -127,7 +137,7 @@ struct aleHelper {
         }
 
         if (!right_evaluated) {
-            if (*right_content == ALEOperations<char>::BracketStart) {
+            if (*right_content == ALEOperations_T_::BracketStart) {
                 if (!FindItem(item, right_content, right_length)) {
                     return false;
                 }
@@ -144,7 +154,7 @@ struct aleHelper {
                 }
 
             } else if (is_number) {
-                if (*right_content == ALEOperations<char>::ParenthesStart) {
+                if (*right_content == ALEOperations_T_::ParenthesStart) {
                     ++right_content;
                     right_length -= 2;
                 }
@@ -2924,7 +2934,7 @@ static int TestALE12() {
     double      number = -1;
     const char *content;
     bool        is_valid;
-    aleHelper   ale;
+    ALEHelper   ale;
 
     content = "a==a";
     number  = ALE::Evaluate(content, &ale);
@@ -3158,7 +3168,7 @@ static int TestALE13() {
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 0, "number");
 
-    aleHelper ale;
+    ALEHelper ale;
 
     content = "a";
     number  = ALE::Evaluate(content, &ale);
@@ -3299,7 +3309,7 @@ static int TestALE14() {
     double      number = -1;
     const char *content;
     bool        is_valid;
-    aleHelper   ale;
+    ALEHelper   ale;
 
     content = "3*{A}^3";
     number  = ALE::Evaluate(content, &ale);
@@ -3592,7 +3602,7 @@ static int TestALE15() {
     double      number = -1;
     const char *content;
     bool        is_valid;
-    aleHelper   ale;
+    ALEHelper   ale;
 
     content  = "{Q}   ==Qentem";
     is_valid = ALE::Evaluate(number, content, &ale);
@@ -3757,7 +3767,7 @@ static int TestALE16() {
     double      number = -1;
     const char *content;
     bool        is_valid;
-    aleHelper   ale;
+    ALEHelper   ale;
 
     content  = "2      {A}";
     is_valid = ALE::Evaluate(number, content, &ale);
