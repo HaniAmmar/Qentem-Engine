@@ -100,10 +100,10 @@ struct StringUtils {
     }
 
     template <typename Char_T_>
-    static ULong Hash(const Char_T_ *key, SizeT length) noexcept {
-        ULong hash   = 11;
-        SizeT base   = 33;
-        SizeT offset = 0;
+    static ULSizeT Hash(const Char_T_ *key, SizeT length) noexcept {
+        ULSizeT hash   = 11;
+        SizeT   base   = 33;
+        SizeT   offset = 0;
 
         while (offset != length) {
             const unsigned int num = static_cast<unsigned int>(key[offset]);
@@ -115,7 +115,7 @@ struct StringUtils {
                 hash *= (length ^ offset);
                 base += offset;
                 --length;
-                hash += static_cast<ULong>(key[length]);
+                hash += static_cast<ULSizeT>(key[length]);
             }
         }
 

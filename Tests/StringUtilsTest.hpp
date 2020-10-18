@@ -30,10 +30,10 @@ namespace Qentem {
 namespace Test {
 
 static int TestHash() {
-    ULong hash;
-    ULong hash2;
-    ULong hash3;
-    ULong hash4;
+    ULSizeT hash;
+    ULSizeT hash2;
+    ULSizeT hash3;
+    ULSizeT hash4;
 
     hash = StringUtils::Hash("", 0);
     NOT_EQ_TO(hash, 0, "hash", "0");

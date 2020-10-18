@@ -47,9 +47,9 @@ class HArray {
     using HAItem_T_ = HAItem<Value_, Char_T_>;
 
     struct HashTable_ {
-        SizeT Position; // To maintain the order of the items.
-        SizeT Next;
-        ULong Hash;
+        SizeT   Position; // To maintain the order of the items.
+        SizeT   Next;
+        ULSizeT Hash;
     };
 
   public:
@@ -186,9 +186,9 @@ class HArray {
             grow();
         }
 
-        SizeT       len  = StringUtils::Count(key);
-        const ULong hash = StringUtils::Hash(key, len);
-        SizeT *     index;
+        SizeT         len  = StringUtils::Count(key);
+        const ULSizeT hash = StringUtils::Hash(key, len);
+        SizeT *       index;
         find(index, key, len, hash);
 
         if ((*index) == 0) {
@@ -203,8 +203,8 @@ class HArray {
             grow();
         }
 
-        const ULong hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT *     index;
+        const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *       index;
         find(index, key.First(), key.Length(), hash);
 
         if ((*index) == 0) {
@@ -219,8 +219,8 @@ class HArray {
             grow();
         }
 
-        const ULong hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT *     index;
+        const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *       index;
         find(index, key.First(), key.Length(), hash);
 
         if ((*index) == 0) {
@@ -235,8 +235,8 @@ class HArray {
             grow();
         }
 
-        const ULong hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT *     index;
+        const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *       index;
         find(index, key.First(), key.Length(), hash);
 
         if ((*index) == 0) {
@@ -335,7 +335,7 @@ class HArray {
                  StringUtils::Hash(from.First(), from.Length()));
 
             if (*left_index != 0) {
-                const ULong to_hash =
+                const ULSizeT to_hash =
                     StringUtils::Hash(to.First(), to.Length());
 
                 SizeT *right_index;
@@ -513,12 +513,12 @@ class HArray {
         return size;
     }
 
-    SizeT *getPosition(ULong hash) const noexcept {
+    SizeT *getPosition(ULSizeT hash) const noexcept {
         return &(getHashTable()[hash & getBase()].Position);
     }
 
     void find(SizeT *&index, const Char_T_ *key, SizeT length,
-              ULong hash) const noexcept {
+              ULSizeT hash) const noexcept {
         index                = getPosition(hash);
         const HAItem_T_ *src = Storage();
         HashTable_ *     ht  = getHashTable();
@@ -537,7 +537,7 @@ class HArray {
     }
 
     inline void insert(SizeT *index, String<Char_T_> &&key,
-                       ULong hash) noexcept {
+                       ULSizeT hash) noexcept {
         HashTable_ *ht = (getHashTable() + Size());
         ht->Next       = 0;
         ht->Hash       = hash;
@@ -550,7 +550,7 @@ class HArray {
         Memory::Construct(&(item->Value), Value_());
     }
 
-    void remove(const Char_T_ *key, SizeT length, ULong hash) const noexcept {
+    void remove(const Char_T_ *key, SizeT length, ULSizeT hash) const noexcept {
         if (Size() != 0) {
             SizeT *index;
             find(index, key, length, hash);
