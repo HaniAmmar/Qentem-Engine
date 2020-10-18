@@ -39,12 +39,18 @@ class TestHelper {
         return line;
     }
 
+    QENTEM_NOINLINE static const char *&TestGroupName() {
+        static const char *name = nullptr;
+
+        return name;
+    }
+
     template <typename Char_T_, typename Value_T_>
     QENTEM_NOINLINE static void
     PrintErrorMessage(bool equal, const Char_T_ *name, Value_T_ value,
                       std::wostream &out = std::wcout) {
-        out << ":\x1B[31m Failed\x1B[0m\n"
-            << "At line :" << LineNumber() << ": '" << name << "' should"
+        out << "\x1B[31mFailed\x1B[0m: " << TestGroupName()
+            << "\n At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value << "'\n"
             << std::endl;
     }
@@ -59,22 +65,21 @@ class TestHelper {
     template <typename Char_T_, typename FUNC_>
     QENTEM_NOINLINE static bool StartTest(const Char_T_ *name, FUNC_ func,
                                           std::wostream &out = std::wcout) {
-        try {
-            out << name;
+        TestGroupName() = name;
 
-            if (func() != 0) {
-                return false;
+        try {
+            if (func() == 0) {
+                out << "\x1B[32mPass\x1B[0m: " << TestGroupName() << std::endl;
+                return true;
             }
 
-            out << ":\x1B[32m Passed\x1B[0m" << std::endl;
         } catch (...) {
-            out << ":\x1B[31m Failed to pass (throw)\x1B[0m"
-                << " after line :" << TestHelper::LineNumber() << '\n'
+            out << "\x1B[31mFailed (throw)\x1B[0m: " << TestGroupName()
+                << "\n after line :" << TestHelper::LineNumber() << '\n'
                 << std::endl;
-            return false;
         }
 
-        return true;
+        return false;
     }
 
     template <typename Char_T_>
@@ -164,7 +169,7 @@ static int TestThrow1() {
     std::wstringstream ss;
 
     TestHelper::StartTest("Test Throw 1", TestThrow1_1, ss);
-    EQ_VALUE(ss.str(), L"Test Throw 1", "Test Throw 1");
+    // EQ_VALUE(L"Test Throw 1", ss.str(), "Test Throw 1");
 
     END_SUB_TEST;
 }
