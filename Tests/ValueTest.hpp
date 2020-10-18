@@ -405,8 +405,6 @@ static int TestNumberValue2() {
     using vu_long      = unsigned long;
     using vu_long_long = unsigned long long;
 
-    using v_long_long = long long;
-
     Value<char>  value1;
     String<char> str_var;
     bool         bool_var;
@@ -479,6 +477,20 @@ static int TestNumberValue2() {
     EQ_VALUE(long_var, 10, "long_var");
     EQ_VALUE(ulong_var, 10, "ulong_var");
     value1.Reset();
+
+    END_SUB_TEST;
+}
+
+static int TestNumberValue3() {
+    using v_long_long = long long;
+
+    Value<char>  value1;
+    String<char> str_var;
+    bool         bool_var;
+
+    double        double_var;
+    long          long_var;
+    unsigned long ulong_var;
 
     /////////////////// signed
 
@@ -594,6 +606,18 @@ static int TestNumberValue2() {
     EQ_VALUE(long_var, 10, "long_var");
     EQ_VALUE(ulong_var, 10, "ulong_var");
     value1.Reset();
+
+    END_SUB_TEST;
+}
+
+static int TestNumberValue4() {
+    Value<char>  value1;
+    String<char> str_var;
+    bool         bool_var;
+
+    double        double_var;
+    long          long_var;
+    unsigned long ulong_var;
 
     /////////////////// float
 
@@ -719,11 +743,10 @@ static int TestNumberValue2() {
     EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
     EQ_FALSE(bool_var, "bool_var");
     value1.Reset();
-
     END_SUB_TEST;
 }
 
-static int TestNumberValue3() {
+static int TestNumberValue5() {
     using vu_short     = unsigned short;
     using vu_int       = unsigned int;
     using vu_long      = unsigned long;
@@ -5677,6 +5700,8 @@ static int RunValueTests() {
     START_TEST("Number Value Test 1", TestNumberValue1);
     START_TEST("Number Value Test 2", TestNumberValue2);
     START_TEST("Number Value Test 3", TestNumberValue3);
+    START_TEST("Number Value Test 4", TestNumberValue4);
+    START_TEST("Number Value Test 5", TestNumberValue5);
     START_TEST("String Value Test", TestStringValue);
     START_TEST("Array Value Test", TestArrayValue);
 
