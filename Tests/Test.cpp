@@ -37,7 +37,9 @@
 #include "ValueTest.hpp"
 #include "JSONTest.hpp"
 #include "TemplateTest.hpp"
+#ifndef QENTEM_SIMD_ENABLED
 #include "TemplateLTest.hpp"
+#endif
 // clang-format on
 
 int RunTests() {
@@ -61,7 +63,9 @@ int RunTests() {
     ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
+#ifndef QENTEM_SIMD_ENABLED
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
+#endif
 
     if (failed == 0) {
         std::wcout << "\x1B[32mAll good.\x1B[0m" << std::endl;
