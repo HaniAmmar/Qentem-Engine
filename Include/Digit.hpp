@@ -36,100 +36,30 @@ namespace Qentem {
  * Basic number conversion.
  */
 
-namespace SubDigit {
-
-template <typename Char_T_, ULong S = sizeof(Char_T_)>
-struct DigitChars {};
-
-// One byte character.
-template <typename Char_T_>
-struct DigitChars<Char_T_, 1> {
-    static constexpr Char_T_ ZeroChar        = '0';
-    static constexpr Char_T_ NineChar        = '9';
-    static constexpr Char_T_ SevenChar       = '7';
-    static constexpr Char_T_ E_Char          = 'e';
-    static constexpr Char_T_ UE_Char         = 'E';
-    static constexpr Char_T_ PlusChar        = '+';
-    static constexpr Char_T_ MinusChar       = '-';
-    static constexpr Char_T_ DotChar         = '.';
-    static constexpr Char_T_ ColonChar       = ':';
-    static constexpr Char_T_ SlashChar       = '/';
-    static constexpr Char_T_ AtChar          = '@'; // A is after @
-    static constexpr Char_T_ UG_Char         = 'G'; // F is before G
-    static constexpr Char_T_ G_Char          = 'g';
-    static constexpr Char_T_ UW_Char         = 'W';
-    static constexpr Char_T_ GraveAccentChar = '`'; // a is after `
-};
-
-// Two bytes character.
-template <typename Char_T_>
-struct DigitChars<Char_T_, 2> {
-    static constexpr Char_T_ ZeroChar        = u'0';
-    static constexpr Char_T_ NineChar        = u'9';
-    static constexpr Char_T_ SevenChar       = u'7';
-    static constexpr Char_T_ E_Char          = u'e';
-    static constexpr Char_T_ UE_Char         = u'E';
-    static constexpr Char_T_ PlusChar        = u'+';
-    static constexpr Char_T_ MinusChar       = u'-';
-    static constexpr Char_T_ DotChar         = u'.';
-    static constexpr Char_T_ ColonChar       = u':';
-    static constexpr Char_T_ SlashChar       = u'/';
-    static constexpr Char_T_ AtChar          = u'@'; // A is after @
-    static constexpr Char_T_ UG_Char         = u'G'; // F is before G
-    static constexpr Char_T_ G_Char          = u'g';
-    static constexpr Char_T_ UW_Char         = u'W';
-    static constexpr Char_T_ GraveAccentChar = u'`'; // a is after `
-};
-
-// Four bytes character.
-template <typename Char_T_>
-struct DigitChars<Char_T_, 4> {
-    static constexpr Char_T_ ZeroChar        = U'0';
-    static constexpr Char_T_ NineChar        = U'9';
-    static constexpr Char_T_ SevenChar       = U'7';
-    static constexpr Char_T_ E_Char          = U'e';
-    static constexpr Char_T_ UE_Char         = U'E';
-    static constexpr Char_T_ PlusChar        = U'+';
-    static constexpr Char_T_ MinusChar       = U'-';
-    static constexpr Char_T_ DotChar         = U'.';
-    static constexpr Char_T_ ColonChar       = U':';
-    static constexpr Char_T_ SlashChar       = U'/';
-    static constexpr Char_T_ AtChar          = U'@'; // A is after @
-    static constexpr Char_T_ UG_Char         = U'G'; // F is before G
-    static constexpr Char_T_ G_Char          = U'g';
-    static constexpr Char_T_ UW_Char         = U'W';
-    static constexpr Char_T_ GraveAccentChar = U'`'; // a is after `
-};
-
-// wchar_t
-template <>
-struct DigitChars<wchar_t> {
-    static constexpr wchar_t ZeroChar        = L'0';
-    static constexpr wchar_t NineChar        = L'9';
-    static constexpr wchar_t SevenChar       = L'7';
-    static constexpr wchar_t E_Char          = L'e';
-    static constexpr wchar_t UE_Char         = L'E';
-    static constexpr wchar_t PlusChar        = L'+';
-    static constexpr wchar_t MinusChar       = L'-';
-    static constexpr wchar_t DotChar         = L'.';
-    static constexpr wchar_t ColonChar       = L':';
-    static constexpr wchar_t SlashChar       = L'/';
-    static constexpr wchar_t AtChar          = L'@'; // A is after @
-    static constexpr wchar_t UG_Char         = L'G'; // F is before G
-    static constexpr wchar_t G_Char          = L'g';
-    static constexpr wchar_t UW_Char         = L'W';
-    static constexpr wchar_t GraveAccentChar = L'`'; // a is after `
-};
-
-} // namespace SubDigit
-
 template <typename Char_T_>
 class Digit {
+  private:
+    struct DigitChars {
+        static constexpr Char_T_ ZeroChar        = '0';
+        static constexpr Char_T_ NineChar        = '9';
+        static constexpr Char_T_ SevenChar       = '7';
+        static constexpr Char_T_ E_Char          = 'e';
+        static constexpr Char_T_ UE_Char         = 'E';
+        static constexpr Char_T_ DotChar         = '.';
+        static constexpr Char_T_ PlusChar        = '+';
+        static constexpr Char_T_ MinusChar       = '-';
+        static constexpr Char_T_ ColonChar       = ':';
+        static constexpr Char_T_ SlashChar       = '/';
+        static constexpr Char_T_ AtChar          = '@'; // A is after @
+        static constexpr Char_T_ UG_Char         = 'G'; // F is before G
+        static constexpr Char_T_ G_Char          = 'g';
+        static constexpr Char_T_ UW_Char         = 'W';
+        static constexpr Char_T_ GraveAccentChar = '`'; // a is after `
+    };
+
   public:
     static unsigned int HexStringToNumber(const Char_T_ *str,
                                           SizeT          length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         unsigned int value = 0;
 
         if (str != nullptr) {
@@ -138,21 +68,21 @@ class Digit {
             while (length != 0) {
                 --length;
 
-                if ((str[length] > DigitChars_T_::ZeroChar) &&
-                    (str[length] < DigitChars_T_::ColonChar)) {
+                if ((str[length] > DigitChars::ZeroChar) &&
+                    (str[length] < DigitChars::ColonChar)) {
                     // No use for 0
                     value += ((static_cast<unsigned int>(str[length]) -
-                               DigitChars_T_::ZeroChar)
+                               DigitChars::ZeroChar)
                               << base); // 1-9
-                } else if ((str[length] > DigitChars_T_::AtChar) &&
-                           (str[length] < DigitChars_T_::UG_Char)) { // A-F
+                } else if ((str[length] > DigitChars::AtChar) &&
+                           (str[length] < DigitChars::UG_Char)) { // A-F
                     value += ((static_cast<unsigned int>(str[length]) -
-                               DigitChars_T_::SevenChar)
+                               DigitChars::SevenChar)
                               << base);
-                } else if ((str[length] > DigitChars_T_::GraveAccentChar) &&
-                           (str[length] < DigitChars_T_::G_Char)) { // a-f
+                } else if ((str[length] > DigitChars::GraveAccentChar) &&
+                           (str[length] < DigitChars::G_Char)) { // a-f
                     value += ((static_cast<unsigned int>(str[length]) -
-                               DigitChars_T_::UW_Char)
+                               DigitChars::UW_Char)
                               << base);
                 }
 
@@ -269,19 +199,15 @@ class Digit {
     template <typename Number_T_>
     static bool stringToInt(Number_T_ &number, const Char_T_ *str,
                             SizeT length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         Number_T_ postion = 1;
 
         do {
             --length;
             const Char_T_ c = str[length];
 
-            if ((c > DigitChars_T_::SlashChar) &&
-                (c < DigitChars_T_::ColonChar)) {
-                number +=
-                    ((static_cast<Number_T_>(c) - DigitChars_T_::ZeroChar) *
-                     postion);
+            if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
+                number += ((static_cast<Number_T_>(c) - DigitChars::ZeroChar) *
+                           postion);
                 postion *= QENTEM_DECIMAL_BASE_;
             } else {
                 return false;
@@ -294,16 +220,14 @@ class Digit {
     template <typename Number_T_>
     static bool stringToUnsignedInt(Number_T_ &number, const Char_T_ *str,
                                     SizeT length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         number = 0;
 
         if (length != 0) {
-            if ((length > 1) && (str[0] == DigitChars_T_::ZeroChar)) {
+            if ((length > 1) && (str[0] == DigitChars::ZeroChar)) {
                 return false; // No leanding zeros.
             }
 
-            if (str[0] == DigitChars_T_::PlusChar) {
+            if (str[0] == DigitChars::PlusChar) {
                 SizeT offset = 1;
                 StringUtils::StartTrim(str, offset, length);
                 length -= offset;
@@ -324,17 +248,15 @@ class Digit {
     template <typename Number_T_>
     static bool stringToSignedInt(Number_T_ &number, const Char_T_ *s_str,
                                   SizeT length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         number = 0;
 
         if (length != 0) {
-            if ((length > 1) && (s_str[0] == DigitChars_T_::ZeroChar)) {
+            if ((length > 1) && (s_str[0] == DigitChars::ZeroChar)) {
                 return false; // No leanding zeros.
             }
 
             switch (s_str[0]) {
-                case DigitChars_T_::MinusChar: {
+                case DigitChars::MinusChar: {
                     SizeT offset = 1;
                     StringUtils::StartTrim(s_str, offset, length);
                     length -= offset;
@@ -348,7 +270,7 @@ class Digit {
                     break;
                 }
 
-                case DigitChars_T_::PlusChar: {
+                case DigitChars::PlusChar: {
                     SizeT offset = 1;
                     StringUtils::StartTrim(s_str, offset, length);
                     length -= offset;
@@ -427,19 +349,17 @@ class Digit {
     template <typename Number_T_>
     static bool stringToSignedFloat(Number_T_ &number, const Char_T_ *str,
                                     SizeT length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         number = 0;
 
         if (length != 0) {
-            if (((length > 1) && ((str[0] == DigitChars_T_::ZeroChar) &&
-                                  (str[1] != DigitChars_T_::DotChar)))) {
+            if (((length > 1) && ((str[0] == DigitChars::ZeroChar) &&
+                                  (str[1] != DigitChars::DotChar)))) {
                 number = 0;
                 return false; // No leanding zeros.
             }
 
             switch (str[0]) {
-                case DigitChars_T_::MinusChar: {
+                case DigitChars::MinusChar: {
                     SizeT n_offset = 1;
                     StringUtils::StartTrim(str, n_offset, length);
                     length -= n_offset;
@@ -453,7 +373,7 @@ class Digit {
                     break;
                 }
 
-                case DigitChars_T_::PlusChar: {
+                case DigitChars::PlusChar: {
                     SizeT offset = 1;
                     StringUtils::StartTrim(str, offset, length);
                     length -= offset;
@@ -484,8 +404,6 @@ class Digit {
 
     QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str,
                                               SizeT &length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         SizeT offset = (length - 1);
 
         if (offset != 0) {
@@ -496,15 +414,14 @@ class Digit {
             do {
                 const Char_T_ c = str[offset];
 
-                if ((c < DigitChars_T_::ZeroChar) ||
-                    (c > DigitChars_T_::NineChar)) {
+                if ((c < DigitChars::ZeroChar) || (c > DigitChars::NineChar)) {
                     switch (c) {
-                        case DigitChars_T_::DotChar: {
+                        case DigitChars::DotChar: {
                             return true;
                         }
 
-                        case DigitChars_T_::E_Char:
-                        case DigitChars_T_::UE_Char: {
+                        case DigitChars::E_Char:
+                        case DigitChars::UE_Char: {
                             if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
                                 // No number.
                                 return false;
@@ -515,15 +432,15 @@ class Digit {
                             continue;
                         }
 
-                        case DigitChars_T_::MinusChar:
-                        case DigitChars_T_::PlusChar: {
+                        case DigitChars::MinusChar:
+                        case DigitChars::PlusChar: {
                             if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) ||
                                 (sign != 0)) {
                                 // No number, or double sign.
                                 return false;
                             }
 
-                            sign = ((c == DigitChars_T_::MinusChar) ? -1 : 1);
+                            sign = ((c == DigitChars::MinusChar) ? -1 : 1);
                             break;
                         }
 
@@ -544,8 +461,8 @@ class Digit {
 
                 while (++offset2 < length) {
                     exponent *= QENTEM_DECIMAL_BASE_;
-                    exponent += static_cast<int>(str[offset2] -
-                                                 DigitChars_T_::ZeroChar);
+                    exponent +=
+                        static_cast<int>(str[offset2] - DigitChars::ZeroChar);
                 }
 
                 if (sign == -1) {
@@ -563,8 +480,6 @@ class Digit {
     QENTEM_NOINLINE static bool stringToFloat(Number_T_ &number, int exponent,
                                               const Char_T_ *str,
                                               SizeT          length) noexcept {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         unsigned long long w_number = 0;
         SizeT              len      = ((length < 18) ? length : 17);
         unsigned int       offset   = 0;
@@ -575,11 +490,10 @@ class Digit {
             c = str[offset];
             ++offset;
 
-            if ((c > DigitChars_T_::SlashChar) &&
-                (c < DigitChars_T_::ColonChar)) {
+            if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
                 w_number *= QENTEM_DECIMAL_BASE_;
-                w_number += (static_cast<ULong>(c) - DigitChars_T_::ZeroChar);
-            } else if (c == DigitChars_T_::DotChar) {
+                w_number += (static_cast<ULong>(c) - DigitChars::ZeroChar);
+            } else if (c == DigitChars::DotChar) {
                 if (has_dot || (offset == length)) {
                     return false;
                 }
@@ -598,11 +512,11 @@ class Digit {
             do {
                 c = str[offset];
 
-                if ((c > DigitChars_T_::SlashChar) &&
-                    (c < DigitChars_T_::ColonChar)) {
+                if ((c > DigitChars::SlashChar) &&
+                    (c < DigitChars::ColonChar)) {
                     base *= QENTEM_DECIMAL_BASE_;
                     number +=
-                        (static_cast<Number_T_>(c) - DigitChars_T_::ZeroChar) /
+                        (static_cast<Number_T_>(c) - DigitChars::ZeroChar) /
                         base;
                 } else {
                     return false;
@@ -614,10 +528,10 @@ class Digit {
             do {
                 c = str[offset];
 
-                if ((c > DigitChars_T_::SlashChar) &&
-                    (c < DigitChars_T_::ColonChar)) {
+                if ((c > DigitChars::SlashChar) &&
+                    (c < DigitChars::ColonChar)) {
                     ++exponent;
-                } else if (c == DigitChars_T_::DotChar) {
+                } else if (c == DigitChars::DotChar) {
                     break;
                 } else {
                     return false;
@@ -663,8 +577,6 @@ class Digit {
     QENTEM_NOINLINE static void intToString(String_T_ &dstring,
                                             Number_T_ number, SizeT min,
                                             bool negative) {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         Char_T_ tmp[QENTEM_INT_NUMBER_MAX_SIZE_];
         SizeT   offset = 0;
 
@@ -680,8 +592,8 @@ class Digit {
          */
 
         while (number != 0) {
-            tmp[offset] = (Char_T_(number % QENTEM_DECIMAL_BASE_) +
-                           DigitChars_T_::ZeroChar);
+            tmp[offset] =
+                (Char_T_(number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
             ++offset;
             number /= QENTEM_DECIMAL_BASE_;
         }
@@ -698,14 +610,14 @@ class Digit {
             }
 
             while (min != 0) {
-                tmp[offset] = DigitChars_T_::ZeroChar;
+                tmp[offset] = DigitChars::ZeroChar;
                 ++offset;
                 --min;
             }
         }
 
         if (negative) {
-            tmp[offset] = DigitChars_T_::MinusChar;
+            tmp[offset] = DigitChars::MinusChar;
             ++offset;
         }
 
@@ -722,8 +634,6 @@ class Digit {
     QENTEM_NOINLINE static void
     doubleToString(String_T_ &dstring, double number, unsigned int min,
                    unsigned int r_min, unsigned int precision) {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         constexpr unsigned int max_length = QENTEM_FLOAT_NUMBER_MAX_SIZE_ - 1;
 
         Char_T_            tmp[max_length];
@@ -755,7 +665,7 @@ class Digit {
         while (tmp_number != 0) {
             --end_offset;
             tmp[end_offset] = (Char_T_(tmp_number % QENTEM_DECIMAL_BASE_) +
-                               DigitChars_T_::ZeroChar);
+                               DigitChars::ZeroChar);
             tmp_number /= QENTEM_DECIMAL_BASE_;
         }
 
@@ -802,7 +712,7 @@ class Digit {
                         --end_offset;
                         tmp[end_offset] =
                             (Char_T_(left_number % QENTEM_DECIMAL_BASE_) +
-                             DigitChars_T_::ZeroChar);
+                             DigitChars::ZeroChar);
                         left_number /= QENTEM_DECIMAL_BASE_;
                     }
 
@@ -835,7 +745,7 @@ class Digit {
             while (fraction != 0) {
                 --end_offset;
                 tmp[end_offset] = (Char_T_(fraction % QENTEM_DECIMAL_BASE_) +
-                                   DigitChars_T_::ZeroChar);
+                                   DigitChars::ZeroChar);
                 fraction /= QENTEM_DECIMAL_BASE_;
             }
 
@@ -843,11 +753,11 @@ class Digit {
                 no_exponent) {
                 unsigned int offset2 = end_offset;
 
-                tmp2[offset] = DigitChars_T_::DotChar;
+                tmp2[offset] = DigitChars::DotChar;
                 ++offset;
 
                 while (end_offset != 0) {
-                    tmp2[offset] = DigitChars_T_::ZeroChar;
+                    tmp2[offset] = DigitChars::ZeroChar;
                     ++offset;
                     --end_offset;
                 }
@@ -859,7 +769,7 @@ class Digit {
                 }
 
                 while (r_min != 0) {
-                    tmp2[offset] = DigitChars_T_::ZeroChar;
+                    tmp2[offset] = DigitChars::ZeroChar;
                     ++offset;
                     --r_min;
                 }
@@ -874,7 +784,7 @@ class Digit {
                 ++end_offset;
 
                 if (end_offset != fraction_length) {
-                    tmp2[offset] = DigitChars_T_::DotChar;
+                    tmp2[offset] = DigitChars::DotChar;
                     ++offset;
 
                     do {
@@ -887,12 +797,12 @@ class Digit {
         }
 
         if (exponent != 0) {
-            tmp2[offset] = DigitChars_T_::E_Char;
+            tmp2[offset] = DigitChars::E_Char;
             ++offset;
 
             if (exponent < 0) {
                 exponent *= -1;
-                tmp2[offset] = DigitChars_T_::MinusChar;
+                tmp2[offset] = DigitChars::MinusChar;
                 ++offset;
             }
 
@@ -902,7 +812,7 @@ class Digit {
                 --end_offset;
                 tmp[end_offset] = static_cast<Char_T_>(
                     static_cast<Char_T_>(exponent % QENTEM_DECIMAL_BASE_) +
-                    DigitChars_T_::ZeroChar);
+                    DigitChars::ZeroChar);
                 exponent /= QENTEM_DECIMAL_BASE_;
             }
 
@@ -933,13 +843,13 @@ class Digit {
         unsigned int offset2 = 0;
 
         if (negative) {
-            str[0] = DigitChars_T_::MinusChar;
+            str[0] = DigitChars::MinusChar;
             ++offset;
             ++offset2;
         }
 
         while (min != 0) {
-            str[offset] = DigitChars_T_::ZeroChar;
+            str[offset] = DigitChars::ZeroChar;
             ++offset;
             --min;
         }
