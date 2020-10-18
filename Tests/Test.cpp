@@ -20,27 +20,25 @@
  * SOFTWARE.
  */
 
-// clang-format off
-#include "TestHelper.hpp"
-#include "MemoryTest.hpp"
-#include "StringUtilsTest.hpp"
-#include "StringTest.hpp"
-#include "StringStreamTest.hpp"
-#include "FixedArrayTest.hpp"
+#include "ALETest.hpp"
 #include "ArrayTest.hpp"
 #include "DigitTest.hpp"
-#include "HArrayTest.hpp"
 #include "EngineTest.hpp"
-#include "ALETest.hpp"
-#include "UnicodeTest.hpp"
-#include "JSONUtilsTest.hpp"
-#include "ValueTest.hpp"
+#include "FixedArrayTest.hpp"
+#include "HArrayTest.hpp"
 #include "JSONTest.hpp"
+#include "JSONUtilsTest.hpp"
+#include "MemoryTest.hpp"
+#include "StringStreamTest.hpp"
+#include "StringTest.hpp"
+#include "StringUtilsTest.hpp"
 #include "TemplateTest.hpp"
+#include "TestHelper.hpp"
+#include "UnicodeTest.hpp"
+#include "ValueTest.hpp"
 #ifndef QENTEM_SIMD_ENABLED
 #include "TemplateLTest.hpp"
 #endif
-// clang-format on
 
 int RunTests() {
     int passed = 0;
