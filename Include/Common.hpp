@@ -70,9 +70,9 @@
 namespace Qentem {
 
 #ifdef QENTEM_64BIT_ARCH
-using ULong = unsigned long long;
+using ULSizeT = unsigned long long;
 #else
-using ULong = unsigned long;
+using ULSizeT = unsigned long;
 #endif
 
 #ifndef QENTEM_SIZE_T
