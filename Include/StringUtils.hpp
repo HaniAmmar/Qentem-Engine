@@ -27,48 +27,15 @@
 
 namespace Qentem {
 
-namespace SubStringUtils {
-template <typename Char_T_, ULong S = sizeof(Char_T_)>
-struct WhiteSpaceChars {};
-
-// One byte character.
-template <typename Char_T_>
-struct WhiteSpaceChars<Char_T_, 1> {
-    static constexpr Char_T_ SpaceChar           = ' ';
-    static constexpr Char_T_ LineControlChar     = '\n';
-    static constexpr Char_T_ TabControlChar      = '\t';
-    static constexpr Char_T_ CarriageControlChar = '\r';
-};
-
-// Two bytes character.
-template <typename Char_T_>
-struct WhiteSpaceChars<Char_T_, 2> {
-    static constexpr Char_T_ SpaceChar           = u' ';
-    static constexpr Char_T_ LineControlChar     = u'\n';
-    static constexpr Char_T_ TabControlChar      = u'\t';
-    static constexpr Char_T_ CarriageControlChar = u'\r';
-};
-
-// Four bytes character.
-template <typename Char_T_>
-struct WhiteSpaceChars<Char_T_, 4> {
-    static constexpr Char_T_ SpaceChar           = U' ';
-    static constexpr Char_T_ LineControlChar     = U'\n';
-    static constexpr Char_T_ TabControlChar      = U'\t';
-    static constexpr Char_T_ CarriageControlChar = U'\r';
-};
-
-// wchar_t
-template <>
-struct WhiteSpaceChars<wchar_t> {
-    static constexpr wchar_t SpaceChar           = L' ';
-    static constexpr wchar_t LineControlChar     = L'\n';
-    static constexpr wchar_t TabControlChar      = L'\t';
-    static constexpr wchar_t CarriageControlChar = L'\r';
-};
-} // namespace SubStringUtils
-
 struct StringUtils {
+    template <typename Char_T_>
+    struct WhiteSpaceChars {
+        static constexpr Char_T_ SpaceChar           = ' ';
+        static constexpr Char_T_ LineControlChar     = '\n';
+        static constexpr Char_T_ TabControlChar      = '\t';
+        static constexpr Char_T_ CarriageControlChar = '\r';
+    };
+
     template <typename Char_T_, typename NumberType = SizeT>
     static NumberType Count(const Char_T_ *str) noexcept {
         NumberType len = 0;
@@ -85,7 +52,7 @@ struct StringUtils {
     template <typename Char_T_, typename Type_>
     static void StartTrim(const Char_T_ *str, Type_ &offset,
                           Type_ end_before) noexcept {
-        using WhiteSpaceChars_T_ = SubStringUtils::WhiteSpaceChars<Char_T_>;
+        using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         while ((offset < end_before) &&
                ((str[offset] == WhiteSpaceChars_T_::SpaceChar) ||
@@ -99,7 +66,7 @@ struct StringUtils {
     template <typename Char_T_, typename Type_>
     static void SoftTrim(const Char_T_ *str, Type_ &offset,
                          Type_ &length) noexcept {
-        using WhiteSpaceChars_T_ = SubStringUtils::WhiteSpaceChars<Char_T_>;
+        using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         if (length != 0) {
             Type_ end_before = (length + offset);
