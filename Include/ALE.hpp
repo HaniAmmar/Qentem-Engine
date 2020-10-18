@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-#include "ALEOperations.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
 
@@ -38,6 +37,9 @@ namespace Qentem {
 
 template <typename>
 struct ALEHelper;
+
+template <typename>
+struct ALEOperations;
 
 class ALE {
   public:
@@ -409,6 +411,8 @@ class ALE {
     static bool getNumber(Number &val, const Char_T_ *content, SizeT offset,
                           SizeT length, const Helper_T_ *callback,
                           Operation op) noexcept {
+        using ALEOperations_T_ = ALEOperations<Char_T_>;
+
         if (op == Operation::Error) {
             return false;
         }
@@ -422,7 +426,7 @@ class ALE {
         }
 
         switch (content[offset]) {
-            case ALEOperations<Char_T_>::ParenthesStart: {
+            case ALEOperations_T_::ParenthesStart: {
                 length += offset;
                 ++offset;
                 --length;
@@ -432,7 +436,7 @@ class ALE {
                              callback);
             }
 
-            case ALEOperations<Char_T_>::BracketStart: {
+            case ALEOperations_T_::BracketStart: {
                 return (callback->ALESetNumber(val.Number, (content + offset),
                                                length));
             }
@@ -584,10 +588,12 @@ struct ALEHelper {
     static bool ALEIsEqual(bool &result, const Char_T_ *content,
                            ALE::Number left, ALE::Number right,
                            bool left_evaluated, bool right_evaluated) noexcept {
+        using ALEOperations_T_ = ALEOperations<Char_T_>;
+
         if (!left_evaluated) {
             const Char_T_ *left_content = (content + left.Content.Offset);
 
-            if (*left_content != ALEOperations<Char_T_>::ParenthesStart) {
+            if (*left_content != ALEOperations_T_::ParenthesStart) {
                 if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content,
                                                      left.Content.Length))) {
                     return false;
@@ -601,7 +607,7 @@ struct ALEHelper {
         if (!right_evaluated) {
             const Char_T_ *right_content = (content + right.Content.Offset);
 
-            if (*right_content != ALEOperations<Char_T_>::ParenthesStart) {
+            if (*right_content != ALEOperations_T_::ParenthesStart) {
                 if (!(Digit<Char_T_>::StringToNumber(
                         right.Number, right_content, right.Content.Length))) {
                     return false;
@@ -615,6 +621,30 @@ struct ALEHelper {
         result = (left.Number == right.Number);
         return true;
     }
+};
+
+template <typename Char_T_>
+struct ALEOperations {
+    static constexpr Char_T_ RemainderOp = '%';
+    static constexpr Char_T_ MultipleOp  = '*';
+    static constexpr Char_T_ DivideOp    = '/';
+    static constexpr Char_T_ AddOp       = '+';
+    static constexpr Char_T_ SubtractOp  = '-';
+    static constexpr Char_T_ EqualOp     = '=';
+    static constexpr Char_T_ NotOp       = '!';
+    static constexpr Char_T_ LessOp      = '<';
+    static constexpr Char_T_ BiggerOp    = '>';
+    static constexpr Char_T_ AndOp       = '&';
+    static constexpr Char_T_ OrOp        = '|';
+
+    static constexpr Char_T_ ParenthesStart = '(';
+    static constexpr Char_T_ ParenthesEnd   = ')';
+    static constexpr Char_T_ BracketStart   = '{';
+    static constexpr Char_T_ BracketEnd     = '}';
+    static constexpr Char_T_ ExponentOp     = '^';
+    static constexpr Char_T_ SpaceChar      = ' ';
+    static constexpr Char_T_ ColonChar      = ':';
+    static constexpr Char_T_ SlashChar      = '/';
 };
 
 } // namespace Qentem
