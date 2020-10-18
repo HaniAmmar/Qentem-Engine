@@ -243,6 +243,7 @@ struct JSONotation {
     static constexpr Char_T_ SlashChar   = '/';
     static constexpr Char_T_ BSlashChar  = '\\';
     static constexpr Char_T_ SpaceChar   = ' ';
+    static constexpr Char_T_ DotChar     = '.';
 
     static constexpr Char_T_ LineControlChar      = '\n';
     static constexpr Char_T_ TabControlChar       = '\t';
@@ -257,6 +258,8 @@ struct JSONotation {
     static constexpr Char_T_ F_Char  = 'f';
     static constexpr Char_T_ U_Char  = 'u';
     static constexpr Char_T_ CU_Char = 'U';
+    static constexpr Char_T_ E_Char  = 'e';
+    static constexpr Char_T_ UE_Char = 'E';
 
     static constexpr SizeT TrueStringLength = 4;
     static const Char_T_ * GetTrueString() noexcept {
