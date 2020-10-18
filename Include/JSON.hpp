@@ -197,8 +197,6 @@ class JSONParser {
     }
 
     VValue parseValue(const Char_T_ *content, SizeT &offset, SizeT length) {
-        using DigitChars_T_ = SubDigit::DigitChars<Char_T_>;
-
         static const Char_T_ *true_string  = JSONotation_T_::GetTrueString();
         static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
         static const Char_T_ *null_string  = JSONotation_T_::GetNullString();
@@ -282,9 +280,9 @@ class JSONParser {
 
                 while (offset < length) {
                     switch (content[offset]) {
-                        case DigitChars_T_::DotChar:
-                        case DigitChars_T_::E_Char:
-                        case DigitChars_T_::UE_Char: {
+                        case JSONotation_T_::DotChar:
+                        case JSONotation_T_::E_Char:
+                        case JSONotation_T_::UE_Char: {
                             is_float = true;
                             break;
                         }
