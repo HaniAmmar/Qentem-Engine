@@ -36,7 +36,7 @@ static SizeT HexStringToNumber(const char *str) noexcept {
 }
 
 static int TestHexConv() {
-    ULong       number;
+    SizeT       number;
     const char *hex = nullptr;
 
     number = HexStringToNumber(hex);

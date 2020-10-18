@@ -488,9 +488,9 @@ class ALE {
             }
 
             case Operation::Remainder: { // %
-                left.Number =
-                    static_cast<double>(static_cast<ULong>(left.Number) %
-                                        static_cast<ULong>(right.Number));
+                left.Number = static_cast<double>(
+                    static_cast<unsigned long long>(left.Number) %
+                    static_cast<unsigned long long>(right.Number));
                 break;
             }
 

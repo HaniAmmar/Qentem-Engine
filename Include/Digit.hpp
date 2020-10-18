@@ -492,7 +492,8 @@ class Digit {
 
             if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
                 w_number *= QENTEM_DECIMAL_BASE_;
-                w_number += (static_cast<ULong>(c) - DigitChars::ZeroChar);
+                w_number +=
+                    (static_cast<unsigned long long>(c) - DigitChars::ZeroChar);
             } else if (c == DigitChars::DotChar) {
                 if (has_dot || (offset == length)) {
                     return false;

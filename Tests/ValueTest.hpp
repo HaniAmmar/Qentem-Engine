@@ -3520,7 +3520,8 @@ static int TestCopyValue4() {
 }
 
 static int TestIndexOperator1() {
-    using vu_int = unsigned int;
+    using vu_int       = unsigned int;
+    using vu_long_long = unsigned long long;
 
     Value<char>  value;
     String<char> str1("D");
@@ -3588,12 +3589,12 @@ static int TestIndexOperator1() {
     EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
     EQ_VALUE(value[1].GetNumber(), 30, "value[1]");
 
-    value[0]         = 50;
-    value[1]         = 100;
-    value[2]         = 200;
-    value[int{3}]    = 300;
-    value[ULong{4}]  = 400;
-    value[vu_int{5}] = 500;
+    value[0]               = 50;
+    value[1]               = 100;
+    value[2]               = 200;
+    value[int{3}]          = 300;
+    value[vu_long_long{4}] = 400;
+    value[vu_int{5}]       = 500;
 
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 6, "Size()");
@@ -3783,7 +3784,8 @@ static int TestIndexOperator2() {
 }
 
 static int TestAddition1() {
-    using vu_int = unsigned int;
+    using vu_int       = unsigned int;
+    using vu_long_long = unsigned long long;
 
     Value<char>  value;
     String<char> str1("D");
@@ -3821,7 +3823,7 @@ static int TestAddition1() {
     value[1] = 100;
     value += int{200};
     value += vu_int{300};
-    value += ULong{400};
+    value += vu_long_long{400};
     value += double{500};
 
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -5528,8 +5530,10 @@ static int TestStringify4() {
 }
 
 static int TestDeleteValue() {
+    using vu_int       = unsigned int;
+    using vu_long_long = unsigned long long;
+
     Value<char> value;
-    using vu_int = unsigned int;
 
     value[0] = 1;
     value.RemoveIndex(int{0});
@@ -5542,7 +5546,7 @@ static int TestDeleteValue() {
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = Array<Value<char>>();
-    value.RemoveIndex(ULong{0});
+    value.RemoveIndex(vu_long_long{0});
     EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
 
     value[0] = false;

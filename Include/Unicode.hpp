@@ -29,7 +29,7 @@
 namespace Qentem {
 namespace Unicode {
 
-template <typename Char_T_, ULong S>
+template <typename Char_T_, int S>
 struct UnicodeToUTF {};
 
 // UTF8
@@ -89,7 +89,8 @@ struct UnicodeToUTF<Char_T_, 4> {
 
 template <typename Char_T_>
 static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
-    UnicodeToUTF<Char_T_, sizeof(Char_T_)>::ToUTF(unicode, ss);
+    UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode,
+                                                                    ss);
 }
 
 } // namespace Unicode
