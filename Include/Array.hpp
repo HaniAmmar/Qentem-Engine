@@ -43,7 +43,11 @@ class Array {
 
     Array(Array &&arr) noexcept
         : index_(arr.Size()), capacity_(arr.Capacity()) {
+#ifdef QENTEM_POINTER_TAGGING
         storage_.ptr_ = arr.Storage();
+#else
+        storage_ = arr.Storage();
+#endif
         arr.clearStorage();
         arr.setSize(0);
         arr.setCapacity(0);

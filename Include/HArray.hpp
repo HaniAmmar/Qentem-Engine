@@ -73,7 +73,11 @@ class HArray {
 
     HArray(HArray &&h_arr) noexcept
         : index_(h_arr.Size()), capacity_(h_arr.Capacity()) {
+#ifdef QENTEM_POINTER_TAGGING
         storage_.ptr_ = h_arr.Storage();
+#else
+        storage_ = h_arr.Storage();
+#endif
         h_arr.clearStorage();
         h_arr.setSize(0);
         h_arr.setCapacity(0);

@@ -42,7 +42,11 @@ class String {
     }
 
     String(Char_T_ *str, SizeT len) noexcept : length_(len) {
+#ifdef QENTEM_POINTER_TAGGING
         storage_.ptr_ = str;
+#else
+        storage_ = str;
+#endif
     }
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
@@ -60,7 +64,11 @@ class String {
         : String(str, StringUtils::Count(str)) {}
 
     String(String &&src) noexcept : length_(src.Length()) {
+#ifdef QENTEM_POINTER_TAGGING
         storage_.ptr_ = src.Storage();
+#else
+        storage_ = src.Storage();
+#endif
         src.clearStorage();
         src.setLength(0);
     }
