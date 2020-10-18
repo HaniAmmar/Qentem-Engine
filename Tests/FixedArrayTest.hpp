@@ -185,6 +185,13 @@ static int TestFixedArray() {
 
     EQ_VALUE(arr1.End(), (arr1.First() + arr1.Size()), "End()");
 
+    arr1.Clear();
+
+    arr1.SetSize(10000);
+    EQ_VALUE(arr1.Size(), 0, "Size()");
+    arr1.SetSize(arr1.Capacity());
+    EQ_VALUE(arr1.Size(), arr1.Capacity(), "Size()");
+
     END_SUB_TEST;
 }
 

@@ -51,7 +51,13 @@ class FixedArray {
     }
 
     void operator+=(const Type_ &item) {
-        *this += static_cast<Type_ &&>(Type_(item));
+        if (!(IsFull())) {
+            storage_[Size()] = item;
+            ++index_;
+            return;
+        }
+
+        throw 1;
     }
 
     inline void Clear() noexcept {
@@ -59,6 +65,12 @@ class FixedArray {
         // destructed. Copy and move operators of 'Type_' should handel reseting
         // their struct.
         index_ = 0;
+    }
+
+    inline void SetSize(unsigned int new_size) noexcept {
+        if (new_size <= Capacity()) {
+            index_ = new_size;
+        }
     }
 
     inline Type_ *      Storage() noexcept { return &(storage_[0]); }
