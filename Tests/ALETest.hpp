@@ -3760,6 +3760,11 @@ static int TestALE15() {
     EQ_VALUE(number, 1, "number");
     EQ_TRUE(is_valid, "is_valid");
 
+    content  = "{A}==6";
+    is_valid = ALE::Evaluate(number, content, &ale);
+    EQ_VALUE(number, 1, "number");
+    EQ_TRUE(is_valid, "is_valid");
+
     END_SUB_TEST;
 }
 
@@ -3802,11 +3807,26 @@ static int TestALE16() {
     EQ_FALSE(is_valid, "is_valid");
 
     content  = "1!#1";
-    is_valid = ALE::Evaluate(number, content);
+    is_valid = ALE::Evaluate(number, content, &ale);
     EQ_FALSE(is_valid, "is_valid");
 
     content  = "1|#1";
-    is_valid = ALE::Evaluate(number, content);
+    is_valid = ALE::Evaluate(number, content, &ale);
+    EQ_FALSE(is_valid, "is_valid");
+
+    content  = "{Q}=={A}+1";
+    is_valid = ALE::Evaluate(number, content, &ale);
+
+    content  = "1U0=={A}+4";
+    is_valid = ALE::Evaluate(number, content, &ale);
+    EQ_FALSE(is_valid, "is_valid");
+
+    content  = "{A}=={Q}";
+    is_valid = ALE::Evaluate(number, content, &ale);
+    EQ_FALSE(is_valid, "is_valid");
+
+    content  = "{A}==1U0";
+    is_valid = ALE::Evaluate(number, content, &ale);
     EQ_FALSE(is_valid, "is_valid");
 
     END_SUB_TEST;
