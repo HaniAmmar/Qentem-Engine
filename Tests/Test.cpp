@@ -20,22 +20,25 @@
  * SOFTWARE.
  */
 
-#include "ALETest.hpp"
+// clang-format off
+#include "TestHelper.hpp"
+#include "MemoryTest.hpp"
+#include "StringUtilsTest.hpp"
+#include "StringTest.hpp"
+#include "StringStreamTest.hpp"
+#include "FixedArrayTest.hpp"
 #include "ArrayTest.hpp"
 #include "DigitTest.hpp"
-#include "EngineTest.hpp"
-#include "FixedArrayTest.hpp"
 #include "HArrayTest.hpp"
-#include "JSONTest.hpp"
-#include "JSONUtilsTest.hpp"
-#include "MemoryTest.hpp"
-#include "StringStreamTest.hpp"
-#include "StringTest.hpp"
-#include "StringUtilsTest.hpp"
-#include "TemplateTest.hpp"
-#include "TestHelper.hpp"
+#include "EngineTest.hpp"
+#include "ALETest.hpp"
 #include "UnicodeTest.hpp"
+#include "JSONUtilsTest.hpp"
 #include "ValueTest.hpp"
+#include "JSONTest.hpp"
+#include "TemplateTest.hpp"
+#include "TemplateLTest.hpp"
+// clang-format on
 
 int RunTests() {
     int passed = 0;
@@ -58,6 +61,7 @@ int RunTests() {
     ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
     if (failed == 0) {
         std::wcout << "\x1B[32mAll good.\x1B[0m" << std::endl;
@@ -90,6 +94,7 @@ int main() {
     //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
     //     Qentem::Test::RunTemplateTests();
+    //     Qentem::Test::RunTemplateXTests();
     // }
 
 #ifdef QENTEM_64BIT_ARCH
