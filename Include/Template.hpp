@@ -1147,28 +1147,32 @@ class Template_T_ {
         return value;
     }
 
-    bool ALESetNumber(double &number, const Char_T_ *content,
-                      SizeT length) const noexcept {
-        if (length > TemplatePatterns_T_::VariableFulllength) {
-            content += TemplatePatterns_T_::VariablePrefixLength;
-            length -= TemplatePatterns_T_::VariableFulllength;
-            const Value_T_ *value = findValue(content, length);
+    bool ALESetNumber(double &number, const Value_T_ *value) const noexcept {
+        if (value->SetNumber(number)) {
+            return true;
+        }
 
-            if (value != nullptr) {
-                if (value->SetNumber(number)) {
-                    return true;
-                }
+        const Char_T_ *str;
+        SizeT          len;
 
-                const Char_T_ *str;
-                SizeT          len;
-
-                if (value->SetCharAndLength(str, len)) {
-                    return ALE::Evaluate(number, str, len, this);
-                }
-            }
+        if (value->SetCharAndLength(str, len)) {
+            return ALE::Evaluate(number, str, len, this);
         }
 
         return false;
+    }
+
+    bool ALESetNumber(double &number, const Char_T_ *content,
+                      SizeT length) const noexcept {
+        const Value_T_ *value = nullptr;
+
+        if (length > TemplatePatterns_T_::VariableFulllength) {
+            content += TemplatePatterns_T_::VariablePrefixLength;
+            length -= TemplatePatterns_T_::VariableFulllength;
+            value = findValue(content, length);
+        }
+
+        return ((value != nullptr) && ALESetNumber(number, value));
     }
 
     bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left,
@@ -1251,12 +1255,12 @@ class Template_T_ {
 
         if (is_number) {
             if (!left_evaluated && ((value_left == nullptr) ||
-                                    !(value_left->SetNumber(left.Number)))) {
+                                    !(ALESetNumber(left.Number, value_left)))) {
                 return false;
             }
 
             if ((value_right != nullptr) &&
-                !(value_right->SetNumber(right.Number))) {
+                !(ALESetNumber(right.Number, value_right))) {
                 return false;
             }
         } else {
@@ -1405,28 +1409,28 @@ struct TemplatePatterns {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr Char_T_ Var_2ND_Char = 'v'; // Second char
+    static constexpr Char_T_ Var_2ND_Char = 'v'; // Second character
     static const Char_T_ *   GetVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
         return &(val[0]);
     }
 
     // {math:
-    static constexpr Char_T_ Math_2ND_Char = 'm'; // Second char
+    static constexpr Char_T_ Math_2ND_Char = 'm'; // Second character
     static const Char_T_ *   GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
         return &(val[0]);
     }
 
     // {if:
-    static constexpr Char_T_ InlineIf_2ND_Char = 'i'; // Second char
+    static constexpr Char_T_ InlineIf_2ND_Char = 'i'; // Second character
     static const Char_T_ *   GetInLineIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
         return &(val[0]);
     }
 
     // <loop
-    static constexpr Char_T_ Loop_2ND_Char = 'l'; // Second char
+    static constexpr Char_T_ Loop_2ND_Char = 'l'; // Second character
     static const Char_T_ *   GetLoopPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
         return &(val[0]);
@@ -1439,7 +1443,7 @@ struct TemplatePatterns {
     }
 
     // <if
-    static constexpr Char_T_ If_2ND_Char = 'i'; // Second char
+    static constexpr Char_T_ If_2ND_Char = 'i'; // Second character
     static const Char_T_ *   GetIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'i', 'f'};
         return &(val[0]);
