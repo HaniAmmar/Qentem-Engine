@@ -25,7 +25,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall -march=native -D QENTEM_AVX2 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_AVX2 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
@@ -34,7 +34,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall -march=native -D QENTEM_SSE2 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_SSE2 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
@@ -44,7 +44,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
@@ -56,7 +56,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - clang++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
@@ -64,7 +64,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
@@ -74,7 +74,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
@@ -84,6 +84,6 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
