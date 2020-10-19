@@ -142,7 +142,9 @@ static int TestToUTF8() {
 }
 
 static int TestToUTF16() {
-    StringStream<char16_t> ss;
+    using QChar = char16_t;
+
+    StringStream<QChar> ss;
 
     Unicode::ToUTF(0x0000, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
@@ -156,57 +158,55 @@ static int TestToUTF16() {
 
     Unicode::ToUTF(0x007F, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{127}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{127}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0x0080, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{128}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{128}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0x00A1, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{161}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{161}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0x07FF, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{2047}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{2047}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0x0800, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{2048}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{2048}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0x08A7, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{2215}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{2215}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0xFFFF, ss);
     EQ_VALUE(ss.Length(), 1, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{65535}, "ss.First()");
+    EQ_VALUE(*(ss.First()), QChar{65535}, "ss.First()");
     ss.Clear();
 
     Unicode::ToUTF(0x10000, ss);
     EQ_VALUE(ss.Length(), 2, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{55296}, "ss.First()");
-    EQ_VALUE(*(ss.First() + 1), char16_t{56320}, "*(ss.First()+1)");
-    const char16_t *v10000 = u"𐀀";
-    EQ_VALUE(ss, v10000, "ss == v10000");
+    EQ_VALUE(*(ss.First()), QChar{55296}, "ss.First()");
+    EQ_VALUE(*(ss.First() + 1), QChar{56320}, "*(ss.First()+1)");
     ss.Clear();
 
     Unicode::ToUTF(0x10A7B, ss);
     EQ_VALUE(ss.Length(), 2, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{55298}, "ss.First()");
-    EQ_VALUE(*(ss.First() + 1), char16_t{56955}, "*(ss.First()+1)");
+    EQ_VALUE(*(ss.First()), QChar{55298}, "ss.First()");
+    EQ_VALUE(*(ss.First() + 1), QChar{56955}, "*(ss.First()+1)");
     ss.Clear();
 
     Unicode::ToUTF(0xE01EF, ss);
     EQ_VALUE(ss.Length(), 2, "ss.Length()");
-    EQ_VALUE(*(ss.First()), char16_t{56128}, "ss.First()");
-    EQ_VALUE(*(ss.First() + 1), char16_t{56815}, "*(ss.First()+1)");
+    EQ_VALUE(*(ss.First()), QChar{56128}, "ss.First()");
+    EQ_VALUE(*(ss.First() + 1), QChar{56815}, "*(ss.First()+1)");
     ss.Clear();
 
     END_SUB_TEST;
