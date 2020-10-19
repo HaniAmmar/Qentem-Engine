@@ -28,8 +28,8 @@
 #ifndef QENTEM_TEMPLATE_H_
 #define QENTEM_TEMPLATE_H_
 
-#ifndef QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_
-#define QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_ 16
+#ifndef QENTEM_TEMPLATE_PARSE_ARRAY_SIZE
+#define QENTEM_TEMPLATE_PARSE_ARRAY_SIZE 32
 #endif
 
 // TODO: Add autoescape and use * for raw variables
@@ -165,7 +165,7 @@ class Template_T_ {
     friend class Qentem::ALE;
 
     using TemplatePatterns_T_ = TemplatePatterns<Char_T_>;
-    using Tags_T_ = FixedArray<Tag_T_, QENTEM_TEMPLATE_PARSE_ARRAY_SIZE_H_>;
+    using Tags_T_ = FixedArray<Tag_T_, QENTEM_TEMPLATE_PARSE_ARRAY_SIZE>;
 
     QENTEM_NOINLINE void process(const Char_T_ *content, SizeT length) const {
         Tags_T_ tags;
