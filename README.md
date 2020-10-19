@@ -8,26 +8,38 @@
 -   [Features](#features)
 -   [Requirements](#requirements)
 -   [Documentation](#documentation)
--   [Components](#requirements)
-    -   [JSON](#json)
-    -   [Template](#template)
-        -   [PHP Module](#php-module)
-        -   [JavaScript Module](#javascript-module)
-    -   [ALE](#ale)
+-   [JSON Example](#json-example)
+-   [Template Example](#template-example)
+    -   [PHP Module](#php-module)
+    -   [JavaScript Module](#javascript-module)
+-   [ALE Example](#ale-example)
 -   [Tests](#tests)
 -   [License](#license)
 
 ## Introduction
 
-Qentem Engine is an independent and cross-platform library that uses a fast algorithm for nest-matching. It has a JSON parser, template rendering engine, and just-in-time arithmetic and logic evaluation.
+Qentem Engine is a self-contained library for rendering HTML templates. Designed to be a server-side module or a client one `(WASM)`. It can also be used to render HTML pages in a normal Application. On PHP, it uses `z_val` for variable replacement. However, it evaluates if statements using a custom arithmetic and logic algorithm; for security and performance reasons. The client-side module – WASM has a compact `Value` container and a fast JSON parser.
 
 ## Features
+-   General
+    -   Cross platform, header only and self-contained; no external libraries is needed.
+    -   Supports UTF-8, UTF-16 and UTF-32.
+    -   Supports 32-bit and 64-bit architecture, little and big endian.
+    -   Low memory usage.
 
--   Cross platform, header only and self-contained; no external libraries like the STL is needed.
--   Supports UTF-8, UTF-16 and UTF-32.
--   Supports any character type (char. u_char, char16_t, char32_t, wchar_t, ...).
--   Fast JSON parser.
--   Fast HTML templating (variable replacement, nested loop, nested if condition, and Inline if).
+-   JSON
+    -   Fast parser.
+    -   Fast stringify.
+    -   `Value` size is 16 bytes on 64-bit, and 12 on 32-bit.
+
+-   Tempate engine
+    -   Fast template rendering.
+    -   Safe evaluation.
+    -   Variable replacement.
+    -   Nested loop.
+    -   Nested if condition.
+    -   Inline if.
+    -   Math tag.
 
 ## Requirements
 
@@ -37,13 +49,7 @@ C++ 11+ compiler.
 
 Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/tree/master/Documentation).
 
-## Components
-
-### JSON
-
-Value is a first-class type in Qentem. It's being used by the template engine for variables' replacement. It has an operator that can access values by its index and/or by its key value in case of objects. The parser is fast and strict; a single mistake in the JSON string will give an empty value.
-
-#### JSON Example
+## JSON Example
 
 ```cpp
 #include "JSON.hpp"
@@ -131,11 +137,7 @@ int main() {
 }
 ```
 
-### Template
-
-Rendering templates is the main reason for making Qentem, and it uses every part of the library. It is fast and HTML friendly. It has loops/nesting loops, if/nesting-if with else and else-if, inline if, variable replacement, and math evaluation.
-
-#### Template Example
+## Template Example
 
 ```cpp
 #include "JSON.hpp"
@@ -208,23 +210,15 @@ int main() {
 }
 ```
 
-#### Template Examples
+### PHP Module
 
-More examples are inside [Examples/Template](https://github.com/HaniAmmar/Qentem-Engine/tree/master/Examples/Template).
+PHP module is @ [BQen](https://github.com/HaniAmmar/BQen)
 
-#### PHP Module
+### JavaScript Module
 
-Templating module for PHP: [BQen](https://github.com/HaniAmmar/BQen)
+JavaScript module is @ [JQen](https://github.com/HaniAmmar/JQen)
 
-#### JavaScript Module
-
-Templating module for JavaScript: [JQen](https://github.com/HaniAmmar/JQen)
-
-### ALE
-
-Arithmetic and logic evaluator for evaluating if conditions and calculation math values for the template engine. It has support for nesting parenthesis `(..)`, and made to be pluggable for numbers' replacement when curly brackets `{..}` are used.
-
-#### ALE Example
+## ALE Example
 
 ```cpp
 #include "ALE.hpp"
@@ -266,10 +260,6 @@ int main() {
     }
 }
 ```
-
-#### ALE Examples
-
-More examples are inside [Examples/ALE](https://github.com/HaniAmmar/Qentem-Engine/tree/master/Examples/ALE).
 
 ## Tests
 
