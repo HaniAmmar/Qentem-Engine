@@ -75,11 +75,11 @@ struct QPointer {
         struct {
 #ifndef QENTEM_BIG_ENDIAN
             unsigned long long int_ : 48;
-            unsigned char      tag_low;
-            unsigned char      tag_high;
+            unsigned long long tag_low : 8;
+            unsigned long long tag_high : 8;
 #else
-            unsigned char      tag_high;
-            unsigned char      tag_low;
+            unsigned long long tag_high : 8;
+            unsigned long long tag_low : 8;
             unsigned long long int_ : 48;
 #endif
         } tag_;
