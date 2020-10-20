@@ -1341,12 +1341,12 @@ class Value {
 
       private:
         struct SubType_ {
-#ifdef QENTEM_BIG_ENDIAN
-            ValueType     type_;
+#ifndef QENTEM_BIG_ENDIAN
             unsigned char padding_[7];
+            ValueType     type_;
 #else
-            unsigned char padding_[7];
             ValueType     type_;
+            unsigned char padding_[7];
 #endif
         };
 

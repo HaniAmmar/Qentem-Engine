@@ -282,9 +282,14 @@ struct Template {
 
         union Data_U_ {
             Data_U_(void *p) : ptr_{p} {}
-            void *             ptr_;
-            unsigned long long int_ : 48;
-            TagType            type_[8];
+            void *ptr_;
+            struct {
+#ifdef QENTEM_BIG_ENDIAN
+                short int_16_;
+#endif
+                unsigned long long int_ : 48;
+            };
+            TagType type_[8];
         } data_{nullptr};
 
 #else

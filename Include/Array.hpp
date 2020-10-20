@@ -337,8 +337,15 @@ class Array {
 
 #if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     union {
+#ifndef QENTEM_BIG_ENDIAN
         unsigned long long int_ : 48;
-        Type_ *            ptr_;
+#else
+        struct {
+            short              int_16_;
+            unsigned long long int_ : 48;
+        };
+#endif
+        Type_ *ptr_;
     } storage_{0};
 #else
     Type_ *storage_{nullptr};

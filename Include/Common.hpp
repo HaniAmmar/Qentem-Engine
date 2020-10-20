@@ -75,7 +75,14 @@ union TaggedPointer {
         : Number{reinterpret_cast<unsigned long long>(ptr)} {}
 
     unsigned long long Number;
+#ifndef QENTEM_BIG_ENDIAN
     unsigned long long Number48 : 48;
+#else
+    struct {
+        short              Number16;
+        unsigned long long Number48 : 48;
+    };
+#endif
 };
 #endif
 
