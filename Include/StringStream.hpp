@@ -44,44 +44,44 @@ class StringStream {
 
     explicit StringStream(SizeT size) {
         if (size != 0) {
-            setCapacity(SizeT{2} << Platform::CLZ(size));
+            setCapacity(algineSize(size));
             allocate();
         }
     }
 
-    StringStream(StringStream &&ss) noexcept
-        : storage_(ss.Storage()), length_(ss.Length()),
-          capacity_(ss.Capacity()) {
-        ss.clearStorage();
-        ss.setLength(0);
-        ss.setCapacity(0);
+    StringStream(StringStream &&src) noexcept
+        : storage_(src.Storage()), length_(src.Length()),
+          capacity_(src.Capacity()) {
+        src.clearStorage();
+        src.setLength(0);
+        src.setCapacity(0);
     }
 
-    StringStream(const StringStream &ss) {
-        if (ss.Length() != 0) {
-            setCapacity(SizeT{2} << Platform::CLZ(ss.Length()));
+    StringStream(const StringStream &src) {
+        if (src.Length() != 0) {
+            setCapacity(algineSize(src.Length()));
             allocate();
-            insert(ss.First(), ss.Length());
+            insert(src.First(), src.Length());
         }
     }
 
-    StringStream &operator=(StringStream &&ss) noexcept {
-        if (this != &ss) {
+    StringStream &operator=(StringStream &&src) noexcept {
+        if (this != &src) {
             deallocate(Storage());
-            setStorage(ss.Storage());
-            setLength(ss.Length());
-            setCapacity(ss.Capacity());
+            setStorage(src.Storage());
+            setLength(src.Length());
+            setCapacity(src.Capacity());
 
-            ss.clearStorage();
-            ss.setLength(0);
-            ss.setCapacity(0);
+            src.clearStorage();
+            src.setLength(0);
+            src.setCapacity(0);
         }
 
         return *this;
     }
 
-    StringStream &operator=(const StringStream &ss) {
-        if (this != &ss) {
+    StringStream &operator=(const StringStream &src) {
+        if (this != &src) {
             if (First() != nullptr) {
                 deallocate(Storage());
                 clearStorage();
@@ -89,7 +89,7 @@ class StringStream {
                 setCapacity(0);
             }
 
-            Insert(ss.First(), ss.Length());
+            Insert(src.First(), src.Length());
         }
 
         return *this;
@@ -110,8 +110,8 @@ class StringStream {
         ++length_;
     }
 
-    inline void operator+=(const StringStream<Char_T_> &ss_src) {
-        insert(ss_src.First(), ss_src.Length());
+    inline void operator+=(const StringStream<Char_T_> &src) {
+        insert(src.First(), src.Length());
     }
 
     inline void operator+=(const String<Char_T_> &src) {
@@ -255,6 +255,16 @@ class StringStream {
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(SizeT new_length) noexcept { length_ = new_length; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+
+    SizeT algineSize(SizeT n_size) noexcept {
+        const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
+
+        if (size < n_size) {
+            return (size << 1U);
+        }
+
+        return size;
+    }
 
     void insert(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
