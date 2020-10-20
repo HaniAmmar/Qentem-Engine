@@ -1048,13 +1048,12 @@ class Value {
         }
     }
 
-    static void StringifyObject(const VObject *obj, StringStream<Char_T_> &ss) {
+    static void StringifyObject(const VObject &obj, StringStream<Char_T_> &ss) {
         using V_item_ = HAItem<Value, Char_T_>;
 
         ss += JSONotation_T_::SCurlyChar;
 
-        for (const V_item_ *h_item = obj->First(),
-                           *end    = (h_item + obj->Size());
+        for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size());
              h_item != end; h_item++) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 ss += JSONotation_T_::QuoteChar;
@@ -1076,10 +1075,10 @@ class Value {
         ss += JSONotation_T_::ECurlyChar;
     }
 
-    static void StringifyArray(const VArray *arr, StringStream<Char_T_> &ss) {
+    static void StringifyArray(const VArray &arr, StringStream<Char_T_> &ss) {
         ss += JSONotation_T_::SSquareChar;
 
-        for (const Value *item = arr->First(), *end = (item + arr->Size());
+        for (const Value *item = arr.First(), *end = (item + arr.Size());
              item != end; item++) {
             if (!(item->IsUndefined())) {
                 StringifyValue(*item, ss);
@@ -1099,12 +1098,12 @@ class Value {
     static void StringifyValue(const Value &val, StringStream<Char_T_> &ss) {
         switch (val.Type()) {
             case ValueType::Object: {
-                StringifyObject(val.GetObject(), ss);
+                StringifyObject(val.object_, ss);
                 return;
             }
 
             case ValueType::Array: {
-                StringifyArray(val.GetArray(), ss);
+                StringifyArray(val.array_, ss);
                 return;
             }
 
@@ -1159,10 +1158,12 @@ class Value {
     inline VString Stringify() const {
         StringStream<Char_T_> ss;
 
-        if (IsObject()) {
-            StringifyObject(this->GetObject(), ss);
-        } else if (IsArray()) {
-            StringifyArray(this->GetArray(), ss);
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
+            StringifyObject(this->object_, ss);
+        } else if (type == ValueType::Array) {
+            StringifyArray(this->array_, ss);
         }
 
         return ss.GetString();
