@@ -21,6 +21,7 @@
  */
 
 #include "Platform.hpp"
+#include "QPointer.hpp"
 #include "String.hpp"
 
 #ifndef QENTEM_HARRAY_H_
@@ -72,8 +73,8 @@ class HArray {
     }
 
     HArray(HArray &&src) noexcept
-        : index_(src.Size()), capacity_(src.Capacity()) {
-        setStorage(src.Storage());
+        : storage_(src.storage_), index_(src.Size()),
+          capacity_(src.Capacity()) {
         src.clearStorage();
         src.setSize(0);
         src.setCapacity(0);
@@ -417,18 +418,11 @@ class HArray {
         }
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    inline HAItem_T_ *Storage() const noexcept {
-        return reinterpret_cast<HAItem_T_ *>(storage_.int_);
-    }
-#else
-    inline HAItem_T_ *Storage() const noexcept { return storage_; }
-#endif
-
-    inline SizeT            Size() const noexcept { return index_; }
-    inline SizeT            Capacity() const noexcept { return capacity_; }
-    inline bool             IsEmpty() const noexcept { return (Size() == 0); }
-    inline bool             IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline HAItem_T_ *Storage() const noexcept { return storage_.GetPointer(); }
+    inline SizeT      Size() const noexcept { return index_; }
+    inline SizeT      Capacity() const noexcept { return capacity_; }
+    inline bool       IsEmpty() const noexcept { return (Size() == 0); }
+    inline bool       IsNotEmpty() const noexcept { return !(IsEmpty()); }
     inline const HAItem_T_ *First() const noexcept { return Storage(); }
     inline const HAItem_T_ *End() const noexcept { return (First() + Size()); }
 
@@ -443,14 +437,7 @@ class HArray {
     //////////// Private ////////////
 
   private:
-    void setStorage(HAItem_T_ *ptr) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        storage_.int_ = TaggedPointer{ptr}.Number48;
-#else
-        storage_ = ptr;
-#endif
-    }
-
+    void setStorage(HAItem_T_ *ptr) noexcept { storage_.Set(ptr); }
     void clearPosition() noexcept {
         for (HashTable_ *item = getHashTable(), *end = (item + Capacity());
              item != end; item++) {
@@ -624,24 +611,9 @@ class HArray {
         }
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    union {
-#ifndef QENTEM_BIG_ENDIAN
-        unsigned long long int_ : 48;
-#else
-        struct {
-            short              int_16_;
-            unsigned long long int_ : 48;
-        };
-#endif
-        HAItem_T_ *ptr_;
-    } storage_{0};
-#else
-    HAItem_T_ *storage_{nullptr};
-#endif
-
-    SizeT index_{0};
-    SizeT capacity_{0};
+    QPointer<HAItem_T_> storage_{};
+    SizeT               index_{0};
+    SizeT               capacity_{0};
 };
 
 } // namespace Qentem

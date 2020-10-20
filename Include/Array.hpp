@@ -21,6 +21,7 @@
  */
 
 #include "Memory.hpp"
+#include "QPointer.hpp"
 
 #ifndef QENTEM_ARRAY_H_
 #define QENTEM_ARRAY_H_
@@ -42,8 +43,8 @@ class Array {
     }
 
     Array(Array &&src) noexcept
-        : index_(src.Size()), capacity_(src.Capacity()) {
-        setStorage(src.Storage());
+        : storage_(src.storage_), index_(src.Size()),
+          capacity_(src.Capacity()) {
         src.clearStorage();
         src.setSize(0);
         src.setCapacity(0);
@@ -267,16 +268,9 @@ class Array {
         setSize(Capacity());
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    inline Type_ *Storage() const noexcept {
-        return reinterpret_cast<Type_ *>(storage_.int_);
-    }
-#else
-    inline Type_ *Storage() const noexcept { return storage_; }
-#endif
-
-    inline SizeT        Size() const noexcept { return index_; }
-    inline SizeT        Capacity() const noexcept { return capacity_; }
+    inline Type_ *Storage() const noexcept { return storage_.GetPointer(); }
+    inline SizeT  Size() const noexcept { return index_; }
+    inline SizeT  Capacity() const noexcept { return capacity_; }
     inline const Type_ *First() const noexcept { return Storage(); }
     inline const Type_ *End() const noexcept { return (First() + Size()); }
     inline bool         IsEmpty() const noexcept { return (Size() == 0); }
@@ -293,14 +287,7 @@ class Array {
     //////////// Private ////////////
 
   private:
-    void setStorage(Type_ *ptr) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        storage_.int_ = TaggedPointer{ptr}.Number48;
-#else
-        storage_ = ptr;
-#endif
-    }
-
+    void setStorage(Type_ *ptr) noexcept { storage_.Set(ptr); }
     void allocate() { setStorage(Memory::Allocate<Type_>(Capacity())); }
     void deallocate(Type_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
@@ -335,24 +322,9 @@ class Array {
         }
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    union {
-#ifndef QENTEM_BIG_ENDIAN
-        unsigned long long int_ : 48;
-#else
-        struct {
-            short              int_16_;
-            unsigned long long int_ : 48;
-        };
-#endif
-        Type_ *ptr_;
-    } storage_{0};
-#else
-    Type_ *storage_{nullptr};
-#endif
-
-    SizeT index_{0};
-    SizeT capacity_{0};
+    QPointer<Type_> storage_{};
+    SizeT           index_{0};
+    SizeT           capacity_{0};
 };
 
 } // namespace Qentem

@@ -21,6 +21,7 @@
  */
 
 #include "Memory.hpp"
+#include "QPointer.hpp"
 #include "StringUtils.hpp"
 
 #ifndef QENTEM_STRING_H_
@@ -36,8 +37,8 @@ class String {
   public:
     String() = default;
 
-    String(String &&src) noexcept : length_(src.Length()) {
-        setStorage(src.Storage());
+    String(String &&src) noexcept
+        : storage_(src.storage_), length_(src.Length()) {
         src.clearStorage();
         src.setLength(0);
     }
@@ -212,15 +213,8 @@ class String {
         return str;
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    inline Char_T_ *Storage() const noexcept {
-        return reinterpret_cast<Char_T_ *>(storage_.int_);
-    }
-#else
-    inline Char_T_ *Storage() const noexcept { return storage_; }
-#endif
-
-    inline SizeT          Length() const noexcept { return length_; }
+    inline Char_T_ *Storage() const noexcept { return storage_.GetPointer(); }
+    inline SizeT    Length() const noexcept { return length_; }
     inline const Char_T_ *First() const noexcept { return Storage(); }
     inline bool           IsEmpty() const noexcept { return (Length() == 0); }
     inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
@@ -277,14 +271,7 @@ class String {
     //////////// Private ////////////
 
   private:
-    void setStorage(Char_T_ *ptr) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        storage_.int_ = TaggedPointer{ptr}.Number48;
-#else
-        storage_ = ptr;
-#endif
-    }
-
+    void setStorage(Char_T_ *ptr) noexcept { storage_.Set(ptr); }
     void allocate(SizeT new_size) {
         setStorage(Memory::Allocate<Char_T_>(new_size));
     }
@@ -293,23 +280,8 @@ class String {
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(SizeT new_length) noexcept { length_ = new_length; }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    union {
-#ifndef QENTEM_BIG_ENDIAN
-        unsigned long long int_ : 48;
-#else
-        struct {
-            short              int_16_;
-            unsigned long long int_ : 48;
-        };
-#endif
-        Char_T_ *ptr_;
-    } storage_{0};
-#else
-    Char_T_ *storage_{nullptr};
-#endif
-
-    SizeT length_{0};
+    QPointer<Char_T_> storage_{};
+    SizeT             length_{0};
 };
 
 } // namespace Qentem

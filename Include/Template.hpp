@@ -194,12 +194,6 @@ struct Template {
 
     template <typename Char_T_>
     struct TagBit {
-#ifdef QENTEM_BIG_ENDIAN
-        static constexpr unsigned char type_index = 0;
-#else
-        static constexpr unsigned char type_index = 7;
-#endif
-
         using LoopData_ = LoopData_T<Char_T_>;
 
       public:
@@ -230,10 +224,11 @@ struct Template {
 
                 offset_     = tag.offset_;
                 end_offset_ = tag.end_offset_;
+                data_.Set(tag.data_);
+
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
                 type_ = tag.type_;
 #endif
-                data_ = tag.data_;
 
                 tag.setData(nullptr);
             }
@@ -256,51 +251,33 @@ struct Template {
         }
 
         inline TagType GetType() const noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-            return (data_.type_[type_index]);
-#else
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             return type_;
+#else
+            return static_cast<TagType>(data_.GetHighTag());
 #endif
         }
-
         inline SizeT Offset() const noexcept { return offset_; }
         inline SizeT EndOffset() const noexcept { return end_offset_; }
 
       private:
-        void clearData() noexcept { setData(nullptr); }
-
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        void setType(TagType type) noexcept { data_.type_[type_index] = type; }
-        void setData(void *new_data) noexcept { data_.ptr_ = new_data; }
-
-        inline void *getData() const noexcept {
-            return reinterpret_cast<void *>(data_.int_);
+        void setType(TagType type) noexcept {
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+            type_ = type;
+#else
+            data_.SetHighTag(static_cast<unsigned char>(type));
+#endif
         }
 
-        SizeT offset_{0};
-        SizeT end_offset_{0};
+        void         clearData() noexcept { setData(nullptr); }
+        void         setData(void *new_data) noexcept { data_.Set(new_data); }
+        inline void *getData() const noexcept { return data_.GetPointer(); }
 
-        union Data_U_ {
-            Data_U_(void *p) : ptr_{p} {}
-            void *ptr_;
-            struct {
-#ifdef QENTEM_BIG_ENDIAN
-                short int_16_;
-#endif
-                unsigned long long int_ : 48;
-            };
-            TagType type_[8];
-        } data_{nullptr};
-
-#else
-        void         setType(TagType type) noexcept { type_ = type; }
-        void         setData(void *new_data) noexcept { data_ = new_data; }
-        inline void *getData() const noexcept { return data_; }
-
-        SizeT   offset_{0};
-        SizeT   end_offset_{0};
-        TagType type_{TagType::Variable};
-        void *  data_{nullptr};
+        SizeT          offset_{0};
+        SizeT          end_offset_{0};
+        QPointer<void> data_{};
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+        TagType type_{};
 #endif
     };
 };

@@ -588,7 +588,7 @@ class Value {
 
     inline ValueType Type() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        return type_.GetType();
+        return static_cast<ValueType>(type_.Value.GetHighTag());
 #else
         return type_;
 #endif
@@ -1173,7 +1173,7 @@ class Value {
 
     inline void setType(ValueType new_type) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        type_.SetType(new_type);
+        type_.Value.SetHighTag(static_cast<unsigned char>(new_type));
 #else
         type_ = new_type;
 #endif
@@ -1333,28 +1333,9 @@ class Value {
 
     struct VType_ {
       public:
-        inline ValueType GetType() const noexcept { return sub.type_; }
-
-        inline void SetType(ValueType new_type) noexcept {
-            sub.type_ = new_type;
-        }
+        QPointer<void> Value;
 
       private:
-        struct SubType_ {
-#ifndef QENTEM_BIG_ENDIAN
-            unsigned char padding_[7];
-            ValueType     type_;
-#else
-            ValueType     type_;
-            unsigned char padding_[7];
-#endif
-        };
-
-        union {
-            unsigned long long int_type_;
-            SubType_           sub;
-        };
-
         SizeT padding_[2];
     };
 #else
