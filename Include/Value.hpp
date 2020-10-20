@@ -54,7 +54,9 @@ class Value {
     Value() noexcept : number_{} {}
 
     Value(Value &&val) noexcept : number_{val.number_} {
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
         setType(val.Type());
+#endif
         val.setTypeToUndefined();
     }
 
@@ -376,18 +378,12 @@ class Value {
 
         if (IsArray()) {
             if (val.IsArray()) {
-                const VArray &src_arr = val.array_;
-                VArray &      des_arr = array_;
-
-                Value *      src_val = src_arr.Storage();
-                const Value *src_end = src_arr.End();
-
-                while (src_val != src_end) {
+                for (Value *src_val = val.array_.Storage(),
+                           *end     = (src_val + val.array_.Size());
+                     src_val < end; src_val++) {
                     if (!(src_val->IsUndefined())) {
-                        des_arr += static_cast<Value &&>(*src_val);
+                        array_ += static_cast<Value &&>(*src_val);
                     }
-
-                    ++src_val;
                 }
             } else if (!(val.IsUndefined())) {
                 array_ += static_cast<Value &&>(val);
@@ -406,18 +402,12 @@ class Value {
 
         if (IsArray()) {
             if (val.IsArray()) {
-                const VArray &src_arr = val.array_;
-                VArray &      des_arr = array_;
-
-                const Value *src_val = src_arr.First();
-                const Value *src_end = src_arr.End();
-
-                while (src_val != src_end) {
+                for (const Value *src_val = val.array_.Storage(),
+                                 *end     = (src_val + val.array_.Size());
+                     src_val < end; src_val++) {
                     if (!(src_val->IsUndefined())) {
-                        des_arr += *src_val;
+                        array_ += *src_val;
                     }
-
-                    ++src_val;
                 }
             } else if (!(val.IsUndefined())) {
                 array_ += val;
@@ -597,7 +587,7 @@ class Value {
     }
 
     inline ValueType Type() const noexcept {
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
         return type_.GetType();
 #else
         return type_;
@@ -1063,10 +1053,9 @@ class Value {
 
         ss += JSONotation_T_::SCurlyChar;
 
-        const V_item_ *h_item = obj->First();
-        const V_item_ *end    = obj->End();
-
-        while (h_item != end) {
+        for (const V_item_ *h_item = obj->First(),
+                           *end    = (h_item + obj->Size());
+             h_item != end; h_item++) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 ss += JSONotation_T_::QuoteChar;
                 JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), ss);
@@ -1076,8 +1065,6 @@ class Value {
                 StringifyValue(h_item->Value, ss);
                 ss += JSONotation_T_::CommaChar;
             }
-
-            ++h_item;
         }
 
         const Char_T_ *last = ss.Last();
@@ -1092,16 +1079,12 @@ class Value {
     static void StringifyArray(const VArray *arr, StringStream<Char_T_> &ss) {
         ss += JSONotation_T_::SSquareChar;
 
-        const Value *item = arr->First();
-        const Value *end  = arr->End();
-
-        while (item != end) {
+        for (const Value *item = arr->First(), *end = (item + arr->Size());
+             item != end; item++) {
             if (!(item->IsUndefined())) {
                 StringifyValue(*item, ss);
                 ss += JSONotation_T_::CommaChar;
             }
-
-            ++item;
         }
 
         const Char_T_ *last = ss.Last();
@@ -1189,7 +1172,7 @@ class Value {
     struct VType_; // For tagging pointers
 
     inline void setType(ValueType new_type) noexcept {
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
         type_.SetType(new_type);
 #else
         type_ = new_type;
@@ -1293,7 +1276,7 @@ class Value {
 
             default: {
                 number_ = val.number_;
-#ifndef QENTEM_POINTER_TAGGING
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
                 setType(val.Type());
 #endif
             }
@@ -1308,14 +1291,17 @@ class Value {
         explicit VNumber(Number_T_ num) noexcept : number_{num} {}
 
         inline void SetNumber(double num) noexcept { number_.d = num; }
+
         inline void SetNumber(unsigned long long num) noexcept {
             number_.ull = num;
         }
+
         inline void SetNumber(long long num) noexcept { number_.sll = num; }
 
         inline unsigned long long GetUInt64() const noexcept {
             return number_.ull;
         }
+
         inline long long GetInt64() const noexcept { return number_.sll; }
         inline double    GetDouble() const noexcept { return number_.d; }
 
@@ -1341,7 +1327,7 @@ class Value {
         VArray  array_;
         VString string_;
         VNumber number_;
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
         VType_ type_;
     };
 

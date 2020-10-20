@@ -36,18 +36,27 @@ class String {
   public:
     String() = default;
 
+    String(String &&src) noexcept : length_(src.Length()) {
+        setStorage(src.Storage());
+        src.clearStorage();
+        src.setLength(0);
+    }
+
+    String(const String &src) : length_(src.Length()) {
+        if (IsNotEmpty()) {
+            allocate(Length() + 1);
+            Char_T_ *des = Storage();
+            Memory::Copy(des, src.First(), (Length() * sizeof(Char_T_)));
+            des[Length()] = 0;
+        }
+    }
+
     explicit String(SizeT len) : length_(len) {
         allocate(len + 1);
         Storage()[Length()] = 0;
     }
 
-    String(Char_T_ *str, SizeT len) noexcept : length_(len) {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.ptr_ = str;
-#else
-        storage_ = str;
-#endif
-    }
+    String(Char_T_ *str, SizeT len) noexcept : length_(len) { setStorage(str); }
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
         allocate(len + 1);
@@ -62,25 +71,6 @@ class String {
 
     explicit String(const Char_T_ *str)
         : String(str, StringUtils::Count(str)) {}
-
-    String(String &&src) noexcept : length_(src.Length()) {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.ptr_ = src.Storage();
-#else
-        storage_ = src.Storage();
-#endif
-        src.clearStorage();
-        src.setLength(0);
-    }
-
-    String(const String &src) : length_(src.Length()) {
-        if (IsNotEmpty()) {
-            allocate(Length() + 1);
-            Char_T_ *des = Storage();
-            Memory::Copy(des, src.First(), (Length() * sizeof(Char_T_)));
-            des[Length()] = 0;
-        }
-    }
 
     ~String() { deallocate(Storage()); }
 
@@ -147,7 +137,6 @@ class String {
 
     String operator+(String &&src) const {
         String ns{Insert(*this, src)};
-
         src.deallocate(src.Storage());
         src.clearStorage();
         src.setLength(0);
@@ -223,9 +212,9 @@ class String {
         return str;
     }
 
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     inline Char_T_ *Storage() const noexcept {
-        return reinterpret_cast<Char_T_ *>(storage_.int_ & 0xFFFFFFFFFFFFULL);
+        return reinterpret_cast<Char_T_ *>(storage_.int_);
     }
 #else
     inline Char_T_ *Storage() const noexcept { return storage_; }
@@ -261,7 +250,7 @@ class String {
         return ns;
     }
 
-    void Insert(const Char_T_ *str, SizeT len) {
+    QENTEM_NOINLINE void Insert(const Char_T_ *str, SizeT len) {
         if ((str != nullptr) && (len != 0)) {
             Char_T_ *old_str = Storage();
             allocate(Length() + len + 1);
@@ -288,13 +277,11 @@ class String {
     //////////// Private ////////////
 
   private:
-    void setStorage(Char_T_ *new_storage) noexcept {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.int_ &= 0xFFFF000000000000ULL; // Preserve the tag
-        storage_.int_ |= reinterpret_cast<unsigned long long>(
-            new_storage); // Restore the tag
+    void setStorage(Char_T_ *ptr) noexcept {
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+        storage_.int_ = TaggedPointer{ptr}.Number48;
 #else
-        storage_ = new_storage;
+        storage_ = ptr;
 #endif
     }
 
@@ -306,9 +293,9 @@ class String {
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(SizeT new_length) noexcept { length_ = new_length; }
 
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     union {
-        unsigned long long int_;
+        unsigned long long int_ : 48;
         Char_T_ *          ptr_;
     } storage_{0};
 #else

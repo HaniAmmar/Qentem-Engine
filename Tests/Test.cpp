@@ -101,7 +101,7 @@ int main() {
 
 #ifdef QENTEM_64BIT_ARCH
     std::wcout << "Arch: 64BIT";
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     std::wcout << "\nTagged Pointers: On";
 #endif
 #endif

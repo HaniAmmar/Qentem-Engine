@@ -41,29 +41,24 @@ class Array {
         }
     }
 
-    Array(Array &&arr) noexcept
-        : index_(arr.Size()), capacity_(arr.Capacity()) {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.ptr_ = arr.Storage();
-#else
-        storage_ = arr.Storage();
-#endif
-        arr.clearStorage();
-        arr.setSize(0);
-        arr.setCapacity(0);
+    Array(Array &&src) noexcept
+        : index_(src.Size()), capacity_(src.Capacity()) {
+        setStorage(src.Storage());
+        src.clearStorage();
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
-    Array(const Array &arr) : capacity_(arr.Size()) {
+    Array(const Array &src) : capacity_(src.Size()) {
         if (Capacity() != 0) {
             allocate();
-
+            setSize(src.Size());
             Type_ *des = Storage();
-            Type_ *src = arr.Storage();
 
-            do {
-                Memory::Construct((des + Size()), src[Size()]);
-                ++index_;
-            } while (Size() != Capacity());
+            for (const Type_ *item = src.First(), *end = (item + src.Size());
+                 item != end; item++, des++) {
+                Memory::Construct(des, *item);
+            }
         }
     }
 
@@ -84,8 +79,8 @@ class Array {
         throw 1; // Index out of range
     }
 
-    Array &operator=(Array &&arr) noexcept {
-        if (this != &arr) {
+    Array &operator=(Array &&src) noexcept {
+        if (this != &src) {
             Type_ *current = Storage();
 
             if (current != nullptr) {
@@ -93,63 +88,62 @@ class Array {
                 deallocate(current);
             }
 
-            setStorage(arr.Storage());
-            setSize(arr.Size());
-            setCapacity(arr.Capacity());
+            setStorage(src.Storage());
+            setSize(src.Size());
+            setCapacity(src.Capacity());
 
-            arr.clearStorage();
-            arr.setSize(0);
-            arr.setCapacity(0);
+            src.clearStorage();
+            src.setSize(0);
+            src.setCapacity(0);
         }
 
         return *this;
     }
 
-    Array &operator=(const Array &arr) {
-        if (this != &arr) {
-            Reserve(arr.Size());
-
+    Array &operator=(const Array &src) {
+        if (this != &src) {
+            Reserve(src.Size());
+            setSize(src.Size());
             Type_ *des = Storage();
-            Type_ *src = arr.Storage();
 
-            while (Size() != Capacity()) {
-                Memory::Construct((des + Size()), src[Size()]);
-                ++index_;
+            for (const Type_ *item = src.First(), *end = (item + src.Size());
+                 item != end; item++, des++) {
+                Memory::Construct(des, *item);
             }
         }
 
         return *this;
     }
 
-    void operator+=(Array &&arr) {
+    void operator+=(Array &&src) {
         if (Capacity() == 0) {
             // If the array hasn't allocated any memory, then there is no need
             // for rest.
-            setStorage(arr.Storage());
-            setSize(arr.Size());
-            setCapacity(arr.Capacity());
+            setStorage(src.Storage());
+            setSize(src.Size());
+            setCapacity(src.Capacity());
         } else {
-            const SizeT n_size = (Size() + arr.Size());
+            const SizeT n_size = (Size() + src.Size());
 
             if (n_size > Capacity()) {
                 resize(n_size);
             }
 
-            if (arr.IsNotEmpty()) {
-                Memory::Copy((Storage() + Size()), arr.First(),
-                             arr.Size() * sizeof(Type_));
+            if (src.IsNotEmpty()) {
+                Memory::Copy((Storage() + Size()), src.First(),
+                             src.Size() * sizeof(Type_));
             }
 
             setSize(n_size);
-            arr.deallocate(arr.Storage());
+            src.deallocate(src.Storage());
         }
 
-        arr.clearStorage();
-        arr.setSize(0);
-        arr.setCapacity(0);
+        src.clearStorage();
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
-    void operator+=(const Array &arr) { copyArray(arr); }
+    void operator+=(const Array &src) { copyArray(src); }
 
     void operator+=(Type_ &&item) {
         if (Size() == Capacity()) {
@@ -168,13 +162,13 @@ class Array {
         *this += static_cast<Type_ &&>(Type_(item));
     }
 
-    inline Array &Insert(Array &&arr) {
-        *this += static_cast<Array &&>(arr);
+    inline Array &Insert(Array &&src) {
+        *this += static_cast<Array &&>(src);
         return *this;
     }
 
-    inline Array &Insert(const Array &arr) {
-        copyArray(arr);
+    inline Array &Insert(const Array &src) {
+        copyArray(src);
         return *this;
     }
 
@@ -273,9 +267,9 @@ class Array {
         setSize(Capacity());
     }
 
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     inline Type_ *Storage() const noexcept {
-        return reinterpret_cast<Type_ *>(storage_.int_ & 0xFFFFFFFFFFFFULL);
+        return reinterpret_cast<Type_ *>(storage_.int_);
     }
 #else
     inline Type_ *Storage() const noexcept { return storage_; }
@@ -299,13 +293,11 @@ class Array {
     //////////// Private ////////////
 
   private:
-    void setStorage(Type_ *new_storage) noexcept {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.int_ &= 0xFFFF000000000000ULL; // Preserve the tag
-        storage_.int_ |= reinterpret_cast<unsigned long long>(
-            new_storage); // Restore the tag
+    void setStorage(Type_ *ptr) noexcept {
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+        storage_.int_ = TaggedPointer{ptr}.Number48;
 #else
-        storage_ = new_storage;
+        storage_ = ptr;
 #endif
     }
 
@@ -316,38 +308,36 @@ class Array {
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     void resize(SizeT new_size) {
-        Type_ *old = Storage();
+        Type_ *src = Storage();
         setCapacity(new_size);
         allocate();
 
         if (IsNotEmpty()) {
-            Memory::Copy(Storage(), old, (Size() * sizeof(Type_)));
+            Memory::Copy(Storage(), src, (Size() * sizeof(Type_)));
         }
 
-        deallocate(old);
+        deallocate(src);
     }
 
-    QENTEM_NOINLINE void copyArray(const Array &arr) {
-        const SizeT n_size = (Size() + arr.Size());
+    QENTEM_NOINLINE void copyArray(const Array &src) {
+        const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {
             resize(n_size);
         }
 
+        index_ += src.Size();
         Type_ *des = Storage();
-        Type_ *src = arr.Storage();
-        SizeT  n   = 0;
 
-        while (n != arr.Size()) {
-            Memory::Construct((des + Size()), src[n]);
-            ++index_;
-            ++n;
+        for (const Type_ *item = src.First(), *end = (item + src.Size());
+             item != end; item++, des++) {
+            Memory::Construct(des, *item);
         }
     }
 
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     union {
-        unsigned long long int_;
+        unsigned long long int_ : 48;
         Type_ *            ptr_;
     } storage_{0};
 #else

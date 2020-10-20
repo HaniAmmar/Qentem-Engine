@@ -71,22 +71,18 @@ class HArray {
         }
     }
 
-    HArray(HArray &&h_arr) noexcept
-        : index_(h_arr.Size()), capacity_(h_arr.Capacity()) {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.ptr_ = h_arr.Storage();
-#else
-        storage_ = h_arr.Storage();
-#endif
-        h_arr.clearStorage();
-        h_arr.setSize(0);
-        h_arr.setCapacity(0);
+    HArray(HArray &&src) noexcept
+        : index_(src.Size()), capacity_(src.Capacity()) {
+        setStorage(src.Storage());
+        src.clearStorage();
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
-    HArray(const HArray &h_arr) { copyArray(h_arr); }
+    HArray(const HArray &src) { copyArray(src); }
 
-    HArray &operator=(HArray &&h_arr) noexcept {
-        if (this != &h_arr) {
+    HArray &operator=(HArray &&src) noexcept {
+        if (this != &src) {
             HAItem_T_ *current = Storage();
 
             if (current != nullptr) {
@@ -94,94 +90,84 @@ class HArray {
                 deallocate(current);
             }
 
-            setStorage(h_arr.Storage());
-            setSize(h_arr.Size());
-            setCapacity(h_arr.Capacity());
+            setStorage(src.Storage());
+            setSize(src.Size());
+            setCapacity(src.Capacity());
 
-            h_arr.clearStorage();
-            h_arr.setSize(0);
-            h_arr.setCapacity(0);
+            src.clearStorage();
+            src.setSize(0);
+            src.setCapacity(0);
         }
 
         return *this;
     }
 
-    HArray &operator=(const HArray &h_arr) {
-        if (this != &h_arr) {
+    HArray &operator=(const HArray &src) {
+        if (this != &src) {
             Reset();
-            copyArray(h_arr);
+            copyArray(src);
         }
 
         return *this;
     }
 
-    void operator+=(HArray &&h_arr) {
-        const SizeT n_size = (Size() + h_arr.Size());
+    void operator+=(HArray &&src) {
+        const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {
             resize(algineSize(n_size));
         }
 
-        HAItem_T_ *       des      = Storage();
-        HAItem_T_ *       src_item = h_arr.Storage();
-        const HashTable_ *src_ht   = h_arr.getHashTable();
-        const HAItem_T_ * end      = h_arr.End();
+        const HashTable_ *src_ht = src.getHashTable();
 
-        while (src_item != end) {
+        for (HAItem_T_ *item = src.Storage(), *end = (item + src.Size()),
+                       *des = Storage();
+             item != end; item++, src_ht++) {
             if (src_ht->Hash != 0) {
                 SizeT *index;
-                find(index, src_item->Key.First(), src_item->Key.Length(),
+                find(index, item->Key.First(), item->Key.Length(),
                      src_ht->Hash);
 
                 if (*index == 0) {
-                    insert(index,
-                           static_cast<String<Char_T_> &&>(src_item->Key),
+                    insert(index, static_cast<String<Char_T_> &&>(item->Key),
                            src_ht->Hash);
                 } else {
-                    src_item->Key.~String<Char_T_>();
+                    item->Key.~String<Char_T_>();
                 }
 
-                des[(*index) - 1].Value =
-                    static_cast<Value_ &&>(src_item->Value);
+                des[(*index) - 1].Value = static_cast<Value_ &&>(item->Value);
             }
-
-            ++src_item;
-            ++src_ht;
         }
 
-        h_arr.deallocate(h_arr.Storage());
-        h_arr.clearStorage();
-        h_arr.setCapacity(0);
-        h_arr.setSize(0);
+        src.deallocate(src.Storage());
+        src.clearStorage();
+        src.setCapacity(0);
+        src.setSize(0);
     }
 
-    void operator+=(const HArray &h_arr) {
-        const SizeT n_size = (Size() + h_arr.Size());
+    void operator+=(const HArray &src) {
+        const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {
             resize(algineSize(n_size));
         }
 
-        HAItem_T_ *       des      = Storage();
-        const HAItem_T_ * src_item = h_arr.Storage();
-        const HashTable_ *src_ht   = h_arr.getHashTable();
-        const HAItem_T_ * end      = h_arr.End();
+        HAItem_T_ *       des    = Storage();
+        const HashTable_ *src_ht = src.getHashTable();
 
-        while (src_item != end) {
+        for (const HAItem_T_ *item = src.First(), *end = item + src.Size();
+             item != end; item++, src_ht++) {
             if (src_ht->Hash != 0) {
                 SizeT *index;
-                find(index, src_item->Key.First(), src_item->Key.Length(),
+                find(index, item->Key.First(), item->Key.Length(),
                      src_ht->Hash);
 
                 if (*index == 0) {
-                    insert(index, String<Char_T_>(src_item->Key), src_ht->Hash);
+                    insert(index, String<Char_T_>(item->Key), src_ht->Hash);
                 }
 
-                des[(*index) - 1].Value = Value_(src_item->Value);
+                des[(*index) - 1].Value = Value_(item->Value);
             }
-
-            ++src_item;
-            ++src_ht;
         }
     }
 
@@ -410,18 +396,12 @@ class HArray {
     // Removes excess storage.
     void Compress() {
         if (Size() != 0) {
-            const HashTable_ *ht  = getHashTable();
-            const HashTable_ *end = (ht + Size());
-
             SizeT n_size = 0;
 
-            while (ht != end) {
+            for (const HashTable_ *ht = getHashTable(), *end = (ht + Size());
+                 ht != end; ht++) {
                 // Find the actual number of items.
-                if (ht->Hash != 0) {
-                    ++n_size;
-                }
-
-                ++ht;
+                n_size += (ht->Hash > 0);
             }
 
             if (n_size == 0) {
@@ -437,9 +417,9 @@ class HArray {
         }
     }
 
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     inline HAItem_T_ *Storage() const noexcept {
-        return reinterpret_cast<HAItem_T_ *>(storage_.int_ & 0xFFFFFFFFFFFFULL);
+        return reinterpret_cast<HAItem_T_ *>(storage_.int_);
     }
 #else
     inline HAItem_T_ *Storage() const noexcept { return storage_; }
@@ -463,30 +443,25 @@ class HArray {
     //////////// Private ////////////
 
   private:
-    void setStorage(HAItem_T_ *new_storage) noexcept {
-#ifdef QENTEM_POINTER_TAGGING
-        storage_.int_ &= 0xFFFF000000000000ULL; // Preserve the tag
-        storage_.int_ |= reinterpret_cast<unsigned long long>(
-            new_storage); // Restore the tag
+    void setStorage(HAItem_T_ *ptr) noexcept {
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+        storage_.int_ = TaggedPointer{ptr}.Number48;
 #else
-        storage_ = new_storage;
+        storage_ = ptr;
 #endif
     }
 
     void clearPosition() noexcept {
-        HashTable_ *      item = getHashTable();
-        const HashTable_ *end  = (item + Capacity());
-
-        while (item != end) {
+        for (HashTable_ *item = getHashTable(), *end = (item + Capacity());
+             item != end; item++) {
             item->Position = 0;
-            ++item;
         }
     }
 
     void allocate() {
         /*--------------------------------*/
-        /*| Hash Table      | Item       |*/
-        /*| Pos, Next, Hash | Key, Value |*/
+        /*| Item       | Hash Table      |*/
+        /*| Key, Value | Pos, Next, Hash |*/
         /*--------------------------------*/
 
         const SizeT size = static_cast<SizeT>(
@@ -517,15 +492,11 @@ class HArray {
         return size;
     }
 
-    SizeT *getPosition(ULSizeT hash) const noexcept {
-        return &(getHashTable()[hash & getBase()].Position);
-    }
-
     void find(SizeT *&index, const Char_T_ *key, SizeT length,
               ULSizeT hash) const noexcept {
-        index                = getPosition(hash);
+        HashTable_ *ht       = getHashTable();
+        index                = &((ht + (hash & getBase()))->Position);
         const HAItem_T_ *src = Storage();
-        HashTable_ *     ht  = getHashTable();
 
         while (*index != 0) {
             HashTable_ *item       = &(ht[(*index) - 1]);
@@ -573,17 +544,18 @@ class HArray {
         }
     }
 
-    QENTEM_NOINLINE void copyArray(const HArray &h_arr) {
+    QENTEM_NOINLINE void copyArray(const HArray &src) {
         // The function Reset() has to be called before this.
-        if (h_arr.Size() != 0) {
-            const HAItem_T_ * src_item = h_arr.First();
-            const HAItem_T_ * end      = h_arr.End();
-            const HashTable_ *src_ht   = h_arr.getHashTable();
+        if (src.Size() != 0) {
+            const HAItem_T_ * src_item = src.First();
+            const HAItem_T_ * end      = (src_item + src.Size());
+            const HashTable_ *src_ht   = src.getHashTable();
 
-            setCapacity(algineSize(h_arr.Size()));
+            setCapacity(algineSize(src.Size()));
             allocate();
 
-            HAItem_T_ * des_item = Storage();
+            HAItem_T_ * des_src  = Storage();
+            HAItem_T_ * des_item = des_src;
             HashTable_ *des_ht   = getHashTable();
 
             do {
@@ -599,24 +571,24 @@ class HArray {
                 ++src_ht;
             } while (src_item != end);
 
-            setSize(static_cast<SizeT>(des_item - Storage()));
+            setSize(static_cast<SizeT>(des_item - des_src));
             generateHash();
         }
     }
 
     void resize(SizeT new_size) {
-        HAItem_T_ *       current  = Storage();
-        HAItem_T_ *       src_item = current;
-        const HashTable_ *src_ht   = getHashTable();
-        const HAItem_T_ * end      = End();
+        HAItem_T_ *       current = Storage();
+        const HashTable_ *src_ht  = getHashTable();
 
         setCapacity(new_size);
         allocate();
 
-        HAItem_T_ * des_item = Storage();
+        HAItem_T_ * des_src  = Storage();
+        HAItem_T_ * des_item = des_src;
         HashTable_ *des_ht   = getHashTable();
 
-        while (src_item != end) {
+        for (HAItem_T_ *src_item = current, *end = (current + Size());
+             src_item != end; src_ht++, src_item++) {
             if (src_ht->Hash != 0) {
                 des_ht->Hash = src_ht->Hash;
                 Memory::Construct(
@@ -627,40 +599,34 @@ class HArray {
                 ++des_ht;
                 ++des_item;
             }
-
-            ++src_ht;
-            ++src_item;
         }
 
-        setSize(static_cast<SizeT>(des_item - Storage()));
+        setSize(static_cast<SizeT>(des_item - des_src));
         deallocate(current);
         generateHash();
     }
 
     void generateHash() const noexcept {
-        SizeT             i    = 0;
-        const SizeT       base = getBase();
-        HashTable_ *      src  = getHashTable();
-        HashTable_ *      item = src;
-        const HashTable_ *end  = (getHashTable() + Size());
+        SizeT       i    = 1;
+        const SizeT base = getBase();
+        HashTable_ *src  = getHashTable();
 
-        while (item != end) {
+        for (HashTable_ *item = src, *end = (src + Size()); item != end;
+             item++, i++) {
             SizeT *index = &((src + (item->Hash & base))->Position);
 
             while (*index != 0) {
                 index = &(src[(*index) - 1].Next);
             }
 
-            ++i;
             *index     = i;
             item->Next = 0;
-            ++item;
         }
     }
 
-#ifdef QENTEM_POINTER_TAGGING
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
     union {
-        unsigned long long int_;
+        unsigned long long int_ : 48;
         HAItem_T_ *        ptr_;
     } storage_{0};
 #else

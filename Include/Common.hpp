@@ -33,7 +33,7 @@
 // 64bit arch only uses the lower 48 bits for pointers,
 // the upper 16 bits can be used for taging.
 #ifndef QENTEM_POINTER_TAGGING
-#define QENTEM_POINTER_TAGGING
+#define QENTEM_POINTER_TAGGING 1
 #endif
 #endif
 
@@ -68,6 +68,16 @@
 #endif
 
 namespace Qentem {
+
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+union TaggedPointer {
+    TaggedPointer(void *ptr)
+        : Number{reinterpret_cast<unsigned long long>(ptr)} {}
+
+    unsigned long long Number;
+    unsigned long long Number48 : 48;
+};
+#endif
 
 #ifdef QENTEM_64BIT_ARCH
 using ULSizeT = unsigned long long;
