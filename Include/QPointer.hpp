@@ -69,20 +69,22 @@ struct QPointer {
 #endif
 
   private:
+    struct Tag_ {
+#ifndef QENTEM_BIG_ENDIAN
+        unsigned long long int_ptr_ : 48;
+        unsigned long long low_ : 8;
+        unsigned long long high_ : 8;
+#else
+        unsigned long long high_ : 8;
+        unsigned long long low_ : 8;
+        unsigned long long int_ptr_ : 48;
+#endif
+    };
+
     union {
         Type_ *ptr_{nullptr};
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        struct {
-#ifndef QENTEM_BIG_ENDIAN
-            unsigned long long int_ptr_ : 48;
-            unsigned long long low_ : 8;
-            unsigned long long high_ : 8;
-#else
-            unsigned long long high_ : 8;
-            unsigned long long low_ : 8;
-            unsigned long long int_ptr_ : 48;
-#endif
-        } tag_;
+        Tag_ tag_;
 #endif
     };
 };
