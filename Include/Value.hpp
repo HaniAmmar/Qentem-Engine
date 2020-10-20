@@ -1319,8 +1319,8 @@ class Value {
             SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
-        const Char_T_ *padding_{nullptr};
-        Number_T_      number_;
+        const void *padding_{nullptr};
+        Number_T_   number_;
     };
 
     union {
