@@ -42,11 +42,11 @@ struct QPointer {
     void Set(Type_ *ptr) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         const unsigned char tag_h = tag_.high_;
-        const unsigned char tag_l = tag_.low_;
+        // const unsigned char tag_l = tag_.low_;
 
         ptr_       = ptr;
         tag_.high_ = tag_h;
-        tag_.low_  = tag_l;
+        // tag_.low_  = tag_l;
 #else
         ptr_ = ptr;
 #endif
@@ -64,8 +64,9 @@ struct QPointer {
     void          SetHighTag(unsigned char tag) noexcept { tag_.high_ = tag; }
     unsigned char GetHighTag() const noexcept { return tag_.high_; }
 
-    void          SetLowTag(unsigned char tag) noexcept { tag_.low_ = tag; }
-    unsigned char GetLowTag() const noexcept { return tag_.low_; }
+// LowTag is not needed at the moment
+//     void          SetLowTag(unsigned char tag) noexcept { tag_.low_ = tag; }
+//     unsigned char GetLowTag() const noexcept { return tag_.low_; }
 #endif
 
   private:
