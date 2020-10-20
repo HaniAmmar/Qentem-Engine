@@ -69,23 +69,6 @@
 
 namespace Qentem {
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-union TaggedPointer {
-    TaggedPointer(void *ptr)
-        : Number{reinterpret_cast<unsigned long long>(ptr)} {}
-
-    unsigned long long Number;
-#ifndef QENTEM_BIG_ENDIAN
-    unsigned long long Number48 : 48;
-#else
-    struct {
-        short              Number16;
-        unsigned long long Number48 : 48;
-    };
-#endif
-};
-#endif
-
 #ifdef QENTEM_64BIT_ARCH
 using ULSizeT = unsigned long long;
 #else
