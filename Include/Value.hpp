@@ -587,7 +587,7 @@ class Value {
     }
 
     inline ValueType Type() const noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         return static_cast<ValueType>(type_.Value.GetHighTag());
 #else
         return type_;
@@ -1173,7 +1173,7 @@ class Value {
     struct VType_; // For tagging pointers
 
     inline void setType(ValueType new_type) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         type_.Value.SetHighTag(static_cast<unsigned char>(new_type));
 #else
         type_ = new_type;
@@ -1328,7 +1328,7 @@ class Value {
         VArray  array_;
         VString string_;
         VNumber number_;
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         VType_ type_;
     };
 

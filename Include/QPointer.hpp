@@ -40,47 +40,47 @@ struct QPointer {
     void Set(const QPointer &src) noexcept { ptr_ = src.ptr_; }
 
     void Set(Type_ *ptr) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        const unsigned char tag_h = tag_.tag_high;
-        const unsigned char tag_l = tag_.tag_low;
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        const unsigned char tag_h = tag_.high_;
+        const unsigned char tag_l = tag_.low_;
 
-        ptr_          = ptr;
-        tag_.tag_high = tag_h;
-        tag_.tag_low  = tag_l;
+        ptr_       = ptr;
+        tag_.high_ = tag_h;
+        tag_.low_  = tag_l;
 #else
         ptr_ = ptr;
 #endif
     }
 
     Type_ *GetPointer() const noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-        return reinterpret_cast<Type_ *>(tag_.int_);
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        return reinterpret_cast<Type_ *>(tag_.int_ptr_);
 #else
         return ptr_;
 #endif
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
-    void SetHighTag(unsigned char tag) noexcept { tag_.tag_high = tag; }
-    unsigned char GetHighTag() const noexcept { return tag_.tag_high; }
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+    void          SetHighTag(unsigned char tag) noexcept { tag_.high_ = tag; }
+    unsigned char GetHighTag() const noexcept { return tag_.high_; }
 
-    void          SetLowTag(unsigned char tag) noexcept { tag_.tag_low = tag; }
-    unsigned char GetLowTag() const noexcept { return tag_.tag_low; }
+    void          SetLowTag(unsigned char tag) noexcept { tag_.low_ = tag; }
+    unsigned char GetLowTag() const noexcept { return tag_.low_; }
 #endif
 
   private:
     union {
         Type_ *ptr_{nullptr};
-#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         struct {
 #ifndef QENTEM_BIG_ENDIAN
-            unsigned long long int_ : 48;
-            unsigned long long tag_low : 8;
-            unsigned long long tag_high : 8;
+            unsigned long long int_ptr_ : 48;
+            unsigned long long low_ : 8;
+            unsigned long long high_ : 8;
 #else
-            unsigned long long tag_high : 8;
-            unsigned long long tag_low : 8;
-            unsigned long long int_ : 48;
+            unsigned long long high_ : 8;
+            unsigned long long low_ : 8;
+            unsigned long long int_ptr_ : 48;
 #endif
         } tag_;
 #endif
