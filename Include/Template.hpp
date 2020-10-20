@@ -194,6 +194,12 @@ struct Template {
 
     template <typename Char_T_>
     struct TagBit {
+#ifdef QENTEM_BIG_ENDIAN
+        static constexpr unsigned char type_index = 0;
+#else
+        static constexpr unsigned char type_index = 7;
+#endif
+
         using LoopData_ = LoopData_T<Char_T_>;
 
       public:
@@ -202,16 +208,18 @@ struct Template {
         TagBit(const TagBit &tag) = delete;
         TagBit &operator=(const TagBit &tag) = delete;
 
-        TagBit(TagType type, SizeT offset, SizeT content_offset,
-               SizeT end_offset, LoopData_ *loop_data) noexcept
-            : offset_(offset), content_offset_(content_offset),
-              end_offset_(end_offset), type_(type), loop_data_(loop_data) {}
+        TagBit(TagType type, SizeT offset, SizeT end_offset, void *ptr) noexcept
+            : offset_(offset), end_offset_(end_offset), data_(ptr) {
+            setType(type);
+        }
 
         TagBit(TagBit &&tag) noexcept
-            : offset_(tag.offset_), content_offset_(tag.content_offset_),
-              end_offset_(tag.end_offset_), type_(tag.type_),
-              loop_data_(tag.loop_data_) {
-            tag.loop_data_ = nullptr;
+            : offset_(tag.offset_), end_offset_(tag.end_offset_),
+              data_(tag.data_) {
+            tag.clearData();
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+            type_ = tag.type_;
+#endif
         }
 
         ~TagBit() { Reset(); }
@@ -220,38 +228,75 @@ struct Template {
             if (this != &tag) {
                 Reset();
 
-                type_           = tag.type_;
-                offset_         = tag.offset_;
-                content_offset_ = tag.content_offset_;
-                end_offset_     = tag.end_offset_;
-                loop_data_      = tag.loop_data_;
+                offset_     = tag.offset_;
+                end_offset_ = tag.end_offset_;
+#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+                type_ = tag.type_;
+#endif
+                data_ = tag.data_;
 
-                tag.loop_data_ = nullptr;
+                tag.setData(nullptr);
             }
 
             return *this;
         }
 
         void Reset() {
-            if (loop_data_ != nullptr) {
-                Memory::Destruct(loop_data_);
-                Memory::Deallocate(loop_data_);
-                loop_data_ = nullptr;
+            LoopData_ *loop_data = LoopData();
+
+            if (loop_data != nullptr) {
+                Memory::Destruct(loop_data);
+                Memory::Deallocate(loop_data);
+                setData(nullptr);
             }
         }
 
-        inline LoopData_ *LoopData() const noexcept { return loop_data_; }
-        inline TagType    Type() const noexcept { return type_; }
-        inline SizeT      Offset() const noexcept { return offset_; }
-        inline SizeT ContentOffset() const noexcept { return content_offset_; }
+        inline LoopData_ *LoopData() const noexcept {
+            return static_cast<LoopData_ *>(getData());
+        }
+
+        inline TagType GetType() const noexcept {
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+            return (data_.type_[type_index]);
+#else
+            return type_;
+#endif
+        }
+
+        inline SizeT Offset() const noexcept { return offset_; }
         inline SizeT EndOffset() const noexcept { return end_offset_; }
 
       private:
-        SizeT      offset_{0};
-        SizeT      content_offset_{0};
-        SizeT      end_offset_{0};
-        TagType    type_{TagType::Variable};
-        LoopData_ *loop_data_{nullptr};
+        void clearData() noexcept { setData(nullptr); }
+
+#if defined(QENTEM_POINTER_TAGGING) && QENTEM_POINTER_TAGGING == 1
+        void setType(TagType type) noexcept { data_.type_[type_index] = type; }
+        void setData(void *new_data) noexcept { data_.ptr_ = new_data; }
+
+        inline void *getData() const noexcept {
+            return reinterpret_cast<void *>(data_.int_);
+        }
+
+        SizeT offset_{0};
+        SizeT end_offset_{0};
+
+        union Data_U_ {
+            Data_U_(void *p) : ptr_{p} {}
+            void *             ptr_;
+            unsigned long long int_ : 48;
+            TagType            type_[8];
+        } data_{nullptr};
+
+#else
+        void         setType(TagType type) noexcept { type_ = type; }
+        void         setData(void *new_data) noexcept { data_ = new_data; }
+        inline void *getData() const noexcept { return data_; }
+
+        SizeT   offset_{0};
+        SizeT   end_offset_{0};
+        TagType type_{TagType::Variable};
+        void *  data_{nullptr};
+#endif
     };
 };
 
@@ -342,8 +387,7 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::Variable, offset,
-                                                   current_offset, end_offset,
-                                                   nullptr};
+                                                   end_offset, nullptr};
 
                                     if (tags.IsFull()) {
                                         return;
@@ -383,8 +427,7 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::Math, offset,
-                                                   current_offset, end_offset,
-                                                   nullptr};
+                                                   end_offset, nullptr};
 
                                     if (tags.IsFull()) {
                                         return;
@@ -425,8 +468,7 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::InLineIf, offset,
-                                                   current_offset, end_offset,
-                                                   nullptr};
+                                                   end_offset, nullptr};
 
                                     if (tags.IsFull()) {
                                         return;
@@ -471,8 +513,7 @@ class Template_CV {
 
                             if (end_offset != 0) {
                                 tags +=
-                                    TagBit{TagType::Loop, offset,
-                                           current_offset, end_offset,
+                                    TagBit{TagType::Loop, offset, end_offset,
                                            Memory::AllocateInit<LoopData_>()};
 
                                 if (tags.IsFull()) {
@@ -509,9 +550,8 @@ class Template_CV {
                                 current_offset, length);
 
                             if (end_offset != 0) {
-                                tags +=
-                                    TagBit{TagType::If, offset, current_offset,
-                                           end_offset, nullptr};
+                                tags += TagBit{TagType::If, offset, end_offset,
+                                               nullptr};
 
                                 if (tags.IsFull()) {
                                     return;
@@ -539,51 +579,65 @@ class Template_CV {
             ss_->Insert((content + previous_offset),
                         (tag->Offset() - previous_offset));
 
-            switch (tag->Type()) {
+            switch (tag->GetType()) {
                 case TagType::Variable: {
-                    renderVariable(
-                        (content + tag->ContentOffset()),
-                        ((tag->EndOffset() - 1) - tag->ContentOffset()));
+                    const SizeT content_offset =
+                        tag->Offset() +
+                        TemplatePatterns_C_::VariablePrefixLength;
+
+                    renderVariable((content + content_offset),
+                                   ((tag->EndOffset() - 1) - content_offset));
 
                     // - 1 is - TemplatePatterns_C_::InLineSuffixLength
                     break;
                 }
 
                 case TagType::Math: {
-                    renderMath((content + tag->ContentOffset()),
-                               ((tag->EndOffset() - 1) - tag->ContentOffset()));
+                    const SizeT content_offset =
+                        tag->Offset() + TemplatePatterns_C_::MathPrefixLength;
+
+                    renderMath((content + content_offset),
+                               ((tag->EndOffset() - 1) - content_offset));
 
                     // - 1 is - TemplatePatterns_C_::InLineSuffixLength
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    renderInLineIf(
-                        (content + tag->ContentOffset()),
-                        ((tag->EndOffset() - 1) - tag->ContentOffset()));
+                    const SizeT content_offset =
+                        tag->Offset() +
+                        TemplatePatterns_C_::InLineIfPrefixLength;
+
+                    renderInLineIf((content + content_offset),
+                                   ((tag->EndOffset() - 1) - content_offset));
 
                     // - 1 is - TemplatePatterns_C_::InLineSuffixLength
                     break;
                 }
 
                 case TagType::Loop: {
+                    const SizeT content_offset =
+                        tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
+
                     if (tag->LoopData()->Content.IsNotEmpty()) { // Cached
-                        generateLoopContent((content + tag->ContentOffset()),
+                        generateLoopContent((content + content_offset),
                                             tag->LoopData());
                     } else {
-                        renderLoop(tag->LoopData(),
-                                   (content + tag->ContentOffset()),
+                        renderLoop(tag->LoopData(), (content + content_offset),
                                    ((tag->EndOffset() -
                                      TemplatePatterns_C_::LoopSuffixLength) -
-                                    tag->ContentOffset()));
+                                    content_offset));
                     }
 
                     break;
                 }
 
                 case TagType::If: {
-                    renderIf((content + tag->ContentOffset()),
-                             (tag->EndOffset() - tag->ContentOffset()));
+                    const SizeT content_offset =
+                        tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
+
+                    renderIf((content + content_offset),
+                             (tag->EndOffset() - content_offset));
                 }
             }
 
