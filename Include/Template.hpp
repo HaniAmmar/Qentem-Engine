@@ -202,9 +202,13 @@ struct Template {
         TagBit(const TagBit &tag) = delete;
         TagBit &operator=(const TagBit &tag) = delete;
 
-        TagBit(TagType type, SizeT offset, SizeT end_offset, void *ptr) noexcept
-            : offset_(offset), end_offset_(end_offset), data_(ptr) {
+        TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept
+            : offset_(offset), end_offset_(end_offset) {
             setType(type);
+
+            if (type == TagType::Loop) {
+                setData(Memory::AllocateInit<LoopData_>());
+            }
         }
 
         TagBit(TagBit &&tag) noexcept
@@ -239,7 +243,7 @@ struct Template {
             if (loop_data != nullptr) {
                 Memory::Destruct(loop_data);
                 Memory::Deallocate(loop_data);
-                setData(nullptr);
+                clearData();
             }
         }
 
@@ -366,7 +370,7 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::Variable, offset,
-                                                   end_offset, nullptr};
+                                                   end_offset};
 
                                     if (tags.IsFull()) {
                                         return;
@@ -406,7 +410,7 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::Math, offset,
-                                                   end_offset, nullptr};
+                                                   end_offset};
 
                                     if (tags.IsFull()) {
                                         return;
@@ -447,7 +451,7 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::InLineIf, offset,
-                                                   end_offset, nullptr};
+                                                   end_offset};
 
                                     if (tags.IsFull()) {
                                         return;
@@ -492,8 +496,7 @@ class Template_CV {
 
                             if (end_offset != 0) {
                                 tags +=
-                                    TagBit{TagType::Loop, offset, end_offset,
-                                           Memory::AllocateInit<LoopData_>()};
+                                    TagBit{TagType::Loop, offset, end_offset};
 
                                 if (tags.IsFull()) {
                                     return;
@@ -529,8 +532,7 @@ class Template_CV {
                                 current_offset, length);
 
                             if (end_offset != 0) {
-                                tags += TagBit{TagType::If, offset, end_offset,
-                                               nullptr};
+                                tags += TagBit{TagType::If, offset, end_offset};
 
                                 if (tags.IsFull()) {
                                     return;
