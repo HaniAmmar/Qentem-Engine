@@ -30,12 +30,34 @@ namespace Qentem {
 template <typename Type_>
 struct QPointer {
   public:
-    QPointer() = default;
-    QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
-    QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} {}
+    QPointer()  = default;
+    ~QPointer() = default;
+    explicit QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
+    QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} { src.ptr_ = nullptr; }
     QPointer(const QPointer &src) noexcept : ptr_{src.ptr_} {}
-    QPointer &operator=(QPointer &&) = delete;
-    QPointer &operator=(const QPointer &) = delete;
+    QPointer &operator=(QPointer &&src) noexcept {
+        if (this != &src) {
+            Set(src.ptr_);
+            src.ptr_ = nullptr;
+        }
+
+        return *this;
+    }
+
+    QPointer &operator=(const QPointer &src) noexcept {
+        if (this != &src) {
+            Set(src.ptr_);
+        }
+
+        return *this;
+    }
+
+    void Reset() noexcept { ptr_ = nullptr; }
+
+    void Set(QPointer &&src) noexcept {
+        ptr_     = src.ptr_;
+        src.ptr_ = nullptr;
+    }
 
     void Set(const QPointer &src) noexcept { ptr_ = src.ptr_; }
 

@@ -1289,7 +1289,7 @@ class Value {
         VNumber() = default;
 
         template <typename Number_T_>
-        explicit VNumber(Number_T_ num) noexcept : number_{num} {}
+        explicit VNumber(const Number_T_ &num) noexcept : number_{num} {}
 
         inline void SetNumber(double num) noexcept { number_.d = num; }
 

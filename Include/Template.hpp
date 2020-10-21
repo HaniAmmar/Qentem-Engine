@@ -209,8 +209,7 @@ struct Template {
 
         TagBit(TagBit &&tag) noexcept
             : offset_(tag.offset_), end_offset_(tag.end_offset_),
-              data_(tag.data_) {
-            tag.clearData();
+              data_(static_cast<QPointer<void> &&>(tag.data_)) {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             type_ = tag.type_;
 #endif
@@ -224,13 +223,11 @@ struct Template {
 
                 offset_     = tag.offset_;
                 end_offset_ = tag.end_offset_;
-                data_.Set(tag.data_);
+                data_.Set(static_cast<QPointer<void> &&>(tag.data_));
 
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
                 type_ = tag.type_;
 #endif
-
-                tag.setData(nullptr);
             }
 
             return *this;
@@ -269,7 +266,7 @@ struct Template {
 #endif
         }
 
-        void         clearData() noexcept { setData(nullptr); }
+        void         clearData() noexcept { data_.Reset(); }
         void         setData(void *new_data) noexcept { data_.Set(new_data); }
         inline void *getData() const noexcept { return data_.GetPointer(); }
 

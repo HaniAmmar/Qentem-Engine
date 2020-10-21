@@ -38,8 +38,8 @@ class String {
     String() = default;
 
     String(String &&src) noexcept
-        : storage_(src.storage_), length_(src.Length()) {
-        src.clearStorage();
+        : storage_(static_cast<QPointer<Char_T_> &&>(src.storage_)),
+          length_(src.Length()) {
         src.setLength(0);
     }
 
@@ -78,9 +78,8 @@ class String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());
-            setStorage(src.Storage());
+            storage_ = static_cast<QPointer<Char_T_> &&>(src.storage_);
             setLength(src.Length());
-            src.clearStorage();
             src.setLength(0);
         }
 

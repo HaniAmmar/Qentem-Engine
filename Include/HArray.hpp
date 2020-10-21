@@ -73,9 +73,8 @@ class HArray {
     }
 
     HArray(HArray &&src) noexcept
-        : storage_(src.storage_), index_(src.Size()),
-          capacity_(src.Capacity()) {
-        src.clearStorage();
+        : storage_(static_cast<QPointer<HAItem_T_> &&>(src.storage_)),
+          index_(src.Size()), capacity_(src.Capacity()) {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -91,11 +90,10 @@ class HArray {
                 deallocate(current);
             }
 
-            setStorage(src.Storage());
+            storage_ = static_cast<QPointer<HAItem_T_> &&>(src.storage_);
             setSize(src.Size());
             setCapacity(src.Capacity());
 
-            src.clearStorage();
             src.setSize(0);
             src.setCapacity(0);
         }

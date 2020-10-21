@@ -43,9 +43,8 @@ class Array {
     }
 
     Array(Array &&src) noexcept
-        : storage_(src.storage_), index_(src.Size()),
-          capacity_(src.Capacity()) {
-        src.clearStorage();
+        : storage_(static_cast<QPointer<Type_> &&>(src.storage_)),
+          index_(src.Size()), capacity_(src.Capacity()) {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -72,14 +71,6 @@ class Array {
         }
     }
 
-    Type_ &operator[](SizeT index) const {
-        if (index < Size()) {
-            return Storage()[index];
-        }
-
-        throw 1; // Index out of range
-    }
-
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
             Type_ *current = Storage();
@@ -89,11 +80,10 @@ class Array {
                 deallocate(current);
             }
 
-            setStorage(src.Storage());
+            storage_ = static_cast<QPointer<Type_> &&>(src.storage_);
             setSize(src.Size());
             setCapacity(src.Capacity());
 
-            src.clearStorage();
             src.setSize(0);
             src.setCapacity(0);
         }
@@ -114,6 +104,14 @@ class Array {
         }
 
         return *this;
+    }
+
+    Type_ &operator[](SizeT index) const {
+        if (index < Size()) {
+            return Storage()[index];
+        }
+
+        throw 1; // Index out of range
     }
 
     void operator+=(Array &&src) {
