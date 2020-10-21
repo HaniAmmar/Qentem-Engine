@@ -96,15 +96,15 @@ struct StringUtils {
     template <typename Char_T_>
     static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
                         SizeT length) noexcept {
-        if ((left != nullptr) && (right != nullptr)) {
-            while ((length != 0) && (*left == *right)) {
-                ++left;
-                ++right;
-                --length;
-            }
-        }
+        SizeT offset = 0;
 
-        return (length == 0);
+        // if ((left != nullptr) && (right != nullptr)) {
+        while ((length != offset) && (left[offset] == right[offset])) {
+            ++offset;
+        }
+        // }
+
+        return (length == offset);
     }
 
     template <typename Char_T_>
