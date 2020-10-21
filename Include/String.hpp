@@ -45,23 +45,20 @@ class String {
 
     String(const String &src) : length_(src.Length()) {
         if (IsNotEmpty()) {
-            allocate(Length() + 1);
-            Char_T_ *des = Storage();
+            Char_T_ *des = allocate(Length() + 1);
             Memory::Copy(des, src.First(), (Length() * sizeof(Char_T_)));
             des[Length()] = 0;
         }
     }
 
     explicit String(SizeT len) : length_(len) {
-        allocate(len + 1);
-        Storage()[Length()] = 0;
+        allocate(len + 1)[Length()] = 0;
     }
 
     String(Char_T_ *str, SizeT len) noexcept : length_(len) { setStorage(str); }
 
     String(const Char_T_ *str, SizeT len) : length_(len) {
-        allocate(len + 1);
-        Char_T_ *des = Storage();
+        Char_T_ *des = allocate(len + 1);
 
         if (len != 0) {
             Memory::Copy(des, str, (Length() * sizeof(Char_T_)));
@@ -90,8 +87,7 @@ class String {
         if (this != &src) {
             deallocate(Storage());
             setLength(src.Length());
-            allocate(Length() + 1);
-            Char_T_ *des = Storage();
+            Char_T_ *des = allocate(Length() + 1);
             Memory::Copy(des, src.First(), (Length() * sizeof(Char_T_)));
             des[Length()] = 0;
         }
@@ -103,9 +99,8 @@ class String {
         SizeT len = StringUtils::Count(str);
 
         deallocate(Storage());
-        allocate(len + 1);
         setLength(len);
-        Char_T_ *des = Storage();
+        Char_T_ *des = allocate(len + 1);
 
         if (len != 0) {
             Memory::Copy(des, str, (len * sizeof(Char_T_)));
@@ -245,13 +240,12 @@ class String {
 
     QENTEM_NOINLINE void Insert(const Char_T_ *str, SizeT len) {
         if ((str != nullptr) && (len != 0)) {
-            Char_T_ *old_str = Storage();
-            allocate(Length() + len + 1);
-            Char_T_ *des = Storage();
+            Char_T_ *src = Storage();
+            Char_T_ *des = allocate(Length() + len + 1);
 
-            if (old_str != nullptr) {
-                Memory::Copy(des, old_str, (Length() * sizeof(Char_T_)));
-                deallocate(old_str);
+            if (src != nullptr) {
+                Memory::Copy(des, src, (Length() * sizeof(Char_T_)));
+                deallocate(src);
             }
 
             Memory::Copy((des + Length()), str, (len * sizeof(Char_T_)));
@@ -270,9 +264,11 @@ class String {
     //////////// Private ////////////
 
   private:
-    void setStorage(Char_T_ *ptr) noexcept { storage_.Set(ptr); }
-    void allocate(SizeT new_size) {
-        setStorage(Memory::Allocate<Char_T_>(new_size));
+    void     setStorage(Char_T_ *ptr) noexcept { storage_.Set(ptr); }
+    Char_T_ *allocate(SizeT new_size) {
+        Char_T_ *new_storage = Memory::Allocate<Char_T_>(new_size);
+        setStorage(new_storage);
+        return new_storage;
     }
 
     void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }

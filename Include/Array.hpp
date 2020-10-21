@@ -51,9 +51,8 @@ class Array {
 
     Array(const Array &src) : capacity_(src.Size()) {
         if (Capacity() != 0) {
-            allocate();
             setSize(src.Size());
-            Type_ *des = Storage();
+            Type_ *des = allocate();
 
             for (const Type_ *item = src.First(), *end = (item + src.Size());
                  item != end; item++, des++) {
@@ -285,8 +284,12 @@ class Array {
     //////////// Private ////////////
 
   private:
-    void setStorage(Type_ *ptr) noexcept { storage_.Set(ptr); }
-    void allocate() { setStorage(Memory::Allocate<Type_>(Capacity())); }
+    void   setStorage(Type_ *ptr) noexcept { storage_.Set(ptr); }
+    Type_ *allocate() {
+        Type_ *new_storage = Memory::Allocate<Type_>(Capacity());
+        setStorage(new_storage);
+        return new_storage;
+    }
     void deallocate(Type_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
@@ -295,10 +298,10 @@ class Array {
     void resize(SizeT new_size) {
         Type_ *src = Storage();
         setCapacity(new_size);
-        allocate();
+        Type_ *des = allocate();
 
         if (IsNotEmpty()) {
-            Memory::Copy(Storage(), src, (Size() * sizeof(Type_)));
+            Memory::Copy(des, src, (Size() * sizeof(Type_)));
         }
 
         deallocate(src);
