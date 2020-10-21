@@ -39,6 +39,9 @@ namespace Qentem {
 
 template <typename Value_, typename Char_T_>
 struct HAItem {
+    SizeT           Position; // To maintain the order of the items.
+    SizeT           Next;
+    ULSizeT         Hash;
     String<Char_T_> Key;
     Value_          Value;
 };
@@ -46,12 +49,6 @@ struct HAItem {
 template <typename Value_, typename Char_T_>
 class HArray {
     using HAItem_T_ = HAItem<Value_, Char_T_>;
-
-    struct HashTable_ {
-        SizeT   Position; // To maintain the order of the items.
-        SizeT   Next;
-        ULSizeT Hash;
-    };
 
   public:
     HArray() = default;
@@ -117,19 +114,16 @@ class HArray {
             resize(algineSize(n_size));
         }
 
-        const HashTable_ *src_ht = src.getHashTable();
-
         for (HAItem_T_ *item = src.Storage(), *end = (item + src.Size()),
                        *des = Storage();
-             item != end; item++, src_ht++) {
-            if (src_ht->Hash != 0) {
+             item != end; item++) {
+            if (item->Hash != 0) {
                 SizeT *index;
-                find(index, item->Key.First(), item->Key.Length(),
-                     src_ht->Hash);
+                find(index, item->Key.First(), item->Key.Length(), item->Hash);
 
                 if (*index == 0) {
                     insert(index, static_cast<String<Char_T_> &&>(item->Key),
-                           src_ht->Hash);
+                           item->Hash);
                 } else {
                     item->Key.~String<Char_T_>();
                 }
@@ -151,18 +145,16 @@ class HArray {
             resize(algineSize(n_size));
         }
 
-        HAItem_T_ *       des    = Storage();
-        const HashTable_ *src_ht = src.getHashTable();
+        HAItem_T_ *des = Storage();
 
         for (const HAItem_T_ *item = src.First(), *end = item + src.Size();
-             item != end; item++, src_ht++) {
-            if (src_ht->Hash != 0) {
+             item != end; item++) {
+            if (item->Hash != 0) {
                 SizeT *index;
-                find(index, item->Key.First(), item->Key.Length(),
-                     src_ht->Hash);
+                find(index, item->Key.First(), item->Key.Length(), item->Hash);
 
                 if (*index == 0) {
-                    insert(index, String<Char_T_>(item->Key), src_ht->Hash);
+                    insert(index, String<Char_T_>(item->Key), item->Hash);
                 }
 
                 des[(*index) - 1].Value = Value_(item->Value);
@@ -236,24 +228,30 @@ class HArray {
     }
 
     Value_ *GetValue(SizeT index) const noexcept {
-        if ((index < Size()) && ((getHashTable() + index)->Hash != 0)) {
-            return &((Storage() + index)->Value);
+        HAItem_T_ *src = Storage();
+
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
+            return &((src + index)->Value);
         }
 
         return nullptr;
     }
 
     const String<Char_T_> *GetKey(SizeT index) const noexcept {
-        if ((index < Size()) && ((getHashTable() + index)->Hash != 0)) {
-            return &((Storage() + index)->Key);
+        HAItem_T_ *src = Storage();
+
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
+            return &((src + index)->Key);
         }
 
         return nullptr;
     }
 
     const HAItem_T_ *GetItem(SizeT index) const noexcept {
-        if ((index < Size()) && ((getHashTable() + index)->Hash != 0)) {
-            return (Storage() + index);
+        HAItem_T_ *src = Storage();
+
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
+            return (src + index);
         }
 
         return nullptr;
@@ -303,11 +301,10 @@ class HArray {
 
     void RemoveIndex(SizeT index) const noexcept {
         if (index < Size()) {
-            const HashTable_ *ht = (getHashTable() + index);
+            const HAItem_T_ *item = (Storage() + index);
 
-            if (ht->Hash != 0) {
-                const HAItem_T_ &item = Storage()[index];
-                remove(item.Key.First(), item.Key.Length(), ht->Hash);
+            if (item->Hash != 0) {
+                remove(item->Key.First(), item->Key.Length(), item->Hash);
             }
         }
     }
@@ -332,14 +329,13 @@ class HArray {
 
                 if (*right_index == 0) {
                     const SizeT offset = ((*left_index) - 1);
-                    HashTable_ *ht     = (getHashTable() + offset);
+                    HAItem_T_ * item   = (Storage() + offset);
                     *right_index       = *left_index;
-                    *left_index        = ht->Next;
-                    ht->Hash           = to_hash;
-                    ht->Next           = 0;
+                    *left_index        = item->Next;
+                    item->Hash         = to_hash;
+                    item->Next         = 0;
 
-                    HAItem_T_ *item = (Storage() + offset);
-                    item->Key       = static_cast<String<Char_T_> &&>(to);
+                    item->Key = static_cast<String<Char_T_> &&>(to);
                     return true;
                 }
             }
@@ -397,10 +393,10 @@ class HArray {
         if (Size() != 0) {
             SizeT n_size = 0;
 
-            for (const HashTable_ *ht = getHashTable(), *end = (ht + Size());
-                 ht != end; ht++) {
+            for (const HAItem_T_ *item = Storage(), *end = (item + Size());
+                 item != end; item++) {
                 // Find the actual number of items.
-                n_size += (ht->Hash > 0);
+                n_size += (item->Hash > 0);
             }
 
             if (n_size == 0) {
@@ -437,35 +433,26 @@ class HArray {
   private:
     void setStorage(HAItem_T_ *ptr) noexcept { storage_.Set(ptr); }
     void clearPosition() noexcept {
-        for (HashTable_ *item = getHashTable(), *end = (item + Capacity());
+        for (HAItem_T_ *item = Storage(), *end = (item + Capacity());
              item != end; item++) {
             item->Position = 0;
         }
     }
 
-    void allocate() {
-        /*--------------------------------*/
-        /*| Item       | Hash Table      |*/
-        /*| Key, Value | Pos, Next, Hash |*/
-        /*--------------------------------*/
-
-        const SizeT size = static_cast<SizeT>(
-            (sizeof(HAItem_T_) + sizeof(HashTable_)) * Capacity());
-
-        setStorage(reinterpret_cast<HAItem_T_ *>(Memory::Allocate<char>(size)));
+    HAItem_T_ *allocate() {
+        HAItem_T_ *new_storage = Memory::Allocate<HAItem_T_>(Capacity());
+        setStorage(new_storage);
         clearPosition();
+
+        return new_storage;
     }
 
     void deallocate(HAItem_T_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
-    SizeT       getBase() const noexcept { return (Capacity() - 1); }
-    HashTable_ *getHashTable() const noexcept {
-        return reinterpret_cast<HashTable_ *>(Storage() + Capacity());
-    }
-
-    void grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
+    SizeT getBase() const noexcept { return (Capacity() - 1); }
+    void  grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
 
     SizeT algineSize(SizeT n_size) noexcept {
         const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
@@ -479,30 +466,27 @@ class HArray {
 
     void find(SizeT *&index, const Char_T_ *key, SizeT length,
               ULSizeT hash) const noexcept {
-        HashTable_ *ht       = getHashTable();
-        index                = &((ht + (hash & getBase()))->Position);
-        const HAItem_T_ *src = Storage();
+        HAItem_T_ *src = Storage();
+        index          = &((src + (hash & getBase()))->Position);
 
         while (*index != 0) {
-            HashTable_ *item       = &(ht[(*index) - 1]);
-            SizeT *     next_index = &(item->Next); // To avoid cache misses.
+            HAItem_T_ *item = &(src[(*index) - 1]);
 
             if (((item->Hash == hash) &&
                  (src + ((*index) - 1))->Key.IsEqual(key, length))) {
                 return;
             }
 
-            index = next_index;
+            index = &(item->Next);
         }
     }
 
     inline void insert(SizeT *index, String<Char_T_> &&key,
                        ULSizeT hash) noexcept {
-        HashTable_ *ht = (getHashTable() + Size());
-        ht->Next       = 0;
-        ht->Hash       = hash;
-
         HAItem_T_ *item = (Storage() + Size());
+        item->Next      = 0;
+        item->Hash      = hash;
+
         ++index_;
         *index = Size();
 
@@ -517,14 +501,13 @@ class HArray {
 
             if (*index != 0) {
                 const SizeT offset = ((*index) - 1);
-                HashTable_ *ht     = (getHashTable() + offset);
-                *index             = ht->Next;
-                ht->Hash           = 0;
-                ht->Next           = 0;
+                HAItem_T_ * item   = (Storage() + offset);
+                *index             = item->Next;
+                item->Hash         = 0;
+                item->Next         = 0;
 
-                HAItem_T_ *item = (Storage() + offset);
-                item->Key       = String<Char_T_>();
-                item->Value     = Value_();
+                item->Key   = String<Char_T_>();
+                item->Value = Value_();
             }
         }
     }
@@ -532,28 +515,23 @@ class HArray {
     QENTEM_NOINLINE void copyArray(const HArray &src) {
         // The function Reset() has to be called before this.
         if (src.Size() != 0) {
-            const HAItem_T_ * src_item = src.First();
-            const HAItem_T_ * end      = (src_item + src.Size());
-            const HashTable_ *src_ht   = src.getHashTable();
+            const HAItem_T_ *src_item = src.First();
+            const HAItem_T_ *end      = (src_item + src.Size());
 
             setCapacity(algineSize(src.Size()));
-            allocate();
 
-            HAItem_T_ * des_src  = Storage();
-            HAItem_T_ * des_item = des_src;
-            HashTable_ *des_ht   = getHashTable();
+            HAItem_T_ *des_src  = allocate();
+            HAItem_T_ *des_item = des_src;
 
             do {
-                if (src_ht->Hash != 0) {
-                    des_ht->Hash = src_ht->Hash;
+                if (src_item->Hash != 0) {
+                    des_item->Hash = src_item->Hash;
                     Memory::Construct(&(des_item->Key), src_item->Key);
                     Memory::Construct(&(des_item->Value), src_item->Value);
                     ++des_item;
-                    ++des_ht;
                 }
 
                 ++src_item;
-                ++src_ht;
             } while (src_item != end);
 
             setSize(static_cast<SizeT>(des_item - des_src));
@@ -562,41 +540,36 @@ class HArray {
     }
 
     void resize(SizeT new_size) {
-        HAItem_T_ *       current = Storage();
-        const HashTable_ *src_ht  = getHashTable();
+        HAItem_T_ *src = Storage();
 
         setCapacity(new_size);
-        allocate();
 
-        HAItem_T_ * des_src  = Storage();
-        HAItem_T_ * des_item = des_src;
-        HashTable_ *des_ht   = getHashTable();
+        HAItem_T_ *des      = allocate();
+        HAItem_T_ *des_item = des;
 
-        for (HAItem_T_ *src_item = current, *end = (current + Size());
-             src_item != end; src_ht++, src_item++) {
-            if (src_ht->Hash != 0) {
-                des_ht->Hash = src_ht->Hash;
-                Memory::Construct(
-                    &(des_item->Key),
-                    static_cast<String<Char_T_> &&>(src_item->Key));
+        for (HAItem_T_ *item = src, *end = (item + Size()); item != end;
+             item++) {
+            if (item->Hash != 0) {
+                des_item->Hash = item->Hash;
+                Memory::Construct(&(des_item->Key),
+                                  static_cast<String<Char_T_> &&>(item->Key));
                 Memory::Construct(&(des_item->Value),
-                                  static_cast<Value_ &&>(src_item->Value));
-                ++des_ht;
+                                  static_cast<Value_ &&>(item->Value));
                 ++des_item;
             }
         }
 
-        setSize(static_cast<SizeT>(des_item - des_src));
-        deallocate(current);
+        setSize(static_cast<SizeT>(des_item - des));
+        deallocate(src);
         generateHash();
     }
 
     void generateHash() const noexcept {
         SizeT       i    = 1;
         const SizeT base = getBase();
-        HashTable_ *src  = getHashTable();
+        HAItem_T_ * src  = Storage();
 
-        for (HashTable_ *item = src, *end = (src + Size()); item != end;
+        for (HAItem_T_ *item = src, *end = (item + Size()); item != end;
              item++, i++) {
             SizeT *index = &((src + (item->Hash & base))->Position);
 
