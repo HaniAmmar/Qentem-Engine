@@ -139,7 +139,7 @@ class Engine {
      * Returns an the index of a character + 1.
      */
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ FindOne(const Char_T_ one_char, const Char_T_ *content,
+    static Number_T_ FindOne(Char_T_ one_char, const Char_T_ *content,
                              Number_T_ offset, Number_T_ end_before) noexcept {
         while (offset < end_before) {
             if (one_char == content[offset]) {
@@ -173,14 +173,13 @@ class Engine {
 
         while (offset < end_before) {
             if (*pattern == content[offset]) {
-                Number_T_ tmp_offset = (offset + pattern_length);
-
-                if (pattern[pattern_length] == content[tmp_offset]) {
+                if (pattern[pattern_length] ==
+                    content[offset + pattern_length]) {
                     const Char_T_ *tmp_content = (content + offset);
-                    tmp_offset                 = 1;
+                    Number_T_      tmp_offset  = 1;
 
                     while ((tmp_offset != pattern_length) &&
-                           pattern[tmp_offset] == tmp_content[tmp_offset]) {
+                           (pattern[tmp_offset] == tmp_content[tmp_offset])) {
                         ++tmp_offset;
                     }
 
