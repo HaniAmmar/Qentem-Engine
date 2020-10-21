@@ -114,7 +114,7 @@ class String {
     String &operator+=(String &&src) {
         Insert(src.First(), src.Length());
         deallocate(src.Storage());
-        src.clearStorage();
+        src.storage_.Reset();
         src.setLength(0);
 
         return *this;
@@ -133,7 +133,7 @@ class String {
     String operator+(String &&src) const {
         String ns{Insert(*this, src)};
         src.deallocate(src.Storage());
-        src.clearStorage();
+        src.storage_.Reset();
         src.setLength(0);
 
         return ns;
@@ -201,7 +201,7 @@ class String {
 
     Char_T_ *Eject() noexcept {
         Char_T_ *str = Storage();
-        clearStorage();
+        storage_.Reset();
         setLength(0);
 
         return str;

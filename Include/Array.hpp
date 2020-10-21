@@ -136,7 +136,7 @@ class Array {
             src.deallocate(src.Storage());
         }
 
-        src.clearStorage();
+        src.storage_.Reset();
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -200,7 +200,7 @@ class Array {
 
     Type_ *Eject() noexcept {
         Type_ *tmp = Storage();
-        clearStorage();
+        storage_.Reset();
         setSize(0);
         setCapacity(0);
 

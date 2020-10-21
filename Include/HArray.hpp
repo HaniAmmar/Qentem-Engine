@@ -133,7 +133,7 @@ class HArray {
         }
 
         src.deallocate(src.Storage());
-        src.clearStorage();
+        src.storage_.Reset();
         src.setCapacity(0);
         src.setSize(0);
     }
