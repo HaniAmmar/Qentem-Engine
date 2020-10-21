@@ -30,7 +30,7 @@ namespace Qentem {
 template <typename Type_>
 struct QPointer {
   public:
-    QPointer()  = default;
+    QPointer() noexcept : ptr_{nullptr} {}
     ~QPointer() = default;
     explicit QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
     QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} { src.ptr_ = nullptr; }
@@ -105,7 +105,7 @@ struct QPointer {
     };
 
     union {
-        Type_ *ptr_{nullptr};
+        Type_ *ptr_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         Tag_ tag_;
 #endif
