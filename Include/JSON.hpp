@@ -54,14 +54,16 @@ class JSONParser {
   public:
     JSONParser() = default;
 
-    inline static VValue Parse(const Char_T_ *content, SizeT length) {
+    static VValue Parse(const Char_T_ *content, SizeT length) {
         JSONParser jp;
         SizeT      offset = 0;
         VValue     value;
 
         while (offset < length) {
-            if ((content[offset] == JSONotation_T_::SCurlyChar) ||
-                (content[offset] == JSONotation_T_::SSquareChar)) {
+            const Char_T_ c      = content[offset];
+            const bool    is_obj = (c == JSONotation_T_::SCurlyChar);
+
+            if (is_obj || (c == JSONotation_T_::SSquareChar)) {
                 while (offset != length) {
                     --length;
 
@@ -73,11 +75,9 @@ class JSONParser {
 
                         case JSONotation_T_::ECurlyChar:
                         case JSONotation_T_::ESquareChar: {
-                            const bool obj_child =
-                                (content[offset] == JSONotation_T_::SCurlyChar);
                             ++length;
 
-                            if (obj_child) {
+                            if (is_obj) {
                                 value = jp.parseObject(content, offset, length);
                             } else {
                                 value = jp.parseArray(content, offset, length);
@@ -151,8 +151,10 @@ class JSONParser {
             obj_value = parseValue(content, offset, length);
             StringUtils::StartTrim(content, offset, length);
 
-            if ((content[offset] != JSONotation_T_::CommaChar) ||
-                (content[offset] == JSONotation_T_::ECurlyChar)) {
+            const Char_T_ c = content[offset];
+
+            if ((c != JSONotation_T_::CommaChar) ||
+                (c == JSONotation_T_::ECurlyChar)) {
                 break;
             }
 
@@ -179,13 +181,15 @@ class JSONParser {
             arr += parseValue(content, offset, length);
             StringUtils::StartTrim(content, offset, length);
 
-            if (content[offset] == JSONotation_T_::ESquareChar) {
+            const Char_T_ c = content[offset];
+
+            if (c == JSONotation_T_::ESquareChar) {
                 ++offset;
                 arr.Compress();
                 return VValue{static_cast<VArray &&>(arr)};
             }
 
-            if (content[offset] != JSONotation_T_::CommaChar) {
+            if (c != JSONotation_T_::CommaChar) {
                 break;
             }
 
