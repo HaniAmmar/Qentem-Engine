@@ -1334,10 +1334,10 @@ class Value {
 
     struct VType_ {
       public:
-        QPointer<void> Value;
+        QPointer<void> Value{};
 
       private:
-        SizeT padding_[2];
+        SizeT padding_[2]{0, 0};
     };
 #else
     };
