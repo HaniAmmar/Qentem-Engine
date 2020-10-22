@@ -109,6 +109,9 @@ struct StringUtils {
 
     template <typename Char_T_>
     static ULSizeT Hash(const Char_T_ *key, SizeT length) noexcept {
+        static constexpr ULSizeT highest_bit =
+            (ULSizeT{1} << ((sizeof(ULSizeT) * 8) - 1));
+
         ULSizeT hash   = 11;
         SizeT   base   = 33;
         SizeT   offset = 0;
@@ -127,7 +130,7 @@ struct StringUtils {
             }
         }
 
-        return ((hash != 0) ? hash : 1); // Never return zero.
+        return (hash | highest_bit); // Never return zero.
     }
 };
 
