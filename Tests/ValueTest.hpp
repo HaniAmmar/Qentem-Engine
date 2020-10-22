@@ -3633,7 +3633,7 @@ static int TestIndexOperator1() {
     NOT_EQ_TO(value.GetValue(3), nullptr, "GetValue(3)", "null");
     NOT_EQ_TO(value.GetValue(4), nullptr, "GetValue(4)", "null");
     NOT_EQ_TO(value.GetValue(5), nullptr, "GetValue(5)", "null");
-    EQ_TO(value.GetValue("5", 1), nullptr, "GetValue(\"5\")", "null");
+    NOT_EQ_TO(value.GetValue("5", 1), nullptr, "GetValue(\"5\")", "null");
     EQ_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
     EQ_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
     EQ_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");

@@ -1997,8 +1997,11 @@ static int TestRender2() {
     value[3] = 5;
     value[4] = 10;
 
+    content = R"(<loop set="numbers" value="val_">val_</loop>)";
+    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+
     content =
-        R"(<loop set="numbers" value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
+        R"(<loop value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
     EQ_VALUE(Template::Render(content, &value), "15", "Render()");
 
     content =
