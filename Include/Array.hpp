@@ -43,8 +43,8 @@ class Array {
     }
 
     Array(Array &&src) noexcept
-        : storage_(static_cast<QPointer<Type_> &&>(src.storage_)),
-          index_(src.Size()), capacity_(src.Capacity()) {
+        : index_(src.Size()), capacity_(src.Capacity()),
+          storage_(static_cast<QPointer<Type_> &&>(src.storage_)) {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -79,9 +79,9 @@ class Array {
                 deallocate(current);
             }
 
-            storage_ = static_cast<QPointer<Type_> &&>(src.storage_);
             setSize(src.Size());
             setCapacity(src.Capacity());
+            storage_ = static_cast<QPointer<Type_> &&>(src.storage_);
 
             src.setSize(0);
             src.setCapacity(0);
@@ -117,9 +117,9 @@ class Array {
         if (Capacity() == 0) {
             // If the array hasn't allocated any memory, then there is no need
             // for rest.
-            setStorage(src.Storage());
             setSize(src.Size());
             setCapacity(src.Capacity());
+            setStorage(src.Storage());
         } else {
             const SizeT n_size = (Size() + src.Size());
 
@@ -136,9 +136,9 @@ class Array {
             src.deallocate(src.Storage());
         }
 
-        src.storage_.Reset();
         src.setSize(0);
         src.setCapacity(0);
+        src.storage_.Reset();
     }
 
     void operator+=(const Array &src) { copyArray(src); }
@@ -186,8 +186,8 @@ class Array {
         if (current != nullptr) {
             Memory::Destruct(current, End());
             deallocate(current);
-
             clearStorage();
+
             setSize(0);
             setCapacity(0);
         }
@@ -199,10 +199,10 @@ class Array {
     }
 
     Type_ *Eject() noexcept {
-        Type_ *tmp = Storage();
-        storage_.Reset();
         setSize(0);
         setCapacity(0);
+        Type_ *tmp = Storage();
+        storage_.Reset();
 
         return tmp;
     }
@@ -323,9 +323,9 @@ class Array {
         }
     }
 
-    QPointer<Type_> storage_{};
     SizeT           index_{0};
     SizeT           capacity_{0};
+    QPointer<Type_> storage_{};
 };
 
 } // namespace Qentem

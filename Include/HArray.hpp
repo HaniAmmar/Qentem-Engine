@@ -70,8 +70,8 @@ class HArray {
     }
 
     HArray(HArray &&src) noexcept
-        : storage_(static_cast<QPointer<HAItem_T_> &&>(src.storage_)),
-          index_(src.Size()), capacity_(src.Capacity()) {
+        : index_(src.Size()), capacity_(src.Capacity()),
+          storage_(static_cast<QPointer<HAItem_T_> &&>(src.storage_)) {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -87,9 +87,9 @@ class HArray {
                 deallocate(current);
             }
 
-            storage_ = static_cast<QPointer<HAItem_T_> &&>(src.storage_);
             setSize(src.Size());
             setCapacity(src.Capacity());
+            storage_ = static_cast<QPointer<HAItem_T_> &&>(src.storage_);
 
             src.setSize(0);
             src.setCapacity(0);
@@ -133,10 +133,10 @@ class HArray {
             }
         }
 
-        src.deallocate(src.Storage());
-        src.storage_.Reset();
         src.setCapacity(0);
         src.setSize(0);
+        src.deallocate(src.Storage());
+        src.storage_.Reset();
     }
 
     void operator+=(const HArray &src) {
@@ -168,7 +168,7 @@ class HArray {
             grow();
         }
 
-        SizeT         len  = StringUtils::Count(key);
+        const SizeT   len  = StringUtils::Count(key);
         const ULSizeT hash = StringUtils::Hash(key, len);
         SizeT *       index;
         HAItem_T_ *   item = find(index, key, len, hash);
@@ -468,8 +468,7 @@ class HArray {
         while (*index != 0) {
             HAItem_T_ *item = &(src[(*index) - 1]);
 
-            if (((item->Hash == hash) &&
-                 (src + ((*index) - 1))->Key.IsEqual(key, length))) {
+            if (((item->Hash == hash) && item->Key.IsEqual(key, length))) {
                 return item;
             }
 
@@ -580,9 +579,9 @@ class HArray {
         }
     }
 
-    QPointer<HAItem_T_> storage_{};
     SizeT               index_{0};
     SizeT               capacity_{0};
+    QPointer<HAItem_T_> storage_{};
 };
 
 } // namespace Qentem

@@ -48,11 +48,11 @@ class StringStream {
     }
 
     StringStream(StringStream &&src) noexcept
-        : storage_(src.Storage()), length_(src.Length()),
-          capacity_(src.Capacity()) {
-        src.clearStorage();
+        : length_(src.Length()), capacity_(src.Capacity()),
+          storage_(src.Storage()) {
         src.setLength(0);
         src.setCapacity(0);
+        src.clearStorage();
     }
 
     StringStream(const StringStream &src) {
@@ -70,9 +70,9 @@ class StringStream {
             setLength(src.Length());
             setCapacity(src.Capacity());
 
-            src.clearStorage();
             src.setLength(0);
             src.setCapacity(0);
+            src.clearStorage();
         }
 
         return *this;
@@ -81,10 +81,10 @@ class StringStream {
     StringStream &operator=(const StringStream &src) {
         if (this != &src) {
             if (First() != nullptr) {
-                deallocate(Storage());
-                clearStorage();
                 setLength(0);
                 setCapacity(0);
+                deallocate(Storage());
+                clearStorage();
             }
 
             Insert(src.First(), src.Length());
@@ -173,11 +173,11 @@ class StringStream {
     inline void Clear() noexcept { setLength(0); }
 
     void Reset() noexcept {
-        if (First() != nullptr) {
-            deallocate(Storage());
-            clearStorage();
+        if (Storage() != nullptr) {
             setLength(0);
             setCapacity(0);
+            deallocate(Storage());
+            clearStorage();
         }
     }
 
@@ -208,10 +208,10 @@ class StringStream {
     }
 
     Char_T_ *Eject() noexcept {
-        Char_T_ *str = Storage();
-        clearStorage();
         setLength(0);
         setCapacity(0);
+        Char_T_ *str = Storage();
+        clearStorage();
 
         return str;
     }
@@ -255,7 +255,7 @@ class StringStream {
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     SizeT algineSize(SizeT n_size) noexcept {
-        return (SizeT{2} << Platform::CLZ(n_size | 8));
+        return (SizeT{2} << Platform::CLZ(n_size | 4U));
     }
 
     void insert(const Char_T_ *str, const SizeT len) {
@@ -273,18 +273,18 @@ class StringStream {
     }
 
     void expand(SizeT new_capacity) {
-        Char_T_ *src     = Storage();
-        SizeT    src_cap = Capacity();
+        SizeT src_cap = Capacity();
         setCapacity(new_capacity);
+        Char_T_ *src = Storage();
         allocate();
 
         Memory::Copy(Storage(), src, (src_cap * sizeof(Char_T_)));
         deallocate(src);
     }
 
-    Char_T_ *storage_{nullptr};
     SizeT    length_{0};
     SizeT    capacity_{0};
+    Char_T_ *storage_{nullptr};
 };
 
 } // namespace Qentem

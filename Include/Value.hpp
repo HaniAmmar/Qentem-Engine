@@ -586,14 +586,6 @@ class Value {
         return (*this)[static_cast<SizeT>(index)];
     }
 
-    inline ValueType Type() const noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return static_cast<ValueType>(type_.Value.GetHighTag());
-#else
-        return type_;
-#endif
-    }
-
     inline bool IsUndefined() const noexcept {
         return (Type() == ValueType::Undefined);
     }
@@ -675,7 +667,7 @@ class Value {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            Value *val = (object_.Find(key, length));
+            Value *val = object_.Find(key, length);
 
             if ((val != nullptr) && !(val->IsUndefined())) {
                 return val;
@@ -823,10 +815,9 @@ class Value {
             }
 
             default: {
+                return false;
             }
         }
-
-        return false;
     }
 
     bool InsertString(StringStream<Char_T_> &ss) const {
@@ -872,10 +863,9 @@ class Value {
             }
 
             default: {
+                return false;
             }
         }
-
-        return false;
     }
 
     bool InsertKey(StringStream<Char_T_> &ss, SizeT index) const {
@@ -939,7 +929,7 @@ class Value {
                     return true;
                 }
 
-                break;
+                return false;
             }
 
             case ValueType::True: {
@@ -954,10 +944,9 @@ class Value {
             }
 
             default: {
+                return false;
             }
         }
-
-        return false;
     }
 
     bool GetBool(bool &value) const noexcept {
@@ -1005,10 +994,9 @@ class Value {
             }
 
             default: {
+                return false;
             }
         }
-
-        return false;
     }
 
     inline void Remove(const Char_T_ *key) const noexcept {
@@ -1121,55 +1109,55 @@ class Value {
         switch (val.Type()) {
             case ValueType::Object: {
                 StringifyObject(val.object_, ss);
-                return;
+                break;
             }
 
             case ValueType::Array: {
                 StringifyArray(val.array_, ss);
-                return;
+                break;
             }
 
             case ValueType::String: {
                 ss += JSONotation_T_::QuoteChar;
                 JSON::EscapeJSON(val.string_.First(), val.string_.Length(), ss);
                 ss += JSONotation_T_::QuoteChar;
-                return;
+                break;
             }
 
             case ValueType::UInt64: {
                 Digit<Char_T_>::NumberToStringStream(
                     ss, val.number_.GetUInt64(), 1);
-                return;
+                break;
             }
 
             case ValueType::Int64: {
                 Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(),
                                                      1);
-                return;
+                break;
             }
 
             case ValueType::Double: {
                 Digit<Char_T_>::NumberToStringStream(
                     ss, val.number_.GetDouble(), 1);
-                return;
+                break;
             }
 
             case ValueType::False: {
                 ss.Insert(JSONotation_T_::GetFalseString(),
                           JSONotation_T_::FalseStringLength);
-                return;
+                break;
             }
 
             case ValueType::True: {
                 ss.Insert(JSONotation_T_::GetTrueString(),
                           JSONotation_T_::TrueStringLength);
-                return;
+                break;
             }
 
             case ValueType::Null: {
                 ss.Insert(JSONotation_T_::GetNullString(),
                           JSONotation_T_::NullStringLength);
-                return;
+                break;
             }
 
             default: {
@@ -1189,6 +1177,14 @@ class Value {
         }
 
         return ss.GetString();
+    }
+
+    inline ValueType Type() const noexcept {
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        return static_cast<ValueType>(type_.Value.GetHighTag());
+#else
+        return type_;
+#endif
     }
 
   private:
@@ -1262,17 +1258,17 @@ class Value {
         switch (Type()) {
             case ValueType::Object: {
                 object_.Reset();
-                return;
+                break;
             }
 
             case ValueType::Array: {
                 array_.Reset();
-                return;
+                break;
             }
 
             case ValueType::String: {
                 string_.Reset();
-                return;
+                break;
             }
 
             default: {
@@ -1284,17 +1280,17 @@ class Value {
         switch (val.Type()) {
             case ValueType::Object: {
                 initValue(val.object_);
-                return;
+                break;
             }
 
             case ValueType::Array: {
                 initValue(val.array_);
-                return;
+                break;
             }
 
             case ValueType::String: {
                 initValue(val.string_);
-                return;
+                break;
             }
 
             default: {
@@ -1341,8 +1337,8 @@ class Value {
             SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
-        const void *padding_{nullptr};
         Number_T_   number_;
+        const void *padding_{nullptr};
     };
 
     union {
@@ -1355,11 +1351,11 @@ class Value {
     };
 
     struct VType_ {
-      public:
-        QPointer<void> Value{};
-
       private:
         SizeT padding_[2]{0, 0};
+
+      public:
+        QPointer<void> Value{};
     };
 #else
     };
