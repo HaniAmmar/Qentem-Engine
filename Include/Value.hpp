@@ -648,13 +648,19 @@ class Value {
     }
 
     Value *GetValue(SizeT index) const noexcept {
-        if (IsArray() && (index < array_.Size())) {
+        const ValueType type = Type();
+
+        if ((type == ValueType::Array) && (index < array_.Size())) {
             Value *val = (array_.Storage() + index);
 
             if (!(val->IsUndefined())) {
                 return val;
             }
-        } else if (IsObject()) {
+
+            return nullptr;
+        }
+
+        if (type == ValueType::Object) {
             Value *val = object_.GetValue(index);
 
             if ((val != nullptr) && (!(val->IsUndefined()))) {
@@ -666,10 +672,26 @@ class Value {
     }
 
     Value *GetValue(const Char_T_ *key, SizeT length) const noexcept {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             Value *val = (object_.Find(key, length));
 
             if ((val != nullptr) && !(val->IsUndefined())) {
+                return val;
+            }
+
+            return nullptr;
+        }
+
+        SizeT index;
+
+        if ((type == ValueType::Array) &&
+            (Digit<Char_T_>::StringToNumber(index, key, length)) &&
+            (index < array_.Size())) {
+            Value *val = (array_.Storage() + index);
+
+            if (!(val->IsUndefined())) {
                 return val;
             }
         }
