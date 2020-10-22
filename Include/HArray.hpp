@@ -114,21 +114,22 @@ class HArray {
             resize(algineSize(n_size));
         }
 
-        for (HAItem_T_ *item = src.Storage(), *end = (item + src.Size()),
-                       *des = Storage();
+        for (HAItem_T_ *item = src.Storage(), *end = (item + src.Size());
              item != end; item++) {
             if (item->Hash != 0) {
-                SizeT *index;
-                find(index, item->Key.First(), item->Key.Length(), item->Hash);
+                SizeT *    index;
+                HAItem_T_ *des_item = find(index, item->Key.First(),
+                                           item->Key.Length(), item->Hash);
 
-                if (*index == 0) {
-                    insert(index, static_cast<String<Char_T_> &&>(item->Key),
-                           item->Hash);
+                if (des_item == nullptr) {
+                    des_item = insert(
+                        index, static_cast<String<Char_T_> &&>(item->Key),
+                        item->Hash);
                 } else {
                     item->Key.~String<Char_T_>();
                 }
 
-                des[(*index) - 1].Value = static_cast<Value_ &&>(item->Value);
+                des_item->Value = static_cast<Value_ &&>(item->Value);
             }
         }
 
@@ -145,19 +146,19 @@ class HArray {
             resize(algineSize(n_size));
         }
 
-        HAItem_T_ *des = Storage();
-
         for (const HAItem_T_ *item = src.First(), *end = item + src.Size();
              item != end; item++) {
             if (item->Hash != 0) {
-                SizeT *index;
-                find(index, item->Key.First(), item->Key.Length(), item->Hash);
+                SizeT *    index;
+                HAItem_T_ *des_item = find(index, item->Key.First(),
+                                           item->Key.Length(), item->Hash);
 
-                if (*index == 0) {
-                    insert(index, String<Char_T_>(item->Key), item->Hash);
+                if (des_item == nullptr) {
+                    des_item =
+                        insert(index, String<Char_T_>(item->Key), item->Hash);
                 }
 
-                des[(*index) - 1].Value = Value_(item->Value);
+                des_item->Value = Value_(item->Value);
             }
         }
     }
@@ -170,13 +171,13 @@ class HArray {
         SizeT         len  = StringUtils::Count(key);
         const ULSizeT hash = StringUtils::Hash(key, len);
         SizeT *       index;
-        find(index, key, len, hash);
+        HAItem_T_ *   item = find(index, key, len, hash);
 
-        if ((*index) == 0) {
-            insert(index, String<Char_T_>(key, len), hash);
+        if (item == nullptr) {
+            item = insert(index, String<Char_T_>(key, len), hash);
         }
 
-        return Storage()[(*index) - 1].Value;
+        return item->Value;
     }
 
     Value_ &operator[](String<Char_T_> &&key) {
@@ -186,13 +187,13 @@ class HArray {
 
         const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
         SizeT *       index;
-        find(index, key.First(), key.Length(), hash);
+        HAItem_T_ *   item = find(index, key.First(), key.Length(), hash);
 
-        if ((*index) == 0) {
-            insert(index, static_cast<String<Char_T_> &&>(key), hash);
+        if (item == nullptr) {
+            item = insert(index, static_cast<String<Char_T_> &&>(key), hash);
         }
 
-        return Storage()[(*index) - 1].Value;
+        return item->Value;
     }
 
     Value_ &operator[](const String<Char_T_> &key) {
@@ -202,13 +203,13 @@ class HArray {
 
         const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
         SizeT *       index;
-        find(index, key.First(), key.Length(), hash);
+        HAItem_T_ *   item = find(index, key.First(), key.Length(), hash);
 
-        if ((*index) == 0) {
-            insert(index, String<Char_T_>(key), hash);
+        if (item == nullptr) {
+            item = insert(index, String<Char_T_>(key), hash);
         }
 
-        return Storage()[(*index) - 1].Value;
+        return item->Value;
     }
 
     void Insert(String<Char_T_> &&key, Value_ &&val) {
@@ -218,13 +219,13 @@ class HArray {
 
         const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
         SizeT *       index;
-        find(index, key.First(), key.Length(), hash);
+        HAItem_T_ *   item = find(index, key.First(), key.Length(), hash);
 
-        if ((*index) == 0) {
-            insert(index, static_cast<String<Char_T_> &&>(key), hash);
+        if (item == nullptr) {
+            item = insert(index, static_cast<String<Char_T_> &&>(key), hash);
         }
 
-        Storage()[(*index) - 1].Value = static_cast<Value_ &&>(val);
+        item->Value = static_cast<Value_ &&>(val);
     }
 
     Value_ *GetValue(SizeT index) const noexcept {
@@ -259,23 +260,18 @@ class HArray {
 
     const HAItem_T_ *GetItem(const String<Char_T_> &key) const noexcept {
         SizeT *index;
-        find(index, key.First(), key.Length(),
-             StringUtils::Hash(key.First(), key.Length()));
-
-        if ((*index) != 0) {
-            return (Storage() + ((*index) - 1));
-        }
-
-        return nullptr;
+        return find(index, key.First(), key.Length(),
+                    StringUtils::Hash(key.First(), key.Length()));
     }
 
     Value_ *Find(const Char_T_ *key, SizeT length) const noexcept {
         if (Size() != 0) {
-            SizeT *index;
-            find(index, key, length, StringUtils::Hash(key, length));
+            SizeT *    index;
+            HAItem_T_ *item =
+                find(index, key, length, StringUtils::Hash(key, length));
 
-            if ((*index) != 0) {
-                return &((Storage()[(*index) - 1]).Value);
+            if (item != nullptr) {
+                return &(item->Value);
             }
         }
 
@@ -464,8 +460,8 @@ class HArray {
         return size;
     }
 
-    void find(SizeT *&index, const Char_T_ *key, SizeT length,
-              ULSizeT hash) const noexcept {
+    HAItem_T_ *find(SizeT *&index, const Char_T_ *key, SizeT length,
+                    ULSizeT hash) const noexcept {
         HAItem_T_ *src = Storage();
         index          = &((src + (hash & getBase()))->Position);
 
@@ -474,15 +470,17 @@ class HArray {
 
             if (((item->Hash == hash) &&
                  (src + ((*index) - 1))->Key.IsEqual(key, length))) {
-                return;
+                return item;
             }
 
             index = &(item->Next);
         }
+
+        return nullptr;
     }
 
-    inline void insert(SizeT *index, String<Char_T_> &&key,
-                       ULSizeT hash) noexcept {
+    inline HAItem_T_ *insert(SizeT *index, String<Char_T_> &&key,
+                             ULSizeT hash) noexcept {
         HAItem_T_ *item = (Storage() + Size());
         item->Next      = 0;
         item->Hash      = hash;
@@ -492,19 +490,19 @@ class HArray {
 
         Memory::Construct(&(item->Key), static_cast<String<Char_T_> &&>(key));
         Memory::Construct(&(item->Value), Value_());
+
+        return item;
     }
 
     void remove(const Char_T_ *key, SizeT length, ULSizeT hash) const noexcept {
         if (Size() != 0) {
-            SizeT *index;
-            find(index, key, length, hash);
+            SizeT *    index;
+            HAItem_T_ *item = find(index, key, length, hash);
 
-            if (*index != 0) {
-                const SizeT offset = ((*index) - 1);
-                HAItem_T_ * item   = (Storage() + offset);
-                *index             = item->Next;
-                item->Hash         = 0;
-                item->Next         = 0;
+            if (item != nullptr) {
+                *index     = item->Next;
+                item->Hash = 0;
+                item->Next = 0;
 
                 item->Key   = String<Char_T_>();
                 item->Value = Value_();
