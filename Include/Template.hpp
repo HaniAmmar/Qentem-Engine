@@ -1171,6 +1171,7 @@ class Template_CV {
     const Value_T_ *findLoopValue(const Char_T_ *key,
                                   SizeT          length) const noexcept {
         SizeT lvl = 0;
+
         do {
             ++lvl;
             ++key;
@@ -1190,25 +1191,17 @@ class Template_CV {
         if (length != 0) { // ~[]
             SizeT offset = 1;
             SizeT tmp    = 1;
-            SizeT id;
 
             do {
                 while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
                 }
 
-                if (value->IsObject()) {
-                    value = value->GetValue((key + offset), (tmp - offset));
-                } else if ((Digit<Char_T_>::StringToNumber(id, (key + offset),
-                                                           (tmp - offset)))) {
-                    value = value->GetValue(id);
-                } else {
-                    return nullptr;
-                }
+                value = value->GetValue((key + offset), (tmp - offset));
 
                 ++tmp;
 
-                if (tmp >= length) {
+                if ((tmp >= length) || (value == nullptr)) {
                     break;
                 }
 
@@ -1236,57 +1229,47 @@ class Template_CV {
                 return findLoopValue(key, length);
             }
 
-            SizeT id;
-
-            if ((key[(length - 1)] ==
+            if ((key[(length - 1)] !=
                  TemplatePatterns_C_::VariableIndexSuffix)) {
-                // String followed by [...]
+                return value->GetValue(key, length);
+            }
 
-                SizeT offset = 0;
-                SizeT tmp    = 1;
+            // String followed by [...]
 
-                while ((key[tmp] != TemplatePatterns_C_::VariableIndexPrefix) &&
-                       (tmp < length)) {
+            SizeT offset = 0;
+            SizeT tmp    = 1;
+
+            while ((key[tmp] != TemplatePatterns_C_::VariableIndexPrefix) &&
+                   (tmp < length)) {
+                ++tmp;
+            }
+
+            do {
+                if (value == nullptr) {
+                    break;
+                }
+
+                value = value->GetValue((key + offset), (tmp - offset));
+
+                ++tmp;
+
+                if (tmp >= length) {
+                    return value;
+                }
+
+                if (key[tmp] == TemplatePatterns_C_::VariableIndexPrefix) {
                     ++tmp;
                 }
 
-                do {
-                    if (value == nullptr) {
-                        break;
-                    }
+                offset = tmp;
 
-                    if (value->IsObject()) {
-                        value = value->GetValue((key + offset), (tmp - offset));
-                    } else if ((Digit<Char_T_>::StringToNumber(
-                                   id, (key + offset), (tmp - offset)))) {
-                        value = value->GetValue(id);
-                    }
-
+                while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
-
-                    if (tmp >= length) {
-                        break;
-                    }
-
-                    if (key[tmp] == TemplatePatterns_C_::VariableIndexPrefix) {
-                        ++tmp;
-                    }
-
-                    offset = tmp;
-
-                    while (key[tmp] !=
-                           TemplatePatterns_C_::VariableIndexSuffix) {
-                        ++tmp;
-                    }
-                } while (true);
-            } else if (value->IsObject()) {
-                value = value->GetValue(key, length);
-            } else if ((Digit<Char_T_>::StringToNumber(id, key, length))) {
-                value = value->GetValue(id);
-            }
+                }
+            } while (true);
         }
 
-        return value;
+        return nullptr;
     }
 
     bool ALESetNumber(double &number, const Value_T_ *value) const noexcept {
