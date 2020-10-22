@@ -40,21 +40,21 @@ template <typename Char_T_>
 class Digit {
   private:
     struct DigitChars {
-        static constexpr Char_T_ ZeroChar        = '0';
-        static constexpr Char_T_ NineChar        = '9';
-        static constexpr Char_T_ SevenChar       = '7';
-        static constexpr Char_T_ E_Char          = 'e';
-        static constexpr Char_T_ UE_Char         = 'E';
-        static constexpr Char_T_ DotChar         = '.';
-        static constexpr Char_T_ PlusChar        = '+';
-        static constexpr Char_T_ MinusChar       = '-';
-        static constexpr Char_T_ ColonChar       = ':';
-        static constexpr Char_T_ SlashChar       = '/';
-        static constexpr Char_T_ AtChar          = '@'; // A is after @
-        static constexpr Char_T_ UG_Char         = 'G'; // F is before G
-        static constexpr Char_T_ G_Char          = 'g';
-        static constexpr Char_T_ UW_Char         = 'W';
-        static constexpr Char_T_ GraveAccentChar = '`'; // a is after `
+        static constexpr Char_T_ ZeroChar  = '0';
+        static constexpr Char_T_ NineChar  = '9';
+        static constexpr Char_T_ SevenChar = '7';
+        static constexpr Char_T_ E_Char    = 'e';
+        static constexpr Char_T_ UE_Char   = 'E';
+        static constexpr Char_T_ DotChar   = '.';
+        static constexpr Char_T_ PlusChar  = '+';
+        static constexpr Char_T_ MinusChar = '-';
+        static constexpr Char_T_ ColonChar = ':';
+        static constexpr Char_T_ SlashChar = '/';
+        static constexpr Char_T_ UA_Char   = 'A';
+        static constexpr Char_T_ UF_Char   = 'F';
+        static constexpr Char_T_ A_Char    = 'a';
+        static constexpr Char_T_ F_Char    = 'f';
+        static constexpr Char_T_ UW_Char   = 'W';
     };
 
   public:
@@ -74,13 +74,13 @@ class Digit {
                     value += ((static_cast<unsigned int>(str[length]) -
                                DigitChars::ZeroChar)
                               << base); // 1-9
-                } else if ((str[length] > DigitChars::AtChar) &&
-                           (str[length] < DigitChars::UG_Char)) { // A-F
+                } else if ((str[length] >= DigitChars::UA_Char) &&
+                           (str[length] <= DigitChars::UF_Char)) { // A-F
                     value += ((static_cast<unsigned int>(str[length]) -
                                DigitChars::SevenChar)
                               << base);
-                } else if ((str[length] > DigitChars::GraveAccentChar) &&
-                           (str[length] < DigitChars::G_Char)) { // a-f
+                } else if ((str[length] >= DigitChars::A_Char) &&
+                           (str[length] <= DigitChars::F_Char)) { // a-f
                     value += ((static_cast<unsigned int>(str[length]) -
                                DigitChars::UW_Char)
                               << base);
