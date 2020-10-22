@@ -328,8 +328,8 @@ static int TestArray3() {
     EQ_VALUE(numbers2.Capacity(), 8, "Capacity");
 
     // Checking move
-    String<char> str1("val1");
-    String<char> str2("val2");
+    String<char> str1("val----------------1");
+    String<char> str2("val----------------2");
 
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
@@ -362,8 +362,8 @@ static int TestArray4() {
     Array<String<char>> strings1;
     Array<String<char>> strings2;
 
-    String<char> str1("val1");
-    String<char> str2("val2");
+    String<char> str1("val----------------1");
+    String<char> str2("val----------------2");
 
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
