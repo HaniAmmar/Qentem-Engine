@@ -1429,27 +1429,27 @@ struct TemplatePatterns {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    // static constexpr SizeT InLineSuffixLength = 1U;
-    // static constexpr SizeT InLinePrefixLength = 1U;
+    // static constexpr unsigned char InLineSuffixLength = 1U;
+    // static constexpr unsigned char InLinePrefixLength = 1U;
 
-    static constexpr SizeT VariablePrefixLength = 5U;
-    static constexpr SizeT VariableFulllength =
+    static constexpr unsigned char VariablePrefixLength = 5U;
+    static constexpr unsigned char VariableFulllength =
         (VariablePrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr SizeT MathPrefixLength = 6U;
-    static constexpr SizeT MathFulllength =
+    static constexpr unsigned char MathPrefixLength = 6U;
+    static constexpr unsigned char MathFulllength =
         (MathPrefixLength + 1U); // + InLineSuffixLength
 
-    static constexpr SizeT InLineIfPrefixLength = 3U;
+    static constexpr unsigned char InLineIfPrefixLength = 3U;
 
-    static constexpr SizeT LoopPrefixLength = 5U;
-    static constexpr SizeT LoopSuffixLength = 7U;
+    static constexpr unsigned char LoopPrefixLength = 5U;
+    static constexpr unsigned char LoopSuffixLength = 7U;
 
-    static constexpr SizeT IfPrefixLength = 3U;
-    static constexpr SizeT IfSuffixLength = 5U;
+    static constexpr unsigned char IfPrefixLength = 3U;
+    static constexpr unsigned char IfSuffixLength = 5U;
 
-    static constexpr SizeT ElsePrefixLength = 5U;
-    static constexpr SizeT ElseSuffixLength = 2U;
+    static constexpr unsigned char ElsePrefixLength = 5U;
+    static constexpr unsigned char ElseSuffixLength = 2U;
 
     static constexpr Char_T_ InLinePrefix = '{';
     static const Char_T_ *   GetInLineSuffix() noexcept {

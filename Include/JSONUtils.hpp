@@ -261,20 +261,20 @@ struct JSONotation {
     static constexpr Char_T_ E_Char  = 'e';
     static constexpr Char_T_ UE_Char = 'E';
 
-    static constexpr SizeT TrueStringLength = 4;
-    static const Char_T_ * GetTrueString() noexcept {
+    static constexpr unsigned char TrueStringLength = 4;
+    static const Char_T_ *         GetTrueString() noexcept {
         static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e'};
         return &(val[0]);
     }
 
-    static constexpr SizeT FalseStringLength = 5;
-    static const Char_T_ * GetFalseString() noexcept {
+    static constexpr unsigned char FalseStringLength = 5;
+    static const Char_T_ *         GetFalseString() noexcept {
         static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e'};
         return &(val[0]);
     }
 
-    static constexpr SizeT NullStringLength = 4;
-    static const Char_T_ * GetNullString() noexcept {
+    static constexpr unsigned char NullStringLength = 4;
+    static const Char_T_ *         GetNullString() noexcept {
         static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l'};
         return &(val[0]);
     }
