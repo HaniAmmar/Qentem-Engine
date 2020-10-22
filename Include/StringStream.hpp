@@ -26,10 +26,6 @@
 #ifndef QENTEM_STRINGSTREAM_H_
 #define QENTEM_STRINGSTREAM_H_
 
-#ifndef QENTEM_STRINGSTREAM_INITIALSIZE_
-#define QENTEM_STRINGSTREAM_INITIALSIZE_ 8U
-#endif
-
 namespace Qentem {
 
 /*
@@ -37,6 +33,8 @@ namespace Qentem {
  */
 template <typename Char_T_>
 class StringStream {
+    static constexpr SizeT initial_size = 8;
+
   public:
     StringStream() = default;
 
@@ -100,10 +98,10 @@ class StringStream {
             SizeT n_size = Capacity();
 
             if (n_size == 0) {
-                n_size = QENTEM_STRINGSTREAM_INITIALSIZE_;
+                n_size = initial_size;
             }
 
-            expand(n_size << 1U);
+            expand(n_size << 2U);
         }
 
         Storage()[Length()] = one_char;
@@ -195,7 +193,7 @@ class StringStream {
         length_ += len;
 
         if (Length() > Capacity()) {
-            expand((SizeT{2} << Platform::CLZ(Length())));
+            expand(algineSize(Length()));
         }
 
         return (Storage() + current_offset);
@@ -205,7 +203,7 @@ class StringStream {
         const SizeT new_len = (Length() + len);
 
         if (new_len > Capacity()) {
-            expand((SizeT{2} << Platform::CLZ(new_len)));
+            expand(algineSize(new_len));
         }
     }
 
@@ -257,13 +255,7 @@ class StringStream {
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     SizeT algineSize(SizeT n_size) noexcept {
-        const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
-
-        if (size < n_size) {
-            return (size << 1U);
-        }
-
-        return size;
+        return (SizeT{2} << Platform::CLZ(n_size | 8));
     }
 
     void insert(const Char_T_ *str, const SizeT len) {
@@ -272,7 +264,7 @@ class StringStream {
             length_ += len;
 
             if (Capacity() < Length()) {
-                expand((SizeT{2} << Platform::CLZ(Length())));
+                expand(algineSize(Length()));
             }
 
             Memory::Copy((Storage() + current_offset), str,
@@ -281,15 +273,13 @@ class StringStream {
     }
 
     void expand(SizeT new_capacity) {
-        SizeT    old_cap = Capacity();
-        Char_T_ *old_str = Storage();
+        Char_T_ *src     = Storage();
+        SizeT    src_cap = Capacity();
         setCapacity(new_capacity);
         allocate();
 
-        if (IsNotEmpty()) {
-            Memory::Copy(Storage(), old_str, (old_cap * sizeof(Char_T_)));
-            deallocate(old_str);
-        }
+        Memory::Copy(Storage(), src, (src_cap * sizeof(Char_T_)));
+        deallocate(src);
     }
 
     Char_T_ *storage_{nullptr};
