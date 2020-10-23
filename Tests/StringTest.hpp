@@ -62,12 +62,15 @@ static int TestString1() {
     EQ_VALUE(str1, "ab", "str1");
     NOT_EQ_TO(str1, "abcd", "str1", "abcd");
 
+    str1 = "ABCDEF0123456789";
+    EQ_VALUE(str1.Length(), 16, "Length");
+
     length = str1.Length();
     strptr = str1.Eject();
     NOT_EQ_TO(strptr, nullptr, "Eject", "null");
 
     str2 = String8(strptr, length); // Manage
-    EQ_VALUE(str2.First(), strptr, "First()");
+    EQ_TO(str2.First(), strptr, "First()", "strptr");
     EQ_VALUE(str2.Length(), length, "Length");
 
     str1 = static_cast<String8 &&>(str2); // Move

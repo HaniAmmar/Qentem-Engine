@@ -131,20 +131,20 @@ static int TestHArray2() {
     NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
     EQ_VALUE(numbers1["key1"], 10000, "key1");
 
-    numbers1["key1"] = 19990;
-    numbers1["key2"] = 20000;
-    numbers1["key1"] = 18880;
-    numbers1["key2"] = 27770;
-    numbers1["key3"] = 39990;
-    numbers1["key1"] = 17770;
-    numbers1["key2"] = 23660;
-    numbers1["key4"] = 40;
-    numbers1["key1"] = 10;
-    numbers1["key2"] = 20;
-    numbers1["key3"] = 30;
-    numbers1["key5"] = 50;
-    numbers1["key6"] = 60;
-    numbers1["key7"] = 70;
+    numbers1["key1"]             = 19990;
+    numbers1["key2"]             = 20000;
+    numbers1["key1"]             = 18880;
+    numbers1["key2"]             = 27770;
+    numbers1["key3"]             = 39990;
+    numbers1["key1"]             = 17770;
+    numbers1["key2"]             = 23660;
+    numbers1["key4"]             = 40;
+    numbers1["key1"]             = 10;
+    numbers1["key2"]             = 20;
+    numbers1["key3"]             = 30;
+    numbers1["key5"]             = 50;
+    numbers1["ABCDEF0123456789"] = 60;
+    numbers1["key7"]             = 70;
 
     EQ_VALUE(numbers1.Size(), 7, "Size");
     EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
@@ -154,7 +154,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers1["key3"], 30, "key3");
     EQ_VALUE(numbers1["key4"], 40, "key4");
     EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
+    EQ_VALUE(numbers1["ABCDEF0123456789"], 60, "key6");
     EQ_VALUE(numbers1["key7"], 70, "key7");
 
     key = numbers1.GetKey(0);
@@ -174,7 +174,7 @@ static int TestHArray2() {
     EQ_TRUE(key->IsEqual("key5", 4), "(GetKey(4) == key5)");
     key = numbers1.GetKey(5);
     NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key6", 4), "(GetKey(5) == key6)");
+    EQ_TRUE(key->IsEqual("ABCDEF0123456789", 16), "(GetKey(5) == key6)");
     key = numbers1.GetKey(6);
     NOT_EQ_TO(key, nullptr, "key", "null");
     EQ_TRUE(key->IsEqual("key7", 4), "(GetKey(6) == key7)");
@@ -192,7 +192,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers1["key3"], 30, "key3");
     EQ_VALUE(numbers1["key4"], 40, "key4");
     EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
+    EQ_VALUE(numbers1["ABCDEF0123456789"], 60, "key6");
     EQ_VALUE(numbers1["key7"], 70, "key7");
     EQ_VALUE(numbers1["key8"], 80, "key8");
     EQ_VALUE(numbers1["key9"], 90, "key9");
@@ -228,7 +228,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers2["key3"], 30, "key3");
     EQ_VALUE(numbers2["key4"], 40, "key4");
     EQ_VALUE(numbers2["key5"], 50, "key5");
-    EQ_VALUE(numbers2["key6"], 60, "key6");
+    EQ_VALUE(numbers2["ABCDEF0123456789"], 60, "key6");
     EQ_VALUE(numbers2["key7"], 70, "key7");
     EQ_VALUE(numbers2["key8"], 80, "key8");
     EQ_VALUE(numbers2["key9"], 90, "key9");
@@ -247,7 +247,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers1["key3"], 30, "key3");
     EQ_VALUE(numbers1["key4"], 40, "key4");
     EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
+    EQ_VALUE(numbers1["ABCDEF0123456789"], 60, "key6");
     EQ_VALUE(numbers1["key7"], 70, "key7");
     EQ_VALUE(numbers1["key8"], 80, "key8");
     EQ_VALUE(numbers1["key9"], 90, "key9");
@@ -557,11 +557,11 @@ static int TestHArray6() {
     HArray<String<char>, char>        strings2;
     const HAItem<String<char>, char> *storage;
 
-    String<char> key1("k-1");
-    String<char> key2("k-2");
+    String<char> key1("k-1-ABCDEF0123456789");
+    String<char> key2("k-2-ABCDEF0123456789");
 
-    String<char> str1("val1");
-    String<char> str2("val2");
+    String<char> str1("val1-ABCDEF0123456789");
+    String<char> str2("val2-ABCDEF0123456789");
 
     const char *k_str1 = key1.First();
     const char *k_str2 = key2.First();
@@ -577,10 +577,10 @@ static int TestHArray6() {
     NOT_EQ_TO(strings1.First(), nullptr, "First()", "null");
     NOT_EQ_TO(strings1.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(strings1.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings1.GetKey(0)), "k-1", "GetKey(0)", "k-1");
+    EQ_TO(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings1.GetKey(1), nullptr, "GetKey(1)", "null");
     EQ_TO(strings1.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings1.GetKey(1)), "k-2", "GetKey(1)", "k-2");
+    EQ_TO(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
     EQ_TO(strings1.GetValue(id)->First(), c_str1, "strings[0].First()",
@@ -594,11 +594,11 @@ static int TestHArray6() {
     NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
     NOT_EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()",
               "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1", "GetKey(0)", "k-1");
+    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
     NOT_EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()",
               "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2", "GetKey(1)", "k-2");
+    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
     NOT_EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()",
@@ -615,10 +615,10 @@ static int TestHArray6() {
     NOT_EQ_TO(strings2.First(), storage, "First()", "storage");
     NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1", "GetKey(0)", "k-1");
+    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
     EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2", "GetKey(1)", "k-2");
+    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
     EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()",
@@ -637,10 +637,10 @@ static int TestHArray6() {
     NOT_EQ_TO(strings2.First(), storage, "First()", "storage");
     NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1", "GetKey(0)", "k-1");
+    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
     EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2", "GetKey(1)", "k-2");
+    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
     EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()",

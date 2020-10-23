@@ -1511,7 +1511,7 @@ static int TestMoveValue1() {
     /////////////
     value1 = true;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -1573,7 +1573,7 @@ static int TestMoveValue1() {
     /////////////
     value1 = false;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -1635,7 +1635,7 @@ static int TestMoveValue1() {
     /////////////
     value1 = nullptr;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -1696,7 +1696,7 @@ static int TestMoveValue1() {
     /////////////
     value1 = 47;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -1734,28 +1734,28 @@ static int TestMoveValue1() {
 
     ////////////////////////////////////////////
 
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value1 = true;
     EQ_TRUE(value1.IsTrue(), "IsTrue()");
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value1 = false;
     EQ_TRUE(value1.IsFalse(), "IsFalse()");
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value1 = nullptr;
     EQ_TRUE(value1.IsNull(), "IsNull()");
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value1 = 4;
     EQ_TRUE(value1.IsNumber(), "IsNumber()");
@@ -1763,7 +1763,7 @@ static int TestMoveValue1() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
@@ -1777,7 +1777,7 @@ static int TestMoveValue1() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
@@ -1823,7 +1823,7 @@ static int TestMoveValue1() {
     /////////////
     value1 = Array<Value<char>>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -1898,7 +1898,7 @@ static int TestMoveValue2() {
     /////////////
     value1 = HArray<Value<char>, char>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<String<char> &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -1971,7 +1971,7 @@ static int TestMoveValue3() {
     /////////////
     value1 = true;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
@@ -2039,7 +2039,7 @@ static int TestMoveValue3() {
     /////////////
     value1 = false;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
@@ -2107,7 +2107,7 @@ static int TestMoveValue3() {
     /////////////
     value1 = nullptr;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
@@ -2174,7 +2174,7 @@ static int TestMoveValue3() {
     /////////////
     value1 = 47;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
@@ -2215,7 +2215,7 @@ static int TestMoveValue3() {
 
     ////////////////////////////////////////////
 
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = true;
     value1 = static_cast<Value<char> &&>(value2);
@@ -2223,7 +2223,7 @@ static int TestMoveValue3() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = false;
     value1 = static_cast<Value<char> &&>(value2);
@@ -2231,7 +2231,7 @@ static int TestMoveValue3() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = nullptr;
     value1 = static_cast<Value<char> &&>(value2);
@@ -2239,7 +2239,7 @@ static int TestMoveValue3() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = 4;
     value1 = static_cast<Value<char> &&>(value2);
@@ -2248,7 +2248,7 @@ static int TestMoveValue3() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     arr_var     = Array<Value<char>>(1);
     arr_storage = arr_var.First();
@@ -2263,7 +2263,7 @@ static int TestMoveValue3() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     h_arr_var     = HArray<Value<char>, char>(1);
     h_arr_storage = h_arr_var.First();
@@ -2314,7 +2314,7 @@ static int TestMoveValue3() {
     /////////////
     value1 = Array<Value<char>>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
@@ -2396,7 +2396,7 @@ static int TestMoveValue4() {
     /////////////
     value1 = HArray<Value<char>, char>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = static_cast<Value<char> &&>(value2);
@@ -2445,7 +2445,7 @@ static int TestCopyValue1() {
 
     value1 = true;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -2511,7 +2511,7 @@ static int TestCopyValue1() {
 
     value1 = false;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -2577,7 +2577,7 @@ static int TestCopyValue1() {
 
     value1 = nullptr;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -2643,7 +2643,7 @@ static int TestCopyValue1() {
 
     value1 = 23;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -2727,7 +2727,7 @@ static int TestCopyValue2() {
     const HAItem<Value<char>, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // No values
     arr_var = Array<Value<char>>(1);
@@ -2736,7 +2736,7 @@ static int TestCopyValue2() {
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // Has values
     arr_var = Array<Value<char>>();
@@ -2752,7 +2752,7 @@ static int TestCopyValue2() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // No values
     h_arr_var = HArray<Value<char>, char>(1);
@@ -2761,7 +2761,7 @@ static int TestCopyValue2() {
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // Has values
     h_arr_var = HArray<Value<char>, char>();
@@ -2784,7 +2784,7 @@ static int TestCopyValue2() {
 
     value1 = Array<Value<char>>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -2825,7 +2825,7 @@ static int TestCopyValue2() {
 
     value1 = HArray<Value<char>, char>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
@@ -2907,7 +2907,7 @@ static int TestCopyValue3() {
     /////////////
     value1 = true;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
@@ -3005,7 +3005,7 @@ static int TestCopyValue3() {
     /////////////
     value1 = false;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
@@ -3103,7 +3103,7 @@ static int TestCopyValue3() {
     /////////////
     value1 = nullptr;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
@@ -3200,7 +3200,7 @@ static int TestCopyValue3() {
     /////////////
     value1 = 47;
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
@@ -3293,7 +3293,7 @@ static int TestCopyValue4() {
 
     ////////////////////////////////////////////
 
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = true;
     value1 = value2;
@@ -3301,7 +3301,7 @@ static int TestCopyValue4() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = false;
     value1 = value2;
@@ -3309,7 +3309,7 @@ static int TestCopyValue4() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = nullptr;
     value1 = value2;
@@ -3317,7 +3317,7 @@ static int TestCopyValue4() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     value2 = 4;
     value1 = value2;
@@ -3326,7 +3326,7 @@ static int TestCopyValue4() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // No values
     value2 = Array<Value<char>>(1);
@@ -3336,7 +3336,7 @@ static int TestCopyValue4() {
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     value1.Reset();
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // Has values
     arr_var = Array<Value<char>>();
@@ -3354,7 +3354,7 @@ static int TestCopyValue4() {
     value1.Reset();
 
     /////////////
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // No values
     value2 = HArray<Value<char>, char>(1);
@@ -3364,7 +3364,7 @@ static int TestCopyValue4() {
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     value1.Reset();
-    value1 = String<char>{"s"};
+    value1 = String<char>{"-ABCDEF0123456789-"};
 
     // Has values
     h_arr_var = HArray<Value<char>, char>();
@@ -3422,7 +3422,7 @@ static int TestCopyValue4() {
     /////////////
     value1 = Array<Value<char>>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
@@ -3500,7 +3500,7 @@ static int TestCopyValue4() {
     /////////////
     value1 = HArray<Value<char>, char>(1);
 
-    str_var   = String<char>{"s"};
+    str_var   = String<char>{"-ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value2    = static_cast<String<char> &&>(str_var);
     value1    = value2;
@@ -3939,17 +3939,18 @@ static int TestAddition2() {
             "StringUtils::IsEqual");
     value.Reset();
     /////////////////
-    str               = String<char>("Qentem");
+    str               = String<char>("-ABCDEF0123456789-");
     const char *c_str = str.First();
     value += static_cast<String<char> &&>(str);
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
     EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789-",
+                                 18),
             "StringUtils::IsEqual");
 
-    str                = String<char>("Hani");
+    str                = String<char>("#0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value += static_cast<String<char> &&>(str);
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -3959,14 +3960,16 @@ static int TestAddition2() {
     EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
     EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
           "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789-",
+                                 18),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF#",
+                                 18),
             "StringUtils::IsEqual");
     value.Reset();
     /////////////////
 
-    str   = String<char>("Qentem");
+    str   = String<char>("-ABCDEF0123456789-");
     c_str = str.First();
     value += str;
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -3974,10 +3977,11 @@ static int TestAddition2() {
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
     NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()",
               "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789-",
+                                 18),
             "StringUtils::IsEqual");
 
-    str    = String<char>("Hani");
+    str    = String<char>("#0123456789ABCDEF#");
     c_str2 = str.First();
     value += str;
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -3988,9 +3992,11 @@ static int TestAddition2() {
               "c_str");
     NOT_EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
               "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789-",
+                                 18),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "Hani", 4),
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF#",
+                                 18),
             "StringUtils::IsEqual");
     value.Reset();
 
@@ -4112,7 +4118,7 @@ static int TestAddition3() {
     arr_var.Reset();
     arr_var += Value<char>{ValueType::False};
     arr_var += Value<char>{ValueType::True};
-    arr_var += Value<char>{String<char>("Qentem")};
+    arr_var += Value<char>{String<char>("#0123456789ABCDEF#")};
     c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
 
@@ -4128,12 +4134,13 @@ static int TestAddition3() {
     EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
     EQ_TRUE(value[2].IsString(), "value[2].IsString()");
     EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF#",
+                                 18),
             "StringUtils::IsEqual");
 
     arr_var += Value<char>{nullptr};
     arr_var += Value<char>{14};
-    arr_var += Value<char>{String<char>("Hani")};
+    arr_var += Value<char>{String<char>("-ABCDEF0123456789-")};
     c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
 
@@ -4151,7 +4158,8 @@ static int TestAddition3() {
     EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
     EQ_TRUE(value[2].IsString(), "value[2].IsString()");
     EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF#",
+                                 18),
             "StringUtils::IsEqual");
     EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
     EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
@@ -4159,7 +4167,8 @@ static int TestAddition3() {
     EQ_TRUE(value[5].IsString(), "value[5].IsString()");
     EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()",
           "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "Hani", 4),
+    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "-ABCDEF0123456789-",
+                                 18),
             "StringUtils::IsEqual");
     //////////////////////////////////////////
 
@@ -4222,7 +4231,7 @@ static int TestAddition4() {
 
     value1.Reset();
     /////////////////
-    str               = String<char>("Qentem");
+    str               = String<char>("-ABCDEF0123456789-");
     const char *c_str = str.First();
     value2            = static_cast<String<char> &&>(str);
 
@@ -4232,10 +4241,11 @@ static int TestAddition4() {
     EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
     NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
               "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
+                                 "-ABCDEF0123456789-", 18),
             "StringUtils::IsEqual");
 
-    str                = String<char>("Hani");
+    str                = String<char>("#0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = static_cast<String<char> &&>(str);
 
@@ -4248,9 +4258,11 @@ static int TestAddition4() {
               "c_str");
     NOT_EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
               "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
+                                 "-ABCDEF0123456789-", 18),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "Hani", 4),
+    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(),
+                                 "#0123456789ABCDEF#", 18),
             "StringUtils::IsEqual");
     value1.Reset();
     /////////////////
@@ -4400,7 +4412,7 @@ static int TestAddition5() {
 
     value1.Reset();
     /////////////////
-    str               = String<char>("Qentem");
+    str               = String<char>("-ABCDEF0123456789-");
     const char *c_str = str.First();
     value2            = static_cast<String<char> &&>(str);
 
@@ -4410,10 +4422,11 @@ static int TestAddition5() {
     EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
     EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
           "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
+                                 "-ABCDEF0123456789-", 18),
             "StringUtils::IsEqual");
 
-    str                = String<char>("Hani");
+    str                = String<char>("#0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = static_cast<String<char> &&>(str);
 
@@ -4426,9 +4439,11 @@ static int TestAddition5() {
           "c_str");
     EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
           "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
+                                 "-ABCDEF0123456789-", 18),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "Hani", 4),
+    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(),
+                                 "#0123456789ABCDEF#", 18),
             "StringUtils::IsEqual");
     value1.Reset();
     /////////////////
@@ -4452,7 +4467,7 @@ static int TestAddition5() {
 
     arr_var += Value<char>{ValueType::False};
     arr_var += Value<char>{ValueType::True};
-    arr_var += Value<char>{String<char>("Qentem")};
+    arr_var += Value<char>{String<char>("-ABCDEF0123456789-")};
     c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
@@ -4470,13 +4485,14 @@ static int TestAddition5() {
     EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
     EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
           "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(),
+                                 "-ABCDEF0123456789-", 18),
             "StringUtils::IsEqual");
 
     arr_var.Reset();
     arr_var += Value<char>{ValueType::Null};
     arr_var += Value<char>{14};
-    arr_var += Value<char>{String<char>("Hani")};
+    arr_var += Value<char>{String<char>("#0123456789ABCDEF#")};
     c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
     value2      = static_cast<Array<Value<char>> &&>(arr_var);
@@ -4495,7 +4511,8 @@ static int TestAddition5() {
     EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
     EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
           "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "Qentem", 6),
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(),
+                                 "-ABCDEF0123456789-", 18),
             "StringUtils::IsEqual");
     EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
     EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
@@ -4503,7 +4520,8 @@ static int TestAddition5() {
     EQ_TRUE(value1[5].IsString(), "value1[0].IsString()");
     EQ_TO(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()",
           "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "Hani", 4),
+    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(),
+                                 "#0123456789ABCDEF#", 18),
             "StringUtils::IsEqual");
     value1.Reset();
     //////////////////////////////////////////
@@ -4523,7 +4541,7 @@ static int TestAddition6() {
 
     value1["k1"] = 11;
     value1["k2"] = 22;
-    str_var      = "Qen";
+    str_var      = "*ABCDEF0123456789*";
     str_c1       = str_var.First();
     value1["k3"] = static_cast<String<char> &&>(str_var);
 
@@ -4534,7 +4552,7 @@ static int TestAddition6() {
     h_arr_var[String<char>("w1")] = 10;
     h_arr_var[String<char>("w2")] = 20;
     h_arr_var[String<char>("w3")] = 30;
-    str_var                       = "Qentem";
+    str_var                       = "-ABCDEF0123456789-";
     str_c2                        = str_var.First();
     h_arr_var[String<char>("w4")] = static_cast<String<char> &&>(str_var);
     h_arr_storage2                = h_arr_var.First();
@@ -4549,8 +4567,9 @@ static int TestAddition6() {
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
     NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
               "value2[\"k3\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
+                               "*ABCDEF0123456789*", 18),
+          true, "value2[\"k3\"].StringStorage()", "IsEqual");
 
     value2 =
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
@@ -4564,8 +4583,9 @@ static int TestAddition6() {
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
     NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
               "value2[\"w4\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
+                               "-ABCDEF0123456789-", 18),
+          true, "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////
@@ -4582,8 +4602,9 @@ static int TestAddition6() {
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
     EQ_TO(value2["k3"].StringStorage(), str_c1,
           "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
+                               "*ABCDEF0123456789*", 18),
+          true, "value2[\"k3\"].StringStorage()", "IsEqual");
 
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
@@ -4601,8 +4622,9 @@ static int TestAddition6() {
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
     EQ_TO(value2["w4"].StringStorage(), str_c2,
           "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
+                               "-ABCDEF0123456789-", 18),
+          true, "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     if (value2.GetObject() != nullptr) {
@@ -4621,14 +4643,16 @@ static int TestAddition6() {
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
     NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
               "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
+                               "-ABCDEF0123456789-", 18),
+          true, "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
     NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
               "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
+                               "*ABCDEF0123456789*", 18),
+          true, "value2[\"k3\"].StringStorage()", "IsEqual");
 
     ////
     value2 =
@@ -4648,16 +4672,18 @@ static int TestAddition6() {
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
     NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
               "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
+                               "-ABCDEF0123456789-", 18),
+          true, "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
     EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
     NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
               "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
+                               "*ABCDEF0123456789*", 18),
+          true, "value2[\"k3\"].StringStorage()", "IsEqual");
 
     value2 =
         HArray<Value<char>, char>(); // Clearing and  Setting to object type.
@@ -4675,16 +4701,18 @@ static int TestAddition6() {
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
     EQ_TO(value2["w4"].StringStorage(), str_c2,
           "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "Qentem", 6), true,
-          "value2[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
+                               "-ABCDEF0123456789-", 18),
+          true, "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
     EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
     EQ_TO(value2["k3"].StringStorage(), str_c1,
           "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "Qen", 3), true,
-          "value2[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
+                               "*ABCDEF0123456789*", 18),
+          true, "value2[\"k3\"].StringStorage()", "IsEqual");
     /////////////////////////////
 
     END_SUB_TEST;
