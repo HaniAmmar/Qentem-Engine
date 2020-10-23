@@ -71,7 +71,13 @@ class String {
         setLength(len);
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (len < short_string_max) {
+#ifndef QENTEM_BIG_ENDIAN
             Char_T_ *des = reinterpret_cast<Char_T_ *>(&unused);
+#else
+            // Two tags at the start
+            Char_T_ *des = reinterpret_cast<Char_T_ *>(
+                (reinterpret_cast<char *>(&storage_) + 2));
+#endif
             Memory::Copy(des, str, (len * sizeof(Char_T_)));
             des[len] = 0;
             Memory::Deallocate(str);
@@ -230,8 +236,17 @@ class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (IsNotEmpty() && (Length() < short_string_max)) {
             str = Memory::Allocate<Char_T_>(Length() + 1);
+#ifndef QENTEM_BIG_ENDIAN
             Memory::Copy(str, reinterpret_cast<Char_T_ *>(&unused),
                          ((Length() + 1) * sizeof(Char_T_)));
+
+#else
+            // Two tags at the start
+            Memory::Copy(str,
+                         reinterpret_cast<Char_T_ *>(
+                             (reinterpret_cast<char *>(&storage_) + 2)),
+                         ((Length() + 1) * sizeof(Char_T_)));
+#endif
         } else {
             str = Storage();
         }
@@ -249,8 +264,14 @@ class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         const SizeT len = Length();
         if ((len != 0) && (len < short_string_max)) {
+#ifndef QENTEM_BIG_ENDIAN
             return const_cast<Char_T_ *>(
                 reinterpret_cast<const Char_T_ *>(&unused));
+#else
+            // Two tags at the start
+            return reinterpret_cast<Char_T_ *>(const_cast<char *>(
+                reinterpret_cast<const char *>(&storage_) + 2));
+#endif
         }
 #endif
         return storage_.GetPointer();
@@ -273,7 +294,13 @@ class String {
         const SizeT len = Length();
 
         if ((len != 0) && (len < short_string_max)) {
+#ifndef QENTEM_BIG_ENDIAN
             return reinterpret_cast<const Char_T_ *>(&unused);
+#else
+            // Two tags at the start
+            return reinterpret_cast<const Char_T_ *>(
+                (reinterpret_cast<const char *>(&storage_) + 2));
+#endif
         }
 #endif
 
@@ -364,8 +391,8 @@ class String {
             return reinterpret_cast<Char_T_ *>(&unused);
 #else
             // Two tags at the start
-            char *str = reinterpret_cast<char *>(&storage_) + 2;
-            return reinterpret_cast<Char_T_ *>(str);
+            return reinterpret_cast<Char_T_ *>(
+                (reinterpret_cast<char *>(&storage_) + 2));
 #endif
         }
 #endif
