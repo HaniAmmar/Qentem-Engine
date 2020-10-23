@@ -87,7 +87,7 @@ struct ALEHelper {
         const Value_T_ *item;
 
         if (FindItem(item, content, length) && (item->Str == nullptr)) {
-            number = item->Number;
+            number = static_cast<double>(item->Number);
             return true;
         }
 
@@ -114,7 +114,7 @@ struct ALEHelper {
                 }
 
                 if (item->Str == nullptr) {
-                    left.Number = item->Number;
+                    left.Number = static_cast<double>(item->Number);
                     is_number   = true;
                 } else {
                     if (is_number) {
@@ -151,7 +151,7 @@ struct ALEHelper {
                 }
 
                 if (item->Str == nullptr) {
-                    right.Number = item->Number;
+                    right.Number = static_cast<double>(item->Number);
                 } else {
                     right_content = item->Str;
                     right_length  = item->StrLength;
