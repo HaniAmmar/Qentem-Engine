@@ -23,8 +23,8 @@
 #ifndef QENTEM_COMMON_H_
 #define QENTEM_COMMON_H_
 
-#ifndef QENTEM_DOUBLE_PRECISION_
-#define QENTEM_DOUBLE_PRECISION_ 15
+#ifndef QENTEM_DOUBLE_PRECISION
+#define QENTEM_DOUBLE_PRECISION 15
 #endif
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) ||          \

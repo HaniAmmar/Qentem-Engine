@@ -792,7 +792,7 @@ class Value {
 
             case ValueType::Double: {
                 value = Digit<Char_T_>::NumberToString(
-                    number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION_);
+                    number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
                 return true;
             }
 
@@ -840,7 +840,7 @@ class Value {
 
             case ValueType::Double: {
                 Digit<Char_T_>::NumberToStringStream(
-                    ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION_);
+                    ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
                 return true;
             }
 
