@@ -114,6 +114,13 @@ static int TestString1() {
     EQ_TO(str1.First(), nullptr, "First()", "null");
     EQ_VALUE(str2.Length(), length, "Length");
 
+    str1 = "A";
+    EQ_VALUE(str1.Length(), 1, "Length");
+    length = str1.Length();
+    strptr = str1.Eject();
+    EQ_TO(strptr[0], 'A', "strptr[0]", "A");
+    Memory::Deallocate(strptr);
+
     END_SUB_TEST;
 }
 
