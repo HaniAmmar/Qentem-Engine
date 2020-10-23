@@ -32,8 +32,8 @@ namespace Qentem {
 /*
  * String container with null terminator and a taggable pointer.
  *
- * If the length is less than (6 + (sizeof(SizeT) * 2)) it will be stored on the
- * stack.
+ * If the length is less than (6 + (sizeof(SizeT) * 2)) the will be stored on
+ * the stack.
  */
 template <typename Char_T_>
 class String {
@@ -71,13 +71,7 @@ class String {
         setLength(len);
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (len < short_string_max) {
-#ifndef QENTEM_BIG_ENDIAN
-            Char_T_ *des = reinterpret_cast<Char_T_ *>(&unused);
-#else
-            // Two tags at the start
-            Char_T_ *des = reinterpret_cast<Char_T_ *>(
-                (reinterpret_cast<char *>(&storage_) + 2));
-#endif
+            Char_T_ *des = Storage();
             Memory::Copy(des, str, (len * sizeof(Char_T_)));
             des[len] = 0;
             Memory::Deallocate(str);
@@ -236,17 +230,7 @@ class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (IsNotEmpty() && (Length() < short_string_max)) {
             str = Memory::Allocate<Char_T_>(Length() + 1);
-#ifndef QENTEM_BIG_ENDIAN
-            Memory::Copy(str, reinterpret_cast<Char_T_ *>(&unused),
-                         ((Length() + 1) * sizeof(Char_T_)));
-
-#else
-            // Two tags at the start
-            Memory::Copy(str,
-                         reinterpret_cast<Char_T_ *>(
-                             (reinterpret_cast<char *>(&storage_) + 2)),
-                         ((Length() + 1) * sizeof(Char_T_)));
-#endif
+            Memory::Copy(str, Storage(), ((Length() + 1) * sizeof(Char_T_)));
         } else {
             str = Storage();
         }
