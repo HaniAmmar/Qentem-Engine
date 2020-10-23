@@ -76,12 +76,6 @@
 
 namespace Qentem {
 
-#ifdef QENTEM_64BIT_ARCH
-using ULSizeT = unsigned long long;
-#else
-using ULSizeT = unsigned long;
-#endif
-
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
 #ifdef QENTEM_64BIT_ARCH
