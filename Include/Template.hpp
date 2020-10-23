@@ -665,13 +665,10 @@ class Template_CV {
                 break;
             }
 
-            if (previous_offset < offset) {
-                // Add any content that comes before any {var:x}
-                ss_->Insert(
-                    (content + previous_offset),
-                    ((offset - TemplatePatterns_C_::VariablePrefixLength) -
-                     previous_offset));
-            }
+            // Add any content that comes before any {var:x}
+            ss_->Insert((content + previous_offset),
+                        ((offset - TemplatePatterns_C_::VariablePrefixLength) -
+                         previous_offset));
 
             const SizeT start_offset = offset;
             offset = Engine::FindOne(TemplatePatterns_C_::GetInLineSuffix()[0],
@@ -683,11 +680,8 @@ class Template_CV {
             // -1 is - TemplatePatterns_C_::InLineSuffixLength
         } while (true);
 
-        if (previous_offset < length) {
-            // Add any content that comes after }
-            ss_->Insert((content + previous_offset),
-                        (length - previous_offset));
-        }
+        // Add any content that comes after }
+        ss_->Insert((content + previous_offset), (length - previous_offset));
     }
 
     /*
@@ -1041,19 +1035,22 @@ class Template_CV {
             } while (true);
         }
 
-        if (loop_data->SubTags.Last() != nullptr) {
-            const SizeT    tag_offset = loop_data->SubTags.Last()->EndOffset();
-            const Char_T_ *remain_str =
-                (loop_data->Content.First() + tag_offset);
-            const SizeT remain_len = (loop_data->Content.Length() - tag_offset);
+        const Char_T_ *loop_content = loop_data->Content.First();
+        const TagBit * last_tag     = loop_data->SubTags.Last();
 
-            // TODO: Split the loop on 4 threads.
+        if (last_tag != nullptr) {
+            TagBit *      start_tag = loop_data->SubTags.Storage();
+            const TagBit *end_tag   = (start_tag + loop_data->SubTags.Size());
+
+            const SizeT tag_offset = last_tag->EndOffset();
+            const SizeT remain_len = (loop_data->Content.Length() - tag_offset);
+            const Char_T_ *remain_str = (loop_content + tag_offset);
+
             do {
+                // TODO: Split the loop on 4 threads.
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
-                loop_template.render(loop_data->SubTags.Storage(),
-                                     loop_data->SubTags.End(),
-                                     loop_data->Content.First(), 0);
+                loop_template.render(start_tag, end_tag, loop_content, 0);
 
                 // Add the remaining string.
                 ss_->Insert(remain_str, remain_len);
@@ -1063,8 +1060,7 @@ class Template_CV {
             } while (loop_size != 0);
         } else {
             do {
-                ss_->Insert(loop_data->Content.First(),
-                            loop_data->Content.Length());
+                ss_->Insert(loop_content, loop_data->Content.Length());
                 --loop_size;
             } while (loop_size != 0);
         }
