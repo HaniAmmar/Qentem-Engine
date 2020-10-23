@@ -31,16 +31,23 @@ namespace Qentem {
 
 /*
  * String container with null terminator and a taggable pointer.
+ *
+ * If the length is less than (6 + (sizeof(SizeT) * 2)) it will be stored on the
+ * stack.
  */
 template <typename Char_T_>
 class String {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+    static constexpr SizeT short_string_max =
+        ((6 + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
+#endif
+
   public:
     String() = default;
 
-    String(String &&src) noexcept
-        : length_(src.length_),
-          storage_(static_cast<QPointer<Char_T_> &&>(src.storage_)) {
-        src.Reset();
+    String(String &&src) noexcept : unused(src.unused), length_(src.length_) {
+        storage_.Set(static_cast<QPointer<Char_T_> &&>(src.storage_));
+        src.clearLength();
     }
 
     String(const String &src) {
@@ -62,6 +69,16 @@ class String {
 
     String(Char_T_ *str, SizeT len) noexcept {
         setLength(len);
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        if (len < short_string_max) {
+            Char_T_ *des = reinterpret_cast<Char_T_ *>(&unused);
+            Memory::Copy(des, str, (len * sizeof(Char_T_)));
+            des[len] = 0;
+            Memory::Deallocate(str);
+
+            return;
+        }
+#endif
         setStorage(str);
     }
 
@@ -80,7 +97,11 @@ class String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());
-            length_  = src.length_;
+            unused  = src.unused;
+            length_ = src.length_;
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+            storage_.SetLowTag(src.storage_.GetLowTag());
+#endif
             storage_ = static_cast<QPointer<Char_T_> &&>(src.storage_);
 
             src.Reset();
@@ -133,7 +154,7 @@ class String {
     String operator+(String &&src) const {
         String ns{Insert(*this, src)};
         src.deallocate(src.Storage());
-        src.setLength(0);
+        src.clearLength();
         src.clearStorage();
 
         return ns;
@@ -199,23 +220,63 @@ class String {
 
     void Reset() noexcept {
         deallocate(Storage());
-        setLength(0);
+        clearLength();
         clearStorage();
     }
 
     Char_T_ *Eject() noexcept {
         Char_T_ *str;
-        str = Storage();
-        setLength(0);
+
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        if (IsNotEmpty() && (Length() < short_string_max)) {
+            str = Memory::Allocate<Char_T_>(Length() + 1);
+            Memory::Copy(str, reinterpret_cast<Char_T_ *>(&unused),
+                         ((Length() + 1) * sizeof(Char_T_)));
+        } else {
+            str = Storage();
+        }
+#else
+        str     = Storage();
+#endif
+
+        clearLength();
         clearStorage();
 
         return str;
     }
 
-    inline Char_T_ *Storage() const noexcept { return storage_.GetPointer(); }
-    inline SizeT    Length() const noexcept { return length_; }
+    inline Char_T_ *Storage() const noexcept {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        const SizeT len = Length();
+        if ((len != 0) && (len < short_string_max)) {
+            return const_cast<Char_T_ *>(
+                reinterpret_cast<const Char_T_ *>(&unused));
+        }
+#endif
+        return storage_.GetPointer();
+    }
+
+    inline SizeT Length() const noexcept {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        const unsigned char len = storage_.GetLowTag();
+
+        if (len != 0) {
+            return len;
+        }
+#endif
+
+        return length_;
+    }
 
     inline const Char_T_ *First() const noexcept {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        const SizeT len = Length();
+
+        if ((len != 0) && (len < short_string_max)) {
+            return reinterpret_cast<const Char_T_ *>(&unused);
+        }
+#endif
+
         return storage_.GetPointer();
     }
 
@@ -275,20 +336,66 @@ class String {
     //////////// Private ////////////
 
   private:
-    void     setLength(SizeT new_length) noexcept { length_ = new_length; }
+    void clearLength() noexcept {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        storage_.SetLowTag(0);
+#endif
+        length_ = 0;
+    }
+
+    void setLength(SizeT new_length) noexcept {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        if (new_length < short_string_max) {
+            storage_.SetLowTag(static_cast<unsigned char>(new_length));
+        } else {
+            storage_.SetLowTag(0);
+            length_ = new_length;
+        }
+#else
+        length_ = new_length;
+#endif
+    }
+
     void     setStorage(Char_T_ *ptr) noexcept { storage_.Set(ptr); }
     Char_T_ *allocate(SizeT new_size) {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        if (new_size <= short_string_max) {
+#ifndef QENTEM_BIG_ENDIAN
+            return reinterpret_cast<Char_T_ *>(&unused);
+#else
+            // Two tags at the start
+            char *str = reinterpret_cast<char *>(&storage_) + 2;
+            return reinterpret_cast<Char_T_ *>(str);
+#endif
+        }
+#endif
+
         Char_T_ *new_storage = Memory::Allocate<Char_T_>(new_size);
         setStorage(new_storage);
         return new_storage;
     }
 
-    void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
+    void deallocate(Char_T_ *old_storage) {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        if (Length() >= short_string_max) {
+            Memory::Deallocate(old_storage);
+        }
+#else
+        Memory::Deallocate(old_storage);
+#endif
+    }
+
     void clearStorage() noexcept { setStorage(nullptr); }
 
+#ifndef QENTEM_BIG_ENDIAN
     SizeT             unused{0};
     SizeT             length_{0};
     QPointer<Char_T_> storage_{};
+#else
+    QPointer<Char_T_> storage_{};
+    SizeT unused{0};
+    SizeT length_{0};
+#endif
 };
 
 } // namespace Qentem

@@ -37,6 +37,13 @@
 #endif
 #endif
 
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+#ifndef QENTEM_SSO
+// Short string optimization
+#define QENTEM_SSO 1
+#endif
+#endif
+
 #ifndef QENTEM_AVX2
 #define QENTEM_AVX2 0
 #endif
