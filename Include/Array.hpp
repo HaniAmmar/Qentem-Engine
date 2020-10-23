@@ -21,6 +21,7 @@
  */
 
 #include "Memory.hpp"
+#include "Platform.hpp"
 #include "QPointer.hpp"
 
 #ifndef QENTEM_ARRAY_H_
@@ -235,7 +236,7 @@ class Array {
         const SizeT n_size = (size + Size());
 
         if (n_size > Capacity()) {
-            resize(n_size);
+            resize((SizeT{2} << Platform::CLZ(n_size)));
         }
     }
 
