@@ -43,8 +43,8 @@ class Array {
     }
 
     Array(Array &&src) noexcept
-        : index_(src.Size()), capacity_(src.Capacity()),
-          storage_(static_cast<QPointer<Type_> &&>(src.storage_)) {
+        : index_(src.Size()), capacity_(src.Capacity()) {
+        storage_.Set(static_cast<QPointer<Type_> &&>(src.storage_));
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -323,9 +323,15 @@ class Array {
         }
     }
 
+#ifndef QENTEM_BIG_ENDIAN
     SizeT           index_{0};
     SizeT           capacity_{0};
     QPointer<Type_> storage_{};
+#else
+    QPointer<Type_> storage_{};
+    SizeT           index_{0};
+    SizeT           capacity_{0};
+#endif
 };
 
 } // namespace Qentem

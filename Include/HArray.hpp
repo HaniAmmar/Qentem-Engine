@@ -70,8 +70,8 @@ class HArray {
     }
 
     HArray(HArray &&src) noexcept
-        : index_(src.Size()), capacity_(src.Capacity()),
-          storage_(static_cast<QPointer<HAItem_T_> &&>(src.storage_)) {
+        : index_(src.Size()), capacity_(src.Capacity()) {
+        storage_.Set(static_cast<QPointer<HAItem_T_> &&>(src.storage_));
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -579,9 +579,15 @@ class HArray {
         }
     }
 
+#ifndef QENTEM_BIG_ENDIAN
     SizeT               index_{0};
     SizeT               capacity_{0};
     QPointer<HAItem_T_> storage_{};
+#else
+    QPointer<HAItem_T_> storage_{};
+    SizeT               index_{0};
+    SizeT               capacity_{0};
+#endif
 };
 
 } // namespace Qentem

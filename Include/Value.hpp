@@ -1337,8 +1337,13 @@ class Value {
             SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
+#ifndef QENTEM_BIG_ENDIAN
         Number_T_   number_;
         const void *padding_{nullptr};
+#else
+        const void *padding_{nullptr};
+        Number_T_   number_;
+#endif
     };
 
     union {
@@ -1351,11 +1356,19 @@ class Value {
     };
 
     struct VType_ {
+#ifndef QENTEM_BIG_ENDIAN
       private:
         SizeT padding_[2]{0, 0};
 
       public:
         QPointer<void> Value{};
+#else
+      public:
+        QPointer<void> Value{};
+
+      private:
+        SizeT padding_[2]{0, 0};
+#endif
     };
 #else
     };
