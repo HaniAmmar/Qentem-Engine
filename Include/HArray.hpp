@@ -41,7 +41,7 @@ template <typename Value_, typename Char_T_>
 struct HAItem {
     SizeT           Position; // To maintain the order of the items.
     SizeT           Next;
-    ULSizeT         Hash;
+    SizeT           Hash;
     String<Char_T_> Key;
     Value_          Value;
 };
@@ -168,10 +168,10 @@ class HArray {
             grow();
         }
 
-        const SizeT   len  = StringUtils::Count(key);
-        const ULSizeT hash = StringUtils::Hash(key, len);
-        SizeT *       index;
-        HAItem_T_ *   item = find(index, key, len, hash);
+        const SizeT len  = StringUtils::Count(key);
+        const SizeT hash = StringUtils::Hash(key, len);
+        SizeT *     index;
+        HAItem_T_ * item = find(index, key, len, hash);
 
         if (item == nullptr) {
             item = insert(index, String<Char_T_>(key, len), hash);
@@ -185,9 +185,9 @@ class HArray {
             grow();
         }
 
-        const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT *       index;
-        HAItem_T_ *   item = find(index, key.First(), key.Length(), hash);
+        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *     index;
+        HAItem_T_ * item = find(index, key.First(), key.Length(), hash);
 
         if (item == nullptr) {
             item = insert(index, static_cast<String<Char_T_> &&>(key), hash);
@@ -201,9 +201,9 @@ class HArray {
             grow();
         }
 
-        const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT *       index;
-        HAItem_T_ *   item = find(index, key.First(), key.Length(), hash);
+        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *     index;
+        HAItem_T_ * item = find(index, key.First(), key.Length(), hash);
 
         if (item == nullptr) {
             item = insert(index, String<Char_T_>(key), hash);
@@ -217,9 +217,9 @@ class HArray {
             grow();
         }
 
-        const ULSizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT *       index;
-        HAItem_T_ *   item = find(index, key.First(), key.Length(), hash);
+        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT *     index;
+        HAItem_T_ * item = find(index, key.First(), key.Length(), hash);
 
         if (item == nullptr) {
             item = insert(index, static_cast<String<Char_T_> &&>(key), hash);
@@ -317,7 +317,7 @@ class HArray {
                  StringUtils::Hash(from.First(), from.Length()));
 
             if (*left_index != 0) {
-                const ULSizeT to_hash =
+                const SizeT to_hash =
                     StringUtils::Hash(to.First(), to.Length());
 
                 SizeT *right_index;
@@ -461,7 +461,7 @@ class HArray {
     }
 
     HAItem_T_ *find(SizeT *&index, const Char_T_ *key, SizeT length,
-                    ULSizeT hash) const noexcept {
+                    SizeT hash) const noexcept {
         HAItem_T_ *src = Storage();
         index          = &((src + (hash & getBase()))->Position);
 
@@ -479,7 +479,7 @@ class HArray {
     }
 
     inline HAItem_T_ *insert(SizeT *index, String<Char_T_> &&key,
-                             ULSizeT hash) noexcept {
+                             SizeT hash) noexcept {
         HAItem_T_ *item = (Storage() + Size());
         item->Next      = 0;
         item->Hash      = hash;
@@ -493,7 +493,7 @@ class HArray {
         return item;
     }
 
-    void remove(const Char_T_ *key, SizeT length, ULSizeT hash) const noexcept {
+    void remove(const Char_T_ *key, SizeT length, SizeT hash) const noexcept {
         if (Size() != 0) {
             SizeT *    index;
             HAItem_T_ *item = find(index, key, length, hash);

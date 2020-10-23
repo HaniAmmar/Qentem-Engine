@@ -108,13 +108,13 @@ struct StringUtils {
     }
 
     template <typename Char_T_>
-    static ULSizeT Hash(const Char_T_ *key, SizeT length) noexcept {
-        static constexpr ULSizeT highest_bit =
-            (ULSizeT{1} << ((sizeof(ULSizeT) * 8) - 1));
+    static SizeT Hash(const Char_T_ *key, SizeT length) noexcept {
+        static constexpr SizeT highest_bit =
+            (SizeT{1} << ((sizeof(SizeT) * 8) - 1));
 
-        ULSizeT hash   = 11;
-        SizeT   base   = 33;
-        SizeT   offset = 0;
+        SizeT hash   = 11;
+        SizeT base   = 33;
+        SizeT offset = 0;
 
         while (offset != length) {
             const unsigned int num = static_cast<unsigned int>(key[offset]);
@@ -126,7 +126,7 @@ struct StringUtils {
                 hash *= (length ^ offset);
                 base += offset;
                 --length;
-                hash += static_cast<ULSizeT>(key[length]);
+                hash += static_cast<SizeT>(key[length]);
             }
         }
 
