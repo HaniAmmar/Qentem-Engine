@@ -96,7 +96,7 @@ int main() {
     //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
     //     Qentem::Test::RunTemplateTests();
-    //     Qentem::Test::RunTemplateXTests();
+    //     Qentem::Test::RunTemplateLTests();
     // }
 
 #ifdef QENTEM_64BIT_ARCH
