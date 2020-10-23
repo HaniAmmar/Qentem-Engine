@@ -427,7 +427,7 @@ class HArray {
     //////////// Private ////////////
 
   private:
-    void setStorage(HAItem_T_ *ptr) noexcept { storage_.Set(ptr); }
+    void setStorage(HAItem_T_ *ptr) noexcept { storage_.SetPointer(ptr); }
     void clearPosition() noexcept {
         for (HAItem_T_ *item = Storage(), *end = (item + Capacity());
              item != end; item++) {

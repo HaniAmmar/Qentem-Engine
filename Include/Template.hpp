@@ -271,7 +271,7 @@ struct Template {
         }
 
         void         clearData() noexcept { data_.Reset(); }
-        void         setData(void *new_data) noexcept { data_.Set(new_data); }
+        void         setData(void *ptr) noexcept { data_.SetPointer(ptr); }
         inline void *getData() const noexcept { return data_.GetPointer(); }
 
         SizeT          offset_{0};

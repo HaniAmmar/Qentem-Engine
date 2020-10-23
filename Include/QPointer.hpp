@@ -22,8 +22,8 @@
 
 #include "Memory.hpp"
 
-#ifndef QENTEM_TAGGED_POINTER_H_
-#define QENTEM_TAGGED_POINTER_H_
+#ifndef QENTEM_Q_POINTER_H_
+#define QENTEM_Q_POINTER_H_
 
 namespace Qentem {
 
@@ -37,7 +37,7 @@ struct QPointer {
     QPointer(const QPointer &src) noexcept : ptr_{src.ptr_} {}
     QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
-            Set(src.ptr_);
+            SetPointer(src.ptr_);
             src.ptr_ = nullptr;
         }
 
@@ -46,7 +46,7 @@ struct QPointer {
 
     QPointer &operator=(const QPointer &src) noexcept {
         if (this != &src) {
-            Set(src.ptr_);
+            SetPointer(src.ptr_);
         }
 
         return *this;
@@ -61,7 +61,7 @@ struct QPointer {
 
     void Set(const QPointer &src) noexcept { ptr_ = src.ptr_; }
 
-    void Set(Type_ *ptr) noexcept {
+    void SetPointer(Type_ *ptr) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         const unsigned char tag_h = tag_.high_;
         const unsigned char tag_l = tag_.low_;

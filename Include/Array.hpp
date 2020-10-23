@@ -284,7 +284,7 @@ class Array {
     //////////// Private ////////////
 
   private:
-    void   setStorage(Type_ *ptr) noexcept { storage_.Set(ptr); }
+    void   setStorage(Type_ *ptr) noexcept { storage_.SetPointer(ptr); }
     Type_ *allocate() {
         Type_ *new_storage = Memory::Allocate<Type_>(Capacity());
         setStorage(new_storage);
