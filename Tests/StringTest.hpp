@@ -196,19 +196,19 @@ static int TestString2() {
     EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     EQ_VALUE(str1, "abc", "str1");
 
-    str2 = String8::Insert(str1, String8("def"));
+    str2 = String8::Merge(str1, String8("def"));
     EQ_VALUE(str2.Length(), 6, "Length");
     NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
     EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     EQ_VALUE(str2, "abcdef", "str2");
 
-    str2 = String8::Insert(str2, String8(""));
+    str2 = String8::Merge(str2, String8(""));
     EQ_VALUE(str2.Length(), 6, "Length");
     NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
     EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     EQ_VALUE(str2, "abcdef", "str2");
 
-    str2 = String8::Insert(String8(""), str2);
+    str2 = String8::Merge(String8(""), str2);
     EQ_VALUE(str2.Length(), 6, "Length");
     NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
     EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
