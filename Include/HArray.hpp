@@ -39,7 +39,6 @@ namespace Qentem {
 
 template <typename Value_, typename Char_T_>
 struct HAItem {
-    SizeT           Position; // To maintain the order of the items.
     SizeT           Next;
     SizeT           Hash;
     String<Char_T_> Key;
@@ -65,13 +64,13 @@ class HArray {
 
         if (current != nullptr) {
             Memory::Destruct(current, End());
-            deallocate(current);
+            deallocate(getHashTable());
         }
     }
 
     HArray(HArray &&src) noexcept
         : index_(src.Size()), capacity_(src.Capacity()) {
-        storage_.Set(static_cast<QPointer<HAItem_T_> &&>(src.storage_));
+        hashTable_.Set(static_cast<QPointer<SizeT> &&>(src.hashTable_));
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -84,12 +83,12 @@ class HArray {
 
             if (current != nullptr) {
                 Memory::Destruct(current, End());
-                deallocate(current);
+                deallocate(getHashTable());
             }
 
             setSize(src.Size());
             setCapacity(src.Capacity());
-            storage_ = static_cast<QPointer<HAItem_T_> &&>(src.storage_);
+            hashTable_ = static_cast<QPointer<SizeT> &&>(src.hashTable_);
 
             src.setSize(0);
             src.setCapacity(0);
@@ -135,8 +134,8 @@ class HArray {
 
         src.setCapacity(0);
         src.setSize(0);
-        src.deallocate(src.Storage());
-        src.storage_.Reset();
+        src.deallocate(src.getHashTable());
+        src.hashTable_.Reset();
     }
 
     void operator+=(const HArray &src) {
@@ -361,7 +360,7 @@ class HArray {
 
         if (current != nullptr) {
             Memory::Destruct(current, End());
-            deallocate(current);
+            deallocate(getHashTable());
             clearStorage();
             setCapacity(0);
             setSize(0);
@@ -408,11 +407,14 @@ class HArray {
         }
     }
 
-    inline HAItem_T_ *Storage() const noexcept { return storage_.GetPointer(); }
-    inline SizeT      Size() const noexcept { return index_; }
-    inline SizeT      Capacity() const noexcept { return capacity_; }
-    inline bool       IsEmpty() const noexcept { return (Size() == 0); }
-    inline bool       IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline HAItem_T_ *Storage() const noexcept {
+        return reinterpret_cast<HAItem_T_ *>(getHashTable() + Capacity());
+    }
+
+    inline SizeT            Size() const noexcept { return index_; }
+    inline SizeT            Capacity() const noexcept { return capacity_; }
+    inline bool             IsEmpty() const noexcept { return (Size() == 0); }
+    inline bool             IsNotEmpty() const noexcept { return !(IsEmpty()); }
     inline const HAItem_T_ *First() const noexcept { return Storage(); }
     inline const HAItem_T_ *End() const noexcept { return (First() + Size()); }
 
@@ -427,26 +429,26 @@ class HArray {
     //////////// Private ////////////
 
   private:
-    void setStorage(HAItem_T_ *ptr) noexcept { storage_.SetPointer(ptr); }
-    void clearPosition() noexcept {
-        for (HAItem_T_ *item = Storage(), *end = (item + Capacity());
-             item != end; item++) {
-            item->Position = 0;
-        }
-    }
+    SizeT *getHashTable() const noexcept { return hashTable_.GetPointer(); }
+    void   setStorage(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
 
     HAItem_T_ *allocate() {
-        HAItem_T_ *new_storage = Memory::Allocate<HAItem_T_>(Capacity());
-        setStorage(new_storage);
-        clearPosition();
+        const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_T_)) * Capacity());
 
-        return new_storage;
+        SizeT *ht = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
+        setStorage(ht);
+
+        for (SizeT *pos = ht, *end = (pos + Capacity()); pos != end; pos++) {
+            *pos = 0;
+        }
+
+        return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }
 
-    void deallocate(HAItem_T_ *old_storage) { Memory::Deallocate(old_storage); }
-    void clearStorage() noexcept { setStorage(nullptr); }
-    void setSize(SizeT new_size) noexcept { index_ = new_size; }
-    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+    void  deallocate(SizeT *hash_table) { Memory::Deallocate(hash_table); }
+    void  clearStorage() noexcept { setStorage(nullptr); }
+    void  setSize(SizeT new_size) noexcept { index_ = new_size; }
+    void  setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
     SizeT getBase() const noexcept { return (Capacity() - 1); }
     void  grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
 
@@ -462,8 +464,9 @@ class HArray {
 
     HAItem_T_ *find(SizeT *&index, const Char_T_ *key, SizeT length,
                     SizeT hash) const noexcept {
+        SizeT *    ht  = getHashTable();
         HAItem_T_ *src = Storage();
-        index          = &((src + (hash & getBase()))->Position);
+        index          = (ht + (hash & getBase()));
 
         while (*index != 0) {
             HAItem_T_ *item = &(src[(*index) - 1]);
@@ -537,6 +540,7 @@ class HArray {
     }
 
     void resize(SizeT new_size) {
+        SizeT *    ht  = getHashTable();
         HAItem_T_ *src = Storage();
 
         setCapacity(new_size);
@@ -557,18 +561,19 @@ class HArray {
         }
 
         setSize(static_cast<SizeT>(des_item - des));
-        deallocate(src);
+        deallocate(ht);
         generateHash();
     }
 
     void generateHash() const noexcept {
         SizeT       i    = 1;
         const SizeT base = getBase();
+        SizeT *     ht   = getHashTable();
         HAItem_T_ * src  = Storage();
 
         for (HAItem_T_ *item = src, *end = (item + Size()); item != end;
              item++, i++) {
-            SizeT *index = &((src + (item->Hash & base))->Position);
+            SizeT *index = (ht + (item->Hash & base));
 
             while (*index != 0) {
                 index = &(src[(*index) - 1].Next);
@@ -580,13 +585,13 @@ class HArray {
     }
 
 #ifndef QENTEM_BIG_ENDIAN
-    SizeT               index_{0};
-    SizeT               capacity_{0};
-    QPointer<HAItem_T_> storage_{};
+    SizeT           index_{0};
+    SizeT           capacity_{0};
+    QPointer<SizeT> hashTable_{};
 #else
-    QPointer<HAItem_T_> storage_{};
-    SizeT               index_{0};
-    SizeT               capacity_{0};
+    QPointer<SizeT> hashTable_{};
+    SizeT           index_{0};
+    SizeT           capacity_{0};
 #endif
 };
 
