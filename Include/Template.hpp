@@ -184,12 +184,12 @@ struct Template {
     struct LoopData_T {
         StringStream<Char_T_>  Content{};
         Array<TagBit<Char_T_>> SubTags{};
-        SizeT                  SetOffset{0};
-        SizeT                  SetLength{0};
-        SizeT                  IndexOffset{0};
-        SizeT                  IndexLength{0};
-        SizeT                  RepeatOffset{0};
-        SizeT                  RepeatLength{0};
+        unsigned char          SetOffset{0};
+        unsigned char          SetLength{0};
+        unsigned char          IndexOffset{0};
+        unsigned char          IndexLength{0};
+        unsigned char          RepeatOffset{0};
+        unsigned char          RepeatLength{0};
     };
 
     template <typename Char_T_>
@@ -552,8 +552,8 @@ class Template_CV {
         }
     }
 
-    QENTEM_NOINLINE void render(TagBit *tag, const TagBit *end,
-                                const Char_T_ *content, SizeT offset) const {
+    void render(TagBit *tag, const TagBit *end, const Char_T_ *content,
+                SizeT offset) const {
         SizeT previous_offset = offset;
 
         while (tag != end) {
@@ -628,13 +628,12 @@ class Template_CV {
     }
 
     void renderVariable(const Char_T_ *content, SizeT length) const {
-        bool            loop_var = (*content == TemplatePatterns_C_::TildeChar);
-        const Value_T_ *value    = findValue(content, length);
+        const Value_T_ *value = findValue(content, length);
 
-        if (((value == nullptr) || !(value->InsertString(*ss_))) && !loop_var) {
-            length += TemplatePatterns_C_::VariableFulllength;
+        if (((value == nullptr) || !(value->InsertString(*ss_))) &&
+            (*content != TemplatePatterns_C_::TildeChar)) {
             ss_->Insert((content - TemplatePatterns_C_::VariablePrefixLength),
-                        length);
+                        (length + TemplatePatterns_C_::VariableFulllength));
         }
     }
 
@@ -645,9 +644,8 @@ class Template_CV {
         if (ALE::Evaluate(number, content, length, this)) {
             Digit<Char_T_>::NumberToStringStream(*ss_, number, 1, 0, 3);
         } else {
-            length += TemplatePatterns_C_::MathFulllength;
             ss_->Insert((content - TemplatePatterns_C_::MathPrefixLength),
-                        length);
+                        (length + TemplatePatterns_C_::MathFulllength));
         }
     }
 
@@ -812,162 +810,196 @@ class Template_CV {
             return;
         }
 
-        if (loop_data->Content.IsEmpty()) {
-            const Char_T_ *loop_value        = nullptr;
-            SizeT          loop_value_length = 0;
-            SizeT          len               = 0;
-            SizeT          offset            = 0;
-            SizeT          previous_offset   = 0;
+        const Char_T_ *loop_value        = nullptr;
+        SizeT          loop_value_length = 0;
+        SizeT          len               = 0;
+        SizeT          offset            = 0;
+        SizeT          previous_offset   = 0;
 
-            SizeT options    = 4; // set, value, times, index
-            bool  break_loop = false;
+        SizeT options    = 4; // set, value, times, index
+        bool  break_loop = false;
 
-            // Stage 1
+        // Stage 1: Extraction
+        do {
+            ++len;
+            offset += len; // Move to the next Char_T_.
+
+            if (!getQuoted(offset, len, content, start_offset)) {
+                break;
+            }
+
+            if (len == 0) {
+                // The syntax is wrong.
+                return;
+            }
+
+            // X="|
+            // 3: Goes back to X
+            // |X="
+            SizeT tmp_offset = (offset - 4);
+
             do {
-                ++len;
-                offset += len; // Move to the next Char_T_.
+                switch (content[tmp_offset]) {
+                    case TemplatePatterns_C_::ValueChar: {
+                        loop_value        = (content + offset);
+                        loop_value_length = len;
+                        break_loop        = true;
+                        break;
+                    }
 
-                if (!getQuoted(offset, len, content, start_offset)) {
+                    case TemplatePatterns_C_::SetChar: {
+                        loop_data->SetOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->SetLength = static_cast<unsigned char>(len);
+
+                        if ((content[offset] ==
+                             TemplatePatterns_C_::InLinePrefix) &&
+                            (len > TemplatePatterns_C_::VariableFulllength)) {
+                            loop_data->SetOffset +=
+                                TemplatePatterns_C_::VariablePrefixLength;
+                            loop_data->SetLength -=
+                                TemplatePatterns_C_::VariableFulllength;
+                        }
+
+                        break_loop = true;
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::IndexChar: {
+                        loop_data->IndexOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->IndexLength =
+                            static_cast<unsigned char>(len);
+                        break_loop = true;
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::RepeatChar: {
+                        loop_data->RepeatOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->RepeatLength =
+                            static_cast<unsigned char>(len);
+                        break_loop = true;
+                        break;
+                    }
+                }
+
+                if (break_loop) {
                     break;
                 }
 
-                if (len == 0) {
-                    // The syntax is wrong.
-                    return;
+                --tmp_offset;
+            } while (tmp_offset > previous_offset);
+
+            break_loop      = false;
+            previous_offset = offset;
+        } while (--options != 0);
+
+        // Stage 2
+        offset          = start_offset;
+        previous_offset = start_offset;
+
+        if (loop_value != nullptr) {
+            do {
+                offset = Engine::Find(loop_value, loop_value_length, content,
+                                      previous_offset, length);
+
+                if (offset == 0) {
+                    break;
                 }
 
-                // X="|
-                // 3: Goes back to X
-                // |X="
-                SizeT tmp_offset = (offset - 4);
+                loop_data->Content.Insert(
+                    (content + previous_offset),
+                    ((offset - loop_value_length) - previous_offset));
 
-                do {
-                    switch (content[tmp_offset]) {
-                        case TemplatePatterns_C_::ValueChar: {
-                            loop_value        = (content + offset);
-                            loop_value_length = len;
-                            break_loop        = true;
-                            break;
-                        }
+                loop_data->Content.Insert(
+                    TemplatePatterns_C_::GetVariablePrefix(),
+                    TemplatePatterns_C_::VariablePrefixLength);
 
-                        case TemplatePatterns_C_::SetChar: {
-                            loop_data->SetOffset = offset;
-                            loop_data->SetLength = len;
-                            break_loop           = true;
-                            break;
-                        }
+                SizeT lvl = 0;
+                while (lvl <= level_) {
+                    loop_data->Content += TemplatePatterns_C_::TildeChar;
+                    ++lvl;
+                }
 
-                        case TemplatePatterns_C_::IndexChar: {
-                            loop_data->IndexOffset = offset;
-                            loop_data->IndexLength = len;
-                            break_loop             = true;
-                            break;
-                        }
+                SizeT sub_offset = offset;
 
-                        case TemplatePatterns_C_::RepeatChar: {
-                            loop_data->RepeatOffset = offset;
-                            loop_data->RepeatLength = len;
-                            break_loop              = true;
-                            break;
-                        }
-                    }
-
-                    if (break_loop) {
-                        break;
-                    }
-
-                    --tmp_offset;
-                } while (tmp_offset > previous_offset);
-
-                break_loop      = false;
-                previous_offset = offset;
-            } while (--options != 0);
-
-            // Stage 2
-            offset          = start_offset;
-            previous_offset = start_offset;
-
-            if (loop_value != nullptr) {
-                do {
-                    offset = Engine::Find(loop_value, loop_value_length,
-                                          content, previous_offset, length);
-
-                    if (offset == 0) {
-                        break;
-                    }
-
-                    loop_data->Content.Insert(
-                        (content + previous_offset),
-                        ((offset - loop_value_length) - previous_offset));
-                    loop_data->Content.Insert(
-                        TemplatePatterns_C_::GetVariablePrefix(),
-                        TemplatePatterns_C_::VariablePrefixLength);
-
-                    SizeT lvl = 0;
-                    while (lvl <= level_) {
-                        loop_data->Content += TemplatePatterns_C_::TildeChar;
-                        ++lvl;
-                    }
-
-                    SizeT sub_offset = offset;
-
-                    while (content[sub_offset] ==
-                           TemplatePatterns_C_::VariableIndexPrefix) {
-                        while ((content[sub_offset] !=
-                                TemplatePatterns_C_::VariableIndexSuffix) &&
-                               (sub_offset < length)) {
-                            ++sub_offset;
-                        }
-
+                while (content[sub_offset] ==
+                       TemplatePatterns_C_::VariableIndexPrefix) {
+                    while ((content[sub_offset] !=
+                            TemplatePatterns_C_::VariableIndexSuffix) &&
+                           (sub_offset < length)) {
                         ++sub_offset;
                     }
 
-                    if (sub_offset > length) {
-                        // Unclosed bracket
-                        break;
-                    }
+                    ++sub_offset;
+                }
 
-                    if ((content[(sub_offset - 1)] ==
-                         TemplatePatterns_C_::VariableIndexSuffix)) {
-                        loop_data->Content.Insert((content + offset),
-                                                  (sub_offset - offset));
-                    }
+                if (sub_offset > length) {
+                    // Unclosed bracket
+                    break;
+                }
 
-                    previous_offset = sub_offset;
-                    loop_data->Content +=
-                        TemplatePatterns_C_::GetInLineSuffix()[0];
-                } while (true);
-            }
+                if ((content[(sub_offset - 1)] ==
+                     TemplatePatterns_C_::VariableIndexSuffix)) {
+                    loop_data->Content.Insert((content + offset),
+                                              (sub_offset - offset));
+                }
 
-            loop_data->Content.Insert((content + previous_offset),
-                                      (length - previous_offset));
+                previous_offset = sub_offset;
+                loop_data->Content += TemplatePatterns_C_::GetInLineSuffix()[0];
+            } while (true);
         }
 
-        // Stage 3
+        loop_data->Content.Insert((content + previous_offset),
+                                  (length - previous_offset));
+
+        // Stage 3: Parse
+        Tags_TC_ tags_buffer;
+        SizeT    loop_offset = 0;
+
+        do {
+            parse(tags_buffer, loop_data->Content.First(), loop_offset,
+                  loop_data->Content.Length());
+
+            if (tags_buffer.IsEmpty()) {
+                break;
+            }
+
+            loop_data->SubTags.Expect(tags_buffer.Size());
+
+            TagBit *      tag = tags_buffer.Storage();
+            const TagBit *end = tags_buffer.End();
+
+            while (tag != end) {
+                loop_data->SubTags += static_cast<TagBit &&>(*tag);
+                ++tag;
+            }
+
+            if (!(tags_buffer.IsFull())) {
+                break;
+            }
+
+            loop_offset =
+                (tags_buffer.First() + tags_buffer.Size() - 1)->EndOffset();
+            tags_buffer.Clear();
+        } while (true);
+
+        // Stage 4
         generateLoopContent(content, loop_data);
     }
 
     QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
                                              LoopData_ *    loop_data) const {
-        // Stage 4: Data
+        // Stage 5: Data
         const Value_T_ *loop_set   = root_value_;
         SizeT           loop_index = 0;
         SizeT           loop_size  = 0;
 
-        // Set
+        // Set (Array)
         if (loop_data->SetLength != 0) {
-            const Char_T_ *content_set = (content + loop_data->SetOffset);
-
-            if ((*content_set == TemplatePatterns_C_::InLinePrefix) &&
-                (loop_data->SetLength >
-                 TemplatePatterns_C_::VariableFulllength)) {
-                loop_set = findValue(
-                    (content_set + TemplatePatterns_C_::VariablePrefixLength),
-                    (loop_data->SetLength -
-                     TemplatePatterns_C_::VariableFulllength)); // {var:x}
-            } else {
-                loop_set = findValue(content_set, loop_data->SetLength);
-            }
+            loop_set = findValue((content + loop_data->SetOffset),
+                                 loop_data->SetLength);
 
             if ((loop_set == nullptr) ||
                 (!(loop_set->IsArray()) && !(loop_set->IsObject()))) {
@@ -999,44 +1031,8 @@ class Template_CV {
             loop_size -= loop_index;
         }
 
-        // Stage 5: Parse
-        Template_CV loop_template{ss_, loop_set, this, (level_ + 1)};
-        Tags_TC_    tags_buffer;
-        SizeT       loop_offset = 0;
-
-        ss_->Expect(loop_data->Content.Length() * loop_size);
-
-        if (loop_data->SubTags.IsEmpty()) {
-            do {
-                parse(tags_buffer, loop_data->Content.First(), loop_offset,
-                      loop_data->Content.Length());
-
-                if (tags_buffer.IsEmpty()) {
-                    break;
-                }
-
-                loop_data->SubTags.Expect(tags_buffer.Size());
-
-                TagBit *      tag = tags_buffer.Storage();
-                const TagBit *end = tags_buffer.End();
-
-                while (tag != end) {
-                    loop_data->SubTags += static_cast<TagBit &&>(*tag);
-                    ++tag;
-                }
-
-                if (!(tags_buffer.IsFull())) {
-                    break;
-                }
-
-                loop_offset =
-                    (tags_buffer.First() + tags_buffer.Size() - 1)->EndOffset();
-                tags_buffer.Clear();
-            } while (true);
-        }
-
-        const Char_T_ *loop_content = loop_data->Content.First();
         const TagBit * last_tag     = loop_data->SubTags.Last();
+        const Char_T_ *loop_content = loop_data->Content.First();
 
         if (last_tag != nullptr) {
             TagBit *      start_tag = loop_data->SubTags.Storage();
@@ -1045,6 +1041,8 @@ class Template_CV {
             const SizeT tag_offset = last_tag->EndOffset();
             const SizeT remain_len = (loop_data->Content.Length() - tag_offset);
             const Char_T_ *remain_str = (loop_content + tag_offset);
+
+            Template_CV loop_template{ss_, loop_set, this, (level_ + 1)};
 
             do {
                 // TODO: Split the loop on 4 threads.
@@ -1058,12 +1056,14 @@ class Template_CV {
                 ++loop_index;
                 --loop_size;
             } while (loop_size != 0);
-        } else {
-            do {
-                ss_->Insert(loop_content, loop_data->Content.Length());
-                --loop_size;
-            } while (loop_size != 0);
+
+            return;
         }
+
+        do {
+            ss_->Insert(loop_content, loop_data->Content.Length());
+            --loop_size;
+        } while (loop_size != 0);
     }
 
     QENTEM_NOINLINE void renderIf(const Char_T_ *content, SizeT length) const {
@@ -1159,11 +1159,6 @@ class Template_CV {
         return else_offset;
     }
 
-    /*
-     * Key can be: name/id, name/id[name/id], name/id[name/id][sub-name/id],
-     * name/id[name/id][sub-name/id][sub-sub-name/id]... "name": a string that
-     * is stored in "keys_". "id" is the index that starts with 0: values_[id]
-     */
     const Value_T_ *findLoopValue(const Char_T_ *key,
                                   SizeT          length) const noexcept {
         SizeT lvl = 0;
