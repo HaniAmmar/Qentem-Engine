@@ -32,7 +32,7 @@
 #define QENTEM_TEMPLATE_PARSE_ARRAY_SIZE 32
 #endif
 
-// TODO: Add autoescape and use * for raw variables
+// TODO: Add autoescape
 
 namespace Qentem {
 
@@ -600,11 +600,12 @@ class Template_CV {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
 
-                    if (tag->LoopData()->Content.IsNotEmpty()) { // Cached
-                        generateLoopContent((content + content_offset),
-                                            tag->LoopData());
+                    LoopData_ *ld = tag->LoopData();
+
+                    if (ld->Content.IsNotEmpty()) { // Cached
+                        generateLoopContent((content + content_offset), ld);
                     } else {
-                        renderLoop(tag->LoopData(), (content + content_offset),
+                        renderLoop(ld, (content + content_offset),
                                    ((tag->EndOffset() -
                                      TemplatePatterns_C_::LoopSuffixLength) -
                                     content_offset));
