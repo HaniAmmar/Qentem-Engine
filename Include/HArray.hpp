@@ -429,6 +429,7 @@ class HArray {
     //////////// Private ////////////
 
   private:
+    SizeT  getBase() const noexcept { return (Capacity() - 1); }
     SizeT *getHashTable() const noexcept { return hashTable_.GetPointer(); }
     void   setStorage(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
 
@@ -445,12 +446,11 @@ class HArray {
         return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }
 
-    void  deallocate(SizeT *hash_table) { Memory::Deallocate(hash_table); }
-    void  clearStorage() noexcept { setStorage(nullptr); }
-    void  setSize(SizeT new_size) noexcept { index_ = new_size; }
-    void  setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
-    SizeT getBase() const noexcept { return (Capacity() - 1); }
-    void  grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
+    void deallocate(SizeT *hash_table) { Memory::Deallocate(hash_table); }
+    void clearStorage() noexcept { setStorage(nullptr); }
+    void setSize(SizeT new_size) noexcept { index_ = new_size; }
+    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+    void grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
 
     SizeT algineSize(SizeT n_size) noexcept {
         const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
@@ -576,7 +576,7 @@ class HArray {
             SizeT *index = (ht + (item->Hash & base));
 
             while (*index != 0) {
-                index = &(src[(*index) - 1].Next);
+                index = &((src + ((*index) - 1))->Next);
             }
 
             *index     = i;
