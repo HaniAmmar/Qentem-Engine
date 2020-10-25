@@ -62,8 +62,8 @@ static int TestString1() {
     EQ_VALUE(str1, "ab", "str1");
     NOT_EQ_TO(str1, "abcd", "str1", "abcd");
 
-    str1 = "ABCDEF0123456789";
-    EQ_VALUE(str1.Length(), 16, "Length");
+    str1 = "ABCDEF0123456789ABCDEF0123456789";
+    EQ_VALUE(str1.Length(), 32, "Length");
 
     length = str1.Length();
     strptr = str1.Eject();
