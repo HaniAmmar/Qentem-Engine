@@ -45,6 +45,13 @@ struct HAItem {
     Value_          Value;
 };
 
+/*|-------------------------------------------|*/
+/*|                Hash Table                 |*/
+/*|____________________|______________________|*/
+/*|     Position       |       HAItem         |*/
+/*| 0, 1 , 2, ... n-1  | item0, item 1, ...   |*/
+/*|____________________|______________________|*/
+
 template <typename Value_, typename Char_T_>
 class HArray {
     using HAItem_T_ = HAItem<Value_, Char_T_>;
@@ -385,34 +392,38 @@ class HArray {
 
     // Removes excess storage.
     void Compress() {
-        if (Size() != 0) {
-            SizeT n_size = 0;
+        const SizeT size = ActualSize();
 
-            for (const HAItem_T_ *item = Storage(), *end = (item + Size());
-                 item != end; item++) {
-                // Find the actual number of items.
-                n_size += (item->Hash > 0);
-            }
+        if (size == 0) {
+            Reset();
+        } else {
+            const SizeT n_cap = algineSize(size);
 
-            if (n_size == 0) {
-                Reset();
-                return;
-            }
-
-            const SizeT n_cap = algineSize(n_size);
-
-            if ((n_size < Size()) || (n_cap < Capacity())) {
+            if ((size < Size()) || (n_cap < Capacity())) {
                 resize(n_cap);
             }
         }
     }
 
+    // Returns the actual number of items.
+    SizeT ActualSize() const noexcept {
+        SizeT size = 0;
+
+        for (const HAItem_T_ *item = Storage(), *end = (item + Size());
+             item != end; item++) {
+            size += (item->Hash != 0);
+        }
+
+        return size;
+    }
+
+    inline SizeT Size() const noexcept { return index_; }
+    inline SizeT Capacity() const noexcept { return capacity_; }
+
     inline HAItem_T_ *Storage() const noexcept {
         return reinterpret_cast<HAItem_T_ *>(getHashTable() + Capacity());
     }
 
-    inline SizeT            Size() const noexcept { return index_; }
-    inline SizeT            Capacity() const noexcept { return capacity_; }
     inline bool             IsEmpty() const noexcept { return (Size() == 0); }
     inline bool             IsNotEmpty() const noexcept { return !(IsEmpty()); }
     inline const HAItem_T_ *First() const noexcept { return Storage(); }
