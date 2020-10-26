@@ -1048,9 +1048,7 @@ class Template_CV {
             do {
                 // TODO: Split the loop on 4 threads.
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
-
                 loop_template.render(start_tag, end_tag, loop_content, 0);
-
                 // Add the remaining string.
                 ss_->Insert(remain_str, remain_len);
 

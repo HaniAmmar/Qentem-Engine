@@ -212,7 +212,7 @@ class String {
             str = src;
         }
 #else
-        str     = Storage();
+        str = Storage();
 #endif
 
         clearLength();
@@ -225,12 +225,10 @@ class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         const unsigned char len = storage_.GetLowTag();
 
-        if (len != 0) {
-            return len;
-        }
-#endif
-
+        return ((len != 0) ? len : length_);
+#else
         return length_;
+#endif
     }
 
     inline Char_T_ *Storage() const noexcept {
