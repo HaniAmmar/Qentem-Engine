@@ -50,8 +50,8 @@ struct StringUtils {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static void StartTrim(const Char_T_ *str, Number_T_ &offset,
-                          Number_T_ end_before) noexcept {
+    static void TrimLeft(const Char_T_ *str, Number_T_ &offset,
+                         Number_T_ end_before) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         while (offset < end_before) {
@@ -69,13 +69,13 @@ struct StringUtils {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static void SoftTrim(const Char_T_ *str, Number_T_ &offset,
-                         Number_T_ &length) noexcept {
+    static void Trim(const Char_T_ *str, Number_T_ &offset,
+                     Number_T_ &length) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         if (length != 0) {
             Number_T_ end_before = (length + offset);
-            StartTrim(str, offset, end_before);
+            TrimLeft(str, offset, end_before);
 
             while (--end_before > offset) {
                 const Char_T_ c = str[end_before];

@@ -303,7 +303,7 @@ class String {
         SizeT          length = src.Length();
         SizeT          offset = 0;
 
-        StringUtils::SoftTrim(str, offset, length);
+        StringUtils::Trim(str, offset, length);
         return String((str + offset), length);
     }
 

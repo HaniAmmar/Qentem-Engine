@@ -417,7 +417,7 @@ class ALE {
             return false;
         }
 
-        StringUtils::SoftTrim(content, offset, length);
+        StringUtils::Trim(content, offset, length);
 
         if ((op == Operation::Equal) || (op == Operation::NotEqual)) {
             val.Content.Offset = static_cast<unsigned int>(offset);

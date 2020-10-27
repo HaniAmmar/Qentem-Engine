@@ -56,10 +56,10 @@ class JSONParser {
 
     static VValue Parse(const Char_T_ *content, SizeT length) {
         SizeT offset = 0;
-        StringUtils::StartTrim(content, offset, length);
+        StringUtils::TrimLeft(content, offset, length);
         VValue value;
         value = JSONParser{}.parseValue(content, offset, length);
-        StringUtils::StartTrim(content, offset, length);
+        StringUtils::TrimLeft(content, offset, length);
 
         if (offset != length) {
             value.Reset();
@@ -101,16 +101,16 @@ class JSONParser {
             }
 
             VValue &obj_value = obj[VString{str, len}];
-            StringUtils::StartTrim(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
 
             if (content[offset] != JSONotation_T_::ColonChar) {
                 break;
             }
 
             ++offset;
-            StringUtils::StartTrim(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
             obj_value = parseValue(content, offset, length);
-            StringUtils::StartTrim(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
 
             const Char_T_ c = content[offset];
 
@@ -124,7 +124,7 @@ class JSONParser {
             }
 
             ++offset;
-            StringUtils::StartTrim(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
         }
 
         return VValue{};
@@ -135,7 +135,7 @@ class JSONParser {
 
         while (offset < length) {
             arr += parseValue(content, offset, length);
-            StringUtils::StartTrim(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
 
             const Char_T_ c = content[offset];
 
@@ -150,7 +150,7 @@ class JSONParser {
             }
 
             ++offset;
-            StringUtils::StartTrim(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
         }
 
         return VValue{};
@@ -160,7 +160,7 @@ class JSONParser {
         switch (content[offset]) {
             case JSONotation_T_::SCurlyChar: {
                 ++offset;
-                StringUtils::StartTrim(content, offset, length);
+                StringUtils::TrimLeft(content, offset, length);
 
                 if (content[offset] == JSONotation_T_::ECurlyChar) {
                     ++offset;
@@ -172,7 +172,7 @@ class JSONParser {
 
             case JSONotation_T_::SSquareChar: {
                 ++offset;
-                StringUtils::StartTrim(content, offset, length);
+                StringUtils::TrimLeft(content, offset, length);
 
                 if (content[offset] == JSONotation_T_::ESquareChar) {
                     ++offset;

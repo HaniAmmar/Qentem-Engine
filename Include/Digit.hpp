@@ -229,7 +229,7 @@ class Digit {
 
             if (str[0] == DigitChars::PlusChar) {
                 SizeT offset = 1;
-                StringUtils::StartTrim(str, offset, length);
+                StringUtils::TrimLeft(str, offset, length);
                 length -= offset;
 
                 if (length != 0) {
@@ -258,7 +258,7 @@ class Digit {
             switch (s_str[0]) {
                 case DigitChars::MinusChar: {
                     SizeT offset = 1;
-                    StringUtils::StartTrim(s_str, offset, length);
+                    StringUtils::TrimLeft(s_str, offset, length);
                     length -= offset;
 
                     if ((length != 0) &&
@@ -272,7 +272,7 @@ class Digit {
 
                 case DigitChars::PlusChar: {
                     SizeT offset = 1;
-                    StringUtils::StartTrim(s_str, offset, length);
+                    StringUtils::TrimLeft(s_str, offset, length);
                     length -= offset;
 
                     if (length != 0) {
@@ -361,7 +361,7 @@ class Digit {
             switch (str[0]) {
                 case DigitChars::MinusChar: {
                     SizeT n_offset = 1;
-                    StringUtils::StartTrim(str, n_offset, length);
+                    StringUtils::TrimLeft(str, n_offset, length);
                     length -= n_offset;
 
                     if ((length != 0) &&
@@ -375,7 +375,7 @@ class Digit {
 
                 case DigitChars::PlusChar: {
                     SizeT offset = 1;
-                    StringUtils::StartTrim(str, offset, length);
+                    StringUtils::TrimLeft(str, offset, length);
                     length -= offset;
 
                     if (length != 0) {

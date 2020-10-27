@@ -104,137 +104,137 @@ static int TestCount() {
 static int TestLeftTrim() {
     int offset = 0;
 
-    StringUtils::StartTrim("", offset, 0);
+    StringUtils::TrimLeft("", offset, 0);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("", offset, 1);
+    StringUtils::TrimLeft("", offset, 1);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("", offset, 10);
+    StringUtils::TrimLeft("", offset, 10);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("a", offset, 1);
+    StringUtils::TrimLeft("a", offset, 1);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("abc", offset, 3);
+    StringUtils::TrimLeft("abc", offset, 3);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("a ", offset, 2);
+    StringUtils::TrimLeft("a ", offset, 2);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("abc ", offset, 4);
+    StringUtils::TrimLeft("abc ", offset, 4);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("a  ", offset, 3);
+    StringUtils::TrimLeft("a  ", offset, 3);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("abc  ", offset, 5);
+    StringUtils::TrimLeft("abc  ", offset, 5);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("a   ", offset, 4);
+    StringUtils::TrimLeft("a   ", offset, 4);
     EQ_VALUE(offset, 0, "offset");
 
-    StringUtils::StartTrim("abc   ", offset, 6);
+    StringUtils::TrimLeft("abc   ", offset, 6);
     EQ_VALUE(offset, 0, "offset");
 
     offset = 0;
-    StringUtils::StartTrim(" a", offset, 2);
+    StringUtils::TrimLeft(" a", offset, 2);
     EQ_VALUE(offset, 1, "offset");
 
     offset = 0;
-    StringUtils::StartTrim(" abc", offset, 4);
+    StringUtils::TrimLeft(" abc", offset, 4);
     EQ_VALUE(offset, 1, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("  a", offset, 3);
+    StringUtils::TrimLeft("  a", offset, 3);
     EQ_VALUE(offset, 2, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("  abc", offset, 5);
+    StringUtils::TrimLeft("  abc", offset, 5);
     EQ_VALUE(offset, 2, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("   a", offset, 4);
+    StringUtils::TrimLeft("   a", offset, 4);
     EQ_VALUE(offset, 3, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("   abc", offset, 6);
+    StringUtils::TrimLeft("   abc", offset, 6);
     EQ_VALUE(offset, 3, "offset");
 
     offset = 0;
-    StringUtils::StartTrim(" a ", offset, 3);
+    StringUtils::TrimLeft(" a ", offset, 3);
     EQ_VALUE(offset, 1, "offset");
 
     offset = 0;
-    StringUtils::StartTrim(" abc ", offset, 5);
+    StringUtils::TrimLeft(" abc ", offset, 5);
     EQ_VALUE(offset, 1, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("  a ", offset, 4);
+    StringUtils::TrimLeft("  a ", offset, 4);
     EQ_VALUE(offset, 2, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("  abc ", offset, 6);
+    StringUtils::TrimLeft("  abc ", offset, 6);
     EQ_VALUE(offset, 2, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("   a  ", offset, 6);
+    StringUtils::TrimLeft("   a  ", offset, 6);
     EQ_VALUE(offset, 3, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("   abc  ", offset, 8);
+    StringUtils::TrimLeft("   abc  ", offset, 8);
     EQ_VALUE(offset, 3, "offset");
 
     offset = 0;
-    StringUtils::StartTrim(" ", offset, 1);
+    StringUtils::TrimLeft(" ", offset, 1);
     EQ_VALUE(offset, 1, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("  ", offset, 2);
+    StringUtils::TrimLeft("  ", offset, 2);
     EQ_VALUE(offset, 2, "offset");
 
     offset = 0;
-    StringUtils::StartTrim("   ", offset, 3);
-    EQ_VALUE(offset, 3, "offset");
-
-    offset = 1;
-    StringUtils::StartTrim(" a ", offset, 3);
-    EQ_VALUE(offset, 1, "offset");
-
-    offset = 1;
-    StringUtils::StartTrim(" abc ", offset, 5);
-    EQ_VALUE(offset, 1, "offset");
-
-    offset = 2;
-    StringUtils::StartTrim("  a ", offset, 4);
-    EQ_VALUE(offset, 2, "offset");
-
-    offset = 2;
-    StringUtils::StartTrim("  abc ", offset, 6);
-    EQ_VALUE(offset, 2, "offset");
-
-    offset = 2;
-    StringUtils::StartTrim("   a  ", offset, 6);
-    EQ_VALUE(offset, 3, "offset");
-
-    offset = 2;
-    StringUtils::StartTrim("   abc  ", offset, 8);
+    StringUtils::TrimLeft("   ", offset, 3);
     EQ_VALUE(offset, 3, "offset");
 
     offset = 1;
-    StringUtils::StartTrim("  ", offset, 2);
-    EQ_VALUE(offset, 2, "offset");
-
-    offset = 2;
-    StringUtils::StartTrim("   ", offset, 3);
-    EQ_VALUE(offset, 3, "offset");
-
-    offset = 0;
-    StringUtils::StartTrim("  ", offset, 1);
+    StringUtils::TrimLeft(" a ", offset, 3);
     EQ_VALUE(offset, 1, "offset");
 
     offset = 1;
-    StringUtils::StartTrim("   ", offset, 2);
+    StringUtils::TrimLeft(" abc ", offset, 5);
+    EQ_VALUE(offset, 1, "offset");
+
+    offset = 2;
+    StringUtils::TrimLeft("  a ", offset, 4);
+    EQ_VALUE(offset, 2, "offset");
+
+    offset = 2;
+    StringUtils::TrimLeft("  abc ", offset, 6);
+    EQ_VALUE(offset, 2, "offset");
+
+    offset = 2;
+    StringUtils::TrimLeft("   a  ", offset, 6);
+    EQ_VALUE(offset, 3, "offset");
+
+    offset = 2;
+    StringUtils::TrimLeft("   abc  ", offset, 8);
+    EQ_VALUE(offset, 3, "offset");
+
+    offset = 1;
+    StringUtils::TrimLeft("  ", offset, 2);
+    EQ_VALUE(offset, 2, "offset");
+
+    offset = 2;
+    StringUtils::TrimLeft("   ", offset, 3);
+    EQ_VALUE(offset, 3, "offset");
+
+    offset = 0;
+    StringUtils::TrimLeft("  ", offset, 1);
+    EQ_VALUE(offset, 1, "offset");
+
+    offset = 1;
+    StringUtils::TrimLeft("   ", offset, 2);
     EQ_VALUE(offset, 2, "offset");
 
     END_SUB_TEST;
@@ -244,217 +244,217 @@ static int TestSoftTrim() {
     SizeT offset = 0;
     SizeT length = 0;
 
-    StringUtils::SoftTrim("", offset, length);
+    StringUtils::Trim("", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 0, "length");
 
     offset = 0;
     length = 1;
-    StringUtils::SoftTrim(" ", offset, length);
+    StringUtils::Trim(" ", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 0, "length");
 
     offset = 0;
     length = 1;
-    StringUtils::SoftTrim("  ", offset, length);
+    StringUtils::Trim("  ", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 0, "length");
 
     offset = 0;
     length = 2;
-    StringUtils::SoftTrim("  ", offset, length);
+    StringUtils::Trim("  ", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 0, "length");
 
     offset = 0;
     length = 2;
-    StringUtils::SoftTrim(" a", offset, length);
+    StringUtils::Trim(" a", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 4;
-    StringUtils::SoftTrim(" abc", offset, length);
+    StringUtils::Trim(" abc", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 1;
     length = 1;
-    StringUtils::SoftTrim(" a", offset, length);
+    StringUtils::Trim(" a", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 1;
     length = 3;
-    StringUtils::SoftTrim(" abc", offset, length);
+    StringUtils::Trim(" abc", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 2;
     length = 1;
-    StringUtils::SoftTrim("  a", offset, length);
+    StringUtils::Trim("  a", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 2;
     length = 3;
-    StringUtils::SoftTrim("  abc", offset, length);
+    StringUtils::Trim("  abc", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 3;
-    StringUtils::SoftTrim("  a", offset, length);
+    StringUtils::Trim("  a", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 5;
-    StringUtils::SoftTrim("  abc", offset, length);
+    StringUtils::Trim("  abc", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 4;
-    StringUtils::SoftTrim("   a", offset, length);
+    StringUtils::Trim("   a", offset, length);
     EQ_VALUE(offset, 3, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 6;
-    StringUtils::SoftTrim("   abc", offset, length);
+    StringUtils::Trim("   abc", offset, length);
     EQ_VALUE(offset, 3, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 2;
-    StringUtils::SoftTrim("a ", offset, length);
+    StringUtils::Trim("a ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 4;
-    StringUtils::SoftTrim("abc ", offset, length);
+    StringUtils::Trim("abc ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 1;
-    StringUtils::SoftTrim("a ", offset, length);
+    StringUtils::Trim("a ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 3;
-    StringUtils::SoftTrim("abc ", offset, length);
+    StringUtils::Trim("abc ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 1;
-    StringUtils::SoftTrim("a  ", offset, length);
+    StringUtils::Trim("a  ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 3;
-    StringUtils::SoftTrim("abc  ", offset, length);
+    StringUtils::Trim("abc  ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 3;
-    StringUtils::SoftTrim("a  ", offset, length);
+    StringUtils::Trim("a  ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 5;
-    StringUtils::SoftTrim("abc  ", offset, length);
+    StringUtils::Trim("abc  ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 4;
-    StringUtils::SoftTrim("a   ", offset, length);
+    StringUtils::Trim("a   ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 6;
-    StringUtils::SoftTrim("abc   ", offset, length);
+    StringUtils::Trim("abc   ", offset, length);
     EQ_VALUE(offset, 0, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 3;
-    StringUtils::SoftTrim(" a ", offset, length);
+    StringUtils::Trim(" a ", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 5;
-    StringUtils::SoftTrim(" abc ", offset, length);
+    StringUtils::Trim(" abc ", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 5;
-    StringUtils::SoftTrim("  a  ", offset, length);
+    StringUtils::Trim("  a  ", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 7;
-    StringUtils::SoftTrim("  abc  ", offset, length);
+    StringUtils::Trim("  abc  ", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 0;
     length = 7;
-    StringUtils::SoftTrim("   a   ", offset, length);
+    StringUtils::Trim("   a   ", offset, length);
     EQ_VALUE(offset, 3, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 0;
     length = 9;
-    StringUtils::SoftTrim("   abc   ", offset, length);
+    StringUtils::Trim("   abc   ", offset, length);
     EQ_VALUE(offset, 3, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 1;
     length = 1;
-    StringUtils::SoftTrim(" a ", offset, length);
+    StringUtils::Trim(" a ", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 1;
     length = 3;
-    StringUtils::SoftTrim(" abc ", offset, length);
+    StringUtils::Trim(" abc ", offset, length);
     EQ_VALUE(offset, 1, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 2;
     length = 1;
-    StringUtils::SoftTrim("  a  ", offset, length);
+    StringUtils::Trim("  a  ", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 2;
     length = 3;
-    StringUtils::SoftTrim("  abc  ", offset, length);
+    StringUtils::Trim("  abc  ", offset, length);
     EQ_VALUE(offset, 2, "offset");
     EQ_VALUE(length, 3, "length");
 
     offset = 3;
     length = 1;
-    StringUtils::SoftTrim("   a   ", offset, length);
+    StringUtils::Trim("   a   ", offset, length);
     EQ_VALUE(offset, 3, "offset");
     EQ_VALUE(length, 1, "length");
 
     offset = 3;
     length = 3;
-    StringUtils::SoftTrim("   abc   ", offset, length);
+    StringUtils::Trim("   abc   ", offset, length);
     EQ_VALUE(offset, 3, "offset");
     EQ_VALUE(length, 3, "length");
 
@@ -538,8 +538,8 @@ static int RunStringUtilsTests() {
 
     START_TEST("Hash Test", TestHash);
     START_TEST("Count Test", TestCount);
-    START_TEST("StartTrim Test", TestLeftTrim);
-    START_TEST("SoftTrim Test", TestSoftTrim);
+    START_TEST("TrimLeft Test", TestLeftTrim);
+    START_TEST("Trim Test", TestSoftTrim);
     START_TEST("IsEqual Test", TestIsEqual);
 
     END_TEST("StringUtils.hpp");
