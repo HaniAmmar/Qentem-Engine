@@ -597,6 +597,7 @@ class HArray {
 
         for (HAItem_T_ *item = src, *end = (item + Size()); item != end;
              item++, i++) {
+            item->Next   = 0;
             SizeT *index = (ht + (item->Hash & base));
 
             while (*index != 0) {
