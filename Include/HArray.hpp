@@ -464,13 +464,9 @@ class HArray {
 
     HAItem_T_ *allocate() {
         const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_T_)) * Capacity());
-
         SizeT *ht = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
         setStorage(ht);
-
-        for (SizeT *pos = ht, *end = (pos + Capacity()); pos != end; pos++) {
-            *pos = 0;
-        }
+        Memory::SetToZero(ht, (sizeof(void *) * Capacity()));
 
         return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }

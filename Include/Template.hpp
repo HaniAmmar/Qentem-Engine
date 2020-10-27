@@ -772,8 +772,8 @@ class Template_CV {
         } while (--times != 0);
     }
 
-    bool parseNumber(SizeT &number, const Char_T_ *content,
-                     const SizeT length) const noexcept {
+    QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content,
+                                     const SizeT length) const noexcept {
         if (length > TemplatePatterns_C_::VariableFulllength) {
             SizeT offset = 0;
             offset = Engine::Find(TemplatePatterns_C_::GetVariablePrefix(),
@@ -820,7 +820,7 @@ class Template_CV {
         SizeT options    = 4; // set, value, times, index
         bool  break_loop = false;
 
-        // Stage 1: Extraction
+        // Stage 1: Info extraction
         do {
             ++len;
             offset += len; // Move to the next Char_T_.
@@ -986,13 +986,12 @@ class Template_CV {
             tags_buffer.Clear();
         } while (true);
 
-        // Stage 4
         generateLoopContent(content, loop_data);
     }
 
     QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
                                              LoopData_ *    loop_data) const {
-        // Stage 5: Data
+        // Stage 4: Data
         const Value_T_ *loop_set   = root_value_;
         SizeT           loop_index = 0;
         SizeT           loop_size  = 0;
