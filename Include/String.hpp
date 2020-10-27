@@ -248,7 +248,21 @@ class String {
         return storage_.GetPointer();
     }
 
-    inline const Char_T_ *First() const noexcept { return Storage(); }
+    inline const Char_T_ *First() const noexcept {
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        const SizeT len = Length();
+        if ((len != 0) && (len < short_string_max)) {
+#ifndef QENTEM_BIG_ENDIAN
+            return reinterpret_cast<const Char_T_ *>(&unused);
+#else
+            // Two tags at the start
+            return reinterpret_cast<const Char_T_ *>(
+                reinterpret_cast<const char *>(&storage_) + 2);
+#endif
+        }
+#endif
+        return storage_.GetPointer();
+    }
 
     inline bool IsEmpty() const noexcept { return (Length() == 0); }
     inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
