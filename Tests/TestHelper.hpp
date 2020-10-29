@@ -203,3 +203,7 @@ static int RunTestHelperTests() {
 } // namespace Qentem
 
 #endif
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4505)
+#endif
