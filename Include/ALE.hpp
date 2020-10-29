@@ -137,10 +137,8 @@ class ALE {
         Bigger,
         LessOrEqual,
         Less,
-
         NotEqual,
         Equal,
-
         Subtraction,
         Addition,
         Division,

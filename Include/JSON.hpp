@@ -57,12 +57,11 @@ class JSONParser {
     static VValue Parse(const Char_T_ *content, SizeT length) {
         SizeT offset = 0;
         StringUtils::TrimLeft(content, offset, length);
-        VValue value;
-        value = JSONParser{}.parseValue(content, offset, length);
+        VValue value = JSONParser{}.parseValue(content, offset, length);
         StringUtils::TrimLeft(content, offset, length);
 
         if (offset != length) {
-            value.Reset();
+            return VValue{};
         }
 
         return value;

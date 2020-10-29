@@ -352,8 +352,8 @@ class HArray {
                     HAItem_T_ * item   = (Storage() + offset);
                     *right_index       = *left_index;
                     *left_index        = item->Next;
-                    item->Hash         = to_hash;
                     item->Next         = 0;
+                    item->Hash         = to_hash;
 
                     item->Key = static_cast<String<Char_T_> &&>(to);
                     return true;
@@ -527,8 +527,8 @@ class HArray {
 
             if (item != nullptr) {
                 *index     = item->Next;
-                item->Hash = 0;
                 item->Next = 0;
+                item->Hash = 0;
 
                 item->Key   = String<Char_T_>();
                 item->Value = Value_();
