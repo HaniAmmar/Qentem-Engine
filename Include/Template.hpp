@@ -1157,40 +1157,63 @@ class Template_CV {
         return else_offset;
     }
 
-    const Value_T_ *findLoopValue(const Char_T_ *key,
-                                  SizeT          length) const noexcept {
-        SizeT lvl = 0;
+    QENTEM_NOINLINE const Value_T_ *findValue(const Char_T_ *key,
+                                              SizeT length) const noexcept {
+        const Value_T_ *value = nullptr;
 
-        do {
-            ++lvl;
-            ++key;
-        } while (*key == TemplatePatterns_C_::TildeChar);
-        length -= lvl;
-
-        const Value_T_ *   value;
-        const Template_CV *obj = this;
-
-        while (lvl < level_) {
-            ++lvl;
-            obj = obj->parent_;
-        }
-
-        value = obj->loop_value_;
-
-        if (length != 0) { // ~[]
-            SizeT offset = 1;
+        if (length != 0) {
+            SizeT offset = 0;
             SizeT tmp    = 1;
 
-            do {
+            if (*key != TemplatePatterns_C_::TildeChar) {
+                value = root_value_;
+
+                if ((key[(length - 1)] !=
+                     TemplatePatterns_C_::VariableIndexSuffix)) {
+                    return value->GetValue(key, length);
+                }
+
+                // [...]
+                while ((key[tmp] != TemplatePatterns_C_::VariableIndexPrefix) &&
+                       (tmp < length)) {
+                    ++tmp;
+                }
+            } else {
+                const Template_CV *obj = this;
+                SizeT              lvl = 0;
+
+                do {
+                    ++lvl;
+                } while (key[lvl] == TemplatePatterns_C_::TildeChar);
+
+                while (lvl < level_) {
+                    ++lvl;
+                    obj = obj->parent_;
+                }
+
+                if ((key[(length - 1)] !=
+                     TemplatePatterns_C_::VariableIndexSuffix)) {
+                    return obj->loop_value_;
+                }
+
+                value  = obj->loop_value_;
+                offset = lvl + 1;
+                // [...]
                 while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
+                }
+            }
+
+            do {
+                if (value == nullptr) {
+                    break;
                 }
 
                 value = value->GetValue((key + offset), (tmp - offset));
 
                 ++tmp;
 
-                if ((tmp >= length) || (value == nullptr)) {
+                if (tmp >= length) {
                     break;
                 }
 
@@ -1207,58 +1230,6 @@ class Template_CV {
         }
 
         return value;
-    }
-
-    QENTEM_NOINLINE const Value_T_ *findValue(const Char_T_ *key,
-                                              SizeT length) const noexcept {
-        const Value_T_ *value = root_value_;
-
-        if (length != 0) {
-            if (*key == TemplatePatterns_C_::TildeChar) {
-                return findLoopValue(key, length);
-            }
-
-            if ((key[(length - 1)] !=
-                 TemplatePatterns_C_::VariableIndexSuffix)) {
-                return value->GetValue(key, length);
-            }
-
-            // String followed by [...]
-
-            SizeT offset = 0;
-            SizeT tmp    = 1;
-
-            while ((key[tmp] != TemplatePatterns_C_::VariableIndexPrefix) &&
-                   (tmp < length)) {
-                ++tmp;
-            }
-
-            do {
-                if (value == nullptr) {
-                    break;
-                }
-
-                value = value->GetValue((key + offset), (tmp - offset));
-
-                ++tmp;
-
-                if (tmp >= length) {
-                    return value;
-                }
-
-                if (key[tmp] == TemplatePatterns_C_::VariableIndexPrefix) {
-                    ++tmp;
-                }
-
-                offset = tmp;
-
-                while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
-                    ++tmp;
-                }
-            } while (true);
-        }
-
-        return nullptr;
     }
 
     bool ALESetNumber(double &number, const Value_T_ *value) const noexcept {
