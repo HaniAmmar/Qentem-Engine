@@ -191,10 +191,10 @@ struct Template {
     template <typename Char_T_>
     struct IfCase_T {
         Array<TagBit<Char_T_>> SubTags{};
-        unsigned int           CaseOffset{};
-        unsigned int           CaseLength{};
-        unsigned int           ContentOffset{};
-        unsigned int           ContentLength{};
+        SizeT                  CaseOffset{};
+        SizeT                  CaseLength{};
+        SizeT                  ContentOffset{};
+        SizeT                  ContentLength{};
     };
 
     template <typename Char_T_>
