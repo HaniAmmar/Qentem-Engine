@@ -353,9 +353,6 @@ class Template_CV {
         SizeT current_offset;
         SizeT tmp_offset;
 
-        static const Char_T_ *inline_suffix =
-            TemplatePatterns_C_::GetInLineSuffix();
-        static const Char_T_  inline_suffix_c = inline_suffix[0];
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
         static const Char_T_ *math_prefix =
@@ -368,6 +365,9 @@ class Template_CV {
             TemplatePatterns_C_::GetLoopSuffix();
         static const Char_T_ *if_prefix = TemplatePatterns_C_::GetIfPrefix();
         static const Char_T_ *if_suffix = TemplatePatterns_C_::GetIfSuffix();
+
+        static const Char_T_ *inline_suffix =
+            TemplatePatterns_C_::GetInLineSuffix();
 
         while (offset < length) {
             if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
@@ -392,7 +392,7 @@ class Template_CV {
                             if (tmp_offset ==
                                 TemplatePatterns_C_::VariablePrefixLength) {
                                 const SizeT end_offset =
-                                    Engine::FindOne(inline_suffix_c, content,
+                                    Engine::FindOne(*inline_suffix, content,
                                                     current_offset, length);
 
                                 if (end_offset != 0) {
@@ -662,7 +662,7 @@ class Template_CV {
 
     void parseVariables(const Char_T_ *content, SizeT length) const {
         static const Char_T_ inline_suffix_c =
-            TemplatePatterns_C_::GetInLineSuffix()[0];
+            *(TemplatePatterns_C_::GetInLineSuffix());
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
 
@@ -787,7 +787,7 @@ class Template_CV {
     QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content,
                                      const SizeT length) const noexcept {
         static const Char_T_ inline_suffix_c =
-            TemplatePatterns_C_::GetInLineSuffix()[0];
+            *(TemplatePatterns_C_::GetInLineSuffix());
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
 
@@ -820,7 +820,7 @@ class Template_CV {
                                              SizeT          length,
                                              LoopData_ *    loop_data) const {
         static const Char_T_ inline_suffix_c =
-            TemplatePatterns_C_::GetInLineSuffix()[0];
+            *(TemplatePatterns_C_::GetInLineSuffix());
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
 
