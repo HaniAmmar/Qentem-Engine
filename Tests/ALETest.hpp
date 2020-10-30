@@ -21,7 +21,7 @@
  */
 
 #include "ALE.hpp"
-#include "FixedArray.hpp"
+#include "Array.hpp"
 #include "TestHelper.hpp"
 
 #ifndef QENTEM_ALE_TESTS_H_
@@ -32,8 +32,6 @@ namespace Test {
 
 struct ALEHelper {
     // See class Template_T_ for another example.
-    static constexpr unsigned int VArraySize = 6;
-
     struct Value_T_ {
         const char *Name;
         SizeT       NameLength;
@@ -46,21 +44,16 @@ struct ALEHelper {
         SizeT       StrLength;
     };
 
-    using VArray = FixedArray<Value_T_, VArraySize>;
-
-    static VArray &GetItems() noexcept {
-        static VArray items;
+    static Array<Value_T_> &GetItems() noexcept {
+        static Array<Value_T_> items;
 
         if (items.IsEmpty()) {
-            Value_T_ *item = items.Storage();
-            items.SetSize(items.Capacity());
-
-            (*item)     = Value_T_{"{1}", 3, 6, nullptr, 0};
-            (*(++item)) = Value_T_{"{A}", 3, 6, nullptr, 0};
-            (*(++item)) = Value_T_{"{AB}", 4, 13, nullptr, 0};
-            (*(++item)) = Value_T_{"{ABC}", 5, 26, nullptr, 0};
-            (*(++item)) = Value_T_{"{Q}", 3, 0, "Qentem", 6};
-            (*(++item)) = Value_T_{"{QA}", 4, 0, "Qentem ALE", 10};
+            items += Value_T_{"{1}", 3, 6, nullptr, 0};
+            items += Value_T_{"{A}", 3, 6, nullptr, 0};
+            items += Value_T_{"{AB}", 4, 13, nullptr, 0};
+            items += Value_T_{"{ABC}", 5, 26, nullptr, 0};
+            items += Value_T_{"{Q}", 3, 0, "Qentem", 6};
+            items += Value_T_{"{QA}", 4, 0, "Qentem ALE", 10};
         }
 
         return items;
@@ -68,7 +61,7 @@ struct ALEHelper {
 
     static bool FindItem(const Value_T_ *&item, const char *content,
                          SizeT length) noexcept {
-        static const VArray &items = GetItems();
+        static const Array<Value_T_> &items = GetItems();
 
         for (SizeT i = 0; i < items.Size(); i++) {
             item = (items.First() + i);

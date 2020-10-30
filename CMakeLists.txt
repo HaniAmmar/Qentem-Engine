@@ -63,14 +63,6 @@ if (ENABLE_COVERAGE)
     target_link_libraries(StringStreamTest --coverage)
 endif()
 
-# FixedArray
-add_executable(FixedArrayTest Tests/FixedArrayTest.cpp)
-add_test(NAME FixedArrayTest COMMAND FixedArrayTest)
-
-if (ENABLE_COVERAGE)
-    target_link_libraries(FixedArrayTest --coverage)
-endif()
-
 # Array
 add_executable(ArrayTest Tests/ArrayTest.cpp)
 add_test(NAME ArrayTest COMMAND ArrayTest)
