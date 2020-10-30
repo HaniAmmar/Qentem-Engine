@@ -1561,7 +1561,7 @@ static int TestLoopXTag3() {
 }
 
 static int TestLoopXTag4() {
-    constexpr unsigned int size_4 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE * 4);
+    constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<wchar_t> content;
     StringStream<wchar_t> output;
@@ -1850,7 +1850,7 @@ static int TestIfXTag2() {
 }
 
 static int TestRenderX1() {
-    constexpr unsigned int size_4 = (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE * 4);
+    constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<wchar_t> content;
     StringStream<wchar_t> output;
@@ -1876,7 +1876,7 @@ static int TestRenderX1() {
     content.Clear();
     output.Clear();
 
-    unsigned int size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+    unsigned int size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += L"{var:";
@@ -1886,7 +1886,7 @@ static int TestRenderX1() {
 
             output += str;
         } else {
-            size += QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+            size += 8;
 
             content += L"{math: 1 + ";
             str = Digit<wchar_t>::NumberToString(i);
@@ -1904,7 +1904,7 @@ static int TestRenderX1() {
     content.Clear();
     output.Clear();
 
-    size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+    size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += L"{var:";
@@ -1914,7 +1914,7 @@ static int TestRenderX1() {
 
             output += str;
         } else {
-            size += QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+            size += 8;
 
             content += LR"({if case="{var:)";
             Digit<wchar_t>::NumberToStringStream(content, i);
@@ -1933,7 +1933,7 @@ static int TestRenderX1() {
     content.Clear();
     output.Clear();
 
-    size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+    size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += L"{var:";
@@ -1943,7 +1943,7 @@ static int TestRenderX1() {
 
             output += str;
         } else {
-            size += QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+            size += 8;
             content += LR"(<loop repeat="1">A</loop>)";
             output += L"A";
         }
@@ -1956,7 +1956,7 @@ static int TestRenderX1() {
     content.Clear();
     output.Clear();
 
-    size = QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+    size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += L"{var:";
@@ -1966,7 +1966,7 @@ static int TestRenderX1() {
 
             output += str;
         } else {
-            size += QENTEM_TEMPLATE_PARSE_ARRAY_SIZE;
+            size += 8;
             content += LR"(<if case="1">A</if>)";
             output += L"A";
         }
@@ -1979,8 +1979,7 @@ static int TestRenderX1() {
     content.Clear();
     output.Clear();
 
-    constexpr unsigned int size_2_1 =
-        (QENTEM_TEMPLATE_PARSE_ARRAY_SIZE * 2) - 1;
+    constexpr unsigned int size_2_1 = (8 * 2) - 1;
 
     for (unsigned int i = 0; i < size_2_1; i++) {
         value += i;
