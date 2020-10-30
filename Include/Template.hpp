@@ -22,15 +22,10 @@
 
 #include "ALE.hpp"
 #include "Array.hpp"
-#include "FixedArray.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_TEMPLATE_H_
 #define QENTEM_TEMPLATE_H_
-
-#ifndef QENTEM_TEMPLATE_PARSE_ARRAY_SIZE
-#define QENTEM_TEMPLATE_PARSE_ARRAY_SIZE 32
-#endif
 
 // TODO: Add autoescape
 
@@ -170,11 +165,12 @@ struct Template {
     }
 
     enum class TagType : unsigned char {
-        Variable = 0, // {var:x}
-        Math,         // {math:x}
-        InLineIf,     // {if:x}
-        Loop,         // <loop set="..." key="..." value="...">
-        If,           // <if case="...">
+        None = 0,
+        Variable, // {var:x}
+        Math,     // {math:x}
+        InLineIf, // {if:x}
+        Loop,     // <loop set="..." key="..." value="...">
+        If,       // <if case="...">
     };
 
     template <typename>
@@ -193,8 +189,23 @@ struct Template {
     };
 
     template <typename Char_T_>
+    struct IfCase_T {
+        Array<TagBit<Char_T_>> SubTags{};
+        unsigned int           CaseOffset{};
+        unsigned int           CaseLength{};
+        unsigned int           ContentOffset{};
+        unsigned int           ContentLength{};
+    };
+
+    template <typename Char_T_>
+    struct IfData_T {
+        Array<IfCase_T<Char_T_>> Cases{1};
+    };
+
+    template <typename Char_T_>
     struct TagBit {
         using LoopData_ = LoopData_T<Char_T_>;
+        using IfData_   = IfData_T<Char_T_>;
 
       public:
         TagBit() = default;
@@ -204,11 +215,13 @@ struct Template {
 
         TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept
             : offset_(offset), end_offset_(end_offset) {
-            setType(type);
-
             if (type == TagType::Loop) {
                 setData(Memory::AllocateInit<LoopData_>());
+            } else if (type == TagType::If) {
+                setData(Memory::AllocateInit<IfData_>());
             }
+
+            setType(type);
         }
 
         TagBit(TagBit &&tag) noexcept
@@ -217,6 +230,8 @@ struct Template {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             type_ = tag.type_;
 #endif
+
+            tag.setType(TagType::None);
         }
 
         ~TagBit() { Reset(); }
@@ -232,23 +247,35 @@ struct Template {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
                 type_ = tag.type_;
 #endif
+
+                tag.setType(TagType::None);
             }
 
             return *this;
         }
 
         void Reset() {
-            LoopData_ *loop_data = LoopData();
+            const TagType type = GetType();
 
-            if (loop_data != nullptr) {
+            if (type == TagType::Loop) {
+                LoopData_ *loop_data = GetLoopData();
                 Memory::Destruct(loop_data);
                 Memory::Deallocate(loop_data);
-                clearData();
+            } else if (type == TagType::If) {
+                IfData_ *if_data = GetIfData();
+                Memory::Destruct(if_data);
+                Memory::Deallocate(if_data);
             }
+
+            clearData();
         }
 
-        inline LoopData_ *LoopData() const noexcept {
+        inline LoopData_ *GetLoopData() const noexcept {
             return static_cast<LoopData_ *>(getData());
+        }
+
+        inline IfData_ *GetIfData() const noexcept {
+            return static_cast<IfData_ *>(getData());
         }
 
         inline TagType GetType() const noexcept {
@@ -258,6 +285,7 @@ struct Template {
             return static_cast<TagType>(data_.GetHighTag());
 #endif
         }
+
         inline SizeT Offset() const noexcept { return offset_; }
         inline SizeT EndOffset() const noexcept { return end_offset_; }
 
@@ -296,42 +324,38 @@ class Template_CV {
   private:
     friend class Qentem::ALE;
 
-    using TagType             = Template::TagType;
-    using TagBit              = Template::TagBit<Char_T_>;
-    using LoopData_           = Template::LoopData_T<Char_T_>;
     using TemplatePatterns_C_ = TemplatePatterns<Char_T_>;
-    using Tags_TC_ = FixedArray<TagBit, QENTEM_TEMPLATE_PARSE_ARRAY_SIZE>;
+
+    using TagType   = Template::TagType;
+    using TagBit    = Template::TagBit<Char_T_>;
+    using LoopData_ = Template::LoopData_T<Char_T_>;
+    using IfCase_   = Template::IfCase_T<Char_T_>;
+    using IfData_   = Template::IfData_T<Char_T_>;
 
     QENTEM_NOINLINE void process(const Char_T_ *content, SizeT length) const {
-        Tags_TC_ tags;
-        SizeT    offset = 0;
+        Array<TagBit> tags{8};
+        SizeT         offset = 0;
 
-        while (offset != length) {
-            parse(tags, content, offset, length);
+        parse(tags, content, offset, length);
+        render(tags.Storage(), tags.End(), content, offset);
 
-            if (tags.IsEmpty()) {
-                break;
-            }
-
-            render(tags.Storage(), tags.End(), content, offset);
+        if (tags.IsNotEmpty()) {
             offset = (tags.First() + tags.Size() - 1)->EndOffset();
-
-            if (!(tags.IsFull())) {
-                break;
-            }
-
-            tags.Clear();
         }
 
         // Add the remaining string.
         ss_->Insert((content + offset), (length - offset));
     }
 
-    QENTEM_NOINLINE static void parse(Tags_TC_ &tags, const Char_T_ *content,
-                                      SizeT offset, SizeT length) {
+    QENTEM_NOINLINE static void parse(Array<TagBit> &tags,
+                                      const Char_T_ *content, SizeT offset,
+                                      SizeT length) {
         SizeT current_offset;
         SizeT tmp_offset;
 
+        static const Char_T_ *inline_suffix =
+            TemplatePatterns_C_::GetInLineSuffix();
+        static const Char_T_  inline_suffix_c = inline_suffix[0];
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
         static const Char_T_ *math_prefix =
@@ -340,7 +364,10 @@ class Template_CV {
             TemplatePatterns_C_::GetInLineIfPrefix();
         static const Char_T_ *loop_prefix =
             TemplatePatterns_C_::GetLoopPrefix();
+        static const Char_T_ *loop_suffix =
+            TemplatePatterns_C_::GetLoopSuffix();
         static const Char_T_ *if_prefix = TemplatePatterns_C_::GetIfPrefix();
+        static const Char_T_ *if_suffix = TemplatePatterns_C_::GetIfSuffix();
 
         while (offset < length) {
             if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
@@ -364,18 +391,13 @@ class Template_CV {
 
                             if (tmp_offset ==
                                 TemplatePatterns_C_::VariablePrefixLength) {
-                                const SizeT end_offset = Engine::FindOne(
-                                    TemplatePatterns_C_::GetInLineSuffix()[0],
-                                    content, current_offset, length);
+                                const SizeT end_offset =
+                                    Engine::FindOne(inline_suffix_c, content,
+                                                    current_offset, length);
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::Variable, offset,
                                                    end_offset};
-
-                                    if (tags.IsFull()) {
-                                        return;
-                                    }
-
                                     offset = end_offset;
                                     continue;
                                 }
@@ -403,19 +425,14 @@ class Template_CV {
                             if (tmp_offset ==
                                 TemplatePatterns_C_::MathPrefixLength) {
                                 SizeT end_offset = Engine::SkipInnerPatterns(
-                                    TemplatePatterns_C_::GetVariablePrefix(),
+                                    variable_prefix,
                                     TemplatePatterns_C_::VariablePrefixLength,
-                                    TemplatePatterns_C_::GetInLineSuffix(), 1,
-                                    content, current_offset, length);
+                                    inline_suffix, 1, content, current_offset,
+                                    length);
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::Math, offset,
                                                    end_offset};
-
-                                    if (tags.IsFull()) {
-                                        return;
-                                    }
-
                                     offset = end_offset;
                                     continue;
                                 }
@@ -444,19 +461,14 @@ class Template_CV {
                             if (tmp_offset ==
                                 TemplatePatterns_C_::InLineIfPrefixLength) {
                                 SizeT end_offset = Engine::SkipInnerPatterns(
-                                    TemplatePatterns_C_::GetVariablePrefix(),
+                                    variable_prefix,
                                     TemplatePatterns_C_::VariablePrefixLength,
-                                    TemplatePatterns_C_::GetInLineSuffix(), 1,
-                                    content, current_offset, length);
+                                    inline_suffix, 1, content, current_offset,
+                                    length);
 
                                 if (end_offset != 0) {
                                     tags += TagBit{TagType::InLineIf, offset,
                                                    end_offset};
-
-                                    if (tags.IsFull()) {
-                                        return;
-                                    }
-
                                     offset = end_offset;
                                     continue;
                                 }
@@ -488,20 +500,15 @@ class Template_CV {
                         if (tmp_offset ==
                             TemplatePatterns_C_::LoopPrefixLength) {
                             SizeT end_offset = Engine::SkipInnerPatterns(
-                                TemplatePatterns_C_::GetLoopPrefix(),
+                                loop_prefix,
                                 TemplatePatterns_C_::LoopPrefixLength,
-                                TemplatePatterns_C_::GetLoopSuffix(),
+                                loop_suffix,
                                 TemplatePatterns_C_::LoopSuffixLength, content,
                                 current_offset, length);
 
                             if (end_offset != 0) {
                                 tags +=
                                     TagBit{TagType::Loop, offset, end_offset};
-
-                                if (tags.IsFull()) {
-                                    return;
-                                }
-
                                 offset = end_offset;
                                 continue;
                             }
@@ -525,19 +532,12 @@ class Template_CV {
 
                         if (tmp_offset == TemplatePatterns_C_::IfPrefixLength) {
                             SizeT end_offset = Engine::SkipInnerPatterns(
-                                TemplatePatterns_C_::GetIfPrefix(),
-                                TemplatePatterns_C_::IfPrefixLength,
-                                TemplatePatterns_C_::GetIfSuffix(),
-                                TemplatePatterns_C_::IfSuffixLength, content,
-                                current_offset, length);
+                                if_prefix, TemplatePatterns_C_::IfPrefixLength,
+                                if_suffix, TemplatePatterns_C_::IfSuffixLength,
+                                content, current_offset, length);
 
                             if (end_offset != 0) {
                                 tags += TagBit{TagType::If, offset, end_offset};
-
-                                if (tags.IsFull()) {
-                                    return;
-                                }
-
                                 offset = end_offset;
                                 continue;
                             }
@@ -599,16 +599,17 @@ class Template_CV {
                 case TagType::Loop: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
+                    LoopData_ *loop_data = tag->GetLoopData();
 
-                    LoopData_ *ld = tag->LoopData();
-
-                    if (ld->Content.IsNotEmpty()) { // Cached
-                        generateLoopContent((content + content_offset), ld);
+                    if (loop_data->Content.IsNotEmpty()) { // Cached
+                        renderLoop((content + content_offset), loop_data);
                     } else {
-                        renderLoop(ld, (content + content_offset),
-                                   ((tag->EndOffset() -
-                                     TemplatePatterns_C_::LoopSuffixLength) -
-                                    content_offset));
+                        generateLoopContent(
+                            (content + content_offset),
+                            ((tag->EndOffset() -
+                              TemplatePatterns_C_::LoopSuffixLength) -
+                             content_offset),
+                            loop_data);
                     }
 
                     break;
@@ -617,9 +618,18 @@ class Template_CV {
                 case TagType::If: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
+                    IfData_ *if_data = tag->GetIfData();
 
-                    renderIf((content + content_offset),
-                             (tag->EndOffset() - content_offset));
+                    if (if_data->Cases.IsNotEmpty()) {
+                        renderIf((content + content_offset), if_data);
+                    } else {
+                        generateIfCases((content + content_offset),
+                                        (tag->EndOffset() - content_offset),
+                                        if_data);
+                    }
+                }
+
+                default: {
                 }
             }
 
@@ -651,12 +661,17 @@ class Template_CV {
     }
 
     void parseVariables(const Char_T_ *content, SizeT length) const {
+        static const Char_T_ inline_suffix_c =
+            TemplatePatterns_C_::GetInLineSuffix()[0];
+        static const Char_T_ *variable_prefix =
+            TemplatePatterns_C_::GetVariablePrefix();
+
         SizeT offset = 0;
         SizeT previous_offset;
 
         do {
             previous_offset = offset;
-            offset = Engine::Find(TemplatePatterns_C_::GetVariablePrefix(),
+            offset          = Engine::Find(variable_prefix,
                                   TemplatePatterns_C_::VariablePrefixLength,
                                   content, offset, length);
 
@@ -670,8 +685,7 @@ class Template_CV {
                          previous_offset));
 
             const SizeT start_offset = offset;
-            offset = Engine::FindOne(TemplatePatterns_C_::GetInLineSuffix()[0],
-                                     content, offset, length);
+            offset = Engine::FindOne(inline_suffix_c, content, offset, length);
 
             renderVariable((content + start_offset),
                            ((offset - 1) - start_offset));
@@ -686,8 +700,9 @@ class Template_CV {
     /*
      * Gets anything between "..."
      */
-    bool getQuoted(SizeT &offset, SizeT &end_offset, const Char_T_ *content,
-                   const SizeT length) const noexcept {
+
+    SizeT getQuoted(const Char_T_ *content, SizeT &offset,
+                    SizeT length) const noexcept {
         offset = Engine::FindOne(TemplatePatterns_C_::QuoteChar, content,
                                  offset, length);
 
@@ -696,12 +711,11 @@ class Template_CV {
                 TemplatePatterns_C_::QuoteChar, content, offset, length);
 
             if (start_offset != 0) {
-                end_offset = ((start_offset - 1) - offset);
-                return true;
+                return ((start_offset - 1) - offset);
             }
         }
 
-        return false;
+        return 0;
     }
 
     QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content,
@@ -716,12 +730,10 @@ class Template_CV {
             ++len;
             offset += len; // Move to the next Char_T_.
 
-            if (!getQuoted(offset, len, content, length)) {
-                break;
-            }
+            len = getQuoted(content, offset, length);
 
             if (len == 0) {
-                return;
+                break;
             }
 
             // = + " + a Char_T_ == 3 + the Char_T_ before it == 4
@@ -774,16 +786,20 @@ class Template_CV {
 
     QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content,
                                      const SizeT length) const noexcept {
+        static const Char_T_ inline_suffix_c =
+            TemplatePatterns_C_::GetInLineSuffix()[0];
+        static const Char_T_ *variable_prefix =
+            TemplatePatterns_C_::GetVariablePrefix();
+
         if (length > TemplatePatterns_C_::VariableFulllength) {
             SizeT offset = 0;
-            offset = Engine::Find(TemplatePatterns_C_::GetVariablePrefix(),
+            offset       = Engine::Find(variable_prefix,
                                   TemplatePatterns_C_::VariablePrefixLength,
                                   content, offset, length);
 
             if (offset != 0) {
                 const SizeT end_offset =
-                    Engine::FindOne(TemplatePatterns_C_::GetInLineSuffix()[0],
-                                    content, offset, length);
+                    Engine::FindOne(inline_suffix_c, content, offset, length);
 
                 if (end_offset == 0) {
                     return false;
@@ -800,9 +816,14 @@ class Template_CV {
         return Digit<Char_T_>::StringToNumber(number, content, length);
     }
 
-    QENTEM_NOINLINE void renderLoop(LoopData_ *    loop_data,
-                                    const Char_T_ *content,
-                                    SizeT          length) const {
+    QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
+                                             SizeT          length,
+                                             LoopData_ *    loop_data) const {
+        static const Char_T_ inline_suffix_c =
+            TemplatePatterns_C_::GetInLineSuffix()[0];
+        static const Char_T_ *variable_prefix =
+            TemplatePatterns_C_::GetVariablePrefix();
+
         const SizeT start_offset = Engine::FindOne(
             TemplatePatterns_C_::MultiLineSuffix, content, SizeT(0), length);
 
@@ -825,13 +846,11 @@ class Template_CV {
             ++len;
             offset += len; // Move to the next Char_T_.
 
-            if (!getQuoted(offset, len, content, start_offset)) {
-                break;
-            }
+            len = getQuoted(content, offset, start_offset);
 
             if (len == 0) {
                 // The syntax is wrong.
-                return;
+                break;
             }
 
             // X="|
@@ -914,8 +933,7 @@ class Template_CV {
                     ((offset - loop_value_length) - previous_offset));
 
                 loop_data->Content.Insert(
-                    TemplatePatterns_C_::GetVariablePrefix(),
-                    TemplatePatterns_C_::VariablePrefixLength);
+                    variable_prefix, TemplatePatterns_C_::VariablePrefixLength);
 
                 SizeT lvl = 0;
                 while (lvl <= level_) {
@@ -948,7 +966,7 @@ class Template_CV {
                 }
 
                 previous_offset = sub_offset;
-                loop_data->Content += TemplatePatterns_C_::GetInLineSuffix()[0];
+                loop_data->Content += inline_suffix_c;
             } while (true);
         }
 
@@ -956,41 +974,14 @@ class Template_CV {
                                   (length - previous_offset));
 
         // Stage 3: Parse
-        Tags_TC_ tags_buffer;
-        SizeT    loop_offset = 0;
-
-        do {
-            parse(tags_buffer, loop_data->Content.First(), loop_offset,
-                  loop_data->Content.Length());
-
-            if (tags_buffer.IsEmpty()) {
-                break;
-            }
-
-            loop_data->SubTags.Expect(tags_buffer.Size());
-
-            TagBit *      tag = tags_buffer.Storage();
-            const TagBit *end = tags_buffer.End();
-
-            while (tag != end) {
-                loop_data->SubTags += static_cast<TagBit &&>(*tag);
-                ++tag;
-            }
-
-            if (!(tags_buffer.IsFull())) {
-                break;
-            }
-
-            loop_offset =
-                (tags_buffer.First() + tags_buffer.Size() - 1)->EndOffset();
-            tags_buffer.Clear();
-        } while (true);
-
-        generateLoopContent(content, loop_data);
+        loop_data->SubTags.Reserve(8);
+        parse(loop_data->SubTags, loop_data->Content.First(), 0,
+              loop_data->Content.Length());
+        renderLoop(content, loop_data);
     }
 
-    QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
-                                             LoopData_ *    loop_data) const {
+    QENTEM_NOINLINE void renderLoop(const Char_T_ *content,
+                                    LoopData_ *    loop_data) const {
         // Stage 4: Data
         const Value_T_ *loop_set   = root_value_;
         SizeT           loop_index = 0;
@@ -1064,89 +1055,98 @@ class Template_CV {
         } while (loop_size != 0);
     }
 
-    QENTEM_NOINLINE void renderIf(const Char_T_ *content, SizeT length) const {
-        double result      = 0;
-        SizeT  offset      = 0;
-        SizeT  case_offset = 0;
-        SizeT  case_length = 0;
-
-        // TODO: Optimize
-
-        if (getQuoted(case_offset, case_length, content, length)) {
-            offset = case_offset;
-            offset += case_length;
-
-            offset = Engine::FindOne(TemplatePatterns_C_::MultiLineSuffix,
-                                     content, offset, length);
-        }
+    QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
+                                         IfData_ *if_data) const {
+        IfCase_ case_bit;
+        case_bit.CaseOffset = 0;
 
         do {
-            if (((case_length != 0) &&
-                 !(ALE::Evaluate(result, (content + case_offset), case_length,
-                                 this))) ||
-                (offset == 0)) {
-                // Error: <if> syntax is wrong; no case=""
+            case_bit.CaseLength =
+                getQuoted(content, case_bit.CaseOffset, length);
+
+            if (case_bit.CaseLength == 0) {
                 return;
             }
 
-            // Find <else..
-            case_offset = findNextElse(content, offset, length);
+            case_bit.ContentOffset = Engine::FindOne(
+                TemplatePatterns_C_::MultiLineSuffix, content,
+                (case_bit.CaseOffset + case_bit.CaseLength + 1), length);
 
-            if ((result > 0) || (case_offset == 0)) {
+            if (case_bit.ContentOffset == 0) {
+                return;
+            }
+
+            SizeT else_offset =
+                nextElse(content, case_bit.ContentOffset, length);
+
+            if (else_offset == 0) {
+                case_bit.ContentLength =
+                    ((length - TemplatePatterns_C_::IfSuffixLength) -
+                     case_bit.ContentOffset);
+                if_data->Cases += static_cast<IfCase_ &&>(case_bit);
                 break;
             }
 
-            // <else has no "i" after it.
-            if (content[case_offset] != TemplatePatterns_C_::ElseIfChar) {
-                result      = 1; // Mark <else as true.
-                case_length = 0;
-            } else if (!getQuoted(case_offset, case_length, content, length)) {
-                // Error: <elseif has no case=""
-                return;
+            case_bit.ContentLength =
+                ((else_offset - TemplatePatterns_C_::ElsePrefixLength) -
+                 case_bit.ContentOffset);
+            if_data->Cases += static_cast<IfCase_ &&>(case_bit);
+
+            if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
+                else_offset =
+                    Engine::FindOne(TemplatePatterns_C_::MultiLineSuffix,
+                                    content, else_offset, length);
+
+                if (else_offset == 0) {
+                    return;
+                }
+
+                case_bit.CaseLength    = 0;
+                case_bit.ContentOffset = else_offset;
+                case_bit.ContentLength =
+                    ((length - TemplatePatterns_C_::IfSuffixLength) -
+                     else_offset);
+
+                if_data->Cases += static_cast<IfCase_ &&>(case_bit);
+                break;
             }
 
-            // Find the end of else/elseif
-            offset = Engine::Find(TemplatePatterns_C_::GetElseSuffix(),
-                                  TemplatePatterns_C_::ElseSuffixLength,
-                                  content, (case_offset + case_length), length);
+            case_bit.CaseOffset = else_offset;
         } while (true);
 
-        if (result > 0) {
-            if (case_offset != 0) {
-                length = case_offset;
-            }
-
-            process((content + offset),
-                    ((length - TemplatePatterns_C_::IfSuffixLength)) - offset);
-        }
+        renderIf(content, if_data);
     }
 
-    static SizeT findNextElse(const Char_T_ *content, SizeT offset,
-                              SizeT length) noexcept {
+    static SizeT nextElse(const Char_T_ *content, SizeT offset,
+                          SizeT length) noexcept {
+        static const Char_T_ *else_txt  = TemplatePatterns_C_::GetElsePrefix();
+        static const Char_T_ *if_prefix = TemplatePatterns_C_::GetIfPrefix();
+        static const Char_T_ *if_suffix = TemplatePatterns_C_::GetIfSuffix();
+
         SizeT else_offset = 0;
 
         do {
-            else_offset = Engine::Find(TemplatePatterns_C_::GetElsePrefix(),
-                                       TemplatePatterns_C_::ElsePrefixLength,
-                                       content, offset, length);
+            else_offset =
+                Engine::Find(else_txt, TemplatePatterns_C_::ElsePrefixLength,
+                             content, offset, length);
 
             if (else_offset == 0) {
                 // No <else.
                 return 0;
             }
 
-            const SizeT next_if = Engine::Find(
-                TemplatePatterns_C_::GetIfPrefix(),
-                TemplatePatterns_C_::IfPrefixLength, content, offset, length);
+            const SizeT next_if =
+                Engine::Find(if_prefix, TemplatePatterns_C_::IfPrefixLength,
+                             content, offset, length);
 
             if ((next_if == 0) || (else_offset < next_if)) {
                 // No nesting <ifs or <else is before the child <if.
                 break;
             }
 
-            offset = Engine::Find(TemplatePatterns_C_::GetIfSuffix(),
-                                  TemplatePatterns_C_::IfSuffixLength, content,
-                                  next_if, length);
+            offset =
+                Engine::Find(if_suffix, TemplatePatterns_C_::IfSuffixLength,
+                             content, next_if, length);
 
             if (else_offset > offset) {
                 // <else came after the child if.
@@ -1155,6 +1155,46 @@ class Template_CV {
         } while (true);
 
         return else_offset;
+    }
+
+    void renderIf(const Char_T_ *content, IfData_ *if_data) const {
+        for (IfCase_ *item = if_data->Cases.Storage(),
+                     *end  = (item + if_data->Cases.Size());
+             item < end; item++) {
+            double result;
+
+            if ((item->CaseLength == 0) ||
+                (ALE::Evaluate(result, (content + item->CaseOffset),
+                               item->CaseLength, this) &&
+                 (result > 0))) {
+                const Char_T_ *if_content = (content + item->ContentOffset);
+                SizeT          if_offset  = 0;
+
+                if (item->SubTags.IsEmpty()) {
+                    parse(item->SubTags, if_content, if_offset,
+                          item->ContentLength);
+                }
+
+                if (item->SubTags.IsNotEmpty()) {
+                    TagBit *      start_tag = item->SubTags.Storage();
+                    const TagBit *end_tag = (start_tag + item->SubTags.Size());
+
+                    render(start_tag, end_tag, if_content, 0);
+
+                    const TagBit *last_tag = item->SubTags.Last();
+
+                    if (last_tag != nullptr) {
+                        const SizeT tag_offset = last_tag->EndOffset();
+                        ss_->Insert((if_content + tag_offset),
+                                    (item->ContentLength - tag_offset));
+                    }
+                } else {
+                    ss_->Insert(if_content, item->ContentLength);
+                }
+
+                break;
+            }
+        }
     }
 
     QENTEM_NOINLINE const Value_T_ *findValue(const Char_T_ *key,
