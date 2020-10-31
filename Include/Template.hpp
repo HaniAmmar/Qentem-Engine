@@ -82,6 +82,7 @@ namespace Qentem {
  * {math: {var:n1} * {var:n2}}
  * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
  * {math: 0.2 + 0.3}
+ *
  * See ALE::Evaluate
  */
 
@@ -234,11 +235,17 @@ struct Template {
             tag.setType(TagType::None);
         }
 
-        ~TagBit() { Reset(); }
+        ~TagBit() {
+            if (GetType() != TagType::None) {
+                Reset();
+            }
+        }
 
         TagBit &operator=(TagBit &&tag) noexcept {
             if (this != &tag) {
-                Reset();
+                if (GetType() != TagType::None) {
+                    Reset();
+                }
 
                 offset_     = tag.offset_;
                 end_offset_ = tag.end_offset_;
@@ -316,9 +323,25 @@ class Template_CV {
   public:
     Template_CV() = delete;
 
-    static void Process(const Char_T_ *content, SizeT length,
-                        const Value_T_ *root_value, StringStream<Char_T_> *ss) {
-        Template_CV{ss, root_value}.process(content, length);
+    QENTEM_NOINLINE static void Process(const Char_T_ *content, SizeT length,
+                                        const Value_T_ *       root_value,
+                                        StringStream<Char_T_> *ss) {
+        Template_CV temp{ss, root_value};
+
+        Array<TagBit> tags{8};
+        temp.parse(tags, content, length);
+
+        TagBit *      start = tags.Storage();
+        const TagBit *end   = (start + tags.Size());
+        temp.render(start, end, content);
+
+        if (tags.IsNotEmpty()) {
+            const SizeT offset = (end - 1)->EndOffset();
+            // Add the remaining string.
+            ss->Insert((content + offset), (length - offset));
+        } else {
+            ss->Insert(content, length);
+        }
     }
 
   private:
@@ -332,24 +355,9 @@ class Template_CV {
     using IfCase_   = Template::IfCase_T<Char_T_>;
     using IfData_   = Template::IfData_T<Char_T_>;
 
-    QENTEM_NOINLINE void process(const Char_T_ *content, SizeT length) const {
-        Array<TagBit> tags{8};
-        SizeT         offset = 0;
-
-        parse(tags, content, offset, length);
-        render(tags.Storage(), tags.End(), content, offset);
-
-        if (tags.IsNotEmpty()) {
-            offset = (tags.First() + tags.Size() - 1)->EndOffset();
-        }
-
-        // Add the remaining string.
-        ss_->Insert((content + offset), (length - offset));
-    }
-
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags,
-                                      const Char_T_ *content, SizeT offset,
-                                      SizeT length) {
+                                      const Char_T_ *content, SizeT length) {
+        SizeT offset = 0;
         SizeT current_offset;
         SizeT tmp_offset;
 
@@ -552,9 +560,9 @@ class Template_CV {
         }
     }
 
-    void render(TagBit *tag, const TagBit *end, const Char_T_ *content,
-                SizeT offset) const {
-        SizeT previous_offset = offset;
+    QENTEM_NOINLINE void render(TagBit *tag, const TagBit *end,
+                                const Char_T_ *content) const {
+        SizeT previous_offset = 0;
 
         while (tag != end) {
             ss_->Insert((content + previous_offset),
@@ -975,7 +983,7 @@ class Template_CV {
 
         // Stage 3: Parse
         loop_data->SubTags.Reserve(8);
-        parse(loop_data->SubTags, loop_data->Content.First(), 0,
+        parse(loop_data->SubTags, loop_data->Content.First(),
               loop_data->Content.Length());
         renderLoop(content, loop_data);
     }
@@ -992,8 +1000,7 @@ class Template_CV {
             loop_set = findValue((content + loop_data->SetOffset),
                                  loop_data->SetLength);
 
-            if ((loop_set == nullptr) ||
-                (!(loop_set->IsArray()) && !(loop_set->IsObject()))) {
+            if (loop_set == nullptr) {
                 return; // set="..." has invalid value.
             }
         }
@@ -1022,37 +1029,39 @@ class Template_CV {
             loop_size -= loop_index;
         }
 
-        const TagBit * last_tag     = loop_data->SubTags.Last();
         const Char_T_ *loop_content = loop_data->Content.First();
+        TagBit *       start_tag    = loop_data->SubTags.Storage();
 
-        if (last_tag != nullptr) {
-            TagBit *      start_tag = loop_data->SubTags.Storage();
-            const TagBit *end_tag   = (start_tag + loop_data->SubTags.Size());
-
-            const SizeT tag_offset = last_tag->EndOffset();
-            const SizeT remain_len = (loop_data->Content.Length() - tag_offset);
-            const Char_T_ *remain_str = (loop_content + tag_offset);
-
-            Template_CV loop_template{ss_, loop_set, this, (level_ + 1)};
-
+        if (start_tag == nullptr) {
             do {
-                // TODO: Split the loop on 4 threads.
-                loop_template.loop_value_ = loop_set->GetValue(loop_index);
-                loop_template.render(start_tag, end_tag, loop_content, 0);
-                // Add the remaining string.
-                ss_->Insert(remain_str, remain_len);
-
-                ++loop_index;
+                ss_->Insert(loop_content, loop_data->Content.Length());
                 --loop_size;
             } while (loop_size != 0);
 
             return;
         }
 
+        const TagBit * end_tag    = (start_tag + loop_data->SubTags.Size());
+        const SizeT    tag_offset = (end_tag - 1)->EndOffset();
+        const SizeT    remain_len = (loop_data->Content.Length() - tag_offset);
+        const Char_T_ *remain_str = (loop_content + tag_offset);
+
+        Template_CV loop_template{ss_, loop_set, this, (level_ + 1)};
+
         do {
-            ss_->Insert(loop_content, loop_data->Content.Length());
+            loop_template.loop_value_ = loop_set->GetValue(loop_index);
+            // TODO: Split the loop on 4 threads.
+            loop_template.render(start_tag, end_tag, loop_content);
+            // Add the remaining string.
+            ss_->Insert(remain_str, remain_len);
             --loop_size;
-        } while (loop_size != 0);
+
+            if (loop_size == 0) {
+                break;
+            }
+
+            ++loop_index;
+        } while (true);
     }
 
     QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
@@ -1132,7 +1141,7 @@ class Template_CV {
 
             if (else_offset == 0) {
                 // No <else.
-                return 0;
+                break;
             }
 
             const SizeT next_if =
@@ -1168,26 +1177,20 @@ class Template_CV {
                                item->CaseLength, this) &&
                  (result > 0))) {
                 const Char_T_ *if_content = (content + item->ContentOffset);
-                SizeT          if_offset  = 0;
 
                 if (item->SubTags.IsEmpty()) {
-                    parse(item->SubTags, if_content, if_offset,
-                          item->ContentLength);
+                    parse(item->SubTags, if_content, item->ContentLength);
                 }
 
                 if (item->SubTags.IsNotEmpty()) {
                     TagBit *      start_tag = item->SubTags.Storage();
                     const TagBit *end_tag = (start_tag + item->SubTags.Size());
 
-                    render(start_tag, end_tag, if_content, 0);
-
-                    const TagBit *last_tag = item->SubTags.Last();
-
-                    if (last_tag != nullptr) {
-                        const SizeT tag_offset = last_tag->EndOffset();
-                        ss_->Insert((if_content + tag_offset),
-                                    (item->ContentLength - tag_offset));
-                    }
+                    render(start_tag, end_tag, if_content);
+                    --end_tag;
+                    const SizeT tag_offset = end_tag->EndOffset();
+                    ss_->Insert((if_content + tag_offset),
+                                (item->ContentLength - tag_offset));
                 } else {
                     ss_->Insert(if_content, item->ContentLength);
                 }
