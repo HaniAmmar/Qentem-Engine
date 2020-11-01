@@ -1830,6 +1830,12 @@ static int TestIfTag2() {
     EQ_VALUE(Template::Render(content, &value), R"(<iw case="0">Qentem</if>)",
              "Render()");
 
+    content = R"(<if case="0"{var:name}</if>)";
+    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+
+    content = R"(<if case="0"><else {var:name}</if>)";
+    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+
     END_SUB_TEST;
 }
 
