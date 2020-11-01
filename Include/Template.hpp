@@ -1064,7 +1064,7 @@ class Template_CV {
         IfCase_ case_bit;
         case_bit.CaseOffset = 0;
 
-        // If content without </if>
+        // The content without </if>
         const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);
 
         do {
