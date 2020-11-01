@@ -1064,6 +1064,9 @@ class Template_CV {
         IfCase_ case_bit;
         case_bit.CaseOffset = 0;
 
+        // If content without </if>
+        const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);
+
         do {
             case_bit.CaseLength =
                 getQuoted(content, case_bit.CaseOffset, length);
@@ -1074,7 +1077,7 @@ class Template_CV {
 
             case_bit.ContentOffset = Engine::FindOne(
                 TemplatePatterns_C_::MultiLineSuffix, content,
-                (case_bit.CaseOffset + case_bit.CaseLength + 1), length);
+                (case_bit.CaseOffset + case_bit.CaseLength + 1), length2);
 
             if (case_bit.ContentOffset == 0) {
                 return;
@@ -1084,9 +1087,7 @@ class Template_CV {
                 nextElse(content, case_bit.ContentOffset, length);
 
             if (else_offset == 0) {
-                case_bit.ContentLength =
-                    ((length - TemplatePatterns_C_::IfSuffixLength) -
-                     case_bit.ContentOffset);
+                case_bit.ContentLength = (length2 - case_bit.ContentOffset);
                 if_data->Cases += static_cast<IfCase_ &&>(case_bit);
                 break;
             }
@@ -1099,7 +1100,7 @@ class Template_CV {
             if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
                 else_offset =
                     Engine::FindOne(TemplatePatterns_C_::MultiLineSuffix,
-                                    content, else_offset, length);
+                                    content, else_offset, length2);
 
                 if (else_offset == 0) {
                     return;
@@ -1107,9 +1108,7 @@ class Template_CV {
 
                 case_bit.CaseLength    = 0;
                 case_bit.ContentOffset = else_offset;
-                case_bit.ContentLength =
-                    ((length - TemplatePatterns_C_::IfSuffixLength) -
-                     else_offset);
+                case_bit.ContentLength = (length2 - else_offset);
 
                 if_data->Cases += static_cast<IfCase_ &&>(case_bit);
                 break;
