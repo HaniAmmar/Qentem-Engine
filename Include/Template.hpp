@@ -371,10 +371,6 @@ class Template_CV {
 
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags_cache,
                                       const Char_T_ *content, SizeT length) {
-        SizeT offset = 0;
-        SizeT current_offset;
-        SizeT tmp_offset;
-
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
         static const Char_T_ *math_prefix =
@@ -391,16 +387,18 @@ class Template_CV {
         static const Char_T_ *inline_suffix =
             TemplatePatterns_C_::GetInLineSuffix();
 
+        SizeT offset = 0;
+
         while (offset < length) {
             if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
-                current_offset = offset;
+                SizeT current_offset = offset;
                 ++current_offset;
 
                 switch (content[current_offset]) {
                     case TemplatePatterns_C_::Var_2ND_Char: {
                         if ((TemplatePatterns_C_::VariablePrefixLength +
                              current_offset) < length) {
-                            tmp_offset = 1;
+                            SizeT tmp_offset = 1;
 
                             do {
                                 ++current_offset;
@@ -434,7 +432,7 @@ class Template_CV {
                     case TemplatePatterns_C_::Math_2ND_Char: {
                         if ((TemplatePatterns_C_::MathPrefixLength +
                              current_offset) < length) {
-                            tmp_offset = 1;
+                            SizeT tmp_offset = 1;
 
                             do {
                                 ++current_offset;
@@ -469,7 +467,7 @@ class Template_CV {
                     case TemplatePatterns_C_::InlineIf_2ND_Char: {
                         if ((TemplatePatterns_C_::InLineIfPrefixLength +
                              current_offset) < length) {
-                            tmp_offset = 1;
+                            SizeT tmp_offset = 1;
 
                             do {
                                 ++current_offset;
@@ -502,14 +500,14 @@ class Template_CV {
                 }
             } else if (content[offset] ==
                        TemplatePatterns_C_::MultiLinePrefix) {
-                current_offset = offset;
+                SizeT current_offset = offset;
                 ++current_offset;
 
                 if (content[current_offset] ==
                     TemplatePatterns_C_::Loop_2ND_Char) { // <loop
                     if ((TemplatePatterns_C_::LoopPrefixLength +
                          current_offset) < length) {
-                        tmp_offset = 1;
+                        SizeT tmp_offset = 1;
 
                         do {
                             ++current_offset;
@@ -542,7 +540,7 @@ class Template_CV {
                            TemplatePatterns_C_::If_2ND_Char) { // <if
                     if ((TemplatePatterns_C_::IfPrefixLength + current_offset) <
                         length) {
-                        tmp_offset = 1;
+                        SizeT tmp_offset = 1;
 
                         do {
                             ++current_offset;
