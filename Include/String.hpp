@@ -33,7 +33,7 @@ namespace Qentem {
  * String container with null terminator and a taggable pointer.
  *
  * If the length is less than ((6 + (sizeof(SizeT) * 2))/ sizeof(Char_T_)) the
- * will be stored on the stack.
+ * string will be stored on the stack.
  */
 template <typename Char_T_>
 class String {
