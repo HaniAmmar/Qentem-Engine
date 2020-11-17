@@ -202,8 +202,6 @@ class String {
             ++str;
         }
 
-        out << '\0';
-
         return out;
     }
 

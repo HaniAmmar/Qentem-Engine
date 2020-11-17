@@ -73,8 +73,6 @@ class StringStream {
             ++str;
         }
 
-        out << '\0';
-
         return out;
     }
 
