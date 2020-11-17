@@ -64,5 +64,5 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, &value).GetString().First() << '\n';
+    std::cout << Template::Render(content, &value).GetString() << '\n';
 }

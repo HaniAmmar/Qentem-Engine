@@ -63,6 +63,21 @@ class StringStream {
         }
     }
 
+    template <typename Stream_T_>
+    friend Stream_T_ &operator<<(Stream_T_ &out, StringStream src) {
+        const Char_T_ *str = src.First();
+        const Char_T_ *end = (str + src.Length());
+
+        while (str != end) {
+            out << *str;
+            ++str;
+        }
+
+        out << '\0';
+
+        return out;
+    }
+
     StringStream &operator=(StringStream &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());

@@ -2038,7 +2038,7 @@ static int TestRender2() {
 }
 
 // std::wcout << '\n'
-//            << Template::Render(content, &value).GetString().First() << '\n';
+//            << Template::Render(content, &value).GetString() << '\n';
 
 static int RunTemplateTests() {
     STARTING_TEST("Template.hpp");

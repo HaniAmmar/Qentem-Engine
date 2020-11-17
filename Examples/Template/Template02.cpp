@@ -21,7 +21,7 @@ int main() {
 9 % 5 = {math:9 % 5}
 )";
 
-    std::cout << Template::Render(content, &value).GetString().First() << '\n';
+    std::cout << Template::Render(content, &value).GetString() << '\n';
 
     /*
         Output:

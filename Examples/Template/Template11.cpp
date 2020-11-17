@@ -21,7 +21,7 @@ Zero!
 </if>
 )";
 
-    std::cout << Template::Render(content, &value).GetString().First() << '\n';
+    std::cout << Template::Render(content, &value).GetString() << '\n';
 
     /*
         Output:

@@ -13,7 +13,7 @@ int main() {
     value["version"]    = 3.0;
     const char *content = R"({var:name}, {var:version})";
 
-    std::cout << Template::Render(content, &value).GetString().First() << '\n';
+    std::cout << Template::Render(content, &value).GetString() << '\n';
 
     /*
         Output:

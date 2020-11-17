@@ -309,7 +309,7 @@ static int TestToUTF32() {
 
 // static void convertTo4Hex(UInt code) {
 //     if (code < 0x10000U) {
-//         std::cout << "\\u" << decToHex(code).First() << "\n";
+//         std::cout << "\\u" << decToHex(code) << "\n";
 //     } else {
 //         code -= 0x10000U;
 //         std::cout << "\n\\u" << decToHex(0xD800U | (code >> 10U)).First();

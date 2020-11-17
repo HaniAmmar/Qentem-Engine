@@ -29,7 +29,7 @@ int main() {
 loop1-value[name]: loop1-value[value]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString().First() << '\n';
+    std::cout << Template::Render(content, &value).GetString() << '\n';
 
     /*
         Output:

@@ -2054,7 +2054,7 @@ static int TestRenderX2() {
 }
 
 // std::wcout << '\n'
-//            << Template::Render(content, &value).GetString().First() << '\n';
+//            << Template::Render(content, &value).GetString() << '\n';
 
 static int RunTemplateLTests() {
     STARTING_TEST("Template.hpp (Wide character)");
