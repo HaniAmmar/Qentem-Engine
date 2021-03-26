@@ -115,14 +115,14 @@ inline static Type_ *Allocate(SizeT size) {
 }
 
 template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(Values_T_ &&... values) {
+inline static Type_ *AllocateInit(Values_T_ &&...values) {
     Type_ *ptr = Allocate<Type_>(1);
     new (ptr) Type_(static_cast<Values_T_ &&>(values)...);
     return ptr;
 }
 
 template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(const Values_T_ &... values) {
+inline static Type_ *AllocateInit(const Values_T_ &...values) {
     Type_ *ptr = Allocate<Type_>(1);
     new (ptr) Type_(values...);
     return ptr;
@@ -155,12 +155,12 @@ inline static void Construct(Type_ *start, const Type_ *end,
 }
 
 template <typename Type_, typename... Values_T_>
-inline static void ConstructValues(Type_ *ptr, Values_T_ &&... values) {
+inline static void ConstructValues(Type_ *ptr, Values_T_ &&...values) {
     new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
 }
 
 template <typename Type_, typename... Values_T_>
-inline static void ConstructValues(Type_ *ptr, const Values_T_ &... values) {
+inline static void ConstructValues(Type_ *ptr, const Values_T_ &...values) {
     new (ptr) Type_{values...};
 }
 
