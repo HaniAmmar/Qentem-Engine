@@ -240,6 +240,12 @@ class Array {
         }
     }
 
+    void Swap(Type_ &item1, Type_ &item2) noexcept {
+        Type_ item = static_cast<Type_ &&>(item1);
+        item1      = static_cast<Type_ &&>(item2);
+        item2      = static_cast<Type_ &&>(item);
+    }
+
     void Compress() {
         // Remove excess storage;
         if (Size() != Capacity()) {
