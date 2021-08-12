@@ -324,6 +324,25 @@ static int TestHArray4() {
     numbers1["key7"] = 70;
     numbers1["key8"] = 80;
 
+    SizeT keyindex;
+
+    numbers1.GetKeyIndex(keyindex, "key1", 4);
+    EQ_VALUE(keyindex, 0, "key1 Index");
+    numbers1.GetKeyIndex(keyindex, "key2", 4);
+    EQ_VALUE(keyindex, 1, "key2 Index");
+    numbers1.GetKeyIndex(keyindex, "key3", 4);
+    EQ_VALUE(keyindex, 2, "key3 Index");
+    numbers1.GetKeyIndex(keyindex, "key4", 4);
+    EQ_VALUE(keyindex, 3, "key4 Index");
+    numbers1.GetKeyIndex(keyindex, "key5", 4);
+    EQ_VALUE(keyindex, 4, "key5 Index");
+    numbers1.GetKeyIndex(keyindex, "key6", 4);
+    EQ_VALUE(keyindex, 5, "key6 Index");
+    numbers1.GetKeyIndex(keyindex, "key7", 4);
+    EQ_VALUE(keyindex, 6, "key7 Index");
+    numbers1.GetKeyIndex(keyindex, "key8", 4);
+    EQ_VALUE(keyindex, 7, "key8 Index");
+
     numbers2["key1"]  = 100;
     numbers2["key3"]  = 300;
     numbers2["key6"]  = 600;
@@ -862,6 +881,98 @@ static int TestHArray10() {
     END_SUB_TEST;
 }
 
+static int TestHArraySort() {
+    HashArray strings;
+
+    strings["2017"] += 2017;
+    strings["2020"] += 2020;
+    strings["2019"] += 2019;
+    strings["2018"] += 2018;
+    strings["2021"] += 2021;
+    strings["2016"] += 2016;
+    strings["2022"] += 2022;
+
+    strings.Sort();
+
+    EQ_VALUE(*strings.GetValue(0), 2016, "strings[2016]");
+    EQ_VALUE(*strings.GetValue(1), 2017, "strings[2017]");
+    EQ_VALUE(*strings.GetValue(2), 2018, "strings[2018]");
+    EQ_VALUE(*strings.GetValue(3), 2019, "strings[2019]");
+    EQ_VALUE(*strings.GetValue(4), 2020, "strings[2020]");
+    EQ_VALUE(*strings.GetValue(5), 2021, "strings[2021]");
+    EQ_VALUE(*strings.GetValue(6), 2022, "strings[2022]");
+
+    EQ_VALUE(strings["2016"], 2016, "strings[2016]");
+    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
+    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2022"], 2022, "strings[2022]");
+
+    strings.Sort(false);
+
+    EQ_VALUE(strings["2022"], 2022, "strings[2022]");
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
+    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+    EQ_VALUE(strings["2016"], 2016, "strings[2016]");
+
+    strings.Reset();
+
+    strings["2020"] = 2020;
+    strings["2017"] = 2017;
+    strings["2019"] = 2019;
+    strings["2018"] = 2018;
+    strings["2021"] = 2021;
+    strings["2021"] = 2021;
+    strings["2018"] = 2018;
+
+    strings.Sort();
+
+    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
+    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+
+    strings.Sort(false);
+
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
+    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+
+    strings.Reset();
+
+    strings["2020"] = 2020;
+    strings["2017"] = 2017;
+    strings["2019"] = 2019;
+    strings["2018"] = 2018;
+    strings["2021"] = 2021;
+    strings["2021"] = 2021;
+    strings["2018"] = 2018;
+
+    strings.Sort(false);
+
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
+    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
+    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+
+    END_SUB_TEST;
+}
+
 static int RunHArrayTests() {
     STARTING_TEST("HArray.hpp");
 
@@ -875,6 +986,7 @@ static int RunHArrayTests() {
     START_TEST("HArray Test 8", TestHArray8);
     START_TEST("HArray Test 9", TestHArray9);
     START_TEST("HArray Test 10", TestHArray10);
+    START_TEST("HArray Sort Test", TestHArraySort);
 
     END_TEST("HArray.hpp");
 }
