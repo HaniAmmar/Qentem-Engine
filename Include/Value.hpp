@@ -1188,6 +1188,66 @@ class Value {
 #endif
     }
 
+    template <typename Number_T_>
+    bool GroupBy(Value &groupedValue, const Char_T_ *key,
+                 const Number_T_ length) {
+        using V_item_ = HAItem<Value, Char_T_>;
+        Value *      current_val;
+        const Value *current_sub_val;
+        Value        new_sub_val;
+        VString      grouped_key;
+        SizeT        grouped_key_index;
+
+        if (IsArray()) {
+            groupedValue.Reset();
+            groupedValue.initObject();
+            new_sub_val.initObject();
+
+            const Value *_item = array_.First();
+
+            if ((_item == nullptr) || !(_item->IsObject()) ||
+                !(_item->object_.GetKeyIndex(grouped_key_index, key, length))) {
+                return false;
+            }
+
+            for (const Value *end = array_.End(); _item != end; _item++) {
+                if ((_item == nullptr) || !(_item->IsObject())) {
+                    return false;
+                }
+
+                SizeT count = 0;
+                for (const V_item_ *obj_item = _item->object_.First(),
+                                   *obj_end  = _item->object_.End();
+                     obj_item != obj_end; obj_item++) {
+                    if ((obj_item == nullptr) ||
+                        obj_item->Value.IsUndefined()) {
+                        return false;
+                    }
+
+                    current_sub_val = &(obj_item->Value);
+
+                    if (count != grouped_key_index) {
+                        new_sub_val[obj_item->Key] = obj_item->Value;
+                    } else {
+                        if (!current_sub_val->SetString(grouped_key)) {
+                            return false;
+                        }
+
+                        current_val = &(groupedValue[grouped_key]);
+                    }
+
+                    ++count;
+                }
+
+                (*current_val) += static_cast<VObject &&>(new_sub_val.object_);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
   private:
     struct VType_; // For tagging pointers
 
