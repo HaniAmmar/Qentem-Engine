@@ -739,6 +739,7 @@ class Value {
         return 0;
     }
 
+    // To get a pointer of a string and length of that string.
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key,
                           Number_T_ &     length) const noexcept {
