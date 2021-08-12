@@ -94,6 +94,48 @@ struct StringUtils {
     }
 
     template <typename Char_T_>
+    static bool IsLess(const Char_T_ *left, const Char_T_ *right,
+                       SizeT left_length, SizeT right_length,
+                       bool orEqual) noexcept {
+        SizeT offset = 0;
+
+        while ((left_length != offset) && (right_length != offset)) {
+            if (left[offset] > right[offset]) {
+                return false;
+            }
+
+            if (left[offset] < right[offset]) {
+                return true;
+            }
+
+            ++offset;
+        }
+
+        return (orEqual && (left_length == right_length));
+    }
+
+    template <typename Char_T_>
+    static bool IsBigger(const Char_T_ *left, const Char_T_ *right,
+                         SizeT left_length, SizeT right_length,
+                         bool orEqual) noexcept {
+        SizeT offset = 0;
+
+        while ((left_length != offset) && (right_length != offset)) {
+            if (left[offset] < right[offset]) {
+                return false;
+            }
+
+            if (left[offset] > right[offset]) {
+                return true;
+            }
+
+            ++offset;
+        }
+
+        return (orEqual && (left_length == right_length));
+    }
+
+    template <typename Char_T_>
     static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
                         SizeT length) noexcept {
         SizeT offset = 0;
