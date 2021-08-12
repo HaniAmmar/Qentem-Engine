@@ -1190,7 +1190,7 @@ class Value {
 
     template <typename Number_T_>
     bool GroupBy(Value &groupedValue, const Char_T_ *key,
-                 const Number_T_ length) {
+                 const Number_T_ length) noexcept {
         using V_item_ = HAItem<Value, Char_T_>;
         Value *      current_val;
         const Value *current_sub_val;
