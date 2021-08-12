@@ -184,6 +184,46 @@ class String {
         return (!(*this == str));
     }
 
+    inline bool operator<(const String &string) const noexcept {
+        return StringUtils::IsLess(First(), string.First(), Length(),
+                                   string.Length(), false);
+    }
+
+    inline bool operator<(const Char_T_ *str) const noexcept {
+        return StringUtils::IsLess(First(), str, Length(),
+                                   StringUtils::Count(str), false);
+    }
+
+    inline bool operator<=(const String &string) const noexcept {
+        return StringUtils::IsLess(First(), string.First(), Length(),
+                                   string.Length(), true);
+    }
+
+    inline bool operator<=(const Char_T_ *str) const noexcept {
+        return StringUtils::IsLess(First(), str, Length(),
+                                   StringUtils::Count(str), true);
+    }
+
+    inline bool operator>(const String &string) const noexcept {
+        return StringUtils::IsBigger(First(), string.First(), Length(),
+                                     string.Length(), false);
+    }
+
+    inline bool operator>(const Char_T_ *str) const noexcept {
+        return StringUtils::IsBigger(First(), str, Length(),
+                                     StringUtils::Count(str), false);
+    }
+
+    inline bool operator>=(const String &string) const noexcept {
+        return StringUtils::IsBigger(First(), string.First(), Length(),
+                                     string.Length(), true);
+    }
+
+    inline bool operator>=(const Char_T_ *str) const noexcept {
+        return StringUtils::IsBigger(First(), str, Length(),
+                                     StringUtils::Count(str), true);
+    }
+
     inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
         if (Length() != length) {
             return false;
