@@ -1248,6 +1248,21 @@ class Value {
         return false;
     }
 
+    // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
+    void Sort(bool ascend = true) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
+            object_.Sort(ascend);
+        }
+
+        // It's not needed, and needs move work on Value & Array (Booth needs
+        // operator < >)
+        // else if (type == ValueType::Array) {
+        //     array_.Sort(ascend);
+        // }
+    }
+
   private:
     struct VType_; // For tagging pointers
 
