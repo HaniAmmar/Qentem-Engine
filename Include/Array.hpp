@@ -247,7 +247,9 @@ class Array {
     }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
-    void Sort(bool ascend = true) { quickSort(Storage(), 0, Size(), ascend); }
+    void Sort(bool ascend = true) noexcept {
+        quickSort(Storage(), 0, Size(), ascend);
+    }
 
     void Compress() {
         // Remove excess storage;
@@ -333,7 +335,7 @@ class Array {
         }
     }
 
-    void quickSort(Type_ *arr, SizeT start, SizeT end, bool ascend) {
+    void quickSort(Type_ *arr, SizeT start, SizeT end, bool ascend) noexcept {
         if (start < end) {
             Type_ *item  = (arr + start);
             SizeT  index = start;
