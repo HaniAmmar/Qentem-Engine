@@ -281,6 +281,18 @@ class HArray {
         return find(index, str, len, StringUtils::Hash(str, len));
     }
 
+    bool GetKeyIndex(SizeT &index, const Char_T_ *str,
+                     const SizeT len) const noexcept {
+        SizeT *sub_index;
+        if (find(sub_index, str, len, StringUtils::Hash(str, len)) != nullptr) {
+            index = (*sub_index) - 1;
+
+            return true;
+        }
+
+        return false;
+    }
+
     Value_ *Find(const Char_T_ *key, SizeT length) const noexcept {
         if (Size() != 0) {
             SizeT *    index;
