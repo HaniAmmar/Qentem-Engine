@@ -246,6 +246,9 @@ class Array {
         item2      = static_cast<Type_ &&>(item);
     }
 
+    // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
+    void Sort(bool ascend = true) { quickSort(Storage(), 0, Size(), ascend); }
+
     void Compress() {
         // Remove excess storage;
         if (Size() != Capacity()) {
@@ -327,6 +330,33 @@ class Array {
         for (const Type_ *item = src.First(), *end = (item + src.Size());
              item != end; item++, des++) {
             Memory::Construct(des, *item);
+        }
+    }
+
+    void quickSort(Type_ *arr, SizeT start, SizeT end, bool ascend) {
+        if (start < end) {
+            Type_ *item  = (arr + start);
+            SizeT  index = start;
+
+            if (ascend) {
+                for (SizeT x = (start + 1); x < end; x++) {
+                    if (!((*(arr + x)) > *item)) {
+                        ++index;
+                        Swap((*(arr + index)), ((*(arr + x))));
+                    }
+                }
+            } else {
+                for (SizeT x = (start + 1); x < end; x++) {
+                    if (!((*(arr + x)) < *item)) {
+                        ++index;
+                        Swap((*(arr + index)), ((*(arr + x))));
+                    }
+                }
+            }
+
+            Swap((*(arr + index)), (*(arr + start)));
+            quickSort(arr, start, index, ascend);
+            quickSort(arr, (index + 1), end, ascend);
         }
     }
 
