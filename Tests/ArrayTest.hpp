@@ -389,6 +389,162 @@ static int TestArray4() {
     END_SUB_TEST;
 }
 
+static int TestArraySort() {
+    Array<int> numbers;
+
+    numbers += 3;
+    numbers += 0;
+    numbers += 5;
+    numbers += 1;
+    numbers += 4;
+    numbers += 2;
+
+    numbers.Sort();
+
+    EQ_VALUE(numbers[0], 0, "numbers[0]");
+    EQ_VALUE(numbers[1], 1, "numbers[1]");
+    EQ_VALUE(numbers[2], 2, "numbers[2]");
+    EQ_VALUE(numbers[3], 3, "numbers[3]");
+    EQ_VALUE(numbers[4], 4, "numbers[4]");
+    EQ_VALUE(numbers[5], 5, "numbers[5]");
+
+    numbers.Sort(false);
+
+    EQ_VALUE(numbers[0], 5, "numbers[0]");
+    EQ_VALUE(numbers[1], 4, "numbers[1]");
+    EQ_VALUE(numbers[2], 3, "numbers[2]");
+    EQ_VALUE(numbers[3], 2, "numbers[3]");
+    EQ_VALUE(numbers[4], 1, "numbers[4]");
+    EQ_VALUE(numbers[5], 0, "numbers[5]");
+
+    numbers.Reset();
+
+    numbers += 3;
+    numbers += 0;
+    numbers += 5;
+    numbers += 1;
+    numbers += 4;
+    numbers += 2;
+
+    numbers.Sort(false);
+
+    EQ_VALUE(numbers[0], 5, "numbers[0]");
+    EQ_VALUE(numbers[1], 4, "numbers[1]");
+    EQ_VALUE(numbers[2], 3, "numbers[2]");
+    EQ_VALUE(numbers[3], 2, "numbers[3]");
+    EQ_VALUE(numbers[4], 1, "numbers[4]");
+    EQ_VALUE(numbers[5], 0, "numbers[5]");
+
+    numbers.Reset();
+
+    numbers += 0;
+    numbers += 1;
+    numbers += 2;
+    numbers += 3;
+    numbers += 4;
+    numbers += 5;
+
+    numbers.Sort();
+
+    EQ_VALUE(numbers[0], 0, "numbers[0]");
+    EQ_VALUE(numbers[1], 1, "numbers[1]");
+    EQ_VALUE(numbers[2], 2, "numbers[2]");
+    EQ_VALUE(numbers[3], 3, "numbers[3]");
+    EQ_VALUE(numbers[4], 4, "numbers[4]");
+    EQ_VALUE(numbers[5], 5, "numbers[5]");
+
+    numbers.Sort(false);
+
+    EQ_VALUE(numbers[0], 5, "numbers[0]");
+    EQ_VALUE(numbers[1], 4, "numbers[1]");
+    EQ_VALUE(numbers[2], 3, "numbers[2]");
+    EQ_VALUE(numbers[3], 2, "numbers[3]");
+    EQ_VALUE(numbers[4], 1, "numbers[4]");
+    EQ_VALUE(numbers[5], 0, "numbers[5]");
+
+    Array<String<char>> strings;
+
+    strings += String<char>("2017");
+    strings += String<char>("2020");
+    strings += String<char>("2019");
+    strings += String<char>("2018");
+    strings += String<char>("2021");
+    strings += String<char>("2018");
+    strings += String<char>("2021");
+
+    strings.Sort();
+
+    EQ_VALUE(strings[0], "2017", "strings[0]");
+    EQ_VALUE(strings[1], "2018", "strings[1]");
+    EQ_VALUE(strings[2], "2018", "strings[2]");
+    EQ_VALUE(strings[3], "2019", "strings[3]");
+    EQ_VALUE(strings[4], "2020", "strings[4]");
+    EQ_VALUE(strings[5], "2021", "strings[5]");
+    EQ_VALUE(strings[6], "2021", "strings[6]");
+
+    strings.Sort(false);
+
+    EQ_VALUE(strings[0], "2021", "strings[0]");
+    EQ_VALUE(strings[1], "2021", "strings[1]");
+    EQ_VALUE(strings[2], "2020", "strings[2]");
+    EQ_VALUE(strings[3], "2019", "strings[3]");
+    EQ_VALUE(strings[4], "2018", "strings[4]");
+    EQ_VALUE(strings[5], "2018", "strings[5]");
+    EQ_VALUE(strings[6], "2017", "strings[6]");
+
+    strings.Reset();
+
+    strings += String<char>("2020");
+    strings += String<char>("2017");
+    strings += String<char>("2019");
+    strings += String<char>("2018");
+    strings += String<char>("2021");
+    strings += String<char>("2021");
+    strings += String<char>("2018");
+
+    strings.Sort();
+
+    EQ_VALUE(strings[0], "2017", "strings[0]");
+    EQ_VALUE(strings[1], "2018", "strings[1]");
+    EQ_VALUE(strings[2], "2018", "strings[2]");
+    EQ_VALUE(strings[3], "2019", "strings[3]");
+    EQ_VALUE(strings[4], "2020", "strings[4]");
+    EQ_VALUE(strings[5], "2021", "strings[5]");
+    EQ_VALUE(strings[6], "2021", "strings[6]");
+
+    strings.Sort(false);
+
+    EQ_VALUE(strings[0], "2021", "strings[0]");
+    EQ_VALUE(strings[1], "2021", "strings[1]");
+    EQ_VALUE(strings[2], "2020", "strings[2]");
+    EQ_VALUE(strings[3], "2019", "strings[3]");
+    EQ_VALUE(strings[4], "2018", "strings[4]");
+    EQ_VALUE(strings[5], "2018", "strings[5]");
+    EQ_VALUE(strings[6], "2017", "strings[6]");
+
+    strings.Reset();
+
+    strings += String<char>("2020");
+    strings += String<char>("2017");
+    strings += String<char>("2019");
+    strings += String<char>("2018");
+    strings += String<char>("2021");
+    strings += String<char>("2021");
+    strings += String<char>("2018");
+
+    strings.Sort(false);
+
+    EQ_VALUE(strings[0], "2021", "strings[0]");
+    EQ_VALUE(strings[1], "2021", "strings[1]");
+    EQ_VALUE(strings[2], "2020", "strings[2]");
+    EQ_VALUE(strings[3], "2019", "strings[3]");
+    EQ_VALUE(strings[4], "2018", "strings[4]");
+    EQ_VALUE(strings[5], "2018", "strings[5]");
+    EQ_VALUE(strings[6], "2017", "strings[6]");
+
+    END_SUB_TEST;
+}
+
 static int RunArrayTests() {
     STARTING_TEST("Array.hpp");
 
@@ -396,6 +552,7 @@ static int RunArrayTests() {
     START_TEST("Array Test 2", TestArray2);
     START_TEST("Array Test 3", TestArray3);
     START_TEST("Array Test 4", TestArray4);
+    START_TEST("Array Sort Test", TestArraySort);
 
     END_TEST("Array.hpp");
 }
