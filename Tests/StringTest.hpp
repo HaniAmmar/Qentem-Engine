@@ -130,52 +130,105 @@ static int TestStringCompare() {
 
     EQ_TO(str1, str2, "str1", "str2");
     EQ_TO(str2, str1, "str2", "str1");
-
     EQ_TO(str1, str3, "str1", "str3");
     EQ_TO(str2, str3, "str2", "str3");
 
     str1 = "abc";
     str2 = "abc";
     str3 = "abc";
-
     EQ_TO(str1, str2, "str1", "str2");
     EQ_TO(str2, str1, "str2", "str1");
-
     EQ_TO(str1, str3, "str1", "str3");
     EQ_TO(str2, str3, "str2", "str3");
 
     str1 = "a";
     str2 = "b";
     str3 = "c";
-
     NOT_EQ_TO(str1, str2, "str1", "str2");
     NOT_EQ_TO(str2, str1, "str2", "str1");
-
     NOT_EQ_TO(str1, str3, "str1", "str3");
     NOT_EQ_TO(str2, str3, "str2", "str3");
 
     str1 = "abc";
     str2 = "efg";
     str3 = "hij";
-
     NOT_EQ_TO(str1, str2, "str1", "str2");
     NOT_EQ_TO(str2, str1, "str2", "str1");
-
     NOT_EQ_TO(str1, str3, "str1", "str3");
     NOT_EQ_TO(str2, str3, "str2", "str3");
 
     str1 = "a";
     str2 = "ef";
     str3 = "abc";
-
     NOT_EQ_TO(str1, str2, "str1", "str2");
     NOT_EQ_TO(str2, str1, "str2", "str1");
-
     NOT_EQ_TO(str1, str3, "str1", "str3");
     NOT_EQ_TO(str2, str3, "str2", "str3");
 
     str1 = "";
     EQ_FALSE(str1.IsEqual(" ", 1), "IsEqual");
+
+    str1 = "";
+    str2 = "";
+    EQ_TRUE((str1 >= str2), "IsBigger");
+    EQ_TRUE((str1 <= str2), "IsLess");
+    EQ_FALSE((str1 > str2), "IsBigger");
+    EQ_FALSE((str1 < str2), "IsLess");
+
+    str1 = "a";
+    str2 = "a";
+    EQ_TRUE((str1 >= str2), "IsBigger");
+    EQ_TRUE((str1 <= str2), "IsLess");
+    EQ_FALSE((str1 > str2), "IsBigger");
+    EQ_FALSE((str1 < str2), "IsLess");
+
+    str1 = "a";
+    str2 = "A";
+    EQ_TRUE((str1 >= str2), "IsBigger");
+    EQ_TRUE((str1 > str2), "IsBigger");
+    EQ_FALSE((str1 <= str2), "IsLess");
+    EQ_FALSE((str1 < str2), "IsLess");
+    //
+    EQ_FALSE((str2 >= str1), "IsBigger");
+    EQ_FALSE((str2 > str1), "IsBigger");
+    EQ_TRUE((str2 <= str1), "IsLess");
+    EQ_TRUE((str2 < str1), "IsLess");
+
+    str1 = "a";
+    str2 = "B";
+    EQ_TRUE((str1 >= str2), "IsBigger");
+    EQ_TRUE((str1 > str2), "IsBigger");
+    EQ_FALSE((str1 <= str2), "IsLess");
+    EQ_FALSE((str1 < str2), "IsLess");
+    //
+    EQ_FALSE((str2 >= str1), "IsBigger");
+    EQ_FALSE((str2 > str1), "IsBigger");
+    EQ_TRUE((str2 <= str1), "IsLess");
+    EQ_TRUE((str2 < str1), "IsLess");
+
+    str1 = "aa";
+    str2 = "aA";
+    EQ_TRUE((str1 >= str2), "IsBigger");
+    EQ_TRUE((str1 > str2), "IsBigger");
+    EQ_FALSE((str1 <= str2), "IsLess");
+    EQ_FALSE((str1 < str2), "IsLess");
+    //
+    EQ_FALSE((str2 >= str1), "IsBigger");
+    EQ_FALSE((str2 > str1), "IsBigger");
+    EQ_TRUE((str2 <= str1), "IsLess");
+    EQ_TRUE((str2 < str1), "IsLess");
+
+    str1 = "2021";
+    str2 = "2018";
+    EQ_TRUE((str1 >= str2), "IsBigger");
+    EQ_TRUE((str1 > str2), "IsBigger");
+    EQ_FALSE((str1 <= str2), "IsLess");
+    EQ_FALSE((str1 < str2), "IsLess");
+    //
+    EQ_FALSE((str2 >= str1), "IsBigger");
+    EQ_FALSE((str2 > str1), "IsBigger");
+    EQ_TRUE((str2 <= str1), "IsLess");
+    EQ_TRUE((str2 < str1), "IsLess");
 
     END_SUB_TEST;
 }
@@ -379,7 +432,7 @@ static int RunStringTests() {
     STARTING_TEST("String.hpp");
 
     START_TEST("String Test 1", TestString1);
-    START_TEST("String::IsEqual", TestStringCompare);
+    START_TEST("String::Compare", TestStringCompare);
     START_TEST("String Test 2", TestString2);
     START_TEST("String::Trim", TestTrim);
 
