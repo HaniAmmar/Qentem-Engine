@@ -48,13 +48,14 @@ struct HAItem {
 /*|-------------------------------------------|*/
 /*|                Hash Table                 |*/
 /*|____________________|______________________|*/
-/*|     Position       |       HAItem         |*/
+/*|     Positions      |       Items          |*/
 /*| 0, 1 , 2, ... n-1  | item0, item 1, ...   |*/
 /*|____________________|______________________|*/
 
 template <typename Value_, typename Char_T_>
 class HArray {
     using HAItem_T_ = HAItem<Value_, Char_T_>;
+    using Key_T_    = String<Char_T_>;
 
   public:
     HArray() = default;
@@ -128,11 +129,10 @@ class HArray {
                                            item->Key.Length(), item->Hash);
 
                 if (des_item == nullptr) {
-                    des_item = insert(
-                        index, static_cast<String<Char_T_> &&>(item->Key),
-                        item->Hash);
+                    des_item = insert(index, static_cast<Key_T_ &&>(item->Key),
+                                      item->Hash);
                 } else {
-                    item->Key.~String<Char_T_>();
+                    item->Key.~Key_T_();
                 }
 
                 des_item->Value = static_cast<Value_ &&>(item->Value);
@@ -160,8 +160,7 @@ class HArray {
                                            item->Key.Length(), item->Hash);
 
                 if (des_item == nullptr) {
-                    des_item =
-                        insert(index, String<Char_T_>(item->Key), item->Hash);
+                    des_item = insert(index, Key_T_(item->Key), item->Hash);
                 }
 
                 des_item->Value = Value_(item->Value);
@@ -183,10 +182,10 @@ class HArray {
             return item->Value;
         }
 
-        return insert(index, String<Char_T_>(key, len), hash)->Value;
+        return insert(index, Key_T_(key, len), hash)->Value;
     }
 
-    Value_ &operator[](String<Char_T_> &&key) {
+    Value_ &operator[](Key_T_ &&key) {
         if (Size() == Capacity()) {
             grow();
         }
@@ -202,10 +201,10 @@ class HArray {
             return item->Value;
         }
 
-        return insert(index, static_cast<String<Char_T_> &&>(key), hash)->Value;
+        return insert(index, static_cast<Key_T_ &&>(key), hash)->Value;
     }
 
-    Value_ &operator[](const String<Char_T_> &key) {
+    Value_ &operator[](const Key_T_ &key) {
         if (Size() == Capacity()) {
             grow();
         }
@@ -221,10 +220,10 @@ class HArray {
             return item->Value;
         }
 
-        return insert(index, String<Char_T_>(key), hash)->Value;
+        return insert(index, Key_T_(key), hash)->Value;
     }
 
-    void Insert(String<Char_T_> &&key, Value_ &&val) {
+    void Insert(Key_T_ &&key, Value_ &&val) {
         if (Size() == Capacity()) {
             grow();
         }
@@ -237,7 +236,7 @@ class HArray {
         HAItem_T_ * item = find(index, str, len, hash);
 
         if (item == nullptr) {
-            item = insert(index, static_cast<String<Char_T_> &&>(key), hash);
+            item = insert(index, static_cast<Key_T_ &&>(key), hash);
         }
 
         item->Value = static_cast<Value_ &&>(val);
@@ -253,7 +252,7 @@ class HArray {
         return nullptr;
     }
 
-    const String<Char_T_> *GetKey(SizeT index) const noexcept {
+    const Key_T_ *GetKey(SizeT index) const noexcept {
         HAItem_T_ *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
@@ -273,7 +272,7 @@ class HArray {
         return nullptr;
     }
 
-    const HAItem_T_ *GetItem(const String<Char_T_> &key) const noexcept {
+    const HAItem_T_ *GetItem(const Key_T_ &key) const noexcept {
         const Char_T_ *str = key.First();
         const SizeT    len = key.Length();
 
@@ -307,7 +306,7 @@ class HArray {
         return nullptr;
     }
 
-    inline Value_ *Find(const String<Char_T_> &key) const noexcept {
+    inline Value_ *Find(const Key_T_ &key) const noexcept {
         return Find(key.First(), key.Length());
     }
 
@@ -319,7 +318,7 @@ class HArray {
         Remove(key, StringUtils::Count(key));
     }
 
-    inline void Remove(const String<Char_T_> &key) const noexcept {
+    inline void Remove(const Key_T_ &key) const noexcept {
         const Char_T_ *str = key.First();
         const SizeT    len = key.Length();
 
@@ -340,8 +339,7 @@ class HArray {
      * This function renames a key to a nonexisting one without changing the
      * order of the item, and returns true if successful.
      */
-    bool Rename(const String<Char_T_> &from,
-                String<Char_T_> &&     to) const noexcept {
+    bool Rename(const Key_T_ &from, Key_T_ &&to) const noexcept {
         if (Size() != 0) {
             const Char_T_ *from_str = from.First();
             const SizeT    from_len = from.Length();
@@ -367,7 +365,7 @@ class HArray {
                     item->Next         = 0;
                     item->Hash         = to_hash;
 
-                    item->Key = static_cast<String<Char_T_> &&>(to);
+                    item->Key = static_cast<Key_T_ &&>(to);
                     return true;
                 }
             }
@@ -376,9 +374,8 @@ class HArray {
         return false;
     }
 
-    bool Rename(const String<Char_T_> &from,
-                const String<Char_T_> &to) const noexcept {
-        return Rename(from, String<Char_T_>(to));
+    bool Rename(const Key_T_ &from, const Key_T_ &to) const noexcept {
+        return Rename(from, Key_T_(to));
     }
 
     void Reserve(SizeT size) {
@@ -478,7 +475,7 @@ class HArray {
         const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_T_)) * Capacity());
         SizeT *ht = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
         setStorage(ht);
-        Memory::SetToZero(ht, (sizeof(void *) * Capacity()));
+        Memory::SetToZero(ht, (sizeof(SizeT) * Capacity()));
 
         return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }
@@ -518,15 +515,14 @@ class HArray {
         return nullptr;
     }
 
-    inline HAItem_T_ *insert(SizeT *index, String<Char_T_> &&key,
-                             SizeT hash) noexcept {
+    inline HAItem_T_ *insert(SizeT *index, Key_T_ &&key, SizeT hash) noexcept {
         HAItem_T_ *item = (Storage() + Size());
         ++index_;
         *index = Size();
 
         item->Next = 0;
         item->Hash = hash;
-        Memory::Construct(&(item->Key), static_cast<String<Char_T_> &&>(key));
+        Memory::Construct(&(item->Key), static_cast<Key_T_ &&>(key));
         Memory::Construct(&(item->Value), Value_());
 
         return item;
@@ -542,7 +538,7 @@ class HArray {
                 item->Next = 0;
                 item->Hash = 0;
 
-                item->Key   = String<Char_T_>();
+                item->Key   = Key_T_();
                 item->Value = Value_();
             }
         }
@@ -589,7 +585,7 @@ class HArray {
             if (item->Hash != 0) {
                 des_item->Hash = item->Hash;
                 Memory::Construct(&(des_item->Key),
-                                  static_cast<String<Char_T_> &&>(item->Key));
+                                  static_cast<Key_T_ &&>(item->Key));
                 Memory::Construct(&(des_item->Value),
                                   static_cast<Value_ &&>(item->Value));
                 ++des_item;
