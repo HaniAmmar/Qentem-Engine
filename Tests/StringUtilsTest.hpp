@@ -533,6 +533,114 @@ static int TestIsEqual() {
     END_SUB_TEST;
 }
 
+static int TestIsBigger() {
+    EQ_TRUE(StringUtils::IsBigger("", "", 0, 0, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("b", "a", 1, 1, false), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("a", "a", 1, 1, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("a", "A", 1, 1, false), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("a", "A", 1, 1, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("aa", "aA", 2, 2, false), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("aa", "aA", 2, 2, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8, 8, true),
+            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8, 8, false),
+            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8, 8, true),
+            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("201811111", "20189999", 4, 4, true),
+            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("2018", "2018", 4, 4, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("201911111", "20189999", 4, 4, true),
+            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("2019", "2018", 4, 4, false), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("201911111", "20189999", 4, 4, false),
+            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("2019", "2018", 4, 4, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("2019", "2018", 3, 3, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("2021", "2018", 4, 4, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("2021", "2018", 4, 4, false), "IsBigger");
+
+    EQ_FALSE(StringUtils::IsBigger("", "", 0, 0, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("a", "a", 1, 1, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("a", "b", 1, 1, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("A", "a", 1, 1, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("A", "a", 1, 1, true), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("aA", "aa", 2, 2, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("aA", "aa", 2, 2, true), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8, 8, true),
+             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8, 8, false),
+             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8, 8, false),
+             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("201811111", "20189999", 4, 4, false),
+             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2018", "2018", 4, 4, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("20189999", "201911111", 4, 4, true),
+             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2018", "2019", 4, 4, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("20189999", "201911111", 4, 4, false),
+             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2018", "2019", 4, 4, true), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2018", "2019", 3, 3, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2019", "2018", 3, 3, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2018", "2021", 4, 4, true), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("2018", "2021", 4, 4, false), "IsBigger");
+
+    END_SUB_TEST;
+}
+
+static int TestIsLess() {
+    EQ_TRUE(StringUtils::IsLess("", "", 0, 0, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("a", "b", 1, 1, false), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("a", "a", 1, 1, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("A", "a", 1, 1, false), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("A", "a", 1, 1, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("aA", "aa", 2, 2, false), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("aA", "aa", 2, 2, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("aBcdefgh", "abcdefgh", 8, 8, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("aBcdefgh", "abcdefgh", 8, 8, false), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("abcdefgh", "abcdefgh", 8, 8, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("20189999", "201811111", 4, 4, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("2018", "2018", 4, 4, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("20189999", "201911111", 4, 4, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("2018", "2019", 4, 4, false), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("20189999", "201911111", 4, 4, false),
+            "IsLess");
+    EQ_TRUE(StringUtils::IsLess("2018", "2019", 4, 4, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("2018", "2019", 3, 3, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("2018", "2021", 4, 4, true), "IsLess");
+    EQ_TRUE(StringUtils::IsLess("2018", "2021", 4, 4, false), "IsLess");
+
+    EQ_FALSE(StringUtils::IsLess("", "", 0, 0, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("a", "a", 1, 1, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("b", "a", 1, 1, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("a", "A", 1, 1, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("a", "A", 1, 1, true), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("aa", "aA", 2, 2, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("aa", "aA", 2, 2, true), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8, 8, true), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8, 8, false),
+             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("abcdefgh", "abcdefgh", 8, 8, false),
+             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("201811111", "20189999", 4, 4, false),
+             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2018", "2018", 4, 4, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("20199999", "201811111", 4, 4, true),
+             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2019", "2018", 4, 4, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("201911111", "20189999", 4, 4, false),
+             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2019", "2018", 4, 4, true), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2019", "2018", 3, 3, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2018", "2019", 3, 3, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2021", "2018", 4, 4, true), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("2021", "2018", 4, 4, false), "IsLess");
+
+    END_SUB_TEST;
+}
+
 static int RunStringUtilsTests() {
     STARTING_TEST("StringUtils.hpp");
 
@@ -541,6 +649,8 @@ static int RunStringUtilsTests() {
     START_TEST("TrimLeft Test", TestLeftTrim);
     START_TEST("Trim Test", TestSoftTrim);
     START_TEST("IsEqual Test", TestIsEqual);
+    START_TEST("IsBigger Test", TestIsBigger);
+    START_TEST("IsLess Test", TestIsLess);
 
     END_TEST("StringUtils.hpp");
 }
