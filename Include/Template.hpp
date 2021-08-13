@@ -195,6 +195,10 @@ struct Template {
         unsigned char          IndexLength{0};
         unsigned char          RepeatOffset{0};
         unsigned char          RepeatLength{0};
+        unsigned char          GroupOffset{0};
+        unsigned char          GroupLength{0};
+        unsigned char          SortOffset{0};
+        unsigned char          SortLength{0};
     };
 
     template <typename Char_T_>
@@ -920,6 +924,23 @@ class Template_CV {
                         break_loop = true;
                         break;
                     }
+
+                    case TemplatePatterns_C_::GroupChar: {
+                        loop_data->GroupOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->GroupLength =
+                            static_cast<unsigned char>(len);
+                        break_loop = true;
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::SortChar: {
+                        loop_data->SortOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->SortLength = static_cast<unsigned char>(len);
+                        break_loop            = true;
+                        break;
+                    }
                 }
 
                 if (break_loop) {
@@ -1510,6 +1531,8 @@ struct TemplatePatterns {
     static constexpr Char_T_ ValueChar  = 'l'; // va[l]ue
     static constexpr Char_T_ RepeatChar = 'p'; // re[p]eat
     static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
+    static constexpr Char_T_ GroupChar  = 'o'; // gr[o]up
+    static constexpr Char_T_ SortChar   = 'r'; // so[r]t
 
     // Var
     static constexpr Char_T_ TildeChar = '~'; // Tilde
