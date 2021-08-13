@@ -1206,8 +1206,8 @@ class Value {
     template <typename Number_T_>
     bool GroupBy(Value &groupedValue, const Char_T_ *key,
                  const Number_T_ length) const noexcept {
-        using V_item_ = HAItem<Value, Char_T_>;
-        Value *      current_val;
+        using V_item_            = HAItem<Value, Char_T_>;
+        Value *      current_val = nullptr;
         const Value *current_sub_val;
         Value        new_sub_val;
         VString      grouped_key;
@@ -1254,7 +1254,10 @@ class Value {
                     ++count;
                 }
 
-                (*current_val) += static_cast<VObject &&>(new_sub_val.object_);
+                if (current_val != nullptr) {
+                    (*current_val) +=
+                        static_cast<VObject &&>(new_sub_val.object_);
+                }
             }
 
             return true;
