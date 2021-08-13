@@ -418,7 +418,7 @@ class HArray {
     }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
-    void Sort(bool ascend = true) {
+    void Sort(bool ascend = true) noexcept {
         quickSort(Storage(), 0, Size(), ascend);
         Memory::SetToZero(getHashTable(), (sizeof(SizeT) * Capacity()));
         generateHash();
@@ -630,7 +630,8 @@ class HArray {
         item2          = static_cast<HAItem_T_ &&>(item);
     }
 
-    void quickSort(HAItem_T_ *arr, SizeT start, SizeT end, bool ascend) {
+    void quickSort(HAItem_T_ *arr, SizeT start, SizeT end,
+                   bool ascend) noexcept {
         if (start < end) {
             Key_T_ *item  = &((arr + start)->Key);
             SizeT   index = start;
