@@ -1029,6 +1029,7 @@ class Template_CV {
     QENTEM_NOINLINE void renderLoop(const Char_T_ *content,
                                     LoopData_ *    loop_data) const {
         // Stage 3: Data
+        Value_T_        grouped_set;
         const Value_T_ *loop_set   = root_value_;
         SizeT           loop_index = 0;
         SizeT           loop_size  = 0;
@@ -1055,6 +1056,21 @@ class Template_CV {
             (!parseNumber(loop_index, (content + loop_data->IndexOffset),
                           loop_data->IndexLength))) {
             return; // Not a number
+        }
+
+        // Grouping
+        if (loop_data->GroupLength != 0) {
+            if (!(loop_set->GroupBy(grouped_set,
+                                    (content + loop_data->GroupOffset),
+                                    loop_data->GroupLength))) {
+                return;
+            }
+
+            if (loop_data->SortLength != 0) {
+                grouped_set.Sort(content[loop_data->SortOffset] == 'a');
+            }
+
+            loop_set = &grouped_set;
         }
 
         if (loop_size == 0) {
