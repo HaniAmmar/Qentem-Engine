@@ -668,8 +668,17 @@ class Template_CV {
     void renderVariable(const Char_T_ *content, SizeT length) const {
         const Value_T_ *value = findValue(content, length);
 
-        if (((value == nullptr) || !(value->InsertString(*ss_))) &&
-            (*content != TemplatePatterns_C_::TildeChar)) {
+        if (value != nullptr) {
+            if (value->InsertString(*ss_)) {
+                return;
+            }
+
+            if (loop_key_ != nullptr) {
+                ss_->Insert(loop_key_, loop_key_length);
+            }
+        }
+
+        if (*content != TemplatePatterns_C_::TildeChar) {
             ss_->Insert((content - TemplatePatterns_C_::VariablePrefixLength),
                         (length + TemplatePatterns_C_::VariableFulllength));
         }
@@ -1059,9 +1068,10 @@ class Template_CV {
         }
 
         // Stage 4: Render
+        Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
         const Char_T_ *loop_content = loop_data->Content.First();
         const SizeT    loop_length  = loop_data->Content.Length();
-        Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
+        const bool     is_object    = loop_set->IsObject();
 
         if (loop_data->SubTags.IsEmpty()) {
             parse(loop_data->SubTags, loop_content, loop_length);
@@ -1069,6 +1079,13 @@ class Template_CV {
 
         do {
             loop_template.loop_value_ = loop_set->GetValue(loop_index);
+
+            if (is_object) {
+                loop_set->SetKeyCharAndLength(loop_index,
+                                              loop_template.loop_key_,
+                                              loop_template.loop_key_length);
+            }
+
             loop_template.process(loop_content, loop_length,
                                   loop_data->SubTags);
 
@@ -1243,7 +1260,7 @@ class Template_CV {
                 }
 
                 value  = obj->loop_value_;
-                offset = lvl + 1;
+                offset = (lvl + 1);
                 // [...]
                 while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
@@ -1423,10 +1440,11 @@ class Template_CV {
 
     StringStream<Char_T_> *ss_;
     const Value_T_ *       root_value_;
-    const Value_T_ *       loop_value_{nullptr};
     const Template_CV *    parent_;
-
-    const SizeT level_;
+    const Value_T_ *       loop_value_{nullptr};
+    const Char_T_ *        loop_key_{nullptr};
+    SizeT                  loop_key_length{0};
+    const SizeT            level_;
 };
 
 template <typename Char_T_>
