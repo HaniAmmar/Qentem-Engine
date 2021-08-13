@@ -110,6 +110,42 @@ inline static void Copy(void *to, const void *from, SizeT size) noexcept {
 }
 
 template <typename Type_>
+inline static void Swap(Type_ &item1, Type_ &item2) noexcept {
+    Type_ item = static_cast<Type_ &&>(item1);
+    item1      = static_cast<Type_ &&>(item2);
+    item2      = static_cast<Type_ &&>(item);
+}
+
+template <typename Type_, typename Number_T_>
+inline static void QuickSort(Type_ *arr, Number_T_ start, Number_T_ end,
+                             bool ascend) noexcept {
+    if (start < end) {
+        Type_ *   item  = (arr + start);
+        Number_T_ index = start;
+
+        if (ascend) {
+            for (Number_T_ x = (start + 1); x < end; x++) {
+                if (!((*(arr + x)) > *item)) {
+                    ++index;
+                    Swap((*(arr + index)), ((*(arr + x))));
+                }
+            }
+        } else {
+            for (Number_T_ x = (start + 1); x < end; x++) {
+                if (!((*(arr + x)) < *item)) {
+                    ++index;
+                    Swap((*(arr + index)), ((*(arr + x))));
+                }
+            }
+        }
+
+        Swap((*(arr + index)), (*(arr + start)));
+        QuickSort(arr, start, index, ascend);
+        QuickSort(arr, (index + 1), end, ascend);
+    }
+}
+
+template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
     return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
 }
