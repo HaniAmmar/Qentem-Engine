@@ -1476,7 +1476,7 @@ static int TestLoopXTag3() {
     EQ_VALUE(Template::Render(content, &value), L"", L"Render()");
 
     content = LR"(<loop value="v">v</loop>)";
-    EQ_VALUE(Template::Render(content, &value), L"", L"Render()");
+    EQ_VALUE(Template::Render(content, &value), L"in", L"Render()");
 
     value.Reset();
     value[L"in"] = 2;
@@ -1556,6 +1556,27 @@ static int TestLoopXTag3() {
 
     content = LR"(<loop repeat="1"><l</loop>)";
     EQ_VALUE(Template::Render(content, &value), L"<l", L"Render()");
+
+    value = JSON::Parse(LR"(
+{
+    "name": "some_val",
+    "2020": [
+        {
+            "month": 5
+        },
+        {
+            "month": 6
+        },
+        {
+            "month": 7
+        }
+    ]
+}
+    )");
+
+    content = LR"(<loop set="2020">{var:name}</loop>)";
+    EQ_VALUE(Template::Render(content, &value), L"some_valsome_valsome_val",
+             L"Render()");
 
     END_SUB_TEST;
 }
