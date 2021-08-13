@@ -195,6 +195,10 @@ struct Template {
         unsigned char          IndexLength{0};
         unsigned char          RepeatOffset{0};
         unsigned char          RepeatLength{0};
+        unsigned char          GroupOffset{0};
+        unsigned char          GroupLength{0};
+        unsigned char          SortOffset{0};
+        unsigned char          SortLength{0};
     };
 
     template <typename Char_T_>
@@ -858,9 +862,7 @@ class Template_CV {
         SizeT          len               = 0;
         SizeT          offset            = 0;
         SizeT          previous_offset   = 0;
-
-        SizeT options    = 4; // set, value, times, index
-        bool  break_loop = false;
+        bool           break_loop        = false;
 
         // Stage 1: Info extraction
         do {
@@ -874,9 +876,8 @@ class Template_CV {
                 break;
             }
 
-            // X="|
-            // 3: Goes back to X
-            // |X="
+            // XY="..."
+            // 4: Goes back to X
             SizeT tmp_offset = (offset - 4);
 
             do {
@@ -923,6 +924,23 @@ class Template_CV {
                         break_loop = true;
                         break;
                     }
+
+                    case TemplatePatterns_C_::GroupChar: {
+                        loop_data->GroupOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->GroupLength =
+                            static_cast<unsigned char>(len);
+                        break_loop = true;
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::SortChar: {
+                        loop_data->SortOffset =
+                            static_cast<unsigned char>(offset);
+                        loop_data->SortLength = static_cast<unsigned char>(len);
+                        break_loop            = true;
+                        break;
+                    }
                 }
 
                 if (break_loop) {
@@ -934,7 +952,7 @@ class Template_CV {
 
             break_loop      = false;
             previous_offset = offset;
-        } while (--options != 0);
+        } while (true);
 
         // Stage 2
         offset          = start_offset;
@@ -1027,6 +1045,11 @@ class Template_CV {
                           loop_data->IndexLength))) {
             return; // Not a number
         }
+
+        // Group
+        // if (loop_data->GroupLength != 0) {
+
+        // }
 
         if (loop_size == 0) {
             loop_size = loop_set->Size();
@@ -1501,15 +1524,23 @@ struct TemplatePatterns {
         return &(val[0]);
     }
 
-    static constexpr Char_T_ QuoteChar  = '"';
-    static constexpr Char_T_ CaseChar   = 'a'; // c[a]se
-    static constexpr Char_T_ TrueChar   = 'u'; // tr[u]e
-    static constexpr Char_T_ FalseChar  = 'l'; // fa[l]se
+    static constexpr Char_T_ QuoteChar = '"';
+
+    // Inline If
+    static constexpr Char_T_ CaseChar  = 'a'; // c[a]se
+    static constexpr Char_T_ TrueChar  = 'u'; // tr[u]e
+    static constexpr Char_T_ FalseChar = 'l'; // fa[l]se
+
+    // Loop
     static constexpr Char_T_ SetChar    = 's'; // [s]et
-    static constexpr Char_T_ ValueChar  = 'u'; // val[u]e
+    static constexpr Char_T_ ValueChar  = 'l'; // va[l]ue
     static constexpr Char_T_ RepeatChar = 'p'; // re[p]eat
     static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
-    static constexpr Char_T_ TildeChar  = '~'; // Tilde
+    static constexpr Char_T_ GroupChar  = 'o'; // gr[o]up
+    static constexpr Char_T_ SortChar   = 'r'; // so[r]t
+
+    // Var
+    static constexpr Char_T_ TildeChar = '~'; // Tilde
 };
 
 } // namespace Qentem

@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+#define QENTEM_POINTER_TAGGING 0
+
 #ifndef QENTEM_COMMON_H_
 #define QENTEM_COMMON_H_
 

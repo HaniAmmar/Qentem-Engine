@@ -5732,6 +5732,164 @@ static int TestDeleteValue() {
     END_SUB_TEST;
 }
 
+static int TestSortValue() {
+    Value<char> value;
+
+    value["2019"] = 0;
+    value["2016"] = 0;
+    value["2017"] = 0;
+    value["2020"] = 0;
+    value["2015"] = 0;
+    value["2021"] = 0;
+    value["2018"] = 0;
+
+    value.Sort();
+
+    EQ_VALUE(
+        value.Stringify(),
+        R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
+        "value.Stringify()");
+
+    value.Reset();
+
+    value["2019"] = 0;
+    value["2016"] = 0;
+    value["2017"] = 0;
+    value["2020"] = 0;
+    value["2015"] = 0;
+    value["2021"] = 0;
+    value["2018"] = 0;
+
+    value.Sort(false);
+
+    EQ_VALUE(
+        value.Stringify(),
+        R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
+        "value.Stringify()");
+
+    value.Reset();
+
+    value["2019"] = 0;
+    value["2016"] = 0;
+    value["2017"] = 0;
+    value["2020"] = 0;
+    value["2015"] = 0;
+    value["2021"] = 0;
+
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(),
+             R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})",
+             "value.Stringify()");
+
+    value.Reset();
+
+    value["2019"] = 0;
+    value["2016"] = 0;
+    value["2017"] = 0;
+    value["2020"] = 0;
+    value["2015"] = 0;
+    value["2021"] = 0;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(),
+             R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})",
+             "value.Stringify()");
+
+    END_SUB_TEST;
+}
+
+static int TestGroupValue() {
+    Value<char> value;
+
+    value += HArray<Value<char>, char>();
+    value += HArray<Value<char>, char>();
+    value += HArray<Value<char>, char>();
+    value += HArray<Value<char>, char>();
+    value += HArray<Value<char>, char>();
+    value += HArray<Value<char>, char>();
+    value += HArray<Value<char>, char>();
+
+    value[0]["year"] = 2019;
+    value[1]["year"] = 2020;
+    value[2]["year"] = 2017;
+    value[3]["year"] = 2020;
+    value[4]["year"] = 2018;
+    value[5]["year"] = 2020;
+    value[6]["year"] = 2018;
+
+    value[0]["month"] = 4;
+    value[1]["month"] = 5;
+    value[2]["month"] = 1;
+    value[3]["month"] = 6;
+    value[4]["month"] = 2;
+    value[5]["month"] = 7;
+    value[6]["month"] = 3;
+
+    Value<char> value2;
+    value.GroupBy(value2, "year", 4);
+    value2.Sort();
+
+    EQ_VALUE(
+        value2.Stringify(),
+        R"({"2017":[{"month":1}],"2018":[{"month":2},{"month":3}],"2019":[{"month":4}],"2020":[{"month":5},{"month":6},{"month":7}]})",
+        "value2.Stringify()");
+
+    value2.Sort(false);
+
+    EQ_VALUE(
+        value2.Stringify(),
+        R"({"2020":[{"month":5},{"month":6},{"month":7}],"2019":[{"month":4}],"2018":[{"month":2},{"month":3}],"2017":[{"month":1}]})",
+        "value2.Stringify()");
+
+    value.Reset();
+    value2.Reset();
+    value.GroupBy(value2, "year", 4);
+    EQ_VALUE(value2.Stringify(), R"()", "value2.Stringify()");
+
+    value[0]["year1"] = 2019;
+    value[1]["year1"] = 2020;
+    value[2]["year1"] = 2017;
+    value[3]["year1"] = 2020;
+    value[4]["year1"] = 2018;
+    value[5]["year1"] = 2020;
+    value[6]["year1"] = 2018;
+
+    value[0]["month"] = 4;
+    value[1]["month"] = 5;
+    value[2]["month"] = 1;
+    value[3]["month"] = 6;
+    value[4]["month"] = 2;
+    value[5]["month"] = 7;
+    value[6]["month"] = 3;
+
+    value.GroupBy(value2, "year", 4);
+    EQ_VALUE(value2.Stringify(), R"({})", "value2.Stringify()");
+
+    ////
+    value.Reset();
+
+    value[0]["year"] = 2019;
+    value[1]["year"] = 2020;
+    value[2]["year"];
+
+    value[0]["month"] = 4;
+    value[1]["month"] = 5;
+    value[2]["month"] = 1;
+
+    EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
+
+    value[2].Reset();
+    value.GroupBy(value2, "year", 4);
+    EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
+
+    value[2]["year"] = HArray<Value<char>, char>();
+    value.GroupBy(value2, "year", 4);
+
+    END_SUB_TEST;
+}
+
 static int RunValueTests() {
     STARTING_TEST("Value.hpp");
 
@@ -5776,6 +5934,9 @@ static int RunValueTests() {
     START_TEST("Stringify Test 4", TestStringify4);
 
     START_TEST("Delete Value Test", TestDeleteValue);
+
+    START_TEST("Sort Value Test", TestSortValue);
+    START_TEST("Group Value Test", TestGroupValue);
 
     END_TEST("Value.hpp");
 }
