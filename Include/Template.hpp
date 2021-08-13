@@ -1059,7 +1059,7 @@ class Template_CV {
         // Stage 4: Render
         const Char_T_ *loop_content = loop_data->Content.First();
         const SizeT    loop_length  = loop_data->Content.Length();
-        Template_CV    loop_template{ss_, loop_set, this, (level_ + 1)};
+        Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
 
         do {
             loop_template.loop_value_ = loop_set->GetValue(loop_index);
