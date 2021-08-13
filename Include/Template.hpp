@@ -135,12 +135,12 @@ namespace Qentem {
  */
 
 template <typename, typename>
-struct Template_CV;
+class Template_CV;
 
 template <typename>
 struct TemplatePatterns;
 
-struct Template {
+class Template {
   public:
     template <typename>
     struct TagBit;
