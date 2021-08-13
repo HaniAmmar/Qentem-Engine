@@ -26,7 +26,7 @@ image:
 build_script:
   - mkdir Build
   - cd Build
-  - cmake --config "Debug" ..
+  - cmake -D CMAKE_BUILD_TYPE=Debug ..
   - cmake --build .
 
 test_script:
