@@ -241,14 +241,12 @@ class Array {
     }
 
     void Swap(Type_ &item1, Type_ &item2) noexcept {
-        Type_ item = static_cast<Type_ &&>(item1);
-        item1      = static_cast<Type_ &&>(item2);
-        item2      = static_cast<Type_ &&>(item);
+        Memory::Swap(item1, item2);
     }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(bool ascend = true) noexcept {
-        quickSort(Storage(), 0, Size(), ascend);
+        Memory::QuickSort<Type_, SizeT>(Storage(), 0, Size(), ascend);
     }
 
     void Compress() {
@@ -332,33 +330,6 @@ class Array {
         for (const Type_ *item = src.First(), *end = (item + src.Size());
              item != end; item++, des++) {
             Memory::Construct(des, *item);
-        }
-    }
-
-    void quickSort(Type_ *arr, SizeT start, SizeT end, bool ascend) noexcept {
-        if (start < end) {
-            Type_ *item  = (arr + start);
-            SizeT  index = start;
-
-            if (ascend) {
-                for (SizeT x = (start + 1); x < end; x++) {
-                    if (!((*(arr + x)) > *item)) {
-                        ++index;
-                        Swap((*(arr + index)), ((*(arr + x))));
-                    }
-                }
-            } else {
-                for (SizeT x = (start + 1); x < end; x++) {
-                    if (!((*(arr + x)) < *item)) {
-                        ++index;
-                        Swap((*(arr + index)), ((*(arr + x))));
-                    }
-                }
-            }
-
-            Swap((*(arr + index)), (*(arr + start)));
-            quickSort(arr, start, index, ascend);
-            quickSort(arr, (index + 1), end, ascend);
         }
     }
 

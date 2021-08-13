@@ -43,6 +43,14 @@ struct HAItem {
     SizeT           Hash;
     String<Char_T_> Key;
     Value_          Value;
+
+    inline bool operator<(const HAItem &item) const noexcept {
+        return (Key < item.Key);
+    }
+
+    inline bool operator>(const HAItem &item) const noexcept {
+        return (Key > item.Key);
+    }
 };
 
 /*|-------------------------------------------|*/
@@ -419,7 +427,7 @@ class HArray {
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(bool ascend = true) noexcept {
-        quickSort(Storage(), 0, Size(), ascend);
+        Memory::QuickSort<HAItem_T_, SizeT>(Storage(), 0, Size(), ascend);
         Memory::SetToZero(getHashTable(), (sizeof(SizeT) * Capacity()));
         generateHash();
     }
@@ -621,40 +629,6 @@ class HArray {
 
             *index     = i;
             item->Next = 0;
-        }
-    }
-
-    void swap(HAItem_T_ &item1, HAItem_T_ &item2) noexcept {
-        HAItem_T_ item = static_cast<HAItem_T_ &&>(item1);
-        item1          = static_cast<HAItem_T_ &&>(item2);
-        item2          = static_cast<HAItem_T_ &&>(item);
-    }
-
-    void quickSort(HAItem_T_ *arr, SizeT start, SizeT end,
-                   bool ascend) noexcept {
-        if (start < end) {
-            Key_T_ *item  = &((arr + start)->Key);
-            SizeT   index = start;
-
-            if (ascend) {
-                for (SizeT x = (start + 1); x < end; x++) {
-                    if (!((arr + x)->Key > *item)) {
-                        ++index;
-                        swap((*(arr + index)), ((*(arr + x))));
-                    }
-                }
-            } else {
-                for (SizeT x = (start + 1); x < end; x++) {
-                    if (!((arr + x)->Key < *item)) {
-                        ++index;
-                        swap((*(arr + index)), ((*(arr + x))));
-                    }
-                }
-            }
-
-            swap((*(arr + index)), (*(arr + start)));
-            quickSort(arr, start, index, ascend);
-            quickSort(arr, (index + 1), end, ascend);
         }
     }
 
