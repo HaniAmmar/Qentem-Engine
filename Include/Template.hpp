@@ -858,9 +858,7 @@ class Template_CV {
         SizeT          len               = 0;
         SizeT          offset            = 0;
         SizeT          previous_offset   = 0;
-
-        SizeT options    = 4; // set, value, times, index
-        bool  break_loop = false;
+        bool           break_loop        = false;
 
         // Stage 1: Info extraction
         do {
@@ -874,9 +872,8 @@ class Template_CV {
                 break;
             }
 
-            // X="|
-            // 3: Goes back to X
-            // |X="
+            // XY="..."
+            // 4: Goes back to X
             SizeT tmp_offset = (offset - 4);
 
             do {
@@ -934,7 +931,7 @@ class Template_CV {
 
             break_loop      = false;
             previous_offset = offset;
-        } while (--options != 0);
+        } while (true);
 
         // Stage 2
         offset          = start_offset;
@@ -1501,15 +1498,21 @@ struct TemplatePatterns {
         return &(val[0]);
     }
 
-    static constexpr Char_T_ QuoteChar  = '"';
-    static constexpr Char_T_ CaseChar   = 'a'; // c[a]se
-    static constexpr Char_T_ TrueChar   = 'u'; // tr[u]e
-    static constexpr Char_T_ FalseChar  = 'l'; // fa[l]se
+    static constexpr Char_T_ QuoteChar = '"';
+
+    // Inline If
+    static constexpr Char_T_ CaseChar  = 'a'; // c[a]se
+    static constexpr Char_T_ TrueChar  = 'u'; // tr[u]e
+    static constexpr Char_T_ FalseChar = 'l'; // fa[l]se
+
+    // Loop
     static constexpr Char_T_ SetChar    = 's'; // [s]et
-    static constexpr Char_T_ ValueChar  = 'u'; // val[u]e
+    static constexpr Char_T_ ValueChar  = 'l'; // va[l]ue
     static constexpr Char_T_ RepeatChar = 'p'; // re[p]eat
     static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
-    static constexpr Char_T_ TildeChar  = '~'; // Tilde
+
+    // Var
+    static constexpr Char_T_ TildeChar = '~'; // Tilde
 };
 
 } // namespace Qentem
