@@ -739,7 +739,22 @@ class Value {
         return 0;
     }
 
-    // To get a pointer of a string and length of that string.
+    // To get a pointer to a key and its length.
+    template <typename Number_T_>
+    bool SetKeyCharAndLength(SizeT index, const Char_T_ *&key,
+                             Number_T_ &length) const noexcept {
+        const VString *val = GetKey(index);
+
+        if (val != nullptr) {
+            key    = val->First();
+            length = val->Length();
+            return true;
+        }
+
+        return false;
+    }
+
+    // To get a pointer to the string and its length.
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key,
                           Number_T_ &     length) const noexcept {
