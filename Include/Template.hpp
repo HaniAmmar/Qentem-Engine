@@ -135,7 +135,7 @@ namespace Qentem {
  */
 
 template <typename, typename>
-class Template_CV;
+struct Template_CV;
 
 template <typename>
 struct TemplatePatterns;
