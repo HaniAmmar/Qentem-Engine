@@ -351,26 +351,28 @@ class Template_CV {
                         const Value_T_ *root_value, StringStream<Char_T_> *ss,
                         Array<TagBit> &tags_cache) {
         Template_CV temp{ss, root_value};
+
+        if (tags_cache.IsEmpty()) {
+            parse(tags_cache, content, length);
+        }
+
         temp.process(content, length, tags_cache);
     }
 
   private:
     void process(const Char_T_ *content, SizeT length,
                  Array<TagBit> &tags_cache) const {
-        if (tags_cache.IsEmpty()) {
-            parse(tags_cache, content, length);
-        }
+        SizeT offset = 0;
 
         if (tags_cache.IsNotEmpty()) {
             TagBit *      start = tags_cache.Storage();
             const TagBit *end   = (start + tags_cache.Size());
             render(start, end, content);
-            const SizeT offset = (end - 1)->EndOffset();
-            // Add the remaining string.
-            ss_->Insert((content + offset), (length - offset));
-        } else {
-            ss_->Insert(content, length);
+            offset = (end - 1)->EndOffset();
         }
+
+        // Add the remaining string.
+        ss_->Insert((content + offset), (length - offset));
     }
 
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags_cache,
@@ -1059,15 +1061,23 @@ class Template_CV {
         // Stage 4: Render
         const Char_T_ *loop_content = loop_data->Content.First();
         const SizeT    loop_length  = loop_data->Content.Length();
-        Template_CV    loop_template{ss_, loop_set, this, (level_ + 1)};
+        Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
+
+        if (loop_data->SubTags.IsEmpty()) {
+            parse(loop_data->SubTags, loop_content, loop_length);
+        }
+
+        // Grouping
+        // if (loop_data->GroupLength != 0) {
+        // loop_set.
+        // }
 
         do {
             loop_template.loop_value_ = loop_set->GetValue(loop_index);
             loop_template.process(loop_content, loop_length,
                                   loop_data->SubTags);
-            --loop_size;
 
-            if (loop_size == 0) {
+            if ((--loop_size) == 0) {
                 break;
             }
 
@@ -1186,6 +1196,11 @@ class Template_CV {
                 (ALE::Evaluate(result, (content + item->CaseOffset),
                                item->CaseLength, this) &&
                  (result > 0))) {
+                if (item->SubTags.IsEmpty()) {
+                    parse(item->SubTags, (content + item->ContentOffset),
+                          item->ContentLength);
+                }
+
                 process((content + item->ContentOffset), item->ContentLength,
                         item->SubTags);
                 break;
