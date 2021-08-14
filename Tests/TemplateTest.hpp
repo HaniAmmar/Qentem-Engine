@@ -1718,6 +1718,26 @@ static int TestLoopTag5() {
         "-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2017-q2-2: 300-- 2020-q1-1: 400 450 450-- 2018-q2-1: 2002: 300",
         "Render()");
 
+    ////////////
+
+    value.Reset();
+
+    value += 4;
+    value += 1;
+    value += 3;
+    value += 5;
+    value += 2;
+    value += 7;
+    value += 6;
+
+    content = R"(<loop value="val1_" sort="a">val1_</loop>)";
+
+    EQ_VALUE(Template::Render(content, &value), "1234567", "Render()");
+
+    content = R"(<loop value="val1_" sort="d">val1_</loop>)";
+
+    EQ_VALUE(Template::Render(content, &value), "7654321", "Render()");
+
     END_SUB_TEST;
 }
 
