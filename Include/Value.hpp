@@ -829,7 +829,7 @@ class Value {
 
         if (val != nullptr) {
             key    = val->First();
-            length = val->Length();
+            length = static_cast<Number_T_>(val->Length());
             return true;
         }
 
@@ -1285,9 +1285,8 @@ class Value {
 #endif
     }
 
-    template <typename Number_T_>
     bool GroupBy(Value &groupedValue, const Char_T_ *key,
-                 const Number_T_ length) const noexcept {
+                 const SizeT length) const noexcept {
         using V_item_            = HAItem<Value, Char_T_>;
         Value *      current_val = nullptr;
         const Value *current_sub_val;
@@ -1354,13 +1353,9 @@ class Value {
 
         if (type == ValueType::Object) {
             object_.Sort(ascend);
+        } else if (type == ValueType::Array) {
+            array_.Sort(ascend);
         }
-
-        // It's not needed, and needs move work on Value & Array (Booth needs
-        // operator < >)
-        // else if (type == ValueType::Array) {
-        //     array_.Sort(ascend);
-        // }
     }
 
   private:
