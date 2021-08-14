@@ -338,7 +338,7 @@ int main() {
 
 ## Tests
 
-The tests are ~13k lines of code; ~4 times the size of the library. To run the tests:
+The tests are ~15k lines of code; ~5 times the size of the library. To run the tests:
 
 -   cmake
     -   Linux
