@@ -1343,6 +1343,10 @@ class Value {
         return false;
     }
 
+    bool GroupBy(Value &groupedValue, const Char_T_ *key) const noexcept {
+        return GroupBy(groupedValue, key, StringUtils::Count(key));
+    }
+
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(bool ascend = true) {
         const ValueType type = Type();
