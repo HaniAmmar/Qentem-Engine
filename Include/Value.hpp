@@ -586,6 +586,88 @@ class Value {
         return (*this)[static_cast<SizeT>(index)];
     }
 
+    inline bool operator<(const Value &val) const noexcept {
+        const ValueType type = Type();
+
+        if (type == val.Type()) {
+            switch (type) {
+                case ValueType::Object: {
+                    return (object_.Size() < val.object_.Size());
+                }
+
+                case ValueType::Array: {
+                    return (array_.Size() < val.array_.Size());
+                }
+
+                case ValueType::String: {
+                    return (string_ < val.string_);
+                }
+
+                case ValueType::UInt64: {
+                    return (number_.GetUInt64() < val.number_.GetUInt64());
+                }
+
+                case ValueType::Int64: {
+                    return (number_.GetInt64() < val.number_.GetInt64());
+                }
+
+                case ValueType::Double: {
+                    return (number_.GetDouble() < val.number_.GetDouble());
+                }
+
+                case ValueType::True:
+                case ValueType::False:
+                case ValueType::Null:
+                case ValueType::Undefined: {
+                    return false;
+                }
+            }
+        }
+
+        return (type < val.Type());
+    }
+
+    inline bool operator>(const Value &val) const noexcept {
+        const ValueType type = Type();
+
+        if (type == val.Type()) {
+            switch (type) {
+                case ValueType::Object: {
+                    return (object_.Size() > val.object_.Size());
+                }
+
+                case ValueType::Array: {
+                    return (array_.Size() > val.array_.Size());
+                }
+
+                case ValueType::String: {
+                    return (string_ > val.string_);
+                }
+
+                case ValueType::UInt64: {
+                    return (number_.GetUInt64() > val.number_.GetUInt64());
+                }
+
+                case ValueType::Int64: {
+                    return (number_.GetInt64() > val.number_.GetInt64());
+                }
+
+                case ValueType::Double: {
+                    return (number_.GetDouble() > val.number_.GetDouble());
+                }
+
+                case ValueType::True:
+                case ValueType::False:
+                case ValueType::Null:
+                case ValueType::Undefined: {
+                    return false;
+                }
+            }
+        }
+
+        return (type > val.Type());
+    }
+
     inline bool IsUndefined() const noexcept {
         return (Type() == ValueType::Undefined);
     }
