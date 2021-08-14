@@ -6090,6 +6090,73 @@ static int TestGroupValue() {
 
     //////////////////////
 
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += true;
+    value2 += true;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([true,true])", "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([true,true])", "value.Stringify()");
+
+    //////////
+    value.Reset();
+    value2.Reset();
+
+    value2 += false;
+    value2 += false;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([false,false])", "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([false,false])", "value.Stringify()");
+    ///////////
+    value.Reset();
+    value2.Reset();
+
+    value2 += nullptr;
+    value2 += nullptr;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([null,null])", "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([null,null])", "value.Stringify()");
+    ///////////
+    value.RemoveIndex(0);
+    value.RemoveIndex(1);
+
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+
+    ///////////////////
+
     END_SUB_TEST;
 }
 
