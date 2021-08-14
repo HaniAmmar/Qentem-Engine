@@ -5885,7 +5885,184 @@ static int TestGroupValue() {
     EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
 
     value[2]["year"] = HArray<Value<char>, char>();
-    value.GroupBy(value2, "year", 4);
+    EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
+
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += 4;
+    value2 += 1;
+    value2 += 3;
+    value2 += 5;
+    value2 += 2;
+    value2 += 7;
+    value2 += 6;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([1,2,3,4,5,6,7])", "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([7,6,5,4,3,2,1])", "value.Stringify()");
+
+    //////////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += 5.4;
+    value2 += "str";
+    value2[2] = Array<Value<char>>();
+    value2 += nullptr;
+    value2 += true;
+    value2 += HArray<Value<char>, char>();
+    value2 += false;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([{},[],"str",5.4,true,false,null])",
+             "value.Stringify()");
+
+    value = value2;
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([null,false,true,5.4,"str",[],{}])",
+             "value.Stringify()");
+
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += -4;
+    value2 += -1;
+    value2 += -3;
+    value2 += -5;
+    value2 += -2;
+    value2 += -7;
+    value2 += -6;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([-7,-6,-5,-4,-3,-2,-1])",
+             "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])",
+             "value.Stringify()");
+
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += "b";
+    value2 += "a";
+    value2 += "g";
+    value2 += "f";
+    value2 += "c";
+    value2 += "e";
+    value2 += "d";
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"(["a","b","c","d","e","f","g"])",
+             "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"(["g","f","e","d","c","b","a"])",
+             "value.Stringify()");
+
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += 0;
+    value2 += 0;
+    value2 += 0;
+    value[0] = value2;
+
+    value2 += 0;
+    value2 += 0;
+    value[1] = value2;
+
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([[0,0,0],[0,0,0,0,0]])",
+             "value.Stringify()");
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += 0;
+    value2 += 0;
+    value2 += 0;
+    value[0] = value2;
+
+    value2 += 0;
+    value2 += 0;
+    value[1] = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([[0,0,0,0,0],[0,0,0]])",
+             "value.Stringify()");
+
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2["a"] = 0;
+    value2["b"] = 0;
+    value2["c"] = 0;
+    value[0]    = value2;
+
+    value2["d"] = 0;
+    value2["e"] = 0;
+    value[1]    = value2;
+
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(),
+             R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])",
+             "value.Stringify()");
+
+    value.Reset();
+    value2.Reset();
+
+    value2["a"] = 0;
+    value2["b"] = 0;
+    value2["c"] = 0;
+    value[0]    = value2;
+
+    value2["d"] = 0;
+    value2["e"] = 0;
+    value[1]    = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(),
+             R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])",
+             "value.Stringify()");
+
+    //////////////////////
 
     END_SUB_TEST;
 }
