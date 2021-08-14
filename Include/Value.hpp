@@ -465,7 +465,8 @@ class Value {
         *this += static_cast<VString &&>(VString(str));
     }
 
-    void operator+=(double num) {
+    template <typename Number_T_>
+    void operator+=(Number_T_ num) {
         if (IsUndefined()) {
             initArray();
         }
@@ -473,11 +474,6 @@ class Value {
         if (IsArray()) {
             array_ += static_cast<Value &&>(Value{num});
         }
-    }
-
-    template <typename Type_T_>
-    inline void operator+=(Type_T_ num) {
-        *this += static_cast<double>(num);
     }
 
     void operator+=(NullType) {
