@@ -1615,6 +1615,112 @@ static int TestLoopTag4() {
     END_SUB_TEST;
 }
 
+static int TestLoopTag5() {
+    Value<char> value;
+    const char *content;
+
+    value = JSON::Parse(R"(
+[
+    {
+        "year": 2019,
+        "quarter": "q1",
+        "week": 1,
+        "total": 100
+    },
+    {
+        "year": 2019,
+        "quarter": "q1",
+        "week": 1,
+        "total": 125
+    },
+    {
+        "year": 2019,
+        "quarter": "q2",
+        "week": 1,
+        "total": 200
+    },
+    {
+        "year": 2017,
+        "quarter": "q2",
+        "week": 2,
+        "total": 300
+    },
+    {
+        "year": 2020,
+        "quarter": "q1",
+        "week": 1,
+        "total": 400
+    },
+    {
+        "year": 2020,
+        "quarter": "q1",
+        "week": 1,
+        "total": 450
+    },
+    {
+        "year": 2020,
+        "quarter": "q1",
+        "week": 1,
+        "total": 450
+    },
+    {
+        "year": 2018,
+        "quarter": "q2",
+        "week": 1,
+        "total": 200
+    },
+    {
+        "year": 2018,
+        "quarter": "q2",
+        "week": 2,
+        "total": 300
+    },
+    {
+        "year": 2019,
+        "quarter": "q2",
+        "week": 2,
+        "total": 300
+    }
+]
+    )");
+
+    content =
+        R"(<loop value="val1_" group="year111" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">val3_</loop></loop></loop>)";
+
+    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+
+    content =
+        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">val3_</loop></loop></loop>)";
+
+    EQ_VALUE(Template::Render(content, &value),
+             "q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300",
+             "Render()");
+
+    content =
+        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_" group="quarter" sort="ascend"><loop set="val2_" value="val3_"><loop set="val3_" value="val4_">val4_</loop></loop></loop></loop>)";
+
+    EQ_VALUE(Template::Render(content, &value),
+             "1400145014501100112512002300120023002300", "Render()");
+
+    content =
+        R"(<loop value="val1_" group="year" sort="descend">-- val1_-<loop set="val1_" value="val2_" group="quarter" sort="ascend">val2_-<loop set="val2_" value="val3_" group="week" sort="ascend">val2_:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> val5_</loop></loop></loop></loop></loop>)";
+
+    EQ_VALUE(
+        Template::Render(content, &value),
+        "-- 2020-q1-1: 400 450 450-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2018-q2-1: 2002: 300-- 2017-q2-2: 300",
+        "Render()");
+
+    content =
+        R"(<loop value="val1_" group="year">-- val1_-<loop set="val1_" value="val2_" group="quarter">val2_-<loop set="val2_" value="val3_" group="week">val2_:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> val5_</loop></loop></loop></loop></loop>)";
+
+    EQ_VALUE(
+        Template::Render(content, &value),
+        "-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2017-q2-2: 300-- 2020-q1-1: 400 450 450-- 2018-q2-1: 2002: 300",
+        "Render()");
+
+    END_SUB_TEST;
+}
+
 static int TestIfTag1() {
     Value<char> value;
     const char *content;
@@ -2077,6 +2183,7 @@ static int RunTemplateTests() {
     START_TEST("Loop Tag Test 2", TestLoopTag2);
     START_TEST("Loop Tag Test 3", TestLoopTag3);
     START_TEST("Loop Tag Test 4", TestLoopTag4);
+    START_TEST("Loop Tag Test 4", TestLoopTag5);
 
     START_TEST("If Tag Test 1", TestIfTag1);
     START_TEST("If Tag Test 2", TestIfTag2);
