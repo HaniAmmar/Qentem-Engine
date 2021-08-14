@@ -5828,7 +5828,7 @@ static int TestGroupValue() {
     value[6]["month"] = 3;
 
     Value<char> value2;
-    value.GroupBy(value2, "year", 4);
+    value.GroupBy(value2, "year");
     value2.Sort();
 
     EQ_VALUE(
@@ -5845,7 +5845,7 @@ static int TestGroupValue() {
 
     value.Reset();
     value2.Reset();
-    value.GroupBy(value2, "year", 4);
+    value.GroupBy(value2, "year");
     EQ_VALUE(value2.Stringify(), R"()", "value2.Stringify()");
 
     value[0]["year1"] = 2019;
@@ -5864,7 +5864,7 @@ static int TestGroupValue() {
     value[5]["month"] = 7;
     value[6]["month"] = 3;
 
-    value.GroupBy(value2, "year", 4);
+    value.GroupBy(value2, "year");
     EQ_VALUE(value2.Stringify(), R"({})", "value2.Stringify()");
 
     ////
@@ -5878,14 +5878,14 @@ static int TestGroupValue() {
     value[1]["month"] = 5;
     value[2]["month"] = 1;
 
-    EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
+    EQ_FALSE(value.GroupBy(value2, "year"), "value2.Stringify()");
 
     value[2].Reset();
-    value.GroupBy(value2, "year", 4);
-    EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
+    value.GroupBy(value2, "year");
+    EQ_FALSE(value.GroupBy(value2, "year"), "value2.Stringify()");
 
     value[2]["year"] = HArray<Value<char>, char>();
-    EQ_FALSE(value.GroupBy(value2, "year", 4), "value2.Stringify()");
+    EQ_FALSE(value.GroupBy(value2, "year"), "value2.Stringify()");
 
     ///////////////////
 
