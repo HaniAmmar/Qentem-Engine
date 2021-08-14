@@ -30,13 +30,15 @@ Qentem Engine is a self-contained library for rendering HTML templates. Designed
 -   JSON
     -   Fast parser.
     -   Fast stringify.
-    -   `Value` size is 16 bytes on 64-bit, and 12 on 32-bit.
+    -   Data Grouping.
+    -   Data Sorting.
+    -   `Value` size: 16 bytes on 64-bit, and 12 on 32-bit.
 
 -   Tempate engine
     -   Fast template rendering.
     -   Safe evaluation.
     -   Variable replacement.
-    -   Nested loop.
+    -   Nested loop (with data grouping and sorting).
     -   Nested if condition.
     -   Inline if.
     -   Math tag.
@@ -62,7 +64,8 @@ namespace JSON = Qentem::JSON;
 int main() {
     Value abc = JSON::Parse(R"(["A","B","C"])");
 
-    Value v_arr; // To be used as an array.
+    // Array
+    Value v_arr;
 
     v_arr += 0;
     v_arr[1] = 10;
@@ -96,7 +99,9 @@ int main() {
 
     ///////////////////////////////////////////
 
-    Value v_obj; // To be used as an object.
+    // Object
+
+    Value v_obj;
 
     v_obj["key0"] = 0;
     v_obj["key1"] = 10;
@@ -134,6 +139,76 @@ int main() {
             "key8": null
         }
     */
+
+    ///////////////////////////////////////////
+
+    // Sorting
+
+    v_arr.Reset();
+
+    v_arr += 4;
+    v_arr += 1;
+    v_arr += 3;
+    v_arr += 5;
+    v_arr += 2;
+    v_arr += 7;
+    v_arr += 6;
+
+    v_arr.Sort(); // Ascending
+
+    std::cout << v_arr.Stringify() << '\n';
+    // Output: [1,2,3,4,5,6,7]
+
+    v_arr.Sort(false); // Descending
+
+    std::cout << v_arr.Stringify() << '\n';
+    // Output: [7,6,5,4,3,2,1]
+
+    ///////////////////////////////////////////
+
+    // Grouping
+
+    v_arr = JSON::Parse(
+        R"([{"year":2019,"month":4},{"year":2020,"month":5},{"year":2017,"month":1},{"year":2020,"month":6},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
+
+    Value v_arr2;
+    if (v_arr.GroupBy(v_arr2, "year")) {
+        std::cout << v_arr2.Stringify() << '\n';
+    }
+
+    /* Output:
+     {
+         "2019": [
+             {
+                 "month": 4
+             }
+         ],
+         "2020": [
+             {
+                 "month": 5
+             },
+             {
+                 "month": 6
+             },
+             {
+                 "month": 7
+             }
+         ],
+         "2017": [
+             {
+                 "month": 1
+             }
+         ],
+         "2018": [
+             {
+                 "month": 2
+             },
+             {
+                 "month": 3
+             }
+         ]
+     }
+ */
 }
 ```
 
@@ -278,7 +353,7 @@ The tests are ~13k lines of code; ~4 times the size of the library. To run the t
         ```shell
         mkdir Build
         cd Build
-        cmake --config "Debug" ..
+        cmake -D CMAKE_BUILD_TYPE=Debug ..
         cmake --build .
         ctest -C Debug
         ```
