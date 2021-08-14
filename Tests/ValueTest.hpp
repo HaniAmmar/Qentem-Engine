@@ -5892,13 +5892,13 @@ static int TestGroupValue() {
     value.Reset();
     value2.Reset();
 
-    value2 += 4;
-    value2 += 1;
-    value2 += 3;
-    value2 += 5;
-    value2 += 2;
-    value2 += 7;
-    value2 += 6;
+    value2 += unsigned(4);
+    value2 += unsigned(1);
+    value2 += unsigned(3);
+    value2 += unsigned(5);
+    value2 += unsigned(2);
+    value2 += unsigned(7);
+    value2 += unsigned(6);
 
     value = value2;
     value.Sort();
@@ -5960,6 +5960,32 @@ static int TestGroupValue() {
     value.Sort(false);
 
     EQ_VALUE(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])",
+             "value.Stringify()");
+
+    ///////////////////
+
+    value.Reset();
+    value2.Reset();
+
+    value2 += 4.5;
+    value2 += 1.5;
+    value2 += 3.5;
+    value2 += 5.5;
+    value2 += 2.5;
+    value2 += 7.5;
+    value2 += 6.5;
+
+    value = value2;
+    value.Sort();
+
+    EQ_VALUE(value.Stringify(), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])",
+             "value.Stringify()");
+
+    value = value2;
+
+    value.Sort(false);
+
+    EQ_VALUE(value.Stringify(), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])",
              "value.Stringify()");
 
     ///////////////////
