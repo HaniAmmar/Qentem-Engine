@@ -1071,6 +1071,10 @@ class Template_CV {
             }
 
             loop_set = &grouped_set;
+        } else if (loop_data->SortLength != 0) {
+            grouped_set = *loop_set;
+            grouped_set.Sort(content[loop_data->SortOffset] == 'a');
+            loop_set = &grouped_set;
         }
 
         if (loop_size == 0) {
