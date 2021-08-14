@@ -1283,12 +1283,11 @@ class Value {
 
     bool GroupBy(Value &groupedValue, const Char_T_ *key,
                  const SizeT length) const noexcept {
-        using V_item_            = HAItem<Value, Char_T_>;
-        Value *      current_val = nullptr;
-        const Value *current_sub_val;
-        Value        new_sub_val;
-        VString      grouped_key;
-        SizeT        grouped_key_index;
+        using V_item_       = HAItem<Value, Char_T_>;
+        Value * current_val = nullptr;
+        Value   new_sub_val;
+        VString grouped_key;
+        SizeT   grouped_key_index;
 
         if (IsArray()) {
             groupedValue.Reset();
@@ -1316,16 +1315,15 @@ class Value {
                         return false;
                     }
 
-                    current_sub_val = &(obj_item->Value);
-
                     if (count != grouped_key_index) {
                         new_sub_val[obj_item->Key] = obj_item->Value;
                     } else {
-                        if (!current_sub_val->SetString(grouped_key)) {
+                        if (!obj_item->Value.SetString(grouped_key)) {
                             return false;
                         }
 
-                        current_val = &(groupedValue[grouped_key]);
+                        current_val = &(
+                            groupedValue[static_cast<VString &&>(grouped_key)]);
                     }
 
                     ++count;
