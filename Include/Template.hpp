@@ -186,7 +186,7 @@ class Template {
     };
 
     template <typename Char_T_>
-    struct LoopData_T {
+    struct LoopInfo_T {
         StringStream<Char_T_>  Content{};
         Array<TagBit<Char_T_>> SubTags{};
         unsigned char          SetOffset{0};
@@ -217,7 +217,7 @@ class Template {
 
     template <typename Char_T_>
     struct TagBit {
-        using LoopData_ = LoopData_T<Char_T_>;
+        using LoopInfo_ = LoopInfo_T<Char_T_>;
         using IfData_   = IfData_T<Char_T_>;
 
       public:
@@ -229,7 +229,7 @@ class Template {
         TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept
             : offset_(offset), end_offset_(end_offset) {
             if (type == TagType::Loop) {
-                setData(Memory::AllocateInit<LoopData_>());
+                setData(Memory::AllocateInit<LoopInfo_>());
             } else if (type == TagType::If) {
                 setData(Memory::AllocateInit<IfData_>());
             }
@@ -277,9 +277,9 @@ class Template {
             const TagType type = GetType();
 
             if (type == TagType::Loop) {
-                LoopData_ *loop_data = GetLoopData();
-                Memory::Destruct(loop_data);
-                Memory::Deallocate(loop_data);
+                LoopInfo_ *loop_info = GetLoopData();
+                Memory::Destruct(loop_info);
+                Memory::Deallocate(loop_info);
             } else if (type == TagType::If) {
                 IfData_ *if_data = GetIfData();
                 Memory::Destruct(if_data);
@@ -289,8 +289,8 @@ class Template {
             clearData();
         }
 
-        inline LoopData_ *GetLoopData() const noexcept {
-            return static_cast<LoopData_ *>(getData());
+        inline LoopInfo_ *GetLoopData() const noexcept {
+            return static_cast<LoopInfo_ *>(getData());
         }
 
         inline IfData_ *GetIfData() const noexcept {
@@ -338,7 +338,7 @@ class Template_CV {
 
     using TagBit    = Template::TagBit<Char_T_>;
     using TagType   = Template::TagType;
-    using LoopData_ = Template::LoopData_T<Char_T_>;
+    using LoopInfo_ = Template::LoopInfo_T<Char_T_>;
     using IfCase_   = Template::IfCase_T<Char_T_>;
     using IfData_   = Template::IfData_T<Char_T_>;
 
@@ -626,17 +626,17 @@ class Template_CV {
                 case TagType::Loop: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
-                    LoopData_ *loop_data = tag->GetLoopData();
+                    LoopInfo_ *loop_info = tag->GetLoopData();
 
-                    if (loop_data->Content.IsNotEmpty()) { // Cached
-                        renderLoop((content + content_offset), loop_data);
+                    if (loop_info->Content.IsNotEmpty()) { // Cached
+                        renderLoop((content + content_offset), loop_info);
                     } else {
                         generateLoopContent(
                             (content + content_offset),
                             ((tag->EndOffset() -
                               TemplatePatterns_C_::LoopSuffixLength) -
                              content_offset),
-                            loop_data);
+                            loop_info);
                     }
 
                     break;
@@ -854,7 +854,7 @@ class Template_CV {
 
     QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
                                              SizeT          length,
-                                             LoopData_ *    loop_data) const {
+                                             LoopInfo_ *    loop_info) const {
         static const Char_T_ inline_suffix_c =
             *(TemplatePatterns_C_::GetInLineSuffix());
         static const Char_T_ *variable_prefix =
@@ -901,16 +901,16 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::SetChar: {
-                        loop_data->SetOffset =
+                        loop_info->SetOffset =
                             static_cast<unsigned char>(offset);
-                        loop_data->SetLength = static_cast<unsigned char>(len);
+                        loop_info->SetLength = static_cast<unsigned char>(len);
 
                         if ((content[offset] ==
                              TemplatePatterns_C_::InLinePrefix) &&
                             (len > TemplatePatterns_C_::VariableFulllength)) {
-                            loop_data->SetOffset +=
+                            loop_info->SetOffset +=
                                 TemplatePatterns_C_::VariablePrefixLength;
-                            loop_data->SetLength -=
+                            loop_info->SetLength -=
                                 TemplatePatterns_C_::VariableFulllength;
                         }
 
@@ -919,36 +919,36 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::IndexChar: {
-                        loop_data->IndexOffset =
+                        loop_info->IndexOffset =
                             static_cast<unsigned char>(offset);
-                        loop_data->IndexLength =
+                        loop_info->IndexLength =
                             static_cast<unsigned char>(len);
                         break_loop = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::RepeatChar: {
-                        loop_data->RepeatOffset =
+                        loop_info->RepeatOffset =
                             static_cast<unsigned char>(offset);
-                        loop_data->RepeatLength =
+                        loop_info->RepeatLength =
                             static_cast<unsigned char>(len);
                         break_loop = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::GroupChar: {
-                        loop_data->GroupOffset =
+                        loop_info->GroupOffset =
                             static_cast<unsigned char>(offset);
-                        loop_data->GroupLength =
+                        loop_info->GroupLength =
                             static_cast<unsigned char>(len);
                         break_loop = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::SortChar: {
-                        loop_data->SortOffset =
+                        loop_info->SortOffset =
                             static_cast<unsigned char>(offset);
-                        loop_data->SortLength = static_cast<unsigned char>(len);
+                        loop_info->SortLength = static_cast<unsigned char>(len);
                         break_loop            = true;
                         break;
                     }
@@ -978,16 +978,16 @@ class Template_CV {
                     break;
                 }
 
-                loop_data->Content.Insert(
+                loop_info->Content.Insert(
                     (content + previous_offset),
                     ((offset - loop_value_length) - previous_offset));
 
-                loop_data->Content.Insert(
+                loop_info->Content.Insert(
                     variable_prefix, TemplatePatterns_C_::VariablePrefixLength);
 
                 SizeT lvl = 0;
                 while (lvl <= level_) {
-                    loop_data->Content += TemplatePatterns_C_::TildeChar;
+                    loop_info->Content += TemplatePatterns_C_::TildeChar;
                     ++lvl;
                 }
 
@@ -1011,23 +1011,23 @@ class Template_CV {
 
                 if ((content[(sub_offset - 1)] ==
                      TemplatePatterns_C_::VariableIndexSuffix)) {
-                    loop_data->Content.Insert((content + offset),
+                    loop_info->Content.Insert((content + offset),
                                               (sub_offset - offset));
                 }
 
                 previous_offset = sub_offset;
-                loop_data->Content += inline_suffix_c;
+                loop_info->Content += inline_suffix_c;
             } while (true);
         }
 
-        loop_data->Content.Insert((content + previous_offset),
+        loop_info->Content.Insert((content + previous_offset),
                                   (length - previous_offset));
 
-        renderLoop(content, loop_data);
+        renderLoop(content, loop_info);
     }
 
     QENTEM_NOINLINE void renderLoop(const Char_T_ *content,
-                                    LoopData_ *    loop_data) const {
+                                    LoopInfo_ *    loop_info) const {
         // Stage 3: Data
         Value_T_        grouped_set;
         const Value_T_ *loop_set   = root_value_;
@@ -1035,9 +1035,9 @@ class Template_CV {
         SizeT           loop_size  = 0;
 
         // Set (Array)
-        if (loop_data->SetLength != 0) {
-            loop_set = findValue((content + loop_data->SetOffset),
-                                 loop_data->SetLength);
+        if (loop_info->SetLength != 0) {
+            loop_set = findValue((content + loop_info->SetOffset),
+                                 loop_info->SetLength);
 
             if (loop_set == nullptr) {
                 return; // set="..." has invalid value.
@@ -1045,36 +1045,38 @@ class Template_CV {
         }
 
         // Size
-        if ((loop_data->RepeatLength != 0) &&
-            (!parseNumber(loop_size, (content + loop_data->RepeatOffset),
-                          loop_data->RepeatLength))) {
+        if ((loop_info->RepeatLength != 0) &&
+            (!parseNumber(loop_size, (content + loop_info->RepeatOffset),
+                          loop_info->RepeatLength))) {
             return; // Not a number
         }
 
         // Index
-        if ((loop_data->IndexLength != 0) &&
-            (!parseNumber(loop_index, (content + loop_data->IndexOffset),
-                          loop_data->IndexLength))) {
+        if ((loop_info->IndexLength != 0) &&
+            (!parseNumber(loop_index, (content + loop_info->IndexOffset),
+                          loop_info->IndexLength))) {
             return; // Not a number
         }
 
-        // Grouping
-        if (loop_data->GroupLength != 0) {
+        // Group
+        if (loop_info->GroupLength != 0) {
             if (!(loop_set->GroupBy(grouped_set,
-                                    (content + loop_data->GroupOffset),
-                                    loop_data->GroupLength))) {
+                                    (content + loop_info->GroupOffset),
+                                    loop_info->GroupLength))) {
                 return;
             }
 
-            if (loop_data->SortLength != 0) {
-                grouped_set.Sort(content[loop_data->SortOffset] == 'a');
+            loop_set = &grouped_set;
+        }
+
+        // Sort
+        if (loop_info->SortLength != 0) {
+            if (loop_info->GroupLength == 0) {
+                grouped_set = *loop_set;
+                loop_set    = &grouped_set;
             }
 
-            loop_set = &grouped_set;
-        } else if (loop_data->SortLength != 0) {
-            grouped_set = *loop_set;
-            grouped_set.Sort(content[loop_data->SortOffset] == 'a');
-            loop_set = &grouped_set;
+            grouped_set.Sort(content[loop_info->SortOffset] == 'a');
         }
 
         if (loop_size == 0) {
@@ -1089,12 +1091,12 @@ class Template_CV {
 
         // Stage 4: Render
         Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
-        const Char_T_ *loop_content = loop_data->Content.First();
-        const SizeT    loop_length  = loop_data->Content.Length();
+        const Char_T_ *loop_content = loop_info->Content.First();
+        const SizeT    loop_length  = loop_info->Content.Length();
         const bool     is_object    = loop_set->IsObject();
 
-        if (loop_data->SubTags.IsEmpty()) {
-            parse(loop_data->SubTags, loop_content, loop_length);
+        if (loop_info->SubTags.IsEmpty()) {
+            parse(loop_info->SubTags, loop_content, loop_length);
         }
 
         do {
@@ -1107,7 +1109,7 @@ class Template_CV {
             }
 
             loop_template.process(loop_content, loop_length,
-                                  loop_data->SubTags);
+                                  loop_info->SubTags);
 
             if ((--loop_size) == 0) {
                 break;
