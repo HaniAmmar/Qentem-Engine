@@ -277,23 +277,23 @@ class Template {
             const TagType type = GetType();
 
             if (type == TagType::Loop) {
-                LoopInfo_ *loop_info = GetLoopData();
+                LoopInfo_ *loop_info = GetLoopInfo();
                 Memory::Destruct(loop_info);
                 Memory::Deallocate(loop_info);
             } else if (type == TagType::If) {
-                IfInfo_ *if_data = GetIfData();
-                Memory::Destruct(if_data);
-                Memory::Deallocate(if_data);
+                IfInfo_ *if_info = GetIfInfo();
+                Memory::Destruct(if_info);
+                Memory::Deallocate(if_info);
             }
 
             clearData();
         }
 
-        inline LoopInfo_ *GetLoopData() const noexcept {
+        inline LoopInfo_ *GetLoopInfo() const noexcept {
             return static_cast<LoopInfo_ *>(getData());
         }
 
-        inline IfInfo_ *GetIfData() const noexcept {
+        inline IfInfo_ *GetIfInfo() const noexcept {
             return static_cast<IfInfo_ *>(getData());
         }
 
@@ -626,7 +626,7 @@ class Template_CV {
                 case TagType::Loop: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
-                    LoopInfo_ *loop_info = tag->GetLoopData();
+                    LoopInfo_ *loop_info = tag->GetLoopInfo();
 
                     if (loop_info->Content.IsNotEmpty()) { // Cached
                         renderLoop((content + content_offset), loop_info);
@@ -645,14 +645,14 @@ class Template_CV {
                 case TagType::If: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
-                    IfInfo_ *if_data = tag->GetIfData();
+                    IfInfo_ *if_info = tag->GetIfInfo();
 
-                    if (if_data->Cases.IsNotEmpty()) {
-                        renderIf((content + content_offset), if_data);
+                    if (if_info->Cases.IsNotEmpty()) {
+                        renderIf((content + content_offset), if_info);
                     } else {
                         generateIfCases((content + content_offset),
                                         (tag->EndOffset() - content_offset),
-                                        if_data);
+                                        if_info);
                     }
                 }
 
@@ -1121,7 +1121,7 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
-                                         IfInfo_ *if_data) const {
+                                         IfInfo_ *if_info) const {
         IfCase_ case_bit;
         case_bit.CaseOffset = 0;
 
@@ -1149,14 +1149,14 @@ class Template_CV {
 
             if (else_offset == 0) {
                 case_bit.ContentLength = (length2 - case_bit.ContentOffset);
-                if_data->Cases += static_cast<IfCase_ &&>(case_bit);
+                if_info->Cases += static_cast<IfCase_ &&>(case_bit);
                 break;
             }
 
             case_bit.ContentLength =
                 ((else_offset - TemplatePatterns_C_::ElsePrefixLength) -
                  case_bit.ContentOffset);
-            if_data->Cases += static_cast<IfCase_ &&>(case_bit);
+            if_info->Cases += static_cast<IfCase_ &&>(case_bit);
 
             if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
                 else_offset =
@@ -1171,14 +1171,14 @@ class Template_CV {
                 case_bit.ContentOffset = else_offset;
                 case_bit.ContentLength = (length2 - else_offset);
 
-                if_data->Cases += static_cast<IfCase_ &&>(case_bit);
+                if_info->Cases += static_cast<IfCase_ &&>(case_bit);
                 break;
             }
 
             case_bit.CaseOffset = else_offset;
         } while (true);
 
-        renderIf(content, if_data);
+        renderIf(content, if_info);
     }
 
     static SizeT nextElse(const Char_T_ *content, SizeT offset,
@@ -1221,9 +1221,9 @@ class Template_CV {
         return else_offset;
     }
 
-    void renderIf(const Char_T_ *content, IfInfo_ *if_data) const {
-        for (IfCase_ *item = if_data->Cases.Storage(),
-                     *end  = (item + if_data->Cases.Size());
+    void renderIf(const Char_T_ *content, IfInfo_ *if_info) const {
+        for (IfCase_ *item = if_info->Cases.Storage(),
+                     *end  = (item + if_info->Cases.Size());
              item < end; item++) {
             double result;
 
