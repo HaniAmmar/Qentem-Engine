@@ -376,20 +376,8 @@ class Value {
             initArray();
         }
 
-        if (IsArray()) {
-            if (val.IsArray()) {
-                for (Value *src_val = val.array_.Storage(),
-                           *end     = (src_val + val.array_.Size());
-                     src_val < end; src_val++) {
-                    if (!(src_val->IsUndefined())) {
-                        array_ += static_cast<Value &&>(*src_val);
-                    }
-                }
-            } else if (!(val.IsUndefined())) {
-                array_ += static_cast<Value &&>(val);
-            }
-        } else if (IsObject() && val.IsObject()) {
-            object_ += static_cast<VObject &&>(val.object_);
+        if (IsArray() && !(val.IsUndefined())) {
+            array_ += static_cast<Value &&>(val);
         }
 
         val.Reset();
@@ -400,20 +388,8 @@ class Value {
             initArray();
         }
 
-        if (IsArray()) {
-            if (val.IsArray()) {
-                for (const Value *src_val = val.array_.Storage(),
-                                 *end     = (src_val + val.array_.Size());
-                     src_val < end; src_val++) {
-                    if (!(src_val->IsUndefined())) {
-                        array_ += *src_val;
-                    }
-                }
-            } else if (!(val.IsUndefined())) {
-                array_ += val;
-            }
-        } else if (IsObject() && val.IsObject()) {
-            object_ += val.object_;
+        if (IsArray() && !(val.IsUndefined())) {
+            array_ += val;
         }
     }
 
@@ -435,11 +411,17 @@ class Value {
     }
 
     void operator+=(VArray &&arr) {
+        if (IsUndefined()) {
+            initArray();
+        }
+
         if (IsArray()) {
-            array_ += static_cast<VArray &&>(arr);
-        } else if (IsUndefined()) {
-            new (&array_) VArray(static_cast<VArray &&>(arr));
-            setTypeToArray();
+            if (arr.Size() != 0) {
+                array_ += static_cast<VArray &&>(arr);
+            } else {
+                array_ +=
+                    static_cast<Value &&>(Value{static_cast<VArray &&>(arr)});
+            }
         }
     }
 
@@ -715,6 +697,43 @@ class Value {
         }
 
         return 0;
+    }
+
+    void Merge(Value &&val) {
+        if (IsUndefined()) {
+            initArray();
+        }
+
+        if (IsArray() && val.IsArray()) {
+            for (Value *src_val = val.array_.Storage(),
+                       *end     = (src_val + val.array_.Size());
+                 src_val < end; src_val++) {
+                if (!(src_val->IsUndefined())) {
+                    array_ += static_cast<Value &&>(*src_val);
+                }
+            }
+        } else if (IsObject() && val.IsObject()) {
+            object_ += static_cast<VObject &&>(val.object_);
+        }
+
+        val.Reset();
+    }
+    void Merge(Value &val) {
+        if (IsUndefined()) {
+            initArray();
+        }
+
+        if (IsArray() && val.IsArray()) {
+            for (Value *src_val = val.array_.Storage(),
+                       *end     = (src_val + val.array_.Size());
+                 src_val < end; src_val++) {
+                if (!(src_val->IsUndefined())) {
+                    array_ += *src_val;
+                }
+            }
+        } else if (IsObject() && val.IsObject()) {
+            object_ += val.object_;
+        }
     }
 
     Value *GetValue(SizeT index) const noexcept {
