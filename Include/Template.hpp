@@ -37,21 +37,27 @@ namespace Qentem {
  *  - {var:s|n}
  *      - var: Variable, s: String, n: Number.
  *
+ *
  *  - {math:var|e|n}
  *      - var|e|n: Raw variable, Equation or Number.
+ *
  *
  *  - {if case="var|s" true="var|var|s" false="var|var|s"}
  *      - Inline if,  var: Raw variable, var: Variable, s: String.
  *
+ *
  *  <...>
- *  - <loop set="s"? value="s"? repeat="var|n"? index="var|n"?>
- *                                                          ...</loop>
+ *  - <loop set="s"? value="s"? repeat="var|n"? index="var|n"? group="s"?
+ *           sort="ascend|descend"?>...</loop>
  *      - s: String, n: Number, var: Raw ariable,
  *      - set: child name in the passed colloction: Optional.
  *      - value: the current value in the colloction: Optional.
  *          Note: Choose a unique name.
  *      - repeat: if set, it will be used instead of the "set" size.
  *      - index: starting index.
+ *      - group: group an array using sub value of an object.
+ *      - sort: sort an array or object (ascend or descend).
+ *
  *
  *  - <if case="var|e|n">...<else(if)? ... >?...</if>
  *      - var|e|n: Raw variable, Equation or Number.
@@ -123,6 +129,14 @@ namespace Qentem {
  * <loop value="loop1-value" index="number|var">
  *     loop1-value
  * </loop>
+ *
+ * <loop value="loop1-value" sort="ascend|descend">
+ *     loop1-value
+ * </loop>
+ *
+ * <loop value="loop1-value" group="s">
+ *     loop1-value
+ * </loop>
  */
 
 /*
@@ -181,8 +195,8 @@ class Template {
         Variable, // {var:x}
         Math,     // {math:x}
         InLineIf, // {if:x}
-        Loop,     // <loop set="..." key="..." value="...">
-        If,       // <if case="...">
+        Loop,     // <loop ...></loop>
+        If,       // <if case="..."></if>
     };
 
     template <typename Char_T_>

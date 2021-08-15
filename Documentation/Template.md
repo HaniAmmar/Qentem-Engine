@@ -232,17 +232,20 @@ To force ALE to treat the variables as numbers, use parentheses: (({var:bool}) =
 ## Loop
 
 ```txt
-<loop set="..." key="..." value="..." index="...">...</loop>
-<loop set="..." key="..." value="...">...</loop>
-<loop set="..." value="...">...</loop>
-<loop set="..." key="...">...</loop>
-
+<loop set="..." value="..." repeat="..." index="..." group="..." sort="...">...</loop>
 <loop value="...">...</loop>
-<loop key="..." repeat="...">...</loop>
-<loop key="...">...</loop>
+<loop set="..." value="...">...</loop>
+<loop set="..." value="..." repeat="...">...</loop>
+<loop set="..." value="..." repeat="..." index="...">...</loop>
+<loop set="..." value="..." repeat="..." index="..." group="...">...</loop>
+
+<loop repeat="...">...</loop>
+<loop set="..." repeat="..." index="...">...</loop>
+<loop set="..." repeat="...">...</loop>
+<loop set="..." index="...">...</loop>
 ```
 
-Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop.
+Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop. `group` groups the giving array by sub-value of an object. `sort` will sort the set in ascendind or descending order.
 
 ### Loop Example 1 (unordered set)
 
@@ -554,6 +557,91 @@ item[0] item[1] item[2] item[3]</loop>
 
             value10 value20 value30 value40
             value100 value200 value300 value400
+    */
+}
+```
+
+### Loop Example 8 (Sorting)
+
+```cpp
+#include "Template.hpp"
+#include "Value.hpp"
+
+#include <iostream>
+
+using Qentem::Template;
+using Qentem::Value;
+
+int main() {
+    Value<char> value;
+
+    value += 4;
+    value += 5;
+    value += 1;
+    value += 6;
+    value += 2;
+    value += 7;
+    value += 3;
+
+    const char *content = R"(
+<loop value="val1_" sort="ascend">val1_ </loop>
+    )";
+
+    std::cout << Template::Render(content, &value).GetString() << '\n';
+    /*
+        Output: 1 2 3 4 5 6 7
+    */
+
+    content = R"(
+<loop value="val1_" sort="descend">val1_ </loop>
+    )";
+
+    std::cout << Template::Render(content, &value).GetString() << '\n';
+    /*
+        Output: 7 6 5 4 3 2 1
+    */
+}
+```
+
+### Loop Example 9 (Grouping)
+
+```cpp
+#include "JSON.hpp"
+#include "Template.hpp"
+
+#include <iostream>
+
+using Qentem::Template;
+using Qentem::Value;
+
+int main() {
+    const Value<char> value = Qentem::JSON::Parse(
+        R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
+
+    const char *content = R"(
+<loop value="val1_" group="year" sort="ascend">Year(val1_):
+    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">val3_</loop>)
+    </loop>
+</loop>
+    )";
+
+    std::cout << Template::Render(content, &value).GetString() << '\n';
+    /*
+        Output:
+            Year(2017):
+                Month(1)
+
+            Year(2018):
+                Month(2)
+                Month(3)
+
+            Year(2019):
+                Month(4)
+
+            Year(2020):
+                Month(1)
+                Month(5)
+                Month(7)
     */
 }
 ```
