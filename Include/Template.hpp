@@ -211,14 +211,14 @@ class Template {
     };
 
     template <typename Char_T_>
-    struct IfData_T {
+    struct IfInfo_T {
         Array<IfCase_T<Char_T_>> Cases{1};
     };
 
     template <typename Char_T_>
     struct TagBit {
         using LoopInfo_ = LoopInfo_T<Char_T_>;
-        using IfData_   = IfData_T<Char_T_>;
+        using IfInfo_   = IfInfo_T<Char_T_>;
 
       public:
         TagBit() = default;
@@ -231,7 +231,7 @@ class Template {
             if (type == TagType::Loop) {
                 setData(Memory::AllocateInit<LoopInfo_>());
             } else if (type == TagType::If) {
-                setData(Memory::AllocateInit<IfData_>());
+                setData(Memory::AllocateInit<IfInfo_>());
             }
 
             setType(type);
@@ -281,7 +281,7 @@ class Template {
                 Memory::Destruct(loop_info);
                 Memory::Deallocate(loop_info);
             } else if (type == TagType::If) {
-                IfData_ *if_data = GetIfData();
+                IfInfo_ *if_data = GetIfData();
                 Memory::Destruct(if_data);
                 Memory::Deallocate(if_data);
             }
@@ -293,8 +293,8 @@ class Template {
             return static_cast<LoopInfo_ *>(getData());
         }
 
-        inline IfData_ *GetIfData() const noexcept {
-            return static_cast<IfData_ *>(getData());
+        inline IfInfo_ *GetIfData() const noexcept {
+            return static_cast<IfInfo_ *>(getData());
         }
 
         inline TagType GetType() const noexcept {
@@ -340,7 +340,7 @@ class Template_CV {
     using TagType   = Template::TagType;
     using LoopInfo_ = Template::LoopInfo_T<Char_T_>;
     using IfCase_   = Template::IfCase_T<Char_T_>;
-    using IfData_   = Template::IfData_T<Char_T_>;
+    using IfInfo_   = Template::IfInfo_T<Char_T_>;
 
     using TemplatePatterns_C_ = TemplatePatterns<Char_T_>;
 
@@ -645,7 +645,7 @@ class Template_CV {
                 case TagType::If: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
-                    IfData_ *if_data = tag->GetIfData();
+                    IfInfo_ *if_data = tag->GetIfData();
 
                     if (if_data->Cases.IsNotEmpty()) {
                         renderIf((content + content_offset), if_data);
@@ -1121,7 +1121,7 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
-                                         IfData_ *if_data) const {
+                                         IfInfo_ *if_data) const {
         IfCase_ case_bit;
         case_bit.CaseOffset = 0;
 
@@ -1221,7 +1221,7 @@ class Template_CV {
         return else_offset;
     }
 
-    void renderIf(const Char_T_ *content, IfData_ *if_data) const {
+    void renderIf(const Char_T_ *content, IfInfo_ *if_data) const {
         for (IfCase_ *item = if_data->Cases.Storage(),
                      *end  = (item + if_data->Cases.Size());
              item < end; item++) {
