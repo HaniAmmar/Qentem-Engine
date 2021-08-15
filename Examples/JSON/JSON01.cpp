@@ -18,8 +18,8 @@ int main() {
 
     v_arr[0] = "text"; // Overwrite
 
-    v_arr[5] = abc;                           // Add sub-array
-    v_arr += JSON::Parse(R"([100,200,300])"); // Merge
+    v_arr += abc; // Add sub-array
+    v_arr.Merge(JSON::Parse(R"([100,200,300])"));
 
     std::cout << v_arr.Stringify() << '\n';
     /* Output:
@@ -54,8 +54,8 @@ int main() {
     v_obj["key6"] = abc; // Add sub-array
 
     // Add the value if the key does not exist, or replace it otherwise.
-    v_obj += JSON::Parse(
-        R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
+    v_obj.Merge(JSON::Parse(
+        R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})"));
 
     std::cout << v_obj.Stringify() << '\n';
     /* Output:
@@ -80,4 +80,74 @@ int main() {
             "key8": null
         }
     */
+
+    ///////////////////////////////////////////
+
+    // Sorting
+
+    v_arr.Reset();
+
+    v_arr += 4;
+    v_arr += 1;
+    v_arr += 3;
+    v_arr += 5;
+    v_arr += 2;
+    v_arr += 7;
+    v_arr += 6;
+
+    v_arr.Sort(); // Ascending
+
+    std::cout << v_arr.Stringify() << '\n';
+    // Output: [1,2,3,4,5,6,7]
+
+    v_arr.Sort(false); // Descending
+
+    std::cout << v_arr.Stringify() << '\n';
+    // Output: [7,6,5,4,3,2,1]
+
+    ///////////////////////////////////////////
+
+    // Grouping
+
+    v_arr = JSON::Parse(
+        R"([{"year":2019,"month":4},{"year":2020,"month":5},{"year":2017,"month":1},{"year":2020,"month":6},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
+
+    Value v_arr2;
+    if (v_arr.GroupBy(v_arr2, "year")) {
+        std::cout << v_arr2.Stringify() << '\n';
+    }
+
+    /* Output:
+     {
+         "2019": [
+             {
+                 "month": 4
+             }
+         ],
+         "2020": [
+             {
+                 "month": 5
+             },
+             {
+                 "month": 6
+             },
+             {
+                 "month": 7
+             }
+         ],
+         "2017": [
+             {
+                 "month": 1
+             }
+         ],
+         "2018": [
+             {
+                 "month": 2
+             },
+             {
+                 "month": 3
+             }
+         ]
+     }
+ */
 }

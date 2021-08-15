@@ -62,10 +62,9 @@ using Value    = Qentem::Value<char>;
 namespace JSON = Qentem::JSON;
 
 int main() {
-    Value abc = JSON::Parse(R"(["A","B","C"])");
+ Value abc = JSON::Parse(R"(["A","B","C"])");
 
-    // Array
-    Value v_arr;
+    Value v_arr; // To be used as an array.
 
     v_arr += 0;
     v_arr[1] = 10;
@@ -75,8 +74,8 @@ int main() {
 
     v_arr[0] = "text"; // Overwrite
 
-    v_arr[5] = abc;                           // Add sub-array
-    v_arr += JSON::Parse(R"([100,200,300])"); // Merge
+    v_arr += abc; // Add sub-array
+    v_arr.Merge(JSON::Parse(R"([100,200,300])"));
 
     std::cout << v_arr.Stringify() << '\n';
     /* Output:
@@ -99,9 +98,7 @@ int main() {
 
     ///////////////////////////////////////////
 
-    // Object
-
-    Value v_obj;
+    Value v_obj; // To be used as an object.
 
     v_obj["key0"] = 0;
     v_obj["key1"] = 10;
@@ -113,8 +110,8 @@ int main() {
     v_obj["key6"] = abc; // Add sub-array
 
     // Add the value if the key does not exist, or replace it otherwise.
-    v_obj += JSON::Parse(
-        R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
+    v_obj.Merge(JSON::Parse(
+        R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})"));
 
     std::cout << v_obj.Stringify() << '\n';
     /* Output:
