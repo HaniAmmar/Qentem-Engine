@@ -48,8 +48,8 @@ class StringStream {
     }
 
     StringStream(StringStream &&src) noexcept
-        : length_(src.Length()), capacity_(src.Capacity()),
-          storage_(src.Storage()) {
+        : storage_(src.Storage()), length_(src.Length()),
+          capacity_(src.Capacity()) {
         src.setLength(0);
         src.setCapacity(0);
         src.clearStorage();
@@ -295,9 +295,9 @@ class StringStream {
         deallocate(src);
     }
 
+    Char_T_ *storage_{nullptr};
     SizeT    length_{0};
     SizeT    capacity_{0};
-    Char_T_ *storage_{nullptr};
 };
 
 } // namespace Qentem
