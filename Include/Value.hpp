@@ -1127,7 +1127,17 @@ class Value {
         if (IsObject()) {
             object_.Compress();
         } else if (IsArray()) {
-            const SizeT size = array_.Size();
+            Value *      src_val = array_.Storage();
+            const Value *src_end = array_.End();
+            SizeT        size    = 0;
+
+            while (src_val != src_end) {
+                if (!(src_val->IsUndefined())) {
+                    ++size;
+                }
+
+                ++src_val;
+            }
 
             if (size != array_.Capacity()) {
                 if (size == 0) {
@@ -1135,9 +1145,8 @@ class Value {
                     return;
                 }
 
-                VArray       new_array(size);
-                Value *      src_val = array_.Storage();
-                const Value *src_end = array_.End();
+                VArray new_array(size);
+                src_val = array_.Storage();
 
                 do {
                     if (!(src_val->IsUndefined())) {

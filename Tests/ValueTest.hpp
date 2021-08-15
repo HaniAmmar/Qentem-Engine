@@ -1144,7 +1144,7 @@ static int TestArrayValue() {
 
     value2.Compress();
     NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value2.GetArray()->Capacity(), 6, "Capacity()");
+    EQ_VALUE(value2.GetArray()->Capacity(), 1, "Capacity()");
     EQ_VALUE(value2.GetArray()->Size(), 1, "Size()");
 
     arr_var.Reset();
