@@ -999,11 +999,18 @@ class Template_CV {
                 loop_info->Content.Insert(
                     variable_prefix, TemplatePatterns_C_::VariablePrefixLength);
 
-                SizeT lvl = 0;
-                while (lvl <= level_) {
-                    loop_info->Content += TemplatePatterns_C_::TildeChar;
-                    ++lvl;
-                }
+                SizeT    lvl    = level_;
+                Char_T_ *buffer = loop_info->Content.Buffer(level_ + 1);
+
+                do {
+                    buffer[lvl] = TemplatePatterns_C_::TildeChar;
+
+                    if (lvl == 0) {
+                        break;
+                    }
+
+                    --lvl;
+                } while (true);
 
                 SizeT sub_offset = offset;
 
