@@ -1076,7 +1076,8 @@ class Template_CV {
                 loop_set    = &grouped_set;
             }
 
-            grouped_set.Sort(content[loop_info->SortOffset] == 'a');
+            grouped_set.Sort(content[loop_info->SortOffset] ==
+                             TemplatePatterns_C_::SortAscend);
         }
 
         if (loop_size == 0) {
@@ -1583,6 +1584,7 @@ struct TemplatePatterns {
     static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
     static constexpr Char_T_ GroupChar  = 'o'; // gr[o]up
     static constexpr Char_T_ SortChar   = 'r'; // so[r]t
+    static constexpr Char_T_ SortAscend = 'a'; // [a]scend
 
     // Var
     static constexpr Char_T_ TildeChar = '~'; // Tilde
