@@ -37,7 +37,8 @@ Qentem Engine is a self-contained library for rendering HTML templates. Designed
 -   Tempate engine
     -   Fast template rendering.
     -   Safe evaluation.
-    -   Variable replacement.
+    -   Variable replacement with auto-escaping.
+    -   Raw variable replacement **without** auto-escaping.
     -   Nested loop (with data grouping and sorting).
     -   Nested if condition.
     -   Inline if.
