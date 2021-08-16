@@ -1547,7 +1547,7 @@ class Value {
         VObject object_;
         VArray  array_;
         VString string_;
-        VNumber number_;
+        VNumber number_{double(0)};
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         VType_ type_;
     };
