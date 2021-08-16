@@ -230,11 +230,11 @@ class StringStream {
     }
 
     String<Char_T_> GetString() {
-        if (Capacity() > Length()) {
-            Storage()[Length()] = 0;
-            const SizeT len     = Length();
-            return String<Char_T_>(Eject(), len);
-        }
+        // if (Capacity() != Length()) {
+        //     const SizeT len = Length();
+        //     Storage()[len]  = 0;
+        //     return String<Char_T_>(Eject(), len);
+        // }
 
         String<Char_T_> str{First(), Length()};
         Reset();
