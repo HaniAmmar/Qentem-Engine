@@ -832,15 +832,8 @@ class Template_CV {
     void renderRawVariable(const Char_T_ *content, SizeT length) const {
         const Value_T_ *value = findValue(content, length);
 
-        if (value != nullptr) {
-            if (value->InsertString(*ss_)) {
-                return;
-            }
-
-            if ((loop_key_ != nullptr) &&
-                (*content == TemplatePatterns_C_::TildeChar)) {
-                ss_->Insert(loop_key_, loop_key_length);
-            }
+        if ((value != nullptr) && value->InsertString(*ss_)) {
+            return;
         }
 
         if (*content != TemplatePatterns_C_::TildeChar) {
