@@ -38,6 +38,10 @@ namespace Qentem {
  *      - var: Variable, s: String, n: Number.
  *
  *
+ *  - {raw:s|n}
+ *      - raw: Same as var but without escaping, s: String, n: Number.
+ *
+ *
  *  - {math:var|e|n}
  *      - var|e|n: Raw variable, Equation or Number.
  *
@@ -75,6 +79,18 @@ namespace Qentem {
  * {var:name}, {var:name[name2]}, {var:name[name2][name3][...]}
  * {var:name}, {var:name[id]}, {var:name[id][id2][...]}
  * {var:id}, {var:id[id2]}, {var:id[id2][...]}
+ */
+
+/*
+ * Raw Variable Tag:
+ *
+ * {raw:name}, {raw:name[id]}
+ * {raw:id}, {raw:id[id2]}, {raw:id[id2][id3]}
+ * {raw:id[name]}, {raw:id[id2][name]}, {raw:id[id2][name1][id3][name2]}
+ *
+ * {raw:name}, {raw:name[name2]}, {raw:name[name2][name3][...]}
+ * {raw:name}, {raw:name[id]}, {raw:name[id][id2][...]}
+ * {raw:id}, {raw:id[id2]}, {raw:id[id2][...]}
  */
 
 /*
@@ -192,11 +208,12 @@ class Template {
 
     enum class TagType : unsigned char {
         None = 0,
-        Variable, // {var:x}
-        Math,     // {math:x}
-        InLineIf, // {if:x}
-        Loop,     // <loop ...></loop>
-        If,       // <if case="..."></if>
+        Variable,    // {var:x}
+        RawVariable, // {raw:x}
+        Math,        // {math:x}
+        InLineIf,    // {if:x}
+        Loop,        // <loop ...></loop>
+        If,          // <if case="..."></if>
     };
 
     template <typename Char_T_>
@@ -393,6 +410,8 @@ class Template_CV {
                                       const Char_T_ *content, SizeT length) {
         static const Char_T_ *variable_prefix =
             TemplatePatterns_C_::GetVariablePrefix();
+        static const Char_T_ *raw_variable_prefix =
+            TemplatePatterns_C_::GetRawVariablePrefix();
         static const Char_T_ *math_prefix =
             TemplatePatterns_C_::GetMathPrefix();
         static const Char_T_ *inLine_if_prefix =
@@ -437,6 +456,40 @@ class Template_CV {
 
                                 if (end_offset != 0) {
                                     tags_cache += TagBit{TagType::Variable,
+                                                         offset, end_offset};
+                                    offset = end_offset;
+                                    continue;
+                                }
+
+                                offset = current_offset;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::Raw_2ND_Char: {
+                        if ((TemplatePatterns_C_::RawVariablePrefixLength +
+                             current_offset) < length) {
+                            SizeT tmp_offset = 1;
+
+                            do {
+                                ++current_offset;
+                                ++tmp_offset;
+                            } while ((tmp_offset !=
+                                      TemplatePatterns_C_::
+                                          RawVariablePrefixLength) &&
+                                     (content[current_offset] ==
+                                      raw_variable_prefix[tmp_offset]));
+
+                            if (tmp_offset ==
+                                TemplatePatterns_C_::RawVariablePrefixLength) {
+                                const SizeT end_offset =
+                                    Engine::FindOne(*inline_suffix, content,
+                                                    current_offset, length);
+
+                                if (end_offset != 0) {
+                                    tags_cache += TagBit{TagType::RawVariable,
                                                          offset, end_offset};
                                     offset = end_offset;
                                     continue;
@@ -614,6 +667,19 @@ class Template_CV {
                     break;
                 }
 
+                case TagType::RawVariable: {
+                    const SizeT content_offset =
+                        tag->Offset() +
+                        TemplatePatterns_C_::VariablePrefixLength;
+
+                    renderRawVariable(
+                        (content + content_offset),
+                        ((tag->EndOffset() - 1) - content_offset));
+
+                    // - 1 is - TemplatePatterns_C_::InLineSuffixLength
+                    break;
+                }
+
                 case TagType::Math: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::MathPrefixLength;
@@ -679,7 +745,85 @@ class Template_CV {
         }
     }
 
+    void escapeHTMLSpecialChars(const Char_T_ *str, SizeT len) const {
+        SizeT offset = 0;
+
+        for (SizeT i = 0; i < len; i++) {
+            switch (str[i]) {
+                case '&': {
+                    ss_->Insert((str + offset), (i - offset));
+                    offset = (i + 1);
+                    ss_->Insert(TemplatePatterns_C_::GetHTMLAnd(),
+                                TemplatePatterns_C_::HTMLAndLength);
+                    break;
+                }
+
+                case '<': {
+                    ss_->Insert((str + offset), (i - offset));
+                    offset = (i + 1);
+                    ss_->Insert(TemplatePatterns_C_::GetHTMLLess(),
+                                TemplatePatterns_C_::HTMLLessLength);
+                    break;
+                }
+
+                case '>': {
+                    ss_->Insert((str + offset), (i - offset));
+                    offset = (i + 1);
+                    ss_->Insert(TemplatePatterns_C_::GetHTMLBigger(),
+                                TemplatePatterns_C_::HTMLBiggerLength);
+                    break;
+                }
+
+                case '"': {
+                    ss_->Insert((str + offset), (i - offset));
+                    offset = (i + 1);
+                    ss_->Insert(TemplatePatterns_C_::GetHTMLQuote(),
+                                TemplatePatterns_C_::HTMLQuoteLength);
+                    break;
+                }
+
+                case '\'': {
+                    ss_->Insert((str + offset), (i - offset));
+                    offset = (i + 1);
+                    ss_->Insert(TemplatePatterns_C_::GetHTMLSingleQuote(),
+                                TemplatePatterns_C_::HTMLSingleQuoteLength);
+                    break;
+                }
+            }
+        }
+
+        ss_->Insert((str + offset), (len - offset));
+    }
+
     void renderVariable(const Char_T_ *content, SizeT length) const {
+        const Value_T_ *value = findValue(content, length);
+
+        if (value != nullptr) {
+            if (value->IsString()) {
+                const Char_T_ *str;
+                SizeT          len;
+                value->SetCharAndLength(str, len);
+                escapeHTMLSpecialChars(str, len);
+                return;
+            }
+
+            if (value->InsertString(*ss_)) {
+                return;
+            }
+
+            if ((loop_key_ != nullptr) &&
+                (*content == TemplatePatterns_C_::TildeChar)) {
+                escapeHTMLSpecialChars(loop_key_, loop_key_length);
+            }
+        }
+
+        if (*content != TemplatePatterns_C_::TildeChar) {
+            ss_->Insert((content - TemplatePatterns_C_::VariablePrefixLength),
+                        (length + TemplatePatterns_C_::VariableFulllength));
+        }
+    }
+
+    void renderRawVariable(const Char_T_ *content, SizeT length) const {
         const Value_T_ *value = findValue(content, length);
 
         if (value != nullptr) {
@@ -687,7 +831,8 @@ class Template_CV {
                 return;
             }
 
-            if (loop_key_ != nullptr) {
+            if ((loop_key_ != nullptr) &&
+                (*content == TemplatePatterns_C_::TildeChar)) {
                 ss_->Insert(loop_key_, loop_key_length);
             }
         }
@@ -1500,25 +1645,6 @@ struct TemplatePatterns {
     // static constexpr unsigned char InLineSuffixLength = 1U;
     // static constexpr unsigned char InLinePrefixLength = 1U;
 
-    static constexpr unsigned char VariablePrefixLength = 5U;
-    static constexpr unsigned char VariableFulllength =
-        (VariablePrefixLength + 1U); // + InLineSuffixLength
-
-    static constexpr unsigned char MathPrefixLength = 6U;
-    static constexpr unsigned char MathFulllength =
-        (MathPrefixLength + 1U); // + InLineSuffixLength
-
-    static constexpr unsigned char InLineIfPrefixLength = 3U;
-
-    static constexpr unsigned char LoopPrefixLength = 5U;
-    static constexpr unsigned char LoopSuffixLength = 7U;
-
-    static constexpr unsigned char IfPrefixLength = 3U;
-    static constexpr unsigned char IfSuffixLength = 5U;
-
-    static constexpr unsigned char ElsePrefixLength = 5U;
-    static constexpr unsigned char ElseSuffixLength = 2U;
-
     static constexpr Char_T_ InLinePrefix = '{';
     static const Char_T_ *   GetInLineSuffix() noexcept {
         static constexpr Char_T_ val[] = {'}'};
@@ -1532,62 +1658,120 @@ struct TemplatePatterns {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr Char_T_ Var_2ND_Char = 'v'; // Second character
-    static const Char_T_ *   GetVariablePrefix() noexcept {
+    static constexpr Char_T_       Var_2ND_Char = 'v'; // Second character
+    static constexpr unsigned char VariablePrefixLength = 5U;
+    static constexpr unsigned char VariableFulllength =
+        (VariablePrefixLength + 1U); // + InLineSuffixLength
+    static const Char_T_ *GetVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
         return &(val[0]);
     }
 
+    // {raw:
+    static constexpr Char_T_       Raw_2ND_Char = 'r'; // Second character
+    static constexpr unsigned char RawVariablePrefixLength = 5U;
+    static constexpr unsigned char RawVariableFulllength =
+        (VariablePrefixLength + 1U); // + InLineSuffixLength
+    static const Char_T_ *GetRawVariablePrefix() noexcept {
+        static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
+        return &(val[0]);
+    }
+
     // {math:
-    static constexpr Char_T_ Math_2ND_Char = 'm'; // Second character
-    static const Char_T_ *   GetMathPrefix() noexcept {
+    static constexpr Char_T_       Math_2ND_Char    = 'm'; // Second character
+    static constexpr unsigned char MathPrefixLength = 6U;
+    static constexpr unsigned char MathFulllength =
+        (MathPrefixLength + 1U); // + InLineSuffixLength
+    static const Char_T_ *GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
         return &(val[0]);
     }
 
     // {if:
-    static constexpr Char_T_ InlineIf_2ND_Char = 'i'; // Second character
-    static const Char_T_ *   GetInLineIfPrefix() noexcept {
+    static constexpr Char_T_       InlineIf_2ND_Char = 'i'; // Second character
+    static constexpr unsigned char InLineIfPrefixLength = 3U;
+    static const Char_T_ *         GetInLineIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
         return &(val[0]);
     }
 
     // <loop
-    static constexpr Char_T_ Loop_2ND_Char = 'l'; // Second character
-    static const Char_T_ *   GetLoopPrefix() noexcept {
+    static constexpr Char_T_       Loop_2ND_Char    = 'l'; // Second character
+    static constexpr unsigned char LoopPrefixLength = 5U;
+    static const Char_T_ *         GetLoopPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
         return &(val[0]);
     }
 
     // </loop>
-    static const Char_T_ *GetLoopSuffix() noexcept {
+    static constexpr unsigned char LoopSuffixLength = 7U;
+    static const Char_T_ *         GetLoopSuffix() noexcept {
         static constexpr Char_T_ val[] = {'<', '/', 'l', 'o', 'o', 'p', '>'};
         return &(val[0]);
     }
 
     // <if
-    static constexpr Char_T_ If_2ND_Char = 'i'; // Second character
-    static const Char_T_ *   GetIfPrefix() noexcept {
+    static constexpr Char_T_       If_2ND_Char    = 'i'; // Second character
+    static constexpr unsigned char IfPrefixLength = 3U;
+    static const Char_T_ *         GetIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'i', 'f'};
         return &(val[0]);
     }
 
     // </if>
-    static const Char_T_ *GetIfSuffix() noexcept {
+    static constexpr unsigned char IfSuffixLength = 5U;
+    static const Char_T_ *         GetIfSuffix() noexcept {
         static constexpr Char_T_ val[] = {'<', '/', 'i', 'f', '>'};
         return &(val[0]);
     }
 
     // <else
-    static constexpr Char_T_ ElseIfChar = 'i'; // else[i]f
-    static const Char_T_ *   GetElsePrefix() noexcept {
+    static constexpr Char_T_       ElseIfChar       = 'i'; // else[i]f
+    static constexpr unsigned char ElsePrefixLength = 5U;
+    static const Char_T_ *         GetElsePrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'e', 'l', 's', 'e'};
         return &(val[0]);
     }
 
     // />
-    static const Char_T_ *GetElseSuffix() noexcept {
+    static constexpr unsigned char ElseSuffixLength = 2U;
+    static const Char_T_ *         GetElseSuffix() noexcept {
         static constexpr Char_T_ val[] = {'/', '>'};
+        return &(val[0]);
+    }
+
+    // &amp; &
+    static constexpr unsigned char HTMLAndLength = 5U;
+    static const Char_T_ *         GetHTMLAnd() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'a', 'm', 'p', ';'};
+        return &(val[0]);
+    }
+
+    // &lt; <
+    static constexpr unsigned char HTMLLessLength = 4U;
+    static const Char_T_ *         GetHTMLLess() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'l', 't', ';'};
+        return &(val[0]);
+    }
+
+    // &gt; >
+    static constexpr unsigned char HTMLBiggerLength = 4U;
+    static const Char_T_ *         GetHTMLBigger() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'g', 't', ';'};
+        return &(val[0]);
+    }
+
+    // &quot; "
+    static constexpr unsigned char HTMLQuoteLength = 6U;
+    static const Char_T_ *         GetHTMLQuote() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'q', 'u', 'o', 't', ';'};
+        return &(val[0]);
+    }
+
+    // &apos; ' (HTML5)
+    static constexpr unsigned char HTMLSingleQuoteLength = 6U;
+    static const Char_T_ *         GetHTMLSingleQuote() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'a', 'p', 'o', 's', ';'};
         return &(val[0]);
     }
 
