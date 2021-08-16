@@ -745,6 +745,7 @@ class Template_CV {
         }
     }
 
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
     void escapeHTMLSpecialChars(const Char_T_ *str, SizeT len) const {
         SizeT offset = 0;
 
@@ -794,11 +795,13 @@ class Template_CV {
 
         ss_->Insert((str + offset), (len - offset));
     }
+#endif
 
     void renderVariable(const Char_T_ *content, SizeT length) const {
         const Value_T_ *value = findValue(content, length);
 
         if (value != nullptr) {
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
             if (value->IsString()) {
                 const Char_T_ *str;
                 SizeT          len;
@@ -806,6 +809,7 @@ class Template_CV {
                 escapeHTMLSpecialChars(str, len);
                 return;
             }
+#endif
 
             if (value->InsertString(*ss_)) {
                 return;
@@ -813,7 +817,11 @@ class Template_CV {
 
             if ((loop_key_ != nullptr) &&
                 (*content == TemplatePatterns_C_::TildeChar)) {
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
                 escapeHTMLSpecialChars(loop_key_, loop_key_length);
+#else
+                ss_->Insert(loop_key_, loop_key_length);
+#endif
             }
         }
 

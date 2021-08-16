@@ -20,6 +20,10 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_AUTOESCAPE_HTML
+#define QENTEM_AUTOESCAPE_HTML 1
+#endif
+
 #ifndef QENTEM_COMMON_H_
 #define QENTEM_COMMON_H_
 
