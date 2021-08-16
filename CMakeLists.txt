@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 project(Qentem_Engine CXX)
-set(CMAKE_CXX_STANDARD 11)
 include_directories("Include")
 enable_testing()
 

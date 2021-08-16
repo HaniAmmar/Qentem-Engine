@@ -359,7 +359,7 @@ The tests are ~15k lines of code; ~5 times the size of the library. To run the t
 -   gcc/clang
     ```shell
     mkdir Build
-    c++ -std=c++11 -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
+    c++ -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
     ./Build/QTest.bin
     ```
 
