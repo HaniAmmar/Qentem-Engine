@@ -469,6 +469,764 @@ static int TestVariableXTag3() {
     END_SUB_TEST;
 }
 
+static int TestVariableXTag4() {
+    Value<wchar_t> value;
+
+    value += LR"(<)";
+    value += LR"(>)";
+    value += LR"(&)";
+    value += LR"(")";
+    value += LR"(')";
+    value += LR"(<>)";
+    value += LR"(<&)";
+    value += LR"(<&)";
+    value += LR"(>")";
+    value += LR"("')";
+    value += LR"(<">)";
+    value += LR"(<'>)";
+    value += LR"(<&>)";
+    value += LR"(&"&)";
+    value += LR"("'")";
+    value += LR"('<')";
+    value += LR"('&')";
+    value += LR"(<>&'")";
+    value += LR"('"<>&)";
+    value += LR"(<"&'>)";
+
+    value += LR"(<<<<<)";
+    value += LR"(>>>>>)";
+    value += LR"(&&&&&)";
+    value += LR"(""""")";
+    value += LR"(''''')";
+
+    value += LR"(A<)";
+    value += LR"(A>)";
+    value += LR"(A&)";
+    value += LR"(A")";
+    value += LR"(A')";
+    value += LR"(<A)";
+    value += LR"(>A)";
+    value += LR"(&A)";
+    value += LR"("A)";
+    value += LR"('A)";
+    value += LR"(A<A)";
+    value += LR"(A>A)";
+    value += LR"(A&A)";
+    value += LR"(A"A)";
+    value += LR"(A'A)";
+
+    value += LR"(AA<AA)";
+    value += LR"(AA>AA)";
+    value += LR"(AA&AA)";
+    value += LR"(AA"AA)";
+    value += LR"(AA'AA)";
+
+    value += LR"(AA<<<<AA)";
+    value += LR"(AA>>>>AA)";
+    value += LR"(AA&&&&AA)";
+    value += LR"(AA""""AA)";
+    value += LR"(AA''''AA)";
+
+    value += LR"(<A>B'C"D&E'F"G<H>I&G"K)";
+    value += LR"(AB"CD'EF<GH>IGK')";
+    value += LR"("ABC'DEF<GHI>GK<)";
+    value += LR"(A""BC<<DE>>FG''HI&&GK)";
+
+    EQ_VALUE(Template::Render(LR"({var:0})", &value), LR"(&lt;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:1})", &value), LR"(&gt;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:2})", &value), LR"(&amp;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:3})", &value), LR"(&quot;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:4})", &value), LR"(&apos;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:5})", &value), LR"(&lt;&gt;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:6})", &value), LR"(&lt;&amp;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:7})", &value), LR"(&lt;&amp;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:8})", &value), LR"(&gt;&quot;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:9})", &value), LR"(&quot;&apos;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:10})", &value), LR"(&lt;&quot;&gt;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:11})", &value), LR"(&lt;&apos;&gt;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:12})", &value), LR"(&lt;&amp;&gt;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:13})", &value), LR"(&amp;&quot;&amp;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:14})", &value), LR"(&quot;&apos;&quot;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:15})", &value), LR"(&apos;&lt;&apos;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:16})", &value), LR"(&apos;&amp;&apos;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:17})", &value),
+             LR"(&lt;&gt;&amp;&apos;&quot;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:18})", &value),
+             LR"(&apos;&quot;&lt;&gt;&amp;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:19})", &value),
+             LR"(&lt;&quot;&amp;&apos;&gt;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:20})", &value),
+             LR"(&lt;&lt;&lt;&lt;&lt;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:21})", &value),
+             LR"(&gt;&gt;&gt;&gt;&gt;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:22})", &value),
+             LR"(&amp;&amp;&amp;&amp;&amp;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:23})", &value),
+             LR"(&quot;&quot;&quot;&quot;&quot;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:24})", &value),
+             LR"(&apos;&apos;&apos;&apos;&apos;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:25})", &value), LR"(A&lt;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:26})", &value), LR"(A&gt;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:27})", &value), LR"(A&amp;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:28})", &value), LR"(A&quot;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:29})", &value), LR"(A&apos;)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:30})", &value), LR"(&lt;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:31})", &value), LR"(&gt;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:32})", &value), LR"(&amp;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:33})", &value), LR"(&quot;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:34})", &value), LR"(&apos;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:35})", &value), LR"(A&lt;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:36})", &value), LR"(A&gt;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:37})", &value), LR"(A&amp;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:38})", &value), LR"(A&quot;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:39})", &value), LR"(A&apos;A)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:40})", &value), LR"(AA&lt;AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:41})", &value), LR"(AA&gt;AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:42})", &value), LR"(AA&amp;AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:43})", &value), LR"(AA&quot;AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:44})", &value), LR"(AA&apos;AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:45})", &value),
+             LR"(AA&lt;&lt;&lt;&lt;AA)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:46})", &value),
+             LR"(AA&gt;&gt;&gt;&gt;AA)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:47})", &value),
+             LR"(AA&amp;&amp;&amp;&amp;AA)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:48})", &value),
+             LR"(AA&quot;&quot;&quot;&quot;AA)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:49})", &value),
+             LR"(AA&apos;&apos;&apos;&apos;AA)", L"Render()");
+    EQ_VALUE(
+        Template::Render(LR"({var:50})", &value),
+        LR"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)",
+        L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:51})", &value),
+             LR"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({var:52})", &value),
+             LR"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", L"Render()");
+    EQ_VALUE(
+        Template::Render(LR"({var:53})", &value),
+        LR"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)",
+        L"Render()");
+
+    END_SUB_TEST;
+}
+
+static int TestRawVariableXTag1() {
+    const wchar_t *content;
+
+    Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5,
+           [null, false, ["Qentem"]]])");
+
+    Value<wchar_t> sub_value = JSON::Parse(
+        LR"({"key1": "a", "key2": "ABC", "key3": false, "key4": 100, "key5": 1.5, "key6": {"one": 1}
+        ,"key7": [null, false, ["Qentem"]]})");
+
+    value += sub_value;
+
+    content = LR"({raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(A)", L"Render()");
+
+    content = LR"({raw:1})";
+    EQ_VALUE(Template::Render(content, &value), LR"(abc)", L"Render()");
+
+    content = LR"({raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(true)", L"Render()");
+
+    content = LR"({raw:3})";
+    EQ_VALUE(Template::Render(content, &value), LR"(456)", L"Render()");
+
+    content = LR"({raw:4})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1.5)", L"Render()");
+
+    content = LR"({raw:5[0]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(null)", L"Render()");
+
+    content = LR"({raw:5[1]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(false)", L"Render()");
+
+    content = LR"({raw:5[2][0]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(Qentem)", L"Render()");
+
+    //////
+
+    content = LR"({raw:key1})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(a)", L"Render()");
+
+    content = LR"({raw:key2})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(ABC)", L"Render()");
+
+    content = LR"({raw:key3})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(false)", L"Render()");
+
+    content = LR"({raw:key4})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(100)", L"Render()");
+
+    content = LR"({raw:key5})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(1.5)", L"Render()");
+
+    content = LR"({raw:key6[one]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(1)", L"Render()");
+
+    content = LR"({raw:key7[0]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(null)", L"Render()");
+
+    content = LR"({raw:key7[1]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(false)", L"Render()");
+
+    content = LR"({raw:key7[2][0]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(Qentem)", L"Render()");
+
+    //
+    content = LR"({raw:6[key1]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(a)", L"Render()");
+
+    content = LR"({raw:6[key2]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(ABC)", L"Render()");
+
+    content = LR"({raw:6[key3]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(false)", L"Render()");
+
+    content = LR"({raw:6[key4]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(100)", L"Render()");
+
+    content = LR"({raw:6[key5]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1.5)", L"Render()");
+
+    content = LR"({raw:6[key6][one]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1)", L"Render()");
+
+    ////////////////
+
+    content = LR"(-{raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(-true)", L"Render()");
+
+    content = LR"(-{raw:key7[0]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(-null)", L"Render()");
+
+    content = LR"(-{raw:key7[2][0]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(-Qentem)", L"Render()");
+
+    content = LR"(-{raw:6[key3]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(-false)", L"Render()");
+
+    content = LR"(-{raw:6[key4]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(-100)", L"Render()");
+    ////////////
+
+    content = LR"({raw:2}-)";
+    EQ_VALUE(Template::Render(content, &value), LR"(true-)", L"Render()");
+
+    content = LR"({raw:key7[0]}-)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(null-)", L"Render()");
+
+    content = LR"({raw:key7[2][0]}-)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(Qentem-)", L"Render()");
+
+    content = LR"({raw:6[key3]}-)";
+    EQ_VALUE(Template::Render(content, &value), LR"(false-)", L"Render()");
+
+    content = LR"({raw:6[key4]}-)";
+    EQ_VALUE(Template::Render(content, &value), LR"(100-)", L"Render()");
+
+    ////////////
+
+    content = LR"(-{raw:2}-)";
+    EQ_VALUE(Template::Render(content, &value), LR"(-true-)", L"Render()");
+
+    content = LR"(-{raw:key7[0]}-)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(-null-)", L"Render()");
+
+    content = LR"(-{raw:key7[2][0]}-)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(-Qentem-)",
+             L"Render()");
+
+    content = LR"(-{raw:6[key3]}-)";
+    EQ_VALUE(Template::Render(content, &value), LR"(-false-)", L"Render()");
+
+    content = LR"(-{raw:6[key4]}-)";
+    EQ_VALUE(Template::Render(content, &value), LR"(-100-)", L"Render()");
+
+    ////////////
+
+    content = LR"(------{raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(------true)", L"Render()");
+
+    content = LR"(------{raw:key7[0]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(------null)",
+             L"Render()");
+
+    content = LR"(------{raw:key7[2][0]})";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(------Qentem)",
+             L"Render()");
+
+    content = LR"(------{raw:6[key3]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(------false)", L"Render()");
+
+    content = LR"(------{raw:6[key4]})";
+    EQ_VALUE(Template::Render(content, &value), LR"(------100)", L"Render()");
+
+    ////////////
+
+    content = LR"({raw:2}------)";
+    EQ_VALUE(Template::Render(content, &value), LR"(true------)", L"Render()");
+
+    content = LR"({raw:key7[0]}------)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(null------)",
+             L"Render()");
+
+    content = LR"({raw:key7[2][0]}------)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(Qentem------)",
+             L"Render()");
+
+    content = LR"({raw:6[key3]}------)";
+    EQ_VALUE(Template::Render(content, &value), LR"(false------)", L"Render()");
+
+    content = LR"({raw:6[key4]}------)";
+    EQ_VALUE(Template::Render(content, &value), LR"(100------)", L"Render()");
+
+    ////////////
+
+    content = LR"(------{raw:2}------)";
+    EQ_VALUE(Template::Render(content, &value), LR"(------true------)",
+             L"Render()");
+
+    content = LR"(------{raw:key7[0]}------)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(------null------)",
+             L"Render()");
+
+    content = LR"(------{raw:key7[2][0]}------)";
+    EQ_VALUE(Template::Render(content, &sub_value), LR"(------Qentem------)",
+             L"Render()");
+
+    content = LR"(------{raw:6[key3]}------)";
+    EQ_VALUE(Template::Render(content, &value), LR"(------false------)",
+             L"Render()");
+
+    content = LR"(------{raw:6[key4]}------)";
+    EQ_VALUE(Template::Render(content, &value), LR"(------100------)",
+             L"Render()");
+
+    content = LR"({raw:key7[2[0]})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:key7[2[0]})",
+             L"Render()");
+
+    content = LR"({raw:6key3]})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:6key3]})",
+             L"Render()");
+
+    END_SUB_TEST;
+}
+
+static int TestRawVariableXTag2() {
+    Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
+    const wchar_t *content;
+
+    content = LR"({raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(AA)", L"Render()");
+
+    content = LR"({raw:1}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(abcA)", L"Render()");
+
+    content = LR"({raw:1}{raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(abctrue)", L"Render()");
+
+    content = LR"({raw:2}{raw:3}{raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(true456true)", L"Render()");
+
+    content = LR"({raw:4}{raw:4}{raw:4})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1.51.51.5)", L"Render()");
+    ///
+
+    content = LR"({raw:0}-{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(A-A)", L"Render()");
+
+    content = LR"({raw:1}--{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(abc--A)", L"Render()");
+
+    content = LR"({raw:1}---{raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(abc---true)", L"Render()");
+
+    content = LR"({raw:2}{raw:3}--{raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"(true456--true)",
+             L"Render()");
+
+    content = LR"({raw:4}--{raw:4}{raw:4})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1.5--1.51.5)", L"Render()");
+
+    content = LR"({raw:4}--{raw:4}--{raw:4})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1.5--1.5--1.5)",
+             L"Render()");
+
+    content = LR"({raw:4}---{raw:4}---{raw:4})";
+    EQ_VALUE(Template::Render(content, &value), LR"(1.5---1.5---1.5)",
+             L"Render()");
+
+    END_SUB_TEST;
+}
+
+static int TestRawVariableXTag3() {
+    Value<wchar_t> value;
+    const wchar_t *content;
+
+    content = LR"({raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0})", L"Render()");
+
+    EQ_VALUE(Template::Render(LR"({raw:a})", &value), LR"({raw:a})",
+             L"Render()");
+
+    content = LR"({raw:0[0]})";
+    EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
+             LR"({raw:0[0]})", L"Render()");
+
+    content = LR"({raw:a[0]})";
+    EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
+             LR"({raw:a[0]})", L"Render()");
+
+    content = LR"({raw:0[a]})";
+    EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
+             LR"({raw:0[a]})", L"Render()");
+
+    content = LR"({raw:a[abc]})";
+    EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
+             LR"({raw:a[abc]})", L"Render()");
+
+    ////////////////
+
+    value = JSON::Parse(LR"([[[]],{"a":["x"],"b":{"a":"X"}}])");
+
+    content = LR"({raw:0})";
+    EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
+             LR"({raw:0})", L"Render()");
+
+    content = LR"({raw:0[0]})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0[0]})", L"Render()");
+
+    content = LR"({raw:0[0][0]})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0[0][0]})",
+             L"Render()");
+
+    /////
+
+    content = LR"({raw:1})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:1})", L"Render()");
+
+    content = LR"({raw:2})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:2})", L"Render()");
+
+    content = LR"({raw:1[a]})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:1[a]})", L"Render()");
+
+    content = LR"({raw:1[b]})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:1[b]})", L"Render()");
+
+    ////
+
+    value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
+
+    content = LR"({raw:0)";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0)", L"Render()");
+
+    content = LR"(raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(raw:0})", L"Render()");
+
+    content = LR"({r})";
+    EQ_VALUE(Template::Render(content, &value), LR"({r})", L"Render()");
+
+    content = LR"({ra})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ra})", L"Render()");
+
+    content = LR"({raw})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw})", L"Render()");
+
+    content = LR"({raw:})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:})", L"Render()");
+
+    content = LR"({r:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({r:0})", L"Render()");
+
+    content = LR"({ra:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ra:0})", L"Render()");
+    ////
+
+    content = LR"({raw:0{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0{raw:0})",
+             L"Render()");
+
+    content = LR"(raw:0{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(raw:0A)", L"Render()");
+
+    content = LR"(raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(raw:0}A)", L"Render()");
+
+    content = LR"({raw:0{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0{raw:0}A)",
+             L"Render()");
+
+    ////
+
+    content = LR"({raw:0{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0{raw:0})",
+             L"Render()");
+
+    content = LR"(raw:0{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(raw:0A)", L"Render()");
+
+    content = LR"(raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"(raw:0}A)", L"Render()");
+
+    content = LR"({raw:0{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0{raw:0}A)",
+             L"Render()");
+
+    ////
+
+    content = LR"({{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({A)", L"Render()");
+
+    content = LR"({{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({AA)", L"Render()");
+
+    content = LR"({r{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({rA)", L"Render()");
+
+    content = LR"({r{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({rAA)", L"Render()");
+
+    content = LR"({ra{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raA)", L"Render()");
+
+    content = LR"({ra{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raAA)", L"Render()");
+
+    content = LR"({raw{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({rawA)", L"Render()");
+
+    content = LR"({raw{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({rawAA)", L"Render()");
+
+    ///
+
+    content = LR"({-{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({-A)", L"Render()");
+
+    content = LR"({-{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({-AA)", L"Render()");
+
+    content = LR"({r-{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({r-A)", L"Render()");
+
+    content = LR"({r-{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({r-AA)", L"Render()");
+
+    content = LR"({ra-{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ra-A)", L"Render()");
+
+    content = LR"({ra-{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ra-AA)", L"Render()");
+
+    content = LR"({raw-{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw-A)", L"Render()");
+
+    content = LR"({raw-{raw:0}{raw:0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw-AA)", L"Render()");
+
+    //
+
+    content = LR"({raw-0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw-0})", L"Render()");
+
+    content = LR"({raw 0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw 0})", L"Render()");
+
+    content = LR"({raw:0 })";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0 })", L"Render()");
+
+    content = LR"({raw:0 )";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0 )", L"Render()");
+
+    content = LR"({raw:0)";
+    EQ_VALUE(Template::Render(content, &value), LR"({raw:0)", L"Render()");
+
+    END_SUB_TEST;
+}
+
+static int TestRawVariableXTag4() {
+    Value<wchar_t> value;
+
+    value += LR"(<)";
+    value += LR"(>)";
+    value += LR"(&)";
+    value += LR"(")";
+    value += LR"(')";
+    value += LR"(<>)";
+    value += LR"(<&)";
+    value += LR"(<&)";
+    value += LR"(>")";
+    value += LR"("')";
+    value += LR"(<">)";
+    value += LR"(<'>)";
+    value += LR"(<&>)";
+    value += LR"(&"&)";
+    value += LR"("'")";
+    value += LR"('<')";
+    value += LR"('&')";
+    value += LR"(<>&'")";
+    value += LR"('"<>&)";
+    value += LR"(<"&'>)";
+
+    value += LR"(<<<<<)";
+    value += LR"(>>>>>)";
+    value += LR"(&&&&&)";
+    value += LR"(""""")";
+    value += LR"(''''')";
+
+    value += LR"(A<)";
+    value += LR"(A>)";
+    value += LR"(A&)";
+    value += LR"(A")";
+    value += LR"(A')";
+    value += LR"(<A)";
+    value += LR"(>A)";
+    value += LR"(&A)";
+    value += LR"("A)";
+    value += LR"('A)";
+    value += LR"(A<A)";
+    value += LR"(A>A)";
+    value += LR"(A&A)";
+    value += LR"(A"A)";
+    value += LR"(A'A)";
+
+    value += LR"(AA<AA)";
+    value += LR"(AA>AA)";
+    value += LR"(AA&AA)";
+    value += LR"(AA"AA)";
+    value += LR"(AA'AA)";
+
+    value += LR"(AA<<<<AA)";
+    value += LR"(AA>>>>AA)";
+    value += LR"(AA&&&&AA)";
+    value += LR"(AA""""AA)";
+    value += LR"(AA''''AA)";
+
+    value += LR"(<A>B'C"D&E'F"G<H>I&G"K)";
+    value += LR"(AB"CD'EF<GH>IGK')";
+    value += LR"("ABC'DEF<GHI>GK<)";
+    value += LR"(A""BC<<DE>>FG''HI&&GK)";
+
+    EQ_VALUE(Template::Render(LR"({raw:0})", &value), LR"(<)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:1})", &value), LR"(>)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:2})", &value), LR"(&)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:3})", &value), LR"(")", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:4})", &value), LR"(')", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:5})", &value), LR"(<>)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:6})", &value), LR"(<&)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:7})", &value), LR"(<&)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:8})", &value), LR"(>")", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:9})", &value), LR"("')", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:10})", &value), LR"(<">)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:11})", &value), LR"(<'>)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:12})", &value), LR"(<&>)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:13})", &value), LR"(&"&)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:14})", &value), LR"("'")", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:15})", &value), LR"('<')", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:16})", &value), LR"('&')", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:17})", &value), LR"(<>&'")",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:18})", &value), LR"('"<>&)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:19})", &value), LR"(<"&'>)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:20})", &value), LR"(<<<<<)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:21})", &value), LR"(>>>>>)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:22})", &value), LR"(&&&&&)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:23})", &value), LR"(""""")",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:24})", &value), LR"(''''')",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:25})", &value), LR"(A<)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:26})", &value), LR"(A>)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:27})", &value), LR"(A&)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:28})", &value), LR"(A")", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:29})", &value), LR"(A')", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:30})", &value), LR"(<A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:31})", &value), LR"(>A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:32})", &value), LR"(&A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:33})", &value), LR"("A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:34})", &value), LR"('A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:35})", &value), LR"(A<A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:36})", &value), LR"(A>A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:37})", &value), LR"(A&A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:38})", &value), LR"(A"A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:39})", &value), LR"(A'A)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:40})", &value), LR"(AA<AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:41})", &value), LR"(AA>AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:42})", &value), LR"(AA&AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:43})", &value), LR"(AA"AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:44})", &value), LR"(AA'AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:45})", &value), LR"(AA<<<<AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:46})", &value), LR"(AA>>>>AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:47})", &value), LR"(AA&&&&AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:48})", &value), LR"(AA""""AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:49})", &value), LR"(AA''''AA)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:50})", &value),
+             LR"(<A>B'C"D&E'F"G<H>I&G"K)", L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:51})", &value), LR"(AB"CD'EF<GH>IGK')",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:52})", &value), LR"("ABC'DEF<GHI>GK<)",
+             L"Render()");
+    EQ_VALUE(Template::Render(LR"({raw:53})", &value),
+             LR"(A""BC<<DE>>FG''HI&&GK)", L"Render()");
+
+    END_SUB_TEST;
+}
+
 static int TestMathXTag1() {
     Value<wchar_t> value;
 
@@ -879,7 +1637,7 @@ static int TestMathXTag2() {
 
     EQ_VALUE(Template::Render(L"math:1}", &value), L"math:1}", L"Render()");
 
-    EQ_VALUE(Template::Render(L"{math:{var:2}", &value), L"{math:{var:2}",
+    EQ_VALUE(Template::Render(L"{math:{var:2}", &value), L"{math:5",
              L"Render()");
 
     EQ_VALUE(Template::Render(L"{{math:{var:2}+5}", &value), L"{10",
@@ -989,7 +1747,7 @@ static int TestInlineIfXTag() {
     content = LR"({if case="{var:2}" true="T" false="F"})";
     EQ_VALUE(Template::Render(content, &value), L"F", L"Render()");
 
-    content = LR"({if case="{var:4}" true="T" false="F"})";
+    content = LR"({if case="{raw:4}" true="T" false="F"})";
     EQ_VALUE(Template::Render(content, &value), L"F", L"Render()");
 
     content = LR"({if case="{var:5}" true="T" false="F"})";
@@ -1106,15 +1864,16 @@ static int TestInlineIfXTag() {
     EQ_VALUE(Template::Render(content, &value), L"{iT", L"Render()");
 
     content = LR"({if{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), L"T", L"Render()");
+    EQ_VALUE(Template::Render(content, &value), L"{ifT", L"Render()");
 
     content =
         LR"({if{if case="1" true="T" false="F"}}{if case="1" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), LR"(T}T)", L"Render()");
+
+    EQ_VALUE(Template::Render(content, &value), LR"(TT)", L"Render()");
 
     content =
-        LR"({if{if case="{var:1}" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), LR"(TT)", L"Render()");
+        LR"({if{if case="{raw:1}" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ifTT)", L"Render()");
 
     /////
     content = LR"({if case="0" true="{var:3}" false="{var:4}"})";
@@ -1123,7 +1882,7 @@ static int TestInlineIfXTag() {
     content = LR"({if case="1" true="{var:3}" false="{var:4}"})";
     EQ_VALUE(Template::Render(content, &value), L"true", L"Render()");
 
-    content = LR"({if case="0" true="{var:3}{var:3}" false="{var:4}{var:4}"})";
+    content = LR"({if case="0" true="{raw:3}{raw:3}" false="{var:4}{var:4}"})";
     EQ_VALUE(Template::Render(content, &value), L"falsefalse", L"Render()");
 
     content =
@@ -1172,6 +1931,9 @@ static int TestLoopXTag1() {
 
     content = LR"(<loop             repeat="1">A</loop>)";
     EQ_VALUE(Template::Render(content, &value), L"A", L"Render()");
+
+    content = LR"(<loop<loop repeat="1">A</loop>)";
+    EQ_VALUE(Template::Render(content, &value), L"<loopA", L"Render()");
 
     content = LR"(<loop repeat="3"         >ABC</loop>)";
     EQ_VALUE(Template::Render(content, &value), L"ABCABCABC", L"Render()");
@@ -1972,6 +2734,9 @@ static int TestIfXTag2() {
     EQ_VALUE(Template::Render(content, &value), LR"(<if case="1">Qentem)",
              L"Render()");
 
+    content = LR"(<if<if case="1">{var:name}</if>)";
+    EQ_VALUE(Template::Render(content, &value), LR"(<ifQentem)", L"Render()");
+
     content = LR"(<if case="1"><if case="1">{var:name}</if>)";
     EQ_VALUE(Template::Render(content, &value), LR"(<if case="1">Qentem)",
              L"Render()");
@@ -2200,34 +2965,37 @@ static int TestRenderX2() {
     END_SUB_TEST;
 }
 
-// std::wcout << '\n'
-//            << Template::Render(content, &value).GetString() << '\n';
-
 static int RunTemplateLTests() {
-    STARTING_TEST("Template.hpp (Wide character)");
+    STARTING_TEST(L"Template.hpp (Wide character)");
 
-    START_TEST("Variable Tag Test 1", TestVariableXTag1);
-    START_TEST("Variable Tag Test 2", TestVariableXTag2);
-    START_TEST("Variable Tag Test 3", TestVariableXTag3);
+    START_TEST(L"Variable Tag Test 1", TestVariableXTag1);
+    START_TEST(L"Variable Tag Test 2", TestVariableXTag2);
+    START_TEST(L"Variable Tag Test 3", TestVariableXTag3);
+    START_TEST(L"Variable Tag Test 4", TestVariableXTag4);
 
-    START_TEST("Math Tag Test 1", TestMathXTag1);
-    START_TEST("Math Tag Test 2", TestMathXTag2);
+    START_TEST(L"Raw Variable Tag Test 1", TestRawVariableXTag1);
+    START_TEST(L"Raw Variable Tag Test 2", TestRawVariableXTag2);
+    START_TEST(L"Raw Variable Tag Test 3", TestRawVariableXTag3);
+    START_TEST(L"Raw Variable Tag Test 4", TestRawVariableXTag4);
 
-    START_TEST("Inline if Tag Test", TestInlineIfXTag);
+    START_TEST(L"Math Tag Test 1", TestMathXTag1);
+    START_TEST(L"Math Tag Test 2", TestMathXTag2);
 
-    START_TEST("Loop Tag Test 1", TestLoopXTag1);
-    START_TEST("Loop Tag Test 2", TestLoopXTag2);
-    START_TEST("Loop Tag Test 3", TestLoopXTag3);
-    START_TEST("Loop Tag Test 4", TestLoopXTag4);
-    START_TEST("Loop Tag Test 5", TestLoopXTag5);
+    START_TEST(L"Inline if Tag Test", TestInlineIfXTag);
 
-    START_TEST("If Tag Test 1", TestIfXTag1);
-    START_TEST("If Tag Test 2", TestIfXTag2);
+    START_TEST(L"Loop Tag Test 1", TestLoopXTag1);
+    START_TEST(L"Loop Tag Test 2", TestLoopXTag2);
+    START_TEST(L"Loop Tag Test 3", TestLoopXTag3);
+    START_TEST(L"Loop Tag Test 4", TestLoopXTag4);
+    START_TEST(L"Loop Tag Test 5", TestLoopXTag5);
 
-    START_TEST("Render Test 1", TestRenderX1);
-    START_TEST("Render Test 2", TestRenderX2);
+    START_TEST(L"If Tag Test 1", TestIfXTag1);
+    START_TEST(L"If Tag Test 2", TestIfXTag2);
 
-    END_TEST("Template.hpp (Wide character)");
+    START_TEST(L"Render Test 1", TestRenderX1);
+    START_TEST(L"Render Test 2", TestRenderX2);
+
+    END_TEST(L"Template.hpp (Wide character)");
 }
 
 } // namespace Test
