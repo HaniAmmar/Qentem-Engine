@@ -846,8 +846,9 @@ class Template_CV {
         }
 
         if (*content != TemplatePatterns_C_::TildeChar) {
-            ss_->Insert((content - TemplatePatterns_C_::VariablePrefixLength),
-                        (length + TemplatePatterns_C_::VariableFulllength));
+            ss_->Insert(
+                (content - TemplatePatterns_C_::RawVariablePrefixLength),
+                (length + TemplatePatterns_C_::RawVariableFulllength));
         }
     }
 
