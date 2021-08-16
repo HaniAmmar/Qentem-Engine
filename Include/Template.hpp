@@ -518,9 +518,8 @@ class Template_CV {
                             if (tmp_offset ==
                                 TemplatePatterns_C_::MathPrefixLength) {
                                 SizeT end_offset = Engine::SkipInnerPatterns(
-                                    variable_prefix,
-                                    TemplatePatterns_C_::VariablePrefixLength,
-                                    inline_suffix, 1, content, current_offset,
+                                    TemplatePatterns_C_::InLinePrefix,
+                                    inline_suffix[0], content, current_offset,
                                     length);
 
                                 if (end_offset != 0) {
@@ -530,7 +529,7 @@ class Template_CV {
                                     continue;
                                 }
 
-                                offset = current_offset;
+                                offset = (current_offset - 1);
                             }
                         }
 
@@ -554,9 +553,8 @@ class Template_CV {
                             if (tmp_offset ==
                                 TemplatePatterns_C_::InLineIfPrefixLength) {
                                 SizeT end_offset = Engine::SkipInnerPatterns(
-                                    variable_prefix,
-                                    TemplatePatterns_C_::VariablePrefixLength,
-                                    inline_suffix, 1, content, current_offset,
+                                    TemplatePatterns_C_::InLinePrefix,
+                                    inline_suffix[0], content, current_offset,
                                     length);
 
                                 if (end_offset != 0) {
@@ -566,7 +564,7 @@ class Template_CV {
                                     continue;
                                 }
 
-                                offset = current_offset;
+                                offset = (current_offset - 1);
                             }
                         }
                     }
@@ -606,7 +604,7 @@ class Template_CV {
                                 continue;
                             }
 
-                            offset = current_offset;
+                            offset = (current_offset - 1);
                         }
                     }
                 } else if (content[current_offset] ==
@@ -636,7 +634,7 @@ class Template_CV {
                                 continue;
                             }
 
-                            offset = current_offset;
+                            offset = (current_offset - 1);
                         }
                     }
                 }
