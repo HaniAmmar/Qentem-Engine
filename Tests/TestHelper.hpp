@@ -39,8 +39,9 @@ class TestHelper {
         return line;
     }
 
-    QENTEM_NOINLINE static const char *&TestGroupName() {
-        static const char *name = nullptr;
+    template <typename Char_T_>
+    QENTEM_NOINLINE static const Char_T_ *&TestGroupName() {
+        static const Char_T_ *name = nullptr;
 
         return name;
     }
@@ -49,7 +50,7 @@ class TestHelper {
     QENTEM_NOINLINE static void
     PrintErrorMessage(bool equal, const Char_T_ *name, Value_T_ value,
                       std::wostream &out = std::wcout) {
-        out << "\x1B[31mFailed\x1B[0m: " << TestGroupName()
+        out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value << "'\n"
             << std::endl;
@@ -65,16 +66,17 @@ class TestHelper {
     template <typename Char_T_, typename FUNC_>
     QENTEM_NOINLINE static bool StartTest(const Char_T_ *name, FUNC_ func,
                                           std::wostream &out = std::wcout) {
-        TestGroupName() = name;
+        TestGroupName<Char_T_>() = name;
 
         try {
             if (func() == 0) {
-                out << "\x1B[32mPass\x1B[0m: " << TestGroupName() << std::endl;
+                out << "\x1B[32mPass\x1B[0m: " << TestGroupName<Char_T_>()
+                    << std::endl;
                 return true;
             }
 
         } catch (...) {
-            out << "\x1B[31mFailed (throw)\x1B[0m: " << TestGroupName()
+            out << "\x1B[31mFailed (throw)\x1B[0m: " << TestGroupName<Char_T_>()
                 << "\n after line :" << TestHelper::LineNumber() << '\n'
                 << std::endl;
         }
