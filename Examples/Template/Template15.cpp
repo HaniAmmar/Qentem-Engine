@@ -12,7 +12,7 @@ int main() {
 
     const char *content = R"(
 <loop value="val1_" group="year" sort="ascend">Year(val1_):
-    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">val3_</loop>)
+    <loop set="val1_" value="val2_">Month(val2_[month])
     </loop>
 </loop>
     )";
@@ -35,4 +35,12 @@ int main() {
                 Month(5)
                 Month(7)
     */
+
+    // Without the names of the values.
+    const char *content = R"(
+<loop value="val1_" group="year" sort="ascend">Year(val1_):
+    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">val3_</loop>)
+    </loop>
+</loop>
+    )";
 }

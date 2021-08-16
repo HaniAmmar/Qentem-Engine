@@ -620,7 +620,7 @@ int main() {
 
     const char *content = R"(
 <loop value="val1_" group="year" sort="ascend">Year(val1_):
-    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">val3_</loop>)
+    <loop set="val1_" value="val2_">Month(val2_[month])
     </loop>
 </loop>
     )";
