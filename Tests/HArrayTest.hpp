@@ -324,7 +324,7 @@ static int TestHArray4() {
     numbers1["key7"] = 70;
     numbers1["key8"] = 80;
 
-    SizeT keyindex;
+    SizeT keyindex = 100;
 
     numbers1.GetKeyIndex(keyindex, "key1", 4);
     EQ_VALUE(keyindex, 0, "key1 Index");
@@ -894,13 +894,20 @@ static int TestHArraySort() {
 
     strings.Sort();
 
-    EQ_VALUE(*strings.GetValue(0), 2016, "strings[2016]");
-    EQ_VALUE(*strings.GetValue(1), 2017, "strings[2017]");
-    EQ_VALUE(*strings.GetValue(2), 2018, "strings[2018]");
-    EQ_VALUE(*strings.GetValue(3), 2019, "strings[2019]");
-    EQ_VALUE(*strings.GetValue(4), 2020, "strings[2020]");
-    EQ_VALUE(*strings.GetValue(5), 2021, "strings[2021]");
-    EQ_VALUE(*strings.GetValue(6), 2022, "strings[2022]");
+    NOT_EQ_TO(strings.GetValue(0), nullptr, "GetValue(0)", "null");
+    EQ_VALUE(*(strings.GetValue(0)), 2016, "strings[2016]");
+    NOT_EQ_TO(strings.GetValue(1), nullptr, "GetValue(1)", "null");
+    EQ_VALUE(*(strings.GetValue(1)), 2017, "strings[2017]");
+    NOT_EQ_TO(strings.GetValue(2), nullptr, "GetValue(2)", "null");
+    EQ_VALUE(*(strings.GetValue(2)), 2018, "strings[2018]");
+    NOT_EQ_TO(strings.GetValue(3), nullptr, "GetValue(3)", "null");
+    EQ_VALUE(*(strings.GetValue(3)), 2019, "strings[2019]");
+    NOT_EQ_TO(strings.GetValue(4), nullptr, "GetValue(4)", "null");
+    EQ_VALUE(*(strings.GetValue(4)), 2020, "strings[2020]");
+    NOT_EQ_TO(strings.GetValue(5), nullptr, "GetValue(5)", "null");
+    EQ_VALUE(*(strings.GetValue(5)), 2021, "strings[2021]");
+    NOT_EQ_TO(strings.GetValue(6), nullptr, "GetValue(6)", "null");
+    EQ_VALUE(*(strings.GetValue(6)), 2022, "strings[2022]");
 
     EQ_VALUE(strings["2016"], 2016, "strings[2016]");
     EQ_VALUE(strings["2017"], 2017, "strings[2017]");

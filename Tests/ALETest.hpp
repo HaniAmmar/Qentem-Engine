@@ -364,7 +364,7 @@ static int TestALE1() {
 }
 
 static int TestALE2() {
-    double      number;
+    double      number = -99;
     const char *content;
     bool        is_valid;
 
