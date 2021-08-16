@@ -30,7 +30,7 @@ int main() {
                 {
                     "text": "The Global Internet is now free.",
                     "date": "2",
-                    "options": "style=\"color: violet;\""
+                    "options": "v_span"
                 },
                 {
                     "text": "No more hackers after implementing NO-WAY-CRPT encryption.",
@@ -55,7 +55,7 @@ int main() {
                 {
                     "text": "TeraMedicine forced to shutdown.",
                     "date": "3011-1-16",
-                    "options": "style=\"font-style: italic;\""
+                    "options": "i_span"
                 }
             ]
         },
@@ -65,7 +65,7 @@ int main() {
                 {
                     "text": "No more Uranium.",
                     "date": "3011-1-19",
-                    "options": "style=\"color: red;\""
+                    "options": "red_span"
                 },
                 {
                     "text": "The Global Internet is now free.",
@@ -93,8 +93,20 @@ int main() {
     <title>{var:title}</title>
     <style>
         body {
-            background-color: {var:body[bc]};
+            background-color: {raw:body[bc]};
             color: {if case="{var:darkmode}" true="{var:body[darkmode_color]}" false="{var:body[color]}"}
+        }
+
+        .i_span {
+            font-style: italic;
+        }
+
+        .red_span {
+            color: red;
+        }
+
+        .v_span {
+            color: violet;
         }
     </style>
 </head>
@@ -107,7 +119,7 @@ int main() {
     <div>
         <ul>
             <loop set="value_s[list]" value="value">
-            <li><span value[options]>value[text]</span> -
+            <li><span class="value[options]">value[text]</span> -
                 <span>
                     <if case="value[date] == 1">
                     New
