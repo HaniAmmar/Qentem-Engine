@@ -260,9 +260,9 @@ class Template {
         TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept
             : offset_(offset), end_offset_(end_offset) {
             if (type == TagType::Loop) {
-                setData(Memory::AllocateInit<LoopInfo_>());
+                setInfo(Memory::AllocateInit<LoopInfo_>());
             } else if (type == TagType::If) {
-                setData(Memory::AllocateInit<IfInfo_>());
+                setInfo(Memory::AllocateInit<IfInfo_>());
             }
 
             setType(type);
@@ -270,7 +270,7 @@ class Template {
 
         TagBit(TagBit &&tag) noexcept
             : offset_(tag.offset_), end_offset_(tag.end_offset_),
-              data_(static_cast<QPointer<void> &&>(tag.data_)) {
+              info_(static_cast<QPointer<void> &&>(tag.info_)) {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             type_ = tag.type_;
 #endif
@@ -292,7 +292,7 @@ class Template {
 
                 offset_     = tag.offset_;
                 end_offset_ = tag.end_offset_;
-                data_.Set(static_cast<QPointer<void> &&>(tag.data_));
+                info_.Set(static_cast<QPointer<void> &&>(tag.info_));
 
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
                 type_ = tag.type_;
@@ -305,26 +305,34 @@ class Template {
         }
 
         void Reset() {
-            const TagType type = GetType();
+            switch (GetType()) {
+                case TagType::Loop: {
+                    LoopInfo_ *loop_info = GetLoopInfo();
+                    Memory::Destruct(loop_info);
+                    Memory::Deallocate(loop_info);
+                    break;
+                }
 
-            if (type == TagType::Loop) {
-                LoopInfo_ *loop_info = GetLoopInfo();
-                Memory::Destruct(loop_info);
-                Memory::Deallocate(loop_info);
-            } else if (type == TagType::If) {
-                IfInfo_ *if_info = GetIfInfo();
-                Memory::Destruct(if_info);
-                Memory::Deallocate(if_info);
+                case TagType::If: {
+                    IfInfo_ *if_info = GetIfInfo();
+                    Memory::Destruct(if_info);
+                    Memory::Deallocate(if_info);
+                    break;
+                }
+
+                default: {
+                }
             }
 
             clearData();
         }
 
         inline LoopInfo_ *GetLoopInfo() const noexcept {
-            return static_cast<LoopInfo_ *>(getData());
+            return static_cast<LoopInfo_ *>(getInfo());
         }
 
         inline IfInfo_ *GetIfInfo() const noexcept {
+            return static_cast<IfInfo_ *>(getInfo());
             return static_cast<IfInfo_ *>(getData());
         }
 
@@ -332,7 +340,7 @@ class Template {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             return type_;
 #else
-            return static_cast<TagType>(data_.GetHighTag());
+            return static_cast<TagType>(info_.GetHighTag());
 #endif
         }
 
@@ -344,17 +352,17 @@ class Template {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             type_ = type;
 #else
-            data_.SetHighTag(static_cast<unsigned char>(type));
+            info_.SetHighTag(static_cast<unsigned char>(type));
 #endif
         }
 
-        void         clearData() noexcept { data_.Reset(); }
-        void         setData(void *ptr) noexcept { data_.SetPointer(ptr); }
-        inline void *getData() const noexcept { return data_.GetPointer(); }
+        void         clearData() noexcept { info_.Reset(); }
+        void         setInfo(void *ptr) noexcept { info_.SetPointer(ptr); }
+        inline void *getInfo() const noexcept { return info_.GetPointer(); }
 
         SizeT          offset_{0};
         SizeT          end_offset_{0};
-        QPointer<void> data_{};
+        QPointer<void> info_{};
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
         TagType type_{};
 #endif
