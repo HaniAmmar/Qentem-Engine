@@ -690,6 +690,136 @@ class Template_CV {
         }
     }
 
+    // Part of parse()
+    QENTEM_NOINLINE static void light_parse(Array<TagBit> &tags_cache,
+                                            const Char_T_ *content,
+                                            SizeT          length) {
+        static const Char_T_ *variable_prefix =
+            TemplatePatterns_C_::GetVariablePrefix();
+        static const Char_T_ *raw_variable_prefix =
+            TemplatePatterns_C_::GetRawVariablePrefix();
+        static const Char_T_ *math_prefix =
+            TemplatePatterns_C_::GetMathPrefix();
+
+        static const Char_T_ *inline_suffix =
+            TemplatePatterns_C_::GetInLineSuffix();
+
+        SizeT offset = 0;
+
+        while (offset < length) {
+            if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
+                SizeT current_offset = offset;
+                ++current_offset;
+
+                switch (content[current_offset]) {
+                    case TemplatePatterns_C_::Var_2ND_Char: {
+                        if ((TemplatePatterns_C_::VariablePrefixLength +
+                             current_offset) < length) {
+                            SizeT tmp_offset = 1;
+
+                            do {
+                                ++current_offset;
+                                ++tmp_offset;
+                            } while (
+                                (tmp_offset !=
+                                 TemplatePatterns_C_::VariablePrefixLength) &&
+                                (content[current_offset] ==
+                                 variable_prefix[tmp_offset]));
+
+                            if (tmp_offset ==
+                                TemplatePatterns_C_::VariablePrefixLength) {
+                                const SizeT end_offset =
+                                    Engine::FindOne(*inline_suffix, content,
+                                                    current_offset, length);
+
+                                if (end_offset != 0) {
+                                    tags_cache += TagBit{TagType::Variable,
+                                                         offset, end_offset};
+                                    offset = end_offset;
+                                    continue;
+                                }
+
+                                offset = current_offset;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::Raw_2ND_Char: {
+                        if ((TemplatePatterns_C_::RawVariablePrefixLength +
+                             current_offset) < length) {
+                            SizeT tmp_offset = 1;
+
+                            do {
+                                ++current_offset;
+                                ++tmp_offset;
+                            } while ((tmp_offset !=
+                                      TemplatePatterns_C_::
+                                          RawVariablePrefixLength) &&
+                                     (content[current_offset] ==
+                                      raw_variable_prefix[tmp_offset]));
+
+                            if (tmp_offset ==
+                                TemplatePatterns_C_::RawVariablePrefixLength) {
+                                const SizeT end_offset =
+                                    Engine::FindOne(*inline_suffix, content,
+                                                    current_offset, length);
+
+                                if (end_offset != 0) {
+                                    tags_cache += TagBit{TagType::RawVariable,
+                                                         offset, end_offset};
+                                    offset = end_offset;
+                                    continue;
+                                }
+
+                                offset = current_offset;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::Math_2ND_Char: {
+                        if ((TemplatePatterns_C_::MathPrefixLength +
+                             current_offset) < length) {
+                            SizeT tmp_offset = 1;
+
+                            do {
+                                ++current_offset;
+                                ++tmp_offset;
+                            } while ((tmp_offset !=
+                                      TemplatePatterns_C_::MathPrefixLength) &&
+                                     (content[current_offset] ==
+                                      math_prefix[tmp_offset]));
+
+                            if (tmp_offset ==
+                                TemplatePatterns_C_::MathPrefixLength) {
+                                SizeT end_offset = Engine::SkipInnerPatterns(
+                                    TemplatePatterns_C_::InLinePrefix,
+                                    inline_suffix[0], content, current_offset,
+                                    length);
+
+                                if (end_offset != 0) {
+                                    tags_cache += TagBit{TagType::Math, offset,
+                                                         end_offset};
+                                    offset = end_offset;
+                                    continue;
+                                }
+
+                                offset = (current_offset - 1);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            ++offset;
+        }
+    }
+
     QENTEM_NOINLINE void render(TagBit *tag, const TagBit *end,
                                 const Char_T_ *content) const {
         SizeT previous_offset = 0;
@@ -1310,8 +1440,8 @@ class Template_CV {
                         (content + inline_if_info->TrueOffset);
 
                     if (inline_if_info->TrueSubTags.IsEmpty()) {
-                        parse(inline_if_info->TrueSubTags, true_content,
-                              inline_if_info->TrueLength);
+                        light_parse(inline_if_info->TrueSubTags, true_content,
+                                    inline_if_info->TrueLength);
                     }
 
                     process(true_content, inline_if_info->TrueLength,
@@ -1322,8 +1452,8 @@ class Template_CV {
                     (content + inline_if_info->FalseOffset);
 
                 if (inline_if_info->FalseSubTags.IsEmpty()) {
-                    parse(inline_if_info->FalseSubTags, false_content,
-                          inline_if_info->FalseLength);
+                    light_parse(inline_if_info->FalseSubTags, false_content,
+                                inline_if_info->FalseLength);
                 }
 
                 process(false_content, inline_if_info->FalseLength,
