@@ -912,42 +912,6 @@ class Template_CV {
         }
     }
 
-    void parseVariables(const Char_T_ *content, SizeT length) const {
-        static const Char_T_ inline_suffix_c =
-            *(TemplatePatterns_C_::GetInLineSuffix());
-        static const Char_T_ *variable_prefix =
-            TemplatePatterns_C_::GetVariablePrefix();
-
-        SizeT offset = 0;
-        SizeT previous_offset;
-
-        do {
-            previous_offset = offset;
-            offset          = Engine::Find(variable_prefix,
-                                  TemplatePatterns_C_::VariablePrefixLength,
-                                  content, offset, length);
-
-            if (offset == 0) {
-                break;
-            }
-
-            // Add any content that comes before any {var:x}
-            ss_->Insert((content + previous_offset),
-                        ((offset - TemplatePatterns_C_::VariablePrefixLength) -
-                         previous_offset));
-
-            const SizeT start_offset = offset;
-            offset = Engine::FindOne(inline_suffix_c, content, offset, length);
-
-            renderVariable((content + start_offset),
-                           ((offset - TemplatePatterns_C_::InLineSuffixLength) -
-                            start_offset));
-        } while (true);
-
-        // Add any content that comes after }
-        ss_->Insert((content + previous_offset), (length - previous_offset));
-    }
-
     /*
      * Gets anything between "..."
      */
