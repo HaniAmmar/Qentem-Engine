@@ -192,12 +192,12 @@ Inline condition. [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/master/D
 {if case="1" true="one" false="not one"} // Fine.
 {if case="2!=1" false="not one"} // Fine.
 {if case="1&&1" true="one"} // Fine.
+{if true="one" case="1"} // OK.
 
 {if true="one" false="not one"} // Wrong.
 {if case="1"} // Wrong.
 {if true="one"} // Wrong.
 {if false="not one"} // Wrong.
-{if true="one" case="1"} // Wrong, 'case' has to be before "true" or "false".
 ```
 
 With variables:
@@ -233,7 +233,7 @@ With variables:
 
 ### ALE Note
 
-ALE treats anything inside parentheses `( )`; true is one, false and null are 0. if the operation is equal, Template will try the following:
+ALE uses `1` for `true`, 0 for `false` and `null`. if the operation is equal, Template will try the following:
 -   If one of the variables is a number, it will convert the other part to a number: ({var:one} == 1)
 -   If none of the variables is a number, it will convert the other part to a string: ({var:bool} == true)
 
