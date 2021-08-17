@@ -120,6 +120,15 @@ static int TestString1() {
     EQ_TO(strptr[0], 'A', "strptr[0]", "A");
     Memory::Deallocate(strptr);
 
+    char *  tmp_size_2 = Memory::Allocate<char>(2);
+    String8 str_size_2 = String8(tmp_size_2, 2);
+
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+    NOT_EQ_VALUE(str_size_2.First(), tmp_size_2, "First()");
+#else
+    EQ_VALUE(str_size_2.First(), tmp_size_2, "First()");
+#endif
+
     END_SUB_TEST;
 }
 
