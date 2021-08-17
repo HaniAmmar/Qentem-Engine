@@ -1868,6 +1868,9 @@ static int TestInlineIfTag() {
 
     value2 += "&";
     value2 += "\"";
+    value2 += 10;
+    value2 += 5;
+    value2 += 15;
 
     content = R"({if case="1" true="{var:0}" false="{var:1}"})";
     EQ_VALUE(Template::Render(content, &value2), R"(&amp;)", "Render()");
@@ -1880,6 +1883,14 @@ static int TestInlineIfTag() {
 
     content = R"({if case="0" true="{raw:0}" false="{raw:1}"})";
     EQ_VALUE(Template::Render(content, &value2), R"(")", "Render()");
+
+    content =
+        R"({if case="{var:2}+{var:3} == {var:4}" true="{math:{var:3}+{var:4}}" false="{math: {var:2}+{var:4}}"})";
+    EQ_VALUE(Template::Render(content, &value2), R"(20)", "Render()");
+
+    content =
+        R"({if case=" {var:4}-{var:3} != {var:2} " true="{math: {var:3}+{var:4} } " false=" {math: {var:2}+{var:4} } "})";
+    EQ_VALUE(Template::Render(content, &value2), R"( 25 )", "Render()");
 
     END_SUB_TEST;
 }

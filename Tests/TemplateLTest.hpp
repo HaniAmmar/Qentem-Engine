@@ -1919,6 +1919,9 @@ static int TestInlineIfXTag() {
 
     value2 += L"&";
     value2 += L"\"";
+    value2 += 10;
+    value2 += 5;
+    value2 += 15;
 
     content = LR"({if case="1" true="{var:0}" false="{var:1}"})";
     EQ_VALUE(Template::Render(content, &value2), LR"(&amp;)", L"Render()");
@@ -1931,6 +1934,14 @@ static int TestInlineIfXTag() {
 
     content = LR"({if case="0" true="{raw:0}" false="{raw:1}"})";
     EQ_VALUE(Template::Render(content, &value2), LR"(")", L"Render()");
+
+    content =
+        LR"({if case="{var:2}+{var:3} == {var:4}" true="{math:{var:3}+{var:4}}" false="{math: {var:2}+{var:4}}"})";
+    EQ_VALUE(Template::Render(content, &value2), LR"(20)", L"Render()");
+
+    content =
+        LR"({if case=" {var:4}-{var:3} != {var:2} " true="{math: {var:3}+{var:4} } " false=" {math: {var:2}+{var:4} } "})";
+    EQ_VALUE(Template::Render(content, &value2), LR"( 25 )", L"Render()");
 
     END_SUB_TEST;
 }
