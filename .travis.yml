@@ -44,7 +44,7 @@ jobs:
 
     before_script:
       - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra -D QENTEM_SSO=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      - g++ -g -O0 -Wall -Wextra -D QENTEM_POINTER_TAGGING=0 -D QENTEM_SSO=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
     script:
       - ./Build/QTest.bin
 
