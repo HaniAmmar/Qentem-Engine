@@ -1836,10 +1836,6 @@ static int TestInlineIfXTag() {
         LR"({if case="1" true="T"}{if case="0" false="F"}{if case="1" true="T"})";
     EQ_VALUE(Template::Render(content, &value), L"TFT", L"Render()");
 
-    content =
-        LR"({if case="1" true="{if case="0" false="{if case="1" true="T"}"}"})";
-    EQ_VALUE(Template::Render(content, &value), L"T", L"Render()");
-
     ///////
 
     content =
