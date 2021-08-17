@@ -212,6 +212,10 @@ int main() {
 
 ## Template Example
 
+### Live Test
+
+Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool)
+
 ```cpp
 #include "JSON.hpp"
 #include "Template.hpp"
