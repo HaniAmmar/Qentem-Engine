@@ -1,6 +1,7 @@
 # Template.hpp
 
 -   [Variable](#variable)
+-   [Raw Variable](#raw-variable)
 -   [Math](#math)
 -   [Inline If](#inline-if)
 -   [Loop](#loop)
@@ -125,9 +126,13 @@ int main() {
 }
 ```
 
-### Variable Note
+### Variable Tag Note
 
-Spaces after `{var:` or before `}` are considered part of the variable's name.
+Spaces after `{var:` or before `}` are considered part of the variable's name, and any string value will be made safe to be printed to the browser; by escaping HTML special chars (>, <, ", ' , &).
+
+## Raw Variable
+
+Raw variable tag is the same as Variable tag, except it does not escape HTML special chars (>, <, ", ' , &).
 
 ## Math
 
@@ -181,7 +186,7 @@ int main() {
 {if case="..." true="..." false="..."}
 ```
 
-Inline condition. [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/master/Documentation/ALE.md) takes the `case` value to evaluate it, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false''s value is used.
+Inline condition. [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/master/Documentation/ALE.md) takes the `case` value to evaluate it, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false`'s value is used.
 
 ```txt
 {if case="1" true="one" false="not one"} // Fine.
@@ -222,7 +227,12 @@ With variables:
 {if case  =  "a  ==  a" false  =  "{var:1}" true   = "{var:0}"}: Same.
 ```
 
+### Inline If Tag Note
+
+`true` and `false` only accept Variable tag, Raw variable tag and Math tag.
+
 ### ALE Note
+
 ALE treats anything inside parentheses `( )`; true is one, false and null are 0. if the operation is equal, Template will try the following:
 -   If one of the variables is a number, it will convert the other part to a number: ({var:one} == 1)
 -   If none of the variables is a number, it will convert the other part to a string: ({var:bool} == true)
