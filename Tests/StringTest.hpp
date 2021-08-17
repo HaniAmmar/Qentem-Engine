@@ -124,9 +124,9 @@ static int TestString1() {
     String8 str_size_2 = String8(tmp_size_2, 2);
 
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    NOT_EQ_VALUE(str_size_2.First(), tmp_size_2, "First()");
+    NOT_EQ_TO(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2");
 #else
-    EQ_VALUE(str_size_2.First(), tmp_size_2, "First()");
+    EQ_TO(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2");
 #endif
 
     END_SUB_TEST;
