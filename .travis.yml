@@ -78,12 +78,12 @@ jobs:
     script:
       - ./Build/QTest.bin
 
-  - os: linux
-    arch: s390x
-    group: edge
+  # - os: linux
+  #   arch: s390x
+  #   group: edge
 
-    before_script:
-      - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+  #   before_script:
+  #     - mkdir ./Build
+  #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+  #   script:
+  #     - ./Build/QTest.bin
