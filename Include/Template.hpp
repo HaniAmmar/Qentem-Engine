@@ -233,6 +233,18 @@ class Template {
     };
 
     template <typename Char_T_>
+    struct InlineIfInfo_T {
+        Array<TagBit<Char_T_>> TrueSubTags{};
+        Array<TagBit<Char_T_>> FalseSubTags{};
+        SizeT                  CaseOffset{};
+        SizeT                  CaseLength{};
+        SizeT                  TrueOffset{};
+        SizeT                  TrueLength{};
+        SizeT                  FalseOffset{};
+        SizeT                  FalseLength{};
+    };
+
+    template <typename Char_T_>
     struct IfCase_T {
         Array<TagBit<Char_T_>> SubTags{};
         SizeT                  CaseOffset{};
@@ -248,8 +260,9 @@ class Template {
 
     template <typename Char_T_>
     struct TagBit {
-        using LoopInfo_ = LoopInfo_T<Char_T_>;
-        using IfInfo_   = IfInfo_T<Char_T_>;
+        using LoopInfo_     = LoopInfo_T<Char_T_>;
+        using IfInfo_       = IfInfo_T<Char_T_>;
+        using InlineIfInfo_ = InlineIfInfo_T<Char_T_>;
 
       public:
         TagBit() = default;
@@ -259,10 +272,24 @@ class Template {
 
         TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept
             : offset_(offset), end_offset_(end_offset) {
-            if (type == TagType::Loop) {
-                setInfo(Memory::AllocateInit<LoopInfo_>());
-            } else if (type == TagType::If) {
-                setInfo(Memory::AllocateInit<IfInfo_>());
+            switch (type) {
+                case TagType::Loop: {
+                    setInfo(Memory::AllocateInit<LoopInfo_>());
+                    break;
+                }
+
+                case TagType::If: {
+                    setInfo(Memory::AllocateInit<IfInfo_>());
+                    break;
+                }
+
+                case TagType::InLineIf: {
+                    setInfo(Memory::AllocateInit<InlineIfInfo_>());
+                    break;
+                }
+
+                default: {
+                }
             }
 
             setType(type);
@@ -320,6 +347,13 @@ class Template {
                     break;
                 }
 
+                case TagType::InLineIf: {
+                    InlineIfInfo_ *inline_if_info = GetInlineIfInfo();
+                    Memory::Destruct(inline_if_info);
+                    Memory::Deallocate(inline_if_info);
+                    break;
+                }
+
                 default: {
                 }
             }
@@ -333,7 +367,10 @@ class Template {
 
         inline IfInfo_ *GetIfInfo() const noexcept {
             return static_cast<IfInfo_ *>(getInfo());
-            return static_cast<IfInfo_ *>(getData());
+        }
+
+        inline InlineIfInfo_ *GetInlineIfInfo() const noexcept {
+            return static_cast<InlineIfInfo_ *>(getInfo());
         }
 
         inline TagType GetType() const noexcept {
@@ -375,11 +412,12 @@ class Template_CV {
     friend class Qentem::ALE;
     friend class Qentem::Template;
 
-    using TagBit    = Template::TagBit<Char_T_>;
-    using TagType   = Template::TagType;
-    using LoopInfo_ = Template::LoopInfo_T<Char_T_>;
-    using IfCase_   = Template::IfCase_T<Char_T_>;
-    using IfInfo_   = Template::IfInfo_T<Char_T_>;
+    using TagBit        = Template::TagBit<Char_T_>;
+    using TagType       = Template::TagType;
+    using LoopInfo_     = Template::LoopInfo_T<Char_T_>;
+    using IfCase_       = Template::IfCase_T<Char_T_>;
+    using IfInfo_       = Template::IfInfo_T<Char_T_>;
+    using InlineIfInfo_ = Template::InlineIfInfo_T<Char_T_>;
 
     using TemplatePatterns_C_ = TemplatePatterns<Char_T_>;
 
@@ -667,9 +705,9 @@ class Template_CV {
                         TemplatePatterns_C_::VariablePrefixLength;
 
                     renderVariable((content + content_offset),
-                                   ((tag->EndOffset() - 1) - content_offset));
-
-                    // - 1 is - TemplatePatterns_C_::InLineSuffixLength
+                                   ((tag->EndOffset() -
+                                     TemplatePatterns_C_::InLineSuffixLength) -
+                                    content_offset));
                     break;
                 }
 
@@ -680,9 +718,9 @@ class Template_CV {
 
                     renderRawVariable(
                         (content + content_offset),
-                        ((tag->EndOffset() - 1) - content_offset));
-
-                    // - 1 is - TemplatePatterns_C_::InLineSuffixLength
+                        ((tag->EndOffset() -
+                          TemplatePatterns_C_::InLineSuffixLength) -
+                         content_offset));
                     break;
                 }
 
@@ -691,21 +729,9 @@ class Template_CV {
                         tag->Offset() + TemplatePatterns_C_::MathPrefixLength;
 
                     renderMath((content + content_offset),
-                               ((tag->EndOffset() - 1) - content_offset));
-
-                    // - 1 is - TemplatePatterns_C_::InLineSuffixLength
-                    break;
-                }
-
-                case TagType::InLineIf: {
-                    const SizeT content_offset =
-                        tag->Offset() +
-                        TemplatePatterns_C_::InLineIfPrefixLength;
-
-                    renderInLineIf((content + content_offset),
-                                   ((tag->EndOffset() - 1) - content_offset));
-
-                    // - 1 is - TemplatePatterns_C_::InLineSuffixLength
+                               ((tag->EndOffset() -
+                                 TemplatePatterns_C_::InLineSuffixLength) -
+                                content_offset));
                     break;
                 }
 
@@ -728,6 +754,27 @@ class Template_CV {
                     break;
                 }
 
+                case TagType::InLineIf: {
+                    const SizeT content_offset =
+                        tag->Offset() +
+                        TemplatePatterns_C_::InLineIfPrefixLength;
+                    InlineIfInfo_ *inline_if_info = tag->GetInlineIfInfo();
+
+                    if (inline_if_info->CaseLength != 0) {
+                        renderInLineIf((content + content_offset),
+                                       inline_if_info);
+                    } else {
+                        generateInLineIfContent(
+                            (content + content_offset),
+                            ((tag->EndOffset() -
+                              TemplatePatterns_C_::InLineSuffixLength) -
+                             content_offset),
+                            inline_if_info);
+                    }
+
+                    break;
+                }
+
                 case TagType::If: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
@@ -740,6 +787,8 @@ class Template_CV {
                                         (tag->EndOffset() - content_offset),
                                         if_info);
                     }
+
+                    break;
                 }
 
                 default: {
@@ -891,9 +940,8 @@ class Template_CV {
             offset = Engine::FindOne(inline_suffix_c, content, offset, length);
 
             renderVariable((content + start_offset),
-                           ((offset - 1) - start_offset));
-
-            // -1 is - TemplatePatterns_C_::InLineSuffixLength
+                           ((offset - TemplatePatterns_C_::InLineSuffixLength) -
+                            start_offset));
         } while (true);
 
         // Add any content that comes after }
@@ -921,72 +969,6 @@ class Template_CV {
         return 0;
     }
 
-    QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content,
-                                        const SizeT    length) const {
-        SizeT offset          = 0;
-        SizeT previous_offset = 0;
-        SizeT len             = 0;
-        SizeT times           = 3;
-        bool  case_value      = false;
-
-        do {
-            ++len;
-            offset += len; // Move to the next Char_T_.
-
-            len = getQuoted(content, offset, length);
-
-            if (len == 0) {
-                break;
-            }
-
-            // = + " + a Char_T_ == 3 + the Char_T_ before it == 4
-            SizeT tmp_offset   = offset - 4;
-            bool  iif_not_done = true;
-
-            do {
-                switch (content[tmp_offset]) {
-                    case TemplatePatterns_C_::CaseChar: {
-                        iif_not_done = false;
-                        double number;
-
-                        if (!(ALE::Evaluate(number, (content + offset), len,
-                                            this))) {
-                            // A messed-up case.
-                            return;
-                        }
-
-                        case_value = (number > 0.0);
-                        break;
-                    }
-
-                    case TemplatePatterns_C_::TrueChar: {
-                        iif_not_done = false;
-
-                        if (case_value) {
-                            parseVariables((content + offset), len);
-                            return;
-                        }
-
-                        break;
-                    }
-
-                    case TemplatePatterns_C_::FalseChar: {
-                        iif_not_done = false;
-
-                        if (!case_value) {
-                            parseVariables((content + offset), len);
-                            return;
-                        }
-
-                        break;
-                    }
-                }
-            } while (iif_not_done && (--tmp_offset > previous_offset));
-
-            previous_offset = offset;
-        } while (--times != 0);
-    }
-
     QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content,
                                      const SizeT length) const noexcept {
         static const Char_T_ inline_suffix_c =
@@ -1008,9 +990,10 @@ class Template_CV {
                     return false;
                 }
 
-                const Value_T_ *value =
-                    findValue((content + offset), ((end_offset - 1) - offset));
-                // -1 is - TemplatePatterns_C_::InLineSuffixLength
+                const Value_T_ *value = findValue(
+                    (content + offset),
+                    ((end_offset - TemplatePatterns_C_::InLineSuffixLength) -
+                     offset));
 
                 return ((value != nullptr) && (value->SetNumber(number)));
             }
@@ -1125,8 +1108,7 @@ class Template_CV {
                     break;
                 }
 
-                --tmp_offset;
-            } while (tmp_offset > previous_offset);
+            } while (--tmp_offset > previous_offset);
 
             break_loop      = false;
             previous_offset = offset;
@@ -1292,6 +1274,98 @@ class Template_CV {
 
             ++loop_index;
         } while (true);
+    }
+
+    QENTEM_NOINLINE void
+    generateInLineIfContent(const Char_T_ *content, SizeT length,
+                            InlineIfInfo_ *inline_if_info) const {
+        SizeT offset          = 0;
+        SizeT previous_offset = 0;
+        SizeT len             = 0;
+        bool  break_loop;
+
+        do {
+            break_loop = false;
+            ++len;
+            offset += len; // Move to the next Char_T_.
+
+            len = getQuoted(content, offset, length);
+
+            if (len == 0) {
+                break;
+            }
+
+            // = + " + a two chars == 4 + the char before it == 5
+            SizeT tmp_offset = (offset - 5);
+
+            do {
+                switch (content[tmp_offset]) {
+                    case TemplatePatterns_C_::CaseChar: {
+                        inline_if_info->CaseOffset = offset;
+                        inline_if_info->CaseLength = len;
+                        break_loop                 = true;
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::TrueChar: {
+                        inline_if_info->TrueOffset = offset;
+                        inline_if_info->TrueLength = len;
+                        break_loop                 = true;
+                        break;
+                    }
+
+                    case TemplatePatterns_C_::FalseChar: {
+                        inline_if_info->FalseOffset = offset;
+                        inline_if_info->FalseLength = len;
+                        break_loop                  = true;
+                        break;
+                    }
+                }
+            } while (!break_loop && (--tmp_offset > previous_offset));
+
+            previous_offset = (offset + len);
+        } while (true);
+
+        renderInLineIf(content, inline_if_info);
+    }
+
+    QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content,
+                                        InlineIfInfo_ *inline_if_info) const {
+        if (inline_if_info->CaseLength != 0) {
+            double result;
+
+            if (!(ALE::Evaluate(result, (content + inline_if_info->CaseOffset),
+                                inline_if_info->CaseLength, this))) {
+                // A messed-up case.
+                return;
+            }
+
+            if (result > 0.0) {
+                if (inline_if_info->TrueLength != 0) {
+                    const Char_T_ *true_content =
+                        (content + inline_if_info->TrueOffset);
+
+                    if (inline_if_info->TrueSubTags.IsEmpty()) {
+                        parse(inline_if_info->TrueSubTags, true_content,
+                              inline_if_info->TrueLength);
+                    }
+
+                    process(true_content, inline_if_info->TrueLength,
+                            inline_if_info->TrueSubTags);
+                }
+            } else if (inline_if_info->FalseLength != 0) {
+                const Char_T_ *false_content =
+                    (content + inline_if_info->FalseOffset);
+
+                if (inline_if_info->FalseSubTags.IsEmpty()) {
+                    parse(inline_if_info->FalseSubTags, false_content,
+                          inline_if_info->FalseLength);
+                }
+
+                process(false_content, inline_if_info->FalseLength,
+                        inline_if_info->FalseSubTags);
+            }
+        }
     }
 
     QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
@@ -1650,7 +1724,7 @@ struct TemplatePatterns {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    // static constexpr unsigned char InLineSuffixLength = 1U;
+    static constexpr unsigned char InLineSuffixLength = 1U;
     // static constexpr unsigned char InLinePrefixLength = 1U;
 
     static constexpr Char_T_ InLinePrefix = '{';
@@ -1669,7 +1743,7 @@ struct TemplatePatterns {
     static constexpr Char_T_       Var_2ND_Char = 'v'; // Second character
     static constexpr unsigned char VariablePrefixLength = 5U;
     static constexpr unsigned char VariableFulllength =
-        (VariablePrefixLength + 1U); // + InLineSuffixLength
+        (VariablePrefixLength + InLineSuffixLength);
     static const Char_T_ *GetVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
         return &(val[0]);
@@ -1679,7 +1753,7 @@ struct TemplatePatterns {
     static constexpr Char_T_       Raw_2ND_Char = 'r'; // Second character
     static constexpr unsigned char RawVariablePrefixLength = 5U;
     static constexpr unsigned char RawVariableFulllength =
-        (VariablePrefixLength + 1U); // + InLineSuffixLength
+        (VariablePrefixLength + InLineSuffixLength);
     static const Char_T_ *GetRawVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
         return &(val[0]);
@@ -1689,7 +1763,7 @@ struct TemplatePatterns {
     static constexpr Char_T_       Math_2ND_Char    = 'm'; // Second character
     static constexpr unsigned char MathPrefixLength = 6U;
     static constexpr unsigned char MathFulllength =
-        (MathPrefixLength + 1U); // + InLineSuffixLength
+        (MathPrefixLength + InLineSuffixLength);
     static const Char_T_ *GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
         return &(val[0]);
@@ -1787,7 +1861,7 @@ struct TemplatePatterns {
 
     // Inline If
     static constexpr Char_T_ CaseChar  = 'a'; // c[a]se
-    static constexpr Char_T_ TrueChar  = 'u'; // tr[u]e
+    static constexpr Char_T_ TrueChar  = 'r'; // t[r]ue
     static constexpr Char_T_ FalseChar = 'l'; // fa[l]se
 
     // Loop

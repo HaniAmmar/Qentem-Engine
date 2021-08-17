@@ -1785,6 +1785,10 @@ static int TestInlineIfTag() {
         R"({if case="1" true="T"}{if case="0" false="F"}{if case="1" true="T"})";
     EQ_VALUE(Template::Render(content, &value), "TFT", "Render()");
 
+    content =
+        R"({if case="1" true="{if case="0" false="{if case="1" true="T"}"}"})";
+    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+
     ///////
 
     content =
@@ -1814,6 +1818,9 @@ static int TestInlineIfTag() {
 
     content = R"({if{if case="{var:1}" true="T" false="F"})";
     EQ_VALUE(Template::Render(content, &value), "{ifT", "Render()");
+
+    content = R"({if case="{var:1}"                    put="F"})";
+    EQ_VALUE(Template::Render(content, &value), "", "Render()");
 
     content =
         R"({if{if case="1" true="T" false="F"}}{if case="1" true="T" false="F"})";
@@ -1859,6 +1866,24 @@ static int TestInlineIfTag() {
     content = R"({if case="1" true="1" false="0")";
     EQ_VALUE(Template::Render(content, &value),
              R"({if case="1" true="1" false="0")", "Render()");
+
+    ///////
+    Value<char> value2;
+
+    value2 += "&";
+    value2 += "\"";
+
+    content = R"({if case="1" true="{var:0}" false="{var:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), R"(&amp;)", "Render()");
+
+    content = R"({if case="1" true="{raw:0}" false="{raw:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), R"(&)", "Render()");
+
+    content = R"({if case="0" true="{var:0}" false="{var:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), R"(&quot;)", "Render()");
+
+    content = R"({if case="0" true="{raw:0}" false="{raw:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), R"(")", "Render()");
 
     END_SUB_TEST;
 }

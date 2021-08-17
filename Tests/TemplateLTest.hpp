@@ -1836,6 +1836,10 @@ static int TestInlineIfXTag() {
         LR"({if case="1" true="T"}{if case="0" false="F"}{if case="1" true="T"})";
     EQ_VALUE(Template::Render(content, &value), L"TFT", L"Render()");
 
+    content =
+        LR"({if case="1" true="{if case="0" false="{if case="1" true="T"}"}"})";
+    EQ_VALUE(Template::Render(content, &value), L"T", L"Render()");
+
     ///////
 
     content =
@@ -1865,6 +1869,9 @@ static int TestInlineIfXTag() {
 
     content = LR"({if{if case="{var:1}" true="T" false="F"})";
     EQ_VALUE(Template::Render(content, &value), L"{ifT", L"Render()");
+
+    content = LR"({if case="{var:1}"                    put="F"})";
+    EQ_VALUE(Template::Render(content, &value), L"", L"Render()");
 
     content =
         LR"({if{if case="1" true="T" false="F"}}{if case="1" true="T" false="F"})";
@@ -1910,6 +1917,24 @@ static int TestInlineIfXTag() {
     content = LR"({if case="1" true="1" false="0")";
     EQ_VALUE(Template::Render(content, &value),
              LR"({if case="1" true="1" false="0")", L"Render()");
+
+    ///////
+    Value<wchar_t> value2;
+
+    value2 += L"&";
+    value2 += L"\"";
+
+    content = LR"({if case="1" true="{var:0}" false="{var:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), LR"(&amp;)", L"Render()");
+
+    content = LR"({if case="1" true="{raw:0}" false="{raw:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), LR"(&)", L"Render()");
+
+    content = LR"({if case="0" true="{var:0}" false="{var:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), LR"(&quot;)", L"Render()");
+
+    content = LR"({if case="0" true="{raw:0}" false="{raw:1}"})";
+    EQ_VALUE(Template::Render(content, &value2), LR"(")", L"Render()");
 
     END_SUB_TEST;
 }
