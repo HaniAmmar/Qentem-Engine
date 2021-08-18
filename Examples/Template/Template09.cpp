@@ -47,7 +47,7 @@ item[var1] item[var2] item[var3] item[var4]</loop>
 item[0] item[1] item[2] item[3]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:

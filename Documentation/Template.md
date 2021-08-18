@@ -117,7 +117,7 @@ int main() {
     value["version"]    = 3.0;
     const char *content = R"({var:name}, {var:version})";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -166,7 +166,7 @@ int main() {
 9 % 5 = {math:9 % 5}
 )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -291,7 +291,7 @@ int main() {
 loop1-value[name]: loop1-value[value]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -325,7 +325,7 @@ int main() {
 loop1-value</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -359,7 +359,7 @@ int main() {
 loop1-value</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -399,7 +399,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -451,7 +451,7 @@ int main() {
         R"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
         repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -483,7 +483,7 @@ int main() {
     const char *content =
         R"(<loop set="list" repeat="{var:size}" index="5" value="loop1-value">loop1-value</loop>)";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -496,7 +496,7 @@ int main() {
     content =
         R"(<loop set="list" repeat="{var:size}" index="{var:start_at}" value="loop1-value">loop1-value</loop>)";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -557,7 +557,7 @@ item[var1] item[var2] item[var3] item[var4]</loop>
 item[0] item[1] item[2] item[3]</loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -597,7 +597,7 @@ int main() {
 <loop value="val1_" sort="ascend">val1_ </loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
     /*
         Output: 1 2 3 4 5 6 7
     */
@@ -606,7 +606,7 @@ int main() {
 <loop value="val1_" sort="descend">val1_ </loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
     /*
         Output: 7 6 5 4 3 2 1
     */
@@ -635,7 +635,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
     /*
         Output:
             Year(2017):
@@ -716,7 +716,7 @@ Not zero or one or two.
 </if>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -757,7 +757,7 @@ Zero!
 </if>
 )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -837,7 +837,7 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 }
 ```
 
@@ -975,6 +975,6 @@ int main() {
 </html>
 )HTML";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 }
 ```

@@ -141,5 +141,5 @@ int main() {
 </html>
 )HTML";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 }

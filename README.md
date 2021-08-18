@@ -283,7 +283,7 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 }
 ```
 

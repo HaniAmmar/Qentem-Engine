@@ -24,7 +24,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:

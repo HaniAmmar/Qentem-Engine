@@ -18,7 +18,7 @@ int main() {
     const char *content =
         R"(<loop set="list" repeat="{var:size}" index="5" value="loop1-value">loop1-value</loop>)";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
@@ -31,7 +31,7 @@ int main() {
     content =
         R"(<loop set="list" repeat="{var:size}" index="{var:start_at}" value="loop1-value">loop1-value</loop>)";
 
-    std::cout << Template::Render(content, &value).GetString() << '\n';
+    std::cout << Template::Render(content, &value) << '\n';
 
     /*
         Output:
