@@ -23,14 +23,7 @@
 #include "Common.hpp"
 #include "Platform.hpp"
 
-#ifdef __APPLE__
-#include <malloc/malloc.h>
-#else
-// #include <malloc.h>
 #include <stdlib.h>
-#endif
-
-#include <new>
 
 #ifndef QENTEM_MEMORY_H_
 #define QENTEM_MEMORY_H_
