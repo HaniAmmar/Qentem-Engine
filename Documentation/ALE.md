@@ -2,7 +2,7 @@
 
 ## Introduction
 
-ALE is for evaluating `{math:...` and `if case="..."` for [Template](https://github.com/HaniAmmar/Qentem-Engine/blob/master/Documentation/Template.md).
+ALE is for evaluating `{math:...` and `if case="..."` for [Template](https://github.com/HaniAmmar/Qentem-Engine/blob/main/Documentation/Template.md).
 
 -   Logic operations:
     -   &&  `And`

@@ -140,7 +140,7 @@ Raw variable tag is the same as Variable tag, except it does not escape HTML spe
 {math:...}
 ```
 
-This tag passes its value to [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/master/Documentation/ALE.md) for arithmetic and logic evaluation.
+This tag passes its value to [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/main/Documentation/ALE.md) for arithmetic and logic evaluation.
 
 ```cpp
 #include "Template.hpp"
@@ -186,7 +186,7 @@ int main() {
 {if case="..." true="..." false="..."}
 ```
 
-Inline condition. [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/master/Documentation/ALE.md) takes the `case` value to evaluate it, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false`'s value is used.
+Inline condition. [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/main/Documentation/ALE.md) takes the `case` value to evaluate it, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false`'s value is used.
 
 ```txt
 {if case="1" true="one" false="not one"} // Fine.

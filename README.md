@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.com/HaniAmmar/Qentem-Engine.svg?branch=master)](https://travis-ci.com/HaniAmmar/Qentem-Engine)
-[![Build status](https://ci.appveyor.com/api/projects/status/08uk7dxqw3vn3usi/branch/master?svg=true)](https://ci.appveyor.com/project/HaniAmmar/qentem-engine/branch/master)
-[![codecov](https://codecov.io/gh/HaniAmmar/Qentem-Engine/branch/master/graph/badge.svg)](https://codecov.io/gh/HaniAmmar/Qentem-Engine)
+[![Build Status](https://travis-ci.com/HaniAmmar/Qentem-Engine.svg?branch=main)](https://travis-ci.com/HaniAmmar/Qentem-Engine)
+[![Build status](https://ci.appveyor.com/api/projects/status/08uk7dxqw3vn3usi/branch/main?svg=true)](https://ci.appveyor.com/project/HaniAmmar/qentem-engine/branch/main)
+[![codecov](https://codecov.io/gh/HaniAmmar/Qentem-Engine/branch/main/graph/badge.svg)](https://codecov.io/gh/HaniAmmar/Qentem-Engine)
 
 # Qentem Engine
 
@@ -50,7 +50,7 @@ C++ 11+ compiler.
 
 ## Documentation
 
-Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/tree/master/Documentation).
+Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/tree/main/Documentation).
 
 ## JSON Example
 

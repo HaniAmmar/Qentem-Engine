@@ -1,6 +1,9 @@
 language: cpp
-
 group: stable
+
+branches:
+  only:
+    - main
 
 git:
   depth: 1
