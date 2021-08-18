@@ -23,8 +23,6 @@
 #include "Common.hpp"
 #include "Platform.hpp"
 
-#include <stdlib.h>
-
 #ifndef QENTEM_MEMORY_H_
 #define QENTEM_MEMORY_H_
 
@@ -141,7 +139,7 @@ inline static void QuickSort(Type_ *arr, Number_T_ start, Number_T_ end,
 
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
-    return static_cast<Type_ *>(malloc(size * sizeof(Type_)));
+    return static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
 }
 
 template <typename Type_, typename... Values_T_>
@@ -209,11 +207,7 @@ inline static void Destruct(Type_ *start, const Type_ *end) noexcept {
     }
 }
 
-inline static void Deallocate(void *ptr) noexcept {
-    if (ptr != nullptr) {
-        free(ptr);
-    }
-}
+inline static void Deallocate(void *ptr) noexcept { ::operator delete(ptr); }
 
 } // namespace Memory
 } // namespace Qentem
