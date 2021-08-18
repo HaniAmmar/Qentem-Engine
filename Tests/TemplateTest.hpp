@@ -525,6 +525,7 @@ static int TestVariableTag4() {
     value += R"("ABC'DEF<GHI>GK<)";
     value += R"(A""BC<<DE>>FG''HI&&GK)";
 
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
     EQ_VALUE(Template::Render(R"({var:0})", &value), R"(&lt;)", "Render()");
     EQ_VALUE(Template::Render(R"({var:1})", &value), R"(&gt;)", "Render()");
     EQ_VALUE(Template::Render(R"({var:2})", &value), R"(&amp;)", "Render()");
@@ -617,6 +618,71 @@ static int TestVariableTag4() {
     EQ_VALUE(Template::Render(R"({var:53})", &value),
              R"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)",
              "Render()");
+#else
+    EQ_VALUE(Template::Render(R"({var:0})", &value), R"(<)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:1})", &value), R"(>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:2})", &value), R"(&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:3})", &value), R"(")", "Render()");
+    EQ_VALUE(Template::Render(R"({var:4})", &value), R"(')", "Render()");
+    EQ_VALUE(Template::Render(R"({var:5})", &value), R"(<>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:6})", &value), R"(<&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:7})", &value), R"(<&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:8})", &value), R"(>")", "Render()");
+    EQ_VALUE(Template::Render(R"({var:9})", &value), R"("')", "Render()");
+    EQ_VALUE(Template::Render(R"({var:10})", &value), R"(<">)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:11})", &value), R"(<'>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:12})", &value), R"(<&>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:13})", &value), R"(&"&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:14})", &value), R"("'")", "Render()");
+    EQ_VALUE(Template::Render(R"({var:15})", &value), R"('<')", "Render()");
+    EQ_VALUE(Template::Render(R"({var:16})", &value), R"('&')", "Render()");
+    EQ_VALUE(Template::Render(R"({var:17})", &value), R"(<>&'")", "Render()");
+    EQ_VALUE(Template::Render(R"({var:18})", &value), R"('"<>&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:19})", &value), R"(<"&'>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:20})", &value), R"(<<<<<)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:21})", &value), R"(>>>>>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:22})", &value), R"(&&&&&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:23})", &value), R"(""""")", "Render()");
+    EQ_VALUE(Template::Render(R"({var:24})", &value), R"(''''')", "Render()");
+    EQ_VALUE(Template::Render(R"({var:25})", &value), R"(A<)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:26})", &value), R"(A>)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:27})", &value), R"(A&)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:28})", &value), R"(A")", "Render()");
+    EQ_VALUE(Template::Render(R"({var:29})", &value), R"(A')", "Render()");
+    EQ_VALUE(Template::Render(R"({var:30})", &value), R"(<A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:31})", &value), R"(>A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:32})", &value), R"(&A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:33})", &value), R"("A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:34})", &value), R"('A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:35})", &value), R"(A<A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:36})", &value), R"(A>A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:37})", &value), R"(A&A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:38})", &value), R"(A"A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:39})", &value), R"(A'A)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:40})", &value), R"(AA<AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:41})", &value), R"(AA>AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:42})", &value), R"(AA&AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:43})", &value), R"(AA"AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:44})", &value), R"(AA'AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:45})", &value), R"(AA<<<<AA)",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:46})", &value), R"(AA>>>>AA)",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:47})", &value), R"(AA&&&&AA)",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:48})", &value), R"(AA""""AA)",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:49})", &value), R"(AA''''AA)",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:50})", &value),
+             R"(<A>B'C"D&E'F"G<H>I&G"K)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:51})", &value), R"(AB"CD'EF<GH>IGK')",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:52})", &value), R"("ABC'DEF<GHI>GK<)",
+             "Render()");
+    EQ_VALUE(Template::Render(R"({var:53})", &value),
+             R"(A""BC<<DE>>FG''HI&&GK)", "Render()");
+#endif
 
     END_SUB_TEST;
 }
@@ -1873,13 +1939,21 @@ static int TestInlineIfTag() {
     value2 += 15;
 
     content = R"({if case="1" true="{var:0}" false="{var:1}"})";
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
     EQ_VALUE(Template::Render(content, &value2), R"(&amp;)", "Render()");
+#else
+    EQ_VALUE(Template::Render(content, &value2), R"(&)", "Render()");
+#endif
 
     content = R"({if case="1" true="{raw:0}" false="{raw:1}"})";
     EQ_VALUE(Template::Render(content, &value2), R"(&)", "Render()");
 
     content = R"({if case="0" true="{var:0}" false="{var:1}"})";
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
     EQ_VALUE(Template::Render(content, &value2), R"(&quot;)", "Render()");
+#else
+    EQ_VALUE(Template::Render(content, &value2), R"(")", "Render()");
+#endif
 
     content = R"({if case="0" true="{raw:0}" false="{raw:1}"})";
     EQ_VALUE(Template::Render(content, &value2), R"(")", "Render()");
