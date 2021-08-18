@@ -82,6 +82,14 @@ jobs:
     script:
       - ./Build/QTest.bin
 
+  - os: osx
+
+    before_script:
+      - mkdir ./Build
+      - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+    script:
+      - ./Build/QTest.bin
+
   - os: linux
     arch: ppc64le
     group: edge
