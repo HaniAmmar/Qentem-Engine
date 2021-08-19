@@ -8,6 +8,7 @@
 -   [Features](#features)
 -   [Requirements](#requirements)
 -   [Documentation](#documentation)
+-   [Live Testing](#live-testing)
 -   [JSON Example](#json-example)
 -   [Template Example](#template-example)
     -   [PHP Module](#php-module)
@@ -51,6 +52,10 @@ C++ 11+ compiler.
 ## Documentation
 
 Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/tree/main/Documentation).
+
+## Live Testing
+
+Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool)
 
 ## JSON Example
 
@@ -211,10 +216,6 @@ int main() {
 ```
 
 ## Template Example
-
-### Live Test
-
-Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool)
 
 ```cpp
 #include "JSON.hpp"
