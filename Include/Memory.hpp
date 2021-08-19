@@ -142,43 +142,41 @@ inline static Type_ *Allocate(SizeT size) {
     return static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
 }
 
-template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(Values_T_ &&...values) {
-    Type_ *ptr = Allocate<Type_>(1);
-    new (ptr) Type_(static_cast<Values_T_ &&>(values)...);
-    return ptr;
-}
-
-template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(const Values_T_ &...values) {
-    Type_ *ptr = Allocate<Type_>(1);
-    new (ptr) Type_(values...);
-    return ptr;
-}
-
 template <typename Type_>
 inline static Type_ *AllocateInit() {
-    Type_ *ptr = Allocate<Type_>(1);
-    new (ptr) Type_();
-    return ptr;
+    return new Type_();
 }
 
+// Allocate and move constructor
+template <typename Type_, typename... Values_T_>
+inline static Type_ *AllocateInit(Values_T_ &&...values) {
+    return new Type_(static_cast<Values_T_ &&>(values)...);
+}
+
+// Allocate and copy constructor
+template <typename Type_, typename... Values_T_>
+inline static Type_ *AllocateInit(const Values_T_ &...values) {
+    return new Type_(values...);
+}
+
+// Move constructor
+template <typename Type_>
+inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
+    new (ptr) Type_{static_cast<Type_ &&>(value)};
+}
+
+// Copy constructor
 template <typename Type_>
 inline static void Construct(Type_ *ptr, const Type_ &value) noexcept {
     new (ptr) Type_{value};
 }
 
 template <typename Type_>
-inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
-    new (ptr) Type_{static_cast<Type_ &&>(value)};
-}
-
-template <typename Type_>
-inline static void Construct(Type_ *start, const Type_ *end,
+inline static void Construct(Type_ *item, const Type_ *end,
                              const Type_ &value) noexcept {
-    while (start < end) {
-        new (start) Type_{value};
-        ++start;
+    while (item < end) {
+        new (item) Type_{value};
+        ++item;
     }
 }
 
@@ -200,10 +198,13 @@ inline static void Destruct(Type_ *ptr) noexcept {
 }
 
 template <typename Type_>
-inline static void Destruct(Type_ *start, const Type_ *end) noexcept {
-    while (start < end) {
-        start->~Type_();
-        ++start;
+inline static void Destruct(Type_ *item, const Type_ *end) noexcept {
+    while (item < end) {
+        if (item != nullptr) {
+            item->~Type_();
+        }
+
+        ++item;
     }
 }
 
