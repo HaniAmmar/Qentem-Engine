@@ -93,13 +93,10 @@ class StringStream {
 
     StringStream &operator=(const StringStream &src) {
         if (this != &src) {
-            if (First() != nullptr) {
-                setLength(0);
-                setCapacity(0);
-                deallocate(Storage());
-                clearStorage();
-            }
-
+            setLength(0);
+            setCapacity(0);
+            deallocate(Storage());
+            clearStorage();
             Insert(src.First(), src.Length());
         }
 
@@ -186,12 +183,10 @@ class StringStream {
     inline void Clear() noexcept { setLength(0); }
 
     void Reset() noexcept {
-        if (Storage() != nullptr) {
-            setLength(0);
-            setCapacity(0);
-            deallocate(Storage());
-            clearStorage();
-        }
+        setLength(0);
+        setCapacity(0);
+        deallocate(Storage());
+        clearStorage();
     }
 
     inline void StepBack(SizeT length) noexcept {

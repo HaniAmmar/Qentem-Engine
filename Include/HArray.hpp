@@ -76,12 +76,8 @@ class HArray {
     }
 
     ~HArray() {
-        HAItem_T_ *current = Storage();
-
-        if (current != nullptr) {
-            Memory::Destruct(current, End());
-            deallocate(getHashTable());
-        }
+        Memory::Destruct(Storage(), End());
+        deallocate(getHashTable());
     }
 
     HArray(HArray &&src) noexcept
@@ -95,12 +91,8 @@ class HArray {
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
-            HAItem_T_ *current = Storage();
-
-            if (current != nullptr) {
-                Memory::Destruct(current, End());
-                deallocate(getHashTable());
-            }
+            Memory::Destruct(Storage(), End());
+            deallocate(getHashTable());
 
             setSize(src.Size());
             setCapacity(src.Capacity());

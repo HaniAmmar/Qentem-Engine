@@ -64,21 +64,15 @@ class Array {
 
     ~Array() {
         Type_ *current = Storage();
-
-        if (current != nullptr) {
-            Memory::Destruct(current, End());
-            deallocate(current);
-        }
+        Memory::Destruct(current, End());
+        deallocate(current);
     }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
             Type_ *current = Storage();
-
-            if (current != nullptr) {
-                Memory::Destruct(current, End());
-                deallocate(current);
-            }
+            Memory::Destruct(current, End());
+            deallocate(current);
 
             setSize(src.Size());
             setCapacity(src.Capacity());
@@ -183,15 +177,11 @@ class Array {
 
     void Reset() noexcept {
         Type_ *current = Storage();
-
-        if (current != nullptr) {
-            Memory::Destruct(current, End());
-            deallocate(current);
-            clearStorage();
-
-            setSize(0);
-            setCapacity(0);
-        }
+        Memory::Destruct(current, End());
+        deallocate(current);
+        clearStorage();
+        setSize(0);
+        setCapacity(0);
     }
 
     void Clear() noexcept {
