@@ -41,21 +41,20 @@ class Engine {
     ~Engine()                         = delete;
 #ifdef QENTEM_SIMD_ENABLED
     /*
-     * Returns an the index of a character + 1.
+     * Returns the (index+1) of a given character.
      */
-
     template <typename Number_T_>
-    static Number_T_ FindOne(const char one_char, const char *content,
+    static Number_T_ FindOne(const char char_1, const char *content,
                              Number_T_ offset, Number_T_ end_before) noexcept {
         content += offset;
-        const QENTEM_SIMD_VAR m_pattern = QENTEM_SIMD_SET_TO_ONE_8(one_char);
+        const QENTEM_SIMD_VAR m_char_1 = QENTEM_SIMD_SET_TO_ONE_8(char_1);
 
         while (offset < end_before) {
             const QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
                 reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
 
             const QENTEM_SIMD_NUMBER_T bits =
-                QENTEM_SIMD_COMPARE_8_MASK(m_pattern, m_content);
+                QENTEM_SIMD_COMPARE_8_MASK(m_char_1, m_content);
 
             if (bits != 0) {
                 const Number_T_ index = (Platform::CTZ(bits) + offset + 1);
@@ -75,7 +74,7 @@ class Engine {
     }
 
     /*
-     * Returns an the index of a pattern + the length of it.
+     * Returns the (index+length) of a given pattern.
      */
     template <typename Number_T_>
     static Number_T_ Find(const char *pattern, SizeT pattern_length,
@@ -131,13 +130,13 @@ class Engine {
 #else
 
     /*
-     * Returns an the index of a character + 1.
+     * Returns the (index+1) of a given character.
      */
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ FindOne(Char_T_ one_char, const Char_T_ *content,
+    static Number_T_ FindOne(Char_T_ char_1, const Char_T_ *content,
                              Number_T_ offset, Number_T_ end_before) noexcept {
         while (offset < end_before) {
-            if (one_char == content[offset]) {
+            if (char_1 == content[offset]) {
                 return (offset + 1);
             }
 
@@ -148,7 +147,7 @@ class Engine {
     }
 
     /*
-     * Returns an the index of a pattern + the length of it.
+     * Returns the (index+length) of a given pattern.
      */
     template <typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static Number_T_
@@ -209,7 +208,7 @@ class Engine {
                       Number_T_ max_end_before) noexcept {
         Number_T_ offset2 = offset;
 
-        do {
+        while (true) {
             offset2 =
                 Find(suffix, suffix_length, content, offset2, max_end_before);
             offset = Find(prefix, prefix_length, content, offset, offset2);
@@ -217,7 +216,7 @@ class Engine {
             if (offset == 0) {
                 return offset2;
             }
-        } while (true);
+        }
 
         return 0;
     }
@@ -229,14 +228,14 @@ class Engine {
                                        Number_T_ max_end_before) noexcept {
         Number_T_ offset2 = offset;
 
-        do {
+        while (true) {
             offset2 = FindOne(suffix, content, offset2, max_end_before);
             offset  = FindOne(prefix, content, offset, offset2);
 
             if (offset == 0) {
                 return offset2;
             }
-        } while (true);
+        }
 
         return 0;
     }
