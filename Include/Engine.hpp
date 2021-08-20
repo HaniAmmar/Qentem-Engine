@@ -202,51 +202,43 @@ class Engine {
      * See Template::nest(...)
      */
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ SkipInnerPatterns(const Char_T_ *start, SizeT start_length,
-                                       const Char_T_ *end, SizeT end_length,
-                                       const Char_T_ *content, Number_T_ offset,
-                                       Number_T_ max_end_before) noexcept {
-        Number_T_ end_before = offset;
+    static Number_T_
+    SkipInnerPatterns(const Char_T_ *prefix, SizeT prefix_length,
+                      const Char_T_ *suffix, SizeT suffix_length,
+                      const Char_T_ *content, Number_T_ offset,
+                      Number_T_ max_end_before) noexcept {
+        Number_T_ offset2 = offset;
 
         do {
-            end_before =
-                Find(end, end_length, content, end_before, max_end_before);
+            offset2 =
+                Find(suffix, suffix_length, content, offset2, max_end_before);
+            offset = Find(prefix, prefix_length, content, offset, offset2);
 
-            if (end_before != 0) {
-                offset = Find(start, start_length, content, offset, end_before);
-
-                if (offset != 0) {
-                    continue;
-                }
+            if (offset == 0) {
+                return offset2;
             }
-
-            break;
         } while (true);
 
-        return end_before;
+        return 0;
     }
 
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ SkipInnerPatterns(const Char_T_ start, const Char_T_ end,
+    static Number_T_ SkipInnerPatterns(const Char_T_  prefix,
+                                       const Char_T_  suffix,
                                        const Char_T_ *content, Number_T_ offset,
                                        Number_T_ max_end_before) noexcept {
-        Number_T_ end_before = offset;
+        Number_T_ offset2 = offset;
 
         do {
-            end_before = FindOne(end, content, end_before, max_end_before);
+            offset2 = FindOne(suffix, content, offset2, max_end_before);
+            offset  = FindOne(prefix, content, offset, offset2);
 
-            if (end_before != 0) {
-                offset = FindOne(start, content, offset, end_before);
-
-                if (offset != 0) {
-                    continue;
-                }
+            if (offset == 0) {
+                return offset2;
             }
-
-            break;
         } while (true);
 
-        return end_before;
+        return 0;
     }
 };
 
