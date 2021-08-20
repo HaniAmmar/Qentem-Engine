@@ -463,141 +463,102 @@ class Template_CV {
 
                 switch (content[current_offset]) {
                     case TemplatePatterns_C_::Var_2ND_Char: {
-                        if ((TemplatePatterns_C_::VariablePrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+                        if (StringUtils::IsEqual(
+                                (TemplatePatterns_C_::GetVariablePrefix() + 2),
+                                (content + current_offset + 1),
+                                (TemplatePatterns_C_::VariablePrefixLength -
+                                 2))) {
+                            const SizeT end_offset = Engine::FindOne(
+                                TemplatePatterns_C_::InLineSuffix, content,
+                                (current_offset +
+                                 TemplatePatterns_C_::VariablePrefixLength),
+                                length);
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while (
-                                (tmp_offset !=
-                                 TemplatePatterns_C_::VariablePrefixLength) &&
-                                (content[current_offset] ==
-                                 TemplatePatterns_C_::GetVariablePrefix()
-                                     [tmp_offset]));
-
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::VariablePrefixLength) {
-                                const SizeT end_offset = Engine::FindOne(
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                if (end_offset != 0) {
-                                    tags_cache += TagBit{TagType::Variable,
-                                                         offset, end_offset};
-                                    offset = end_offset;
-                                    continue;
-                                }
-
-                                offset = current_offset;
+                            if (end_offset != 0) {
+                                tags_cache += TagBit{TagType::Variable, offset,
+                                                     end_offset};
+                                offset = end_offset;
+                                continue;
                             }
+
+                            offset = current_offset;
                         }
 
                         break;
                     }
 
                     case TemplatePatterns_C_::Raw_2ND_Char: {
-                        if ((TemplatePatterns_C_::RawVariablePrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+                        if (StringUtils::IsEqual(
+                                (TemplatePatterns_C_::GetRawVariablePrefix() +
+                                 2),
+                                (content + current_offset + 1),
+                                (TemplatePatterns_C_::RawVariablePrefixLength -
+                                 2))) {
+                            const SizeT end_offset = Engine::FindOne(
+                                TemplatePatterns_C_::InLineSuffix, content,
+                                (current_offset +
+                                 TemplatePatterns_C_::RawVariablePrefixLength),
+                                length);
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while ((tmp_offset !=
-                                      TemplatePatterns_C_::
-                                          RawVariablePrefixLength) &&
-                                     (content[current_offset] ==
-                                      TemplatePatterns_C_::
-                                          GetRawVariablePrefix()[tmp_offset]));
-
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::RawVariablePrefixLength) {
-                                const SizeT end_offset = Engine::FindOne(
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                if (end_offset != 0) {
-                                    tags_cache += TagBit{TagType::RawVariable,
-                                                         offset, end_offset};
-                                    offset = end_offset;
-                                    continue;
-                                }
-
-                                offset = current_offset;
+                            if (end_offset != 0) {
+                                tags_cache += TagBit{TagType::RawVariable,
+                                                     offset, end_offset};
+                                offset = end_offset;
+                                continue;
                             }
+
+                            offset = current_offset;
                         }
 
                         break;
                     }
 
                     case TemplatePatterns_C_::Math_2ND_Char: {
-                        if ((TemplatePatterns_C_::MathPrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+                        if (StringUtils::IsEqual(
+                                (TemplatePatterns_C_::GetMathPrefix() + 2),
+                                (content + current_offset + 1),
+                                (TemplatePatterns_C_::MathPrefixLength - 2))) {
+                            SizeT end_offset = Engine::SkipInnerPatterns(
+                                TemplatePatterns_C_::InLinePrefix,
+                                TemplatePatterns_C_::InLineSuffix, content,
+                                (current_offset +
+                                 TemplatePatterns_C_::MathPrefixLength - 1),
+                                length);
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while ((tmp_offset !=
-                                      TemplatePatterns_C_::MathPrefixLength) &&
-                                     (content[current_offset] ==
-                                      TemplatePatterns_C_::GetMathPrefix()
-                                          [tmp_offset]));
-
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::MathPrefixLength) {
-                                SizeT end_offset = Engine::SkipInnerPatterns(
-                                    TemplatePatterns_C_::InLinePrefix,
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                if (end_offset != 0) {
-                                    tags_cache += TagBit{TagType::Math, offset,
-                                                         end_offset};
-                                    offset = end_offset;
-                                    continue;
-                                }
-
-                                offset = (current_offset - 1);
+                            if (end_offset != 0) {
+                                tags_cache +=
+                                    TagBit{TagType::Math, offset, end_offset};
+                                offset = end_offset;
+                                continue;
                             }
+
+                            offset = (current_offset - 1);
                         }
 
                         break;
                     }
 
                     case TemplatePatterns_C_::InlineIf_2ND_Char: {
-                        if ((TemplatePatterns_C_::InLineIfPrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+                        if (StringUtils::IsEqual(
+                                (TemplatePatterns_C_::GetInLineIfPrefix() + 2),
+                                (content + current_offset + 1),
+                                (TemplatePatterns_C_::InLineIfPrefixLength -
+                                 2))) {
+                            SizeT end_offset = Engine::SkipInnerPatterns(
+                                TemplatePatterns_C_::InLinePrefix,
+                                TemplatePatterns_C_::InLineSuffix, content,
+                                (current_offset +
+                                 TemplatePatterns_C_::InLineIfPrefixLength - 1),
+                                length);
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while (
-                                (tmp_offset !=
-                                 TemplatePatterns_C_::InLineIfPrefixLength) &&
-                                (content[current_offset] ==
-                                 TemplatePatterns_C_::GetInLineIfPrefix()
-                                     [tmp_offset]));
-
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::InLineIfPrefixLength) {
-                                SizeT end_offset = Engine::SkipInnerPatterns(
-                                    TemplatePatterns_C_::InLinePrefix,
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                if (end_offset != 0) {
-                                    tags_cache += TagBit{TagType::InLineIf,
-                                                         offset, end_offset};
-                                    offset = end_offset;
-                                    continue;
-                                }
-
-                                offset = (current_offset - 1);
+                            if (end_offset != 0) {
+                                tags_cache += TagBit{TagType::InLineIf, offset,
+                                                     end_offset};
+                                offset = end_offset;
+                                continue;
                             }
+
+                            offset = (current_offset - 1);
                         }
                     }
                 }
@@ -608,70 +569,49 @@ class Template_CV {
 
                 if (content[current_offset] ==
                     TemplatePatterns_C_::Loop_2ND_Char) { // <loop
-                    if ((TemplatePatterns_C_::LoopPrefixLength +
-                         current_offset) < length) {
-                        SizeT tmp_offset = 1;
+                    if (StringUtils::IsEqual(
+                            (TemplatePatterns_C_::GetLoopPrefix() + 2),
+                            (content + current_offset + 1),
+                            (TemplatePatterns_C_::LoopPrefixLength - 2))) {
+                        SizeT end_offset = Engine::SkipInnerPatterns(
+                            TemplatePatterns_C_::GetLoopPrefix(),
+                            TemplatePatterns_C_::LoopPrefixLength,
+                            TemplatePatterns_C_::GetLoopSuffix(),
+                            TemplatePatterns_C_::LoopSuffixLength, content,
+                            (current_offset +
+                             TemplatePatterns_C_::InLineIfPrefixLength - 1),
+                            length);
 
-                        do {
-                            ++current_offset;
-                            ++tmp_offset;
-                        } while (
-                            (tmp_offset <
-                             TemplatePatterns_C_::LoopPrefixLength) &&
-                            (content[current_offset] ==
-                             TemplatePatterns_C_::GetLoopPrefix()[tmp_offset]));
-
-                        if (tmp_offset ==
-                            TemplatePatterns_C_::LoopPrefixLength) {
-                            SizeT end_offset = Engine::SkipInnerPatterns(
-                                TemplatePatterns_C_::GetLoopPrefix(),
-                                TemplatePatterns_C_::LoopPrefixLength,
-                                TemplatePatterns_C_::GetLoopSuffix(),
-                                TemplatePatterns_C_::LoopSuffixLength, content,
-                                current_offset, length);
-
-                            if (end_offset != 0) {
-                                tags_cache +=
-                                    TagBit{TagType::Loop, offset, end_offset};
-                                offset = end_offset;
-                                continue;
-                            }
-
-                            offset = (current_offset - 1);
+                        if (end_offset != 0) {
+                            tags_cache +=
+                                TagBit{TagType::Loop, offset, end_offset};
+                            offset = end_offset;
+                            continue;
                         }
+
+                        offset = (current_offset - 1);
                     }
                 } else if (content[current_offset] ==
                            TemplatePatterns_C_::If_2ND_Char) { // <if
-                    if ((TemplatePatterns_C_::IfPrefixLength + current_offset) <
-                        length) {
-                        SizeT tmp_offset = 1;
+                    if (StringUtils::IsEqual(
+                            (TemplatePatterns_C_::GetIfPrefix() + 2),
+                            (content + current_offset + 1),
+                            (TemplatePatterns_C_::IfPrefixLength - 2))) {
+                        SizeT end_offset = Engine::SkipInnerPatterns(
+                            TemplatePatterns_C_::GetIfPrefix(),
+                            TemplatePatterns_C_::IfPrefixLength,
+                            TemplatePatterns_C_::GetIfSuffix(),
+                            TemplatePatterns_C_::IfSuffixLength, content,
+                            current_offset, length);
 
-                        do {
-                            ++current_offset;
-                            ++tmp_offset;
-                        } while (
-                            (tmp_offset !=
-                             TemplatePatterns_C_::IfPrefixLength) &&
-                            (content[current_offset] ==
-                             TemplatePatterns_C_::GetIfPrefix()[tmp_offset]));
-
-                        if (tmp_offset == TemplatePatterns_C_::IfPrefixLength) {
-                            SizeT end_offset = Engine::SkipInnerPatterns(
-                                TemplatePatterns_C_::GetIfPrefix(),
-                                TemplatePatterns_C_::IfPrefixLength,
-                                TemplatePatterns_C_::GetIfSuffix(),
-                                TemplatePatterns_C_::IfSuffixLength, content,
-                                current_offset, length);
-
-                            if (end_offset != 0) {
-                                tags_cache +=
-                                    TagBit{TagType::If, offset, end_offset};
-                                offset = end_offset;
-                                continue;
-                            }
-
-                            offset = (current_offset - 1);
+                        if (end_offset != 0) {
+                            tags_cache +=
+                                TagBit{TagType::If, offset, end_offset};
+                            offset = end_offset;
+                            continue;
                         }
+
+                        offset = (current_offset - 1);
                     }
                 }
             }
@@ -686,103 +626,77 @@ class Template_CV {
                                             SizeT          length) {
         SizeT offset = 0;
 
-        while (offset < length) {
-            if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
-                SizeT current_offset = offset;
-                ++current_offset;
+        while (true) {
+            offset = Engine::FindOne(TemplatePatterns_C_::InLinePrefix, content,
+                                     offset, length);
 
-                switch (content[current_offset]) {
-                    case TemplatePatterns_C_::Var_2ND_Char: {
-                        if ((TemplatePatterns_C_::VariablePrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+            if (offset == 0) {
+                break;
+            }
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while (
-                                (tmp_offset !=
-                                 TemplatePatterns_C_::VariablePrefixLength) &&
-                                (content[current_offset] ==
-                                 TemplatePatterns_C_::GetVariablePrefix()
-                                     [tmp_offset]));
+            switch (content[offset]) {
+                case TemplatePatterns_C_::Var_2ND_Char: {
+                    if (StringUtils::IsEqual(
+                            (TemplatePatterns_C_::GetVariablePrefix() + 2),
+                            (content + offset + 1),
+                            (TemplatePatterns_C_::VariablePrefixLength - 2))) {
+                        const SizeT end_offset = Engine::FindOne(
+                            TemplatePatterns_C_::InLineSuffix, content,
+                            (offset +
+                             TemplatePatterns_C_::VariablePrefixLength),
+                            length);
+                        // end_offset will never be zero
 
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::VariablePrefixLength) {
-                                const SizeT end_offset = Engine::FindOne(
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                tags_cache += TagBit{TagType::Variable, offset,
-                                                     end_offset};
-                                offset = end_offset;
-                            }
-                        }
-
-                        continue;
+                        tags_cache += TagBit{
+                            TagType::Variable,
+                            (offset - TemplatePatterns_C_::InLinePrefixLength),
+                            end_offset};
+                        offset = end_offset;
                     }
 
-                    case TemplatePatterns_C_::Raw_2ND_Char: {
-                        if ((TemplatePatterns_C_::RawVariablePrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+                    break;
+                }
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while ((tmp_offset !=
-                                      TemplatePatterns_C_::
-                                          RawVariablePrefixLength) &&
-                                     (content[current_offset] ==
-                                      TemplatePatterns_C_::
-                                          GetRawVariablePrefix()[tmp_offset]));
-
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::RawVariablePrefixLength) {
-                                const SizeT end_offset = Engine::FindOne(
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                tags_cache += TagBit{TagType::RawVariable,
-                                                     offset, end_offset};
-                                offset = end_offset;
-                            }
-                        }
-
-                        continue;
+                case TemplatePatterns_C_::Raw_2ND_Char: {
+                    if (StringUtils::IsEqual(
+                            (TemplatePatterns_C_::GetRawVariablePrefix() + 2),
+                            (content + offset + 1),
+                            (TemplatePatterns_C_::RawVariablePrefixLength -
+                             2))) {
+                        const SizeT end_offset = Engine::FindOne(
+                            TemplatePatterns_C_::InLineSuffix, content,
+                            (offset +
+                             TemplatePatterns_C_::RawVariablePrefixLength),
+                            length);
+                        tags_cache += TagBit{
+                            TagType::RawVariable,
+                            (offset - TemplatePatterns_C_::InLinePrefixLength),
+                            end_offset};
+                        offset = end_offset;
                     }
 
-                    case TemplatePatterns_C_::Math_2ND_Char: {
-                        if ((TemplatePatterns_C_::MathPrefixLength +
-                             current_offset) < length) {
-                            SizeT tmp_offset = 1;
+                    break;
+                }
 
-                            do {
-                                ++current_offset;
-                                ++tmp_offset;
-                            } while ((tmp_offset !=
-                                      TemplatePatterns_C_::MathPrefixLength) &&
-                                     (content[current_offset] ==
-                                      TemplatePatterns_C_::GetMathPrefix()
-                                          [tmp_offset]));
-
-                            if (tmp_offset ==
-                                TemplatePatterns_C_::MathPrefixLength) {
-                                SizeT end_offset = Engine::SkipInnerPatterns(
-                                    TemplatePatterns_C_::InLinePrefix,
-                                    TemplatePatterns_C_::InLineSuffix, content,
-                                    current_offset, length);
-
-                                tags_cache +=
-                                    TagBit{TagType::Math, offset, end_offset};
-                                offset = end_offset;
-                            }
-                        }
+                case TemplatePatterns_C_::Math_2ND_Char: {
+                    if (StringUtils::IsEqual(
+                            (TemplatePatterns_C_::GetMathPrefix() + 2),
+                            (content + offset + 1),
+                            (TemplatePatterns_C_::MathPrefixLength - 2))) {
+                        SizeT end_offset = Engine::SkipInnerPatterns(
+                            TemplatePatterns_C_::InLinePrefix,
+                            TemplatePatterns_C_::InLineSuffix, content,
+                            (offset + TemplatePatterns_C_::MathPrefixLength -
+                             1),
+                            length);
+                        tags_cache += TagBit{
+                            TagType::Math,
+                            (offset - TemplatePatterns_C_::InLinePrefixLength),
+                            end_offset};
+                        offset = end_offset;
                     }
                 }
             }
-
-            ++offset;
         }
     }
 
@@ -1076,7 +990,7 @@ class Template_CV {
         bool           break_loop        = false;
 
         // Stage 1: Info extraction
-        do {
+        while (true) {
             ++len;
             offset += len; // Move to the next Char_T_.
 
@@ -1110,8 +1024,8 @@ class Template_CV {
                             (len > TemplatePatterns_C_::VariableFulllength)) {
                             loop_info->SetOffset +=
                                 TemplatePatterns_C_::VariablePrefixLength;
-                            loop_info->SetLength -=
-                                TemplatePatterns_C_::VariableFulllength;
+                            loop_info->SetLength -= static_cast<unsigned char>(
+                                TemplatePatterns_C_::VariableFulllength);
                         }
 
                         break_loop = true;
@@ -1162,14 +1076,14 @@ class Template_CV {
 
             break_loop      = false;
             previous_offset = offset;
-        } while (true);
+        }
 
         // Stage 2
         offset          = start_offset;
         previous_offset = start_offset;
 
         if (loop_value != nullptr) {
-            do {
+            while (true) {
                 offset = Engine::Find(loop_value, loop_value_length, content,
                                       previous_offset, length);
 
@@ -1188,7 +1102,7 @@ class Template_CV {
                 SizeT    lvl    = level_;
                 Char_T_ *buffer = loop_info->Content.Buffer(level_ + 1);
 
-                do {
+                while (true) {
                     buffer[lvl] = TemplatePatterns_C_::TildeChar;
 
                     if (lvl == 0) {
@@ -1196,7 +1110,7 @@ class Template_CV {
                     }
 
                     --lvl;
-                } while (true);
+                }
 
                 SizeT sub_offset = offset;
 
@@ -1224,7 +1138,7 @@ class Template_CV {
 
                 previous_offset = sub_offset;
                 loop_info->Content += TemplatePatterns_C_::InLineSuffix;
-            } while (true);
+            }
         }
 
         loop_info->Content.Insert((content + previous_offset),
@@ -1307,7 +1221,7 @@ class Template_CV {
             parse(loop_info->SubTags, loop_content, loop_length);
         }
 
-        do {
+        while (true) {
             loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
             if (is_object) {
@@ -1324,7 +1238,7 @@ class Template_CV {
             }
 
             ++loop_index;
-        } while (true);
+        }
     }
 
     QENTEM_NOINLINE void
@@ -1335,7 +1249,7 @@ class Template_CV {
         SizeT len             = 0;
         bool  break_loop;
 
-        do {
+        while (true) {
             break_loop = false;
             ++len;
             offset += len; // Move to the next Char_T_.
@@ -1375,7 +1289,7 @@ class Template_CV {
             } while (!break_loop && (--tmp_offset > previous_offset));
 
             previous_offset = (offset + len);
-        } while (true);
+        }
 
         renderInLineIf(content, inline_if_info);
     }
@@ -1427,7 +1341,7 @@ class Template_CV {
         // The content without </if>
         const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);
 
-        do {
+        while (true) {
             case_bit.CaseLength =
                 getQuoted(content, case_bit.CaseOffset, length);
 
@@ -1475,7 +1389,7 @@ class Template_CV {
             }
 
             case_bit.CaseOffset = else_offset;
-        } while (true);
+        }
 
         renderIf(content, if_info);
     }
@@ -1484,7 +1398,7 @@ class Template_CV {
                           SizeT length) noexcept {
         SizeT else_offset = 0;
 
-        do {
+        while (true) {
             else_offset = Engine::Find(TemplatePatterns_C_::GetElsePrefix(),
                                        TemplatePatterns_C_::ElsePrefixLength,
                                        content, offset, length);
@@ -1511,7 +1425,7 @@ class Template_CV {
                 // <else came after the child if.
                 break;
             }
-        } while (true);
+        }
 
         return else_offset;
     }
@@ -1585,7 +1499,7 @@ class Template_CV {
                 }
             }
 
-            do {
+            while (true) {
                 if (value == nullptr) {
                     break;
                 }
@@ -1607,7 +1521,7 @@ class Template_CV {
                 while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
                 }
-            } while (true);
+            }
         }
 
         return value;
@@ -1771,8 +1685,8 @@ struct TemplatePatterns {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    static constexpr unsigned char InLineSuffixLength = 1U;
-    // static constexpr unsigned char InLinePrefixLength = 1U;
+    static constexpr SizeT InLineSuffixLength = 1U;
+    static constexpr SizeT InLinePrefixLength = 1U;
 
     static constexpr Char_T_ InLinePrefix = '{';
     static constexpr Char_T_ InLineSuffix = '}';
@@ -1784,9 +1698,9 @@ struct TemplatePatterns {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr Char_T_       Var_2ND_Char = 'v'; // Second character
-    static constexpr unsigned char VariablePrefixLength = 5U;
-    static constexpr unsigned char VariableFulllength =
+    static constexpr Char_T_ Var_2ND_Char         = 'v'; // Second character
+    static constexpr SizeT   VariablePrefixLength = 5U;
+    static constexpr SizeT   VariableFulllength =
         (VariablePrefixLength + InLineSuffixLength);
     static const Char_T_ *GetVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
@@ -1794,9 +1708,9 @@ struct TemplatePatterns {
     }
 
     // {raw:
-    static constexpr Char_T_       Raw_2ND_Char = 'r'; // Second character
-    static constexpr unsigned char RawVariablePrefixLength = 5U;
-    static constexpr unsigned char RawVariableFulllength =
+    static constexpr Char_T_ Raw_2ND_Char            = 'r'; // Second character
+    static constexpr SizeT   RawVariablePrefixLength = 5U;
+    static constexpr SizeT   RawVariableFulllength =
         (VariablePrefixLength + InLineSuffixLength);
     static const Char_T_ *GetRawVariablePrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
@@ -1804,9 +1718,9 @@ struct TemplatePatterns {
     }
 
     // {math:
-    static constexpr Char_T_       Math_2ND_Char    = 'm'; // Second character
-    static constexpr unsigned char MathPrefixLength = 6U;
-    static constexpr unsigned char MathFulllength =
+    static constexpr Char_T_ Math_2ND_Char    = 'm'; // Second character
+    static constexpr SizeT   MathPrefixLength = 6U;
+    static constexpr SizeT   MathFulllength =
         (MathPrefixLength + InLineSuffixLength);
     static const Char_T_ *GetMathPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
@@ -1814,89 +1728,89 @@ struct TemplatePatterns {
     }
 
     // {if:
-    static constexpr Char_T_       InlineIf_2ND_Char = 'i'; // Second character
-    static constexpr unsigned char InLineIfPrefixLength = 3U;
-    static const Char_T_ *         GetInLineIfPrefix() noexcept {
+    static constexpr Char_T_ InlineIf_2ND_Char    = 'i'; // Second character
+    static constexpr SizeT   InLineIfPrefixLength = 3U;
+    static const Char_T_ *   GetInLineIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
         return &(val[0]);
     }
 
     // <loop
-    static constexpr Char_T_       Loop_2ND_Char    = 'l'; // Second character
-    static constexpr unsigned char LoopPrefixLength = 5U;
-    static const Char_T_ *         GetLoopPrefix() noexcept {
+    static constexpr Char_T_ Loop_2ND_Char    = 'l'; // Second character
+    static constexpr SizeT   LoopPrefixLength = 5U;
+    static const Char_T_ *   GetLoopPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
         return &(val[0]);
     }
 
     // </loop>
-    static constexpr unsigned char LoopSuffixLength = 7U;
-    static const Char_T_ *         GetLoopSuffix() noexcept {
+    static constexpr SizeT LoopSuffixLength = 7U;
+    static const Char_T_ * GetLoopSuffix() noexcept {
         static constexpr Char_T_ val[] = {'<', '/', 'l', 'o', 'o', 'p', '>'};
         return &(val[0]);
     }
 
     // <if
-    static constexpr Char_T_       If_2ND_Char    = 'i'; // Second character
-    static constexpr unsigned char IfPrefixLength = 3U;
-    static const Char_T_ *         GetIfPrefix() noexcept {
+    static constexpr Char_T_ If_2ND_Char    = 'i'; // Second character
+    static constexpr SizeT   IfPrefixLength = 3U;
+    static const Char_T_ *   GetIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'i', 'f'};
         return &(val[0]);
     }
 
     // </if>
-    static constexpr unsigned char IfSuffixLength = 5U;
-    static const Char_T_ *         GetIfSuffix() noexcept {
+    static constexpr SizeT IfSuffixLength = 5U;
+    static const Char_T_ * GetIfSuffix() noexcept {
         static constexpr Char_T_ val[] = {'<', '/', 'i', 'f', '>'};
         return &(val[0]);
     }
 
     // <else
-    static constexpr Char_T_       ElseIfChar       = 'i'; // else[i]f
-    static constexpr unsigned char ElsePrefixLength = 5U;
-    static const Char_T_ *         GetElsePrefix() noexcept {
+    static constexpr Char_T_ ElseIfChar       = 'i'; // else[i]f
+    static constexpr SizeT   ElsePrefixLength = 5U;
+    static const Char_T_ *   GetElsePrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'e', 'l', 's', 'e'};
         return &(val[0]);
     }
 
     // />
-    static constexpr unsigned char ElseSuffixLength = 2U;
-    static const Char_T_ *         GetElseSuffix() noexcept {
+    static constexpr SizeT ElseSuffixLength = 2U;
+    static const Char_T_ * GetElseSuffix() noexcept {
         static constexpr Char_T_ val[] = {'/', '>'};
         return &(val[0]);
     }
 
     // &amp; &
-    static constexpr unsigned char HTMLAndLength = 5U;
-    static const Char_T_ *         GetHTMLAnd() noexcept {
+    static constexpr SizeT HTMLAndLength = 5U;
+    static const Char_T_ * GetHTMLAnd() noexcept {
         static constexpr Char_T_ val[] = {'&', 'a', 'm', 'p', ';'};
         return &(val[0]);
     }
 
     // &lt; <
-    static constexpr unsigned char HTMLLessLength = 4U;
-    static const Char_T_ *         GetHTMLLess() noexcept {
+    static constexpr SizeT HTMLLessLength = 4U;
+    static const Char_T_ * GetHTMLLess() noexcept {
         static constexpr Char_T_ val[] = {'&', 'l', 't', ';'};
         return &(val[0]);
     }
 
     // &gt; >
-    static constexpr unsigned char HTMLBiggerLength = 4U;
-    static const Char_T_ *         GetHTMLBigger() noexcept {
+    static constexpr SizeT HTMLBiggerLength = 4U;
+    static const Char_T_ * GetHTMLBigger() noexcept {
         static constexpr Char_T_ val[] = {'&', 'g', 't', ';'};
         return &(val[0]);
     }
 
     // &quot; "
-    static constexpr unsigned char HTMLQuoteLength = 6U;
-    static const Char_T_ *         GetHTMLQuote() noexcept {
+    static constexpr SizeT HTMLQuoteLength = 6U;
+    static const Char_T_ * GetHTMLQuote() noexcept {
         static constexpr Char_T_ val[] = {'&', 'q', 'u', 'o', 't', ';'};
         return &(val[0]);
     }
 
     // &apos; ' (HTML5)
-    static constexpr unsigned char HTMLSingleQuoteLength = 6U;
-    static const Char_T_ *         GetHTMLSingleQuote() noexcept {
+    static constexpr SizeT HTMLSingleQuoteLength = 6U;
+    static const Char_T_ * GetHTMLSingleQuote() noexcept {
         static constexpr Char_T_ val[] = {'&', 'a', 'p', 'o', 's', ';'};
         return &(val[0]);
     }
