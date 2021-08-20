@@ -466,6 +466,21 @@ static int TestVariableXTag3() {
     content = LR"({var:0)";
     EQ_VALUE(Template::Render(content, &value), LR"({var:0)", L"Render()");
 
+    content = LR"( {var-0})";
+    EQ_VALUE(Template::Render(content, &value), LR"( {var-0})", L"Render()");
+
+    content = LR"( {var 0})";
+    EQ_VALUE(Template::Render(content, &value), LR"( {var 0})", L"Render()");
+
+    content = LR"( {var:0 })";
+    EQ_VALUE(Template::Render(content, &value), LR"( {var:0 })", L"Render()");
+
+    content = LR"( {var:0 )";
+    EQ_VALUE(Template::Render(content, &value), LR"( {var:0 )", L"Render()");
+
+    content = LR"( {var:0)";
+    EQ_VALUE(Template::Render(content, &value), LR"( {var:0)", L"Render()");
+
     END_SUB_TEST;
 }
 
@@ -1160,6 +1175,20 @@ static int TestRawVariableXTag3() {
     content = LR"({raw:0)";
     EQ_VALUE(Template::Render(content, &value), LR"({raw:0)", L"Render()");
 
+    content = LR"({ raw-0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ raw-0})", L"Render()");
+
+    content = LR"({ raw 0})";
+    EQ_VALUE(Template::Render(content, &value), LR"({ raw 0})", L"Render()");
+
+    content = LR"({ raw:0 })";
+    EQ_VALUE(Template::Render(content, &value), LR"({ raw:0 })", L"Render()");
+
+    content = LR"({ raw:0 )";
+    EQ_VALUE(Template::Render(content, &value), LR"({ raw:0 )", L"Render()");
+
+    content = LR"({ raw:0)";
+    EQ_VALUE(Template::Render(content, &value), LR"({ raw:0)", L"Render()");
     END_SUB_TEST;
 }
 
@@ -1934,7 +1963,7 @@ static int TestInlineIfXTag() {
     EQ_VALUE(Template::Render(content, &value), L"{if", L"Render()");
 
     content = LR"({if})";
-    EQ_VALUE(Template::Render(content, &value), L"{if}", L"Render()");
+    EQ_VALUE(Template::Render(content, &value), L"", L"Render()");
 
     content = LR"({{if case="{var:1}" true="T" false="F"})";
     EQ_VALUE(Template::Render(content, &value), L"{T", L"Render()");

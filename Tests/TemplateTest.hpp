@@ -459,6 +459,21 @@ static int TestVariableTag3() {
     content = R"({var:0)";
     EQ_VALUE(Template::Render(content, &value), R"({var:0)", "Render()");
 
+    content = R"( {var-0})";
+    EQ_VALUE(Template::Render(content, &value), R"( {var-0})", "Render()");
+
+    content = R"( {var 0})";
+    EQ_VALUE(Template::Render(content, &value), R"( {var 0})", "Render()");
+
+    content = R"( {var:0 })";
+    EQ_VALUE(Template::Render(content, &value), R"( {var:0 })", "Render()");
+
+    content = R"( {var:0 )";
+    EQ_VALUE(Template::Render(content, &value), R"( {var:0 )", "Render()");
+
+    content = R"( {var:0)";
+    EQ_VALUE(Template::Render(content, &value), R"( {var:0)", "Render()");
+
     END_SUB_TEST;
 }
 
@@ -1115,6 +1130,21 @@ static int TestRawVariableTag3() {
 
     content = R"({raw:0)";
     EQ_VALUE(Template::Render(content, &value), R"({raw:0)", "Render()");
+
+    content = R"( {raw-0})";
+    EQ_VALUE(Template::Render(content, &value), R"( {raw-0})", "Render()");
+
+    content = R"( {raw 0})";
+    EQ_VALUE(Template::Render(content, &value), R"( {raw 0})", "Render()");
+
+    content = R"( {raw:0 })";
+    EQ_VALUE(Template::Render(content, &value), R"( {raw:0 })", "Render()");
+
+    content = R"( {raw:0 )";
+    EQ_VALUE(Template::Render(content, &value), R"( {raw:0 )", "Render()");
+
+    content = R"( {raw:0)";
+    EQ_VALUE(Template::Render(content, &value), R"( {raw:0)", "Render()");
 
     END_SUB_TEST;
 }
@@ -1870,7 +1900,7 @@ static int TestInlineIfTag() {
     EQ_VALUE(Template::Render(content, &value), "{if", "Render()");
 
     content = R"({if})";
-    EQ_VALUE(Template::Render(content, &value), "{if}", "Render()");
+    EQ_VALUE(Template::Render(content, &value), "", "Render()");
 
     content = R"({{if case="{var:1}" true="T" false="F"})";
     EQ_VALUE(Template::Render(content, &value), "{T", "Render()");
