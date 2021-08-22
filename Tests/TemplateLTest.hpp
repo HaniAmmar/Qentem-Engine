@@ -3233,36 +3233,36 @@ static int TestRenderL2() {
 }
 
 static int RunTemplateLTests() {
-    STARTING_TEST("(Template.hpp (32-bit character))");
+    STARTING_TEST("Template.hpp (32-bit character)");
 
-    START_TEST("(Variable Tag Test 1)", TestVariableLTag1);
-    START_TEST("(Variable Tag Test 2)", TestVariableLTag2);
-    START_TEST("(Variable Tag Test 3)", TestVariableLTag3);
-    START_TEST("(Variable Tag Test 4)", TestVariableLTag4);
+    START_TEST("Variable Tag Test 1", TestVariableLTag1);
+    START_TEST("Variable Tag Test 2", TestVariableLTag2);
+    START_TEST("Variable Tag Test 3", TestVariableLTag3);
+    START_TEST("Variable Tag Test 4", TestVariableLTag4);
 
-    START_TEST("(Raw Variable Tag Test 1)", TestRawVariableLTag1);
-    START_TEST("(Raw Variable Tag Test 2)", TestRawVariableLTag2);
-    START_TEST("(Raw Variable Tag Test 3)", TestRawVariableLTag3);
-    START_TEST("(Raw Variable Tag Test 4)", TestRawVariableLTag4);
+    START_TEST("Raw Variable Tag Test 1", TestRawVariableLTag1);
+    START_TEST("Raw Variable Tag Test 2", TestRawVariableLTag2);
+    START_TEST("Raw Variable Tag Test 3", TestRawVariableLTag3);
+    START_TEST("Raw Variable Tag Test 4", TestRawVariableLTag4);
 
-    START_TEST("(Math Tag Test 1)", TestMathLTag1);
-    START_TEST("(Math Tag Test 2)", TestMathLTag2);
+    START_TEST("Math Tag Test 1", TestMathLTag1);
+    START_TEST("Math Tag Test 2", TestMathLTag2);
 
-    START_TEST("(Inline if Tag Test)", TestInlineIfLTag);
+    START_TEST("Inline if Tag Test", TestInlineIfLTag);
 
-    START_TEST("(Loop Tag Test 1)", TestLoopLTag1);
-    START_TEST("(Loop Tag Test 2)", TestLoopLTag2);
-    START_TEST("(Loop Tag Test 3)", TestLoopLTag3);
-    START_TEST("(Loop Tag Test 4)", TestLoopLTag4);
-    START_TEST("(Loop Tag Test 5)", TestLoopLTag5);
+    START_TEST("Loop Tag Test 1", TestLoopLTag1);
+    START_TEST("Loop Tag Test 2", TestLoopLTag2);
+    START_TEST("Loop Tag Test 3", TestLoopLTag3);
+    START_TEST("Loop Tag Test 4", TestLoopLTag4);
+    START_TEST("Loop Tag Test 5", TestLoopLTag5);
 
-    START_TEST("(If Tag Test 1)", TestIfLTag1);
-    START_TEST("(If Tag Test 2)", TestIfLTag2);
+    START_TEST("If Tag Test 1", TestIfLTag1);
+    START_TEST("If Tag Test 2", TestIfLTag2);
 
-    START_TEST("(Render Test 1)", TestRenderL1);
-    START_TEST("(Render Test 2)", TestRenderL2);
+    START_TEST("Render Test 1", TestRenderL1);
+    START_TEST("Render Test 2", TestRenderL2);
 
-    END_TEST("(Template.hpp (32-bit character))");
+    END_TEST("Template.hpp (32-bit character)");
 }
 
 } // namespace Test

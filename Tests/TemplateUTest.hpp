@@ -3233,36 +3233,36 @@ static int TestRenderU2() {
 }
 
 static int RunTemplateUTests() {
-    STARTING_TEST("(Template.hpp (16-bit character))");
+    STARTING_TEST("Template.hpp (16-bit character)");
 
-    START_TEST("(Variable Tag Test 1)", TestVariableUTag1);
-    START_TEST("(Variable Tag Test 2)", TestVariableUTag2);
-    START_TEST("(Variable Tag Test 3)", TestVariableUTag3);
-    START_TEST("(Variable Tag Test 4)", TestVariableUTag4);
+    START_TEST("Variable Tag Test 1", TestVariableUTag1);
+    START_TEST("Variable Tag Test 2", TestVariableUTag2);
+    START_TEST("Variable Tag Test 3", TestVariableUTag3);
+    START_TEST("Variable Tag Test 4", TestVariableUTag4);
 
-    START_TEST("(Raw Variable Tag Test 1)", TestRawVariableUTag1);
-    START_TEST("(Raw Variable Tag Test 2)", TestRawVariableUTag2);
-    START_TEST("(Raw Variable Tag Test 3)", TestRawVariableUTag3);
-    START_TEST("(Raw Variable Tag Test 4)", TestRawVariableUTag4);
+    START_TEST("Raw Variable Tag Test 1", TestRawVariableUTag1);
+    START_TEST("Raw Variable Tag Test 2", TestRawVariableUTag2);
+    START_TEST("Raw Variable Tag Test 3", TestRawVariableUTag3);
+    START_TEST("Raw Variable Tag Test 4", TestRawVariableUTag4);
 
-    START_TEST("(Math Tag Test 1)", TestMathUTag1);
-    START_TEST("(Math Tag Test 2)", TestMathUTag2);
+    START_TEST("Math Tag Test 1", TestMathUTag1);
+    START_TEST("Math Tag Test 2", TestMathUTag2);
 
-    START_TEST("(Inline if Tag Test)", TestInlineIfUTag);
+    START_TEST("Inline if Tag Test", TestInlineIfUTag);
 
-    START_TEST("(Loop Tag Test 1)", TestLoopUTag1);
-    START_TEST("(Loop Tag Test 2)", TestLoopUTag2);
-    START_TEST("(Loop Tag Test 3)", TestLoopUTag3);
-    START_TEST("(Loop Tag Test 4)", TestLoopUTag4);
-    START_TEST("(Loop Tag Test 5)", TestLoopUTag5);
+    START_TEST("Loop Tag Test 1", TestLoopUTag1);
+    START_TEST("Loop Tag Test 2", TestLoopUTag2);
+    START_TEST("Loop Tag Test 3", TestLoopUTag3);
+    START_TEST("Loop Tag Test 4", TestLoopUTag4);
+    START_TEST("Loop Tag Test 5", TestLoopUTag5);
 
-    START_TEST("(If Tag Test 1)", TestIfUTag1);
-    START_TEST("(If Tag Test 2)", TestIfUTag2);
+    START_TEST("If Tag Test 1", TestIfUTag1);
+    START_TEST("If Tag Test 2", TestIfUTag2);
 
-    START_TEST("(Render Test 1)", TestRenderU1);
-    START_TEST("(Render Test 2)", TestRenderU2);
+    START_TEST("Render Test 1", TestRenderU1);
+    START_TEST("Render Test 2", TestRenderU2);
 
-    END_TEST("(Template.hpp (16-bit character))");
+    END_TEST("Template.hpp (16-bit character)");
 }
 
 } // namespace Test
