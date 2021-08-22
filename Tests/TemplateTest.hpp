@@ -3140,7 +3140,7 @@ static int TestRender2() {
 }
 
 static int RunTemplateTests() {
-    STARTING_TEST("Template.hpp (16-bit character)");
+    STARTING_TEST("Template.hpp (8-bit character)");
 
     START_TEST("Variable Tag Test 1", TestVariableTag1);
     START_TEST("Variable Tag Test 2", TestVariableTag2);
