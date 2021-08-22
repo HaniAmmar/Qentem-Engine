@@ -38,7 +38,7 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_MAX_NUMBER 0xFFFFFFFFU
 #define QENTEM_SIMD_VAR __m256i
 #define QENTEM_SIMD_LOAD _mm256_loadu_si256
-#define QENTEM_SIMD_SET_TO_ZERO _mm256_setzero_si256
+#define QENTEM_SIMD_ZERO _mm256_setzero_si256()
 #define QENTEM_SIMD_SET_TO_ONE_8 _mm256_set1_epi8
 #define QENTEM_SIMD_SET_TO_ONE_64 _mm256_set1_epi64x
 #define QENTEM_SIMD_STOREU _mm256_storeu_si256
@@ -58,7 +58,7 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_MAX_NUMBER 0xFFFFU
 #define QENTEM_SIMD_VAR __m128i
 #define QENTEM_SIMD_LOAD _mm_loadu_si128
-#define QENTEM_SIMD_SET_TO_ZERO _mm_setzero_si128
+#define QENTEM_SIMD_ZERO _mm_setzero_si128()
 #define QENTEM_SIMD_SET_TO_ONE_8 _mm_set1_epi8
 #define QENTEM_SIMD_SET_TO_ONE_64 _mm_set1_epi64x
 #define QENTEM_SIMD_STOREU _mm_storeu_si128

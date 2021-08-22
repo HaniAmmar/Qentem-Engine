@@ -37,7 +37,7 @@ inline static void SetToZero(void *ptr, SizeT size) noexcept {
     if (m_size != 0) {
         QENTEM_SIMD_VAR *      m_ptr  = static_cast<QENTEM_SIMD_VAR *>(ptr);
         const QENTEM_SIMD_VAR *end    = (m_ptr + m_size);
-        const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_SET_TO_ZERO();
+        const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_ZERO;
 
         do {
             QENTEM_SIMD_STOREU(m_ptr, m_zero);
