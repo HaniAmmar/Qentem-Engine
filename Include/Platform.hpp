@@ -25,8 +25,12 @@
 #ifndef QENTEM_PLATFORM_H_
 #define QENTEM_PLATFORM_H_
 
-#if QENTEM_AVX2 == 1 || QENTEM_SSE2 == 1
+#if QENTEM_AVX2 == 1 || QENTEM_SSE2 == 1 || QENTEM_MSIMD128 == 1
+#if QENTEM_MSIMD128 == 1
+#include <wasm_simd128.h>
+#else
 #include <immintrin.h>
+#endif
 #define QENTEM_SIMD_ENABLED
 #endif
 
@@ -66,6 +70,21 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
     static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
 #define QENTEM_COMPARE_16_MASK_8(a, b)                                         \
     static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
+#elif defined(QENTEM_MSIMD128) && (QENTEM_MSIMD128 == 1)
+using QENTEM_SIMD_NUMBER_T = unsigned int;
+#define QENTEM_SIMD_SIZE 16U
+#define QENTEM_SIMD_SHIFT_SIZE 4U
+#define QENTEM_SIMD_MAX_NUMBER 0xFFFFU
+#define QENTEM_SIMD_VAR v128_t
+#define QENTEM_SIMD_LOAD wasm_v128_load
+#define QENTEM_SIMD_ZERO wasm_i64x2_const_splat(0)
+#define QENTEM_SIMD_SET_TO_ONE_8 wasm_i8x16_splat
+#define QENTEM_SIMD_SET_TO_ONE_64 wasm_i64x2_splat
+#define QENTEM_SIMD_STOREU wasm_v128_store
+#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                       \
+    static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i8x16_eq(a, b)))
+#define QENTEM_COMPARE_16_MASK_8(a, b)                                         \
+    static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i16x8_eq(a, b)))
 #endif
 
 #ifdef _MSC_VER
