@@ -48,8 +48,8 @@ class TestHelper {
 
     template <typename Char_T_, typename Value_T_>
     QENTEM_NOINLINE static void
-    PrintErrorMessage(bool equal, const Char_T_ *name, const Value_T_ &value,
-                      std::wostream &out = std::wcout) {
+    PrintErrorMessage1(bool equal, const Char_T_ *name, const Value_T_ &value,
+                       std::wostream &out = std::wcout) {
         out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value << "'\n"
@@ -58,9 +58,9 @@ class TestHelper {
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE static void
-    PrintErrorMessage(bool equal, const Char_T_ *name, const Value1_T_ &value1,
-                      const Value2_T_ &value2,
-                      std::wostream &  out = std::wcout) {
+    PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
+                       const Value2_T_ &value2,
+                       std::wostream &  out = std::wcout) {
         out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value2 << "'\n"
@@ -118,7 +118,7 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) != (right)) {                                          \
-            TestHelper::PrintErrorMessage(false, name, _tmp_left, value);      \
+            TestHelper::PrintErrorMessage2(false, name, _tmp_left, value);     \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -128,7 +128,7 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) == (right)) {                                          \
-            TestHelper::PrintErrorMessage(true, name, _tmp_left, value);       \
+            TestHelper::PrintErrorMessage2(true, name, _tmp_left, value);      \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -138,7 +138,7 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) != (right)) {                                          \
-            TestHelper::PrintErrorMessage(false, name, _tmp_left, right);      \
+            TestHelper::PrintErrorMessage2(false, name, _tmp_left, right);     \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -148,7 +148,7 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) == (right)) {                                          \
-            TestHelper::PrintErrorMessage(true, name, _tmp_left, right);       \
+            TestHelper::PrintErrorMessage2(true, name, _tmp_left, right);      \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -157,7 +157,7 @@ class TestHelper {
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if (!(condition)) {                                                    \
-            TestHelper::PrintErrorMessage(false, name, "true");                \
+            TestHelper::PrintErrorMessage1(false, name, "true");               \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -166,7 +166,7 @@ class TestHelper {
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if (condition) {                                                       \
-            TestHelper::PrintErrorMessage(true, name, "true");                 \
+            TestHelper::PrintErrorMessage1(true, name, "true");                \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -199,7 +199,11 @@ QENTEM_MAYBE_UNUSED
 static int TestThrow2() {
     std::wstringstream ss;
 
-    TestHelper::PrintErrorMessage(false, "", 1, 0, ss);
+    int n = 0;
+    int m = 1;
+
+    TestHelper::PrintErrorMessage1(false, "", n, ss);
+    TestHelper::PrintErrorMessage2(false, "", n, m, ss);
 
     EQ_VALUE(TestHelper::StartTest("Test Throw 2", TestThrow2_2, ss), false,
              "Test Throw 2");

@@ -34,43 +34,51 @@ using VStringStream = StringStream<char>;
 using VHArray       = HArray<ValueC, char>;
 using VArray        = Array<ValueC>;
 
-template <typename Stream_T_>
-static Stream_T_ &operator<<(Stream_T_ &out, ValueType type) {
+static const char *TestGetTypeSting(ValueType type) {
     switch (type) {
-        case ValueType::Undefined:
-            out << "Undefined";
-            break;
         case ValueType::Object:
-            out << "Object";
-            break;
-        case ValueType::Array:
-            out << "Array";
-            break;
-        case ValueType::String:
-            out << "String";
-            break;
-        case ValueType::UInt64:
-            out << "UInt64";
-            break;
-        case ValueType::Int64:
-            out << "Int64";
-            break;
-        case ValueType::Double:
-            out << "Double";
-            break;
-        case ValueType::True:
-            out << "True";
-            break;
-        case ValueType::False:
-            out << "False";
-            break;
-        case ValueType::Null:
-            out << "Null";
-            break;
-    }
+            return "Object";
 
-    return out;
+        case ValueType::Array:
+            return "Array";
+
+        case ValueType::String:
+            return "String";
+
+        case ValueType::UInt64:
+            return "UInt64";
+
+        case ValueType::Int64:
+            return "Int64";
+
+        case ValueType::Double:
+            return "Double";
+
+        case ValueType::True:
+            return "True";
+
+        case ValueType::False:
+            return "False";
+
+        case ValueType::Null:
+            return "Null";
+
+        default:
+            return "Undefined";
+    }
 }
+
+#define EQ_VALUE_TYPE(left, right, name)                                       \
+    do {                                                                       \
+        const auto &_tmp_left    = left;                                       \
+        TestHelper::LineNumber() = __LINE__;                                   \
+        if ((_tmp_left) != (right)) {                                          \
+            TestHelper::PrintErrorMessage2(false, name,                        \
+                                           TestGetTypeSting(_tmp_left),        \
+                                           TestGetTypeSting(right));           \
+            return 1;                                                          \
+        }                                                                      \
+    } while (false)
 
 static int TestEmptyValue() {
     ValueC value1;
@@ -90,7 +98,7 @@ static int TestEmptyValue() {
     EQ_FALSE(value1.IsTrue(), "IsTrue()");
     EQ_FALSE(value1.IsFalse(), "IsFalse()");
     EQ_FALSE(value1.IsNull(), "IsNull()");
-    EQ_VALUE(value1.Type(), ValueType::Undefined, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::Undefined, "Type()");
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
@@ -151,7 +159,7 @@ static int TestTrueValue() {
 
     value1 = true;
     EQ_TRUE(value1.IsTrue(), "IsTrue()");
-    EQ_VALUE(value1.Type(), ValueType::True, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::True, "Type()");
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
@@ -223,7 +231,7 @@ static int TestFalseValue() {
 
     value1 = false;
     EQ_TRUE(value1.IsFalse(), "IsFalse()");
-    EQ_VALUE(value1.Type(), ValueType::False, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::False, "Type()");
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
@@ -295,7 +303,7 @@ static int TestNullValue() {
 
     value1 = nullptr;
     EQ_TRUE(value1.IsNull(), "IsNull()");
-    EQ_VALUE(value1.Type(), ValueType::Null, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::Null, "Type()");
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
@@ -459,7 +467,7 @@ static int TestNumberValue2() {
     /////////////////// unsigned
 
     value1 = ValueC{vu_short{10}};
-    EQ_VALUE(value1.Type(), ValueType::UInt64, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::UInt64, "Type()");
     EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
     EQ_FALSE(value1.IsInt64(), "IsInt64()");
     EQ_FALSE(value1.IsDouble(), "IsDouble()");
@@ -538,7 +546,7 @@ static int TestNumberValue3() {
     /////////////////// signed
 
     value1 = ValueC{short{-10}};
-    EQ_VALUE(value1.Type(), ValueType::Int64, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::Int64, "Type()");
     EQ_FALSE(value1.IsUInt64(), "IsUInt64()");
     EQ_TRUE(value1.IsInt64(), "IsInt64()");
     EQ_FALSE(value1.IsDouble(), "IsDouble()");
@@ -665,7 +673,7 @@ static int TestNumberValue4() {
     /////////////////// float
 
     value1 = ValueC{float{10.5}};
-    EQ_VALUE(value1.Type(), ValueType::Double, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::Double, "Type()");
     EQ_FALSE(value1.IsUInt64(), "IsUInt64()");
     EQ_FALSE(value1.IsInt64(), "IsInt64()");
     EQ_TRUE(value1.IsDouble(), "IsDouble()");
@@ -859,7 +867,7 @@ static int TestStringValue() {
 
     value1 = "-ABCDEF0123456789ABCDEF0123456789-";
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_VALUE(value1.Type(), ValueType::String, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::String, "Type()");
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
@@ -984,7 +992,7 @@ static int TestArrayValue() {
 
     value1 = arr_var; // Copy.
     EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Type(), ValueType::Array, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::Array, "Type()");
     EQ_VALUE(value1.Size(), 5, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
@@ -1226,7 +1234,7 @@ static int TestObjectValue1() {
 
     value1 = h_arr_var; // Copy.
     EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_VALUE(value1.Type(), ValueType::Object, "Type()");
+    EQ_VALUE_TYPE(value1.Type(), ValueType::Object, "Type()");
     EQ_VALUE(value1.Size(), 5, "Size()");
     NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     NOT_EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
