@@ -74,6 +74,36 @@ class Engine {
     }
 
     /*
+     * Returns the location of two given characters.
+     */
+    template <typename Number_T_>
+    static QENTEM_SIMD_NUMBER_T FindTwo(const char char_1, const char char_2,
+                                        const char *content, Number_T_ &offset,
+                                        Number_T_ end_before) noexcept {
+        content += offset;
+        const QENTEM_SIMD_VAR m_char_1 = QENTEM_SIMD_SET_TO_ONE_8(char_1);
+        const QENTEM_SIMD_VAR m_char_2 = QENTEM_SIMD_SET_TO_ONE_8(char_2);
+
+        while (offset < end_before) {
+            const QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
+                reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
+
+            const QENTEM_SIMD_NUMBER_T bits =
+                QENTEM_SIMD_COMPARE_8_MASK(m_char_1, m_content) |
+                QENTEM_SIMD_COMPARE_8_MASK(m_char_2, m_content);
+
+            if (bits != 0) {
+                return bits;
+            }
+
+            offset += QENTEM_SIMD_SIZE;
+            content += QENTEM_SIMD_SIZE;
+        }
+
+        return 0;
+    }
+
+    /*
      * Returns the (index+length) of a given pattern.
      */
     template <typename Number_T_>
