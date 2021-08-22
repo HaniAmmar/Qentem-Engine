@@ -31,13 +31,12 @@
 #include "StringStreamTest.hpp"
 #include "StringTest.hpp"
 #include "StringUtilsTest.hpp"
+#include "TemplateLTest.hpp"
 #include "TemplateTest.hpp"
+#include "TemplateUTest.hpp"
 #include "TestHelper.hpp"
 #include "UnicodeTest.hpp"
 #include "ValueTest.hpp"
-#ifndef QENTEM_SIMD_ENABLED
-#include "TemplateLTest.hpp"
-#endif
 
 int RunTests() {
     int passed = 0;
@@ -59,9 +58,8 @@ int RunTests() {
     ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
-#ifndef QENTEM_SIMD_ENABLED
+    ((Qentem::Test::RunTemplateUTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
-#endif
 
     if (failed == 0) {
         std::wcout << "\x1B[32mAll good.\x1B[0m" << std::endl;
@@ -93,6 +91,7 @@ int main() {
     //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
     //     Qentem::Test::RunTemplateTests();
+    //     Qentem::Test::RunTemplateUTests();
     //     Qentem::Test::RunTemplateLTests();
     // }
 
@@ -111,13 +110,11 @@ int main() {
     std::wcout << "Big-endian";
 #endif
 
-#ifdef QENTEM_SIMD_ENABLED
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
     std::wcout << "\nAVX2: On";
 #endif
 #if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
     std::wcout << "\nSSE2: On";
-#endif
 #endif
 
     std::wcout << "\nSize of SizeT: " << sizeof(Qentem::SizeT) << '\n';
