@@ -48,7 +48,7 @@ class TestHelper {
 
     template <typename Char_T_, typename Value_T_>
     QENTEM_NOINLINE static void
-    PrintErrorMessage(bool equal, const Char_T_ *name, Value_T_ value,
+    PrintErrorMessage(bool equal, const Char_T_ *name, const Value_T_ &value,
                       std::wostream &out = std::wcout) {
         out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
@@ -58,8 +58,9 @@ class TestHelper {
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE static void
-    PrintErrorMessage(bool equal, const Char_T_ *name, Value1_T_ value1,
-                      Value2_T_ value2, std::wostream &out = std::wcout) {
+    PrintErrorMessage(bool equal, const Char_T_ *name, const Value1_T_ &value1,
+                      const Value2_T_ &value2,
+                      std::wostream &  out = std::wcout) {
         out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value2 << "'\n"
@@ -114,36 +115,40 @@ class TestHelper {
 
 #define EQ_TO(left, right, name, value)                                        \
     do {                                                                       \
+        const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if ((left) != (right)) {                                               \
-            TestHelper::PrintErrorMessage(false, name, left, value);           \
+        if ((_tmp_left) != (right)) {                                          \
+            TestHelper::PrintErrorMessage(false, name, _tmp_left, value);      \
             return 1;                                                          \
         }                                                                      \
     } while (false)
 
 #define NOT_EQ_TO(left, right, name, value)                                    \
     do {                                                                       \
+        const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if ((left) == (right)) {                                               \
-            TestHelper::PrintErrorMessage(true, name, left, value);            \
+        if ((_tmp_left) == (right)) {                                          \
+            TestHelper::PrintErrorMessage(true, name, _tmp_left, value);       \
             return 1;                                                          \
         }                                                                      \
     } while (false)
 
 #define EQ_VALUE(left, right, name)                                            \
     do {                                                                       \
+        const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if ((left) != (right)) {                                               \
-            TestHelper::PrintErrorMessage(false, name, left, right);           \
+        if ((_tmp_left) != (right)) {                                          \
+            TestHelper::PrintErrorMessage(false, name, _tmp_left, right);      \
             return 1;                                                          \
         }                                                                      \
     } while (false)
 
 #define NOT_EQ_VALUE(left, right, name)                                        \
     do {                                                                       \
+        const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
-        if ((left) == (right)) {                                               \
-            TestHelper::PrintErrorMessage(true, name, left, right);            \
+        if ((_tmp_left) == (right)) {                                          \
+            TestHelper::PrintErrorMessage(true, name, _tmp_left, right);       \
             return 1;                                                          \
         }                                                                      \
     } while (false)
