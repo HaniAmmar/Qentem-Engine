@@ -75,6 +75,7 @@ jobs:
 
   - os: freebsd
     arch: amd64
+    compiler: clang++
 
     before_script:
       - mkdir ./Build
@@ -83,6 +84,7 @@ jobs:
       - ./Build/QTest.bin
 
   - os: osx
+    compiler: clang++
 
     before_script:
       - mkdir ./Build
