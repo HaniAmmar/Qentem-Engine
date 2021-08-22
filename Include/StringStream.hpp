@@ -63,19 +63,6 @@ class StringStream {
         }
     }
 
-    template <typename Stream_T_>
-    friend Stream_T_ &operator<<(Stream_T_ &out, StringStream src) {
-        const Char_T_ *str = src.First();
-        const Char_T_ *end = (str + src.Length());
-
-        while (str != end) {
-            out << *str;
-            ++str;
-        }
-
-        return out;
-    }
-
     StringStream &operator=(StringStream &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());
@@ -99,6 +86,26 @@ class StringStream {
             clearStorage();
             Insert(src.First(), src.Length());
         }
+
+        return *this;
+    }
+
+    StringStream &operator=(const Char_T_ *str) {
+        setLength(0);
+        setCapacity(0);
+        deallocate(Storage());
+        clearStorage();
+        insert(str, StringUtils::Count(str));
+
+        return *this;
+    }
+
+    StringStream &operator=(const String<Char_T_> &src) {
+        setLength(0);
+        setCapacity(0);
+        deallocate(Storage());
+        clearStorage();
+        insert(src.First(), src.Length());
 
         return *this;
     }
@@ -128,6 +135,36 @@ class StringStream {
 
     inline void operator+=(const Char_T_ *str) {
         insert(str, StringUtils::Count(str));
+    }
+
+    template <typename Stream_T_>
+    friend Stream_T_ &operator<<(Stream_T_ &out, const StringStream &src) {
+        const Char_T_ *str = src.First();
+        const Char_T_ *end = (str + src.Length());
+
+        while (str != end) {
+            out << *str;
+            ++str;
+        }
+
+        return out;
+    }
+
+    friend StringStream &operator<<(StringStream &      out,
+                                    const StringStream &src) {
+        out.insert(src.First(), src.Length());
+        return out;
+    }
+
+    friend StringStream &operator<<(StringStream &         out,
+                                    const String<Char_T_> &src) {
+        out.insert(src.First(), src.Length());
+        return out;
+    }
+
+    friend StringStream &operator<<(StringStream &out, const Char_T_ ch) {
+        out += ch;
+        return out;
     }
 
     inline bool operator==(const StringStream &ss) const noexcept {

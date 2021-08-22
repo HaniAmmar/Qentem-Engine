@@ -156,6 +156,12 @@ class String {
         return ns;
     }
 
+    template <typename Stream_T_>
+    friend Stream_T_ &operator<<(Stream_T_ &out, String src) {
+        out << src.First();
+        return out;
+    }
+
     inline bool operator==(const String &string) const noexcept {
         const SizeT len = Length();
 
@@ -230,19 +236,6 @@ class String {
         }
 
         return StringUtils::IsEqual(First(), str, length);
-    }
-
-    template <typename Stream_T_>
-    friend Stream_T_ &operator<<(Stream_T_ &out, String src) {
-        const Char_T_ *str = src.First();
-        const Char_T_ *end = (str + src.Length());
-
-        while (str != end) {
-            out << *str;
-            ++str;
-        }
-
-        return out;
     }
 
     void Reset() noexcept {
