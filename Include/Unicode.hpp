@@ -32,16 +32,22 @@ namespace Unicode {
 template <typename Char_T_, int S>
 struct UnicodeToUTF {};
 
+template <typename Char_T_>
+static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
+    UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode,
+                                                                    ss);
+}
+
 // UTF8
 template <typename Char_T_>
 struct UnicodeToUTF<Char_T_, 1> {
     static void ToUTF(unsigned int           unicode,
                       StringStream<Char_T_> &ss) noexcept {
         /*
-         * ToUTF8(0xC3D, ss);
-         * ToUTF8(0x00A1, ss);
-         * ToUTF8(0x08A7, ss);
-         * ToUTF8(0x10A7B, ss);
+         * ToUTF(0xC3D, ss);
+         * ToUTF(0x00A1, ss);
+         * ToUTF(0x08A7, ss);
+         * ToUTF(0x10A7B, ss);
          */
 
         if (unicode < 0x80U) {
@@ -86,12 +92,6 @@ struct UnicodeToUTF<Char_T_, 4> {
         ss += static_cast<Char_T_>(unicode);
     }
 };
-
-template <typename Char_T_>
-static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
-    UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode,
-                                                                    ss);
-}
 
 } // namespace Unicode
 } // namespace Qentem
