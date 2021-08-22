@@ -43,18 +43,18 @@ class Engine {
     /*
      * Returns the (index+1) of a given character.
      */
-    template <typename Number_T_>
-    static Number_T_ FindOne(const char char_1, const char *content,
+    template <typename Char_T_, typename Number_T_>
+    static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content,
                              Number_T_ offset, Number_T_ end_before) noexcept {
         content += offset;
-        const QENTEM_SIMD_VAR m_char_1 = QENTEM_SIMD_SET_TO_ONE_8(char_1);
+        const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
 
         while (offset < end_before) {
             const QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
                 reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
 
             const QENTEM_SIMD_NUMBER_T bits =
-                QENTEM_SIMD_COMPARE_8_MASK(m_char_1, m_content);
+                Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
 
             if (bits != 0) {
                 const Number_T_ index = (Platform::CTZ(bits) + offset + 1);
@@ -66,8 +66,8 @@ class Engine {
                 return index;
             }
 
-            offset += QENTEM_SIMD_SIZE;
-            content += QENTEM_SIMD_SIZE;
+            offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+            content += Platform::SMIDNextOffset<Char_T_, Number_T_>();
         }
 
         return 0;
@@ -76,28 +76,28 @@ class Engine {
     /*
      * Returns the location of two given characters.
      */
-    template <typename Number_T_>
-    static QENTEM_SIMD_NUMBER_T FindTwo(const char char_1, const char char_2,
-                                        const char *content, Number_T_ &offset,
-                                        Number_T_ end_before) noexcept {
+    template <typename Char_T_, typename Number_T_>
+    static QENTEM_SIMD_NUMBER_T
+    FindTwo(const Char_T_ char_1, const Char_T_ char_2, const Char_T_ *content,
+            Number_T_ &offset, Number_T_ end_before) noexcept {
         content += offset;
-        const QENTEM_SIMD_VAR m_char_1 = QENTEM_SIMD_SET_TO_ONE_8(char_1);
-        const QENTEM_SIMD_VAR m_char_2 = QENTEM_SIMD_SET_TO_ONE_8(char_2);
+        const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
+        const QENTEM_SIMD_VAR m_char_2 = Platform::SMIDSetToOne(char_2);
 
         while (offset < end_before) {
             const QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
                 reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
 
             const QENTEM_SIMD_NUMBER_T bits =
-                QENTEM_SIMD_COMPARE_8_MASK(m_char_1, m_content) |
-                QENTEM_SIMD_COMPARE_8_MASK(m_char_2, m_content);
+                Platform::SMIDCompare<Char_T_>(m_char_1, m_content) |
+                Platform::SMIDCompare<Char_T_>(m_char_2, m_content);
 
             if (bits != 0) {
                 return bits;
             }
 
-            offset += QENTEM_SIMD_SIZE;
-            content += QENTEM_SIMD_SIZE;
+            offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+            content += Platform::SMIDNextOffset<Char_T_, Number_T_>();
         }
 
         return 0;
@@ -106,9 +106,9 @@ class Engine {
     /*
      * Returns the (index+length) of a given pattern.
      */
-    template <typename Number_T_>
-    static Number_T_ Find(const char *pattern, SizeT pattern_length,
-                          const char *content, Number_T_ offset,
+    template <typename Char_T_, typename Number_T_>
+    static Number_T_ Find(const Char_T_ *pattern, SizeT pattern_length,
+                          const Char_T_ *content, Number_T_ offset,
                           Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
@@ -118,20 +118,20 @@ class Engine {
 
         const SizeT           len_less_one = (pattern_length - 1);
         const QENTEM_SIMD_VAR m_pattern_first =
-            QENTEM_SIMD_SET_TO_ONE_8(*pattern);
+            Platform::SMIDSetToOne(*pattern);
         const QENTEM_SIMD_VAR m_pattern_last =
-            QENTEM_SIMD_SET_TO_ONE_8(pattern[len_less_one]);
+            Platform::SMIDSetToOne(pattern[len_less_one]);
 
         while (offset < end_before) {
             QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(
                 reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
             QENTEM_SIMD_NUMBER_T bits =
-                QENTEM_SIMD_COMPARE_8_MASK(m_content, m_pattern_first);
+                Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
 
             m_content =
                 QENTEM_SIMD_LOAD(reinterpret_cast<const QENTEM_SIMD_VAR *>(
                     content + len_less_one));
-            bits &= QENTEM_SIMD_COMPARE_8_MASK(m_content, m_pattern_last);
+            bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
 
             while (bits != 0) {
                 const Number_T_ index = Platform::CTZ(bits);
@@ -151,8 +151,8 @@ class Engine {
                 bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
             }
 
-            offset += QENTEM_SIMD_SIZE;
-            content += QENTEM_SIMD_SIZE;
+            offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+            content += Platform::SMIDNextOffset<Char_T_, Number_T_>();
         }
 
         return 0;
