@@ -455,11 +455,46 @@ class Template_CV {
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags_cache,
                                       const Char_T_ *content, SizeT length) {
         SizeT offset = 0;
+#ifdef QENTEM_SIMD_ENABLED
+        SizeT                m_offset = 0;
+        QENTEM_SIMD_NUMBER_T bits     = 0;
 
+        while (true) {
+            while (true) {
+                if ((bits == 0) && (offset < length)) {
+                    bits = Engine::FindTwo(TemplatePatterns_C_::InLinePrefix,
+                                           TemplatePatterns_C_::MultiLinePrefix,
+                                           content, m_offset, length);
+                }
+
+                if (bits == 0) {
+                    return;
+                }
+
+                const SizeT index = Platform::CTZ(bits);
+                bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
+                const SizeT next_offset = (index + m_offset);
+
+                if (bits == 0) {
+                    m_offset += QENTEM_SIMD_SIZE;
+                }
+
+                if (next_offset < offset) {
+                    continue;
+                }
+
+                if (next_offset < length) {
+                    offset = next_offset;
+                    break;
+                }
+
+                return;
+            }
+#else
         while (offset < length) {
+#endif
             if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
-                SizeT current_offset = offset;
-                ++current_offset;
+                const SizeT current_offset = (offset + 1);
 
                 switch (content[current_offset]) {
                     case TemplatePatterns_C_::Var_2ND_Char: {
@@ -480,8 +515,6 @@ class Template_CV {
                                 offset = end_offset;
                                 continue;
                             }
-
-                            offset = current_offset;
                         }
 
                         break;
@@ -506,8 +539,6 @@ class Template_CV {
                                 offset = end_offset;
                                 continue;
                             }
-
-                            offset = current_offset;
                         }
 
                         break;
@@ -531,8 +562,6 @@ class Template_CV {
                                 offset = end_offset;
                                 continue;
                             }
-
-                            offset = (current_offset - 1);
                         }
 
                         break;
@@ -557,15 +586,12 @@ class Template_CV {
                                 offset = end_offset;
                                 continue;
                             }
-
-                            offset = (current_offset - 1);
                         }
                     }
                 }
             } else if (content[offset] ==
                        TemplatePatterns_C_::MultiLinePrefix) {
-                SizeT current_offset = offset;
-                ++current_offset;
+                const SizeT current_offset = (offset + 1);
 
                 if (content[current_offset] ==
                     TemplatePatterns_C_::Loop_2ND_Char) { // <loop
@@ -588,8 +614,6 @@ class Template_CV {
                             offset = end_offset;
                             continue;
                         }
-
-                        offset = (current_offset - 1);
                     }
                 } else if (content[current_offset] ==
                            TemplatePatterns_C_::If_2ND_Char) { // <if
@@ -610,13 +634,12 @@ class Template_CV {
                             offset = end_offset;
                             continue;
                         }
-
-                        offset = (current_offset - 1);
                     }
                 }
             }
-
+#ifndef QENTEM_SIMD_ENABLED
             ++offset;
+#endif
         }
     }
 
