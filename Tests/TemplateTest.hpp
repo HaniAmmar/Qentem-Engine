@@ -33,8 +33,7 @@ namespace Test {
 static int TestVariableTag1() {
     const char *content;
 
-    Value<char> value = JSON::Parse(
-        R"(["A", "abc", true, 456, 1.5,
+    Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5,
            [null, false, ["Qentem"]]])");
 
     Value<char> sub_value = JSON::Parse(
@@ -44,193 +43,199 @@ static int TestVariableTag1() {
     value += sub_value;
 
     content = R"({var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(A)", R"(Render())");
 
     content = R"({var:1})";
-    EQ_VALUE(Template::Render(content, &value), R"(abc)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abc)", R"(Render())");
 
     content = R"({var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true)", R"(Render())");
 
     content = R"({var:3})";
-    EQ_VALUE(Template::Render(content, &value), R"(456)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(456)", R"(Render())");
 
     content = R"({var:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5)", R"(Render())");
 
     content = R"({var:5[0]})";
-    EQ_VALUE(Template::Render(content, &value), R"(null)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(null)", R"(Render())");
 
     content = R"({var:5[1]})";
-    EQ_VALUE(Template::Render(content, &value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false)", R"(Render())");
 
     content = R"({var:5[2][0]})";
-    EQ_VALUE(Template::Render(content, &value), R"(Qentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Qentem)", R"(Render())");
 
     //////
 
     content = R"({var:key1})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(a)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(a)", R"(Render())");
 
     content = R"({var:key2})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(ABC)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(ABC)", R"(Render())");
 
     content = R"({var:key3})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", R"(Render())");
 
     content = R"({var:key4})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(100)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(100)", R"(Render())");
 
     content = R"({var:key5})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(1.5)", R"(Render())");
 
     content = R"({var:key6[one]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(1)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(1)", R"(Render())");
 
     content = R"({var:key7[0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(null)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(null)", R"(Render())");
 
     content = R"({var:key7[1]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", R"(Render())");
 
     content = R"({var:key7[2][0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem)", R"(Render())");
 
     //
     content = R"({var:6[key1]})";
-    EQ_VALUE(Template::Render(content, &value), R"(a)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content = R"({var:6[key2]})";
-    EQ_VALUE(Template::Render(content, &value), R"(ABC)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(ABC)", R"(Render())");
 
     content = R"({var:6[key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false)", R"(Render())");
 
     content = R"({var:6[key4]})";
-    EQ_VALUE(Template::Render(content, &value), R"(100)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(100)", R"(Render())");
 
     content = R"({var:6[key5]})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5)", R"(Render())");
 
     content = R"({var:6[key6][one]})";
-    EQ_VALUE(Template::Render(content, &value), R"(1)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1)", R"(Render())");
 
     ////////////////
 
     content = R"(-{var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(-true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-true)", R"(Render())");
 
     content = R"(-{var:key7[0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-null)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-null)", R"(Render())");
 
     content = R"(-{var:key7[2][0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem)",
+             R"(Render())");
 
     content = R"(-{var:6[key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"(-false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-false)", R"(Render())");
 
     content = R"(-{var:6[key4]})";
-    EQ_VALUE(Template::Render(content, &value), R"(-100)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-100)", R"(Render())");
     ////////////
 
     content = R"({var:2}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(true-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true-)", R"(Render())");
 
     content = R"({var:key7[0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(null-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(null-)", R"(Render())");
 
     content = R"({var:key7[2][0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem-)",
+             R"(Render())");
 
     content = R"({var:6[key3]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(false-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false-)", R"(Render())");
 
     content = R"({var:6[key4]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(100-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(100-)", R"(Render())");
 
     ////////////
 
     content = R"(-{var:2}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(-true-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-true-)", R"(Render())");
 
     content = R"(-{var:key7[0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-null-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-null-)", R"(Render())");
 
     content = R"(-{var:key7[2][0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem-)",
+             R"(Render())");
 
     content = R"(-{var:6[key3]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(-false-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-false-)", R"(Render())");
 
     content = R"(-{var:6[key4]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(-100-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-100-)", R"(Render())");
 
     ////////////
 
     content = R"(------{var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(------true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(------true)", R"(Render())");
 
     content = R"(------{var:key7[0]})";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------null)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{var:key7[2][0]})";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------Qentem)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{var:6[key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"(------false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(------false)",
+             R"(Render())");
 
     content = R"(------{var:6[key4]})";
-    EQ_VALUE(Template::Render(content, &value), R"(------100)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(------100)", R"(Render())");
 
     ////////////
 
     content = R"({var:2}------)";
-    EQ_VALUE(Template::Render(content, &value), R"(true------)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true------)", R"(Render())");
 
     content = R"({var:key7[0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(null------)",
-             "Render()");
+             R"(Render())");
 
     content = R"({var:key7[2][0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem------)",
-             "Render()");
+             R"(Render())");
 
     content = R"({var:6[key3]}------)";
-    EQ_VALUE(Template::Render(content, &value), R"(false------)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false------)",
+             R"(Render())");
 
     content = R"({var:6[key4]}------)";
-    EQ_VALUE(Template::Render(content, &value), R"(100------)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(100------)", R"(Render())");
 
     ////////////
 
     content = R"(------{var:2}------)";
     EQ_VALUE(Template::Render(content, &value), R"(------true------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{var:key7[0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------null------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{var:key7[2][0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------Qentem------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{var:6[key3]}------)";
     EQ_VALUE(Template::Render(content, &value), R"(------false------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{var:6[key4]}------)";
     EQ_VALUE(Template::Render(content, &value), R"(------100------)",
-             "Render()");
+             R"(Render())");
 
     content = R"({var:key7[2[0]})";
     EQ_VALUE(Template::Render(content, &value), R"({var:key7[2[0]})",
-             "Render()");
+             R"(Render())");
 
     content = R"({var:6key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:6key3]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:6key3]})",
+             R"(Render())");
 
     END_SUB_TEST;
 }
@@ -240,42 +245,46 @@ static int TestVariableTag2() {
     const char *content;
 
     content = R"({var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA)", R"(Render())");
 
     content = R"({var:1}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(abcA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abcA)", R"(Render())");
 
     content = R"({var:1}{var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(abctrue)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abctrue)", R"(Render())");
 
     content = R"({var:2}{var:3}{var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(true456true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true456true)",
+             R"(Render())");
 
     content = R"({var:4}{var:4}{var:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.51.51.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.51.51.5)", R"(Render())");
     ///
 
     content = R"({var:0}-{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(A-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(A-A)", R"(Render())");
 
     content = R"({var:1}--{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(abc--A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abc--A)", R"(Render())");
 
     content = R"({var:1}---{var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(abc---true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abc---true)", R"(Render())");
 
     content = R"({var:2}{var:3}--{var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(true456--true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true456--true)",
+             R"(Render())");
 
     content = R"({var:4}--{var:4}{var:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.51.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.51.5)",
+             R"(Render())");
 
     content = R"({var:4}--{var:4}--{var:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.5--1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.5--1.5)",
+             R"(Render())");
 
     content = R"({var:4}---{var:4}---{var:4})";
     EQ_VALUE(Template::Render(content, &value), R"(1.5---1.5---1.5)",
-             "Render()");
+             R"(Render())");
 
     END_SUB_TEST;
 }
@@ -285,25 +294,26 @@ static int TestVariableTag3() {
     const char *content;
 
     content = R"({var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0})", R"(Render())");
 
-    EQ_VALUE(Template::Render(R"({var:a})", &value), R"({var:a})", "Render()");
+    EQ_VALUE(Template::Render(R"({var:a})", &value), R"({var:a})",
+             R"(Render())");
 
     content = R"({var:0[0]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({var:0[0]})", "Render()");
+             R"({var:0[0]})", R"(Render())");
 
     content = R"({var:a[0]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({var:a[0]})", "Render()");
+             R"({var:a[0]})", R"(Render())");
 
     content = R"({var:0[a]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({var:0[a]})", "Render()");
+             R"({var:0[a]})", R"(Render())");
 
     content = R"({var:a[abc]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({var:a[abc]})", "Render()");
+             R"({var:a[abc]})", R"(Render())");
 
     ////////////////
 
@@ -311,168 +321,171 @@ static int TestVariableTag3() {
 
     content = R"({var:0})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({var:0})", "Render()");
+             R"({var:0})", R"(Render())");
 
     content = R"({var:0[0]})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0[0]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0[0]})", R"(Render())");
 
     content = R"({var:0[0][0]})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0[0][0]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0[0][0]})",
+             R"(Render())");
 
     /////
 
     content = R"({var:1})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:1})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:1})", R"(Render())");
 
     content = R"({var:2})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:2})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:2})", R"(Render())");
 
     content = R"({var:1[a]})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:1[a]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:1[a]})", R"(Render())");
 
     content = R"({var:1[b]})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:1[b]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:1[b]})", R"(Render())");
 
     ////
 
     value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
 
     content = R"({var:0)";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0)", R"(Render())");
 
     content = R"(var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(var:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(var:0})", R"(Render())");
 
     content = R"({v})";
-    EQ_VALUE(Template::Render(content, &value), R"({v})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({v})", R"(Render())");
 
     content = R"({va})";
-    EQ_VALUE(Template::Render(content, &value), R"({va})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({va})", R"(Render())");
 
     content = R"({var})";
-    EQ_VALUE(Template::Render(content, &value), R"({var})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var})", R"(Render())");
 
     content = R"({var:})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:})", R"(Render())");
 
     content = R"({v:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({v:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({v:0})", R"(Render())");
 
     content = R"({va:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({va:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({va:0})", R"(Render())");
     ////
 
     content = R"({var:0{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0{var:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0{var:0})",
+             R"(Render())");
 
     content = R"(var:0{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(var:0A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(var:0A)", R"(Render())");
 
     content = R"(var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(var:0}A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(var:0}A)", R"(Render())");
 
     content = R"({var:0{var:0}{var:0})";
     EQ_VALUE(Template::Render(content, &value), R"({var:0{var:0}A)",
-             "Render()");
+             R"(Render())");
 
     ////
 
     content = R"({var:0{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0{var:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0{var:0})",
+             R"(Render())");
 
     content = R"(var:0{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(var:0A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(var:0A)", R"(Render())");
 
     content = R"(var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(var:0}A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(var:0}A)", R"(Render())");
 
     content = R"({var:0{var:0}{var:0})";
     EQ_VALUE(Template::Render(content, &value), R"({var:0{var:0}A)",
-             "Render()");
+             R"(Render())");
 
     ////
 
     content = R"({{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({A)", R"(Render())");
 
     content = R"({{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({AA)", R"(Render())");
 
     content = R"({v{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({vA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({vA)", R"(Render())");
 
     content = R"({v{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({vAA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({vAA)", R"(Render())");
 
     content = R"({va{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({vaA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({vaA)", R"(Render())");
 
     content = R"({va{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({vaAA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({vaAA)", R"(Render())");
 
     content = R"({var{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({varA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({varA)", R"(Render())");
 
     content = R"({var{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({varAA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({varAA)", R"(Render())");
 
     ///
 
     content = R"({-{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({-A)", R"(Render())");
 
     content = R"({-{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({-AA)", R"(Render())");
 
     content = R"({v-{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({v-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({v-A)", R"(Render())");
 
     content = R"({v-{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({v-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({v-AA)", R"(Render())");
 
     content = R"({va-{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({va-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({va-A)", R"(Render())");
 
     content = R"({va-{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({va-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({va-AA)", R"(Render())");
 
     content = R"({var-{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var-A)", R"(Render())");
 
     content = R"({var-{var:0}{var:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var-AA)", R"(Render())");
 
     //
 
     content = R"({var-0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var-0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var-0})", R"(Render())");
 
     content = R"({var 0})";
-    EQ_VALUE(Template::Render(content, &value), R"({var 0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var 0})", R"(Render())");
 
     content = R"({var:0 })";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0 })", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0 })", R"(Render())");
 
     content = R"({var:0 )";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0 )", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0 )", R"(Render())");
 
     content = R"({var:0)";
-    EQ_VALUE(Template::Render(content, &value), R"({var:0)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:0)", R"(Render())");
 
     content = R"( {var-0})";
-    EQ_VALUE(Template::Render(content, &value), R"( {var-0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( {var-0})", R"(Render())");
 
     content = R"( {var 0})";
-    EQ_VALUE(Template::Render(content, &value), R"( {var 0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( {var 0})", R"(Render())");
 
     content = R"( {var:0 })";
-    EQ_VALUE(Template::Render(content, &value), R"( {var:0 })", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( {var:0 })", R"(Render())");
 
     content = R"( {var:0 )";
-    EQ_VALUE(Template::Render(content, &value), R"( {var:0 )", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( {var:0 )", R"(Render())");
 
     content = R"( {var:0)";
-    EQ_VALUE(Template::Render(content, &value), R"( {var:0)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( {var:0)", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -541,162 +554,191 @@ static int TestVariableTag4() {
     value += R"(A""BC<<DE>>FG''HI&&GK)";
 
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    EQ_VALUE(Template::Render(R"({var:0})", &value), R"(&lt;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:1})", &value), R"(&gt;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:2})", &value), R"(&amp;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:3})", &value), R"(&quot;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:4})", &value), R"(&apos;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:5})", &value), R"(&lt;&gt;)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:0})", &value), R"(&lt;)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:1})", &value), R"(&gt;)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:2})", &value), R"(&amp;)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:3})", &value), R"(&quot;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:4})", &value), R"(&apos;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:5})", &value), R"(&lt;&gt;)",
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:6})", &value), R"(&lt;&amp;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:7})", &value), R"(&lt;&amp;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:8})", &value), R"(&gt;&quot;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:9})", &value), R"(&quot;&apos;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:10})", &value), R"(&lt;&quot;&gt;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:11})", &value), R"(&lt;&apos;&gt;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:12})", &value), R"(&lt;&amp;&gt;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:13})", &value), R"(&amp;&quot;&amp;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:14})", &value), R"(&quot;&apos;&quot;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:15})", &value), R"(&apos;&lt;&apos;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:16})", &value), R"(&apos;&amp;&apos;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:17})", &value),
-             R"(&lt;&gt;&amp;&apos;&quot;)", "Render()");
+             R"(&lt;&gt;&amp;&apos;&quot;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:18})", &value),
-             R"(&apos;&quot;&lt;&gt;&amp;)", "Render()");
+             R"(&apos;&quot;&lt;&gt;&amp;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:19})", &value),
-             R"(&lt;&quot;&amp;&apos;&gt;)", "Render()");
+             R"(&lt;&quot;&amp;&apos;&gt;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:20})", &value), R"(&lt;&lt;&lt;&lt;&lt;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:21})", &value), R"(&gt;&gt;&gt;&gt;&gt;)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:22})", &value),
-             R"(&amp;&amp;&amp;&amp;&amp;)", "Render()");
+             R"(&amp;&amp;&amp;&amp;&amp;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:23})", &value),
-             R"(&quot;&quot;&quot;&quot;&quot;)", "Render()");
+             R"(&quot;&quot;&quot;&quot;&quot;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:24})", &value),
-             R"(&apos;&apos;&apos;&apos;&apos;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:25})", &value), R"(A&lt;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:26})", &value), R"(A&gt;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:27})", &value), R"(A&amp;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:28})", &value), R"(A&quot;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:29})", &value), R"(A&apos;)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:30})", &value), R"(&lt;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:31})", &value), R"(&gt;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:32})", &value), R"(&amp;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:33})", &value), R"(&quot;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:34})", &value), R"(&apos;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:35})", &value), R"(A&lt;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:36})", &value), R"(A&gt;A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:37})", &value), R"(A&amp;A)", "Render()");
+             R"(&apos;&apos;&apos;&apos;&apos;)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:25})", &value), R"(A&lt;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:26})", &value), R"(A&gt;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:27})", &value), R"(A&amp;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:28})", &value), R"(A&quot;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:29})", &value), R"(A&apos;)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:30})", &value), R"(&lt;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:31})", &value), R"(&gt;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:32})", &value), R"(&amp;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:33})", &value), R"(&quot;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:34})", &value), R"(&apos;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:35})", &value), R"(A&lt;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:36})", &value), R"(A&gt;A)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:37})", &value), R"(A&amp;A)",
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:38})", &value), R"(A&quot;A)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:39})", &value), R"(A&apos;A)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:40})", &value), R"(AA&lt;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:41})", &value), R"(AA&gt;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:42})", &value), R"(AA&amp;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:43})", &value), R"(AA&quot;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:44})", &value), R"(AA&apos;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:45})", &value), R"(AA&lt;&lt;&lt;&lt;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:46})", &value), R"(AA&gt;&gt;&gt;&gt;AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:47})", &value),
-             R"(AA&amp;&amp;&amp;&amp;AA)", "Render()");
+             R"(AA&amp;&amp;&amp;&amp;AA)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:48})", &value),
-             R"(AA&quot;&quot;&quot;&quot;AA)", "Render()");
+             R"(AA&quot;&quot;&quot;&quot;AA)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:49})", &value),
-             R"(AA&apos;&apos;&apos;&apos;AA)", "Render()");
+             R"(AA&apos;&apos;&apos;&apos;AA)", R"(Render())");
     EQ_VALUE(
         Template::Render(R"({var:50})", &value),
         R"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)",
-        "Render()");
+        R"(Render())");
     EQ_VALUE(Template::Render(R"({var:51})", &value),
-             R"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)", "Render()");
+             R"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:52})", &value),
-             R"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", "Render()");
+             R"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:53})", &value),
              R"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)",
-             "Render()");
+             R"(Render())");
 #else
-    EQ_VALUE(Template::Render(R"({var:0})", &value), R"(<)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:1})", &value), R"(>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:2})", &value), R"(&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:3})", &value), R"(")", "Render()");
-    EQ_VALUE(Template::Render(R"({var:4})", &value), R"(')", "Render()");
-    EQ_VALUE(Template::Render(R"({var:5})", &value), R"(<>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:6})", &value), R"(<&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:7})", &value), R"(<&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:8})", &value), R"(>")", "Render()");
-    EQ_VALUE(Template::Render(R"({var:9})", &value), R"("')", "Render()");
-    EQ_VALUE(Template::Render(R"({var:10})", &value), R"(<">)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:11})", &value), R"(<'>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:12})", &value), R"(<&>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:13})", &value), R"(&"&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:14})", &value), R"("'")", "Render()");
-    EQ_VALUE(Template::Render(R"({var:15})", &value), R"('<')", "Render()");
-    EQ_VALUE(Template::Render(R"({var:16})", &value), R"('&')", "Render()");
-    EQ_VALUE(Template::Render(R"({var:17})", &value), R"(<>&'")", "Render()");
-    EQ_VALUE(Template::Render(R"({var:18})", &value), R"('"<>&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:19})", &value), R"(<"&'>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:20})", &value), R"(<<<<<)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:21})", &value), R"(>>>>>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:22})", &value), R"(&&&&&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:23})", &value), R"(""""")", "Render()");
-    EQ_VALUE(Template::Render(R"({var:24})", &value), R"(''''')", "Render()");
-    EQ_VALUE(Template::Render(R"({var:25})", &value), R"(A<)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:26})", &value), R"(A>)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:27})", &value), R"(A&)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:28})", &value), R"(A")", "Render()");
-    EQ_VALUE(Template::Render(R"({var:29})", &value), R"(A')", "Render()");
-    EQ_VALUE(Template::Render(R"({var:30})", &value), R"(<A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:31})", &value), R"(>A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:32})", &value), R"(&A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:33})", &value), R"("A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:34})", &value), R"('A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:35})", &value), R"(A<A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:36})", &value), R"(A>A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:37})", &value), R"(A&A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:38})", &value), R"(A"A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:39})", &value), R"(A'A)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:40})", &value), R"(AA<AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:41})", &value), R"(AA>AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:42})", &value), R"(AA&AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:43})", &value), R"(AA"AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({var:44})", &value), R"(AA'AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({var:0})", &value), R"(<)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:1})", &value), R"(>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:2})", &value), R"(&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:3})", &value), R"(")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:4})", &value), R"(')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:5})", &value), R"(<>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:6})", &value), R"(<&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:7})", &value), R"(<&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:8})", &value), R"(>")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:9})", &value), R"("')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:10})", &value), R"(<">)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:11})", &value), R"(<'>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:12})", &value), R"(<&>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:13})", &value), R"(&"&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:14})", &value), R"("'")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:15})", &value), R"('<')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:16})", &value), R"('&')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:17})", &value), R"(<>&'")",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:18})", &value), R"('"<>&)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:19})", &value), R"(<"&'>)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:20})", &value), R"(<<<<<)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:21})", &value), R"(>>>>>)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:22})", &value), R"(&&&&&)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:23})", &value), R"(""""")",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:24})", &value), R"(''''')",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:25})", &value), R"(A<)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:26})", &value), R"(A>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:27})", &value), R"(A&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:28})", &value), R"(A")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:29})", &value), R"(A')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:30})", &value), R"(<A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:31})", &value), R"(>A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:32})", &value), R"(&A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:33})", &value), R"("A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:34})", &value), R"('A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:35})", &value), R"(A<A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:36})", &value), R"(A>A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:37})", &value), R"(A&A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:38})", &value), R"(A"A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:39})", &value), R"(A'A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:40})", &value), R"(AA<AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:41})", &value), R"(AA>AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:42})", &value), R"(AA&AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:43})", &value), R"(AA"AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({var:44})", &value), R"(AA'AA)",
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:45})", &value), R"(AA<<<<AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:46})", &value), R"(AA>>>>AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:47})", &value), R"(AA&&&&AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:48})", &value), R"(AA""""AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:49})", &value), R"(AA''''AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:50})", &value),
-             R"(<A>B'C"D&E'F"G<H>I&G"K)", "Render()");
+             R"(<A>B'C"D&E'F"G<H>I&G"K)", R"(Render())");
     EQ_VALUE(Template::Render(R"({var:51})", &value), R"(AB"CD'EF<GH>IGK')",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:52})", &value), R"("ABC'DEF<GHI>GK<)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({var:53})", &value),
-             R"(A""BC<<DE>>FG''HI&&GK)", "Render()");
+             R"(A""BC<<DE>>FG''HI&&GK)", R"(Render())");
 #endif
 
     END_SUB_TEST;
@@ -705,8 +747,7 @@ static int TestVariableTag4() {
 static int TestRawVariableTag1() {
     const char *content;
 
-    Value<char> value = JSON::Parse(
-        R"(["A", "abc", true, 456, 1.5,
+    Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5,
            [null, false, ["Qentem"]]])");
 
     Value<char> sub_value = JSON::Parse(
@@ -716,193 +757,199 @@ static int TestRawVariableTag1() {
     value += sub_value;
 
     content = R"({raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(A)", R"(Render())");
 
     content = R"({raw:1})";
-    EQ_VALUE(Template::Render(content, &value), R"(abc)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abc)", R"(Render())");
 
     content = R"({raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true)", R"(Render())");
 
     content = R"({raw:3})";
-    EQ_VALUE(Template::Render(content, &value), R"(456)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(456)", R"(Render())");
 
     content = R"({raw:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5)", R"(Render())");
 
     content = R"({raw:5[0]})";
-    EQ_VALUE(Template::Render(content, &value), R"(null)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(null)", R"(Render())");
 
     content = R"({raw:5[1]})";
-    EQ_VALUE(Template::Render(content, &value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false)", R"(Render())");
 
     content = R"({raw:5[2][0]})";
-    EQ_VALUE(Template::Render(content, &value), R"(Qentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Qentem)", R"(Render())");
 
     //////
 
     content = R"({raw:key1})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(a)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(a)", R"(Render())");
 
     content = R"({raw:key2})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(ABC)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(ABC)", R"(Render())");
 
     content = R"({raw:key3})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", R"(Render())");
 
     content = R"({raw:key4})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(100)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(100)", R"(Render())");
 
     content = R"({raw:key5})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(1.5)", R"(Render())");
 
     content = R"({raw:key6[one]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(1)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(1)", R"(Render())");
 
     content = R"({raw:key7[0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(null)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(null)", R"(Render())");
 
     content = R"({raw:key7[1]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(false)", R"(Render())");
 
     content = R"({raw:key7[2][0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem)", R"(Render())");
 
     //
     content = R"({raw:6[key1]})";
-    EQ_VALUE(Template::Render(content, &value), R"(a)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content = R"({raw:6[key2]})";
-    EQ_VALUE(Template::Render(content, &value), R"(ABC)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(ABC)", R"(Render())");
 
     content = R"({raw:6[key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"(false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false)", R"(Render())");
 
     content = R"({raw:6[key4]})";
-    EQ_VALUE(Template::Render(content, &value), R"(100)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(100)", R"(Render())");
 
     content = R"({raw:6[key5]})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5)", R"(Render())");
 
     content = R"({raw:6[key6][one]})";
-    EQ_VALUE(Template::Render(content, &value), R"(1)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1)", R"(Render())");
 
     ////////////////
 
     content = R"(-{raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(-true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-true)", R"(Render())");
 
     content = R"(-{raw:key7[0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-null)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-null)", R"(Render())");
 
     content = R"(-{raw:key7[2][0]})";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem)",
+             R"(Render())");
 
     content = R"(-{raw:6[key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"(-false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-false)", R"(Render())");
 
     content = R"(-{raw:6[key4]})";
-    EQ_VALUE(Template::Render(content, &value), R"(-100)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-100)", R"(Render())");
     ////////////
 
     content = R"({raw:2}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(true-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true-)", R"(Render())");
 
     content = R"({raw:key7[0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(null-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(null-)", R"(Render())");
 
     content = R"({raw:key7[2][0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem-)",
+             R"(Render())");
 
     content = R"({raw:6[key3]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(false-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false-)", R"(Render())");
 
     content = R"({raw:6[key4]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(100-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(100-)", R"(Render())");
 
     ////////////
 
     content = R"(-{raw:2}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(-true-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-true-)", R"(Render())");
 
     content = R"(-{raw:key7[0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-null-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-null-)", R"(Render())");
 
     content = R"(-{raw:key7[2][0]}-)";
-    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem-)", "Render()");
+    EQ_VALUE(Template::Render(content, &sub_value), R"(-Qentem-)",
+             R"(Render())");
 
     content = R"(-{raw:6[key3]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(-false-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-false-)", R"(Render())");
 
     content = R"(-{raw:6[key4]}-)";
-    EQ_VALUE(Template::Render(content, &value), R"(-100-)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-100-)", R"(Render())");
 
     ////////////
 
     content = R"(------{raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(------true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(------true)", R"(Render())");
 
     content = R"(------{raw:key7[0]})";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------null)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{raw:key7[2][0]})";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------Qentem)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{raw:6[key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"(------false)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(------false)",
+             R"(Render())");
 
     content = R"(------{raw:6[key4]})";
-    EQ_VALUE(Template::Render(content, &value), R"(------100)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(------100)", R"(Render())");
 
     ////////////
 
     content = R"({raw:2}------)";
-    EQ_VALUE(Template::Render(content, &value), R"(true------)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true------)", R"(Render())");
 
     content = R"({raw:key7[0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(null------)",
-             "Render()");
+             R"(Render())");
 
     content = R"({raw:key7[2][0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(Qentem------)",
-             "Render()");
+             R"(Render())");
 
     content = R"({raw:6[key3]}------)";
-    EQ_VALUE(Template::Render(content, &value), R"(false------)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false------)",
+             R"(Render())");
 
     content = R"({raw:6[key4]}------)";
-    EQ_VALUE(Template::Render(content, &value), R"(100------)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(100------)", R"(Render())");
 
     ////////////
 
     content = R"(------{raw:2}------)";
     EQ_VALUE(Template::Render(content, &value), R"(------true------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{raw:key7[0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------null------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{raw:key7[2][0]}------)";
     EQ_VALUE(Template::Render(content, &sub_value), R"(------Qentem------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{raw:6[key3]}------)";
     EQ_VALUE(Template::Render(content, &value), R"(------false------)",
-             "Render()");
+             R"(Render())");
 
     content = R"(------{raw:6[key4]}------)";
     EQ_VALUE(Template::Render(content, &value), R"(------100------)",
-             "Render()");
+             R"(Render())");
 
     content = R"({raw:key7[2[0]})";
     EQ_VALUE(Template::Render(content, &value), R"({raw:key7[2[0]})",
-             "Render()");
+             R"(Render())");
 
     content = R"({raw:6key3]})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:6key3]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:6key3]})",
+             R"(Render())");
 
     END_SUB_TEST;
 }
@@ -912,42 +959,46 @@ static int TestRawVariableTag2() {
     const char *content;
 
     content = R"({raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA)", R"(Render())");
 
     content = R"({raw:1}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(abcA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abcA)", R"(Render())");
 
     content = R"({raw:1}{raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(abctrue)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abctrue)", R"(Render())");
 
     content = R"({raw:2}{raw:3}{raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(true456true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true456true)",
+             R"(Render())");
 
     content = R"({raw:4}{raw:4}{raw:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.51.51.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.51.51.5)", R"(Render())");
     ///
 
     content = R"({raw:0}-{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(A-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(A-A)", R"(Render())");
 
     content = R"({raw:1}--{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(abc--A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abc--A)", R"(Render())");
 
     content = R"({raw:1}---{raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(abc---true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(abc---true)", R"(Render())");
 
     content = R"({raw:2}{raw:3}--{raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"(true456--true)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true456--true)",
+             R"(Render())");
 
     content = R"({raw:4}--{raw:4}{raw:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.51.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.51.5)",
+             R"(Render())");
 
     content = R"({raw:4}--{raw:4}--{raw:4})";
-    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.5--1.5)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1.5--1.5--1.5)",
+             R"(Render())");
 
     content = R"({raw:4}---{raw:4}---{raw:4})";
     EQ_VALUE(Template::Render(content, &value), R"(1.5---1.5---1.5)",
-             "Render()");
+             R"(Render())");
 
     END_SUB_TEST;
 }
@@ -957,25 +1008,26 @@ static int TestRawVariableTag3() {
     const char *content;
 
     content = R"({raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0})", R"(Render())");
 
-    EQ_VALUE(Template::Render(R"({raw:a})", &value), R"({raw:a})", "Render()");
+    EQ_VALUE(Template::Render(R"({raw:a})", &value), R"({raw:a})",
+             R"(Render())");
 
     content = R"({raw:0[0]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({raw:0[0]})", "Render()");
+             R"({raw:0[0]})", R"(Render())");
 
     content = R"({raw:a[0]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({raw:a[0]})", "Render()");
+             R"({raw:a[0]})", R"(Render())");
 
     content = R"({raw:0[a]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({raw:0[a]})", "Render()");
+             R"({raw:0[a]})", R"(Render())");
 
     content = R"({raw:a[abc]})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({raw:a[abc]})", "Render()");
+             R"({raw:a[abc]})", R"(Render())");
 
     ////////////////
 
@@ -983,169 +1035,171 @@ static int TestRawVariableTag3() {
 
     content = R"({raw:0})";
     EQ_VALUE(Template::Render(content, StringUtils::Count(content), &value),
-             R"({raw:0})", "Render()");
+             R"({raw:0})", R"(Render())");
 
     content = R"({raw:0[0]})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0[0]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0[0]})", R"(Render())");
 
     content = R"({raw:0[0][0]})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0[0][0]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0[0][0]})",
+             R"(Render())");
 
     /////
 
     content = R"({raw:1})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:1})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:1})", R"(Render())");
 
     content = R"({raw:2})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:2})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:2})", R"(Render())");
 
     content = R"({raw:1[a]})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:1[a]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:1[a]})", R"(Render())");
 
     content = R"({raw:1[b]})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:1[b]})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:1[b]})", R"(Render())");
 
     ////
 
     value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
 
     content = R"({raw:0)";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0)", R"(Render())");
 
     content = R"(raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(raw:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(raw:0})", R"(Render())");
 
     content = R"({r})";
-    EQ_VALUE(Template::Render(content, &value), R"({r})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({r})", R"(Render())");
 
     content = R"({ra})";
-    EQ_VALUE(Template::Render(content, &value), R"({ra})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({ra})", R"(Render())");
 
     content = R"({raw})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw})", R"(Render())");
 
     content = R"({raw:})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:})", R"(Render())");
 
     content = R"({r:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({r:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({r:0})", R"(Render())");
 
     content = R"({ra:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({ra:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({ra:0})", R"(Render())");
     ////
 
     content = R"({raw:0{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0{raw:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0{raw:0})",
+             R"(Render())");
 
     content = R"(raw:0{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(raw:0A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(raw:0A)", R"(Render())");
 
     content = R"(raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(raw:0}A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(raw:0}A)", R"(Render())");
 
     content = R"({raw:0{raw:0}{raw:0})";
     EQ_VALUE(Template::Render(content, &value), R"({raw:0{raw:0}A)",
-             "Render()");
+             R"(Render())");
 
     ////
 
     content = R"({raw:0{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0{raw:0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0{raw:0})",
+             R"(Render())");
 
     content = R"(raw:0{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(raw:0A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(raw:0A)", R"(Render())");
 
     content = R"(raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"(raw:0}A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(raw:0}A)", R"(Render())");
 
     content = R"({raw:0{raw:0}{raw:0})";
     EQ_VALUE(Template::Render(content, &value), R"({raw:0{raw:0}A)",
-             "Render()");
+             R"(Render())");
 
     ////
 
     content = R"({{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({A)", R"(Render())");
 
     content = R"({{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({AA)", R"(Render())");
 
     content = R"({r{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({rA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({rA)", R"(Render())");
 
     content = R"({r{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({rAA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({rAA)", R"(Render())");
 
     content = R"({ra{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raA)", R"(Render())");
 
     content = R"({ra{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raAA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raAA)", R"(Render())");
 
     content = R"({raw{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({rawA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({rawA)", R"(Render())");
 
     content = R"({raw{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({rawAA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({rawAA)", R"(Render())");
 
     ///
 
     content = R"({-{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({-A)", R"(Render())");
 
     content = R"({-{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({-AA)", R"(Render())");
 
     content = R"({r-{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({r-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({r-A)", R"(Render())");
 
     content = R"({r-{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({r-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({r-AA)", R"(Render())");
 
     content = R"({ra-{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({ra-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({ra-A)", R"(Render())");
 
     content = R"({ra-{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({ra-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({ra-AA)", R"(Render())");
 
     content = R"({raw-{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw-A)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw-A)", R"(Render())");
 
     content = R"({raw-{raw:0}{raw:0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw-AA)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw-AA)", R"(Render())");
 
     //
 
     content = R"({raw-0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw-0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw-0})", R"(Render())");
 
     content = R"({raw 0})";
-    EQ_VALUE(Template::Render(content, &value), R"({raw 0})", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw 0})", R"(Render())");
 
     content = R"({raw:0 })";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0 })", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0 })", R"(Render())");
 
     content = R"({raw:0 )";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0 )", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0 )", R"(Render())");
 
     content = R"({raw:0)";
-    EQ_VALUE(Template::Render(content, &value), R"({raw:0)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({raw:0)", R"(Render())");
 
-    content = R"( {raw-0})";
-    EQ_VALUE(Template::Render(content, &value), R"( {raw-0})", "Render()");
+    content = R"({ raw-0})";
+    EQ_VALUE(Template::Render(content, &value), R"({ raw-0})", R"(Render())");
 
-    content = R"( {raw 0})";
-    EQ_VALUE(Template::Render(content, &value), R"( {raw 0})", "Render()");
+    content = R"({ raw 0})";
+    EQ_VALUE(Template::Render(content, &value), R"({ raw 0})", R"(Render())");
 
-    content = R"( {raw:0 })";
-    EQ_VALUE(Template::Render(content, &value), R"( {raw:0 })", "Render()");
+    content = R"({ raw:0 })";
+    EQ_VALUE(Template::Render(content, &value), R"({ raw:0 })", R"(Render())");
 
-    content = R"( {raw:0 )";
-    EQ_VALUE(Template::Render(content, &value), R"( {raw:0 )", "Render()");
+    content = R"({ raw:0 )";
+    EQ_VALUE(Template::Render(content, &value), R"({ raw:0 )", R"(Render())");
 
-    content = R"( {raw:0)";
-    EQ_VALUE(Template::Render(content, &value), R"( {raw:0)", "Render()");
-
+    content = R"({ raw:0)";
+    EQ_VALUE(Template::Render(content, &value), R"({ raw:0)", R"(Render())");
     END_SUB_TEST;
 }
 
@@ -1212,69 +1266,82 @@ static int TestRawVariableTag4() {
     value += R"("ABC'DEF<GHI>GK<)";
     value += R"(A""BC<<DE>>FG''HI&&GK)";
 
-    EQ_VALUE(Template::Render(R"({raw:0})", &value), R"(<)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:1})", &value), R"(>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:2})", &value), R"(&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:3})", &value), R"(")", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:4})", &value), R"(')", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:5})", &value), R"(<>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:6})", &value), R"(<&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:7})", &value), R"(<&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:8})", &value), R"(>")", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:9})", &value), R"("')", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:10})", &value), R"(<">)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:11})", &value), R"(<'>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:12})", &value), R"(<&>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:13})", &value), R"(&"&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:14})", &value), R"("'")", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:15})", &value), R"('<')", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:16})", &value), R"('&')", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:17})", &value), R"(<>&'")", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:18})", &value), R"('"<>&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:19})", &value), R"(<"&'>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:20})", &value), R"(<<<<<)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:21})", &value), R"(>>>>>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:22})", &value), R"(&&&&&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:23})", &value), R"(""""")", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:24})", &value), R"(''''')", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:25})", &value), R"(A<)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:26})", &value), R"(A>)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:27})", &value), R"(A&)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:28})", &value), R"(A")", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:29})", &value), R"(A')", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:30})", &value), R"(<A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:31})", &value), R"(>A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:32})", &value), R"(&A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:33})", &value), R"("A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:34})", &value), R"('A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:35})", &value), R"(A<A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:36})", &value), R"(A>A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:37})", &value), R"(A&A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:38})", &value), R"(A"A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:39})", &value), R"(A'A)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:40})", &value), R"(AA<AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:41})", &value), R"(AA>AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:42})", &value), R"(AA&AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:43})", &value), R"(AA"AA)", "Render()");
-    EQ_VALUE(Template::Render(R"({raw:44})", &value), R"(AA'AA)", "Render()");
+    EQ_VALUE(Template::Render(R"({raw:0})", &value), R"(<)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:1})", &value), R"(>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:2})", &value), R"(&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:3})", &value), R"(")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:4})", &value), R"(')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:5})", &value), R"(<>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:6})", &value), R"(<&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:7})", &value), R"(<&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:8})", &value), R"(>")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:9})", &value), R"("')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:10})", &value), R"(<">)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:11})", &value), R"(<'>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:12})", &value), R"(<&>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:13})", &value), R"(&"&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:14})", &value), R"("'")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:15})", &value), R"('<')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:16})", &value), R"('&')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:17})", &value), R"(<>&'")",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:18})", &value), R"('"<>&)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:19})", &value), R"(<"&'>)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:20})", &value), R"(<<<<<)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:21})", &value), R"(>>>>>)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:22})", &value), R"(&&&&&)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:23})", &value), R"(""""")",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:24})", &value), R"(''''')",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:25})", &value), R"(A<)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:26})", &value), R"(A>)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:27})", &value), R"(A&)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:28})", &value), R"(A")", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:29})", &value), R"(A')", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:30})", &value), R"(<A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:31})", &value), R"(>A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:32})", &value), R"(&A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:33})", &value), R"("A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:34})", &value), R"('A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:35})", &value), R"(A<A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:36})", &value), R"(A>A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:37})", &value), R"(A&A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:38})", &value), R"(A"A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:39})", &value), R"(A'A)", R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:40})", &value), R"(AA<AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:41})", &value), R"(AA>AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:42})", &value), R"(AA&AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:43})", &value), R"(AA"AA)",
+             R"(Render())");
+    EQ_VALUE(Template::Render(R"({raw:44})", &value), R"(AA'AA)",
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:45})", &value), R"(AA<<<<AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:46})", &value), R"(AA>>>>AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:47})", &value), R"(AA&&&&AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:48})", &value), R"(AA""""AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:49})", &value), R"(AA''''AA)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:50})", &value),
-             R"(<A>B'C"D&E'F"G<H>I&G"K)", "Render()");
+             R"(<A>B'C"D&E'F"G<H>I&G"K)", R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:51})", &value), R"(AB"CD'EF<GH>IGK')",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:52})", &value), R"("ABC'DEF<GHI>GK<)",
-             "Render()");
+             R"(Render())");
     EQ_VALUE(Template::Render(R"({raw:53})", &value),
-             R"(A""BC<<DE>>FG''HI&&GK)", "Render()");
+             R"(A""BC<<DE>>FG''HI&&GK)", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -1282,192 +1349,196 @@ static int TestRawVariableTag4() {
 static int TestMathTag1() {
     Value<char> value;
 
-    value["a1"] = 5;
-    value["a2"] = true;
-    value["a3"] = nullptr;
-    value["a4"] = false;
-    value["a5"] = "10";
-    value["a6"] = "20";
-    value["a7"] = 6;
-    value["a8"] = 1;
-    value["a9"] = "1";
-    value["eq"] = "(8+1+{var:a8})";
+    value[R"(a1)"] = 5;
+    value[R"(a2)"] = true;
+    value[R"(a3)"] = nullptr;
+    value[R"(a4)"] = false;
+    value[R"(a5)"] = R"(10)";
+    value[R"(a6)"] = R"(20)";
+    value[R"(a7)"] = 6;
+    value[R"(a8)"] = 1;
+    value[R"(a9)"] = R"(1)";
+    value[R"(eq)"] = R"((8+1+{var:a8}))";
 
-    EQ_VALUE(Template::Render("{math:1+1}", &value), "2", "Render()");
+    EQ_VALUE(Template::Render(R"({math:1+1})", &value), R"(2)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a1}+8}", &value), R"(13)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a1}+8})", &value), R"(13)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a7}+8}", &value), R"(14)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a7}+8})", &value), R"(14)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a7}+{var:a1}}", &value), R"(11)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a7}+{var:a1}})", &value), R"(11)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a5}+{var:a1}}", &value), R"(15)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a5}+{var:a1}})", &value), R"(15)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a1}+{var:a5}}", &value), R"(15)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a1}+{var:a5}})", &value), R"(15)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}+{var:a5}}", &value), R"(30)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}+{var:a5}})", &value), R"(30)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}*{var:a2}}", &value), R"(20)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}*{var:a2}})", &value), R"(20)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}*{var:a4}}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}*{var:a4}})", &value), R"(0)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}*{var:a7}}", &value), R"(120)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}*{var:a7}})", &value), R"(120)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a7}+{var:a6}}", &value), R"(26)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a7}+{var:a6}})", &value), R"(26)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a1}+{var:a2}}", &value), R"(6)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a1}+{var:a2}})", &value), R"(6)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a8}=={var:a2}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a8}=={var:a2}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a2}=={var:a8}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a2}=={var:a8}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a5}!={var:a1}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a5}!={var:a1}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a2}!={var:a4}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a2}!={var:a4}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a2}==true}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a2}==true})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a9}=={var:a8}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a9}=={var:a8}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a8}=={var:a9}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a8}=={var:a9}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1=={var:a8}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:1=={var:a8}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:6-5==({var:a9})}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:6-5==({var:a9})})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:6-5==({var:a8})}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:6-5==({var:a8})})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:null!={var:a3}}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:null!={var:a3}})", &value), R"(0)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:({var:a3})==(0)}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:({var:a3})==(0)})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a1}+{var:a7}}", &value), "11",
-             "Render()");
-
-    EQ_VALUE(Template::Render(
-                 "{math:{var:a1}+{var:a7}}{math:{var:a1}+{var:a7}}", &value),
-             "1111", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a1}+{var:a7}})", &value), R"(11)",
+             R"(Render())");
 
     EQ_VALUE(Template::Render(
-                 "{math:{var:a1}+{var:a7}}*{math:{var:a1}+{var:a7}}", &value),
-             "11*11", "Render()");
+                 R"({math:{var:a1}+{var:a7}}{math:{var:a1}+{var:a7}})", &value),
+             R"(1111)", R"(Render())");
 
-    EQ_VALUE(Template::Render(
-                 "{math:{var:a1}+{var:a7}}##{math:{var:a1}+{var:a7}}", &value),
-             "11##11", "Render()");
+    EQ_VALUE(
+        Template::Render(R"({math:{var:a1}+{var:a7}}*{math:{var:a1}+{var:a7}})",
+                         &value),
+        R"(11*11)", R"(Render())");
 
-    EQ_VALUE(Template::Render(
-                 "{math:{var:a1}+{var:a7}}&&&%%^^&&*{math:{var:a1}+{var:a7}}",
-                 &value),
-             "11&&&%%^^&&*11", "Render()");
+    EQ_VALUE(
+        Template::Render(
+            R"({math:{var:a1}+{var:a7}}##{math:{var:a1}+{var:a7}})", &value),
+        R"(11##11)", R"(Render())");
+
+    EQ_VALUE(
+        Template::Render(
+            R"({math:{var:a1}+{var:a7}}&&&%%^^&&*{math:{var:a1}+{var:a7}})",
+            &value),
+        R"(11&&&%%^^&&*11)", R"(Render())");
 
     ///////////////////
 
-    EQ_VALUE(Template::Render("{math: {var:a1}+8}", &value), R"(13)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math: {var:a1}+8})", &value), R"(13)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:  {var:a7}+8}", &value), R"(14)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:  {var:a7}+8})", &value), R"(14)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:     {var:a7}+{var:a1}}", &value), R"(11)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:     {var:a7}+{var:a1}})", &value),
+             R"(11)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a5} +{var:a1}}", &value), R"(15)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a5} +{var:a1}})", &value), R"(15)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a1}  +{var:a5}}", &value), R"(15)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a1}  +{var:a5}})", &value), R"(15)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}    +{var:a5}}", &value), R"(30)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}    +{var:a5}})", &value),
+             R"(30)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}* {var:a2}}", &value), R"(20)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}* {var:a2}})", &value), R"(20)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}*  {var:a4}}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}*  {var:a4}})", &value), R"(0)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a6}*      {var:a7}}", &value),
-             R"(120)", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a6}*      {var:a7}})", &value),
+             R"(120)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a7}+{var:a6} }", &value), R"(26)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a7}+{var:a6} })", &value), R"(26)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a1}+{var:a2}  }", &value), R"(6)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a1}+{var:a2}  })", &value), R"(6)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a8}=={var:a2}      }", &value),
-             R"(1)", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a8}=={var:a2}      })", &value),
+             R"(1)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a2}=={var:a8}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a2}=={var:a8}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math: {var:a5}!={var:a1} }", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math: {var:a5}!={var:a1} })", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:  {var:a2}!={var:a4}  }", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:  {var:a2}!={var:a4}  })", &value),
+             R"(1)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:    1=={var:a9}     }", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:    1=={var:a9}     })", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a9} == {var:a8}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a9} == {var:a8}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:a8}  ==  {var:a9}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:a8}  ==  {var:a9}})", &value),
+             R"(1)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1==          {var:a8}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:1==          {var:a8}})", &value),
+             R"(1)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:6-5         ==1}", &value), R"(1)",
-             "Render()");
-
-    EQ_VALUE(
-        Template::Render("{math:1          ==            {var:a8}}", &value),
-        R"(1)", "Render()");
+    EQ_VALUE(Template::Render(R"({math:6-5         ==1})", &value), R"(1)",
+             R"(Render())");
 
     EQ_VALUE(
-        Template::Render("{math:     0     !=    ({var:a3})        }", &value),
-        R"(0)", "Render()");
+        Template::Render(R"({math:1          ==            {var:a8}})", &value),
+        R"(1)", R"(Render())");
+
+    EQ_VALUE(Template::Render(R"({math:     0     !=    ({var:a3})        })",
+                              &value),
+             R"(0)", R"(Render())");
 
     EQ_VALUE(
-        Template::Render("{math:{var:a3}       ==       null     }", &value),
-        R"(1)", "Render()");
+        Template::Render(R"({math:{var:a3}       ==       null     })", &value),
+        R"(1)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:eq}}", &value), R"(10)", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:eq}})", &value), R"(10)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:10==(8+1+{var:a8})}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:10==(8+1+{var:a8})})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:eq}==9+1}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:eq}==9+1})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:(5*2)=={var:eq}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:(5*2)=={var:eq}})", &value), R"(1)",
+             R"(Render())");
 
     //////////////
     value.Reset();
@@ -1476,111 +1547,113 @@ static int TestMathTag1() {
     value += true;
     value += nullptr;
     value += false;
-    value += "10";
-    value += "20";
+    value += R"(10)";
+    value += R"(20)";
     value += 6;
     value += 1;
-    value += "1";
-    value += "Qentem";
+    value += R"(1)";
+    value += R"(Qentem)";
 
-    EQ_VALUE(Template::Render("{math:{var:0}+8}", &value), R"(13)", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}+8})", &value), R"(13)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:6}+8}", &value), R"(14)", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:6}+8})", &value), R"(14)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:6}+{var:0}}", &value), R"(11)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:6}+{var:0}})", &value), R"(11)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:4}+{var:0}}", &value), R"(15)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:4}+{var:0}})", &value), R"(15)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}+{var:4}}", &value), R"(15)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}+{var:4}})", &value), R"(15)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:5}+{var:4}}", &value), R"(30)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:5}+{var:4}})", &value), R"(30)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:5}*{var:1}}", &value), R"(20)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:5}*{var:1}})", &value), R"(20)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:5}*{var:3}}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:5}*{var:3}})", &value), R"(0)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:5}*{var:6}}", &value), R"(120)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:5}*{var:6}})", &value), R"(120)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:6}+{var:5}}", &value), R"(26)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:6}+{var:5}})", &value), R"(26)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}+{var:1}}", &value), R"(6)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}+{var:1}})", &value), R"(6)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:7}=={var:1}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:7}=={var:1}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}=={var:7}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}=={var:7}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:4}!={var:0}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:4}!={var:0}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}!={var:3}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}!={var:3}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:({var:1})==({var:8})}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:({var:1})==({var:8})})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("-{math:{var:8}=={var:7}}", &value), R"(-1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"(-{math:{var:8}=={var:7}})", &value), R"(-1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("--{math:{var:7}=={var:8}}", &value), R"(--1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"(--{math:{var:7}=={var:8}})", &value), R"(--1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("---{math:1=={var:7}}", &value), R"(---1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"(---{math:1=={var:7}})", &value), R"(---1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1==({var:8})}-", &value), R"(1-)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:1==({var:8})}-)", &value), R"(1-)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:6-5==({var:7})}--", &value), R"(1--)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:6-5==({var:7})}--)", &value), R"(1--)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:0==({var:2})}---", &value), R"(1---)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:0==({var:2})}---)", &value), R"(1---)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("-{math:{var:2}!=null}-", &value), R"(-0-)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"(-{math:{var:2}!=null}-)", &value), R"(-0-)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("--{math:Qente=={var:9}}--", &value), R"(--0--)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"(--{math:Qente=={var:9}}--)", &value),
+             R"(--0--)", R"(Render())");
 
-    EQ_VALUE(Template::Render("---{math:Qente !={var:9}}---", &value),
-             R"(---1---)", "Render()");
+    EQ_VALUE(Template::Render(R"(---{math:Qente !={var:9}}---)", &value),
+             R"(---1---)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:  Qentem   =={var:9}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:  Qentem   =={var:9}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:  Qentem!={var:9}}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:  Qentem!={var:9}})", &value), R"(0)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:9}   ==    Qente}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:9}   ==    Qente})", &value),
+             R"(0)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:9} !=    Qente    }", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:9} !=    Qente    })", &value),
+             R"(1)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:  {var:9}   ==Qentem}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:  {var:9}   ==Qentem})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math: {var:9} !=Qentem}", &value), R"(0)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math: {var:9} !=Qentem})", &value), R"(0)",
+             R"(Render())");
 
     /////////
 
-    EQ_VALUE(Template::Render("{math: true == {var:1}}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math: true == {var:1}})", &value), R"(1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math: {var:1} == true}", &value), R"(1)",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math: {var:1} == true})", &value), R"(1)",
+             R"(Render())");
 
     END_SUB_TEST;
 }
@@ -1592,141 +1665,152 @@ static int TestMathTag2() {
     value[1] = HArray<Value<char>, char>();
     value[2] = 5;
 
-    EQ_VALUE(Template::Render("{math:{var:0}+8}", &value), "{math:{var:0}+8}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}+8})", &value),
+             R"({math:{var:0}+8})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}+8}", &value),
-             R"({math:{var:1}+8})", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}+8})", &value),
+             R"({math:{var:1}+8})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}+{var:0}}", &value),
-             R"({math:{var:2}+{var:0}})", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2}+{var:0}})", &value),
+             R"({math:{var:2}+{var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}+{var:0}}", &value),
-             R"({math:{var:2}+{var:0}})", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2}+{var:0}})", &value),
+             R"({math:{var:2}+{var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}+{var:1}}", &value),
-             "{math:{var:0}+{var:1}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}+{var:1}})", &value),
+             R"({math:{var:0}+{var:1}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}+{var:2}}", &value),
-             "{math:{var:1}+{var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}+{var:2}})", &value),
+             R"({math:{var:1}+{var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}*{var:1}}", &value),
-             "{math:{var:2}*{var:1}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2}*{var:1}})", &value),
+             R"({math:{var:2}*{var:1}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}*{var:1}}", &value),
-             "{math:{var:0}*{var:1}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}*{var:1}})", &value),
+             R"({math:{var:0}*{var:1}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}*{var:2}}", &value),
-             "{math:{var:0}*{var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}*{var:2}})", &value),
+             R"({math:{var:0}*{var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}+{var:0}}", &value),
-             "{math:{var:2}+{var:0}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2}+{var:0}})", &value),
+             R"({math:{var:2}+{var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}+{var:2}}", &value),
-             "{math:{var:1}+{var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}+{var:2}})", &value),
+             R"({math:{var:1}+{var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}=={var:1}}", &value),
-             "{math:{var:0}=={var:1}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}=={var:1}})", &value),
+             R"({math:{var:0}=={var:1}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}=={var:0}}", &value),
-             "{math:{var:1}=={var:0}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}=={var:0}})", &value),
+             R"({math:{var:1}=={var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}!={var:2}}", &value),
-             "{math:{var:0}!={var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}!={var:2}})", &value),
+             R"({math:{var:0}!={var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}!={var:0}}", &value),
-             "{math:{var:2}!={var:0}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2}!={var:0}})", &value),
+             R"({math:{var:2}!={var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}=={var:2}}", &value),
-             "{math:{var:1}=={var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}=={var:2}})", &value),
+             R"({math:{var:1}=={var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:8}=={var:7}}", &value),
-             "{math:{var:8}=={var:7}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:8}=={var:7}})", &value),
+             R"({math:{var:8}=={var:7}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:7}=={var:2}}", &value),
-             "{math:{var:7}=={var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:7}=={var:2}})", &value),
+             R"({math:{var:7}=={var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1=={var:7}}", &value), "{math:1=={var:7}}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:1=={var:7}})", &value),
+             R"({math:1=={var:7}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:(6-5)=={var:8}}", &value),
-             "{math:(6-5)=={var:8}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:(6-5)=={var:8}})", &value),
+             R"({math:(6-5)=={var:8}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:(6-5)=={var:0}}", &value),
-             "{math:(6-5)=={var:0}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:(6-5)=={var:0}})", &value),
+             R"({math:(6-5)=={var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}=={var:8}}", &value),
-             "{math:{var:0}=={var:8}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}=={var:8}})", &value),
+             R"({math:{var:0}=={var:8}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:0}=={var:0}}", &value),
-             "{math:{var:0}=={var:0}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:0}=={var:0}})", &value),
+             R"({math:{var:0}=={var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:0=={var:1}}", &value), "{math:0=={var:1}}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:0=={var:1}})", &value),
+             R"({math:0=={var:1}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:1}!=0}", &value), "{math:{var:1}!=0}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:1}!=0})", &value),
+             R"({math:{var:1}!=0})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:W={var:0}}", &value), "{math:W={var:0}}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:W={var:0}})", &value),
+             R"({math:W={var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:W=={var:0}}", &value), "{math:W=={var:0}}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:W=={var:0}})", &value),
+             R"({math:W=={var:0}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}==c}", &value), "{math:{var:2}==c}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2}==c})", &value),
+             R"({math:{var:2}==c})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:abc=={var:2}}", &value),
-             "{math:abc=={var:2}}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:abc=={var:2}})", &value),
+             R"({math:abc=={var:2}})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:sds}", &value), "{math:sds}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:sds})", &value), R"({math:sds})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1", &value), "{math:1", "Render()");
+    EQ_VALUE(Template::Render(R"({math:1)", &value), R"({math:1)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("math:1}", &value), "math:1}", "Render()");
+    EQ_VALUE(Template::Render(R"(math:1})", &value), R"(math:1})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:{var:2}", &value), "{math:5", "Render()");
+    EQ_VALUE(Template::Render(R"({math:{var:2})", &value), R"({math:5)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{{math:{var:2}+5}", &value), "{10", "Render()");
+    EQ_VALUE(Template::Render(R"({{math:{var:2}+5})", &value), R"({10)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{m{var:2}}", &value), "{m5}", "Render()");
+    EQ_VALUE(Template::Render(R"({m{var:2}})", &value), R"({m5})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{ma{var:2}}", &value), "{ma5}", "Render()");
+    EQ_VALUE(Template::Render(R"({ma{var:2}})", &value), R"({ma5})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{mat{var:2}}", &value), "{mat5}", "Render()");
+    EQ_VALUE(Template::Render(R"({mat{var:2}})", &value), R"({mat5})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math{var:2}}", &value), "{math5}", "Render()");
+    EQ_VALUE(Template::Render(R"({math{var:2}})", &value), R"({math5})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math {var:2}}", &value), "{math 5}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math {var:2}})", &value), R"({math 5})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:}", &value), "{math:}", "Render()");
+    EQ_VALUE(Template::Render(R"({math:})", &value), R"({math:})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math-{var:2}}{math:{var:2}+5}", &value),
-             "{math-5}10", "Render()");
+    EQ_VALUE(Template::Render(R"({math-{var:2}}{math:{var:2}+5})", &value),
+             R"({math-5}10)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math-4}{math:{var:2}+5}", &value), "{math-4}10",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math-4}{math:{var:2}+5})", &value),
+             R"({math-4}10)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math-4} {math:{var:2}+5}", &value),
-             "{math-4} 10", "Render()");
+    EQ_VALUE(Template::Render(R"({math-4} {math:{var:2}+5})", &value),
+             R"({math-4} 10)", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:4", &value), "{math:4", "Render()");
+    EQ_VALUE(Template::Render(R"({math:4)", &value), R"({math:4)",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:4    ", &value), "{math:4    ",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:4    )", &value), R"({math:4    )",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:A==1+1}", &value), "{math:A==1+1}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:A==1+1})", &value), R"({math:A==1+1})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:(A)!=1+1}", &value), "{math:(A)!=1+1}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:(A)!=1+1})", &value),
+             R"({math:(A)!=1+1})", R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1+1==A}", &value), "{math:1+1==A}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:1+1==A})", &value), R"({math:1+1==A})",
+             R"(Render())");
 
-    EQ_VALUE(Template::Render("{math:1+1!=(A)}", &value), "{math:1+1!=(A)}",
-             "Render()");
+    EQ_VALUE(Template::Render(R"({math:1+1!=(A)})", &value),
+             R"({math:1+1!=(A)})", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -1741,260 +1825,262 @@ static int TestInlineIfTag() {
     value += true;
     value += false;
     value += nullptr;
-    value += "ABC";
+    value += R"(ABC)";
     value += Array<Value<char>>();
 
     content = R"({if case="0" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="-1" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="0.1" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="1" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     ////
 
     content = R"({if case="0" true="T"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({if case="-1" true="T"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({if case="0.1" true="T"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="1" true="T"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     ///
 
     content = R"({if case="0" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="-1" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="0.1" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({if case="1" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     /////
 
     content = R"({if case="{var:0}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="{var:2}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="{raw:4}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="{var:5}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "F", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(F)", R"(Render())");
 
     content = R"({if case="{var:6}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({if case="fas" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({if case="{var:7}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({if case="{var:20}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     ////
     content = R"({if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="{var:3}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="{var:6}==ABC" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     /////////////////
 
     content = R"({if case=" {var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="{var:1} " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case=" {var:1} " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="  {var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="{var:1}  " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="  {var:1}  " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="      {var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="{var:1}          " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="    {var:1}        " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
     ////
 
     content = R"(-{if case=" {var:1} " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "-T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-T)", R"(Render())");
 
     content = R"({if case=" {var:1} " true="T" false="F"}-)";
-    EQ_VALUE(Template::Render(content, &value), "T-", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T-)", R"(Render())");
 
     content = R"(-{if case=" {var:1} " true="T" false="F"}-)";
-    EQ_VALUE(Template::Render(content, &value), "-T-", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-T-)", R"(Render())");
 
     content = R"(--{if case=" {var:1} " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "--T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(--T)", R"(Render())");
 
     content = R"({if case=" {var:1} " true="T" false="F"}--)";
-    EQ_VALUE(Template::Render(content, &value), "T--", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T--)", R"(Render())");
 
     content = R"(--{if case=" {var:1} " true="T" false="F"}--)";
-    EQ_VALUE(Template::Render(content, &value), "--T--", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(--T--)", R"(Render())");
 
     content = R"(---{if case=" {var:1} " true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "---T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(---T)", R"(Render())");
 
     content = R"({if case=" {var:1} " true="T" false="F"}---)";
-    EQ_VALUE(Template::Render(content, &value), "T---", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T---)", R"(Render())");
 
     content = R"(---{if case=" {var:1} " true="T" false="F"}---)";
-    EQ_VALUE(Template::Render(content, &value), "---T---", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(---T---)", R"(Render())");
 
     content =
         R"({if case="1" true="T"}{if case="0" false="F"}{if case="1" true="T"})";
-    EQ_VALUE(Template::Render(content, &value), "TFT", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(TFT)", R"(Render())");
 
     ///////
 
     content =
         R"({if case="{var:7}" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(T)", R"(Render())");
 
     content = R"({if case="01" true="{var:3}" false="{var:4}"}--)";
-    EQ_VALUE(Template::Render(content, &value), "--", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(--)", R"(Render())");
 
     content = R"({if case="" true="c" false="d"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({i)";
-    EQ_VALUE(Template::Render(content, &value), "{i", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({i)", R"(Render())");
 
     content = R"({if)";
-    EQ_VALUE(Template::Render(content, &value), "{if", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({if)", R"(Render())");
 
     content = R"({if})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"({{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "{T", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({T)", R"(Render())");
 
     content = R"({i{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "{iT", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({iT)", R"(Render())");
 
     content = R"({if{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), "{ifT", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({ifT)", R"(Render())");
 
     content = R"({if case="{var:1}"                    put="F"})";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content =
         R"({if{if case="1" true="T" false="F"}}{if case="1" true="T" false="F"})";
 
-    EQ_VALUE(Template::Render(content, &value), R"(TT)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(TT)", R"(Render())");
 
     content =
         R"({if{if case="{raw:1}" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
-    EQ_VALUE(Template::Render(content, &value), R"({ifTT)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({ifTT)", R"(Render())");
 
     /////
     content = R"({if case="0" true="{var:3}" false="{var:4}"})";
-    EQ_VALUE(Template::Render(content, &value), "false", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false)", R"(Render())");
 
     content = R"({if case="1" true="{var:3}" false="{var:4}"})";
-    EQ_VALUE(Template::Render(content, &value), "true", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true)", R"(Render())");
 
     content = R"({if case="0" true="{raw:3}{raw:3}" false="{var:4}{var:4}"})";
-    EQ_VALUE(Template::Render(content, &value), "falsefalse", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(falsefalse)", R"(Render())");
 
     content =
         R"({if case="1000" true="{var:3}{var:3}" false="{var:4}{var:4}"})";
-    EQ_VALUE(Template::Render(content, &value), "truetrue", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(truetrue)", R"(Render())");
 
     content =
         R"({if case="0" true="{var:3}---{var:3}" false="{var:4}---{var:4}"})";
-    EQ_VALUE(Template::Render(content, &value), "false---false", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(false---false)",
+             R"(Render())");
 
     content =
         R"({if case="1" true="{var:3}---{var:3}" false="{var:4}---{var:4}"})";
-    EQ_VALUE(Template::Render(content, &value), "true---true", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(true---true)",
+             R"(Render())");
 
     content = R"({if case="0" true="{var:10}" false="{var:20}"})";
-    EQ_VALUE(Template::Render(content, &value), "{var:20}", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:20})", R"(Render())");
 
     content = R"({if case="1" true="{var:10}" false="{var:20}"})";
-    EQ_VALUE(Template::Render(content, &value), "{var:10}", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"({var:10})", R"(Render())");
 
     content = R"({if case="1" true="1" false="0")";
     EQ_VALUE(Template::Render(content, &value),
-             R"({if case="1" true="1" false="0")", "Render()");
+             R"({if case="1" true="1" false="0")", R"(Render())");
 
     content = R"({if case="1" true="1" false="0")";
     EQ_VALUE(Template::Render(content, &value),
-             R"({if case="1" true="1" false="0")", "Render()");
+             R"({if case="1" true="1" false="0")", R"(Render())");
 
     ///////
     Value<char> value2;
 
-    value2 += "&";
-    value2 += "\"";
+    value2 += R"(&)";
+    value2 += R"(")";
     value2 += 10;
     value2 += 5;
     value2 += 15;
 
     content = R"({if case="1" true="{var:0}" false="{var:1}"})";
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    EQ_VALUE(Template::Render(content, &value2), R"(&amp;)", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(&amp;)", R"(Render())");
 #else
-    EQ_VALUE(Template::Render(content, &value2), R"(&)", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(&)", R"(Render())");
 #endif
 
     content = R"({if case="1" true="{raw:0}" false="{raw:1}"})";
-    EQ_VALUE(Template::Render(content, &value2), R"(&)", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(&)", R"(Render())");
 
     content = R"({if case="0" true="{var:0}" false="{var:1}"})";
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    EQ_VALUE(Template::Render(content, &value2), R"(&quot;)", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(&quot;)", R"(Render())");
 #else
-    EQ_VALUE(Template::Render(content, &value2), R"(")", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(")", R"(Render())");
 #endif
 
     content = R"({if case="0" true="{raw:0}" false="{raw:1}"})";
-    EQ_VALUE(Template::Render(content, &value2), R"(")", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(")", R"(Render())");
 
     content =
         R"({if case="{var:2}+{var:3} == {var:4}" true="{math:{var:3}+{var:4}}" false="{math: {var:2}+{var:4}}"})";
-    EQ_VALUE(Template::Render(content, &value2), R"(20)", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(20)", R"(Render())");
 
     content =
         R"({if case=" {var:4}-{var:3} != {var:2} " true="{math: {var:3}+{var:4} } " false=" {math: {var:2}+{var:4} } "})";
-    EQ_VALUE(Template::Render(content, &value2), R"( 25 )", "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"( 25 )", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2005,111 +2091,112 @@ static int TestLoopTag1() {
 
     value += 100;
     value += -50;
-    value += "Qentem";
+    value += R"(Qentem)";
     value += true;
     value += false;
     value += nullptr;
     value += 3;
 
     content = R"(<loop repeat="10">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AAAAAAAAAA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AAAAAAAAAA)", R"(Render())");
 
     content = R"(<loop             repeat="1">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "A", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(A)", R"(Render())");
 
     content = R"(<loop<loop repeat="1">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "<loopA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(<loopA)", R"(Render())");
 
     content = R"(<loop repeat="3"         >ABC</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "ABCABCABC", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(ABCABCABC)", R"(Render())");
 
     content = R"(-<loop repeat="3">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "-AAA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-AAA)", R"(Render())");
 
     content = R"(<loop repeat="3">A</loop>-)";
-    EQ_VALUE(Template::Render(content, &value), "AAA-", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AAA-)", R"(Render())");
 
     content = R"(-<loop repeat="3">A</loop>-)";
-    EQ_VALUE(Template::Render(content, &value), "-AAA-", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(-AAA-)", R"(Render())");
 
     content = R"(--<loop repeat="3">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "--AAA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(--AAA)", R"(Render())");
 
     content = R"(<loop repeat="3">A</loop>--)";
-    EQ_VALUE(Template::Render(content, &value), "AAA--", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AAA--)", R"(Render())");
 
     content = R"(--<loop repeat="3">A</loop>--)";
-    EQ_VALUE(Template::Render(content, &value), "--AAA--", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(--AAA--)", R"(Render())");
 
     content = R"(---<loop repeat="3">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "---AAA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(---AAA)", R"(Render())");
 
     content = R"(<loop repeat="3">A</loop>---)";
-    EQ_VALUE(Template::Render(content, &value), "AAA---", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AAA---)", R"(Render())");
 
     content = R"(---<loop repeat="3">A</loop>---)";
-    EQ_VALUE(Template::Render(content, &value), "---AAA---", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(---AAA---)", R"(Render())");
 
     content = R"(<loop repeat="2">A</loop><loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AABBB", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AABBB)", R"(Render())");
 
     content = R"(<loop repeat="2">A</loop>-<loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AA-BBB", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA-BBB)", R"(Render())");
 
     content = R"(<loop repeat="2">A</loop>--<loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AA--BBB", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA--BBB)", R"(Render())");
 
     content = R"(<loop repeat="2">A</loop>---<loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AA---BBB", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA---BBB)", R"(Render())");
 
     content =
         R"(<loop repeat="2">A</loop>            <loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AA            BBB",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA            BBB)",
+             R"(Render())");
 
     ////
 
     content =
         R"(<loop repeat="4">CC</loop><loop repeat="2">A</loop><loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "CCCCCCCCAABBB", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(CCCCCCCCAABBB)",
+             R"(Render())");
 
     content =
         R"(<loop repeat="4">CC</loop>-<loop repeat="2">A</loop>-<loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "CCCCCCCC-AA-BBB", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(CCCCCCCC-AA-BBB)",
+             R"(Render())");
 
     content =
         R"(<loop repeat="4">CC</loop>--<loop repeat="2">A</loop>--<loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "CCCCCCCC--AA--BBB",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(CCCCCCCC--AA--BBB)",
+             R"(Render())");
 
     content =
         R"(<loop repeat="4">CC</loop>---<loop repeat="2">A</loop>---<loop repeat="3">B</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "CCCCCCCC---AA---BBB",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(CCCCCCCC---AA---BBB)",
+             R"(Render())");
 
     content =
         R"(<loop repeat="4">CC</loop>     <loop repeat="2">A</loop>            <loop repeat="3">B</loop>)";
     EQ_VALUE(Template::Render(content, &value),
-             "CCCCCCCC     AA            BBB", "Render()");
+             R"(CCCCCCCC     AA            BBB)", R"(Render())");
 
     ////////////////
 
     content = R"(<loop repeat="6"value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value),
-             "100, -50, Qentem, true, false, null, ", "Render()");
+             R"(100, -50, Qentem, true, false, null, )", R"(Render())");
 
     content =
         R"(<loop repeat="6" value="loop1-value">loop1-value, loop1-value </loop>)";
     EQ_VALUE(
         Template::Render(content, &value),
-        "100, 100 -50, -50 Qentem, Qentem true, true false, false null, null ",
-        "Render()");
+        R"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null )",
+        R"(Render())");
 
-    content =
-        R"(<loop index="2" repeat="4" value="loop1-value">loop1-value{if
+    content = R"(<loop index="2" repeat="4" value="loop1-value">loop1-value{if
         case="loop1-value != null" true=", "}</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "Qentem, true, false, null",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Qentem, true, false, null)",
+             R"(Render())");
 
     ////////////////
 
@@ -2118,19 +2205,18 @@ static int TestLoopTag1() {
     value += 1;
     value += 2;
 
-    content =
-        R"(<loop repeat="3" value="loop1-value"><loop
+    content = R"(<loop repeat="3" value="loop1-value"><loop
         repeat="2" value="loop2-value">(loop1-value: loop2-value) </loop></loop>)";
     EQ_VALUE(Template::Render(content, &value),
-             "(0: 0) (0: 1) (1: 0) (1: 1) (2: 0) (2: 1) ", "Render()");
+             R"((0: 0) (0: 1) (1: 0) (1: 1) (2: 0) (2: 1) )", R"(Render())");
 
     content =
         R"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
         repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
     EQ_VALUE(
         Template::Render(content, &value),
-        "(0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) ",
-        "Render()");
+        R"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )",
+        R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2143,122 +2229,123 @@ static int TestLoopTag2() {
 
     value1 += 100;
     value1 += -50;
-    value1 += "A";
+    value1 += R"(A)";
     value1 += true;
     value1 += false;
     value1 += nullptr;
 
-    value2["k-1"] = 4;
-    value2["k-2"] = 1.5;
-    value2["k-3"] = "ABC";
-    value2["k-4"] = true;
-    value2["k-5"] = false;
-    value2["k-6"] = nullptr;
+    value2[R"(k-1)"] = 4;
+    value2[R"(k-2)"] = 1.5;
+    value2[R"(k-3)"] = R"(ABC)";
+    value2[R"(k-4)"] = true;
+    value2[R"(k-5)"] = false;
+    value2[R"(k-6)"] = nullptr;
 
     //////////////////////
-    value3["arr1"] = value1;
+    value3[R"(arr1)"] = value1;
 
     content = R"(<loop value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value1),
-             "100, -50, A, true, false, null, ", "Render()");
+             R"(100, -50, A, true, false, null, )", R"(Render())");
 
     content = R"(<loop value="loop1-value" index="3">loop1-value, </loop>)";
-    EQ_VALUE(Template::Render(content, &value2), "true, false, null, ",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value2), R"(true, false, null, )",
+             R"(Render())");
 
     content = R"(<loop value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value2),
-             "4, 1.5, ABC, true, false, null, ", "Render()");
+             R"(4, 1.5, ABC, true, false, null, )", R"(Render())");
 
     content = R"(<loop set="arr1" value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "100, -50, A, true, false, null, ", "Render()");
+             R"(100, -50, A, true, false, null, )", R"(Render())");
 
-    value3["arr1"] = value2;
+    value3[R"(arr1)"] = value2;
 
     content = R"(<loop set="arr1" value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "4, 1.5, ABC, true, false, null, ", "Render()");
+             R"(4, 1.5, ABC, true, false, null, )", R"(Render())");
 
     //////////////////////
-    value3["arr1"] = value1;
+    value3[R"(arr1)"] = value1;
 
     content = R"(<loop value="loop1-value" >loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value1),
-             "100, -50, A, true, false, null, ", "Render()");
+             R"(100, -50, A, true, false, null, )", R"(Render())");
 
     content = R"(<loop value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value2),
-             "4, 1.5, ABC, true, false, null, ", "Render()");
+             R"(4, 1.5, ABC, true, false, null, )", R"(Render())");
 
     content = R"(<loop value="loop1-value"set="arr1">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "100, -50, A, true, false, null, ", "Render()");
+             R"(100, -50, A, true, false, null, )", R"(Render())");
 
-    value3["arr1"] = value2;
+    value3[R"(arr1)"] = value2;
 
     content = R"(<loop set="arr1" value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "4, 1.5, ABC, true, false, null, ", "Render()");
+             R"(4, 1.5, ABC, true, false, null, )", R"(Render())");
 
     //////////////////////
     value3.Reset();
-    value3["arr1"]["arr2"]["arr3"] = value1;
+    value3[R"(arr1)"][R"(arr2)"][R"(arr3)"] = value1;
 
     content =
         R"(<loop set="arr1[arr2][arr3]" value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "100, -50, A, true, false, null, ", "Render()");
+             R"(100, -50, A, true, false, null, )", R"(Render())");
 
     value3.Reset();
     value3[0][0][0] = value2;
 
     content = R"(<loop set="0[0][0]"value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "4, 1.5, ABC, true, false, null, ", "Render()");
+             R"(4, 1.5, ABC, true, false, null, )", R"(Render())");
 
     value3.Reset();
-    value3["k1"][0]["k3"] = value1;
+    value3[R"(k1)"][0][R"(k3)"] = value1;
 
     content =
         R"(<loop value="loop1-value" set="k1[0][k3]">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
-             "100, -50, A, true, false, null, ", "Render()");
+             R"(100, -50, A, true, false, null, )", R"(Render())");
 
     value3.Reset();
-    value3[0]["k2"][0] = value2;
+    value3[0][R"(k2)"][0] = value2;
 
     content =
         R"(<loop set="0[k2][0]"key="loop1-key"value="loop1-value">loop1-value, loop1-value, </loop>)";
     EQ_VALUE(
         Template::Render(content, &value3),
         R"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )",
-        "Render()");
+        R"(Render())");
 
     value3 = JSON::Parse(R"({"group":[[10],[20],[30]]})");
 
     content =
         R"(<loop set="group" value="_Val1"><loop set="_Val1" value="_Val2">_Val2</loop></loop>)";
-    EQ_VALUE(Template::Render(content, &value3), "102030", "Render()");
+    EQ_VALUE(Template::Render(content, &value3), R"(102030)", R"(Render())");
 
     value3 = JSON::Parse(R"({"group":[1,2,3,4]})");
 
     content = R"(<loop set="group" value="_Val" repeat="1">_Val</loop>)";
-    EQ_VALUE(Template::Render(content, &value3), "1", "Render()");
+    EQ_VALUE(Template::Render(content, &value3), R"(1)", R"(Render())");
 
     content = R"(<loop set="group" value="_Val" index="3">_Val</loop>)";
-    EQ_VALUE(Template::Render(content, &value3), "4", "Render()");
+    EQ_VALUE(Template::Render(content, &value3), R"(4)", R"(Render())");
 
     content =
         R"(<loop index="2" repeat="1" set="group" value="_Val">_Val</loop>)";
-    EQ_VALUE(Template::Render(content, &value3), "3", "Render()");
+    EQ_VALUE(Template::Render(content, &value3), R"(3)", R"(Render())");
 
     value3  = JSON::Parse(R"({"numbers":[1,2,3,4,5,6,7,8]})");
     content = R"(A<loop set="numbers" value="t">t</loop>B)";
-    EQ_VALUE(Template::Render(content, &value3), "A12345678B", "Render()");
+    EQ_VALUE(Template::Render(content, &value3), R"(A12345678B)",
+             R"(Render())");
 
     content = R"(<loop set="numbers" value="t">t[0]</loop>)";
-    EQ_VALUE(Template::Render(content, &value3), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value3), R"()", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2268,90 +2355,91 @@ static int TestLoopTag3() {
     const char *content;
 
     content = R"(<loop></loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop>abcd</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<l</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "<l</loop>", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(<l</loop>)", R"(Render())");
 
     content = R"(<lo</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "<lo</loop>", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(<lo</loop>)", R"(Render())");
 
     content = R"(<loo</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "<loo</loop>", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(<loo</loop>)",
+             R"(Render())");
 
     content = R"(<loop></loop><loop repeat="2">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA)", R"(Render())");
 
     content = R"(<loop key="a">a</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop value="a">a</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop set="ss" value="a">a</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop set="" value="a">a</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="2" A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="OOO">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="{var:10}">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
-    value["in"] = Array<Value<char>>();
+    value[R"(in)"] = Array<Value<char>>();
 
     content = R"(<loop repeat="{var:in}">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="10" index="{var:in}">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="10" index="{var:in">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="10" index="{var:100}">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop repeat="10" index="O">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop value="v">v</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "in", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(in)", R"(Render())");
 
     value.Reset();
-    value["in"] = 2;
+    value[R"(in)"] = 2;
 
     content = R"(<loop repeat="{var:in}">A</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "AA", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(AA)", R"(Render())");
 
     /////
     value.Reset();
-    value["k1"] = 10;
-    value["k2"] = 20;
-    value["k3"] = 30;
+    value[R"(k1)"] = 10;
+    value[R"(k2)"] = 20;
+    value[R"(k3)"] = 30;
 
-    value["k2"].Reset();
+    value[R"(k2)"].Reset();
 
     content = R"(<loop value="v">v</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "1030", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1030)", R"(Render())");
 
     value.RemoveIndex(1);
 
     content = R"(<loop value="v">v)";
     EQ_VALUE(Template::Render(content, &value), R"(<loop value="v">v)",
-             "Render()");
+             R"(Render())");
 
     content = R"(<loop value="v">v     )";
     EQ_VALUE(Template::Render(content, &value), R"(<loop value="v">v     )",
-             "Render()");
+             R"(Render())");
 
     value.Reset();
     value += 10;
@@ -2361,7 +2449,7 @@ static int TestLoopTag3() {
     value.RemoveIndex(1);
 
     content = R"(<loop value="v">v</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "1030", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1030)", R"(Render())");
 
     value = JSON::Parse(R"(
 {
@@ -2386,24 +2474,24 @@ static int TestLoopTag3() {
 
     content =
         R"(<loop set="object" value="item">item[var1]item[var2]item[var3] item[var4]</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "value1value2value3 value4",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(value1value2value3 value4)",
+             R"(Render())");
 
     content =
         R"(<loop set="array" value="item"> item[0] item[1] item[2] item[3] </loop>)";
     EQ_VALUE(Template::Render(content, &value),
-             " value10 value20 value30 value40 ", "Render()");
+             R"( value10 value20 value30 value40 )", R"(Render())");
 
     content =
         R"(<loop set="object" value="item">item[var11]item[var22]item[var33] item[var44]</loop>)";
-    EQ_VALUE(Template::Render(content, &value), " ", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( )", R"(Render())");
 
     content =
         R"(<loop set="array" value="item">item[var11]item[var22]item[var33] item[var44]</loop>)";
-    EQ_VALUE(Template::Render(content, &value), " ", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"( )", R"(Render())");
 
     content = R"(<loop repeat="1"><l</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "<l", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(<l)", R"(Render())");
 
     value = JSON::Parse(R"(
 {
@@ -2423,8 +2511,8 @@ static int TestLoopTag3() {
     )");
 
     content = R"(<loop set="2020">{var:name}</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "some_valsome_valsome_val",
-             "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(some_valsome_valsome_val)",
+             R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2443,10 +2531,10 @@ static int TestLoopTag4() {
 
     content += R"(<loop repeat="1">)";
     for (unsigned int i = 0; i < size_4; i++) {
-        content += "{var:";
+        content += R"({var:)";
         str = Digit<char>::NumberToString(i);
         content += str;
-        content += "}";
+        content += R"(})";
 
         output += str;
     }
@@ -2454,7 +2542,7 @@ static int TestLoopTag4() {
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     //////////////////////
 
@@ -2463,14 +2551,14 @@ static int TestLoopTag4() {
 
     content += R"(<loop value="loop1-value">A loop1-value B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
-        output += "A ";
+        output += R"(A )";
         Digit<char>::NumberToStringStream(output, i);
-        output += " B";
+        output += R"( B)";
     }
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2547,36 +2635,36 @@ static int TestLoopTag5() {
     content =
         R"(<loop value="val1_" group="year111" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">val3_</loop></loop></loop>)";
 
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content =
         R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">val3_</loop></loop></loop>)";
 
     EQ_VALUE(Template::Render(content, &value),
-             "q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300",
-             "Render()");
+             R"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)",
+             R"(Render())");
 
     content =
         R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_" group="quarter" sort="ascend"><loop set="val2_" value="val3_"><loop set="val3_" value="val4_">val4_</loop></loop></loop></loop>)";
 
     EQ_VALUE(Template::Render(content, &value),
-             "1400145014501100112512002300120023002300", "Render()");
+             R"(1400145014501100112512002300120023002300)", R"(Render())");
 
     content =
         R"(<loop value="val1_" group="year" sort="descend">-- val1_-<loop set="val1_" value="val2_" group="quarter" sort="ascend">val2_-<loop set="val2_" value="val3_" group="week" sort="ascend">val2_:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> val5_</loop></loop></loop></loop></loop>)";
 
     EQ_VALUE(
         Template::Render(content, &value),
-        "-- 2020-q1-1: 400 450 450-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2018-q2-1: 2002: 300-- 2017-q2-2: 300",
-        "Render()");
+        R"(-- 2020-q1-1: 400 450 450-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2018-q2-1: 2002: 300-- 2017-q2-2: 300)",
+        R"(Render())");
 
     content =
         R"(<loop value="val1_" group="year">-- val1_-<loop set="val1_" value="val2_" group="quarter">val2_-<loop set="val2_" value="val3_" group="week">val2_:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> val5_</loop></loop></loop></loop></loop>)";
 
     EQ_VALUE(
         Template::Render(content, &value),
-        "-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2017-q2-2: 300-- 2020-q1-1: 400 450 450-- 2018-q2-1: 2002: 300",
-        "Render()");
+        R"(-- 2019-q1-1: 100 125q2-1: 2002: 300-- 2017-q2-2: 300-- 2020-q1-1: 400 450 450-- 2018-q2-1: 2002: 300)",
+        R"(Render())");
 
     ////////////
 
@@ -2592,11 +2680,11 @@ static int TestLoopTag5() {
 
     content = R"(<loop value="val1_" sort="a">val1_</loop>)";
 
-    EQ_VALUE(Template::Render(content, &value), "1234567", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(1234567)", R"(Render())");
 
     content = R"(<loop value="val1_" sort="d">val1_</loop>)";
 
-    EQ_VALUE(Template::Render(content, &value), "7654321", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(7654321)", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2605,108 +2693,112 @@ static int TestIfTag1() {
     Value<char> value;
     const char *content;
 
-    value["name"] = "Qen";
-    value["t"]    = true;
-    value["f"]    = false;
-    value["n"]    = nullptr;
-    value["1"]    = 1;
-    value["one"]  = "1";
-    value["zero"] = 0;
+    value[R"(name)"] = R"(Qen)";
+    value[R"(t)"]    = true;
+    value[R"(f)"]    = false;
+    value[R"(n)"]    = nullptr;
+    value[R"(1)"]    = 1;
+    value[R"(one)"]  = R"(1)";
+    value[R"(zero)"] = 0;
 
     content = R"(<if case="1>0">{var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), "Qen", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Qen)", R"(Render())");
 
     content = R"(#<if case="{var:one}">{var:name}</if>#)";
-    EQ_VALUE(Template::Render(content, &value), "#Qen#", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(#Qen#)", R"(Render())");
 
     content = R"(##<if case="{var:zero}">{var:name}</if>##)";
-    EQ_VALUE(Template::Render(content, &value), "####", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(####)", R"(Render())");
 
     content = R"(<if case="{var:1}">{var:name}1<else />{var:name}2</if>)";
-    EQ_VALUE(Template::Render(content, &value), "Qen1", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Qen1)", R"(Render())");
 
     content = R"(<if case="{var:f}">{var:name}1<else />{var:name}2</if>)";
-    EQ_VALUE(Template::Render(content, &value), "Qen2", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Qen2)", R"(Render())");
 
     content = R"(#<if case="{var:t}">G<if case="1">oo</if>d</if>!#)";
-    EQ_VALUE(Template::Render(content, &value), "#Good!#", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(#Good!#)", R"(Render())");
 
     content =
         R"(###<if case="1">G<if case="1">o</if>o<if case="1">d!</if></if>###)";
-    EQ_VALUE(Template::Render(content, &value), "###Good!###", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(###Good!###)",
+             R"(Render())");
 
     content =
         R"(Be <if case="1">G<if case="1">oo<if case="1">d</if></if></if>!)";
-    EQ_VALUE(Template::Render(content, &value), "Be Good!", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Be Good!)", R"(Render())");
 
     content = R"(<if case="1">Good!<elseif case="0" />Bad!</if>)";
-    EQ_VALUE(Template::Render(content, &value), "Good!", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Good!)", R"(Render())");
 
     content = R"(<if case="{var:n}">Bad!<elseif case="1" />Good!</if>#)";
-    EQ_VALUE(Template::Render(content, &value), "Good!#", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Good!#)", R"(Render())");
 
     content = R"(<if case="{var:f}">Bad!<elseif case="0" />Very Bad!</if>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content =
         R"(#<if case="0">Bad!<elseif case="0" />Very Bad!<else />Very Good!</if>)";
-    EQ_VALUE(Template::Render(content, &value), "#Very Good!", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(#Very Good!)",
+             R"(Render())");
 
     content = R"(<if case="1">a<else />b</if>)";
-    EQ_VALUE(Template::Render(content, &value), "a", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content = R"(<if case="0">a<else />b</if>)";
-    EQ_VALUE(Template::Render(content, &value), "b", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(b)", R"(Render())");
 
     content = R"(<if case="0">a<else /><if case="1">b</if></if>)";
-    EQ_VALUE(Template::Render(content, &value), "b", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(b)", R"(Render())");
 
     content = R"(<if case="1">a<else /><if case="1">b</if></if>)";
-    EQ_VALUE(Template::Render(content, &value), "a", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content = R"(<if case="0">a<if case="1">b</if>c</if>Empty)";
-    EQ_VALUE(Template::Render(content, &value), "Empty", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(Empty)", R"(Render())");
 
     content = R"(<if case="1">a<else /><if case="1">b</if>c</if>===========)";
-    EQ_VALUE(Template::Render(content, &value), "a===========", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a===========)",
+             R"(Render())");
 
     content = R"(===========<if case="1">a<if case="1">b</if><else />c</if>)";
-    EQ_VALUE(Template::Render(content, &value), "===========ab", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(===========ab)",
+             R"(Render())");
 
     content =
         R"(<if case="1">a<elseif case="1" />b<elseif case="1" />c<else />d</if>)";
-    EQ_VALUE(Template::Render(content, &value), "a", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content =
         R"(<if case="0">a<elseif case="1" />b<elseif case="1" />c<else />d</if>)";
-    EQ_VALUE(Template::Render(content, &value), "b", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(b)", R"(Render())");
 
     content =
         R"(===========<if case="0">a<elseif case="0" />b<elseif case="1" />c<else />d</if>===========)";
-    EQ_VALUE(Template::Render(content, &value),
-             "===========c===========", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(===========c===========)",
+             R"(Render())");
 
     content =
         R"(<if case="0">a<elseif case="0" />b<elseif case="0" />c<else />d</if>)";
-    EQ_VALUE(Template::Render(content, &value), "d", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(d)", R"(Render())");
 
     content = R"(<if case="1">a<if case="0">b<elseif case="0"/>c</if></if>)";
-    EQ_VALUE(Template::Render(content, &value), "a", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content = R"(<if case="1">a<if case="1">b<elseif case="0"/>c</if></if>)";
-    EQ_VALUE(Template::Render(content, &value), "ab", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(ab)", R"(Render())");
 
     content =
         R"(<if case="1"><if case="1">b<elseif case="c"/>c</if>a<else />c</if>)";
-    EQ_VALUE(Template::Render(content, &value), "ba", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(ba)", R"(Render())");
 
     content =
         R"(<if case="0">a<else />c<if case="1">b<elseif case="0"/>c</if></if>)";
-    EQ_VALUE(Template::Render(content, &value), "cb", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(cb)", R"(Render())");
 
     content =
         R"(<if_case="1"><if case="0">Bad1!<elseif case="0" />Bad2!</if>a</if>)";
-    EQ_VALUE(Template::Render(content, &value), "a", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(a)", R"(Render())");
 
     content = R"(<if case="1">
                 <if case="0">Bad1!
@@ -2729,7 +2821,7 @@ static int TestIfTag1() {
                 </if>
             </if>)";
     EQ_VALUE(String<char>::Trim(Template::Render(content, &value).GetString()),
-             "a", "Render()");
+             R"(a)", R"(Render())");
 
     content = R"(<if case="0">a
                 <if case="1">Bad1!
@@ -2753,7 +2845,7 @@ static int TestIfTag1() {
                 </if>d
             </if>)";
     EQ_VALUE(String<char>::Trim(Template::Render(content, &value).GetString()),
-             "b", "Render()");
+             R"(b)", R"(Render())");
 
     content = R"(<if case="0">
                 <if case="1">Bad1!
@@ -2777,7 +2869,7 @@ static int TestIfTag1() {
                 </if>
             </if>)";
     EQ_VALUE(String<char>::Trim(Template::Render(content, &value).GetString()),
-             "c", "Render()");
+             R"(c)", R"(Render())");
 
     content = R"(<if case="0">a
                 <if case="1">Bad1!
@@ -2801,7 +2893,7 @@ static int TestIfTag1() {
                 </if>d
             </if>)";
     EQ_VALUE(String<char>::Trim(Template::Render(content, &value).GetString()),
-             "d", "Render()");
+             R"(d)", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2810,41 +2902,41 @@ static int TestIfTag2() {
     Value<char> value;
     const char *content;
 
-    value["name"] = "Qentem";
+    value[R"(name)"] = R"(Qentem)";
 
     content = R"(<if case="1">{var:name})";
     EQ_VALUE(Template::Render(content, &value), R"(<if case="1">Qentem)",
-             "Render()");
+             R"(Render())");
 
     content = R"(<if<if case="1">{var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), R"(<ifQentem)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(<ifQentem)", R"(Render())");
 
     content = R"(<if case="1"><if case="1">{var:name}</if>)";
     EQ_VALUE(Template::Render(content, &value), R"(<if case="1">Qentem)",
-             "Render()");
+             R"(Render())");
 
     content = R"(<if case="1"><if case="1"><if case="1">{var:name}</if></if>)";
     EQ_VALUE(Template::Render(content, &value), R"(<if case="1">Qentem)",
-             "Render()");
+             R"(Render())");
 
     content = R"(<if case="ABC">{var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<if>{var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<if case="0"><elseif />{var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<iw case="0">{var:name}</if>)";
     EQ_VALUE(Template::Render(content, &value), R"(<iw case="0">Qentem</if>)",
-             "Render()");
+             R"(Render())");
 
     content = R"(<if case="0"{var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<if case="0"><else {var:name}</if>)";
-    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     END_SUB_TEST;
 }
@@ -2862,16 +2954,16 @@ static int TestRender1() {
     }
 
     for (unsigned int i = 0; i < size_4; i++) {
-        content += "{var:";
+        content += R"({var:)";
         str = Digit<char>::NumberToString(i);
         content += str;
         output += str;
-        content += "}";
+        content += R"(})";
     }
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     content.Clear();
     output.Clear();
@@ -2879,19 +2971,19 @@ static int TestRender1() {
     unsigned int size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
-            content += "{var:";
+            content += R"({var:)";
             str = Digit<char>::NumberToString(i);
             content += str;
-            content += "}";
+            content += R"(})";
 
             output += str;
         } else {
             size += 8;
 
-            content += "{math: 1 + ";
+            content += R"({math: 1 + )";
             str = Digit<char>::NumberToString(i);
             content += str;
-            content += "}";
+            content += R"(})";
 
             Digit<char>::NumberToStringStream(output, 1U + i);
         }
@@ -2899,7 +2991,7 @@ static int TestRender1() {
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     content.Clear();
     output.Clear();
@@ -2907,10 +2999,10 @@ static int TestRender1() {
     size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
-            content += "{var:";
+            content += R"({var:)";
             str = Digit<char>::NumberToString(i);
             content += str;
-            content += "}";
+            content += R"(})";
 
             output += str;
         } else {
@@ -2922,13 +3014,13 @@ static int TestRender1() {
             Digit<char>::NumberToStringStream(content, 1U + i);
             content += R"(" true="yes"})";
 
-            output += "yes";
+            output += R"(yes)";
         }
     }
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     content.Clear();
     output.Clear();
@@ -2936,22 +3028,22 @@ static int TestRender1() {
     size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
-            content += "{var:";
+            content += R"({var:)";
             str = Digit<char>::NumberToString(i);
             content += str;
-            content += "}";
+            content += R"(})";
 
             output += str;
         } else {
             size += 8;
             content += R"(<loop repeat="1">A</loop>)";
-            output += "A";
+            output += R"(A)";
         }
     }
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     content.Clear();
     output.Clear();
@@ -2959,22 +3051,22 @@ static int TestRender1() {
     size = 8;
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
-            content += "{var:";
+            content += R"({var:)";
             str = Digit<char>::NumberToString(i);
             content += str;
-            content += "}";
+            content += R"(})";
 
             output += str;
         } else {
             size += 8;
             content += R"(<if case="1">A</if>)";
-            output += "A";
+            output += R"(A)";
         }
     }
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     content.Clear();
     output.Clear();
@@ -2987,17 +3079,17 @@ static int TestRender1() {
 
     content += R"(<loop repeat="1">)";
     for (unsigned int i = 0; i < size_2_1; i++) {
-        content += "{var:";
+        content += R"({var:)";
         str = Digit<char>::NumberToString(i);
         content += str;
         output += str;
-        content += "}";
+        content += R"(})";
     }
     content += R"(</loop>)";
 
     EQ_TRUE(
         (Template::Render(content.First(), content.Length(), &value) == output),
-        "Render()");
+        R"(Render())");
 
     END_SUB_TEST;
 }
@@ -3013,28 +3105,28 @@ static int TestRender2() {
     value[4] = 10;
 
     content = R"(<loop set="numbers" value="val_">val_</loop>)";
-    EQ_VALUE(Template::Render(content, &value), "", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content =
         R"(<loop value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
-    EQ_VALUE(Template::Render(content, &value), "15", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(15)", R"(Render())");
 
     content =
         R"(<loop value="loop1_val">{if case="loop1_val < 5", true="loop1_val"}</loop>)";
-    EQ_VALUE(Template::Render(content, &value), R"(012)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(012)", R"(Render())");
 
     content =
         R"(<loop value="loop1_val">{if case="loop1_val < 5", true="{var:4}"}</loop>)";
-    EQ_VALUE(Template::Render(content, &value), R"(101010)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(101010)", R"(Render())");
 
     content = R"(<loop value="loop1_val">loop1_val[]</loop>)";
-    EQ_VALUE(Template::Render(content, &value), R"()", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
 
     content = R"(<loop value="loop1_val">loop1_val[0 </loop>)";
     EQ_VALUE(
         Template::Render(content, &value),
         R"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
-        "Render()");
+        R"(Render())");
 
     value.Reset();
     value[0][0] += 1;
@@ -3042,13 +3134,13 @@ static int TestRender2() {
     value[0][0] += 3;
 
     content = R"(<loop value="loop1_val">loop1_val[0][2]</loop>)";
-    EQ_VALUE(Template::Render(content, &value), R"(3)", "Render()");
+    EQ_VALUE(Template::Render(content, &value), R"(3)", R"(Render())");
 
     END_SUB_TEST;
 }
 
 static int RunTemplateTests() {
-    STARTING_TEST("Template.hpp");
+    STARTING_TEST("Template.hpp (16-bit character)");
 
     START_TEST("Variable Tag Test 1", TestVariableTag1);
     START_TEST("Variable Tag Test 2", TestVariableTag2);
@@ -3069,7 +3161,7 @@ static int RunTemplateTests() {
     START_TEST("Loop Tag Test 2", TestLoopTag2);
     START_TEST("Loop Tag Test 3", TestLoopTag3);
     START_TEST("Loop Tag Test 4", TestLoopTag4);
-    START_TEST("Loop Tag Test 4", TestLoopTag5);
+    START_TEST("Loop Tag Test 5", TestLoopTag5);
 
     START_TEST("If Tag Test 1", TestIfTag1);
     START_TEST("If Tag Test 2", TestIfTag2);
@@ -3077,7 +3169,7 @@ static int RunTemplateTests() {
     START_TEST("Render Test 1", TestRender1);
     START_TEST("Render Test 2", TestRender2);
 
-    END_TEST("Template.hpp");
+    END_TEST("Template.hpp (8-bit character)");
 }
 
 } // namespace Test
