@@ -136,14 +136,16 @@ static int TestStringStream() {
     ss2.Reset();
 
     ss1 += "efg";
-    ss2 = StringStream<char>(static_cast<StringStream<char> &&>(ss2)); // Move
-    EQ_VALUE(ss1.Length(), 3, "Length");
-    EQ_TRUE((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)");
-    EQ_VALUE(ss1, "efg", "StringStream");
-    EQ_VALUE(ss2.Length(), 0, "Length");
-    EQ_VALUE(ss2.Capacity(), 0, "Capacity");
-    EQ_TO(ss2.First(), nullptr, "First()", "null");
+    ss2 = StringStream<char>(static_cast<StringStream<char> &&>(ss1)); // Move
+    EQ_VALUE(ss1.Length(), 0, "Length");
+    EQ_TRUE((ss1.Capacity() == 0), "(ss1.Capacity() = 0)");
+    EQ_TO(ss1.First(), nullptr, "First()", "null");
+    EQ_VALUE(ss2, "efg", "StringStream");
+    EQ_VALUE(ss2.Length(), 3, "Length");
+    EQ_TRUE((ss2.Capacity() >= 3), "(ss1.Capacity() >= 3)");
+    EQ_VALUE(ss2.First()[2], 'g', "First()[0]");
 
+    ss2.Reset();
     ss2.Insert("a", 1);
     EQ_VALUE(ss2.Length(), 1, "Length");
     EQ_TRUE((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)");
@@ -235,6 +237,35 @@ static int TestStringStream() {
     ss2 = ss1;
     EQ_VALUE(ss2.Length(), 5, "Length");
     EQ_VALUE(ss2, "abcde", "StringStream");
+
+    /////////
+
+    ss2.Reset();
+
+    ss1 = "abcdefgh";
+    EQ_VALUE(ss1, "abcdefgh", "StringStream");
+
+    ss2 << ss1;
+    EQ_VALUE(ss1, "abcdefgh", "StringStream");
+    EQ_VALUE(ss2, "abcdefgh", "StringStream");
+
+    String<char> n_str = String<char>("123456789");
+    ss1                = n_str;
+    EQ_VALUE(ss1, "123456789", "StringStream");
+
+    ss2.Reset();
+
+    ss2 << n_str;
+    EQ_VALUE(ss2, "123456789", "StringStream");
+
+    ///
+    std::stringstream std_ss;
+    std_ss << ss2;
+
+    std::string std_str = std_ss.str();
+
+    EQ_TRUE(StringUtils::IsEqual(std_str.c_str(), "123456789", 9),
+            "StringStream");
 
     END_SUB_TEST;
 }

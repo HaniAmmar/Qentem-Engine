@@ -341,6 +341,15 @@ static int TestString2() {
     EQ_VALUE(str2.Length(), 0, "Length");
     EQ_TO(str2.First(), nullptr, "First()", "null");
 
+    ///
+    ///
+    std::stringstream std_ss;
+    std_ss << str1;
+
+    std::string std_str = std_ss.str();
+
+    EQ_TRUE(StringUtils::IsEqual(std_str.c_str(), "123456", 6), "StringStream");
+
     END_SUB_TEST;
 }
 
