@@ -338,7 +338,7 @@ class ALE {
                     // (...) are evaluated to numbers.
 
                     ++offset;
-                    offset = Engine::SkipInnerPatterns(
+                    offset = Engine::SkipInnerPatterns<Char_T_>(
                         ALEOperations_T_::ParenthesStart,
                         ALEOperations_T_::ParenthesEnd, content, offset,
                         end_offset);
@@ -356,8 +356,9 @@ class ALE {
                     // {...} are evaluated to numbers or strings.
 
                     ++offset;
-                    offset = Engine::FindOne(ALEOperations_T_::BracketEnd,
-                                             content, offset, end_offset);
+                    offset =
+                        Engine::FindOne<Char_T_>(ALEOperations_T_::BracketEnd,
+                                                 content, offset, end_offset);
 
                     if (offset != 0) {
                         continue;

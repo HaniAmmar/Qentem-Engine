@@ -462,9 +462,10 @@ class Template_CV {
         while (true) {
             while (true) {
                 if ((bits == 0) && (offset < length)) {
-                    bits = Engine::FindTwo(TemplatePatterns_C_::InLinePrefix,
-                                           TemplatePatterns_C_::MultiLinePrefix,
-                                           content, m_offset, length);
+                    bits = Engine::FindTwo<Char_T_>(
+                        TemplatePatterns_C_::InLinePrefix,
+                        TemplatePatterns_C_::MultiLinePrefix, content, m_offset,
+                        length);
                 }
 
                 if (bits == 0) {
@@ -476,7 +477,7 @@ class Template_CV {
                 const SizeT next_offset = (index + m_offset);
 
                 if (bits == 0) {
-                    m_offset += QENTEM_SIMD_SIZE;
+                    m_offset += Platform::SMIDNextOffset<Char_T_, SizeT>();
                 }
 
                 if (next_offset < offset) {
@@ -503,7 +504,7 @@ class Template_CV {
                                 (content + current_offset + 1),
                                 (TemplatePatterns_C_::VariablePrefixLength -
                                  2))) {
-                            const SizeT end_offset = Engine::FindOne(
+                            const SizeT end_offset = Engine::FindOne<Char_T_>(
                                 TemplatePatterns_C_::InLineSuffix, content,
                                 (current_offset +
                                  TemplatePatterns_C_::VariablePrefixLength),
@@ -527,7 +528,7 @@ class Template_CV {
                                 (content + current_offset + 1),
                                 (TemplatePatterns_C_::RawVariablePrefixLength -
                                  2))) {
-                            const SizeT end_offset = Engine::FindOne(
+                            const SizeT end_offset = Engine::FindOne<Char_T_>(
                                 TemplatePatterns_C_::InLineSuffix, content,
                                 (current_offset +
                                  TemplatePatterns_C_::RawVariablePrefixLength),
@@ -549,12 +550,13 @@ class Template_CV {
                                 (TemplatePatterns_C_::GetMathPrefix() + 2),
                                 (content + current_offset + 1),
                                 (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                            SizeT end_offset = Engine::SkipInnerPatterns(
-                                TemplatePatterns_C_::InLinePrefix,
-                                TemplatePatterns_C_::InLineSuffix, content,
-                                (current_offset +
-                                 TemplatePatterns_C_::MathPrefixLength - 1),
-                                length);
+                            SizeT end_offset =
+                                Engine::SkipInnerPatterns<Char_T_>(
+                                    TemplatePatterns_C_::InLinePrefix,
+                                    TemplatePatterns_C_::InLineSuffix, content,
+                                    (current_offset +
+                                     TemplatePatterns_C_::MathPrefixLength - 1),
+                                    length);
 
                             if (end_offset != 0) {
                                 tags_cache +=
@@ -573,12 +575,14 @@ class Template_CV {
                                 (content + current_offset + 1),
                                 (TemplatePatterns_C_::InLineIfPrefixLength -
                                  2))) {
-                            SizeT end_offset = Engine::SkipInnerPatterns(
-                                TemplatePatterns_C_::InLinePrefix,
-                                TemplatePatterns_C_::InLineSuffix, content,
-                                (current_offset +
-                                 TemplatePatterns_C_::InLineIfPrefixLength - 1),
-                                length);
+                            SizeT end_offset =
+                                Engine::SkipInnerPatterns<Char_T_>(
+                                    TemplatePatterns_C_::InLinePrefix,
+                                    TemplatePatterns_C_::InLineSuffix, content,
+                                    (current_offset +
+                                     TemplatePatterns_C_::InLineIfPrefixLength -
+                                     1),
+                                    length);
 
                             if (end_offset != 0) {
                                 tags_cache += TagBit{TagType::InLineIf, offset,
@@ -599,7 +603,7 @@ class Template_CV {
                             (TemplatePatterns_C_::GetLoopPrefix() + 2),
                             (content + current_offset + 1),
                             (TemplatePatterns_C_::LoopPrefixLength - 2))) {
-                        SizeT end_offset = Engine::SkipInnerPatterns(
+                        SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::GetLoopPrefix(),
                             TemplatePatterns_C_::LoopPrefixLength,
                             TemplatePatterns_C_::GetLoopSuffix(),
@@ -621,7 +625,7 @@ class Template_CV {
                             (TemplatePatterns_C_::GetIfPrefix() + 2),
                             (content + current_offset + 1),
                             (TemplatePatterns_C_::IfPrefixLength - 2))) {
-                        SizeT end_offset = Engine::SkipInnerPatterns(
+                        SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::GetIfPrefix(),
                             TemplatePatterns_C_::IfPrefixLength,
                             TemplatePatterns_C_::GetIfSuffix(),
@@ -650,8 +654,8 @@ class Template_CV {
         SizeT offset = 0;
 
         while (true) {
-            offset = Engine::FindOne(TemplatePatterns_C_::InLinePrefix, content,
-                                     offset, length);
+            offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLinePrefix,
+                                              content, offset, length);
 
             if (offset == 0) {
                 break;
@@ -663,7 +667,7 @@ class Template_CV {
                             (TemplatePatterns_C_::GetVariablePrefix() + 2),
                             (content + offset + 1),
                             (TemplatePatterns_C_::VariablePrefixLength - 2))) {
-                        const SizeT end_offset = Engine::FindOne(
+                        const SizeT end_offset = Engine::FindOne<Char_T_>(
                             TemplatePatterns_C_::InLineSuffix, content,
                             (offset +
                              TemplatePatterns_C_::VariablePrefixLength),
@@ -686,7 +690,7 @@ class Template_CV {
                             (content + offset + 1),
                             (TemplatePatterns_C_::RawVariablePrefixLength -
                              2))) {
-                        const SizeT end_offset = Engine::FindOne(
+                        const SizeT end_offset = Engine::FindOne<Char_T_>(
                             TemplatePatterns_C_::InLineSuffix, content,
                             (offset +
                              TemplatePatterns_C_::RawVariablePrefixLength),
@@ -706,7 +710,7 @@ class Template_CV {
                             (TemplatePatterns_C_::GetMathPrefix() + 2),
                             (content + offset + 1),
                             (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                        SizeT end_offset = Engine::SkipInnerPatterns(
+                        SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::InLinePrefix,
                             TemplatePatterns_C_::InLineSuffix, content,
                             (offset + TemplatePatterns_C_::MathPrefixLength -
@@ -951,11 +955,11 @@ class Template_CV {
 
     SizeT getQuoted(const Char_T_ *content, SizeT &offset,
                     SizeT length) const noexcept {
-        offset = Engine::FindOne(TemplatePatterns_C_::QuoteChar, content,
-                                 offset, length);
+        offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::QuoteChar,
+                                          content, offset, length);
 
         if (offset != 0) {
-            const SizeT start_offset = Engine::FindOne(
+            const SizeT start_offset = Engine::FindOne<Char_T_>(
                 TemplatePatterns_C_::QuoteChar, content, offset, length);
 
             if (start_offset != 0) {
@@ -970,12 +974,13 @@ class Template_CV {
                                      const SizeT length) const noexcept {
         if (length > TemplatePatterns_C_::VariableFulllength) {
             SizeT offset = 0;
-            offset = Engine::Find(TemplatePatterns_C_::GetVariablePrefix(),
-                                  TemplatePatterns_C_::VariablePrefixLength,
-                                  content, offset, length);
+            offset =
+                Engine::Find<Char_T_>(TemplatePatterns_C_::GetVariablePrefix(),
+                                      TemplatePatterns_C_::VariablePrefixLength,
+                                      content, offset, length);
 
             if (offset != 0) {
-                const SizeT end_offset = Engine::FindOne(
+                const SizeT end_offset = Engine::FindOne<Char_T_>(
                     TemplatePatterns_C_::InLineSuffix, content, offset, length);
 
                 if (end_offset == 0) {
@@ -997,7 +1002,7 @@ class Template_CV {
     QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
                                              SizeT          length,
                                              LoopInfo_ *    loop_info) const {
-        const SizeT start_offset = Engine::FindOne(
+        const SizeT start_offset = Engine::FindOne<Char_T_>(
             TemplatePatterns_C_::MultiLineSuffix, content, SizeT(0), length);
 
         if (start_offset == 0) {
@@ -1107,8 +1112,9 @@ class Template_CV {
 
         if (loop_value != nullptr) {
             while (true) {
-                offset = Engine::Find(loop_value, loop_value_length, content,
-                                      previous_offset, length);
+                offset =
+                    Engine::Find<Char_T_>(loop_value, loop_value_length,
+                                          content, previous_offset, length);
 
                 if (offset == 0) {
                     break;
@@ -1372,7 +1378,7 @@ class Template_CV {
                 return;
             }
 
-            case_bit.ContentOffset = Engine::FindOne(
+            case_bit.ContentOffset = Engine::FindOne<Char_T_>(
                 TemplatePatterns_C_::MultiLineSuffix, content,
                 (case_bit.CaseOffset + case_bit.CaseLength + 1), length2);
 
@@ -1395,9 +1401,9 @@ class Template_CV {
             if_info->Cases += static_cast<IfCase_ &&>(case_bit);
 
             if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
-                else_offset =
-                    Engine::FindOne(TemplatePatterns_C_::MultiLineSuffix,
-                                    content, else_offset, length2);
+                else_offset = Engine::FindOne<Char_T_>(
+                    TemplatePatterns_C_::MultiLineSuffix, content, else_offset,
+                    length2);
 
                 if (else_offset == 0) {
                     return;
@@ -1422,16 +1428,16 @@ class Template_CV {
         SizeT else_offset = 0;
 
         while (true) {
-            else_offset = Engine::Find(TemplatePatterns_C_::GetElsePrefix(),
-                                       TemplatePatterns_C_::ElsePrefixLength,
-                                       content, offset, length);
+            else_offset = Engine::Find<Char_T_>(
+                TemplatePatterns_C_::GetElsePrefix(),
+                TemplatePatterns_C_::ElsePrefixLength, content, offset, length);
 
             if (else_offset == 0) {
                 // No <else.
                 break;
             }
 
-            const SizeT next_if = Engine::Find(
+            const SizeT next_if = Engine::Find<Char_T_>(
                 TemplatePatterns_C_::GetIfPrefix(),
                 TemplatePatterns_C_::IfPrefixLength, content, offset, length);
 
@@ -1440,9 +1446,9 @@ class Template_CV {
                 break;
             }
 
-            offset = Engine::Find(TemplatePatterns_C_::GetIfSuffix(),
-                                  TemplatePatterns_C_::IfSuffixLength, content,
-                                  next_if, length);
+            offset = Engine::Find<Char_T_>(TemplatePatterns_C_::GetIfSuffix(),
+                                           TemplatePatterns_C_::IfSuffixLength,
+                                           content, next_if, length);
 
             if (else_offset > offset) {
                 // <else came after the child if.
