@@ -167,6 +167,11 @@ class StringStream {
         return out;
     }
 
+    friend StringStream &operator<<(StringStream &out, const Char_T_ *str) {
+        out.insert(str, StringUtils::Count(str));
+        return out;
+    }
+
     inline bool operator==(const StringStream &ss) const noexcept {
         if (Length() != ss.Length()) {
             return false;
