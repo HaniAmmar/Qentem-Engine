@@ -73,9 +73,9 @@ static const char *GetStingOfType(ValueType type) {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) != (right)) {                                          \
-            TestHelper::PrintErrorMessage2(false, name,                        \
-                                           GetStingOfType(_tmp_left),          \
-                                           GetStingOfType(right));             \
+            TestHelper::PrintErrorMessage2(                                    \
+                false, name, GetStingOfType(_tmp_left), GetStingOfType(right), \
+                QENTEM_OUTPUT_STREAM);                                         \
             return 1;                                                          \
         }                                                                      \
     } while (false)

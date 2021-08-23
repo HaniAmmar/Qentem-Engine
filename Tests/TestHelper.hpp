@@ -22,14 +22,30 @@
 
 #include "Common.hpp"
 
+#ifndef QENTEM_OUTPUT_STREAM
 #include <iostream>
-#include <sstream>
+#define QENTEM_OUTPUT_STREAM std::wcout
+#endif
 
 #ifndef QENTEM_TESTHELPER_H_
 #define QENTEM_TESTHELPER_H_
 
 namespace Qentem {
 namespace Test {
+
+class EmptyStream {
+    template <typename Stream_T_, typename Value_T_>
+    friend Stream_T_ &operator<<(Stream_T_ &out, const Value_T_ &val) {
+        (void)val;
+        return out;
+    }
+
+    template <typename Stream_T_>
+    friend Stream_T_ &operator<<(Stream_T_ &out, const void *val) {
+        (void)val;
+        return out;
+    }
+};
 
 class TestHelper {
   public:
@@ -46,69 +62,63 @@ class TestHelper {
         return name;
     }
 
-    template <typename Char_T_, typename Value_T_>
+    template <typename Char_T_, typename Value_T_, typename Stream_T_>
     QENTEM_NOINLINE static void
     PrintErrorMessage1(bool equal, const Char_T_ *name, const Value_T_ &value,
-                       std::wostream &out = std::wcout) {
+                       Stream_T_ &out) {
         out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
-            << (equal ? " not " : " ") << "equal '" << value << "'\n"
-            << std::endl;
+            << (equal ? " not " : " ") << "equal '" << value << "'\n\n";
     }
 
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
+    template <typename Char_T_, typename Value1_T_, typename Value2_T_,
+              typename Stream_T_>
     QENTEM_NOINLINE static void
     PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
-                       const Value2_T_ &value2,
-                       std::wostream &  out = std::wcout) {
+                       const Value2_T_ &value2, Stream_T_ &out) {
         out << "\x1B[31mFailed\x1B[0m: " << TestGroupName<Char_T_>()
             << "\n At line :" << LineNumber() << ": '" << name << "' should"
             << (equal ? " not " : " ") << "equal '" << value2 << "'\n"
-            << "Returned Value: " << value1 << "\n"
-            << std::endl;
+            << "Returned Value: " << value1 << "\n\n";
     }
 
-    template <typename Char_T_>
+    template <typename Char_T_, typename Stream_T_>
     QENTEM_NOINLINE static void StartingTest(const Char_T_ *name,
-                                             std::wostream &out = std::wcout) {
-        out << "\x1B[36m" << name << "\x1B[0m"
-            << " Tests:" << std::endl;
+                                             Stream_T_ &    out) {
+        out << "\x1B[36m" << name << "\x1B[0m Tests:\n";
     }
 
-    template <typename Char_T_, typename FUNC_>
+    template <typename Char_T_, typename FUNC_, typename Stream_T_>
     QENTEM_NOINLINE static bool StartTest(const Char_T_ *name, FUNC_ func,
-                                          std::wostream &out = std::wcout) {
+                                          Stream_T_ &out) {
         TestGroupName<Char_T_>() = name;
 
         try {
             if (func() == 0) {
                 out << "\x1B[32mPass\x1B[0m: " << TestGroupName<Char_T_>()
-                    << std::endl;
+                    << "\n";
                 return true;
             }
 
         } catch (...) {
             out << "\x1B[31mFailed (throw)\x1B[0m: " << TestGroupName<Char_T_>()
-                << "\n after line :" << TestHelper::LineNumber() << '\n'
-                << std::endl;
+                << "\n after line :" << TestHelper::LineNumber() << "\n";
         }
 
         return false;
     }
 
-    template <typename Char_T_>
-    QENTEM_NOINLINE static void EndTest(const Char_T_ *name,
-                                        std::wostream &out = std::wcout) {
-        out << "\x1B[36m" << name << "\x1B[32m Passed all tests\x1B[0m\n"
-            << std::endl;
+    template <typename Char_T_, typename Stream_T_>
+    QENTEM_NOINLINE static void EndTest(const Char_T_ *name, Stream_T_ &out) {
+        out << "\x1B[36m" << name << "\x1B[32m Passed all tests\x1B[0m\n\n";
     }
 };
 
-#define STARTING_TEST(name) TestHelper::StartingTest(name)
+#define STARTING_TEST(name) TestHelper::StartingTest(name, QENTEM_OUTPUT_STREAM)
 
 #define START_TEST(name, func)                                                 \
     do {                                                                       \
-        if (!TestHelper::StartTest(name, func)) {                              \
+        if (!TestHelper::StartTest(name, func, QENTEM_OUTPUT_STREAM)) {        \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -118,7 +128,8 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) != (right)) {                                          \
-            TestHelper::PrintErrorMessage2(false, name, _tmp_left, value);     \
+            TestHelper::PrintErrorMessage2(false, name, _tmp_left, value,      \
+                                           QENTEM_OUTPUT_STREAM);              \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -128,7 +139,8 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) == (right)) {                                          \
-            TestHelper::PrintErrorMessage2(true, name, _tmp_left, value);      \
+            TestHelper::PrintErrorMessage2(true, name, _tmp_left, value,       \
+                                           QENTEM_OUTPUT_STREAM);              \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -138,7 +150,8 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) != (right)) {                                          \
-            TestHelper::PrintErrorMessage2(false, name, _tmp_left, right);     \
+            TestHelper::PrintErrorMessage2(false, name, _tmp_left, right,      \
+                                           QENTEM_OUTPUT_STREAM);              \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -148,7 +161,8 @@ class TestHelper {
         const auto &_tmp_left    = left;                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) == (right)) {                                          \
-            TestHelper::PrintErrorMessage2(true, name, _tmp_left, right);      \
+            TestHelper::PrintErrorMessage2(true, name, _tmp_left, right,       \
+                                           QENTEM_OUTPUT_STREAM);              \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -157,7 +171,8 @@ class TestHelper {
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if (!(condition)) {                                                    \
-            TestHelper::PrintErrorMessage1(false, name, "true");               \
+            TestHelper::PrintErrorMessage1(false, name, "true",                \
+                                           QENTEM_OUTPUT_STREAM);              \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -166,7 +181,8 @@ class TestHelper {
     do {                                                                       \
         TestHelper::LineNumber() = __LINE__;                                   \
         if (condition) {                                                       \
-            TestHelper::PrintErrorMessage1(true, name, "true");                \
+            TestHelper::PrintErrorMessage1(true, name, "true",                 \
+                                           QENTEM_OUTPUT_STREAM);              \
             return 1;                                                          \
         }                                                                      \
     } while (false)
@@ -175,7 +191,7 @@ class TestHelper {
 
 #define END_TEST(name)                                                         \
     do {                                                                       \
-        TestHelper::EndTest(name);                                             \
+        TestHelper::EndTest(name, QENTEM_OUTPUT_STREAM);                       \
         return 0;                                                              \
     } while (false)
 
@@ -184,9 +200,9 @@ static int TestThrow1_1() { return 1; }
 
 QENTEM_MAYBE_UNUSED
 static int TestThrow1() {
-    std::wstringstream ss;
+    EmptyStream es;
 
-    TestHelper::StartTest("Test Throw 1", TestThrow1_1, ss);
+    TestHelper::StartTest("Test Throw 1", TestThrow1_1, es);
     // EQ_VALUE(L"Test Throw 1", ss.str(), "Test Throw 1");
 
     END_SUB_TEST;
@@ -197,15 +213,15 @@ static int TestThrow2_2() { throw 1; }
 
 QENTEM_MAYBE_UNUSED
 static int TestThrow2() {
-    std::wstringstream ss;
+    EmptyStream es;
 
     int n = 0;
     int m = 1;
 
-    TestHelper::PrintErrorMessage1(false, "", n, ss);
-    TestHelper::PrintErrorMessage2(false, "", n, m, ss);
+    TestHelper::PrintErrorMessage1(false, "", n, es);
+    TestHelper::PrintErrorMessage2(false, "", n, m, es);
 
-    EQ_VALUE(TestHelper::StartTest("Test Throw 2", TestThrow2_2, ss), false,
+    EQ_VALUE(TestHelper::StartTest("Test Throw 2", TestThrow2_2, es), false,
              "Test Throw 2");
 
     END_SUB_TEST;

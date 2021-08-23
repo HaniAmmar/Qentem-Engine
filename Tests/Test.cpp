@@ -62,14 +62,14 @@ int RunTests() {
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
     if (failed == 0) {
-        std::wcout << "\x1B[32mAll good.\x1B[0m" << std::endl;
+        QENTEM_OUTPUT_STREAM << "\x1B[32mAll good.\x1B[0m\n";
         return 0;
     }
 
     total = (passed + failed);
 
-    std::wcout << "\x1B[31mNot good!\x1B[0m " << failed << " out of " << total
-               << " failed." << std::endl;
+    QENTEM_OUTPUT_STREAM << "\x1B[31mNot good!\x1B[0m " << failed << " out of "
+                         << total << " failed.\n";
 
     return 1;
 }
@@ -95,30 +95,32 @@ int main() {
     //     Qentem::Test::RunTemplateLTests();
     // }
 
+    QENTEM_OUTPUT_STREAM << "\x1B[36mConfiguration\x1B[0m:\n";
+
 #ifdef QENTEM_64BIT_ARCH
-    std::wcout << "Arch: 64BIT";
+    QENTEM_OUTPUT_STREAM << "Arch: 64BIT";
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    std::wcout << "\nTagged Pointers: On";
+    QENTEM_OUTPUT_STREAM << "\nTagged Pointers: On";
 #endif
 #endif
 
-    std::wcout << "\nEndianness: ";
+    QENTEM_OUTPUT_STREAM << "\nEndianness: ";
 
 #ifndef QENTEM_BIG_ENDIAN
-    std::wcout << "Little-endian";
+    QENTEM_OUTPUT_STREAM << "Little-endian";
 #else
-    std::wcout << "Big-endian";
+    QENTEM_OUTPUT_STREAM << "Big-endian";
 #endif
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-    std::wcout << "\nAVX2: On";
+    QENTEM_OUTPUT_STREAM << "\nAVX2: On";
 #endif
 #if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-    std::wcout << "\nSSE2: On";
+    QENTEM_OUTPUT_STREAM << "\nSSE2: On";
 #endif
 
-    std::wcout << "\nSize of SizeT: " << sizeof(Qentem::SizeT) << '\n';
-    std::wcout << std::endl;
+    QENTEM_OUTPUT_STREAM << "\nSize of SizeT: " << sizeof(Qentem::SizeT)
+                         << "\n\n";
 
     return RunTests();
 }
