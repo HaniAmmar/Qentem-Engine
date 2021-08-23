@@ -34,7 +34,7 @@ using VStringStream = StringStream<char>;
 using VHArray       = HArray<ValueC, char>;
 using VArray        = Array<ValueC>;
 
-static const char *TestGetTypeSting(ValueType type) {
+static const char *GetStingOfType(ValueType type) {
     switch (type) {
         case ValueType::Object:
             return "Object";
@@ -74,11 +74,41 @@ static const char *TestGetTypeSting(ValueType type) {
         TestHelper::LineNumber() = __LINE__;                                   \
         if ((_tmp_left) != (right)) {                                          \
             TestHelper::PrintErrorMessage2(false, name,                        \
-                                           TestGetTypeSting(_tmp_left),        \
-                                           TestGetTypeSting(right));           \
+                                           GetStingOfType(_tmp_left),          \
+                                           GetStingOfType(right));             \
             return 1;                                                          \
         }                                                                      \
     } while (false)
+
+static int TestGetStingOfType() {
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Undefined),
+                                 "Undefined", 9),
+            "Undefined");
+    EQ_TRUE(
+        StringUtils::IsEqual(GetStingOfType(ValueType::Object), "Object", 6),
+        "Object");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Array), "Array", 5),
+            "Array");
+    EQ_TRUE(
+        StringUtils::IsEqual(GetStingOfType(ValueType::String), "String", 6),
+        "String");
+    EQ_TRUE(
+        StringUtils::IsEqual(GetStingOfType(ValueType::UInt64), "UInt64", 6),
+        "UInt64");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Int64), "Int64", 5),
+            "Int64");
+    EQ_TRUE(
+        StringUtils::IsEqual(GetStingOfType(ValueType::Double), "Double", 6),
+        "Double");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::True), "True", 4),
+            "True");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::False), "False", 5),
+            "False");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Null), "Null", 4),
+            "Null");
+
+    END_SUB_TEST;
+}
 
 static int TestEmptyValue() {
     ValueC value1;
@@ -6229,6 +6259,8 @@ static int TestGroupValue() {
 
 static int RunValueTests() {
     STARTING_TEST("Value.hpp");
+
+    START_TEST("GetType Sting Test", TestGetStingOfType);
 
     START_TEST("Empty Value Test", TestEmptyValue);
     START_TEST("True Value Test", TestTrueValue);
