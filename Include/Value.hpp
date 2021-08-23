@@ -480,12 +480,12 @@ class Value {
 
     Value &operator[](const Char_T_ *key) {
         if (IsObject()) {
-            return (object_)[key];
+            return object_[key];
         }
 
         if (IsUndefined()) {
             initObject();
-            return (object_)[key];
+            return object_[key];
         }
 
         throw 3;
@@ -493,12 +493,12 @@ class Value {
 
     Value &operator[](VString &&key) {
         if (IsObject()) {
-            return (object_)[static_cast<VString &&>(key)];
+            return object_[static_cast<VString &&>(key)];
         }
 
         if (IsUndefined()) {
             initObject();
-            return (object_)[static_cast<VString &&>(key)];
+            return object_[static_cast<VString &&>(key)];
         }
 
         throw 3;
@@ -506,12 +506,12 @@ class Value {
 
     Value &operator[](const VString &key) {
         if (IsObject()) {
-            return (object_)[key];
+            return object_[key];
         }
 
         if (IsUndefined()) {
             initObject();
-            return (object_)[key];
+            return object_[key];
         }
 
         throw 3;
@@ -1311,16 +1311,14 @@ class Value {
 
     bool GroupBy(Value &groupedValue, const Char_T_ *key,
                  const SizeT length) const noexcept {
-        using V_item_       = HAItem<Value, Char_T_>;
-        Value * current_val = nullptr;
-        Value   new_sub_val;
+        using V_item_ = HAItem<Value, Char_T_>;
+        VObject new_sub_obj;
         VString grouped_key;
         SizeT   grouped_key_index;
 
         if (IsArray()) {
             groupedValue.Reset();
             groupedValue.initObject();
-            new_sub_val.initObject();
 
             const Value *_item = array_.First();
 
@@ -1344,23 +1342,16 @@ class Value {
                     }
 
                     if (count != grouped_key_index) {
-                        new_sub_val[obj_item->Key] = obj_item->Value;
-                    } else {
-                        if (!obj_item->Value.SetString(grouped_key)) {
-                            return false;
-                        }
-
-                        current_val = &(
-                            groupedValue[static_cast<VString &&>(grouped_key)]);
+                        new_sub_obj[obj_item->Key] = obj_item->Value;
+                    } else if (!obj_item->Value.SetString(grouped_key)) {
+                        return false;
                     }
 
                     ++count;
                 }
 
-                if (current_val != nullptr) {
-                    (*current_val) +=
-                        static_cast<VObject &&>(new_sub_val.object_);
-                }
+                groupedValue.object_[static_cast<VString &&>(grouped_key)] +=
+                    static_cast<VObject &&>(new_sub_obj);
             }
 
             return true;
