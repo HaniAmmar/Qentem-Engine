@@ -249,23 +249,30 @@ static int TestStringStream() {
     EQ_VALUE(ss1, "abcdefgh", "StringStream");
     EQ_VALUE(ss2, "abcdefgh", "StringStream");
 
-    String<char> n_str = String<char>("123456789");
+    String<char> n_str = String<char>("123456");
     ss1                = n_str;
-    EQ_VALUE(ss1, "123456789", "StringStream");
+    EQ_VALUE(ss1, "123456", "StringStream");
 
     ss2.Reset();
 
     ss2 << n_str;
-    EQ_VALUE(ss2, "123456789", "StringStream");
+    EQ_VALUE(ss2, "123456", "StringStream");
 
-    ///
-    std::stringstream std_ss;
-    std_ss << ss2;
+    struct SimpleStream {
+        const unsigned int max = 6;
+        char               str[6]{0};
+        unsigned int       index{0};
 
-    std::string std_str = std_ss.str();
+        void operator<<(const char c) {
+            str[index] = c;
+            ++index;
+        }
+    };
 
-    EQ_TRUE(StringUtils::IsEqual(std_str.c_str(), "123456789", 9),
-            "StringStream");
+    SimpleStream sis;
+    sis << ss2;
+
+    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "123456", 6), "SimpleStream");
 
     END_SUB_TEST;
 }

@@ -341,14 +341,24 @@ static int TestString2() {
     EQ_VALUE(str2.Length(), 0, "Length");
     EQ_TO(str2.First(), nullptr, "First()", "null");
 
-    ///
-    ///
-    std::stringstream std_ss;
-    std_ss << str1;
+    struct SimpleStream {
+        const unsigned int max = 6;
+        char               str[6]{0};
+        unsigned int       index{0};
 
-    std::string std_str = std_ss.str();
+        void operator<<(const char *c) {
+            while (index < max) {
+                str[index] = *c;
+                ++index;
+                ++c;
+            }
+        }
+    };
 
-    EQ_TRUE(StringUtils::IsEqual(std_str.c_str(), "123456", 6), "StringStream");
+    SimpleStream sis;
+    sis << str1;
+
+    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "123456", 6), "SimpleStream");
 
     END_SUB_TEST;
 }
