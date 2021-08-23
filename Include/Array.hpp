@@ -111,7 +111,7 @@ class Array {
     void operator+=(Array &&src) {
         if (Capacity() == 0) {
             // If the array hasn't allocated any memory, then there is no need
-            // for rest.
+            // for the rest.
             setSize(src.Size());
             setCapacity(src.Capacity());
             setStorage(src.Storage());
