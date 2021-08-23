@@ -1,3 +1,6 @@
 #include "EngineTest.hpp"
 
-int main() { return Qentem::Test::RunEngineTests(); }
+int main() {
+    Qentem::Test::TestHelper::Init();
+    return Qentem::Test::RunEngineTests();
+}

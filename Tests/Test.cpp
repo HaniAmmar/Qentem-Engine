@@ -20,61 +20,18 @@
  * SOFTWARE.
  */
 
-#include "ALETest.hpp"
-#include "ArrayTest.hpp"
-#include "DigitTest.hpp"
-#include "EngineTest.hpp"
-#include "HArrayTest.hpp"
-#include "JSONTest.hpp"
-#include "JSONUtilsTest.hpp"
-#include "MemoryTest.hpp"
-#include "StringStreamTest.hpp"
-#include "StringTest.hpp"
-#include "StringUtilsTest.hpp"
-#include "TemplateLTest.hpp"
-#include "TemplateTest.hpp"
-#include "TemplateUTest.hpp"
-#include "TestHelper.hpp"
-#include "UnicodeTest.hpp"
-#include "ValueTest.hpp"
+#include "StringStream.hpp"
 
-int RunTests() {
-    int passed = 0;
-    int failed = 0;
-    int total  = 0;
+// static Qentem::StringStream<char> test_ss;
+// #define QENTEM_OUTPUT_STREAM_TYPE Qentem::StringStream<char>
+// #define QENTEM_OUTPUT_STREAM test_ss
 
-    ((Qentem::Test::RunTestHelperTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunMemoryTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunDigitTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunEngineTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunALETests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunUnicodeTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunJSONUtilsTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunValueTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunJSONTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunTemplateTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunTemplateUTests() == 0) ? ++passed : ++failed);
-    ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
-
-    if (failed == 0) {
-        QENTEM_OUTPUT_STREAM << "\x1B[32mAll good.\x1B[0m\n";
-        return 0;
-    }
-
-    total = (passed + failed);
-
-    QENTEM_OUTPUT_STREAM << "\x1B[31mNot good!\x1B[0m " << failed << " out of "
-                         << total << " failed.\n";
-
-    return 1;
-}
+#include "Test.hpp"
 
 int main() {
+    Qentem::Test::TestHelper::Init();
+    Qentem::Test::PrintInfo();
+
     // for (int i = 0; i < 100000; i++) {
     //     Qentem::Test::RunTestHelperTests();
     //     Qentem::Test::RunMemoryTests();
@@ -95,32 +52,5 @@ int main() {
     //     Qentem::Test::RunTemplateLTests();
     // }
 
-    QENTEM_OUTPUT_STREAM << "\x1B[36mConfiguration\x1B[0m:\n";
-
-#ifdef QENTEM_64BIT_ARCH
-    QENTEM_OUTPUT_STREAM << "Arch: 64BIT";
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    QENTEM_OUTPUT_STREAM << "\nTagged Pointers: On";
-#endif
-#endif
-
-    QENTEM_OUTPUT_STREAM << "\nEndianness: ";
-
-#ifndef QENTEM_BIG_ENDIAN
-    QENTEM_OUTPUT_STREAM << "Little-endian";
-#else
-    QENTEM_OUTPUT_STREAM << "Big-endian";
-#endif
-
-#if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-    QENTEM_OUTPUT_STREAM << "\nAVX2: On";
-#endif
-#if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-    QENTEM_OUTPUT_STREAM << "\nSSE2: On";
-#endif
-
-    QENTEM_OUTPUT_STREAM << "\nSize of SizeT: " << sizeof(Qentem::SizeT)
-                         << "\n\n";
-
-    return RunTests();
+    return Qentem::Test::RunTests();
 }

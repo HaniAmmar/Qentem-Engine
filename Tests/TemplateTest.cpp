@@ -1,3 +1,6 @@
 #include "TemplateTest.hpp"
 
-int main() { return Qentem::Test::RunTemplateTests(); }
+int main() {
+    Qentem::Test::TestHelper::Init();
+    return Qentem::Test::RunTemplateTests();
+}

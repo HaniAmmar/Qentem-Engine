@@ -1,3 +1,6 @@
 #include "JSONUtilsTest.hpp"
 
-int main() { return Qentem::Test::RunJSONUtilsTests(); }
+int main() {
+    Qentem::Test::TestHelper::Init();
+    return Qentem::Test::RunJSONUtilsTests();
+}

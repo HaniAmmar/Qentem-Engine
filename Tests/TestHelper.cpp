@@ -1,3 +1,6 @@
 #include "TestHelper.hpp"
 
-int main() { return Qentem::Test::RunTestHelperTests(); }
+int main() {
+    Qentem::Test::TestHelper::Init();
+    return Qentem::Test::RunTestHelperTests();
+}

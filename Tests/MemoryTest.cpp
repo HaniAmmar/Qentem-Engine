@@ -1,3 +1,6 @@
 #include "MemoryTest.hpp"
 
-int main() { return Qentem::Test::RunMemoryTests(); }
+int main() {
+    Qentem::Test::TestHelper::Init();
+    return Qentem::Test::RunMemoryTests();
+}
