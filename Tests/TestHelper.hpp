@@ -222,6 +222,9 @@ class EmptyStream {
 };
 
 QENTEM_MAYBE_UNUSED
+static int TestError_1() { return 1; }
+
+QENTEM_MAYBE_UNUSED
 static int TestError() {
     using TestHelperEmptyStream = TestHelper_T<EmptyStream>;
     EmptyStream es;
@@ -231,6 +234,9 @@ static int TestError() {
     TestHelperEmptyStream::SetStream(es);
     TestHelperEmptyStream::PrintErrorMessage1(false, "", n);
     TestHelperEmptyStream::PrintErrorMessage2(false, "", n, m);
+
+    EQ_FALSE(TestHelperEmptyStream::StartTest("Test StartTest()", TestError_1),
+             "StartTest()");
 
     END_SUB_TEST;
 }
