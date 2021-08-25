@@ -1661,9 +1661,9 @@ static int TestMathTag1() {
 static int TestMathTag2() {
     Value<char> value;
 
-    value[0] = Array<Value<char>>();
-    value[1] = HArray<Value<char>, char>();
-    value[2] = 5;
+    value += Array<Value<char>>();
+    value += HArray<Value<char>, char>();
+    value += 5;
 
     EQ_VALUE(Template::Render(R"({math:{var:0}+8})", &value),
              R"({math:{var:0}+8})", R"(Render())");
@@ -2222,24 +2222,12 @@ static int TestLoopTag1() {
 }
 
 static int TestLoopTag2() {
-    Value<char> value1;
-    Value<char> value2;
     Value<char> value3;
     const char *content;
 
-    value1 += 100;
-    value1 += -50;
-    value1 += R"(A)";
-    value1 += true;
-    value1 += false;
-    value1 += nullptr;
-
-    value2[R"(k-1)"] = 4;
-    value2[R"(k-2)"] = 1.5;
-    value2[R"(k-3)"] = R"(ABC)";
-    value2[R"(k-4)"] = true;
-    value2[R"(k-5)"] = false;
-    value2[R"(k-6)"] = nullptr;
+    Value<char> value1 = JSON::Parse(R"([100, -50, "A", true, false, null])");
+    Value<char> value2 = JSON::Parse(
+        R"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 
     //////////////////////
     value3[R"(arr1)"] = value1;
@@ -2297,7 +2285,7 @@ static int TestLoopTag2() {
              R"(100, -50, A, true, false, null, )", R"(Render())");
 
     value3.Reset();
-    value3[0][0][0] = value2;
+    value3[0][0] += value2;
 
     content = R"(<loop set="0[0][0]"value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
@@ -2312,7 +2300,7 @@ static int TestLoopTag2() {
              R"(100, -50, A, true, false, null, )", R"(Render())");
 
     value3.Reset();
-    value3[0][R"(k2)"][0] = value2;
+    value3[0][R"(k2)"] += value2;
 
     content =
         R"(<loop set="0[k2][0]"key="loop1-key"value="loop1-value">loop1-value, loop1-value, </loop>)";
@@ -3098,11 +3086,11 @@ static int TestRender2() {
     Value<char> value;
     const char *content;
 
-    value[0] = 0;
-    value[1] = 1;
-    value[2] = 2;
-    value[3] = 5;
-    value[4] = 10;
+    value += 0;
+    value += 1;
+    value += 2;
+    value += 5;
+    value += 10;
 
     content = R"(<loop set="numbers" value="val_">val_</loop>)";
     EQ_VALUE(Template::Render(content, &value), R"()", R"(Render())");
@@ -3128,10 +3116,7 @@ static int TestRender2() {
         R"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
         R"(Render())");
 
-    value.Reset();
-    value[0][0] += 1;
-    value[0][0] += 2;
-    value[0][0] += 3;
+    value = JSON::Parse(R"([[[1,2,3]]])");
 
     content = R"(<loop value="loop1_val">loop1_val[0][2]</loop>)";
     EQ_VALUE(Template::Render(content, &value), R"(3)", R"(Render())");

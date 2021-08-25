@@ -372,37 +372,36 @@ class Value {
     }
 
     void operator+=(Value &&val) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray() && !(val.IsUndefined())) {
-            array_ += static_cast<Value &&>(val);
-        }
+        array_ += static_cast<Value &&>(val);
 
         val.Reset();
     }
 
     void operator+=(const Value &val) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray() && !(val.IsUndefined())) {
-            array_ += val;
-        }
+        array_ += val;
     }
 
     void operator+=(VObject &&obj) {
-        if (IsUndefined()) {
-            initArray();
-        }
+        if (IsObject()) {
+            object_ += static_cast<VObject &&>(obj);
+        } else {
+            if (!(IsArray())) {
+                Reset();
+                initArray();
+            }
 
-        if (IsArray()) {
             array_ +=
                 static_cast<Value &&>(Value{static_cast<VObject &&>(obj)});
-        } else if (IsObject()) {
-            object_ += static_cast<VObject &&>(obj);
         }
     }
 
@@ -411,17 +410,15 @@ class Value {
     }
 
     void operator+=(VArray &&arr) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray()) {
-            if (arr.Size() != 0) {
-                array_ += static_cast<VArray &&>(arr);
-            } else {
-                array_ +=
-                    static_cast<Value &&>(Value{static_cast<VArray &&>(arr)});
-            }
+        if (arr.Size() != 0) {
+            array_ += static_cast<VArray &&>(arr);
+        } else {
+            array_ += static_cast<Value &&>(Value{static_cast<VArray &&>(arr)});
         }
     }
 
@@ -430,13 +427,12 @@ class Value {
     }
 
     void operator+=(VString &&str) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray()) {
-            array_ += Value{static_cast<VString &&>(str)};
-        }
+        array_ += Value{static_cast<VString &&>(str)};
     }
 
     void operator+=(const VString &str) {
@@ -449,114 +445,82 @@ class Value {
 
     template <typename Number_T_>
     void operator+=(Number_T_ num) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray()) {
-            array_ += static_cast<Value &&>(Value{num});
-        }
+        array_ += static_cast<Value &&>(Value{num});
     }
 
     void operator+=(NullType) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray()) {
-            array_ += static_cast<Value &&>(Value{nullptr});
-        }
+        array_ += static_cast<Value &&>(Value{nullptr});
     }
 
     void operator+=(bool is_true) {
-        if (IsUndefined()) {
+        if (!(IsArray())) {
+            Reset();
             initArray();
         }
 
-        if (IsArray()) {
-            array_ += static_cast<Value &&>(Value{is_true});
-        }
+        array_ += static_cast<Value &&>(Value{is_true});
     }
 
     Value &operator[](const Char_T_ *key) {
-        if (IsObject()) {
-            return object_[key];
-        }
-
-        if (IsUndefined()) {
+        if (!(IsObject())) {
+            Reset();
             initObject();
-            return object_[key];
         }
 
-        throw 3;
+        return object_[key];
     }
 
     Value &operator[](VString &&key) {
-        if (IsObject()) {
-            return object_[static_cast<VString &&>(key)];
-        }
-
-        if (IsUndefined()) {
+        if (!(IsObject())) {
+            Reset();
             initObject();
-            return object_[static_cast<VString &&>(key)];
         }
 
-        throw 3;
+        return object_[static_cast<VString &&>(key)];
     }
 
     Value &operator[](const VString &key) {
-        if (IsObject()) {
-            return object_[key];
-        }
-
-        if (IsUndefined()) {
+        if (!(IsObject())) {
+            Reset();
             initObject();
-            return object_[key];
         }
 
-        throw 3;
+        return object_[key];
     }
 
     Value &operator[](SizeT index) {
-        switch (Type()) {
-            case ValueType::Array: {
-                if (array_.Size() > index) {
-                    return (array_.Storage()[index]);
-                }
+        const ValueType type = Type();
 
-                if (array_.Size() == index) {
-                    array_ += Value();
-                    return (array_.Storage()[index]);
-                }
+        if (type == ValueType::Array) {
+            if (array_.Size() > index) {
+                return (array_.Storage()[index]);
+            }
+        } else if (type == ValueType::Object) {
+            Value *val = object_.GetValue(index);
 
-                break;
+            if (val != nullptr) {
+                return (*val);
             }
 
-            case ValueType::Object: {
-                Value *val = object_.GetValue(index);
-
-                if (val != nullptr) {
-                    return (*val);
-                }
-
-                break;
-            }
-
-            case ValueType::Undefined: {
-                if (index == 0) {
-                    initArray();
-                    array_.ResizeAndInitialize(1);
-                    return *(array_.Storage());
-                }
-
-                break;
-            }
-
-            default: {
-            }
+            Reset();
+            initArray();
+        } else {
+            Reset();
+            initArray();
         }
 
-        throw 1;
+        array_.ResizeAndInitialize(index + 1);
+        return (array_.Storage()[index]);
     }
 
     template <typename Type_T_>

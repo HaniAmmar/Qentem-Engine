@@ -1192,13 +1192,16 @@ static int TestArrayValue() {
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////////////////////
+    str_var   = "-ABCDEF0123456789ABCDEF0123456789-";
+    c_str_var = str_var.First();
+
     arr_var.ResizeAndInitialize(4);
-    arr_var[0] = 10;
-    arr_var[1] = 20;
-    arr_var[2] = 30;
-    str_var    = "-ABCDEF0123456789ABCDEF0123456789-";
-    c_str_var  = str_var.First();
-    arr_var[3] = static_cast<VString &&>(str_var);
+    ValueC *val_ptr = arr_var.Storage();
+
+    val_ptr[0] = 10;
+    val_ptr[1] = 20;
+    val_ptr[2] = 30;
+    val_ptr[3] = static_cast<VString &&>(str_var);
 
     value2 = arr_var;
     EQ_VALUE(value2.Size(), 4, "value2.Size()");
@@ -3635,57 +3638,11 @@ static int TestIndexOperator1() {
     ValueC  value;
     VString str1("D");
     VString str2("DEFG");
-    bool    did_throw;
-
-    try {
-        did_throw = false;
-        value[10] = 5;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
 
     value[0] = 5;
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_VALUE(value[0].GetNumber(), 5, "value[0]");
-
-    try {
-        did_throw = false;
-        value[2]  = 12;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    try {
-        did_throw   = false;
-        value[str2] = 120;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    try {
-        did_throw           = false;
-        value[VString("W")] = 120;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    try {
-        did_throw    = false;
-        value["WYX"] = 120;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
 
     value[0] = 20;
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -3726,14 +3683,6 @@ static int TestIndexOperator1() {
     EQ_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
     EQ_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
     EQ_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
-    try {
-        did_throw = false;
-        value[7]  = "cc";
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
     EQ_TO(value.GetValue(6), nullptr, "GetValue(6)", "null");
 
     //////////////////////////////////////////
@@ -3744,24 +3693,6 @@ static int TestIndexOperator1() {
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_VALUE(value[0].GetNumber(), 7.5, "value[0]");
     EQ_VALUE(value["A"].GetNumber(), 7.5, "value[\"A\"]");
-
-    try {
-        did_throw = false;
-        value[1]  = 5;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    try {
-        did_throw = false;
-        value[10] = 5;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
 
     value["A"] = 59;
     EQ_TRUE(value.IsObject(), "IsObject()");
@@ -3825,14 +3756,6 @@ static int TestIndexOperator1() {
     EQ_TRUE(value.GetKey(4)->IsEqual("EFEFE", 5), "GetKey(4)->IsEqual()");
     EQ_TRUE(value.GetKey(5)->IsEqual("FGHIGKLM", 8), "GetKey(5)->IsEqual()");
 
-    try {
-        did_throw = false;
-        value[6]  = "W";
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
     EQ_TO(value.GetValue(6), nullptr, "GetValue(6)", "null");
 
     value.Reset();
@@ -3899,28 +3822,11 @@ static int TestAddition1() {
     ValueC  value;
     VString str1("D");
     VString str2("DEFG");
-    bool    did_throw;
-
-    try {
-        did_throw = false;
-        value[10] = 5;
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
 
     value += 20;
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
-
-    try {
-        did_throw = false;
-        value[2]  = 12;
-    } catch (...) {
-        did_throw = true;
-    }
 
     value += 30;
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -3943,15 +3849,6 @@ static int TestAddition1() {
     EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
     EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
     EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
-
-    try {
-        did_throw = false;
-        value[7]  = "cc";
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
 
     //////////////////////////////////////////
 
@@ -4139,8 +4036,8 @@ static int TestAddition3() {
     arr_var += ValueC{false};
     arr_var += ValueC{true};
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
-    c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str       = arr_storage[2].StringStorage();
 
     value += arr_var;
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -4163,8 +4060,8 @@ static int TestAddition3() {
     arr_var += ValueC{nullptr};
     arr_var += ValueC{14};
     arr_var += ValueC{VString("^ABCDEF0123456789ABCDEF0123456789^")};
-    c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str2      = arr_storage[2].StringStorage();
 
     value += arr_var;
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -4211,14 +4108,13 @@ static int TestAddition3() {
               "null");
 
     value.Reset();
-    ///
-
     arr_var.Reset();
+
     arr_var += ValueC{ValueType::False};
     arr_var += ValueC{ValueType::True};
     arr_var += ValueC{VString("#0123456789ABCDEF0123456789ABCDEF#")};
-    c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str       = arr_storage[2].StringStorage();
 
     value += static_cast<VArray &&>(arr_var);
     EQ_TRUE(value.IsArray(), "IsArray()");
@@ -4239,8 +4135,8 @@ static int TestAddition3() {
     arr_var += ValueC{nullptr};
     arr_var += ValueC{14};
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
-    c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str2      = arr_storage[2].StringStorage();
 
     value += static_cast<VArray &&>(arr_var);
     EQ_TO(arr_var.First(), nullptr, "arr_var.First()", "null");
@@ -4399,9 +4295,8 @@ static int TestAddition4() {
     arr_var += ValueC{ValueType::False};
     arr_var += ValueC{ValueType::True};
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
-    c_str = arr_var[2].StringStorage();
-
     arr_storage = arr_var.First();
+    c_str       = arr_storage[2].StringStorage();
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(static_cast<ValueC &&>(value2));
@@ -4425,8 +4320,8 @@ static int TestAddition4() {
     arr_var += ValueC{ValueType::Null};
     arr_var += ValueC{14};
     arr_var += ValueC{VString("^ABCDEF0123456789ABCDEF0123456789^")};
-    c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str2      = arr_storage[2].StringStorage();
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(value2);
@@ -4472,6 +4367,14 @@ static int TestAddition5() {
     /////////////////
 
     value2 = true;
+    EQ_TRUE(value2.IsTrue(), "value2.IsTrue()");
+
+    value1 += static_cast<ValueC &&>(value2);
+
+    EQ_TRUE(value1.IsArray(), "IsArray()");
+    EQ_VALUE(value1.Size(), 1, "Size()");
+    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+
     value2 += true;
     value2 += false;
     value2 += nullptr;
@@ -4479,13 +4382,6 @@ static int TestAddition5() {
     value2 += 4;
     value2 += VArray(1);
     value2 += VHArray(1);
-
-    EQ_TRUE(value2.IsTrue(), "value2.IsTrue()");
-
-    value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
 
     value2 = true;
     value1 += static_cast<ValueC &&>(value2);
@@ -4585,8 +4481,8 @@ static int TestAddition5() {
     arr_var += ValueC{ValueType::False};
     arr_var += ValueC{ValueType::True};
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
-    c_str       = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str       = arr_storage[2].StringStorage();
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(static_cast<ValueC &&>(value2));
@@ -4610,8 +4506,8 @@ static int TestAddition5() {
     arr_var += ValueC{ValueType::Null};
     arr_var += ValueC{14};
     arr_var += ValueC{VString("#0123456789ABCDEF0123456789ABCDEF#")};
-    c_str2      = arr_var[2].StringStorage();
     arr_storage = arr_var.First();
+    c_str2      = arr_storage[2].StringStorage();
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(static_cast<ValueC &&>(value2));

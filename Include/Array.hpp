@@ -100,13 +100,13 @@ class Array {
         return *this;
     }
 
-    Type_ &operator[](SizeT index) const {
-        if (index < Size()) {
-            return Storage()[index];
-        }
+    // Type_ &operator[](SizeT index) const {
+    //     if (index < Size()) {
+    //         return Storage()[index];
+    //     }
 
-        throw 1; // Index out of range
-    }
+    //     throw 1; // Index out of range
+    // }
 
     void operator+=(Array &&src) {
         if (Capacity() == 0) {

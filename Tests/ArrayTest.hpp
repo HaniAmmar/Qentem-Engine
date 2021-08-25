@@ -277,43 +277,18 @@ static int TestArray3() {
         numbers1 += i;
     }
 
+    SizeT *storage1 = numbers1.Storage();
+    SizeT *storage2 = numbers1.Storage();
+
     EQ_VALUE(numbers1.Size(), 8, "Size");
     EQ_TRUE((numbers1.Capacity() >= 8), "(numbers1.Capacity() >= 8)");
     NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
 
-    bool did_throw;
+    numbers2.Insert(storage1[0]).Insert(storage1[1]);
 
-    try {
-        did_throw = false;
-        numbers2[0];
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    try {
-        did_throw = false;
-        numbers2[7];
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    try {
-        did_throw = false;
-        numbers1[8];
-    } catch (...) {
-        did_throw = true;
-    }
-
-    EQ_TRUE(did_throw, "did_throw");
-
-    numbers2.Insert(numbers1[0]).Insert(numbers1[1]);
     for (SizeT i = 2; i < 8; i++) {
-        numbers2.Insert(numbers1[i]);
-        EQ_VALUE(numbers2[i], numbers1[i], "numbers2[i]");
+        numbers2.Insert(storage1[i]);
+        EQ_VALUE(storage2[i], storage1[i], "storage2[i]");
     }
 
     EQ_VALUE(numbers2.Size(), 8, "Size");
@@ -335,25 +310,34 @@ static int TestArray3() {
     const char *str2_cstr = str2.First();
 
     strings += static_cast<String<char> &&>(str1);
-    EQ_TO(strings[0].First(), str1_cstr, "strings[0].First()", "str1_cstr");
+    String<char> *storage_str = strings.Storage();
+
+    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()",
+          "str1_cstr");
 
     strings.Insert(static_cast<String<char> &&>(str2));
-    EQ_TO(strings[1].First(), str2_cstr, "strings[1].First()", "str2_cstr");
+    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()",
+          "str2_cstr");
 
     strings += str1;
-    NOT_EQ_TO(strings[2].First(), str1_cstr, "strings[2].First()", "str1_cstr");
+    NOT_EQ_TO(storage_str[2].First(), str1_cstr, "storage_str[2].First()",
+              "str1_cstr");
 
     strings.Insert(str2);
-    NOT_EQ_TO(strings[3].First(), str2_cstr, "strings[3].First()", "str2_cstr");
+    NOT_EQ_TO(storage_str[3].First(), str2_cstr, "storage_str[3].First()",
+              "str2_cstr");
 
     // Checking move after expanding.
     for (SizeT i = 0; i < 16; i++) {
         strings += String<char>("");
     }
 
-    EQ_TO(strings[0].First(), str1_cstr, "strings[0].First()", "str1_cstr");
+    storage_str = strings.Storage();
+    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()",
+          "str1_cstr");
 
-    EQ_TO(strings[1].First(), str2_cstr, "strings[1].First()", "str2_cstr");
+    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()",
+          "str2_cstr");
 
     END_SUB_TEST;
 }
@@ -372,19 +356,23 @@ static int TestArray4() {
     strings1 += static_cast<String<char> &&>(str2);
 
     strings2 += strings1;
+    String<char> *storage2 = strings2.Storage();
+
     EQ_VALUE(strings2.Size(), 2, "Size");
     NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(strings2[0].First(), str1_cstr, "strings[0].First()",
+    NOT_EQ_TO(storage2[0].First(), str1_cstr, "storage2[0].First()",
               "str1_cstr");
-    NOT_EQ_TO(strings2[1].First(), str2_cstr, "strings[1].First()",
+    NOT_EQ_TO(storage2[1].First(), str2_cstr, "storage2[1].First()",
               "str2_cstr");
 
     strings2.Reserve(2);
     strings2 += static_cast<Array<String<char>> &&>(strings1);
+    storage2 = strings2.Storage();
+
     EQ_VALUE(strings2.Size(), 2, "Size");
     NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    EQ_TO(strings2[0].First(), str1_cstr, "strings[0].First()", "str1_cstr");
-    EQ_TO(strings2[1].First(), str2_cstr, "strings[1].First()", "str2_cstr");
+    EQ_TO(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr");
+    EQ_TO(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr");
 
     END_SUB_TEST;
 }
@@ -401,21 +389,24 @@ static int TestArraySort() {
 
     numbers.Sort();
 
-    EQ_VALUE(numbers[0], 0, "numbers[0]");
-    EQ_VALUE(numbers[1], 1, "numbers[1]");
-    EQ_VALUE(numbers[2], 2, "numbers[2]");
-    EQ_VALUE(numbers[3], 3, "numbers[3]");
-    EQ_VALUE(numbers[4], 4, "numbers[4]");
-    EQ_VALUE(numbers[5], 5, "numbers[5]");
+    int *storage = numbers.Storage();
+
+    EQ_VALUE(storage[0], 0, "storage[0]");
+    EQ_VALUE(storage[1], 1, "storage[1]");
+    EQ_VALUE(storage[2], 2, "storage[2]");
+    EQ_VALUE(storage[3], 3, "storage[3]");
+    EQ_VALUE(storage[4], 4, "storage[4]");
+    EQ_VALUE(storage[5], 5, "storage[5]");
 
     numbers.Sort(false);
+    storage = numbers.Storage();
 
-    EQ_VALUE(numbers[0], 5, "numbers[0]");
-    EQ_VALUE(numbers[1], 4, "numbers[1]");
-    EQ_VALUE(numbers[2], 3, "numbers[2]");
-    EQ_VALUE(numbers[3], 2, "numbers[3]");
-    EQ_VALUE(numbers[4], 1, "numbers[4]");
-    EQ_VALUE(numbers[5], 0, "numbers[5]");
+    EQ_VALUE(storage[0], 5, "storage[0]");
+    EQ_VALUE(storage[1], 4, "storage[1]");
+    EQ_VALUE(storage[2], 3, "storage[2]");
+    EQ_VALUE(storage[3], 2, "storage[3]");
+    EQ_VALUE(storage[4], 1, "storage[4]");
+    EQ_VALUE(storage[5], 0, "storage[5]");
 
     numbers.Reset();
 
@@ -427,13 +418,14 @@ static int TestArraySort() {
     numbers += 2;
 
     numbers.Sort(false);
+    storage = numbers.Storage();
 
-    EQ_VALUE(numbers[0], 5, "numbers[0]");
-    EQ_VALUE(numbers[1], 4, "numbers[1]");
-    EQ_VALUE(numbers[2], 3, "numbers[2]");
-    EQ_VALUE(numbers[3], 2, "numbers[3]");
-    EQ_VALUE(numbers[4], 1, "numbers[4]");
-    EQ_VALUE(numbers[5], 0, "numbers[5]");
+    EQ_VALUE(storage[0], 5, "storage[0]");
+    EQ_VALUE(storage[1], 4, "storage[1]");
+    EQ_VALUE(storage[2], 3, "storage[2]");
+    EQ_VALUE(storage[3], 2, "storage[3]");
+    EQ_VALUE(storage[4], 1, "storage[4]");
+    EQ_VALUE(storage[5], 0, "storage[5]");
 
     numbers.Reset();
 
@@ -445,22 +437,24 @@ static int TestArraySort() {
     numbers += 5;
 
     numbers.Sort();
+    storage = numbers.Storage();
 
-    EQ_VALUE(numbers[0], 0, "numbers[0]");
-    EQ_VALUE(numbers[1], 1, "numbers[1]");
-    EQ_VALUE(numbers[2], 2, "numbers[2]");
-    EQ_VALUE(numbers[3], 3, "numbers[3]");
-    EQ_VALUE(numbers[4], 4, "numbers[4]");
-    EQ_VALUE(numbers[5], 5, "numbers[5]");
+    EQ_VALUE(storage[0], 0, "storage[0]");
+    EQ_VALUE(storage[1], 1, "storage[1]");
+    EQ_VALUE(storage[2], 2, "storage[2]");
+    EQ_VALUE(storage[3], 3, "storage[3]");
+    EQ_VALUE(storage[4], 4, "storage[4]");
+    EQ_VALUE(storage[5], 5, "storage[5]");
 
     numbers.Sort(false);
+    storage = numbers.Storage();
 
-    EQ_VALUE(numbers[0], 5, "numbers[0]");
-    EQ_VALUE(numbers[1], 4, "numbers[1]");
-    EQ_VALUE(numbers[2], 3, "numbers[2]");
-    EQ_VALUE(numbers[3], 2, "numbers[3]");
-    EQ_VALUE(numbers[4], 1, "numbers[4]");
-    EQ_VALUE(numbers[5], 0, "numbers[5]");
+    EQ_VALUE(storage[0], 5, "storage[0]");
+    EQ_VALUE(storage[1], 4, "storage[1]");
+    EQ_VALUE(storage[2], 3, "storage[2]");
+    EQ_VALUE(storage[3], 2, "storage[3]");
+    EQ_VALUE(storage[4], 1, "storage[4]");
+    EQ_VALUE(storage[5], 0, "storage[5]");
 
     Array<String<char>> strings;
 
@@ -473,24 +467,26 @@ static int TestArraySort() {
     strings += String<char>("2021");
 
     strings.Sort();
+    String<char> *storage_str = strings.Storage();
 
-    EQ_VALUE(strings[0], "2017", "strings[0]");
-    EQ_VALUE(strings[1], "2018", "strings[1]");
-    EQ_VALUE(strings[2], "2018", "strings[2]");
-    EQ_VALUE(strings[3], "2019", "strings[3]");
-    EQ_VALUE(strings[4], "2020", "strings[4]");
-    EQ_VALUE(strings[5], "2021", "strings[5]");
-    EQ_VALUE(strings[6], "2021", "strings[6]");
+    EQ_VALUE(storage_str[0], "2017", "storage_str[0]");
+    EQ_VALUE(storage_str[1], "2018", "storage_str[1]");
+    EQ_VALUE(storage_str[2], "2018", "storage_str[2]");
+    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
+    EQ_VALUE(storage_str[4], "2020", "storage_str[4]");
+    EQ_VALUE(storage_str[5], "2021", "storage_str[5]");
+    EQ_VALUE(storage_str[6], "2021", "storage_str[6]");
 
     strings.Sort(false);
+    storage_str = strings.Storage();
 
-    EQ_VALUE(strings[0], "2021", "strings[0]");
-    EQ_VALUE(strings[1], "2021", "strings[1]");
-    EQ_VALUE(strings[2], "2020", "strings[2]");
-    EQ_VALUE(strings[3], "2019", "strings[3]");
-    EQ_VALUE(strings[4], "2018", "strings[4]");
-    EQ_VALUE(strings[5], "2018", "strings[5]");
-    EQ_VALUE(strings[6], "2017", "strings[6]");
+    EQ_VALUE(storage_str[0], "2021", "storage_str[0]");
+    EQ_VALUE(storage_str[1], "2021", "storage_str[1]");
+    EQ_VALUE(storage_str[2], "2020", "storage_str[2]");
+    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
+    EQ_VALUE(storage_str[4], "2018", "storage_str[4]");
+    EQ_VALUE(storage_str[5], "2018", "storage_str[5]");
+    EQ_VALUE(storage_str[6], "2017", "storage_str[6]");
 
     strings.Reset();
 
@@ -503,24 +499,26 @@ static int TestArraySort() {
     strings += String<char>("2018");
 
     strings.Sort();
+    storage_str = strings.Storage();
 
-    EQ_VALUE(strings[0], "2017", "strings[0]");
-    EQ_VALUE(strings[1], "2018", "strings[1]");
-    EQ_VALUE(strings[2], "2018", "strings[2]");
-    EQ_VALUE(strings[3], "2019", "strings[3]");
-    EQ_VALUE(strings[4], "2020", "strings[4]");
-    EQ_VALUE(strings[5], "2021", "strings[5]");
-    EQ_VALUE(strings[6], "2021", "strings[6]");
+    EQ_VALUE(storage_str[0], "2017", "storage_str[0]");
+    EQ_VALUE(storage_str[1], "2018", "storage_str[1]");
+    EQ_VALUE(storage_str[2], "2018", "storage_str[2]");
+    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
+    EQ_VALUE(storage_str[4], "2020", "storage_str[4]");
+    EQ_VALUE(storage_str[5], "2021", "storage_str[5]");
+    EQ_VALUE(storage_str[6], "2021", "storage_str[6]");
 
     strings.Sort(false);
+    storage_str = strings.Storage();
 
-    EQ_VALUE(strings[0], "2021", "strings[0]");
-    EQ_VALUE(strings[1], "2021", "strings[1]");
-    EQ_VALUE(strings[2], "2020", "strings[2]");
-    EQ_VALUE(strings[3], "2019", "strings[3]");
-    EQ_VALUE(strings[4], "2018", "strings[4]");
-    EQ_VALUE(strings[5], "2018", "strings[5]");
-    EQ_VALUE(strings[6], "2017", "strings[6]");
+    EQ_VALUE(storage_str[0], "2021", "storage_str[0]");
+    EQ_VALUE(storage_str[1], "2021", "storage_str[1]");
+    EQ_VALUE(storage_str[2], "2020", "storage_str[2]");
+    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
+    EQ_VALUE(storage_str[4], "2018", "storage_str[4]");
+    EQ_VALUE(storage_str[5], "2018", "storage_str[5]");
+    EQ_VALUE(storage_str[6], "2017", "storage_str[6]");
 
     strings.Reset();
 
@@ -533,14 +531,15 @@ static int TestArraySort() {
     strings += String<char>("2018");
 
     strings.Sort(false);
+    storage_str = strings.Storage();
 
-    EQ_VALUE(strings[0], "2021", "strings[0]");
-    EQ_VALUE(strings[1], "2021", "strings[1]");
-    EQ_VALUE(strings[2], "2020", "strings[2]");
-    EQ_VALUE(strings[3], "2019", "strings[3]");
-    EQ_VALUE(strings[4], "2018", "strings[4]");
-    EQ_VALUE(strings[5], "2018", "strings[5]");
-    EQ_VALUE(strings[6], "2017", "strings[6]");
+    EQ_VALUE(storage_str[0], "2021", "storage_str[0]");
+    EQ_VALUE(storage_str[1], "2021", "storage_str[1]");
+    EQ_VALUE(storage_str[2], "2020", "storage_str[2]");
+    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
+    EQ_VALUE(storage_str[4], "2018", "storage_str[4]");
+    EQ_VALUE(storage_str[5], "2018", "storage_str[5]");
+    EQ_VALUE(storage_str[6], "2017", "storage_str[6]");
 
     END_SUB_TEST;
 }

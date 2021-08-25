@@ -86,9 +86,9 @@ class TestHelper_T {
     PrintErrorMessage1(bool equal, const Char_T_ *name, const Value_T_ &value) {
         Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed"
                  << QENTEM_OUTPUT_END_COLOR << ": " << TestGroupName<Char_T_>()
-                 << "\n At line :" << LineNumber() << ": '" << name
-                 << "' should" << (equal ? " not " : " ") << "equal '" << value
-                 << "'\n\n";
+                 << "\n At line :" << LineNumber() << ": `" << name
+                 << "` should" << (equal ? " not " : " ") << "equal `" << value
+                 << "`\n\n";
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
@@ -97,10 +97,9 @@ class TestHelper_T {
                        const Value2_T_ &value2) {
         Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed"
                  << QENTEM_OUTPUT_END_COLOR << ": " << TestGroupName<Char_T_>()
-                 << "\n At line :" << LineNumber() << ": '" << name
-                 << "' should" << (equal ? " not " : " ") << "equal '" << value2
-                 << "'\n"
-                 << "Returned Value: " << value1 << "\n\n";
+                 << "\n At line :" << LineNumber() << ": `" << name
+                 << "` should" << (equal ? " not " : " ") << "equal `" << value2
+                 << "`\n Returned Value: `" << value1 << "`\n\n";
     }
 
     template <typename Char_T_>
@@ -113,19 +112,11 @@ class TestHelper_T {
     QENTEM_NOINLINE static bool StartTest(const Char_T_ *name, FUNC_ func) {
         TestGroupName<Char_T_>() = name;
 
-        try {
-            if (func() == 0) {
-                Stream() << QENTEM_OUTPUT_START_COLOR_PASS << "Pass"
-                         << QENTEM_OUTPUT_END_COLOR << ": "
-                         << TestGroupName<Char_T_>() << '\n';
-                return true;
-            }
-
-        } catch (...) {
-            Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed (throw)"
+        if (func() == 0) {
+            Stream() << QENTEM_OUTPUT_START_COLOR_PASS << "Pass"
                      << QENTEM_OUTPUT_END_COLOR << ": "
-                     << TestGroupName<Char_T_>()
-                     << "\n after line :" << LineNumber() << '\n';
+                     << TestGroupName<Char_T_>() << '\n';
+            return true;
         }
 
         return false;
@@ -216,9 +207,6 @@ using TestHelper = TestHelper_T<QENTEM_OUTPUT_STREAM_TYPE>;
         return 0;                                                              \
     } while (false)
 
-QENTEM_MAYBE_UNUSED
-static int TestThrow1_1() { return 1; }
-
 class EmptyStream {
     template <typename Stream_T_, typename Value_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const Value_T_ &val) {
@@ -234,22 +222,7 @@ class EmptyStream {
 };
 
 QENTEM_MAYBE_UNUSED
-static int TestThrow1() {
-    using TestHelperEmptyStream = TestHelper_T<EmptyStream>;
-    EmptyStream es;
-
-    TestHelperEmptyStream::SetStream(es);
-    TestHelperEmptyStream::StartTest("Test Throw 1", TestThrow1_1);
-    // EQ_VALUE(L"Test Throw 1", ss.str(), "Test Throw 1");
-
-    END_SUB_TEST;
-}
-
-QENTEM_MAYBE_UNUSED
-static int TestThrow2_2() { throw 1; }
-
-QENTEM_MAYBE_UNUSED
-static int TestThrow2() {
+static int TestError() {
     using TestHelperEmptyStream = TestHelper_T<EmptyStream>;
     EmptyStream es;
     int         n = 0;
@@ -259,9 +232,6 @@ static int TestThrow2() {
     TestHelperEmptyStream::PrintErrorMessage1(false, "", n);
     TestHelperEmptyStream::PrintErrorMessage2(false, "", n, m);
 
-    EQ_FALSE(TestHelperEmptyStream::StartTest("Test Throw 2", TestThrow2_2),
-             "Test Throw 2");
-
     END_SUB_TEST;
 }
 
@@ -269,8 +239,7 @@ QENTEM_MAYBE_UNUSED
 static int RunTestHelperTests() {
     STARTING_TEST("TestHelper.hpp");
 
-    START_TEST("Throw Test 1", TestThrow1);
-    START_TEST("Throw Test 2", TestThrow2);
+    START_TEST("Test Error", TestError);
 
     END_TEST("TestHelper.hpp");
 }

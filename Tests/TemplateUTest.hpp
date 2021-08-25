@@ -1743,9 +1743,9 @@ static int TestMathUTag1() {
 static int TestMathUTag2() {
     Value<char16_t> value;
 
-    value[0] = Array<Value<char16_t>>();
-    value[1] = HArray<Value<char16_t>, char16_t>();
-    value[2] = 5;
+    value += Array<Value<char16_t>>();
+    value += HArray<Value<char16_t>, char16_t>();
+    value += 5;
 
     EQ_VALUE(Template::Render(uR"({math:{var:0}+8})", &value),
              uR"({math:{var:0}+8})", uR"(Render())");
@@ -2308,24 +2308,13 @@ static int TestLoopUTag1() {
 }
 
 static int TestLoopUTag2() {
-    Value<char16_t> value1;
-    Value<char16_t> value2;
     Value<char16_t> value3;
     const char16_t *content;
 
-    value1 += 100;
-    value1 += -50;
-    value1 += uR"(A)";
-    value1 += true;
-    value1 += false;
-    value1 += nullptr;
-
-    value2[uR"(k-1)"] = 4;
-    value2[uR"(k-2)"] = 1.5;
-    value2[uR"(k-3)"] = uR"(ABC)";
-    value2[uR"(k-4)"] = true;
-    value2[uR"(k-5)"] = false;
-    value2[uR"(k-6)"] = nullptr;
+    Value<char16_t> value1 =
+        JSON::Parse(uR"([100, -50, "A", true, false, null])");
+    Value<char16_t> value2 = JSON::Parse(
+        uR"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 
     //////////////////////
     value3[uR"(arr1)"] = value1;
@@ -2383,7 +2372,7 @@ static int TestLoopUTag2() {
              uR"(100, -50, A, true, false, null, )", uR"(Render())");
 
     value3.Reset();
-    value3[0][0][0] = value2;
+    value3[0][0] += value2;
 
     content = uR"(<loop set="0[0][0]"value="loop1-value">loop1-value, </loop>)";
     EQ_VALUE(Template::Render(content, &value3),
@@ -2398,7 +2387,7 @@ static int TestLoopUTag2() {
              uR"(100, -50, A, true, false, null, )", uR"(Render())");
 
     value3.Reset();
-    value3[0][uR"(k2)"][0] = value2;
+    value3[0][uR"(k2)"] += value2;
 
     content =
         uR"(<loop set="0[k2][0]"key="loop1-key"value="loop1-value">loop1-value, loop1-value, </loop>)";
@@ -3191,11 +3180,11 @@ static int TestRenderU2() {
     Value<char16_t> value;
     const char16_t *content;
 
-    value[0] = 0;
-    value[1] = 1;
-    value[2] = 2;
-    value[3] = 5;
-    value[4] = 10;
+    value += 0;
+    value += 1;
+    value += 2;
+    value += 5;
+    value += 10;
 
     content = uR"(<loop set="numbers" value="val_">val_</loop>)";
     EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
@@ -3221,10 +3210,7 @@ static int TestRenderU2() {
         uR"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
         uR"(Render())");
 
-    value.Reset();
-    value[0][0] += 1;
-    value[0][0] += 2;
-    value[0][0] += 3;
+    value = JSON::Parse(uR"([[[1,2,3]]])");
 
     content = uR"(<loop value="loop1_val">loop1_val[0][2]</loop>)";
     EQ_VALUE(Template::Render(content, &value), uR"(3)", uR"(Render())");
