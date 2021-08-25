@@ -896,7 +896,7 @@ class Value {
         }
     }
 
-    bool InsertString(StringStream<Char_T_> &ss) const {
+    bool InsertStringInto(StringStream<Char_T_> &ss) const {
         switch (Type()) {
             case ValueType::String: {
                 ss += string_;
@@ -944,7 +944,7 @@ class Value {
         }
     }
 
-    bool InsertKey(StringStream<Char_T_> &ss, SizeT index) const {
+    bool InsertIndexOfKeyInto(StringStream<Char_T_> &ss, SizeT index) const {
         if (IsObject()) {
             const VString *key = object_.GetKey(index);
 
