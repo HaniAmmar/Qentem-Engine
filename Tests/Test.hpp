@@ -69,7 +69,7 @@ static int RunTests() {
 
     if (failed == 0) {
         TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_PASS << "All good."
-                             << QENTEM_OUTPUT_END_COLOR << "\n";
+                             << QENTEM_OUTPUT_END_COLOR << '\n';
         return 0;
     }
 
@@ -84,16 +84,16 @@ static int RunTests() {
 
 static void PrintInfo() {
     TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_MAIN << "Configuration"
-                         << QENTEM_OUTPUT_END_COLOR << "\n";
+                         << QENTEM_OUTPUT_END_COLOR << '\n';
 
 #ifdef QENTEM_64BIT_ARCH
     TestHelper::Stream() << "Arch: 64BIT";
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    TestHelper::Stream() << "\nTagged Pointers: On";
+    TestHelper::Stream() << "\nTagged Pointers: On\n";
 #endif
 #endif
 
-    TestHelper::Stream() << "\nEndianness: ";
+    TestHelper::Stream() << "Endianness: ";
 
 #ifndef QENTEM_BIG_ENDIAN
     TestHelper::Stream() << "Little-endian";

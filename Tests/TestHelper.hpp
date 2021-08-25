@@ -117,7 +117,7 @@ class TestHelper_T {
             if (func() == 0) {
                 Stream() << QENTEM_OUTPUT_START_COLOR_PASS << "Pass"
                          << QENTEM_OUTPUT_END_COLOR << ": "
-                         << TestGroupName<Char_T_>() << "\n";
+                         << TestGroupName<Char_T_>() << '\n';
                 return true;
             }
 
@@ -125,7 +125,7 @@ class TestHelper_T {
             Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed (throw)"
                      << QENTEM_OUTPUT_END_COLOR << ": "
                      << TestGroupName<Char_T_>()
-                     << "\n after line :" << LineNumber() << "\n";
+                     << "\n after line :" << LineNumber() << '\n';
         }
 
         return false;

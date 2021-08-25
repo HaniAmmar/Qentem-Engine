@@ -278,9 +278,9 @@ static int TestToUTF32() {
     END_SUB_TEST;
 }
 
-// static String<char> decToHex(UInt code) {
+// static String<char> decToHex(SizeT code) {
 //     StringStream<char> ss;
-//     UInt              hex = 0;
+//     SizeT              hex = 0;
 
 //     while (code != 0) {
 //         hex  = code % 16U;
@@ -288,11 +288,12 @@ static int TestToUTF32() {
 //         ss += char(hex + ((hex < 10) ? 48U : 55U));
 //     }
 
-//     String<char> val = ss.GetString();
+//     String<char> str = ss.GetString();
+//     char *       val = str.Storage();
 
-//     if (val.Length() > 1) {
+//     if (str.Length() > 1) {
 //         SizeT x = 0;
-//         SizeT y = (val.Length() - 1);
+//         SizeT y = (str.Length() - 1);
 
 //         // Reverse
 //         do {
@@ -304,17 +305,17 @@ static int TestToUTF32() {
 //         } while (x < y);
 //     }
 
-//     return val;
+//     return str;
 // }
 
-// static void convertTo4Hex(UInt code) {
+// static void convertTo4Hex(SizeT code) {
 //     if (code < 0x10000U) {
-//         std::cout << "\\u" << decToHex(code) << "\n";
+//         std::cout << "\\u" << decToHex(code) << '\n';
 //     } else {
 //         code -= 0x10000U;
 //         std::cout << "\n\\u" << decToHex(0xD800U | (code >> 10U)).First();
 //         std::cout << "\\u" << decToHex(0xDC00U | (code & 0x3FFU)).First()
-//                   << "\n";
+//                   << '\n';
 //     }
 // }
 
