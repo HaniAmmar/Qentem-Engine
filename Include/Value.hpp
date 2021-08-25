@@ -505,16 +505,15 @@ class Value {
             if (array_.Size() > index) {
                 return (array_.Storage()[index]);
             }
-        } else if (type == ValueType::Object) {
-            Value *val = object_.GetValue(index);
+        } else {
+            if (type == ValueType::Object) {
+                Value *val = object_.GetValue(index);
 
-            if (val != nullptr) {
-                return (*val);
+                if (val != nullptr) {
+                    return (*val);
+                }
             }
 
-            Reset();
-            initArray();
-        } else {
             Reset();
             initArray();
         }
