@@ -27,6 +27,7 @@ Qentem Engine is a self-contained library for rendering HTML templates. Designed
     -   Supports UTF-8, UTF-16 and UTF-32.
     -   Supports 32-bit and 64-bit architecture, little and big endian.
     -   Low memory usage.
+    -   No exceptions (try, catch and throw).
 
 -   JSON
     -   Fast parser.
