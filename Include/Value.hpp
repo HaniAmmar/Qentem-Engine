@@ -510,7 +510,7 @@ class Value {
                 Value *val = object_.GetValue(index);
 
                 if (val != nullptr) {
-                    return (*val);
+                    return *val;
                 }
             }
 
@@ -518,7 +518,16 @@ class Value {
             initArray();
         }
 
-        array_.ResizeAndInitialize(index + 1);
+        if (array_.Size() == index) {
+            if (array_.Capacity() == array_.Size()) {
+                array_.Resize((index + 1) * 2);
+            }
+
+            array_ += Value();
+        } else {
+            array_.ResizeAndInitialize(index + 1);
+        }
+
         return (array_.Storage()[index]);
     }
 
@@ -1161,9 +1170,7 @@ class Value {
             }
         }
 
-        const Char_T_ *last = ss.Last();
-
-        if (*last == JSONotation_T_::CommaChar) {
+        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
             ss.StepBack(1);
         }
 
@@ -1181,9 +1188,7 @@ class Value {
             }
         }
 
-        const Char_T_ *last = ss.Last();
-
-        if (*last == JSONotation_T_::CommaChar) {
+        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
             ss.StepBack(1);
         }
 

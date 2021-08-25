@@ -3857,6 +3857,15 @@ static int TestAddition1() {
     EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
     EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
 
+    value.Reset();
+
+    value[10] = 100;
+    EQ_TRUE(value.IsArray(), "IsArray()");
+    EQ_VALUE(value.Size(), 11, "Size()");
+    EQ_TRUE(value[3].IsUndefined(), "value[3]");
+    EQ_TRUE(value[4].IsUndefined(), "value[4]");
+    EQ_TRUE(value[5].IsUndefined(), "value[5]");
+    EQ_VALUE(value[10].GetNumber(), 100, "value[10]");
     //////////////////////////////////////////
 
     END_SUB_TEST;
