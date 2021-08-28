@@ -150,7 +150,7 @@ inline static Type_ *AllocateInit() {
 // Allocate and move constructor
 template <typename Type_, typename... Values_T_>
 inline static Type_ *AllocateInit(Values_T_ &&...values) {
-    return new Type_(static_cast<Values_T_ &&>(values)...);
+    return new Type_{static_cast<Values_T_ &&>(values)...};
 }
 
 // Allocate and copy constructor
