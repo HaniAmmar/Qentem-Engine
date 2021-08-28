@@ -218,30 +218,30 @@ class Template {
 
     template <typename Char_T_>
     struct LoopInfo_T {
-        const StringStream<Char_T_> Content;
-        Array<TagBit<Char_T_>>      SubTags;
-        const unsigned char         SetOffset;
-        const unsigned char         SetLength;
-        const unsigned char         IndexOffset;
-        const unsigned char         IndexLength;
-        const unsigned char         RepeatOffset;
-        const unsigned char         RepeatLength;
-        const unsigned char         GroupOffset;
-        const unsigned char         GroupLength;
-        const unsigned char         SortOffset;
-        const unsigned char         SortLength;
+        const StringStream<Char_T_>  Content;
+        const Array<TagBit<Char_T_>> SubTags;
+        const unsigned char          SetOffset;
+        const unsigned char          SetLength;
+        const unsigned char          IndexOffset;
+        const unsigned char          IndexLength;
+        const unsigned char          RepeatOffset;
+        const unsigned char          RepeatLength;
+        const unsigned char          GroupOffset;
+        const unsigned char          GroupLength;
+        const unsigned char          SortOffset;
+        const unsigned char          SortLength;
     };
 
     template <typename Char_T_>
     struct InlineIfInfo_T {
-        Array<TagBit<Char_T_>> TrueSubTags;
-        Array<TagBit<Char_T_>> FalseSubTags;
-        const unsigned int     CaseOffset;
-        const unsigned int     CaseLength;
-        const unsigned int     TrueOffset;
-        const unsigned int     TrueLength;
-        const unsigned int     FalseOffset;
-        const unsigned int     FalseLength;
+        const Array<TagBit<Char_T_>> TrueSubTags;
+        const Array<TagBit<Char_T_>> FalseSubTags;
+        const unsigned int           CaseOffset;
+        const unsigned int           CaseLength;
+        const unsigned int           TrueOffset;
+        const unsigned int           TrueLength;
+        const unsigned int           FalseOffset;
+        const unsigned int           FalseLength;
     };
 
     template <typename Char_T_>
@@ -414,7 +414,7 @@ class Template_CV {
 
   private:
     void process(const Char_T_ *content, SizeT length,
-                 Array<TagBit> &tags_cache) const {
+                 const Array<TagBit> &tags_cache) const {
         SizeT offset = 0;
 
         if (tags_cache.IsNotEmpty()) {
@@ -999,6 +999,7 @@ class Template_CV {
         SizeT          previous_offset   = 0;
         bool           break_loop        = false;
 
+        Array<TagBit>         sub_tags;
         StringStream<Char_T_> inner_content;
         unsigned char         set_offset    = 0;
         unsigned char         set_length    = 0;
@@ -1158,11 +1159,13 @@ class Template_CV {
         inner_content.Insert((content + previous_offset),
                              (length - previous_offset));
 
+        parse(sub_tags, inner_content.First(), inner_content.Length());
+
         loop_info = Memory::AllocateInit<LoopInfo_>(
             static_cast<StringStream<Char_T_> &&>(inner_content),
-            Array<TagBit>(), set_offset, set_length, index_offset, index_length,
-            repeat_offset, repeat_length, group_offset, group_length,
-            sort_offset, sort_length);
+            static_cast<Array<TagBit> &&>(sub_tags), set_offset, set_length,
+            index_offset, index_length, repeat_offset, repeat_length,
+            group_offset, group_length, sort_offset, sort_length);
 
         renderLoop(content, loop_info);
     }
@@ -1237,10 +1240,6 @@ class Template_CV {
         const SizeT    loop_length  = loop_info->Content.Length();
         const bool     is_object    = loop_set->IsObject();
 
-        if (loop_info->SubTags.IsEmpty()) {
-            parse(loop_info->SubTags, loop_content, loop_length);
-        }
-
         while (true) {
             loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
@@ -1264,12 +1263,14 @@ class Template_CV {
     QENTEM_NOINLINE void
     generateInLineIfInfo(const Char_T_ *content, SizeT length,
                          InlineIfInfo_ *&inline_if_info) const {
-        unsigned int case_offset  = 0;
-        unsigned int case_length  = 0;
-        unsigned int true_offset  = 0;
-        unsigned int true_length  = 0;
-        unsigned int false_offset = 0;
-        unsigned int false_length = 0;
+        Array<TagBit> true_subtags;
+        Array<TagBit> false_subtags;
+        unsigned int  case_offset  = 0;
+        unsigned int  case_length  = 0;
+        unsigned int  true_offset  = 0;
+        unsigned int  true_length  = 0;
+        unsigned int  false_offset = 0;
+        unsigned int  false_length = 0;
 
         SizeT offset          = 0;
         SizeT previous_offset = 0;
@@ -1318,9 +1319,18 @@ class Template_CV {
             previous_offset = (offset + len);
         }
 
+        if (true_length != 0) {
+            light_parse(true_subtags, (content + true_offset), true_length);
+        }
+
+        if (false_length != 0) {
+            light_parse(false_subtags, (content + false_offset), false_length);
+        }
+
         inline_if_info = Memory::AllocateInit<InlineIfInfo_>(
-            Array<TagBit>(), Array<TagBit>(), case_offset, case_length,
-            true_offset, true_length, false_offset, false_length);
+            static_cast<Array<TagBit> &&>(true_subtags),
+            static_cast<Array<TagBit> &&>(false_subtags), case_offset,
+            case_length, true_offset, true_length, false_offset, false_length);
 
         renderInLineIf(content, inline_if_info);
     }
@@ -1338,27 +1348,13 @@ class Template_CV {
 
             if (result > 0.0) {
                 if (inline_if_info->TrueLength != 0) {
-                    const Char_T_ *true_content =
-                        (content + inline_if_info->TrueOffset);
-
-                    if (inline_if_info->TrueSubTags.IsEmpty()) {
-                        light_parse(inline_if_info->TrueSubTags, true_content,
-                                    inline_if_info->TrueLength);
-                    }
-
-                    process(true_content, inline_if_info->TrueLength,
+                    process((content + inline_if_info->TrueOffset),
+                            inline_if_info->TrueLength,
                             inline_if_info->TrueSubTags);
                 }
             } else if (inline_if_info->FalseLength != 0) {
-                const Char_T_ *false_content =
-                    (content + inline_if_info->FalseOffset);
-
-                if (inline_if_info->FalseSubTags.IsEmpty()) {
-                    light_parse(inline_if_info->FalseSubTags, false_content,
-                                inline_if_info->FalseLength);
-                }
-
-                process(false_content, inline_if_info->FalseLength,
+                process((content + inline_if_info->FalseOffset),
+                        inline_if_info->FalseLength,
                         inline_if_info->FalseSubTags);
             }
         }
