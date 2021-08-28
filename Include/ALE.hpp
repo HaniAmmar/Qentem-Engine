@@ -130,22 +130,22 @@ class ALE {
     }
 
     enum class Operation {
-        None = 0,
-        Or,
-        And,
-        BiggerOrEqual,
-        Bigger,
-        LessOrEqual,
-        Less,
-        NotEqual,
-        Equal,
-        Subtraction,
-        Addition,
-        Division,
-        Multiplication,
-        Remainder,
-        Exponent,
-        Error
+        None = 0u,
+        Or,             // ||
+        And,            // &&
+        BiggerOrEqual,  // >=
+        Bigger,         // >
+        LessOrEqual,    // <=
+        Less,           // <
+        NotEqual,       // !=
+        Equal,          // ==
+        Subtraction,    // -
+        Addition,       // +
+        Division,       // /
+        Multiplication, // *
+        Remainder,      // %
+        Exponent,       // ^
+        Error           // X
     };
 
   private:
