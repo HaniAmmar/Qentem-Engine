@@ -236,32 +236,27 @@ class Template {
     struct InlineIfInfo_T {
         Array<TagBit<Char_T_>> TrueSubTags{};
         Array<TagBit<Char_T_>> FalseSubTags{};
-        SizeT                  CaseOffset{};
-        SizeT                  CaseLength{};
-        SizeT                  TrueOffset{};
-        SizeT                  TrueLength{};
-        SizeT                  FalseOffset{};
-        SizeT                  FalseLength{};
+        unsigned int           CaseOffset{};
+        unsigned int           CaseLength{};
+        unsigned int           TrueOffset{};
+        unsigned int           TrueLength{};
+        unsigned int           FalseOffset{};
+        unsigned int           FalseLength{};
     };
 
     template <typename Char_T_>
     struct IfCase_T {
-        Array<TagBit<Char_T_>> SubTags{};
-        SizeT                  CaseOffset{};
-        SizeT                  CaseLength{};
-        SizeT                  ContentOffset{};
-        SizeT                  ContentLength{};
-    };
-
-    template <typename Char_T_>
-    struct IfInfo_T {
-        Array<IfCase_T<Char_T_>> Cases{1};
+        Array<TagBit<Char_T_>> SubTags;
+        const SizeT            CaseOffset;
+        const SizeT            CaseLength;
+        const SizeT            ContentOffset;
+        const SizeT            ContentLength;
     };
 
     template <typename Char_T_>
     struct TagBit {
         using LoopInfo_     = LoopInfo_T<Char_T_>;
-        using IfInfo_       = IfInfo_T<Char_T_>;
+        using IfInfo_       = Array<IfCase_T<Char_T_>>;
         using InlineIfInfo_ = InlineIfInfo_T<Char_T_>;
 
       public:
@@ -416,7 +411,7 @@ class Template_CV {
     using TagType       = Template::TagType;
     using LoopInfo_     = Template::LoopInfo_T<Char_T_>;
     using IfCase_       = Template::IfCase_T<Char_T_>;
-    using IfInfo_       = Template::IfInfo_T<Char_T_>;
+    using IfInfo_       = Array<IfCase_>;
     using InlineIfInfo_ = Template::InlineIfInfo_T<Char_T_>;
 
     using TemplatePatterns_C_ = TemplatePatterns<Char_T_>;
@@ -817,7 +812,7 @@ class Template_CV {
                         tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
                     IfInfo_ *if_info = tag->GetIfInfo();
 
-                    if (if_info->Cases.IsNotEmpty()) {
+                    if (if_info->IsNotEmpty()) {
                         renderIf((content + content_offset), if_info);
                     } else {
                         generateIfCases((content + content_offset),
@@ -1295,23 +1290,29 @@ class Template_CV {
             do {
                 switch (content[tmp_offset]) {
                     case TemplatePatterns_C_::CaseChar: {
-                        inline_if_info->CaseOffset = offset;
-                        inline_if_info->CaseLength = len;
-                        break_loop                 = true;
+                        inline_if_info->CaseOffset =
+                            static_cast<unsigned int>(offset);
+                        inline_if_info->CaseLength =
+                            static_cast<unsigned int>(len);
+                        break_loop = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::TrueChar: {
-                        inline_if_info->TrueOffset = offset;
-                        inline_if_info->TrueLength = len;
-                        break_loop                 = true;
+                        inline_if_info->TrueOffset =
+                            static_cast<unsigned int>(offset);
+                        inline_if_info->TrueLength =
+                            static_cast<unsigned int>(len);
+                        break_loop = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::FalseChar: {
-                        inline_if_info->FalseOffset = offset;
-                        inline_if_info->FalseLength = len;
-                        break_loop                  = true;
+                        inline_if_info->FalseOffset =
+                            static_cast<unsigned int>(offset);
+                        inline_if_info->FalseLength =
+                            static_cast<unsigned int>(len);
+                        break_loop = true;
                         break;
                     }
                 }
@@ -1364,41 +1365,44 @@ class Template_CV {
 
     QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
                                          IfInfo_ *if_info) const {
-        IfCase_ case_bit;
-        case_bit.CaseOffset = 0;
+        SizeT case_offset = 0;
+        SizeT case_length;
+        SizeT content_offset;
+        SizeT content_length;
 
         // The content without </if>
         const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);
 
         while (true) {
-            case_bit.CaseLength =
-                getQuoted(content, case_bit.CaseOffset, length);
+            case_length = getQuoted(content, case_offset, length);
 
-            if (case_bit.CaseLength == 0) {
+            if (case_length == 0) {
                 return;
             }
 
-            case_bit.ContentOffset = Engine::FindOne<Char_T_>(
+            content_offset = Engine::FindOne<Char_T_>(
                 TemplatePatterns_C_::MultiLineSuffix, content,
-                (case_bit.CaseOffset + case_bit.CaseLength + 1), length2);
+                (case_offset + case_length + 1), length2);
 
-            if (case_bit.ContentOffset == 0) {
+            if (content_offset == 0) {
                 return;
             }
 
-            SizeT else_offset =
-                nextElse(content, case_bit.ContentOffset, length);
+            SizeT else_offset = nextElse(content, content_offset, length);
 
             if (else_offset == 0) {
-                case_bit.ContentLength = (length2 - case_bit.ContentOffset);
-                if_info->Cases += static_cast<IfCase_ &&>(case_bit);
+                content_length = (length2 - content_offset);
+                if_info->Insert(IfCase_{Array<TagBit>(), case_offset,
+                                        case_length, content_offset,
+                                        content_length});
                 break;
             }
 
-            case_bit.ContentLength =
+            content_length =
                 ((else_offset - TemplatePatterns_C_::ElsePrefixLength) -
-                 case_bit.ContentOffset);
-            if_info->Cases += static_cast<IfCase_ &&>(case_bit);
+                 content_offset);
+            if_info->Insert(IfCase_{Array<TagBit>(), case_offset, case_length,
+                                    content_offset, content_length});
 
             if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
                 else_offset = Engine::FindOne<Char_T_>(
@@ -1409,15 +1413,17 @@ class Template_CV {
                     return;
                 }
 
-                case_bit.CaseLength    = 0;
-                case_bit.ContentOffset = else_offset;
-                case_bit.ContentLength = (length2 - else_offset);
+                case_length    = 0;
+                content_offset = else_offset;
+                content_length = (length2 - else_offset);
 
-                if_info->Cases += static_cast<IfCase_ &&>(case_bit);
+                if_info->Insert(IfCase_{Array<TagBit>(), case_offset,
+                                        case_length, content_offset,
+                                        content_length});
                 break;
             }
 
-            case_bit.CaseOffset = else_offset;
+            case_offset = else_offset;
         }
 
         renderIf(content, if_info);
@@ -1460,8 +1466,8 @@ class Template_CV {
     }
 
     void renderIf(const Char_T_ *content, IfInfo_ *if_info) const {
-        for (IfCase_ *item = if_info->Cases.Storage(),
-                     *end  = (item + if_info->Cases.Size());
+        for (IfCase_ *item = if_info->Storage(),
+                     *end  = (item + if_info->Size());
              item < end; item++) {
             double result;
 
