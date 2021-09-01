@@ -36,7 +36,7 @@ namespace Qentem {
  */
 
 template <typename>
-struct ALEHelper;
+struct ALEBasicHelper;
 
 template <typename>
 struct ALEOperations;
@@ -117,12 +117,10 @@ class ALE {
         return Evaluate(content, StringUtils::Count(content), callback);
     }
 
-    //////////////////////////// For testing //////////////////////////////////
-
     template <typename Char_T_>
     inline static bool Evaluate(double &number, const Char_T_ *content,
                                 SizeT length) noexcept {
-        static ALEHelper<Char_T_> helper;
+        static ALEBasicHelper<Char_T_> helper;
         return Evaluate(number, content, length, &helper);
     }
 
@@ -354,7 +352,7 @@ class ALE {
                 }
 
                 case ALEOperations_T_::BracketStart: {
-                    // {...} are evaluated to numbers or strings.
+                    // {...} are evaluated by callback to a number or string.
 
                     ++offset;
                     offset =
@@ -455,7 +453,7 @@ class ALE {
         switch (op) {
             case Operation::Exponent: { // ^
                 if (right.Number != 0.0) {
-                    // NOTE: Needs more work.
+                    // NOTE: Needs more work to evaluate fractions
                     if (left.Number != 0.0) {
                         const bool neg = (right.Number < 0);
 
@@ -575,7 +573,7 @@ class ALE {
 };
 
 template <typename Char_T_>
-struct ALEHelper {
+struct ALEBasicHelper {
     static bool ALESetNumber(double &number, const Char_T_ *content,
                              SizeT length) noexcept {
         return false;
