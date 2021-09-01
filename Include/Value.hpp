@@ -953,7 +953,7 @@ class Value {
         }
     }
 
-    bool InsertIndexOfKeyInto(StringStream<Char_T_> &ss, SizeT index) const {
+    bool InsertKeyByIndexInto(StringStream<Char_T_> &ss, SizeT index) const {
         if (IsObject()) {
             const VString *key = object_.GetKey(index);
 
