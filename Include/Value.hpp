@@ -1115,9 +1115,7 @@ class Value {
     }
 
     void Compress() {
-        if (IsObject()) {
-            object_.Compress();
-        } else if (IsArray()) {
+        if (IsArray()) {
             Value *      src_val = array_.Storage();
             const Value *src_end = array_.End();
             SizeT        size    = 0;
@@ -1149,6 +1147,8 @@ class Value {
 
                 array_ = static_cast<VArray &&>(new_array);
             }
+        } else if (IsObject()) {
+            object_.Compress();
         }
     }
 

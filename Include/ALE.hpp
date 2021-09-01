@@ -52,10 +52,30 @@ class ALE {
 
     union Number {
         double Number;
+
         struct {
             unsigned int Offset;
             unsigned int Length;
-        } Content{};
+        } Content{0, 0};
+    };
+
+    enum class Operation {
+        None = 0u,
+        Or,             // ||
+        And,            // &&
+        BiggerOrEqual,  // >=
+        Bigger,         // >
+        LessOrEqual,    // <=
+        Less,           // <
+        NotEqual,       // !=
+        Equal,          // ==
+        Subtraction,    // -
+        Addition,       // +
+        Division,       // /
+        Multiplication, // *
+        Remainder,      // %
+        Exponent,       // ^
+        Error           // X
     };
 
     template <typename Char_T_, typename Helper_T_>
@@ -128,25 +148,6 @@ class ALE {
     inline static double Evaluate(const Char_T_ *content) noexcept {
         return Evaluate(content, StringUtils::Count(content));
     }
-
-    enum class Operation {
-        None = 0u,
-        Or,             // ||
-        And,            // &&
-        BiggerOrEqual,  // >=
-        Bigger,         // >
-        LessOrEqual,    // <=
-        Less,           // <
-        NotEqual,       // !=
-        Equal,          // ==
-        Subtraction,    // -
-        Addition,       // +
-        Division,       // /
-        Multiplication, // *
-        Remainder,      // %
-        Exponent,       // ^
-        Error           // X
-    };
 
   private:
     template <typename Char_T_, typename Helper_T_>
