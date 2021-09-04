@@ -11,15 +11,16 @@
 -   [Live Testing](#live-testing)
 -   [JSON Example](#json-example)
 -   [Template Example](#template-example)
-    -   [PHP Module](#php-module)
     -   [JavaScript Module](#javascript-module)
+    -   [Python Module](#python-module)
+    -   [PHP Module](#php-module)
 -   [ALE Example](#ale-example)
 -   [Tests](#tests)
 -   [License](#license)
 
 ## Introduction
 
-Qentem Engine is a self-contained library for rendering HTML templates. Designed to be a server-side module or a client one `(WASM)`. It can also be used to render HTML pages in a normal Application. On PHP, it uses `z_val` for variable replacement. However, it evaluates if statements using a custom arithmetic and logic algorithm; for security and performance reasons. The client-side module – WASM has a compact `Value` container and a fast JSON parser.
+Qentem Engine is a self-contained library for rendering HTML templates. Designed to be a server-side module or a client one `WASM`. It can also be used to render HTML pages in a normal Application. On PHP, it uses `z_val` for variable replacement. However, it evaluates if statements using a custom arithmetic and logic algorithm; for security and performance reasons. The client-side module `WASM` has a compact `Value` container and a fast JSON parser.
 
 ## Features
 -   General
@@ -289,13 +290,17 @@ int main() {
 }
 ```
 
-### PHP Module
-
-PHP module is @ [BQen](https://github.com/HaniAmmar/BQen)
-
 ### JavaScript Module
 
 JavaScript module is @ [JQen](https://github.com/HaniAmmar/JQen)
+
+### Python Module
+
+Python module is @ [PiQen](https://github.com/HaniAmmar/PiQen)
+
+### PHP Module
+
+PHP module is @ [BQen](https://github.com/HaniAmmar/BQen)
 
 ## ALE Example
 
