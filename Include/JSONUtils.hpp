@@ -177,46 +177,47 @@ static void EscapeJSON(const Char_T_ *content, SizeT length,
                     buffer.Insert((content + offset2), (offset - offset2));
                 }
 
+                buffer += JSONotation_T_::BSlashChar;
                 offset2 = offset + 1;
 
                 switch (content[offset]) {
                     case JSONotation_T_::QuoteChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedQuote(), 2);
+                        buffer += JSONotation_T_::QuoteChar;
                         break;
                     }
 
                     case JSONotation_T_::BSlashChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedBSlash(), 2);
+                        buffer += JSONotation_T_::BSlashChar;
                         break;
                     }
 
                     case JSONotation_T_::SlashChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedSlash(), 2);
+                        buffer += JSONotation_T_::SlashChar;
                         break;
                     }
 
                     case JSONotation_T_::BackSpaceControlChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedBackSpace(), 2);
+                        buffer += JSONotation_T_::B_Char;
                         break;
                     }
 
                     case JSONotation_T_::FormfeedControlChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedFormfeed(), 2);
+                        buffer += JSONotation_T_::F_Char;
                         break;
                     }
 
                     case JSONotation_T_::LineControlChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedLine(), 2);
+                        buffer += JSONotation_T_::N_Char;
                         break;
                     }
 
                     case JSONotation_T_::CarriageControlChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedCarriage(), 2);
+                        buffer += JSONotation_T_::R_Char;
                         break;
                     }
 
                     case JSONotation_T_::TabControlChar: {
-                        buffer.Insert(JSONotation_T_::GetEscapedTab(), 2);
+                        buffer += JSONotation_T_::T_Char;
                         break;
                     }
                 }
@@ -259,7 +260,7 @@ struct JSONotation {
     static constexpr Char_T_ U_Char  = 'u';
     static constexpr Char_T_ CU_Char = 'U';
     static constexpr Char_T_ E_Char  = 'e';
-    static constexpr Char_T_ UE_Char = 'E';
+    static constexpr Char_T_ CE_Char = 'E';
 
     static constexpr unsigned char TrueStringLength = 4;
     static const Char_T_ *         GetTrueString() noexcept {
@@ -276,48 +277,6 @@ struct JSONotation {
     static constexpr unsigned char NullStringLength = 4;
     static const Char_T_ *         GetNullString() noexcept {
         static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l'};
-        return &(val[0]);
-    }
-
-    ////////// Escaped //////////
-
-    static const Char_T_ *GetEscapedQuote() noexcept {
-        static constexpr Char_T_ val[] = {'\\', '"'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedBSlash() noexcept {
-        static constexpr Char_T_ val[] = {'\\', '\\'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedSlash() noexcept {
-        static constexpr Char_T_ val[] = {'\\', '/'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedLine() noexcept {
-        static constexpr Char_T_ val[] = {'\\', 'n'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedTab() noexcept {
-        static constexpr Char_T_ val[] = {'\\', 't'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedCarriage() noexcept {
-        static constexpr Char_T_ val[] = {'\\', 'r'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedBackSpace() noexcept {
-        static constexpr Char_T_ val[] = {'\\', 'b'};
-        return &(val[0]);
-    }
-
-    static const Char_T_ *GetEscapedFormfeed() noexcept {
-        static constexpr Char_T_ val[] = {'\\', 'f'};
         return &(val[0]);
     }
 };

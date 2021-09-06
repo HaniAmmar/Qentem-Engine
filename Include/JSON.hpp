@@ -266,7 +266,7 @@ class JSONParser {
                     switch (content[offset]) {
                         case JSONotation_T_::DotChar:
                         case JSONotation_T_::E_Char:
-                        case JSONotation_T_::UE_Char: {
+                        case JSONotation_T_::CE_Char: {
                             is_float = true;
                             break;
                         }
