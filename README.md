@@ -26,7 +26,7 @@ Qentem Engine is a self-contained library for rendering HTML templates. Designed
 -   General
     -   Cross platform, header only and self-contained; no external libraries is needed.
     -   Supports UTF-8, UTF-16 and UTF-32.
-    -   Supports 32-bit and 64-bit architecture, little and big endian.
+    -   Supports 32-bit and 64-bit architecture, little and big-endian.
     -   Low memory usage.
     -   No exceptions (try, catch and throw).
 
@@ -37,7 +37,7 @@ Qentem Engine is a self-contained library for rendering HTML templates. Designed
     -   Data sorting.
     -   `Value` size: 16 bytes on 64-bit, and 12 on 32-bit.
 
--   Tempate engine
+-   Template engine
     -   Fast template rendering.
     -   Safe evaluation.
     -   Variable replacement with HTML auto-escape.
