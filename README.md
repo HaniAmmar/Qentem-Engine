@@ -20,11 +20,11 @@
 
 ## Introduction
 
-Qentem Engine is a self-contained library for rendering HTML templates. Designed to be a server-side module or a client one `WASM`. It can also be used to render HTML pages in a normal Application. On PHP, it uses `z_val` for variable replacement. However, it evaluates if statements using a custom arithmetic and logic algorithm; for security and performance reasons. The client-side module `WASM` has a compact `Value` container and a fast JSON parser.
+Qentem Engine is a self-contained library for rendering HTML templates, designed to work in the back-end or the font-end `WASM`. It is capable of rendering HTML pages in normal applications. It has a PHP module that uses the `z_val` for variable replacement, but it evaluates if statements through custom arithmetic and logic algorithm; for security and performance reasons. The client-side module `WASM` has a compact `Value` container and a fast JSON parser.
 
 ## Features
 -   General
-    -   Cross platform, header only and self-contained; no external libraries is needed.
+    -   Cross-platform, header-only and self-contained; no external libraries are needed.
     -   Supports UTF-8, UTF-16 and UTF-32.
     -   Supports 32-bit and 64-bit architecture, little and big-endian.
     -   Low memory usage.
