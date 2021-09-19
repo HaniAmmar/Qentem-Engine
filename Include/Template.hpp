@@ -648,7 +648,7 @@ class Template_CV {
                             (offset +
                              TemplatePatterns_C_::VariablePrefixLength),
                             length);
-                        // end_offset will never be zero
+                        // end_offset cannot be zero
 
                         tags_cache += TagBit{
                             TagType::Variable,
