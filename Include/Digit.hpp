@@ -906,90 +906,14 @@ class Digit {
 
     QENTEM_NOINLINE static unsigned long long
     extractFraction(double number, unsigned int precision) noexcept {
-        switch (precision) {
-            case 1: {
-                number *= 1E2;
-                break;
-            }
+        const double mul[] = {1,    1E2,  1E3,  1E4,  1E5,  1E6,
+                              1E7,  1E8,  1E9,  1E10, 1E11, 1E12,
+                              1E13, 1E14, 1E15, 1E16, 1E17};
 
-            case 2: {
-                number *= 1E3;
-                break;
-            }
-
-            case 3: {
-                number *= 1E4;
-                break;
-            }
-
-            case 4: {
-                number *= 1E5;
-                break;
-            }
-
-            case 5: {
-                number *= 1E6;
-                break;
-            }
-
-            case 6: {
-                number *= 1E7;
-                break;
-            }
-
-            case 7: {
-                number *= 1E8;
-                break;
-            }
-
-            case 8: {
-                number *= 1E9;
-                break;
-            }
-
-            case 9: {
-                number *= 1E10;
-                break;
-            }
-
-            case 10: {
-                number *= 1E11;
-                break;
-            }
-
-            case 11: {
-                number *= 1E12;
-                break;
-            }
-
-            case 12: {
-                number *= 1E13;
-                break;
-            }
-
-            case 13: {
-                number *= 1E14;
-                break;
-            }
-
-            case 14: {
-                number *= 1E15;
-                break;
-            }
-
-            case 15: {
-                number *= 1E16;
-                break;
-            }
-
-            case 16: {
-                number *= 1E17;
-                break;
-            }
-
-            default: {
-                number *= 1E18;
-            }
+        if (precision < 17U) {
+            number *= mul[precision];
+        } else {
+            number *= 1E18;
         }
 
         return static_cast<unsigned long long>(number);

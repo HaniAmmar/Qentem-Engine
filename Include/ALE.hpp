@@ -63,12 +63,12 @@ class ALE {
         None = 0u,
         Or,             // ||
         And,            // &&
-        BiggerOrEqual,  // >=
-        Bigger,         // >
-        LessOrEqual,    // <=
-        Less,           // <
-        NotEqual,       // !=
         Equal,          // ==
+        NotEqual,       // !=
+        BiggerOrEqual,  // >=
+        LessOrEqual,    // <=
+        Bigger,         // >
+        Less,           // <
         Subtraction,    // -
         Addition,       // +
         Division,       // /
@@ -211,20 +211,10 @@ class ALE {
     }
 
     static void advance(Operation op, SizeT &offset) {
-        switch (op) {
-            case Operation::Equal:
-            case Operation::NotEqual:
-            case Operation::LessOrEqual:
-            case Operation::BiggerOrEqual:
-            case Operation::And:
-            case Operation::Or: {
-                offset += 2;
-                break;
-            }
+        ++offset;
 
-            default: {
-                ++offset;
-            }
+        if ((op >= Operation::Or) && (op <= Operation::LessOrEqual)) {
+            ++offset;
         }
     }
 
@@ -352,7 +342,8 @@ class ALE {
                 }
 
                 case ALEOperations_T_::BracketStart: {
-                    // {...} are evaluated by callback to a number or string.
+                    // {...} are evaluated by callback to a number or
+                    // string.
 
                     ++offset;
                     offset =
