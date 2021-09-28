@@ -1152,118 +1152,15 @@ class Value {
         }
     }
 
-    static void StringifyObject(const VObject &obj, StringStream<Char_T_> &ss) {
-        using V_item_ = HAItem<Value, Char_T_>;
-
-        ss += JSONotation_T_::SCurlyChar;
-
-        for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size());
-             h_item != end; h_item++) {
-            if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
-                ss += JSONotation_T_::QuoteChar;
-                JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), ss);
-                ss += JSONotation_T_::QuoteChar;
-                ss += JSONotation_T_::ColonChar;
-
-                StringifyValue(h_item->Value, ss);
-                ss += JSONotation_T_::CommaChar;
-            }
-        }
-
-        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
-            ss.StepBack(1);
-        }
-
-        ss += JSONotation_T_::ECurlyChar;
-    }
-
-    static void StringifyArray(const VArray &arr, StringStream<Char_T_> &ss) {
-        ss += JSONotation_T_::SSquareChar;
-
-        for (const Value *item = arr.First(), *end = (item + arr.Size());
-             item != end; item++) {
-            if (!(item->IsUndefined())) {
-                StringifyValue(*item, ss);
-                ss += JSONotation_T_::CommaChar;
-            }
-        }
-
-        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
-            ss.StepBack(1);
-        }
-
-        ss += JSONotation_T_::ESquareChar;
-    }
-
-    static void StringifyValue(const Value &val, StringStream<Char_T_> &ss) {
-        switch (val.Type()) {
-            case ValueType::Object: {
-                StringifyObject(val.object_, ss);
-                break;
-            }
-
-            case ValueType::Array: {
-                StringifyArray(val.array_, ss);
-                break;
-            }
-
-            case ValueType::String: {
-                ss += JSONotation_T_::QuoteChar;
-                JSON::EscapeJSON(val.string_.First(), val.string_.Length(), ss);
-                ss += JSONotation_T_::QuoteChar;
-                break;
-            }
-
-            case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(
-                    ss, val.number_.GetUInt64(), 1);
-                break;
-            }
-
-            case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(),
-                                                     1);
-                break;
-            }
-
-            case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(
-                    ss, val.number_.GetDouble(), 1);
-                break;
-            }
-
-            case ValueType::False: {
-                ss.Insert(JSONotation_T_::GetFalseString(),
-                          JSONotation_T_::FalseStringLength);
-                break;
-            }
-
-            case ValueType::True: {
-                ss.Insert(JSONotation_T_::GetTrueString(),
-                          JSONotation_T_::TrueStringLength);
-                break;
-            }
-
-            case ValueType::Null: {
-                ss.Insert(JSONotation_T_::GetNullString(),
-                          JSONotation_T_::NullStringLength);
-                break;
-            }
-
-            default: {
-            }
-        }
-    }
-
     inline VString Stringify() const {
         StringStream<Char_T_> ss;
 
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            StringifyObject(this->object_, ss);
+            stringifyObject(this->object_, ss);
         } else if (type == ValueType::Array) {
-            StringifyArray(this->array_, ss);
+            stringifyArray(this->array_, ss);
         }
 
         return ss.GetString();
@@ -1345,6 +1242,109 @@ class Value {
 
   private:
     struct VType_; // For tagging pointers
+
+    static void stringifyObject(const VObject &obj, StringStream<Char_T_> &ss) {
+        using V_item_ = HAItem<Value, Char_T_>;
+
+        ss += JSONotation_T_::SCurlyChar;
+
+        for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size());
+             h_item != end; h_item++) {
+            if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
+                ss += JSONotation_T_::QuoteChar;
+                JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), ss);
+                ss += JSONotation_T_::QuoteChar;
+                ss += JSONotation_T_::ColonChar;
+
+                stringifyValue(h_item->Value, ss);
+                ss += JSONotation_T_::CommaChar;
+            }
+        }
+
+        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
+            ss.StepBack(1);
+        }
+
+        ss += JSONotation_T_::ECurlyChar;
+    }
+
+    static void stringifyArray(const VArray &arr, StringStream<Char_T_> &ss) {
+        ss += JSONotation_T_::SSquareChar;
+
+        for (const Value *item = arr.First(), *end = (item + arr.Size());
+             item != end; item++) {
+            if (!(item->IsUndefined())) {
+                stringifyValue(*item, ss);
+                ss += JSONotation_T_::CommaChar;
+            }
+        }
+
+        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
+            ss.StepBack(1);
+        }
+
+        ss += JSONotation_T_::ESquareChar;
+    }
+
+    static void stringifyValue(const Value &val, StringStream<Char_T_> &ss) {
+        switch (val.Type()) {
+            case ValueType::Object: {
+                stringifyObject(val.object_, ss);
+                break;
+            }
+
+            case ValueType::Array: {
+                stringifyArray(val.array_, ss);
+                break;
+            }
+
+            case ValueType::String: {
+                ss += JSONotation_T_::QuoteChar;
+                JSON::EscapeJSON(val.string_.First(), val.string_.Length(), ss);
+                ss += JSONotation_T_::QuoteChar;
+                break;
+            }
+
+            case ValueType::UInt64: {
+                Digit<Char_T_>::NumberToStringStream(
+                    ss, val.number_.GetUInt64(), 1);
+                break;
+            }
+
+            case ValueType::Int64: {
+                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(),
+                                                     1);
+                break;
+            }
+
+            case ValueType::Double: {
+                Digit<Char_T_>::NumberToStringStream(
+                    ss, val.number_.GetDouble(), 1);
+                break;
+            }
+
+            case ValueType::False: {
+                ss.Insert(JSONotation_T_::GetFalseString(),
+                          JSONotation_T_::FalseStringLength);
+                break;
+            }
+
+            case ValueType::True: {
+                ss.Insert(JSONotation_T_::GetTrueString(),
+                          JSONotation_T_::TrueStringLength);
+                break;
+            }
+
+            case ValueType::Null: {
+                ss.Insert(JSONotation_T_::GetNullString(),
+                          JSONotation_T_::NullStringLength);
+                break;
+            }
+
+            default: {
+            }
+        }
+    }
 
     inline void setType(ValueType new_type) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
