@@ -260,8 +260,8 @@ static int TestStringStream() {
 
     struct SimpleStream {
         const unsigned int max = 6;
-        char               str[6]{0};
         unsigned int       index{0};
+        char               str[6]{0};
 
         void operator<<(const char c) {
             str[index] = c;
