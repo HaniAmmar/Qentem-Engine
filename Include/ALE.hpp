@@ -36,10 +36,10 @@ namespace Qentem {
  */
 
 template <typename>
-struct ALEBasicHelper;
+class ALEBasicHelper;
 
 template <typename>
-struct ALEOperations;
+class ALEOperations;
 
 class ALE {
   public:
@@ -120,7 +120,7 @@ class ALE {
     template <typename Char_T_>
     inline static bool Evaluate(double &number, const Char_T_ *content,
                                 SizeT length) noexcept {
-        static ALEBasicHelper<Char_T_> helper;
+        ALEBasicHelper<Char_T_> helper;
         return Evaluate(number, content, length, &helper);
     }
 

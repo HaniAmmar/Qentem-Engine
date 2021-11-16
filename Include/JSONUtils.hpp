@@ -31,7 +31,7 @@ namespace Qentem {
 namespace JSON {
 
 template <typename>
-struct JSONotation;
+class JSONotation;
 
 template <typename Char_T_>
 QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *        content,

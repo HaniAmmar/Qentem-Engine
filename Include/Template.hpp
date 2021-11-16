@@ -168,7 +168,7 @@ template <typename, typename>
 class Template_CV;
 
 template <typename>
-struct TemplatePatterns;
+class TemplatePatterns;
 
 class Template {
   public:
