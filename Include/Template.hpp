@@ -1712,7 +1712,8 @@ class Template_CV {
 };
 
 template <typename Char_T_>
-struct TemplatePatterns {
+class TemplatePatterns {
+  public:
     /*
      *InLineSuffixLength and InLinePrefixLength should not be more than
      *1

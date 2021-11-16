@@ -39,7 +39,8 @@ namespace Qentem {
 template <typename Char_T_>
 class Digit {
   private:
-    struct DigitChars {
+    class DigitChars {
+      public:
         static constexpr Char_T_ ZeroChar  = '0';
         static constexpr Char_T_ NineChar  = '9';
         static constexpr Char_T_ SevenChar = '7';
@@ -173,7 +174,8 @@ class Digit {
 
   private:
     template <typename Number_T_, bool IS_UNSIGNED, bool IS_FLOAT>
-    struct StringToNumberHelper {
+    class StringToNumberHelper {
+      public:
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
                                           SizeT length) noexcept {
             return stringToSignedFloat(number, str, length);
@@ -181,7 +183,8 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct StringToNumberHelper<Number_T_, true, false> {
+    class StringToNumberHelper<Number_T_, true, false> {
+      public:
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
                                           SizeT length) noexcept {
             return stringToUnsignedInt(number, str, length);
@@ -189,7 +192,8 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct StringToNumberHelper<Number_T_, false, false> {
+    class StringToNumberHelper<Number_T_, false, false> {
+      public:
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str,
                                           SizeT length) noexcept {
             return stringToSignedInt(number, str, length);
@@ -297,7 +301,8 @@ class Digit {
     }
 
     template <typename Number_T_, bool IS_UNSIGNED>
-    struct NumberToStringHelper {
+    class NumberToStringHelper {
+      public:
         inline static String<Char_T_> NumberToString(Number_T_    number,
                                                      unsigned int min = 1) {
             String<Char_T_> str;
@@ -307,7 +312,8 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct NumberToStringHelper<Number_T_, false> {
+    class NumberToStringHelper<Number_T_, false> {
+      public:
         inline static String<Char_T_> NumberToString(Number_T_    number,
                                                      unsigned int min = 1) {
             String<Char_T_> str;
@@ -324,7 +330,8 @@ class Digit {
     };
 
     template <typename Number_T_, bool IS_UNSIGNED>
-    struct NumberToStringStreamHelper {
+    class NumberToStringStreamHelper {
+      public:
         inline static void NumberToStringStream(StringStream<Char_T_> &ss,
                                                 Number_T_              number,
                                                 unsigned int min = 1) {
@@ -333,7 +340,8 @@ class Digit {
     };
 
     template <typename Number_T_>
-    struct NumberToStringStreamHelper<Number_T_, false> {
+    class NumberToStringStreamHelper<Number_T_, false> {
+      public:
         inline static void NumberToStringStream(StringStream<Char_T_> &ss,
                                                 Number_T_              number,
                                                 unsigned int min = 1) {

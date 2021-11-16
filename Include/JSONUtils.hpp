@@ -233,7 +233,8 @@ static void EscapeJSON(const Char_T_ *content, SizeT length,
 }
 
 template <typename Char_T_>
-struct JSONotation {
+class JSONotation {
+  public:
     static constexpr Char_T_ QuoteChar   = '"';
     static constexpr Char_T_ CommaChar   = ',';
     static constexpr Char_T_ ColonChar   = ':';

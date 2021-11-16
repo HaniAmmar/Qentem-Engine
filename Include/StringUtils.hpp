@@ -27,9 +27,11 @@
 
 namespace Qentem {
 
-struct StringUtils {
+class StringUtils {
+  public:
     template <typename Char_T_>
-    struct WhiteSpaceChars {
+    class WhiteSpaceChars {
+      public:
         static constexpr Char_T_ SpaceChar           = ' ';
         static constexpr Char_T_ LineControlChar     = '\n';
         static constexpr Char_T_ TabControlChar      = '\t';

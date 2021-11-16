@@ -30,7 +30,8 @@
 namespace Qentem {
 namespace Test {
 
-struct ALEHelper {
+class ALEHelper {
+  public:
     // See class Template_T_ for another example.
     struct Value_T_ {
         const char *Name;
