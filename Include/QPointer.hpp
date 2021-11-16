@@ -28,7 +28,21 @@
 namespace Qentem {
 
 template <typename Type_>
-struct QPointer {
+class QPointer {
+    // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
+  private:
+    struct Tag_ {
+#ifndef QENTEM_BIG_ENDIAN
+        unsigned long long int_ptr_ : 48;
+        unsigned long long low_ : 8;
+        unsigned long long high_ : 8;
+#else
+        unsigned long long high_ : 8;
+        unsigned long long low_ : 8;
+        unsigned long long int_ptr_ : 48;
+#endif
+    };
+
   public:
     QPointer() noexcept : ptr_{nullptr} {}
     ~QPointer() = default;
@@ -89,19 +103,6 @@ struct QPointer {
     void          SetLowTag(unsigned char tag) noexcept { tag_.low_ = tag; }
     unsigned char GetLowTag() const noexcept { return tag_.low_; }
 #endif
-
-  private:
-    struct Tag_ {
-#ifndef QENTEM_BIG_ENDIAN
-        unsigned long long int_ptr_ : 48;
-        unsigned long long low_ : 8;
-        unsigned long long high_ : 8;
-#else
-        unsigned long long high_ : 8;
-        unsigned long long low_ : 8;
-        unsigned long long int_ptr_ : 48;
-#endif
-    };
 
     union {
         Type_ *ptr_;
