@@ -60,7 +60,7 @@ class ALE {
     };
 
     enum class Operation {
-        None = 0u,
+        None = 0U,
         Or,             // ||
         And,            // &&
         Equal,          // ==
@@ -564,7 +564,8 @@ class ALE {
 };
 
 template <typename Char_T_>
-struct ALEBasicHelper {
+class ALEBasicHelper {
+  public:
     static bool ALESetNumber(double &number, const Char_T_ *content,
                              SizeT length) noexcept {
         return false;
@@ -613,7 +614,8 @@ struct ALEBasicHelper {
 };
 
 template <typename Char_T_>
-struct ALEOperations {
+class ALEOperations {
+  public:
     static constexpr Char_T_ RemainderOp = '%';
     static constexpr Char_T_ MultipleOp  = '*';
     static constexpr Char_T_ DivideOp    = '/';
