@@ -161,7 +161,7 @@ class StringUtils {
         SizeT offset = 0;
 
         while (offset != length) {
-            const unsigned int num = static_cast<unsigned int>(key[offset]);
+            const unsigned int num = static_cast<unsigned char>(key[offset]);
             ++offset;
             hash += (base * offset * num);
             base += offset;
