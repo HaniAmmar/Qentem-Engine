@@ -162,7 +162,7 @@ class StringStream {
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &out, const Char_T_ ch) {
+    friend StringStream &operator<<(StringStream &out, Char_T_ ch) {
         out += ch;
         return out;
     }
