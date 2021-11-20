@@ -185,14 +185,14 @@ class Template {
 
     template <typename Char_T_, typename Value_T_, typename Number_T_>
     inline static void Render(const Char_T_ *content, Number_T_ length,
-                              const Value_T_ *       root_value,
+                              const Value_T_        *root_value,
                               StringStream<Char_T_> *ss) {
         Array<TagBit<Char_T_>> tags_cache;
         Render(content, length, root_value, ss, &tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename Number_T_>
-    inline static StringStream<Char_T_> Render(const Char_T_ * content,
+    inline static StringStream<Char_T_> Render(const Char_T_  *content,
                                                Number_T_       length,
                                                const Value_T_ *root_value) {
         StringStream<Char_T_> ss;
@@ -201,7 +201,7 @@ class Template {
     }
 
     template <typename Char_T_, typename Value_T_>
-    inline static StringStream<Char_T_> Render(const Char_T_ * content,
+    inline static StringStream<Char_T_> Render(const Char_T_  *content,
                                                const Value_T_ *root_value) {
         return Render(content, StringUtils::Count(content), root_value);
     }
@@ -418,7 +418,7 @@ class Template_CV {
         SizeT offset = 0;
 
         if (tags_cache.IsNotEmpty()) {
-            TagBit *      start = tags_cache.Storage();
+            TagBit       *start = tags_cache.Storage();
             const TagBit *end   = (start + tags_cache.Size());
             render(start, end, content);
             offset = (end - 1)->EndOffset();
@@ -448,9 +448,9 @@ class Template_CV {
                     return;
                 }
 
-                const SizeT index = Platform::CTZ(bits);
-                bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
+                const SizeT index       = Platform::CTZ(bits);
                 const SizeT next_offset = (index + m_offset);
+                bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
 
                 if (bits == 0) {
                     m_offset += Platform::SMIDNextOffset<Char_T_, SizeT>();
@@ -526,7 +526,7 @@ class Template_CV {
                                 (TemplatePatterns_C_::GetMathPrefix() + 2),
                                 (content + current_offset + 1),
                                 (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                            SizeT end_offset =
+                            const SizeT end_offset =
                                 Engine::SkipInnerPatterns<Char_T_>(
                                     TemplatePatterns_C_::InLinePrefix,
                                     TemplatePatterns_C_::InLineSuffix, content,
@@ -551,7 +551,7 @@ class Template_CV {
                                 (content + current_offset + 1),
                                 (TemplatePatterns_C_::InLineIfPrefixLength -
                                  2))) {
-                            SizeT end_offset =
+                            const SizeT end_offset =
                                 Engine::SkipInnerPatterns<Char_T_>(
                                     TemplatePatterns_C_::InLinePrefix,
                                     TemplatePatterns_C_::InLineSuffix, content,
@@ -579,14 +579,15 @@ class Template_CV {
                             (TemplatePatterns_C_::GetLoopPrefix() + 2),
                             (content + current_offset + 1),
                             (TemplatePatterns_C_::LoopPrefixLength - 2))) {
-                        SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
-                            TemplatePatterns_C_::GetLoopPrefix(),
-                            TemplatePatterns_C_::LoopPrefixLength,
-                            TemplatePatterns_C_::GetLoopSuffix(),
-                            TemplatePatterns_C_::LoopSuffixLength, content,
-                            (current_offset +
-                             TemplatePatterns_C_::InLineIfPrefixLength - 1),
-                            length);
+                        const SizeT end_offset =
+                            Engine::SkipInnerPatterns<Char_T_>(
+                                TemplatePatterns_C_::GetLoopPrefix(),
+                                TemplatePatterns_C_::LoopPrefixLength,
+                                TemplatePatterns_C_::GetLoopSuffix(),
+                                TemplatePatterns_C_::LoopSuffixLength, content,
+                                (current_offset +
+                                 TemplatePatterns_C_::InLineIfPrefixLength - 1),
+                                length);
 
                         if (end_offset != 0) {
                             tags_cache +=
@@ -601,12 +602,13 @@ class Template_CV {
                             (TemplatePatterns_C_::GetIfPrefix() + 2),
                             (content + current_offset + 1),
                             (TemplatePatterns_C_::IfPrefixLength - 2))) {
-                        SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
-                            TemplatePatterns_C_::GetIfPrefix(),
-                            TemplatePatterns_C_::IfPrefixLength,
-                            TemplatePatterns_C_::GetIfSuffix(),
-                            TemplatePatterns_C_::IfSuffixLength, content,
-                            current_offset, length);
+                        const SizeT end_offset =
+                            Engine::SkipInnerPatterns<Char_T_>(
+                                TemplatePatterns_C_::GetIfPrefix(),
+                                TemplatePatterns_C_::IfPrefixLength,
+                                TemplatePatterns_C_::GetIfSuffix(),
+                                TemplatePatterns_C_::IfSuffixLength, content,
+                                current_offset, length);
 
                         if (end_offset != 0) {
                             tags_cache +=
@@ -686,12 +688,13 @@ class Template_CV {
                             (TemplatePatterns_C_::GetMathPrefix() + 2),
                             (content + offset + 1),
                             (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                        SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
-                            TemplatePatterns_C_::InLinePrefix,
-                            TemplatePatterns_C_::InLineSuffix, content,
-                            (offset + TemplatePatterns_C_::MathPrefixLength -
-                             1),
-                            length);
+                        const SizeT end_offset =
+                            Engine::SkipInnerPatterns<Char_T_>(
+                                TemplatePatterns_C_::InLinePrefix,
+                                TemplatePatterns_C_::InLineSuffix, content,
+                                (offset +
+                                 TemplatePatterns_C_::MathPrefixLength - 1),
+                                length);
                         tags_cache += TagBit{
                             TagType::Math,
                             (offset - TemplatePatterns_C_::InLinePrefixLength),
@@ -983,7 +986,7 @@ class Template_CV {
 
     QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content,
                                              SizeT          length,
-                                             LoopInfo_ *&   loop_info) const {
+                                             LoopInfo_    *&loop_info) const {
         const SizeT start_offset = Engine::FindOne<Char_T_>(
             TemplatePatterns_C_::MultiLineSuffix, content, SizeT(0), length);
 
@@ -1171,7 +1174,7 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE void renderLoop(const Char_T_ *content,
-                                    LoopInfo_ *    loop_info) const {
+                                    LoopInfo_     *loop_info) const {
         // Stage 3: Data
         Value_T_        grouped_set;
         const Value_T_ *loop_set   = root_value_;
@@ -1703,10 +1706,10 @@ class Template_CV {
         : ss_(ss), root_value_(root_value), parent_(parent), level_(level) {}
 
     StringStream<Char_T_> *ss_;
-    const Value_T_ *       root_value_;
-    const Template_CV *    parent_;
-    const Value_T_ *       loop_value_{nullptr};
-    const Char_T_ *        loop_key_{nullptr};
+    const Value_T_        *root_value_;
+    const Template_CV     *parent_;
+    const Value_T_        *loop_value_{nullptr};
+    const Char_T_         *loop_key_{nullptr};
     SizeT                  loop_key_length{0};
     const SizeT            level_;
 };
@@ -1764,7 +1767,7 @@ class TemplatePatterns {
     // {if:
     static constexpr Char_T_ InlineIf_2ND_Char    = 'i'; // Second character
     static constexpr SizeT   InLineIfPrefixLength = 3U;
-    static const Char_T_ *   GetInLineIfPrefix() noexcept {
+    static const Char_T_    *GetInLineIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
         return &(val[0]);
     }
@@ -1772,14 +1775,14 @@ class TemplatePatterns {
     // <loop
     static constexpr Char_T_ Loop_2ND_Char    = 'l'; // Second character
     static constexpr SizeT   LoopPrefixLength = 5U;
-    static const Char_T_ *   GetLoopPrefix() noexcept {
+    static const Char_T_    *GetLoopPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
         return &(val[0]);
     }
 
     // </loop>
     static constexpr SizeT LoopSuffixLength = 7U;
-    static const Char_T_ * GetLoopSuffix() noexcept {
+    static const Char_T_  *GetLoopSuffix() noexcept {
         static constexpr Char_T_ val[] = {'<', '/', 'l', 'o', 'o', 'p', '>'};
         return &(val[0]);
     }
@@ -1787,14 +1790,14 @@ class TemplatePatterns {
     // <if
     static constexpr Char_T_ If_2ND_Char    = 'i'; // Second character
     static constexpr SizeT   IfPrefixLength = 3U;
-    static const Char_T_ *   GetIfPrefix() noexcept {
+    static const Char_T_    *GetIfPrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'i', 'f'};
         return &(val[0]);
     }
 
     // </if>
     static constexpr SizeT IfSuffixLength = 5U;
-    static const Char_T_ * GetIfSuffix() noexcept {
+    static const Char_T_  *GetIfSuffix() noexcept {
         static constexpr Char_T_ val[] = {'<', '/', 'i', 'f', '>'};
         return &(val[0]);
     }
@@ -1802,49 +1805,49 @@ class TemplatePatterns {
     // <else
     static constexpr Char_T_ ElseIfChar       = 'i'; // else[i]f
     static constexpr SizeT   ElsePrefixLength = 5U;
-    static const Char_T_ *   GetElsePrefix() noexcept {
+    static const Char_T_    *GetElsePrefix() noexcept {
         static constexpr Char_T_ val[] = {'<', 'e', 'l', 's', 'e'};
         return &(val[0]);
     }
 
     // />
     static constexpr SizeT ElseSuffixLength = 2U;
-    static const Char_T_ * GetElseSuffix() noexcept {
+    static const Char_T_  *GetElseSuffix() noexcept {
         static constexpr Char_T_ val[] = {'/', '>'};
         return &(val[0]);
     }
 
     // &amp; &
     static constexpr SizeT HTMLAndLength = 5U;
-    static const Char_T_ * GetHTMLAnd() noexcept {
+    static const Char_T_  *GetHTMLAnd() noexcept {
         static constexpr Char_T_ val[] = {'&', 'a', 'm', 'p', ';'};
         return &(val[0]);
     }
 
     // &lt; <
     static constexpr SizeT HTMLLessLength = 4U;
-    static const Char_T_ * GetHTMLLess() noexcept {
+    static const Char_T_  *GetHTMLLess() noexcept {
         static constexpr Char_T_ val[] = {'&', 'l', 't', ';'};
         return &(val[0]);
     }
 
     // &gt; >
     static constexpr SizeT HTMLBiggerLength = 4U;
-    static const Char_T_ * GetHTMLBigger() noexcept {
+    static const Char_T_  *GetHTMLBigger() noexcept {
         static constexpr Char_T_ val[] = {'&', 'g', 't', ';'};
         return &(val[0]);
     }
 
     // &quot; "
     static constexpr SizeT HTMLQuoteLength = 6U;
-    static const Char_T_ * GetHTMLQuote() noexcept {
+    static const Char_T_  *GetHTMLQuote() noexcept {
         static constexpr Char_T_ val[] = {'&', 'q', 'u', 'o', 't', ';'};
         return &(val[0]);
     }
 
     // &apos; ' (HTML5)
     static constexpr SizeT HTMLSingleQuoteLength = 6U;
-    static const Char_T_ * GetHTMLSingleQuote() noexcept {
+    static const Char_T_  *GetHTMLSingleQuote() noexcept {
         static constexpr Char_T_ val[] = {'&', 'a', 'p', 'o', 's', ';'};
         return &(val[0]);
     }

@@ -150,13 +150,13 @@ class StringStream {
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &      out,
+    friend StringStream &operator<<(StringStream       &out,
                                     const StringStream &src) {
         out.insert(src.First(), src.Length());
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &         out,
+    friend StringStream &operator<<(StringStream          &out,
                                     const String<Char_T_> &src) {
         out.insert(src.First(), src.Length());
         return out;
@@ -210,7 +210,7 @@ class StringStream {
         return (!(*this == str));
     }
 
-    inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
+    inline bool IsEqual(const Char_T_ *str, const SizeT length) const noexcept {
         if (Length() != length) {
             return false;
         }
@@ -218,7 +218,7 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, length);
     }
 
-    inline void Insert(const Char_T_ *str, SizeT length) {
+    inline void Insert(const Char_T_ *str, const SizeT length) {
         insert(str, length);
     }
 
@@ -231,14 +231,14 @@ class StringStream {
         clearStorage();
     }
 
-    inline void StepBack(SizeT length) noexcept {
-        if (length <= Length()) {
-            length_ -= length;
+    inline void StepBack(const SizeT len) noexcept {
+        if (len <= Length()) {
+            length_ -= len;
         }
     }
 
     // Set the needed length to write directly to the buffer,
-    Char_T_ *Buffer(SizeT len) noexcept {
+    Char_T_ *Buffer(const SizeT len) noexcept {
         const SizeT current_offset = Length();
         length_ += len;
 
@@ -250,10 +250,10 @@ class StringStream {
     }
 
     inline void Expect(SizeT len) {
-        const SizeT new_len = (Length() + len);
+        len += Length();
 
-        if (new_len > Capacity()) {
-            expand(algineSize(new_len));
+        if (len > Capacity()) {
+            expand(algineSize(len));
         }
     }
 
@@ -267,19 +267,20 @@ class StringStream {
     }
 
     String<Char_T_> GetString() {
-        if (Capacity() > Length()) {
-            const SizeT len = Length();
-            Storage()[len]  = 0;
-            return String<Char_T_>(Eject(), len);
-        }
+        const SizeT len = Length();
 
-        String<Char_T_> str{First(), Length()};
+        // if (Capacity() > len) {
+        //     Storage()[len]  = 0;
+        //     return String<Char_T_>(Eject(), len);
+        // }
+
+        String<Char_T_> str{First(), len};
         Reset();
 
         return str;
     }
 
-    inline Char_T_ *      Storage() const noexcept { return storage_; }
+    inline Char_T_       *Storage() const noexcept { return storage_; }
     inline SizeT          Length() const noexcept { return length_; }
     inline SizeT          Capacity() const noexcept { return capacity_; }
     inline const Char_T_ *First() const noexcept { return Storage(); }
@@ -301,8 +302,10 @@ class StringStream {
     void allocate() { setStorage(Memory::Allocate<Char_T_>(Capacity())); }
     void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
-    void setLength(SizeT new_length) noexcept { length_ = new_length; }
-    void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+    void setLength(const SizeT new_length) noexcept { length_ = new_length; }
+    void setCapacity(const SizeT new_capacity) noexcept {
+        capacity_ = new_capacity;
+    }
 
     SizeT algineSize(SizeT n_size) noexcept {
         return (SizeT{2} << Platform::CLZ(n_size | 4U));
@@ -322,8 +325,8 @@ class StringStream {
         }
     }
 
-    void expand(SizeT new_capacity) {
-        SizeT src_cap = Capacity();
+    void expand(const SizeT new_capacity) {
+        const SizeT src_cap = Capacity();
         setCapacity(new_capacity);
         Char_T_ *src = Storage();
         allocate();

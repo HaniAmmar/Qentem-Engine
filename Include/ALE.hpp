@@ -112,7 +112,7 @@ class ALE {
     }
 
     template <typename Char_T_, typename Helper_T_>
-    inline static double Evaluate(const Char_T_ *  content,
+    inline static double Evaluate(const Char_T_   *content,
                                   const Helper_T_ *callback) noexcept {
         return Evaluate(content, StringUtils::Count(content), callback);
     }
@@ -125,7 +125,7 @@ class ALE {
     }
 
     template <typename Char_T_>
-    inline static bool Evaluate(double &       number,
+    inline static bool Evaluate(double        &number,
                                 const Char_T_ *content) noexcept {
         return Evaluate(number, content, StringUtils::Count(content));
     }
@@ -150,7 +150,8 @@ class ALE {
   private:
     template <typename Char_T_, typename Helper_T_>
     static bool parse(Operation &current_op, Number &left,
-                      const Char_T_ *content, SizeT &offset, SizeT end_offset,
+                      const Char_T_ *content, SizeT &offset,
+                      const SizeT      end_offset,
                       const Helper_T_ *callback) noexcept {
         Number    right;
         SizeT     previous_offset = offset;
@@ -220,7 +221,8 @@ class ALE {
 
     template <typename Char_T_>
     static Operation nextOperation(Operation &weight, const Char_T_ *content,
-                                   SizeT &offset, SizeT end_offset) noexcept {
+                                   SizeT      &offset,
+                                   const SizeT end_offset) noexcept {
         using ALEOperations_T_ = ALEOperations<Char_T_>;
 
         while (offset < end_offset) {

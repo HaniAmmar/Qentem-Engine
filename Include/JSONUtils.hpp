@@ -34,7 +34,7 @@ template <typename>
 class JSONotation;
 
 template <typename Char_T_>
-QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *        content,
+QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_         *content,
                                               SizeT                  length,
                                               StringStream<Char_T_> &buffer) {
     using JSONotation_T_ = JSONotation<Char_T_>;
@@ -264,19 +264,19 @@ class JSONotation {
     static constexpr Char_T_ CE_Char = 'E';
 
     static constexpr unsigned char TrueStringLength = 4;
-    static const Char_T_ *         GetTrueString() noexcept {
+    static const Char_T_          *GetTrueString() noexcept {
         static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e'};
         return &(val[0]);
     }
 
     static constexpr unsigned char FalseStringLength = 5;
-    static const Char_T_ *         GetFalseString() noexcept {
+    static const Char_T_          *GetFalseString() noexcept {
         static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e'};
         return &(val[0]);
     }
 
     static constexpr unsigned char NullStringLength = 4;
-    static const Char_T_ *         GetNullString() noexcept {
+    static const Char_T_          *GetNullString() noexcept {
         static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l'};
         return &(val[0]);
     }

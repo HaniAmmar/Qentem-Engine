@@ -45,7 +45,8 @@ class Engine {
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content,
-                             Number_T_ offset, Number_T_ end_before) noexcept {
+                             Number_T_       offset,
+                             const Number_T_ end_before) noexcept {
         content += offset;
         const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
 
@@ -79,7 +80,7 @@ class Engine {
     template <typename Char_T_, typename Number_T_>
     static QENTEM_SIMD_NUMBER_T
     FindTwo(const Char_T_ char_1, const Char_T_ char_2, const Char_T_ *content,
-            Number_T_ &offset, Number_T_ end_before) noexcept {
+            Number_T_ &offset, const Number_T_ end_before) noexcept {
         content += offset;
         const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
         const QENTEM_SIMD_VAR m_char_2 = Platform::SMIDSetToOne(char_2);
@@ -109,7 +110,7 @@ class Engine {
     template <typename Char_T_, typename Number_T_>
     static Number_T_ Find(const Char_T_ *pattern, SizeT pattern_length,
                           const Char_T_ *content, Number_T_ offset,
-                          Number_T_ end_before) noexcept {
+                          const Number_T_ end_before) noexcept {
         if (pattern_length == 1) {
             return FindOne(*pattern, content, offset, end_before);
         }
@@ -164,7 +165,8 @@ class Engine {
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ FindOne(Char_T_ char_1, const Char_T_ *content,
-                             Number_T_ offset, Number_T_ end_before) noexcept {
+                             Number_T_       offset,
+                             const Number_T_ end_before) noexcept {
         while (offset < end_before) {
             if (char_1 == content[offset]) {
                 return (offset + 1);
@@ -235,7 +237,7 @@ class Engine {
     SkipInnerPatterns(const Char_T_ *prefix, SizeT prefix_length,
                       const Char_T_ *suffix, SizeT suffix_length,
                       const Char_T_ *content, Number_T_ offset,
-                      Number_T_ max_end_before) noexcept {
+                      const Number_T_ max_end_before) noexcept {
         Number_T_ offset2 = offset;
 
         while (true) {
@@ -252,10 +254,10 @@ class Engine {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ SkipInnerPatterns(const Char_T_  prefix,
-                                       const Char_T_  suffix,
-                                       const Char_T_ *content, Number_T_ offset,
-                                       Number_T_ max_end_before) noexcept {
+    static Number_T_
+    SkipInnerPatterns(const Char_T_ prefix, const Char_T_ suffix,
+                      const Char_T_ *content, Number_T_ offset,
+                      const Number_T_ max_end_before) noexcept {
         Number_T_ offset2 = offset;
 
         while (true) {

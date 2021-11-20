@@ -35,7 +35,7 @@ inline static void SetToZero(void *ptr, SizeT size) noexcept {
     const SizeT remaining = (size ^ (m_size << QENTEM_SIMD_SHIFT_SIZE));
 
     if (m_size != 0) {
-        QENTEM_SIMD_VAR *      m_ptr  = static_cast<QENTEM_SIMD_VAR *>(ptr);
+        QENTEM_SIMD_VAR       *m_ptr  = static_cast<QENTEM_SIMD_VAR *>(ptr);
         const QENTEM_SIMD_VAR *end    = (m_ptr + m_size);
         const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_ZERO;
 
@@ -49,10 +49,10 @@ inline static void SetToZero(void *ptr, SizeT size) noexcept {
         }
     }
 
-    char *      des = (static_cast<char *>(ptr) + (size - remaining));
+    char       *des = (static_cast<char *>(ptr) + (size - remaining));
     const char *end = (des + remaining);
 #else
-    char *      des = static_cast<char *>(ptr);
+    char       *des = static_cast<char *>(ptr);
     const char *end = (des + size);
 #endif
 
@@ -68,7 +68,7 @@ inline static void Copy(void *to, const void *from, SizeT size) noexcept {
     const SizeT remaining = (size ^ (m_size << QENTEM_SIMD_SHIFT_SIZE));
 
     if (m_size != 0) {
-        QENTEM_SIMD_VAR *      m_to = static_cast<QENTEM_SIMD_VAR *>(to);
+        QENTEM_SIMD_VAR       *m_to = static_cast<QENTEM_SIMD_VAR *>(to);
         const QENTEM_SIMD_VAR *m_form =
             static_cast<const QENTEM_SIMD_VAR *>(from);
         const QENTEM_SIMD_VAR *end = (m_form + m_size);
@@ -87,11 +87,11 @@ inline static void Copy(void *to, const void *from, SizeT size) noexcept {
     const SizeT start = (size - remaining);
     const char *src   = static_cast<const char *>(from) + start;
     const char *end   = (src + remaining);
-    char *      des   = static_cast<char *>(to) + start;
+    char       *des   = static_cast<char *>(to) + start;
 #else
     const char *src = static_cast<const char *>(from);
     const char *end = (src + size);
-    char *      des = static_cast<char *>(to);
+    char       *des = static_cast<char *>(to);
 #endif
 
     while (src != end) {
@@ -112,7 +112,7 @@ template <typename Type_, typename Number_T_>
 inline static void QuickSort(Type_ *arr, Number_T_ start, Number_T_ end,
                              bool ascend) noexcept {
     if (start < end) {
-        Type_ *   item  = (arr + start);
+        Type_    *item  = (arr + start);
         Number_T_ index = start;
 
         if (ascend) {
@@ -172,11 +172,11 @@ inline static void Construct(Type_ *ptr, const Type_ &value) noexcept {
 }
 
 template <typename Type_>
-inline static void Construct(Type_ *item, const Type_ *end,
+inline static void Construct(Type_ *ptr, const Type_ *end,
                              const Type_ &value) noexcept {
-    while (item < end) {
-        new (item) Type_{value};
-        ++item;
+    while (ptr < end) {
+        new (ptr) Type_{value};
+        ++ptr;
     }
 }
 

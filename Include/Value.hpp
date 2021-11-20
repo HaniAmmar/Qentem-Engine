@@ -826,7 +826,7 @@ class Value {
     // To get a pointer to the string and its length.
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key,
-                          Number_T_ &     length) const noexcept {
+                          Number_T_      &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
                 key    = string_.First();
@@ -1116,7 +1116,7 @@ class Value {
 
     void Compress() {
         if (IsArray()) {
-            Value *      src_val = array_.Storage();
+            Value       *src_val = array_.Storage();
             const Value *src_end = array_.End();
             SizeT        size    = 0;
 

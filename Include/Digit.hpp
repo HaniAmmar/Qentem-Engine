@@ -848,7 +848,7 @@ class Digit {
             min = 0;
         }
 
-        Char_T_ *    str     = getCharForNumber(dstring, end_offset);
+        Char_T_     *str     = getCharForNumber(dstring, end_offset);
         unsigned int offset2 = 0;
 
         if (negative) {
@@ -882,7 +882,7 @@ class Digit {
     }
 
     QENTEM_NOINLINE static void extractExponent(double &number,
-                                                int &   exponent) noexcept {
+                                                int    &exponent) noexcept {
         if (number > 1E19) {
             do {
                 if (number > 1E99) {

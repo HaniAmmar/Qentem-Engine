@@ -105,7 +105,7 @@ class QPointer {
 #endif
 
     union {
-        Type_ *ptr_;
+        Type_ *ptr_{nullptr};
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         Tag_ tag_;
 #endif

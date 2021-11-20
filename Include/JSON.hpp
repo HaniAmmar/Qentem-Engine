@@ -73,7 +73,8 @@ class JSONParser {
     using VArray         = Array<VValue>;
     using VString        = String<Char_T_>;
 
-    VValue parseObject(const Char_T_ *content, SizeT &offset, SizeT length) {
+    VValue parseObject(const Char_T_ *content, SizeT &offset,
+                       const SizeT length) {
         VObject obj;
 
         while (offset < length) {
@@ -129,7 +130,8 @@ class JSONParser {
         return VValue{};
     }
 
-    VValue parseArray(const Char_T_ *content, SizeT &offset, SizeT length) {
+    VValue parseArray(const Char_T_ *content, SizeT &offset,
+                      const SizeT length) {
         VArray arr;
 
         while (offset < length) {
@@ -155,7 +157,8 @@ class JSONParser {
         return VValue{};
     }
 
-    VValue parseValue(const Char_T_ *content, SizeT &offset, SizeT length) {
+    VValue parseValue(const Char_T_ *content, SizeT &offset,
+                      const SizeT length) {
         switch (content[offset]) {
             case JSONotation_T_::SCurlyChar: {
                 ++offset;

@@ -143,7 +143,7 @@ class String {
 
         const SizeT len = StringUtils::Count(str);
         String      ns  = String{src_len + len};
-        Char_T_ *   des = ns.Storage();
+        Char_T_    *des = ns.Storage();
 
         if (IsNotEmpty()) {
             Memory::Copy(des, First(), (src_len * sizeof(Char_T_)));
@@ -248,7 +248,7 @@ class String {
         Char_T_ *str;
 
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        Char_T_ *   src = Storage();
+        Char_T_    *src = Storage();
         const SizeT len = Length();
 
         if (len < short_string_max) {
@@ -326,7 +326,7 @@ class String {
     static String Merge(const String &src1, const String &src2) {
         const SizeT ns_len = (src1.Length() + src2.Length());
         String      ns     = String{ns_len};
-        Char_T_ *   des    = ns.Storage();
+        Char_T_    *des    = ns.Storage();
 
         if (src1.IsNotEmpty()) {
             Memory::Copy(des, src1.First(), (src1.Length() * sizeof(Char_T_)));
@@ -344,8 +344,8 @@ class String {
         if ((str != nullptr) && (len != 0)) {
             const SizeT src_len = Length();
             const SizeT new_len = (src_len + len);
-            Char_T_ *   src     = Storage();
-            Char_T_ *   des     = allocate(new_len + 1);
+            Char_T_    *src     = Storage();
+            Char_T_    *des     = allocate(new_len + 1);
 
             if (src != nullptr) {
                 Memory::Copy(des, src, (src_len * sizeof(Char_T_)));

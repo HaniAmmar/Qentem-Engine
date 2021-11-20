@@ -53,11 +53,14 @@ class Array {
     Array(const Array &src) : capacity_(src.Size()) {
         if (Capacity() != 0) {
             setSize(src.Size());
-            Type_ *des = allocate();
+            Type_       *des  = allocate();
+            const Type_ *item = src.First();
+            const Type_ *end  = (item + src.Size());
 
-            for (const Type_ *item = src.First(), *end = (item + src.Size());
-                 item != end; item++, des++) {
+            while (item != end) {
                 Memory::Construct(des, *item);
+                ++des;
+                ++item;
             }
         }
     }
@@ -91,9 +94,13 @@ class Array {
             setSize(src.Size());
             Type_ *des = Storage();
 
-            for (const Type_ *item = src.First(), *end = (item + src.Size());
-                 item != end; item++, des++) {
+            const Type_ *item = src.First();
+            const Type_ *end  = (item + src.Size());
+
+            while (item != end) {
                 Memory::Construct(des, *item);
+                ++des;
+                ++item;
             }
         }
 
@@ -315,11 +322,14 @@ class Array {
         }
 
         index_ += src.Size();
-        Type_ *des = Storage();
+        Type_       *des  = Storage();
+        const Type_ *item = src.First();
+        const Type_ *end  = (item + src.Size());
 
-        for (const Type_ *item = src.First(), *end = (item + src.Size());
-             item != end; item++, des++) {
+        while (item != end) {
             Memory::Construct(des, *item);
+            ++des;
+            ++item;
         }
     }
 
