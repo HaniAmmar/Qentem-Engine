@@ -220,16 +220,16 @@ class Template {
     struct LoopInfo_T {
         const StringStream<Char_T_>  Content;
         const Array<TagBit<Char_T_>> SubTags;
-        const unsigned char          SetOffset;
-        const unsigned char          SetLength;
-        const unsigned char          IndexOffset;
-        const unsigned char          IndexLength;
-        const unsigned char          RepeatOffset;
-        const unsigned char          RepeatLength;
-        const unsigned char          GroupOffset;
-        const unsigned char          GroupLength;
-        const unsigned char          SortOffset;
-        const unsigned char          SortLength;
+        const unsigned short         SetOffset;
+        const unsigned short         SetLength;
+        const unsigned short         IndexOffset;
+        const unsigned short         IndexLength;
+        const unsigned short         RepeatOffset;
+        const unsigned short         RepeatLength;
+        const unsigned short         GroupOffset;
+        const unsigned short         GroupLength;
+        const unsigned short         SortOffset;
+        const unsigned short         SortLength;
     };
 
     template <typename Char_T_>
@@ -271,8 +271,8 @@ class Template {
         }
 
         TagBit(TagBit &&tag) noexcept
-            : offset_(tag.offset_), end_offset_(tag.end_offset_),
-              info_(static_cast<QPointer<void> &&>(tag.info_)) {
+            : info_(static_cast<QPointer<void> &&>(tag.info_)),
+              offset_(tag.offset_), end_offset_(tag.end_offset_) {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             type_ = tag.type_;
 #endif
@@ -373,9 +373,9 @@ class Template {
         void         clearData() noexcept { info_.Reset(); }
         inline void *getInfo() const noexcept { return info_.GetPointer(); }
 
+        QPointer<void> info_{};
         SizeT          offset_{0};
         SizeT          end_offset_{0};
-        QPointer<void> info_{};
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
         TagType type_{};
 #endif

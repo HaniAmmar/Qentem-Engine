@@ -29,20 +29,6 @@ namespace Qentem {
 
 template <typename Type_>
 class QPointer {
-    // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
-  private:
-    struct Tag_ {
-#ifndef QENTEM_BIG_ENDIAN
-        unsigned long long int_ptr_ : 48;
-        unsigned long long low_ : 8;
-        unsigned long long high_ : 8;
-#else
-        unsigned long long high_ : 8;
-        unsigned long long low_ : 8;
-        unsigned long long int_ptr_ : 48;
-#endif
-    };
-
   public:
     QPointer() noexcept : ptr_{nullptr} {}
     ~QPointer() = default;
@@ -77,12 +63,12 @@ class QPointer {
 
     void SetPointer(Type_ *ptr) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        const unsigned char tag_h = tag_.high_;
-        const unsigned char tag_l = tag_.low_;
+        const unsigned char tag_h = bits_.high_;
+        const unsigned char tag_l = bits_.low_;
 
-        ptr_       = ptr;
-        tag_.high_ = tag_h;
-        tag_.low_  = tag_l;
+        ptr_        = ptr;
+        bits_.high_ = tag_h;
+        bits_.low_  = tag_l;
 #else
         ptr_ = ptr;
 #endif
@@ -90,24 +76,36 @@ class QPointer {
 
     Type_ *GetPointer() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return reinterpret_cast<Type_ *>(tag_.int_ptr_);
+        return reinterpret_cast<Type_ *>(bits_.int_);
 #else
         return ptr_;
 #endif
     }
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    void          SetHighTag(unsigned char tag) noexcept { tag_.high_ = tag; }
-    unsigned char GetHighTag() const noexcept { return tag_.high_; }
+    void          SetHighTag(unsigned char tag) noexcept { bits_.high_ = tag; }
+    unsigned char GetHighTag() const noexcept { return bits_.high_; }
 
-    void          SetLowTag(unsigned char tag) noexcept { tag_.low_ = tag; }
-    unsigned char GetLowTag() const noexcept { return tag_.low_; }
+    void          SetLowTag(unsigned char tag) noexcept { bits_.low_ = tag; }
+    unsigned char GetLowTag() const noexcept { return bits_.low_; }
 #endif
 
+    // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
+  private:
     union {
-        Type_ *ptr_{nullptr};
+        Type_ *ptr_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        Tag_ tag_;
+        struct {
+#ifndef QENTEM_BIG_ENDIAN
+            unsigned long long int_ : 48;
+            unsigned long long low_ : 8;
+            unsigned long long high_ : 8;
+#else
+            unsigned long long high_ : 8;
+            unsigned long long low_ : 8;
+            unsigned long long int_ : 48;
+#endif
+        } bits_;
 #endif
     };
 };

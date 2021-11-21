@@ -45,7 +45,7 @@ class String {
   public:
     String() = default;
 
-    String(String &&src) noexcept : unused(src.unused), length_(src.length_) {
+    String(String &&src) noexcept : free_(src.free_), length_(src.length_) {
         storage_.Set(static_cast<QPointer<Char_T_> &&>(src.storage_));
         src.clearLength();
     }
@@ -80,7 +80,7 @@ class String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());
-            unused  = src.unused;
+            free_   = src.free_;
             length_ = src.length_;
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
             storage_.SetLowTag(src.storage_.GetLowTag());
@@ -283,7 +283,7 @@ class String {
         if ((len != 0) && (len < short_string_max)) {
 #ifndef QENTEM_BIG_ENDIAN
             return const_cast<Char_T_ *>(
-                reinterpret_cast<const Char_T_ *>(&unused));
+                reinterpret_cast<const Char_T_ *>(&free_));
 #else
             // Two tags at the start
             return reinterpret_cast<Char_T_ *>(const_cast<char *>(
@@ -299,7 +299,7 @@ class String {
         const SizeT len = Length();
         if ((len != 0) && (len < short_string_max)) {
 #ifndef QENTEM_BIG_ENDIAN
-            return reinterpret_cast<const Char_T_ *>(&unused);
+            return reinterpret_cast<const Char_T_ *>(&free_);
 #else
             // Two tags at the start
             return reinterpret_cast<const Char_T_ *>(
@@ -395,7 +395,7 @@ class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (new_size <= short_string_max) {
 #ifndef QENTEM_BIG_ENDIAN
-            return reinterpret_cast<Char_T_ *>(&unused);
+            return reinterpret_cast<Char_T_ *>(&free_);
 #else
             // Two tags at the start
             return reinterpret_cast<Char_T_ *>(
@@ -430,12 +430,12 @@ class String {
     }
 
 #ifndef QENTEM_BIG_ENDIAN
-    SizeT             unused{0};
+    SizeT             free_{0};
     SizeT             length_{0};
     QPointer<Char_T_> storage_{};
 #else
     QPointer<Char_T_> storage_{};
-    SizeT unused{0};
+    SizeT free_{0};
     SizeT length_{0};
 #endif
 };

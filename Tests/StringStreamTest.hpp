@@ -249,19 +249,19 @@ static int TestStringStream() {
     EQ_VALUE(ss1, "abcdefgh", "StringStream");
     EQ_VALUE(ss2, "abcdefgh", "StringStream");
 
-    String<char> n_str = String<char>("123456");
+    String<char> n_str = String<char>("12345678");
     ss1                = n_str;
-    EQ_VALUE(ss1, "123456", "StringStream");
+    EQ_VALUE(ss1, "12345678", "StringStream");
 
     ss2.Reset();
 
     ss2 << n_str;
-    EQ_VALUE(ss2, "123456", "StringStream");
+    EQ_VALUE(ss2, "12345678", "StringStream");
 
     struct SimpleStream {
-        const unsigned int max = 6;
+        char               str[8]{0};
+        const unsigned int max = 8;
         unsigned int       index{0};
-        char               str[6]{0};
 
         void operator<<(const char c) {
             str[index] = c;

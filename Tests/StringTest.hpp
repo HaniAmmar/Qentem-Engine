@@ -120,7 +120,7 @@ static int TestString1() {
     EQ_TO(strptr[0], 'A', "strptr[0]", "A");
     Memory::Deallocate(strptr);
 
-    char *  tmp_size_2 = Memory::Allocate<char>(2);
+    char   *tmp_size_2 = Memory::Allocate<char>(2);
     String8 str_size_2 = String8(tmp_size_2, 2);
 
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
@@ -331,20 +331,20 @@ static int TestString2() {
     EQ_VALUE(str1, "abcdefghigkl123", "str1");
 
     str1.Reset();
-    str1 = "123";
-    str2 = "456";
+    str1 = "1234";
+    str2 = "5678";
     str1 = str1 + static_cast<String8 &&>(str2);
-    EQ_VALUE(str1.Length(), 6, "Length");
+    EQ_VALUE(str1.Length(), 8, "Length");
     NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
     EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "123456", "str1");
+    EQ_VALUE(str1, "12345678", "str1");
     EQ_VALUE(str2.Length(), 0, "Length");
     EQ_TO(str2.First(), nullptr, "First()", "null");
 
     struct SimpleStream {
-        const unsigned int max = 6;
+        char               str[8]{0};
+        const unsigned int max = 8;
         unsigned int       index{0};
-        char               str[6]{0};
 
         void operator<<(const char *c) {
             while (index < max) {
@@ -358,7 +358,7 @@ static int TestString2() {
     SimpleStream sis;
     sis << str1;
 
-    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "123456", 6), "SimpleStream");
+    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8), "SimpleStream");
 
     END_SUB_TEST;
 }

@@ -1482,7 +1482,7 @@ class Value {
 
       private:
         union Number_T_ {
-            Number_T_() noexcept : padding_{0, 0} {}
+            Number_T_() noexcept : padding_{0} {}
             explicit Number_T_(unsigned long long num) noexcept : ull{num} {}
             explicit Number_T_(long long num) noexcept : sll{num} {}
             explicit Number_T_(double num) noexcept : d{num} {}
@@ -1514,7 +1514,7 @@ class Value {
     struct VType_ {
 #ifndef QENTEM_BIG_ENDIAN
       private:
-        SizeT padding_[2]{0, 0};
+        SizeT padding_[2]{0};
 
       public:
         QPointer<void> Value{};
@@ -1523,7 +1523,7 @@ class Value {
         QPointer<void> Value{};
 
       private:
-        SizeT padding_[2]{0, 0};
+        SizeT padding_[2]{0};
 #endif
     };
 #else
