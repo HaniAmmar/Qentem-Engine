@@ -922,8 +922,7 @@ class Template_CV {
         }
     }
 
-    QENTEM_NOINLINE void renderMath(const Char_T_ *content,
-                                    SizeT          length) const {
+    void renderMath(const Char_T_ *content, SizeT length) const {
         double number;
 
         if (ALE::Evaluate(number, content, length, this)) {

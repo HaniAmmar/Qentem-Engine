@@ -912,11 +912,8 @@ class Digit {
         }
     }
 
-    QENTEM_NOINLINE static unsigned long long
-    extractFraction(double number, unsigned int precision) noexcept {
-        const double mul[] = {1,    1E2,  1E3,  1E4,  1E5,  1E6,
-                              1E7,  1E8,  1E9,  1E10, 1E11, 1E12,
-                              1E13, 1E14, 1E15, 1E16, 1E17};
+    static unsigned long long extractFraction(double       number,
+                                              unsigned int precision) noexcept {
 
         if (precision < 17U) {
             number *= mul[precision];

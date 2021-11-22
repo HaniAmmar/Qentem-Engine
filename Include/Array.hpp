@@ -314,7 +314,7 @@ class Array {
         deallocate(src);
     }
 
-    QENTEM_NOINLINE void copyArray(const Array &src) {
+    void copyArray(const Array &src) {
         const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {

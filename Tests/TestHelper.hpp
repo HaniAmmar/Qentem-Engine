@@ -68,14 +68,14 @@ class TestHelper_T {
 
     static void SetStream(Stream_T_ &out) { GetStream() = &out; }
 
-    QENTEM_NOINLINE static unsigned long &LineNumber() {
+    static unsigned long &LineNumber() {
         static unsigned long line = 0;
 
         return line;
     }
 
     template <typename Char_T_>
-    QENTEM_NOINLINE static const Char_T_ *&TestGroupName() {
+    static const Char_T_ *&TestGroupName() {
         static const Char_T_ *name = nullptr;
 
         return name;

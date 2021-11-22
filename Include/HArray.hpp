@@ -560,7 +560,7 @@ class HArray {
         }
     }
 
-    QENTEM_NOINLINE void copyArray(const HArray &src) {
+    void copyArray(const HArray &src) {
         // The function Reset() has to be called before this.
         if (src.Size() != 0) {
             const HAItem_T_ *src_item = src.First();
