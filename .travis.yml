@@ -2,112 +2,111 @@ language: cpp
 group: stable
 
 branches:
-  only:
-    - main
+    only:
+        - main
 
 git:
-  depth: 1
+    depth: 1
 
 sudo: false
 
 jobs:
-  - os: linux
-    arch: amd64
+    - os: linux
+      arch: amd64
 
-    before_script:
-      - mkdir Build
-      - cd Build
-      - cmake -D ENABLE_COVERAGE:BOOL=TRUE ..
-    script:
-      - cmake --build .
-      - ctest
-      - bash <(curl -s https://codecov.io/bash)
+      before_script:
+          - mkdir Build
+          - cd Build
+          - cmake -D ENABLE_COVERAGE:BOOL=TRUE ..
+      script:
+          - cmake --build .
+          - ctest
+          - bash <(curl -s https://codecov.io/bash)
 
-  - os: linux
-    arch: amd64
+    - os: linux
+      arch: amd64
 
-    before_script:
-      - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_AVX2=1 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+      before_script:
+          - mkdir ./Build
+          - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_AVX2=1 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
-  - os: linux
-    arch: amd64
+    - os: linux
+      arch: amd64
 
-    before_script:
-      - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+      before_script:
+          - mkdir ./Build
+          - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
+    - os: linux
+      arch: amd64
 
-  - os: linux
-    arch: amd64
+      before_script:
+          - mkdir ./Build
+          - g++ -g -O0 -Wall -Wextra -D QENTEM_POINTER_TAGGING=0 -D QENTEM_SSO=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
-    before_script:
-      - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra -D QENTEM_POINTER_TAGGING=0 -D QENTEM_SSO=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+    - os: linux
+      arch: arm64
+      virt: lxd
 
-  - os: linux
-    arch: arm64
-    virt: lxd
+      before_script:
+          - mkdir ./Build
+          - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
-    before_script:
-      - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+    - os: linux
+      arch: arm64-graviton2
+      dist: focal
+      virt: vm
+      compiler: clang++
 
-  - os: linux
-    arch: arm64-graviton2
-    dist: focal
-    virt: vm
-    compiler: clang++
+      before_script:
+          - mkdir ./Build
+          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
-    before_script:
-      - mkdir ./Build
-      - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+    - os: freebsd
+      arch: amd64
+      compiler: clang++
 
-  - os: freebsd
-    arch: amd64
-    compiler: clang++
+      before_script:
+          - mkdir ./Build
+          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
-    before_script:
-      - mkdir ./Build
-      - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+    - os: osx
+      compiler: clang++
 
-  - os: osx
-    compiler: clang++
+      before_script:
+          - mkdir ./Build
+          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+      script:
+          - ./Build/QTest.bin
 
-    before_script:
-      - mkdir ./Build
-      - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+    # - os: linux
+    #   arch: ppc64le
+    #   group: edge
 
-  - os: linux
-    arch: ppc64le
-    group: edge
+    #   before_script:
+    #     - mkdir ./Build
+    #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+    #   script:
+    #     - ./Build/QTest.bin
 
-    before_script:
-      - mkdir ./Build
-      - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-    script:
-      - ./Build/QTest.bin
+    # - os: linux
+    #   arch: s390x
+    #   group: edge
 
-  # - os: linux
-  #   arch: s390x
-  #   group: edge
-
-  #   before_script:
-  #     - mkdir ./Build
-  #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
-  #   script:
-  #     - ./Build/QTest.bin
+    #   before_script:
+    #     - mkdir ./Build
+    #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+    #   script:
+    #     - ./Build/QTest.bin
