@@ -65,17 +65,11 @@ class Array {
         }
     }
 
-    ~Array() {
-        Type_ *current = Storage();
-        Memory::Destruct(current, End());
-        deallocate(current);
-    }
+    ~Array() { deallocate(Storage()); }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
-            Type_ *current = Storage();
-            Memory::Destruct(current, End());
-            deallocate(current);
+            deallocate(Storage());
 
             setSize(src.Size());
             setCapacity(src.Capacity());
@@ -183,9 +177,7 @@ class Array {
     }
 
     void Reset() noexcept {
-        Type_ *current = Storage();
-        Memory::Destruct(current, End());
-        deallocate(current);
+        deallocate(Storage());
         clearStorage();
         setSize(0);
         setCapacity(0);
@@ -250,13 +242,6 @@ class Array {
         // Remove excess storage;
         if (Size() != Capacity()) {
             Resize(Size());
-        }
-    }
-
-    void GoBackTo(SizeT index) noexcept {
-        if (index < Size()) {
-            Memory::Destruct((Storage() + index), End());
-            setSize(index);
         }
     }
 
