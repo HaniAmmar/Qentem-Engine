@@ -191,13 +191,6 @@ inline static void ConstructValues(Type_ *ptr, const Values_T_ &...values) {
 }
 
 template <typename Type_>
-inline static void Destruct(Type_ *ptr) noexcept {
-    if (ptr != nullptr) {
-        ptr->~Type_();
-    }
-}
-
-template <typename Type_>
 inline static void Destruct(Type_ *item, const Type_ *end) noexcept {
     while (item < end) {
         if (item != nullptr) {

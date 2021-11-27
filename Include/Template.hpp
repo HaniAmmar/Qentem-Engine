@@ -276,7 +276,6 @@ class Template {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
             type_ = tag.type_;
 #endif
-
             tag.setType(TagType::None);
         }
 
@@ -285,7 +284,6 @@ class Template {
                 case TagType::Loop: {
                     LoopInfo_ *loop_info =
                         static_cast<LoopInfo_ *>(info_.GetPointer());
-                    Memory::Destruct(loop_info);
                     Memory::Deallocate(loop_info);
                     break;
                 }
@@ -293,7 +291,6 @@ class Template {
                 case TagType::If: {
                     IfInfo_ *if_info =
                         static_cast<IfInfo_ *>(info_.GetPointer());
-                    Memory::Destruct(if_info);
                     Memory::Deallocate(if_info);
                     break;
                 }
@@ -301,7 +298,6 @@ class Template {
                 case TagType::InLineIf: {
                     InlineIfInfo_ *inline_if_info =
                         static_cast<InlineIfInfo_ *>(info_.GetPointer());
-                    Memory::Destruct(inline_if_info);
                     Memory::Deallocate(inline_if_info);
                     break;
                 }

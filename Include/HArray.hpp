@@ -75,10 +75,7 @@ class HArray {
         }
     }
 
-    ~HArray() {
-        Memory::Destruct(Storage(), End());
-        deallocate(getHashTable());
-    }
+    ~HArray() { deallocate(getHashTable()); }
 
     HArray(HArray &&src) noexcept
         : index_(src.Size()), capacity_(src.Capacity()) {
@@ -91,7 +88,6 @@ class HArray {
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
-            Memory::Destruct(Storage(), End());
             deallocate(getHashTable());
 
             setSize(src.Size());
@@ -399,7 +395,6 @@ class HArray {
         HAItem_T_ *current = Storage();
 
         if (current != nullptr) {
-            Memory::Destruct(current, End());
             deallocate(getHashTable());
             clearStorage();
             setCapacity(0);
