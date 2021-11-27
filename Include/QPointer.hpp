@@ -37,7 +37,9 @@ class QPointer {
 
     explicit QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
 
-    QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} { src.ptr_ = nullptr; }
+    explicit QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} {
+        src.ptr_ = nullptr;
+    }
 
     void operator=(QPointer &&src) noexcept {
         SetPointer(src.ptr_);
