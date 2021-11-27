@@ -281,51 +281,26 @@ class Template {
         }
 
         ~TagBit() {
-            if (GetType() != TagType::None) {
-                Reset();
-            }
-        }
-
-        TagBit &operator=(TagBit &&tag) noexcept {
-            if (this != &tag) {
-                if (GetType() != TagType::None) {
-                    Reset();
-                }
-
-                offset_     = tag.offset_;
-                end_offset_ = tag.end_offset_;
-                info_.Set(static_cast<QPointer<void> &&>(tag.info_));
-
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
-                type_ = tag.type_;
-#endif
-
-                tag.setType(TagType::None);
-            }
-
-            return *this;
-        }
-
-        void SetInfo(void *ptr) noexcept { info_.SetPointer(ptr); }
-
-        void Reset() {
             switch (GetType()) {
                 case TagType::Loop: {
-                    LoopInfo_ *loop_info = GetLoopInfo();
+                    LoopInfo_ *loop_info =
+                        static_cast<LoopInfo_ *>(info_.GetPointer());
                     Memory::Destruct(loop_info);
                     Memory::Deallocate(loop_info);
                     break;
                 }
 
                 case TagType::If: {
-                    IfInfo_ *if_info = GetIfInfo();
+                    IfInfo_ *if_info =
+                        static_cast<IfInfo_ *>(info_.GetPointer());
                     Memory::Destruct(if_info);
                     Memory::Deallocate(if_info);
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    InlineIfInfo_ *inline_if_info = GetInlineIfInfo();
+                    InlineIfInfo_ *inline_if_info =
+                        static_cast<InlineIfInfo_ *>(info_.GetPointer());
                     Memory::Destruct(inline_if_info);
                     Memory::Deallocate(inline_if_info);
                     break;
@@ -334,21 +309,11 @@ class Template {
                 default: {
                 }
             }
-
-            clearData();
         }
 
-        inline LoopInfo_ *GetLoopInfo() const noexcept {
-            return static_cast<LoopInfo_ *>(getInfo());
-        }
+        void SetInfo(void *ptr) noexcept { info_.SetPointer(ptr); }
 
-        inline IfInfo_ *GetIfInfo() const noexcept {
-            return static_cast<IfInfo_ *>(getInfo());
-        }
-
-        inline InlineIfInfo_ *GetInlineIfInfo() const noexcept {
-            return static_cast<InlineIfInfo_ *>(getInfo());
-        }
+        inline void *GetPointer() const noexcept { return info_.GetPointer(); }
 
         inline TagType GetType() const noexcept {
 #if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
@@ -369,9 +334,6 @@ class Template {
             info_.SetHighTag(static_cast<unsigned char>(type));
 #endif
         }
-
-        void         clearData() noexcept { info_.Reset(); }
-        inline void *getInfo() const noexcept { return info_.GetPointer(); }
 
         QPointer<void> info_{};
         SizeT          offset_{0};
@@ -754,7 +716,8 @@ class Template_CV {
                 case TagType::Loop: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
-                    LoopInfo_ *loop_info = tag->GetLoopInfo();
+                    LoopInfo_ *loop_info =
+                        static_cast<LoopInfo_ *>(tag->GetPointer());
 
                     if (loop_info != nullptr) { // Cached
                         renderLoop((content + content_offset), loop_info);
@@ -775,7 +738,8 @@ class Template_CV {
                     const SizeT content_offset =
                         tag->Offset() +
                         TemplatePatterns_C_::InLineIfPrefixLength;
-                    InlineIfInfo_ *inline_if_info = tag->GetInlineIfInfo();
+                    InlineIfInfo_ *inline_if_info =
+                        static_cast<InlineIfInfo_ *>(tag->GetPointer());
 
                     if (inline_if_info != nullptr) {
                         renderInLineIf((content + content_offset),
@@ -796,13 +760,12 @@ class Template_CV {
                 case TagType::If: {
                     const SizeT content_offset =
                         tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
-                    IfInfo_ *if_info = tag->GetIfInfo();
+                    IfInfo_ *if_info =
+                        static_cast<IfInfo_ *>(tag->GetPointer());
 
                     if (if_info != nullptr) {
                         renderIf((content + content_offset), if_info);
                     } else {
-                        if_info = Memory::AllocateInit<IfInfo_>();
-
                         generateIfCases((content + content_offset),
                                         (tag->EndOffset() - content_offset),
                                         if_info);
@@ -1363,11 +1326,13 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE void generateIfCases(const Char_T_ *content, SizeT length,
-                                         IfInfo_ *if_info) const {
+                                         IfInfo_ *&if_info) const {
         SizeT case_offset = 0;
         SizeT case_length;
         SizeT content_offset;
         SizeT content_length;
+
+        if_info = Memory::AllocateInit<IfInfo_>();
 
         // The content without </if>
         const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);

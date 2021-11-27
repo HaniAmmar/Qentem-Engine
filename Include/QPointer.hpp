@@ -31,44 +31,22 @@ template <typename Type_>
 class QPointer {
   public:
     QPointer() noexcept : ptr_{nullptr} {}
-    ~QPointer() = default;
+    ~QPointer()                   = default;
+    QPointer(const QPointer &src) = delete;
+    QPointer &operator=(const QPointer &src) = delete;
+
     explicit QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
+
     QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} { src.ptr_ = nullptr; }
-    QPointer(const QPointer &src) noexcept : ptr_{src.ptr_} {}
-    QPointer &operator=(QPointer &&src) noexcept {
-        if (this != &src) {
-            SetPointer(src.ptr_);
-            src.ptr_ = nullptr;
-        }
 
-        return *this;
-    }
-
-    QPointer &operator=(const QPointer &src) noexcept {
-        if (this != &src) {
-            SetPointer(src.ptr_);
-        }
-
-        return *this;
-    }
-
-    void Reset() noexcept { ptr_ = nullptr; }
-
-    void Set(QPointer &&src) noexcept {
-        ptr_     = src.ptr_;
+    void operator=(QPointer &&src) noexcept {
+        SetPointer(src.ptr_);
         src.ptr_ = nullptr;
     }
 
-    void Set(const QPointer &src) noexcept { ptr_ = src.ptr_; }
-
     void SetPointer(Type_ *ptr) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        const unsigned char tag_h = bits_.high_;
-        const unsigned char tag_l = bits_.low_;
-
-        ptr_        = ptr;
-        bits_.high_ = tag_h;
-        bits_.low_  = tag_l;
+        bits_.num_ = (QPointer(ptr)).bits_.num_;
 #else
         ptr_ = ptr;
 #endif
@@ -76,10 +54,15 @@ class QPointer {
 
     Type_ *GetPointer() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return reinterpret_cast<Type_ *>(bits_.int_);
+        return reinterpret_cast<Type_ *>(bits_.num_);
 #else
         return ptr_;
 #endif
+    }
+
+    void Set(QPointer &&src) noexcept {
+        ptr_     = src.ptr_;
+        src.ptr_ = nullptr;
     }
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
@@ -90,6 +73,8 @@ class QPointer {
     unsigned char GetLowTag() const noexcept { return bits_.low_; }
 #endif
 
+    void Reset() noexcept { ptr_ = nullptr; }
+
     // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
   private:
     union {
@@ -97,13 +82,13 @@ class QPointer {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         struct {
 #ifndef QENTEM_BIG_ENDIAN
-            unsigned long long int_ : 48;
+            unsigned long long num_ : 48;
             unsigned long long low_ : 8;
             unsigned long long high_ : 8;
 #else
             unsigned long long high_ : 8;
             unsigned long long low_ : 8;
-            unsigned long long int_ : 48;
+            unsigned long long num_ : 48;
 #endif
         } bits_;
 #endif
