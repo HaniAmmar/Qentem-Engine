@@ -60,7 +60,7 @@ class QPointer {
 #endif
     }
 
-    void Set(QPointer &&src) noexcept {
+    void Move(QPointer &&src) noexcept {
         ptr_     = src.ptr_;
         src.ptr_ = nullptr;
     }

@@ -82,7 +82,7 @@ class HArray {
 
     HArray(HArray &&src) noexcept
         : index_(src.Size()), capacity_(src.Capacity()) {
-        hashTable_.Set(static_cast<QPointer<SizeT> &&>(src.hashTable_));
+        hashTable_.Move(static_cast<QPointer<SizeT> &&>(src.hashTable_));
         src.setSize(0);
         src.setCapacity(0);
     }

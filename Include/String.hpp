@@ -46,7 +46,7 @@ class String {
     String() = default;
 
     String(String &&src) noexcept : free_(src.free_), length_(src.length_) {
-        storage_.Set(static_cast<QPointer<Char_T_> &&>(src.storage_));
+        storage_.Move(static_cast<QPointer<Char_T_> &&>(src.storage_));
         src.clearLength();
     }
 
