@@ -243,28 +243,6 @@ static int TestArray2() {
     NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
     NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
 
-    numbers1.ResizeAndInitialize(16);
-
-    numbers1.GoBackTo(5);
-    EQ_VALUE(numbers1.Size(), 5, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-
-    numbers1.GoBackTo(0);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-
-    numbers1.GoBackTo(16);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-
-    numbers1.Compress();
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
-
     END_SUB_TEST;
 }
 

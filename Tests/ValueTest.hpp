@@ -115,7 +115,7 @@ static int TestEmptyValue() {
 
     VStringStream ss_var;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -182,7 +182,7 @@ static int TestTrueValue() {
 
     VStringStream ss_var;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -254,7 +254,7 @@ static int TestFalseValue() {
 
     VStringStream ss_var;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -326,7 +326,7 @@ static int TestNullValue() {
 
     VStringStream ss_var;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -400,7 +400,7 @@ static int TestNumberValue1() {
 
     VStringStream ss_var;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -891,7 +891,7 @@ static int TestStringValue() {
 
     VStringStream ss_var;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -1014,7 +1014,7 @@ static int TestArrayValue() {
     VArray        arr_var;
     const ValueC *storage;
     VString       str_var;
-    const char *  c_str_var;
+    const char   *c_str_var;
     SizeT         c_str_len;
     double        num_var;
     bool          bool_var;
@@ -1222,10 +1222,9 @@ static int TestArrayValue() {
     ////////////////////
 
     arr_var.Clear();
-    arr_var.ResizeAndInitialize(10);
-    arr_var.GoBackTo(5);
+    arr_var.Resize(5);
     value2 = static_cast<VArray &&>(arr_var);
-    EQ_VALUE(value2.Size(), 5, "value2.Size()");
+    EQ_VALUE(value2.GetArray()->Capacity(), 5, "value2.Size()");
 
     value2 += 1;
 
@@ -1255,7 +1254,7 @@ static int TestObjectValue1() {
     const ObjectItem_ *storage;
     VStringStream      ss_var;
     VString            str_var;
-    const char *       c_str_var;
+    const char        *c_str_var;
     SizeT              c_str_len;
     double             num_var;
     bool               bool_var;
@@ -1400,7 +1399,7 @@ static int TestObjectValue2() {
     const ObjectItem_ *storage;
     VStringStream      ss_var;
     VString            str_var;
-    const char *       c_str_var;
+    const char        *c_str_var;
 
     h_arr_var.Reset();
     for (unsigned int i = 0; i < 7; i++) {
@@ -4025,8 +4024,8 @@ static int TestAddition3() {
     VArray        arr_var;
     const ValueC *arr_storage;
     VString       str;
-    const char *  c_str;
-    const char *  c_str2;
+    const char   *c_str;
+    const char   *c_str2;
     /////////////////
     arr_var = VArray(1);
     value += arr_var;
@@ -4562,8 +4561,8 @@ static int TestAddition6() {
     ValueC                      value1;
     ValueC                      value2;
     VString                     str_var;
-    const char *                str_c1;
-    const char *                str_c2;
+    const char                 *str_c1;
+    const char                 *str_c2;
     VHArray                     h_arr_var;
     const HAItem<ValueC, char> *h_arr_storage1 = nullptr;
     const HAItem<ValueC, char> *h_arr_storage2 = nullptr;
