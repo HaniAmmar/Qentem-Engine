@@ -1077,6 +1077,7 @@ static int TestArrayValue() {
           "storage");
 
     EQ_VALUE(value2.Size(), 10, "Size()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
               "storage");
 
@@ -1088,16 +1089,19 @@ static int TestArrayValue() {
     value2 = ValueC{value1};
     EQ_TRUE(value2.IsArray(), "IsArray()");
     EQ_VALUE(value2.Size(), 7, "Size()");
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
               "storage");
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 7, "Size()");
+    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
 
@@ -1109,6 +1113,7 @@ static int TestArrayValue() {
     value1  = static_cast<VArray &&>(arr_var);
 
     ValueC value3(static_cast<ValueC &&>(value1));
+    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
 
@@ -1119,6 +1124,7 @@ static int TestArrayValue() {
     storage = arr_var.First();
     value3  = arr_var; // Copy
     EQ_VALUE(value3.Size(), 3, "Size()");
+    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
               "storage");
 
@@ -1126,6 +1132,7 @@ static int TestArrayValue() {
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
     value3  = static_cast<VArray &&>(arr_var); // Move
+    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
           "storage");
 
@@ -1224,6 +1231,7 @@ static int TestArrayValue() {
     arr_var.Clear();
     arr_var.Resize(5);
     value2 = static_cast<VArray &&>(arr_var);
+    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
     EQ_VALUE(value2.GetArray()->Capacity(), 5, "value2.Size()");
 
     value2 += 1;
