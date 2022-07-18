@@ -1241,8 +1241,6 @@ class Value {
     }
 
   private:
-    struct VType_; // For tagging pointers
-
     static void stringifyObject(const VObject &obj, StringStream<Char_T_> &ss) {
         using V_item_ = HAItem<Value, Char_T_>;
 
@@ -1502,15 +1500,6 @@ class Value {
 #endif
     };
 
-    union {
-        VObject object_;
-        VArray  array_;
-        VString string_;
-        VNumber number_{double(0)};
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        VType_ type_;
-    };
-
     struct VType_ {
 #ifndef QENTEM_BIG_ENDIAN
       private:
@@ -1526,6 +1515,16 @@ class Value {
         SizeT padding_[2]{0};
 #endif
     };
+
+    union {
+        VObject object_;
+        VArray  array_;
+        VString string_;
+        VNumber number_{double(0)};
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        VType_ type_;
+    };
+
 #else
     };
 

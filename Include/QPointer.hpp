@@ -31,8 +31,8 @@ template <typename Type_>
 class QPointer {
   public:
     QPointer() noexcept : ptr_{nullptr} {}
-    ~QPointer()                   = default;
-    QPointer(const QPointer &src) = delete;
+    ~QPointer()                              = default;
+    QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
     explicit QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
@@ -81,20 +81,24 @@ class QPointer {
 
     // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
   private:
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+    struct Bits {
+#ifndef QENTEM_BIG_ENDIAN
+        unsigned long long num_ : 48;
+        unsigned long long low_ : 8;
+        unsigned long long high_ : 8;
+#else
+        unsigned long long high_ : 8;
+        unsigned long long low_ : 8;
+        unsigned long long num_ : 48;
+#endif
+    };
+#endif
+
     union {
         Type_ *ptr_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        struct {
-#ifndef QENTEM_BIG_ENDIAN
-            unsigned long long num_ : 48;
-            unsigned long long low_ : 8;
-            unsigned long long high_ : 8;
-#else
-            unsigned long long high_ : 8;
-            unsigned long long low_ : 8;
-            unsigned long long num_ : 48;
-#endif
-        } bits_;
+        Bits bits_;
 #endif
     };
 };
