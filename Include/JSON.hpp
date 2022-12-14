@@ -55,16 +55,18 @@ class JSONParser {
     JSONParser() = default;
 
     static VValue Parse(const Char_T_ *content, SizeT length) {
-        SizeT offset = 0;
-        StringUtils::TrimLeft(content, offset, length);
-        VValue value = JSONParser{}.parseValue(content, offset, length);
-        StringUtils::TrimLeft(content, offset, length);
+        if (length != 0) {
+            SizeT offset = 0;
+            StringUtils::TrimLeft(content, offset, length);
+            VValue value = JSONParser{}.parseValue(content, offset, length);
+            StringUtils::TrimLeft(content, offset, length);
 
-        if (offset != length) {
-            return VValue{};
+            if (offset == length) {
+                return value;
+            }
         }
 
-        return value;
+        return VValue{};
     }
 
   private:
