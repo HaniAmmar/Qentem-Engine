@@ -731,7 +731,7 @@ class Template_CV {
             }
 #endif
 
-            if (value->InsertStringInto(*ss_)) {
+            if (value->CopyStringValueTo(*ss_)) {
                 return;
             }
 
@@ -753,7 +753,7 @@ class Template_CV {
     void renderRawVariable(const Char_T_ *content, SizeT length) const {
         const Value_T_ *value = findValue(content, length);
 
-        if ((value != nullptr) && value->InsertStringInto(*ss_)) {
+        if ((value != nullptr) && value->CopyStringValueTo(*ss_)) {
             return;
         }
 

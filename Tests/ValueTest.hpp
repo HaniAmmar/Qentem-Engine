@@ -185,7 +185,7 @@ static int TestTrueValue() {
     EQ_VALUE(value1.Length(), 0, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "true", "str_var");
-    EQ_TRUE(value1.InsertStringInto(ss_var), "InsertStringInto()");
+    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
     EQ_VALUE(ss_var, "true", "ss_var");
     EQ_VALUE(value1.GetNumber(), 1, "GetNumber()");
     EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
@@ -255,7 +255,7 @@ static int TestFalseValue() {
     EQ_VALUE(value1.Length(), 0, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "false", "str_var");
-    EQ_TRUE(value1.InsertStringInto(ss_var), "InsertStringInto()");
+    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
     EQ_VALUE(ss_var, "false", "ss_var");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
     EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
@@ -325,7 +325,7 @@ static int TestNullValue() {
     EQ_VALUE(value1.Length(), 0, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "null", "str_var");
-    EQ_TRUE(value1.InsertStringInto(ss_var), "InsertStringInto()");
+    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
     EQ_VALUE(ss_var, "null", "ss_var");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
     EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
@@ -395,7 +395,7 @@ static int TestNumberValue1() {
     EQ_VALUE(value1.Length(), 0, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "33", "str_var");
-    EQ_TRUE(value1.InsertStringInto(ss_var), "InsertStringInto()");
+    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
     EQ_VALUE(ss_var, "33", "ss_var");
     EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
     EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
@@ -889,7 +889,7 @@ static int TestStringValue() {
     EQ_VALUE(value1.Length(), 34, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "-ABCDEF0123456789ABCDEF0123456789-", "str_var");
-    EQ_TRUE(value1.InsertStringInto(ss_var), "InsertStringInto()");
+    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
     EQ_VALUE(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", "ss_var");
     EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
     EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");

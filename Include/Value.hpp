@@ -848,7 +848,7 @@ class Value {
         }
     }
 
-    bool InsertStringInto(StringStream<Char_T_> &ss) const {
+    bool CopyStringValueTo(StringStream<Char_T_> &ss) const {
         switch (Type()) {
             case ValueType::String: {
                 ss += string_;
