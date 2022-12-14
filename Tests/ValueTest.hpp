@@ -120,7 +120,7 @@ static int TestEmptyValue() {
           ", 0)",
           "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
+    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
     EQ_FALSE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
     EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
@@ -175,7 +175,7 @@ static int TestTrueValue() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
+    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
     EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
     EQ_TRUE(StringUtils::IsEqual("true", c_str_var, c_str_len), "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
@@ -245,7 +245,7 @@ static int TestFalseValue() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
+    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
     EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
     EQ_TRUE(StringUtils::IsEqual("false", c_str_var, c_str_len), "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
@@ -315,7 +315,7 @@ static int TestNullValue() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
+    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
     EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
     EQ_TRUE(StringUtils::IsEqual("null", c_str_var, c_str_len), "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
@@ -386,7 +386,7 @@ static int TestNumberValue1() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
     EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
@@ -876,7 +876,7 @@ static int TestStringValue() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
     EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true, "SetCharAndLength()", "true");
     EQ_TO(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), true, "value1.StringStorage()",
           "value1.SetCharAndLength()");
@@ -998,7 +998,7 @@ static int TestArrayValue() {
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
     EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
@@ -1229,8 +1229,8 @@ static int TestObjectValue1() {
     NOT_EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
     NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     NOT_EQ_TO(value1.GetKey(4), nullptr, "GetKey(4)", "null");
-    NOT_EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
-    NOT_EQ_TO(value1.InsertKeyByIndexInto(ss_var, 4), false, "InsertKeyByIndexInto(4)", "false");
+    NOT_EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
+    NOT_EQ_TO(value1.CopyKeyByIndexTo(ss_var, 4), false, "CopyKeyByIndexTo(4)", "false");
     EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()", "null");
