@@ -68,44 +68,27 @@ static const char *GetStingOfType(ValueType type) {
     }
 }
 
-#define EQ_VALUE_TYPE(left, right, name)                                       \
-    do {                                                                       \
-        const auto &_tmp_left    = left;                                       \
-        TestHelper::LineNumber() = __LINE__;                                   \
-        if ((_tmp_left) != (right)) {                                          \
-            TestHelper::PrintErrorMessage2(false, name,                        \
-                                           GetStingOfType(_tmp_left),          \
-                                           GetStingOfType(right));             \
-            return 1;                                                          \
-        }                                                                      \
+#define EQ_VALUE_TYPE(left, right, name)                                                                               \
+    do {                                                                                                               \
+        const auto &_tmp_left    = left;                                                                               \
+        TestHelper::LineNumber() = __LINE__;                                                                           \
+        if ((_tmp_left) != (right)) {                                                                                  \
+            TestHelper::PrintErrorMessage2(false, name, GetStingOfType(_tmp_left), GetStingOfType(right));             \
+            return 1;                                                                                                  \
+        }                                                                                                              \
     } while (false)
 
 static int TestGetStingOfType() {
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Undefined),
-                                 "Undefined", 9),
-            "Undefined");
-    EQ_TRUE(
-        StringUtils::IsEqual(GetStingOfType(ValueType::Object), "Object", 6),
-        "Object");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Array), "Array", 5),
-            "Array");
-    EQ_TRUE(
-        StringUtils::IsEqual(GetStingOfType(ValueType::String), "String", 6),
-        "String");
-    EQ_TRUE(
-        StringUtils::IsEqual(GetStingOfType(ValueType::UInt64), "UInt64", 6),
-        "UInt64");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Int64), "Int64", 5),
-            "Int64");
-    EQ_TRUE(
-        StringUtils::IsEqual(GetStingOfType(ValueType::Double), "Double", 6),
-        "Double");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::True), "True", 4),
-            "True");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::False), "False", 5),
-            "False");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Null), "Null", 4),
-            "Null");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Undefined), "Undefined", 9), "Undefined");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Object), "Object", 6), "Object");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Array), "Array", 5), "Array");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::String), "String", 6), "String");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::UInt64), "UInt64", 6), "UInt64");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Int64), "Int64", 5), "Int64");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Double), "Double", 6), "Double");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::True), "True", 4), "True");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::False), "False", 5), "False");
+    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Null), "Null", 4), "Null");
 
     END_SUB_TEST;
 }
@@ -138,8 +121,7 @@ static int TestEmptyValue() {
           "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
-    EQ_FALSE(value1.SetCharAndLength(c_str_var, c_str_len),
-             "SetCharAndLength()");
+    EQ_FALSE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
     EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
@@ -194,10 +176,8 @@ static int TestTrueValue() {
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
-    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len),
-            "SetCharAndLength()");
-    EQ_TRUE(StringUtils::IsEqual("true", c_str_var, c_str_len),
-            "value1.SetCharAndLength()");
+    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
+    EQ_TRUE(StringUtils::IsEqual("true", c_str_var, c_str_len), "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -266,10 +246,8 @@ static int TestFalseValue() {
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
-    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len),
-            "SetCharAndLength()");
-    EQ_TRUE(StringUtils::IsEqual("false", c_str_var, c_str_len),
-            "value1.SetCharAndLength()");
+    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
+    EQ_TRUE(StringUtils::IsEqual("false", c_str_var, c_str_len), "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -338,10 +316,8 @@ static int TestNullValue() {
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_FALSE(value1.InsertKeyByIndexInto(ss_var, 0), "InsertKeyByIndexInto(0)");
-    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len),
-            "SetCharAndLength()");
-    EQ_TRUE(StringUtils::IsEqual("null", c_str_var, c_str_len),
-            "value1.SetCharAndLength()");
+    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
+    EQ_TRUE(StringUtils::IsEqual("null", c_str_var, c_str_len), "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -410,10 +386,8 @@ static int TestNumberValue1() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false,
-          "InsertKeyByIndexInto(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
-          "SetCharAndLength()", "false");
+    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
@@ -902,21 +876,16 @@ static int TestStringValue() {
     EQ_VALUE(value1.Size(), 0, "Size()");
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false,
-          "InsertKeyByIndexInto(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true,
-          "SetCharAndLength()", "true");
-    EQ_TO(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len),
-          true, "value1.StringStorage()", "value1.SetCharAndLength()");
+    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true, "SetCharAndLength()", "true");
+    EQ_TO(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), true, "value1.StringStorage()",
+          "value1.SetCharAndLength()");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value1.GetString()), "-ABCDEF0123456789ABCDEF0123456789-",
-             "GetString()");
+    EQ_VALUE(*(value1.GetString()), "-ABCDEF0123456789ABCDEF0123456789-", "GetString()");
     NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), "IsEqual()");
     EQ_VALUE(value1.Length(), 34, "Length()");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
     EQ_VALUE(str_var, "-ABCDEF0123456789ABCDEF0123456789-", "str_var");
@@ -1029,16 +998,12 @@ static int TestArrayValue() {
     EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
     EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false,
-          "InsertKeyByIndexInto(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
-          "SetCharAndLength()", "false");
+    EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
     EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()", "storage");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
     EQ_VALUE(value1.Length(), 0, "Length()");
@@ -1071,15 +1036,12 @@ static int TestArrayValue() {
     EQ_TO(value1.GetValue(9), nullptr, "GetValue(9)", "null");
     EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     EQ_VALUE(value2.Size(), 10, "Size()");
     NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
@@ -1090,20 +1052,17 @@ static int TestArrayValue() {
     EQ_TRUE(value2.IsArray(), "IsArray()");
     EQ_VALUE(value2.Size(), 7, "Size()");
     NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 7, "Size()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
     NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
 
@@ -1114,8 +1073,7 @@ static int TestArrayValue() {
 
     ValueC value3(static_cast<ValueC &&>(value1));
     NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     EQ_TRUE(value1.IsUndefined(), "isUndefined()");
 
@@ -1125,22 +1083,19 @@ static int TestArrayValue() {
     value3  = arr_var; // Copy
     EQ_VALUE(value3.Size(), 3, "Size()");
     NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
     value3  = static_cast<VArray &&>(arr_var); // Move
     NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()", "storage");
 
     value3 = ValueC{VArray(3)};
     EQ_TRUE(value3.IsArray(), "IsArray()");
     NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
+    NOT_EQ_TO(value3.GetArray()->First(), nullptr, "GetArray()->First()", "null");
     EQ_VALUE(value3.GetArray()->Capacity(), 3, "GetArray()->Capacity()");
 
     value1[0] = 1;
@@ -1173,20 +1128,16 @@ static int TestArrayValue() {
     EQ_VALUE(value2.Size(), 3, "value2.Size()");
     EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()",
-              "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
-          "value2[2].StringStorage()", "Qen");
+    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen");
 
     value2[3] = 44;
     value2[4] = 55;
     EQ_VALUE(value2.Size(), 5, "value2.Size()");
     EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()",
-              "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
-          "value2[2].StringStorage()", "Qen");
+    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen");
     EQ_VALUE(value2[3].GetNumber(), 44, "value2[3].GetNumber()");
     EQ_VALUE(value2[4].GetNumber(), 55, "value2[4].GetNumber()");
 
@@ -1194,10 +1145,8 @@ static int TestArrayValue() {
     EQ_VALUE(value2.Size(), 3, "value2.Size()");
     EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()",
-              "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true,
-          "value2[2].StringStorage()", "Qen");
+    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen");
     EQ_TO(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
@@ -1218,12 +1167,9 @@ static int TestArrayValue() {
     EQ_VALUE(value2[0].GetNumber(), 10, "value2[0].GetNumber()");
     EQ_VALUE(value2[1].GetNumber(), 20, "value2[1].GetNumber()");
     EQ_VALUE(value2[2].GetNumber(), 30, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[3].StringStorage(), c_str_var, "value2[3].StringStorage()",
-              "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[3].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value2[3].StringStorage()",
-          "-ABCDEF0123456789ABCDEF0123456789-");
+    NOT_EQ_TO(value2[3].StringStorage(), c_str_var, "value2[3].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value2[3].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value2[3].StringStorage()", "-ABCDEF0123456789ABCDEF0123456789-");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////////////////////
@@ -1283,17 +1229,12 @@ static int TestObjectValue1() {
     NOT_EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
     NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
     NOT_EQ_TO(value1.GetKey(4), nullptr, "GetKey(4)", "null");
-    NOT_EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false,
-              "InsertKeyByIndexInto(0)", "false");
-    NOT_EQ_TO(value1.InsertKeyByIndexInto(ss_var, 4), false,
-              "InsertKeyByIndexInto(4)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false,
-          "SetCharAndLength()", "false");
+    NOT_EQ_TO(value1.InsertKeyByIndexInto(ss_var, 0), false, "InsertKeyByIndexInto(0)", "false");
+    NOT_EQ_TO(value1.InsertKeyByIndexInto(ss_var, 4), false, "InsertKeyByIndexInto(4)", "false");
+    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()", "storage");
     EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
     EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
     EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
@@ -1325,16 +1266,14 @@ static int TestObjectValue1() {
     value2 = value1;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     EQ_VALUE(value1.Size(), 10, "Size()");
-    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     value1 = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
 
     EQ_TRUE(value2.IsObject(), "IsObject()");
-    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     h_arr_var.Reset();
     // Testing empty values
@@ -1360,15 +1299,13 @@ static int TestObjectValue1() {
     value2 = ValueC{value1};
     EQ_TRUE(value2.IsObject(), "IsObject()");
     EQ_VALUE(value2.Size(), 7, "Size()");
-    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     h_arr_var.Reset();
     value2 = h_arr_var;
     EQ_TRUE(value2.IsObject(), "IsObject()");
     EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     h_arr_var.Reset();
     value1 = h_arr_var;
@@ -1386,8 +1323,7 @@ static int TestObjectValue1() {
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
     EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     h_arr_var.Reset();
     value2 = h_arr_var;
@@ -1422,8 +1358,7 @@ static int TestObjectValue2() {
     ValueC value3(static_cast<ValueC &&>(value1));
     EQ_TRUE(value3.IsObject(), "IsObject()");
     EQ_VALUE(value3.Size(), 7, "Size()");
-    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
-          "storage");
+    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     h_arr_var.Reset();
     value3 = h_arr_var;
@@ -1441,10 +1376,8 @@ static int TestObjectValue2() {
     value3  = h_arr_var; // Copy
     EQ_VALUE(value3.Size(), 3, "Size()");
     NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     for (unsigned int i = 0; i < 13; i++) {
         VString key("Key_");
@@ -1457,16 +1390,13 @@ static int TestObjectValue2() {
     EQ_TRUE(value3.IsObject(), "IsObject()");
     EQ_VALUE(value3.Size(), 13, "Size()");
     NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()", "storage");
 
     value3 = ValueC{VHArray(4)};
     EQ_TRUE(value3.IsObject(), "IsObject()");
     NOT_EQ_TO(value3.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
+    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetObject()->First()", "null");
     EQ_VALUE(value3.GetObject()->Capacity(), 4, "GetArray()->Capacity()");
 
     value1.Reset();
@@ -1500,20 +1430,16 @@ static int TestObjectValue2() {
     EQ_VALUE(value3.Size(), 3, "value3.Size()");
     EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
     EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var,
-              "value3[\"k3\"].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true,
-          "value3[\"k3\"].StringStorage()", "Qen");
+    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var, "value3[\"k3\"].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()", "Qen");
 
     value3["k4"] = 44;
     value3["k5"] = 55;
     EQ_VALUE(value3.Size(), 5, "value3.Size()");
     EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
     EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var,
-              "value3[\"k3\"].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true,
-          "value3[\"k3\"].StringStorage()", "Qen");
+    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var, "value3[\"k3\"].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()", "Qen");
     EQ_VALUE(value3["k4"].GetNumber(), 44, "value3[\"k4\"].GetNumber()");
     EQ_VALUE(value3["k5"].GetNumber(), 55, "value3[\"k5\"].GetNumber()");
 
@@ -1521,13 +1447,10 @@ static int TestObjectValue2() {
     EQ_VALUE(value3.Size(), 3, "value3.Size()");
     EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
     EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
-    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true,
-          "value3[\"k3\"].StringStorage()", "Qen");
-    EQ_TO(value3.GetValue("k4", 2), nullptr, "value3.GetValue(\"k4\", 2)",
-          "null");
+    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()", "Qen");
+    EQ_TO(value3.GetValue("k4", 2), nullptr, "value3.GetValue(\"k4\", 2)", "null");
     EQ_TO(value3.GetValue(3), nullptr, "value3.GetValue(3)", "null");
-    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)",
-          "null");
+    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)", "null");
     EQ_TO(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null");
 
     ////////////////////
@@ -1543,13 +1466,10 @@ static int TestObjectValue2() {
     EQ_VALUE(value3["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
     EQ_VALUE(value3["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
     EQ_VALUE(value3["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value3["w4"].StringStorage(), c_str_var,
-              "value3[\"w4\"].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value3["w4"].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value3[\"w4\"].StringStorage()", "Qen");
-    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)",
-          "null");
+    NOT_EQ_TO(value3["w4"].StringStorage(), c_str_var, "value3[\"w4\"].StringStorage()", "c_str_var");
+    EQ_TO(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value3[\"w4\"].StringStorage()", "Qen");
+    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)", "null");
     EQ_TO(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null");
     ////////////////////
 
@@ -1564,8 +1484,7 @@ static int TestObjectValue2() {
     value3.Compress();
     NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
     EQ_VALUE(value3.GetObject()->Size(), 3, "Size()");
-    EQ_TRUE(value3.GetObject()->Capacity() >= 3,
-            "GetObject()->Capacity() >= 3");
+    EQ_TRUE(value3.GetObject()->Capacity() >= 3, "GetObject()->Capacity() >= 3");
 
     END_SUB_TEST;
 }
@@ -1616,8 +1535,7 @@ static int TestMoveValue1() {
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -1628,10 +1546,8 @@ static int TestMoveValue1() {
     value1      = static_cast<VArray &&>(arr_var);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -1642,10 +1558,8 @@ static int TestMoveValue1() {
     value1        = static_cast<VHArray &&>(h_arr_var);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1678,8 +1592,7 @@ static int TestMoveValue1() {
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -1690,10 +1603,8 @@ static int TestMoveValue1() {
     value1      = static_cast<VArray &&>(arr_var);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -1704,10 +1615,8 @@ static int TestMoveValue1() {
     value1        = static_cast<VHArray &&>(h_arr_var);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1740,8 +1649,7 @@ static int TestMoveValue1() {
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -1752,10 +1660,8 @@ static int TestMoveValue1() {
     value1      = static_cast<VArray &&>(arr_var);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -1766,10 +1672,8 @@ static int TestMoveValue1() {
     value1        = static_cast<VHArray &&>(h_arr_var);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1801,8 +1705,7 @@ static int TestMoveValue1() {
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -1813,10 +1716,8 @@ static int TestMoveValue1() {
     value1      = static_cast<VArray &&>(arr_var);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -1827,10 +1728,8 @@ static int TestMoveValue1() {
     value1        = static_cast<VHArray &&>(h_arr_var);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1871,10 +1770,8 @@ static int TestMoveValue1() {
     value1      = static_cast<VArray &&>(arr_var);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -1885,10 +1782,8 @@ static int TestMoveValue1() {
     value1        = static_cast<VHArray &&>(h_arr_var);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1928,8 +1823,7 @@ static int TestMoveValue1() {
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -1940,10 +1834,8 @@ static int TestMoveValue1() {
     value1        = static_cast<VHArray &&>(h_arr_var);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2003,8 +1895,7 @@ static int TestMoveValue2() {
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2015,10 +1906,8 @@ static int TestMoveValue2() {
     value1      = static_cast<VArray &&>(arr_var);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2077,8 +1966,7 @@ static int TestMoveValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2090,10 +1978,8 @@ static int TestMoveValue3() {
     value1      = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2105,10 +1991,8 @@ static int TestMoveValue3() {
     value1        = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2145,8 +2029,7 @@ static int TestMoveValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2158,10 +2041,8 @@ static int TestMoveValue3() {
     value1      = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2173,10 +2054,8 @@ static int TestMoveValue3() {
     value1        = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2213,8 +2092,7 @@ static int TestMoveValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2226,10 +2104,8 @@ static int TestMoveValue3() {
     value1      = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2241,10 +2117,8 @@ static int TestMoveValue3() {
     value1        = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2280,8 +2154,7 @@ static int TestMoveValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2293,10 +2166,8 @@ static int TestMoveValue3() {
     value1      = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2308,10 +2179,8 @@ static int TestMoveValue3() {
     value1        = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2357,10 +2226,8 @@ static int TestMoveValue3() {
     value1      = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2372,10 +2239,8 @@ static int TestMoveValue3() {
     value1        = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2420,8 +2285,7 @@ static int TestMoveValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2433,10 +2297,8 @@ static int TestMoveValue3() {
     value1        = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2502,8 +2364,7 @@ static int TestMoveValue4() {
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-          "c_str_var");
+    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2515,10 +2376,8 @@ static int TestMoveValue4() {
     value1      = static_cast<ValueC &&>(value2);
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2550,8 +2409,7 @@ static int TestCopyValue1() {
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2573,10 +2431,8 @@ static int TestCopyValue1() {
     value1      = arr_var;
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2602,10 +2458,8 @@ static int TestCopyValue1() {
     value1        = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2616,8 +2470,7 @@ static int TestCopyValue1() {
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2639,10 +2492,8 @@ static int TestCopyValue1() {
     value1      = arr_var;
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2668,10 +2519,8 @@ static int TestCopyValue1() {
     value1        = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2682,8 +2531,7 @@ static int TestCopyValue1() {
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2705,10 +2553,8 @@ static int TestCopyValue1() {
     value1      = arr_var;
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2734,10 +2580,8 @@ static int TestCopyValue1() {
     value1        = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2748,8 +2592,7 @@ static int TestCopyValue1() {
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2771,10 +2614,8 @@ static int TestCopyValue1() {
     value1      = arr_var;
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2800,10 +2641,8 @@ static int TestCopyValue1() {
     value1        = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2846,10 +2685,8 @@ static int TestCopyValue2() {
     value1      = arr_var;
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -2875,10 +2712,8 @@ static int TestCopyValue2() {
     value1        = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2889,8 +2724,7 @@ static int TestCopyValue2() {
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2916,10 +2750,8 @@ static int TestCopyValue2() {
     value1        = h_arr_var;
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2930,8 +2762,7 @@ static int TestCopyValue2() {
     c_str_var = str_var.First();
     value1    = str_var;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -2953,10 +2784,8 @@ static int TestCopyValue2() {
     value1      = arr_var;
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
     ////////////////////////////////////////////
     END_SUB_TEST;
@@ -3013,8 +2842,7 @@ static int TestCopyValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3039,10 +2867,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -3071,10 +2897,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3111,8 +2935,7 @@ static int TestCopyValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3137,10 +2960,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -3169,10 +2990,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3209,8 +3028,7 @@ static int TestCopyValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3235,10 +3053,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -3267,10 +3083,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3306,8 +3120,7 @@ static int TestCopyValue3() {
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3332,10 +3145,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -3364,10 +3175,8 @@ static int TestCopyValue3() {
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3448,10 +3257,8 @@ static int TestCopyValue4() {
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     /////////////
@@ -3480,10 +3287,8 @@ static int TestCopyValue4() {
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3528,8 +3333,7 @@ static int TestCopyValue4() {
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3558,10 +3362,8 @@ static int TestCopyValue4() {
 
     EQ_TRUE(value1.IsObject(), "IsObject()");
     NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage,
-              "GetObject()->First()", "storage");
+    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3606,8 +3408,7 @@ static int TestCopyValue4() {
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
     EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()",
-              "c_str_var");
+    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
     value1.Reset();
 
     /////////////
@@ -3632,10 +3433,8 @@ static int TestCopyValue4() {
 
     EQ_TRUE(value1.IsArray(), "IsArray()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3818,8 +3617,7 @@ static int TestIndexOperator2() {
     EQ_VALUE(value_ptr->GetNumber(), 30, "GetValue(\"CCCC\", 4)");
     ////////////////////
     EQ_TO(value.GetValue("a", 1), nullptr, "GetValue(\"a\", 1)", "null");
-    EQ_TO(value.GetValue("ABCDEF", 6), nullptr, "GetValue(\"ABCDEF\", 1)",
-          "null");
+    EQ_TO(value.GetValue("ABCDEF", 6), nullptr, "GetValue(\"ABCDEF\", 1)", "null");
     EQ_TO(value.GetValue("b", 1), nullptr, "GetValue(\"b\", 1)", "null");
     EQ_TO(value.GetValue("bb", 2), nullptr, "GetValue(\"bb\", 2)", "null");
 
@@ -3931,8 +3729,7 @@ static int TestAddition2() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     value += "^ABCDEF0123456789ABCDEF0123456789^";
@@ -3940,11 +3737,9 @@ static int TestAddition2() {
     EQ_VALUE(value.Size(), 2, "Size()");
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
     EQ_TRUE(value[1].IsString(), "value[1].IsString()");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(),
-                                 "^ABCDEF0123456789ABCDEF0123456789^", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
             "StringUtils::IsEqual");
     value.Reset();
     /////////////////
@@ -3955,8 +3750,7 @@ static int TestAddition2() {
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
     EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
@@ -3967,13 +3761,10 @@ static int TestAddition2() {
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
     EQ_TRUE(value[1].IsString(), "value[1].IsString()");
     EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
-          "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
     value.Reset();
     /////////////////
@@ -3984,10 +3775,8 @@ static int TestAddition2() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()",
-              "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     str    = VString("#0123456789ABCDEF0123456789ABCDEF#");
@@ -3997,15 +3786,11 @@ static int TestAddition2() {
     EQ_VALUE(value.Size(), 2, "Size()");
     EQ_TRUE(value[0].IsString(), "value[0].IsString()");
     EQ_TRUE(value[1].IsString(), "value[1].IsString()");
-    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()",
-              "c_str");
-    NOT_EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()",
-              "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
+    NOT_EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
     value.Reset();
 
@@ -4040,8 +3825,7 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
 
     value.Reset();
 
@@ -4050,8 +3834,7 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
 
     value.Reset();
     ///
@@ -4066,17 +3849,13 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 3, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
     EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
     EQ_TRUE(value[2].IsString(), "value[2].IsString()");
-    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()",
-              "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     arr_var.Reset();
@@ -4090,26 +3869,20 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 6, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
     EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
     EQ_TRUE(value[2].IsString(), "value[2].IsString()");
-    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()",
-              "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
     EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
     EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
     EQ_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
     EQ_TRUE(value[5].IsString(), "value[5].IsString()");
-    NOT_EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()",
-              "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(),
-                                 "^ABCDEF0123456789ABCDEF0123456789^", 34),
+    NOT_EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
             "StringUtils::IsEqual");
 
     value.Reset();
@@ -4118,8 +3891,7 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
 
     value.Reset();
 
@@ -4127,8 +3899,7 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 1, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
 
     value.Reset();
     arr_var.Reset();
@@ -4143,16 +3914,13 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 3, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
-          "storage");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
     EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
     EQ_TRUE(value[2].IsString(), "value[2].IsString()");
     EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
 
     arr_var += ValueC{nullptr};
@@ -4167,25 +3935,20 @@ static int TestAddition3() {
     EQ_TRUE(value.IsArray(), "IsArray()");
     EQ_VALUE(value.Size(), 6, "Size()");
     NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
     EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
     EQ_TRUE(value[2].IsString(), "value[2].IsString()");
     EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
     EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
     EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
     EQ_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
     EQ_TRUE(value[5].IsString(), "value[5].IsString()");
-    EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()",
-          "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
     //////////////////////////////////////////
 
@@ -4256,10 +4019,8 @@ static int TestAddition4() {
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 1, "Size()");
     EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
-              "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
@@ -4271,15 +4032,11 @@ static int TestAddition4() {
     EQ_VALUE(value1.Size(), 2, "Size()");
     EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
     EQ_TRUE(value1[1].IsString(), "value1[1].IsString()");
-    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
-              "c_str");
-    NOT_EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
-              "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    NOT_EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
     value1.Reset();
     /////////////////
@@ -4326,17 +4083,13 @@ static int TestAddition4() {
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 3, "Size()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
     EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
     EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[2].StringStorage()",
-          "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value1[2].StringStorage(), c_str, "value1[2].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     arr_var.Reset();
@@ -4351,26 +4104,20 @@ static int TestAddition4() {
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 6, "Size()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
     EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
     EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
-          "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
     EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
     EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
     EQ_VALUE(value1[4].GetNumber(), 14, "value1[4].GetNumber()");
     EQ_TRUE(value1[5].IsString(), "value1[5].IsString()");
-    NOT_EQ_TO(value1[5].StringStorage(), c_str2, "value1[5].StringStorage()",
-              "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(),
-                                 "^ABCDEF0123456789ABCDEF0123456789^", 34),
+    NOT_EQ_TO(value1[5].StringStorage(), c_str2, "value1[5].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
             "StringUtils::IsEqual");
 
     value1.Reset();
@@ -4456,10 +4203,8 @@ static int TestAddition5() {
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 1, "Size()");
     EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
-          "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
@@ -4471,15 +4216,11 @@ static int TestAddition5() {
     EQ_VALUE(value1.Size(), 2, "Size()");
     EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
     EQ_TRUE(value1[1].IsString(), "value1[1].IsString()");
-    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()",
-          "c_str");
-    EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()",
-          "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
     value1.Reset();
     /////////////////
@@ -4512,17 +4253,13 @@ static int TestAddition5() {
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 3, "Size()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
     EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
     EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
-          "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
 
     arr_var.Reset();
@@ -4538,26 +4275,20 @@ static int TestAddition5() {
     EQ_TRUE(value1.IsArray(), "IsArray()");
     EQ_VALUE(value1.Size(), 6, "Size()");
     NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()",
-              "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()",
-              "storage");
+    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
     EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
     EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
     EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()",
-          "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(),
-                                 "-ABCDEF0123456789ABCDEF0123456789-", 34),
+    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
+    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
             "StringUtils::IsEqual");
     EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
     EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
     EQ_VALUE(value1[4].GetNumber(), 14, "value1[3].GetNumber()");
     EQ_TRUE(value1[5].IsString(), "value1[0].IsString()");
-    EQ_TO(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()",
-          "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(),
-                                 "#0123456789ABCDEF0123456789ABCDEF#", 34),
+    EQ_TO(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2");
+    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
             "StringUtils::IsEqual");
     value1.Reset();
     //////////////////////////////////////////
@@ -4597,67 +4328,55 @@ static int TestAddition6() {
     value2.Merge(value1); // Copy
     EQ_VALUE(value2.Size(), 3, "value2.Size()");
     NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage1,
-              "GetArray()->First()", "storage");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage1, "GetArray()->First()", "storage");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
-              "value2[\"k3\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
-                               "*ABCDEF0123456789ABCDEF0123456789*", 34),
-          true, "value2[\"k3\"].StringStorage()", "IsEqual");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+          "value2[\"k3\"].StringStorage()", "IsEqual");
 
     value2 = VHArray();  // Clearing and  Setting to object type.
     value2 += h_arr_var; // Copy
     EQ_VALUE(value2.Size(), 4, "value2.Size()");
     NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2,
-              "GetArray()->First()", "storage");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage");
     EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
     EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
-              "value2[\"w4\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value2[\"w4\"].StringStorage()", "IsEqual");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     ////
 
-    value2 = VHArray(); // Clearing and  Setting to object type.
+    value2 = VHArray();                           // Clearing and  Setting to object type.
     value2.Merge(static_cast<ValueC &&>(value1)); // Move
     EQ_TRUE(value1.IsUndefined(), "value1.IsUndefined()");
     EQ_VALUE(value2.Size(), 3, "value2.Size()");
     NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2,
-              "GetArray()->First()", "storage");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    EQ_TO(value2["k3"].StringStorage(), str_c1,
-          "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
-                               "*ABCDEF0123456789ABCDEF0123456789*", 34),
-          true, "value2[\"k3\"].StringStorage()", "IsEqual");
+    EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+          "value2[\"k3\"].StringStorage()", "IsEqual");
 
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
 
-    value2 = VHArray(); // Clearing and  Setting to object type.
+    value2 = VHArray();                           // Clearing and  Setting to object type.
     value2 += static_cast<VHArray &&>(h_arr_var); // Move
     EQ_TO(h_arr_var.First(), nullptr, "h_arr_var.First()", "null");
     EQ_VALUE(value2.Size(), 4, "value2.Size()");
     NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2,
-              "GetArray()->First()", "storage");
+    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage");
     EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
     EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    EQ_TO(value2["w4"].StringStorage(), str_c2,
-          "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value2[\"w4\"].StringStorage()", "IsEqual");
+    EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
 
     if (value2.GetObject() != nullptr) {
@@ -4673,18 +4392,14 @@ static int TestAddition6() {
     EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
     EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
-              "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value2[\"w4\"].StringStorage()", "IsEqual");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
-              "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
-                               "*ABCDEF0123456789ABCDEF0123456789*", 34),
-          true, "value2[\"k3\"].StringStorage()", "IsEqual");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+          "value2[\"k3\"].StringStorage()", "IsEqual");
 
     ////
     value2       = VHArray(); // Clearing and  Setting to object type.
@@ -4701,20 +4416,16 @@ static int TestAddition6() {
     EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
     EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2,
-              "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value2[\"w4\"].StringStorage()", "IsEqual");
+    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
     EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1,
-              "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
-                               "*ABCDEF0123456789ABCDEF0123456789*", 34),
-          true, "value2[\"k3\"].StringStorage()", "IsEqual");
+    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+          "value2[\"k3\"].StringStorage()", "IsEqual");
 
     value2       = VHArray(); // Clearing and  Setting to object type.
     value2["w0"] = 5;
@@ -4729,20 +4440,16 @@ static int TestAddition6() {
     EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
     EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
     EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    EQ_TO(value2["w4"].StringStorage(), str_c2,
-          "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(),
-                               "-ABCDEF0123456789ABCDEF0123456789-", 34),
-          true, "value2[\"w4\"].StringStorage()", "IsEqual");
+    EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
+    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+          "value2[\"w4\"].StringStorage()", "IsEqual");
     EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
     EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
     EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
     EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    EQ_TO(value2["k3"].StringStorage(), str_c1,
-          "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(),
-                               "*ABCDEF0123456789ABCDEF0123456789*", 34),
-          true, "value2[\"k3\"].StringStorage()", "IsEqual");
+    EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
+    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+          "value2[\"k3\"].StringStorage()", "IsEqual");
     /////////////////////////////
 
     END_SUB_TEST;
@@ -5119,8 +4826,7 @@ static int TestStringify1() {
     value += "ABC";
     value += VArray();
     value += VHArray();
-    EQ_VALUE(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])", "Stringify()");
 
     ///////////
     value.Reset();
@@ -5131,8 +4837,7 @@ static int TestStringify1() {
     value += nullptr;
     value += false;
     value += true;
-    EQ_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])", "Stringify()");
     ///////////////////////////////////////
     END_SUB_TEST;
 }
@@ -5174,8 +4879,7 @@ static int TestStringify2() {
 
     value.Reset();
     value["5vn7b83y98t3wrupwmwa4ataw"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()");
     ///////////
 
     value.Reset();
@@ -5419,43 +5123,37 @@ static int TestStringify2() {
     value["A"]  = true;
     value["y"]  = VHArray();
     value["AA"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})", "Stringify()");
 
     value.Reset();
     value["A"] = false;
     value["y"] = VArray();
     value["B"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})", "Stringify()");
 
     value.Reset();
     value["A"]   = nullptr;
     value["y"]   = VHArray();
     value["ABC"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()");
 
     value.Reset();
     value["t"] = nullptr;
     value["Y"] = 789;
     value["A"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})", "Stringify()");
 
     value.Reset();
     value["A"]     = "ABC";
     value["y"]     = VArray();
     value["key-u"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()");
 
     value.Reset();
     value["X"]     = VArray();
     value["Y"]     = VHArray();
     value["key-u"] = 498;
-    EQ_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})", "Stringify()");
 
     value.Reset();
     value["X"] = VHArray();
@@ -5469,48 +5167,42 @@ static int TestStringify2() {
     value["y"]     = VHArray();
     value["AA"]    = 0;
     value["k-300"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()");
 
     value.Reset();
     value["B1"]    = false;
     value["y"]     = VArray();
     value["[A]"]   = nullptr;
     value["k-300"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()");
 
     value.Reset();
     value["{A}"]   = nullptr;
     value["y"]     = VHArray();
     value["AA"]    = "ABC";
     value["k-300"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()");
 
     value.Reset();
     value["x"]     = "ABC";
     value["[]]"]   = VArray();
     value["key-u"] = VHArray();
     value["A"]     = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()");
 
     value.Reset();
     value["X"]       = VArray();
     value["CCCCccc"] = false;
     value["key-u"]   = VHArray();
     value["A"]       = true;
-    EQ_VALUE(value.Stringify(),
-             R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()");
 
     value.Reset();
     value["X"]     = VHArray();
     value["A"]     = nullptr;
     value["key-u"] = VArray();
     value["k-300"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()");
 
     ///////////
     value.Reset();
@@ -5521,9 +5213,7 @@ static int TestStringify2() {
     value["E"] = "ABC";
     value["F"] = VArray();
     value["G"] = VHArray();
-    EQ_VALUE(value.Stringify(),
-             R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()");
 
     ///////////
     value.Reset();
@@ -5534,10 +5224,8 @@ static int TestStringify2() {
     value["EEEEE"]   = nullptr;
     value["FFFFFF"]  = false;
     value["GGGGGGG"] = true;
-    EQ_VALUE(
-        value.Stringify(),
-        R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
-        "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
+             "Stringify()");
     ///////////////////////////////////////
 
     END_SUB_TEST;
@@ -5553,8 +5241,7 @@ static int TestStringify3() {
     value[0] += "ABC";
     value[0] += VArray();
     value[0] += VHArray();
-    EQ_VALUE(value.Stringify(), R"([[true,false,null,0,"ABC",[],{}]])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()");
 
     value         = VArray();
     value[0]["a"] = true;
@@ -5564,9 +5251,7 @@ static int TestStringify3() {
     value[0]["B"] = "a";
     value[0]["2"] = VArray();
     value[0]["6"] = VHArray();
-    EQ_VALUE(value.Stringify(),
-             R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", "Stringify()");
 
     value.Reset();
     value["o"] += true;
@@ -5576,8 +5261,7 @@ static int TestStringify3() {
     value["o"] += "ABC";
     value["o"] += VArray();
     value["o"] += VHArray();
-    EQ_VALUE(value.Stringify(), R"({"o":[true,false,null,0,"ABC",[],{}]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"o":[true,false,null,0,"ABC",[],{}]})", "Stringify()");
 
     value.Reset();
     value["i"]["a"] = true;
@@ -5587,10 +5271,7 @@ static int TestStringify3() {
     value["i"]["B"] = "a";
     value["i"]["2"] = VArray();
     value["i"]["6"] = VHArray();
-    EQ_VALUE(
-        value.Stringify(),
-        R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})",
-        "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", "Stringify()");
 
     ////
     END_SUB_TEST;
@@ -5600,8 +5281,7 @@ static int TestStringify4() {
     ValueC value;
 
     value["\"\\/\b\f\n\r\t"] = "\t\r\n\f\b/\\\"";
-    EQ_VALUE(value.Stringify(), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})", "value.Stringify()");
 
     value.Reset();
     value += "\"\\/\b\f\n\r\t";
@@ -5715,8 +5395,7 @@ static int TestDeleteValue() {
     value["bb"]  = true;
     value["AAA"] = nullptr;
     value.Remove("bb");
-    EQ_VALUE(value.Stringify(), R"({"A":false,"AAA":null})",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"AAA":null})", "value.Stringify()");
     value.Remove("A");
     EQ_VALUE(value.Stringify(), R"({"AAA":null})", "value.Stringify()");
 
@@ -5761,10 +5440,8 @@ static int TestSortValue() {
 
     value.Sort();
 
-    EQ_VALUE(
-        value.Stringify(),
-        R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
-        "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
+             "value.Stringify()");
 
     value.Reset();
 
@@ -5778,10 +5455,8 @@ static int TestSortValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(
-        value.Stringify(),
-        R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
-        "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
+             "value.Stringify()");
 
     value.Reset();
 
@@ -5794,9 +5469,7 @@ static int TestSortValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(),
-             R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})", "value.Stringify()");
 
     value.Reset();
 
@@ -5809,9 +5482,7 @@ static int TestSortValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(),
-             R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})", "value.Stringify()");
 
     END_SUB_TEST;
 }
@@ -5943,14 +5614,12 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([{},[],"str",5.4,true,false,null])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()");
 
     value = value2;
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([null,false,true,5.4,"str",[],{}])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()");
 
     ///////////////////
 
@@ -5968,15 +5637,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([-7,-6,-5,-4,-3,-2,-1])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([-7,-6,-5,-4,-3,-2,-1])", "value.Stringify()");
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])", "value.Stringify()");
 
     ///////////////////
 
@@ -5994,15 +5661,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])", "value.Stringify()");
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])", "value.Stringify()");
 
     ///////////////////
 
@@ -6020,15 +5685,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"(["a","b","c","d","e","f","g"])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["a","b","c","d","e","f","g"])", "value.Stringify()");
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"(["g","f","e","d","c","b","a"])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["g","f","e","d","c","b","a"])", "value.Stringify()");
 
     ///////////////////
 
@@ -6046,8 +5709,7 @@ static int TestGroupValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([[0,0,0],[0,0,0,0,0]])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[0,0,0],[0,0,0,0,0]])", "value.Stringify()");
 
     value.Reset();
     value2.Reset();
@@ -6063,8 +5725,7 @@ static int TestGroupValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([[0,0,0,0,0],[0,0,0]])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[0,0,0,0,0],[0,0,0]])", "value.Stringify()");
 
     ///////////////////
 
@@ -6082,9 +5743,7 @@ static int TestGroupValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(),
-             R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])", "value.Stringify()");
 
     value.Reset();
     value2.Reset();
@@ -6100,9 +5759,7 @@ static int TestGroupValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(),
-             R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])",
-             "value.Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])", "value.Stringify()");
 
     //////////////////////
 

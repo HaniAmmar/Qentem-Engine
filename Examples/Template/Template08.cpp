@@ -15,8 +15,7 @@ int main() {
 
     value["size"] = 5;
 
-    const char *content =
-        R"(<loop set="list" repeat="{var:size}" index="5" value="loop1-value">loop1-value</loop>)";
+    const char *content = R"(<loop set="list" repeat="{var:size}" index="5" value="loop1-value">loop1-value</loop>)";
 
     std::cout << Template::Render(content, &value) << '\n';
 
@@ -28,8 +27,7 @@ int main() {
     value["size"]     = 7;
     value["start_at"] = 3;
 
-    content =
-        R"(<loop set="list" repeat="{var:size}" index="{var:start_at}" value="loop1-value">loop1-value</loop>)";
+    content = R"(<loop set="list" repeat="{var:size}" index="{var:start_at}" value="loop1-value">loop1-value</loop>)";
 
     std::cout << Template::Render(content, &value) << '\n';
 

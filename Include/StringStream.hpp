@@ -48,8 +48,7 @@ class StringStream {
     }
 
     StringStream(StringStream &&src) noexcept
-        : storage_(src.Storage()), length_(src.Length()),
-          capacity_(src.Capacity()) {
+        : storage_(src.Storage()), length_(src.Length()), capacity_(src.Capacity()) {
         src.setLength(0);
         src.setCapacity(0);
         src.clearStorage();
@@ -125,17 +124,11 @@ class StringStream {
         ++length_;
     }
 
-    inline void operator+=(const StringStream<Char_T_> &src) {
-        insert(src.First(), src.Length());
-    }
+    inline void operator+=(const StringStream<Char_T_> &src) { insert(src.First(), src.Length()); }
 
-    inline void operator+=(const String<Char_T_> &src) {
-        insert(src.First(), src.Length());
-    }
+    inline void operator+=(const String<Char_T_> &src) { insert(src.First(), src.Length()); }
 
-    inline void operator+=(const Char_T_ *str) {
-        insert(str, StringUtils::Count(str));
-    }
+    inline void operator+=(const Char_T_ *str) { insert(str, StringUtils::Count(str)); }
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const StringStream &src) {
@@ -150,14 +143,12 @@ class StringStream {
         return out;
     }
 
-    friend StringStream &operator<<(StringStream       &out,
-                                    const StringStream &src) {
+    friend StringStream &operator<<(StringStream &out, const StringStream &src) {
         out.insert(src.First(), src.Length());
         return out;
     }
 
-    friend StringStream &operator<<(StringStream          &out,
-                                    const String<Char_T_> &src) {
+    friend StringStream &operator<<(StringStream &out, const String<Char_T_> &src) {
         out.insert(src.First(), src.Length());
         return out;
     }
@@ -198,17 +189,11 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, len);
     }
 
-    inline bool operator!=(const StringStream &ss) const noexcept {
-        return (!(*this == ss));
-    }
+    inline bool operator!=(const StringStream &ss) const noexcept { return (!(*this == ss)); }
 
-    inline bool operator!=(const String<Char_T_> &string) const noexcept {
-        return (!(*this == string));
-    }
+    inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
 
-    inline bool operator!=(const Char_T_ *str) const noexcept {
-        return (!(*this == str));
-    }
+    inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
 
     inline bool IsEqual(const Char_T_ *str, const SizeT length) const noexcept {
         if (Length() != length) {
@@ -218,9 +203,7 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, length);
     }
 
-    inline void Insert(const Char_T_ *str, const SizeT length) {
-        insert(str, length);
-    }
+    inline void Insert(const Char_T_ *str, const SizeT length) { insert(str, length); }
 
     inline void Clear() noexcept { setLength(0); }
 
@@ -303,13 +286,9 @@ class StringStream {
     void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(const SizeT new_length) noexcept { length_ = new_length; }
-    void setCapacity(const SizeT new_capacity) noexcept {
-        capacity_ = new_capacity;
-    }
+    void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
-    SizeT algineSize(SizeT n_size) noexcept {
-        return (SizeT{2} << Platform::CLZ(n_size | 4U));
-    }
+    SizeT algineSize(SizeT n_size) noexcept { return (SizeT{2} << Platform::CLZ(n_size | 4U)); }
 
     void insert(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
@@ -320,8 +299,7 @@ class StringStream {
                 expand(algineSize(Length()));
             }
 
-            Memory::Copy((Storage() + current_offset), str,
-                         (len * sizeof(Char_T_)));
+            Memory::Copy((Storage() + current_offset), str, (len * sizeof(Char_T_)));
         }
     }
 

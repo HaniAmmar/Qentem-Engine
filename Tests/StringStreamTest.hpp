@@ -96,8 +96,7 @@ static int TestStringStream() {
     ss2 += String<char>("abc");
     ss1 = ss2; // Copy
     EQ_VALUE(ss1.Length(), ss2.Length(), "Length");
-    EQ_TRUE((ss1.Capacity() >= ss2.Length()),
-            "(ss1.Capacity() >= ss2.Length())");
+    EQ_TRUE((ss1.Capacity() >= ss2.Length()), "(ss1.Capacity() >= ss2.Length())");
     EQ_VALUE(ss1, "abc", "StringStream");
     ss1.Reset();
 

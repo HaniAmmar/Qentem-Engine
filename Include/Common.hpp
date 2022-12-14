@@ -31,8 +31,8 @@
 #define QENTEM_DOUBLE_PRECISION 15
 #endif
 
-#if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) ||          \
-    defined(__ppc64__) || defined(__powerpc64__) || defined(__s390__)
+#if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__powerpc64__) ||  \
+    defined(__s390__)
 #define QENTEM_64BIT_ARCH
 // 64bit arch only uses the lower 48 bits for pointers,
 // the upper 16 bits can be used for taging.

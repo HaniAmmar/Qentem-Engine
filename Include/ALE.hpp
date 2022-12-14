@@ -43,10 +43,10 @@ class ALEOperations;
 
 class ALE {
   public:
-    ALE()            = delete;
-    ALE(ALE &&)      = delete;
-    ALE(const ALE &) = delete;
-    ALE &operator=(ALE &&) = delete;
+    ALE()                       = delete;
+    ALE(ALE &&)                 = delete;
+    ALE(const ALE &)            = delete;
+    ALE &operator=(ALE &&)      = delete;
     ALE &operator=(const ALE &) = delete;
     ~ALE()                      = delete;
 
@@ -79,8 +79,7 @@ class ALE {
     };
 
     template <typename Char_T_, typename Helper_T_>
-    static bool Evaluate(double &number, const Char_T_ *content, SizeT length,
-                         const Helper_T_ *callback) noexcept {
+    static bool Evaluate(double &number, const Char_T_ *content, SizeT length, const Helper_T_ *callback) noexcept {
         Number    num;
         Operation current_op = Operation::None;
         SizeT     offset     = 0;
@@ -94,14 +93,12 @@ class ALE {
     }
 
     template <typename Char_T_, typename Helper_T_>
-    inline static bool Evaluate(double &number, const Char_T_ *content,
-                                const Helper_T_ *callback) noexcept {
+    inline static bool Evaluate(double &number, const Char_T_ *content, const Helper_T_ *callback) noexcept {
         return Evaluate(number, content, StringUtils::Count(content), callback);
     }
 
     template <typename Char_T_, typename Helper_T_>
-    static double Evaluate(const Char_T_ *content, SizeT length,
-                           const Helper_T_ *callback) noexcept {
+    static double Evaluate(const Char_T_ *content, SizeT length, const Helper_T_ *callback) noexcept {
         double number;
 
         if (Evaluate(number, content, length, callback)) {
@@ -112,27 +109,23 @@ class ALE {
     }
 
     template <typename Char_T_, typename Helper_T_>
-    inline static double Evaluate(const Char_T_   *content,
-                                  const Helper_T_ *callback) noexcept {
+    inline static double Evaluate(const Char_T_ *content, const Helper_T_ *callback) noexcept {
         return Evaluate(content, StringUtils::Count(content), callback);
     }
 
     template <typename Char_T_>
-    inline static bool Evaluate(double &number, const Char_T_ *content,
-                                SizeT length) noexcept {
+    inline static bool Evaluate(double &number, const Char_T_ *content, SizeT length) noexcept {
         ALEBasicHelper<Char_T_> helper;
         return Evaluate(number, content, length, &helper);
     }
 
     template <typename Char_T_>
-    inline static bool Evaluate(double        &number,
-                                const Char_T_ *content) noexcept {
+    inline static bool Evaluate(double &number, const Char_T_ *content) noexcept {
         return Evaluate(number, content, StringUtils::Count(content));
     }
 
     template <typename Char_T_>
-    inline static double Evaluate(const Char_T_ *content,
-                                  SizeT          length) noexcept {
+    inline static double Evaluate(const Char_T_ *content, SizeT length) noexcept {
         double number;
 
         if (Evaluate(number, content, length)) {
@@ -149,45 +142,36 @@ class ALE {
 
   private:
     template <typename Char_T_, typename Helper_T_>
-    static bool parse(Operation &current_op, Number &left,
-                      const Char_T_ *content, SizeT &offset,
-                      const SizeT      end_offset,
-                      const Helper_T_ *callback) noexcept {
+    static bool parse(Operation &current_op, Number &left, const Char_T_ *content, SizeT &offset,
+                      const SizeT end_offset, const Helper_T_ *callback) noexcept {
         Number    right;
         SizeT     previous_offset = offset;
         Operation op_w;
-        Operation op = nextOperation(op_w, content, offset, end_offset);
+        Operation op              = nextOperation(op_w, content, offset, end_offset);
         bool      left_evaluated  = false;
         bool      right_evaluated = false;
 
-        if (getNumber(left, content, previous_offset,
-                      (offset - previous_offset), callback, op)) {
+        if (getNumber(left, content, previous_offset, (offset - previous_offset), callback, op)) {
             advance(op, offset);
             previous_offset = offset;
 
             while (offset < end_offset) {
                 Operation       next_op_w;
-                const Operation next_op =
-                    nextOperation(next_op_w, content, offset, end_offset);
+                const Operation next_op = nextOperation(next_op_w, content, offset, end_offset);
 
                 if (next_op_w > op_w) {
                     Operation tmp_op = op;
                     right_evaluated  = (op_w == Operation::Equal);
 
-                    if (parse(tmp_op, right, content, previous_offset,
-                              end_offset, callback) &&
-                        process(content, left, right, left_evaluated,
-                                right_evaluated, op, callback)) {
+                    if (parse(tmp_op, right, content, previous_offset, end_offset, callback) &&
+                        process(content, left, right, left_evaluated, right_evaluated, op, callback)) {
                         op             = tmp_op;
                         offset         = previous_offset;
                         left_evaluated = true;
                         continue;
                     }
-                } else if (getNumber(right, content, previous_offset,
-                                     (offset - previous_offset), callback,
-                                     op) &&
-                           process(content, left, right, left_evaluated,
-                                   right_evaluated, op, callback)) {
+                } else if (getNumber(right, content, previous_offset, (offset - previous_offset), callback, op) &&
+                           process(content, left, right, left_evaluated, right_evaluated, op, callback)) {
                     advance(next_op, offset);
 
                     if (next_op_w < current_op) {
@@ -220,8 +204,7 @@ class ALE {
     }
 
     template <typename Char_T_>
-    static Operation nextOperation(Operation &weight, const Char_T_ *content,
-                                   SizeT      &offset,
+    static Operation nextOperation(Operation &weight, const Char_T_ *content, SizeT &offset,
                                    const SizeT end_offset) noexcept {
         using ALEOperations_T_ = ALEOperations<Char_T_>;
 
@@ -330,9 +313,7 @@ class ALE {
 
                     ++offset;
                     offset = Engine::SkipInnerPatterns<Char_T_>(
-                        ALEOperations_T_::ParenthesStart,
-                        ALEOperations_T_::ParenthesEnd, content, offset,
-                        end_offset);
+                        ALEOperations_T_::ParenthesStart, ALEOperations_T_::ParenthesEnd, content, offset, end_offset);
 
                     if (offset != 0) {
                         continue;
@@ -348,9 +329,7 @@ class ALE {
                     // string.
 
                     ++offset;
-                    offset =
-                        Engine::FindOne<Char_T_>(ALEOperations_T_::BracketEnd,
-                                                 content, offset, end_offset);
+                    offset = Engine::FindOne<Char_T_>(ALEOperations_T_::BracketEnd, content, offset, end_offset);
 
                     if (offset != 0) {
                         continue;
@@ -399,8 +378,7 @@ class ALE {
     }
 
     template <typename Char_T_, typename Helper_T_>
-    static bool getNumber(Number &val, const Char_T_ *content, SizeT offset,
-                          SizeT length, const Helper_T_ *callback,
+    static bool getNumber(Number &val, const Char_T_ *content, SizeT offset, SizeT length, const Helper_T_ *callback,
                           Operation op) noexcept {
         using ALEOperations_T_ = ALEOperations<Char_T_>;
 
@@ -423,26 +401,22 @@ class ALE {
                 --length;
 
                 Operation current_op = Operation::None;
-                return parse(current_op, val, content, offset, length,
-                             callback);
+                return parse(current_op, val, content, offset, length, callback);
             }
 
             case ALEOperations_T_::BracketStart: {
-                return (callback->ALESetNumber(val.Number, (content + offset),
-                                               length));
+                return (callback->ALESetNumber(val.Number, (content + offset), length));
             }
 
             default: {
-                return (Digit<Char_T_>::StringToNumber(
-                    val.Number, (content + offset), length));
+                return (Digit<Char_T_>::StringToNumber(val.Number, (content + offset), length));
             }
         }
     }
 
     template <typename Char_T_, typename Helper_T_>
-    static bool process(const Char_T_ *content, Number &left, Number right,
-                        bool left_evaluated, bool right_evaluated, Operation op,
-                        const Helper_T_ *callback) noexcept {
+    static bool process(const Char_T_ *content, Number &left, Number right, bool left_evaluated, bool right_evaluated,
+                        Operation op, const Helper_T_ *callback) noexcept {
         switch (op) {
             case Operation::Exponent: { // ^
                 if (right.Number != 0.0) {
@@ -458,9 +432,8 @@ class ALE {
                             return false;
                         }
 
-                        unsigned int times =
-                            static_cast<unsigned int>(right.Number);
-                        const double num = left.Number;
+                        unsigned int times = static_cast<unsigned int>(right.Number);
+                        const double num   = left.Number;
 
                         while (--times != 0) {
                             left.Number *= num;
@@ -479,9 +452,8 @@ class ALE {
             }
 
             case Operation::Remainder: { // %
-                left.Number = static_cast<double>(
-                    static_cast<unsigned long long>(left.Number) %
-                    static_cast<unsigned long long>(right.Number));
+                left.Number = static_cast<double>(static_cast<unsigned long long>(left.Number) %
+                                                  static_cast<unsigned long long>(right.Number));
                 break;
             }
 
@@ -543,8 +515,7 @@ class ALE {
             case Operation::NotEqual: { // !=
                 bool is_equal;
 
-                if (callback->ALEIsEqual(is_equal, content, left, right,
-                                         left_evaluated, right_evaluated)) {
+                if (callback->ALEIsEqual(is_equal, content, left, right, left_evaluated, right_evaluated)) {
                     if (op == Operation::Equal) {
                         left.Number = (is_equal ? 1 : 0);
                     } else {
@@ -568,8 +539,7 @@ class ALE {
 template <typename Char_T_>
 class ALEBasicHelper {
   public:
-    static bool ALESetNumber(double &number, const Char_T_ *content,
-                             SizeT length) noexcept {
+    static bool ALESetNumber(double &number, const Char_T_ *content, SizeT length) noexcept {
         return false;
 
         (void)number;
@@ -577,8 +547,7 @@ class ALEBasicHelper {
         (void)length;
     }
 
-    static bool ALEIsEqual(bool &result, const Char_T_ *content,
-                           ALE::Number left, ALE::Number right,
+    static bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left, ALE::Number right,
                            bool left_evaluated, bool right_evaluated) noexcept {
         using ALEOperations_T_ = ALEOperations<Char_T_>;
 
@@ -586,12 +555,10 @@ class ALEBasicHelper {
             const Char_T_ *left_content = (content + left.Content.Offset);
 
             if (*left_content != ALEOperations_T_::ParenthesStart) {
-                if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content,
-                                                     left.Content.Length))) {
+                if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content, left.Content.Length))) {
                     return false;
                 }
-            } else if (!(ALE::Evaluate(left.Number, (++left_content),
-                                       (left.Content.Length - 2)))) {
+            } else if (!(ALE::Evaluate(left.Number, (++left_content), (left.Content.Length - 2)))) {
                 return false;
             }
         }
@@ -600,12 +567,10 @@ class ALEBasicHelper {
             const Char_T_ *right_content = (content + right.Content.Offset);
 
             if (*right_content != ALEOperations_T_::ParenthesStart) {
-                if (!(Digit<Char_T_>::StringToNumber(
-                        right.Number, right_content, right.Content.Length))) {
+                if (!(Digit<Char_T_>::StringToNumber(right.Number, right_content, right.Content.Length))) {
                     return false;
                 }
-            } else if (!(ALE::Evaluate(right.Number, (++right_content),
-                                       (right.Content.Length - 2)))) {
+            } else if (!(ALE::Evaluate(right.Number, (++right_content), (right.Content.Length - 2)))) {
                 return false;
             }
         }

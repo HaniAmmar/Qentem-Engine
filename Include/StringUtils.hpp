@@ -52,17 +52,14 @@ class StringUtils {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static void TrimLeft(const Char_T_ *str, Number_T_ &offset,
-                         Number_T_ end_before) noexcept {
+    static void TrimLeft(const Char_T_ *str, Number_T_ &offset, Number_T_ end_before) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         while (offset < end_before) {
             const Char_T_ c = str[offset];
 
-            if ((c != WhiteSpaceChars_T_::SpaceChar) &&
-                (c != WhiteSpaceChars_T_::LineControlChar) &&
-                (c != WhiteSpaceChars_T_::TabControlChar) &&
-                (c != WhiteSpaceChars_T_::CarriageControlChar)) {
+            if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
+                (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
                 return;
             }
 
@@ -71,8 +68,7 @@ class StringUtils {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static void Trim(const Char_T_ *str, Number_T_ &offset,
-                     Number_T_ &length) noexcept {
+    static void Trim(const Char_T_ *str, Number_T_ &offset, Number_T_ &length) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         if (length != 0) {
@@ -82,10 +78,8 @@ class StringUtils {
             while (--end_before > offset) {
                 const Char_T_ c = str[end_before];
 
-                if ((c != WhiteSpaceChars_T_::SpaceChar) &&
-                    (c != WhiteSpaceChars_T_::LineControlChar) &&
-                    (c != WhiteSpaceChars_T_::TabControlChar) &&
-                    (c != WhiteSpaceChars_T_::CarriageControlChar)) {
+                if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
+                    (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
                     break;
                 }
             }
@@ -96,8 +90,7 @@ class StringUtils {
     }
 
     template <typename Char_T_>
-    static bool IsLess(const Char_T_ *left, const Char_T_ *right,
-                       SizeT left_length, SizeT right_length,
+    static bool IsLess(const Char_T_ *left, const Char_T_ *right, SizeT left_length, SizeT right_length,
                        bool orEqual) noexcept {
         SizeT offset = 0;
 
@@ -117,8 +110,7 @@ class StringUtils {
     }
 
     template <typename Char_T_>
-    static bool IsBigger(const Char_T_ *left, const Char_T_ *right,
-                         SizeT left_length, SizeT right_length,
+    static bool IsBigger(const Char_T_ *left, const Char_T_ *right, SizeT left_length, SizeT right_length,
                          bool orEqual) noexcept {
         SizeT offset = 0;
 
@@ -138,8 +130,7 @@ class StringUtils {
     }
 
     template <typename Char_T_>
-    static bool IsEqual(const Char_T_ *left, const Char_T_ *right,
-                        SizeT length) noexcept {
+    static bool IsEqual(const Char_T_ *left, const Char_T_ *right, SizeT length) noexcept {
         SizeT offset = 0;
 
         // if ((left != nullptr) && (right != nullptr)) {
@@ -153,8 +144,7 @@ class StringUtils {
 
     template <typename Char_T_>
     static SizeT Hash(const Char_T_ *key, SizeT length) noexcept {
-        static constexpr SizeT highest_bit =
-            (SizeT{1} << ((sizeof(SizeT) * 8) - 1));
+        static constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - 1));
 
         SizeT hash   = 11;
         SizeT base   = 33;

@@ -54,8 +54,7 @@ int main() {
     v_obj["key6"] = abc; // Add sub-array
 
     // Add the value if the key does not exist, or replace it otherwise.
-    v_obj.Merge(JSON::Parse(
-        R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})"));
+    v_obj.Merge(JSON::Parse(R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})"));
 
     std::cout << v_obj.Stringify() << '\n';
     /* Output:

@@ -290,20 +290,16 @@ static int TestArray3() {
     strings += static_cast<String<char> &&>(str1);
     String<char> *storage_str = strings.Storage();
 
-    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()",
-          "str1_cstr");
+    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
 
     strings.Insert(static_cast<String<char> &&>(str2));
-    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()",
-          "str2_cstr");
+    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
 
     strings += str1;
-    NOT_EQ_TO(storage_str[2].First(), str1_cstr, "storage_str[2].First()",
-              "str1_cstr");
+    NOT_EQ_TO(storage_str[2].First(), str1_cstr, "storage_str[2].First()", "str1_cstr");
 
     strings.Insert(str2);
-    NOT_EQ_TO(storage_str[3].First(), str2_cstr, "storage_str[3].First()",
-              "str2_cstr");
+    NOT_EQ_TO(storage_str[3].First(), str2_cstr, "storage_str[3].First()", "str2_cstr");
 
     // Checking move after expanding.
     for (SizeT i = 0; i < 16; i++) {
@@ -311,11 +307,9 @@ static int TestArray3() {
     }
 
     storage_str = strings.Storage();
-    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()",
-          "str1_cstr");
+    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
 
-    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()",
-          "str2_cstr");
+    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
 
     END_SUB_TEST;
 }
@@ -338,10 +332,8 @@ static int TestArray4() {
 
     EQ_VALUE(strings2.Size(), 2, "Size");
     NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(storage2[0].First(), str1_cstr, "storage2[0].First()",
-              "str1_cstr");
-    NOT_EQ_TO(storage2[1].First(), str2_cstr, "storage2[1].First()",
-              "str2_cstr");
+    NOT_EQ_TO(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr");
+    NOT_EQ_TO(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr");
 
     strings2.Reserve(2);
     strings2 += static_cast<Array<String<char>> &&>(strings1);

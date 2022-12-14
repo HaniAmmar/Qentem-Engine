@@ -73,8 +73,7 @@ class JSONParser {
     using VArray         = Array<VValue>;
     using VString        = String<Char_T_>;
 
-    VValue parseObject(const Char_T_ *content, SizeT &offset,
-                       const SizeT length) {
+    VValue parseObject(const Char_T_ *content, SizeT &offset, const SizeT length) {
         VObject obj;
 
         while (offset < length) {
@@ -130,8 +129,7 @@ class JSONParser {
         return VValue{};
     }
 
-    VValue parseArray(const Char_T_ *content, SizeT &offset,
-                      const SizeT length) {
+    VValue parseArray(const Char_T_ *content, SizeT &offset, const SizeT length) {
         VArray arr;
 
         while (offset < length) {
@@ -157,8 +155,7 @@ class JSONParser {
         return VValue{};
     }
 
-    VValue parseValue(const Char_T_ *content, SizeT &offset,
-                      const SizeT length) {
+    VValue parseValue(const Char_T_ *content, SizeT &offset, const SizeT length) {
         switch (content[offset]) {
             case JSONotation_T_::SCurlyChar: {
                 ++offset;
@@ -207,8 +204,7 @@ class JSONParser {
             }
 
             case JSONotation_T_::T_Char: {
-                static const Char_T_ *true_string =
-                    JSONotation_T_::GetTrueString();
+                static const Char_T_ *true_string = JSONotation_T_::GetTrueString();
 
                 SizeT tmp_offset = 0;
 
@@ -225,8 +221,7 @@ class JSONParser {
             }
 
             case JSONotation_T_::F_Char: {
-                static const Char_T_ *false_string =
-                    JSONotation_T_::GetFalseString();
+                static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
 
                 SizeT tmp_offset = 0;
 
@@ -243,9 +238,8 @@ class JSONParser {
             }
 
             case JSONotation_T_::N_Char: {
-                static const Char_T_ *null_string =
-                    JSONotation_T_::GetNullString();
-                SizeT tmp_offset = 0;
+                static const Char_T_ *null_string = JSONotation_T_::GetNullString();
+                SizeT                 tmp_offset  = 0;
 
                 do {
                     ++offset;
@@ -286,25 +280,19 @@ class JSONParser {
                             if (is_float || len > 19) {
                                 double num;
 
-                                if (Digit<Char_T_>::StringToNumber(
-                                        num, num_content,
-                                        (offset - num_offset))) {
+                                if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
                                     return VValue{num};
                                 }
                             } else if (is_not_negative) {
                                 unsigned long long num;
 
-                                if (Digit<Char_T_>::StringToNumber(
-                                        num, num_content,
-                                        (offset - num_offset))) {
+                                if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
                                     return VValue{num};
                                 }
                             } else {
                                 long long num;
 
-                                if (Digit<Char_T_>::StringToNumber(
-                                        num, num_content,
-                                        (offset - num_offset))) {
+                                if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
                                     return VValue{num};
                                 }
                             }

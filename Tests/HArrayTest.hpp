@@ -95,8 +95,8 @@ static int TestHArray1() {
 static int TestHArray2() {
     HashArray                  numbers1(8);
     HashArray                  numbers2;
-    const String<char> *       key;
-    const char *               str_c;
+    const String<char>        *key;
+    const char                *str_c;
     const HAItem<SizeT, char> *storage;
 
     numbers1["key1"] = 1;
@@ -156,8 +156,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers1["key4"], 40, "key4");
     EQ_VALUE(numbers1["key5"], 50, "key5");
     EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70,
-             "ABCDEF0123456789ABCDEF0123456789");
+    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
 
     key = numbers1.GetKey(0);
     NOT_EQ_TO(key, nullptr, "key", "null");
@@ -179,8 +178,7 @@ static int TestHArray2() {
     EQ_TRUE(key->IsEqual("key6", 4), "(GetKey(5) == key6)");
     key = numbers1.GetKey(6);
     NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("ABCDEF0123456789ABCDEF0123456789", 32),
-            "(GetKey(6) == key7)");
+    EQ_TRUE(key->IsEqual("ABCDEF0123456789ABCDEF0123456789", 32), "(GetKey(6) == key7)");
 
     key   = numbers1.GetKey(6);
     str_c = key->First();
@@ -196,8 +194,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers1["key4"], 40, "key4");
     EQ_VALUE(numbers1["key5"], 50, "key5");
     EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70,
-             "ABCDEF0123456789ABCDEF0123456789");
+    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
     EQ_VALUE(numbers1["key8"], 80, "key8");
     EQ_VALUE(numbers1["key9"], 90, "key9");
 
@@ -215,8 +212,7 @@ static int TestHArray2() {
     EQ_TRUE((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
     NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
     NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
-    NOT_EQ_TO(numbers1.GetKey(6), numbers2.GetKey(6), "numbers1.GetKey(6)",
-              "numbers2.GetKey(6)");
+    NOT_EQ_TO(numbers1.GetKey(6), numbers2.GetKey(6), "numbers1.GetKey(6)", "numbers2.GetKey(6)");
     NOT_EQ_TO(key->First(), str_c, "str_c", "GetKey(6)->First()");
 
     numbers2 = static_cast<HashArray &&>(numbers1);
@@ -233,8 +229,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers2["key4"], 40, "key4");
     EQ_VALUE(numbers2["key5"], 50, "key5");
     EQ_VALUE(numbers2["key6"], 60, "key6");
-    EQ_VALUE(numbers2["ABCDEF0123456789ABCDEF0123456789"], 70,
-             "ABCDEF0123456789ABCDEF0123456789");
+    EQ_VALUE(numbers2["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
     EQ_VALUE(numbers2["key8"], 80, "key8");
     EQ_VALUE(numbers2["key9"], 90, "key9");
 
@@ -253,8 +248,7 @@ static int TestHArray2() {
     EQ_VALUE(numbers1["key4"], 40, "key4");
     EQ_VALUE(numbers1["key5"], 50, "key5");
     EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70,
-             "ABCDEF0123456789ABCDEF0123456789");
+    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
     EQ_VALUE(numbers1["key8"], 80, "key8");
     EQ_VALUE(numbers1["key9"], 90, "key9");
 
@@ -264,8 +258,8 @@ static int TestHArray2() {
 static int TestHArray3() {
     HashArray                  numbers1(8);
     HashArray                  numbers2;
-    const String<char> *       key;
-    const char *               str_c;
+    const String<char>        *key;
+    const char                *str_c;
     const HAItem<SizeT, char> *storage;
 
     numbers2["key4"] = 40;
@@ -313,7 +307,7 @@ static int TestHArray4() {
     HashArray                  numbers2;
     HashArray                  numbers3(3);
     const HAItem<SizeT, char> *storage;
-    SizeT *                    value;
+    SizeT                     *value;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -470,8 +464,7 @@ static int TestHArray4() {
     for (SizeT i = 0; i < 10; i++) {
         String<char> key = Digit<char>::NumberToString(i);
 
-        numbers1.Insert(Digit<char>::NumberToString(i),
-                        static_cast<SizeT &&>(SizeT{i}));
+        numbers1.Insert(Digit<char>::NumberToString(i), static_cast<SizeT &&>(SizeT{i}));
         value = numbers1.Find(key);
         NOT_EQ_TO(value, nullptr, "value", "null");
         EQ_VALUE(*value, i, key.First());
@@ -483,7 +476,7 @@ static int TestHArray4() {
 static int TestHArray5() {
     HArray<SizeT, char> numbers1;
     String<char>        key;
-    SizeT *             value;
+    SizeT              *value;
 
     for (SizeT i = 1; i < 11; i++) {
         key = "k-";
@@ -519,8 +512,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 1; i < 11; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value",
-              "null");
+        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -533,8 +525,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 1; i < 101; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value",
-              "null");
+        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -546,8 +537,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 101; i < 201; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value",
-              "null");
+        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -560,8 +550,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 0; i < 1001; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value",
-              "null");
+        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -593,47 +582,35 @@ static int TestHArray6() {
     const char *c_str1 = str1.First();
     const char *c_str2 = str2.First();
 
-    strings1[static_cast<String<char> &&>(key1)] =
-        static_cast<String<char> &&>(str1);
-    strings1[static_cast<String<char> &&>(key2)] =
-        static_cast<String<char> &&>(str2);
+    strings1[static_cast<String<char> &&>(key1)] = static_cast<String<char> &&>(str1);
+    strings1[static_cast<String<char> &&>(key2)] = static_cast<String<char> &&>(str2);
 
     EQ_VALUE(strings1.Size(), 2, "Size");
     NOT_EQ_TO(strings1.First(), nullptr, "First()", "null");
     NOT_EQ_TO(strings1.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(strings1.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(0)", "k-1");
+    EQ_TO(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings1.GetKey(1), nullptr, "GetKey(1)", "null");
     EQ_TO(strings1.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(1)", "k-2");
+    EQ_TO(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
-    EQ_TO(strings1.GetValue(id)->First(), c_str1, "strings[0].First()",
-          "c_str1");
-    EQ_TO(strings1.GetValue(++id)->First(), c_str2, "strings[1].First()",
-          "c_str2");
+    EQ_TO(strings1.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
+    EQ_TO(strings1.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
 
     strings2 += strings1;
     EQ_VALUE(strings2.Size(), 2, "Size");
     NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
     NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()",
-              "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(0)", "k-1");
+    NOT_EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
+    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
-    NOT_EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()",
-              "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(1)", "k-2");
+    NOT_EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
+    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
-    NOT_EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()",
-              "c_str1");
-    NOT_EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()",
-              "c_str2");
+    NOT_EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
+    NOT_EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
 
     strings2.Reserve(2);
     storage = strings1.First();
@@ -644,18 +621,14 @@ static int TestHArray6() {
     NOT_EQ_TO(strings2.First(), storage, "First()", "storage");
     NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(0)", "k-1");
+    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
     EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(1)", "k-2");
+    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
-    EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()",
-          "c_str1");
-    EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()",
-          "c_str2");
+    EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
+    EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
 
     strings1 += static_cast<HArray<String<char>, char> &&>(strings2);
     strings1.Resize(10);
@@ -668,18 +641,14 @@ static int TestHArray6() {
     NOT_EQ_TO(strings2.First(), storage, "First()", "storage");
     NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
     EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(0)", "k-1");
+    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
     NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
     EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789",
-          "GetKey(1)", "k-2");
+    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
 
     id = 0;
-    EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()",
-          "c_str1");
-    EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()",
-          "c_str2");
+    EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
+    EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
 
     END_SUB_TEST;
 }

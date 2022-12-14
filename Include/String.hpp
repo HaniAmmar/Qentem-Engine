@@ -38,8 +38,7 @@ namespace Qentem {
 template <typename Char_T_>
 class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    static constexpr SizeT short_string_max =
-        ((6 + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
+    static constexpr SizeT short_string_max = ((6 + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
 #endif
 
   public:
@@ -71,9 +70,7 @@ class String {
 
     String(const Char_T_ *str, SizeT len) { copyString(str, len); }
 
-    explicit String(const Char_T_ *str) {
-        copyString(str, StringUtils::Count(str));
-    }
+    explicit String(const Char_T_ *str) { copyString(str, StringUtils::Count(str)); }
 
     ~String() { deallocate(Storage()); }
 
@@ -134,9 +131,7 @@ class String {
         return ns;
     }
 
-    inline String operator+(const String &src) const {
-        return Merge(*this, src);
-    }
+    inline String operator+(const String &src) const { return Merge(*this, src); }
 
     String operator+(const Char_T_ *str) const {
         const SizeT src_len = Length();
@@ -182,52 +177,40 @@ class String {
         return StringUtils::IsEqual(First(), str, len);
     }
 
-    inline bool operator!=(const String &string) const noexcept {
-        return (!(*this == string));
-    }
+    inline bool operator!=(const String &string) const noexcept { return (!(*this == string)); }
 
-    inline bool operator!=(const Char_T_ *str) const noexcept {
-        return (!(*this == str));
-    }
+    inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
 
     inline bool operator<(const String &string) const noexcept {
-        return StringUtils::IsLess(First(), string.First(), Length(),
-                                   string.Length(), false);
+        return StringUtils::IsLess(First(), string.First(), Length(), string.Length(), false);
     }
 
     inline bool operator<(const Char_T_ *str) const noexcept {
-        return StringUtils::IsLess(First(), str, Length(),
-                                   StringUtils::Count(str), false);
+        return StringUtils::IsLess(First(), str, Length(), StringUtils::Count(str), false);
     }
 
     inline bool operator<=(const String &string) const noexcept {
-        return StringUtils::IsLess(First(), string.First(), Length(),
-                                   string.Length(), true);
+        return StringUtils::IsLess(First(), string.First(), Length(), string.Length(), true);
     }
 
     inline bool operator<=(const Char_T_ *str) const noexcept {
-        return StringUtils::IsLess(First(), str, Length(),
-                                   StringUtils::Count(str), true);
+        return StringUtils::IsLess(First(), str, Length(), StringUtils::Count(str), true);
     }
 
     inline bool operator>(const String &string) const noexcept {
-        return StringUtils::IsBigger(First(), string.First(), Length(),
-                                     string.Length(), false);
+        return StringUtils::IsBigger(First(), string.First(), Length(), string.Length(), false);
     }
 
     inline bool operator>(const Char_T_ *str) const noexcept {
-        return StringUtils::IsBigger(First(), str, Length(),
-                                     StringUtils::Count(str), false);
+        return StringUtils::IsBigger(First(), str, Length(), StringUtils::Count(str), false);
     }
 
     inline bool operator>=(const String &string) const noexcept {
-        return StringUtils::IsBigger(First(), string.First(), Length(),
-                                     string.Length(), true);
+        return StringUtils::IsBigger(First(), string.First(), Length(), string.Length(), true);
     }
 
     inline bool operator>=(const Char_T_ *str) const noexcept {
-        return StringUtils::IsBigger(First(), str, Length(),
-                                     StringUtils::Count(str), true);
+        return StringUtils::IsBigger(First(), str, Length(), StringUtils::Count(str), true);
     }
 
     inline bool IsEqual(const Char_T_ *str, SizeT length) const noexcept {
@@ -282,12 +265,10 @@ class String {
         const SizeT len = Length();
         if ((len != 0) && (len < short_string_max)) {
 #ifndef QENTEM_BIG_ENDIAN
-            return const_cast<Char_T_ *>(
-                reinterpret_cast<const Char_T_ *>(&free_));
+            return const_cast<Char_T_ *>(reinterpret_cast<const Char_T_ *>(&free_));
 #else
             // Two tags at the start
-            return reinterpret_cast<Char_T_ *>(const_cast<char *>(
-                reinterpret_cast<const char *>(&storage_) + 2));
+            return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) + 2));
 #endif
         }
 #endif
@@ -302,8 +283,7 @@ class String {
             return reinterpret_cast<const Char_T_ *>(&free_);
 #else
             // Two tags at the start
-            return reinterpret_cast<const Char_T_ *>(
-                reinterpret_cast<const char *>(&storage_) + 2);
+            return reinterpret_cast<const Char_T_ *>(reinterpret_cast<const char *>(&storage_) + 2);
 #endif
         }
 #endif
@@ -333,8 +313,7 @@ class String {
         }
 
         if (src2.IsNotEmpty()) {
-            Memory::Copy((des + src1.Length()), src2.First(),
-                         (src2.Length() * sizeof(Char_T_)));
+            Memory::Copy((des + src1.Length()), src2.First(), (src2.Length() * sizeof(Char_T_)));
         }
 
         return ns;
@@ -398,8 +377,7 @@ class String {
             return reinterpret_cast<Char_T_ *>(&free_);
 #else
             // Two tags at the start
-            return reinterpret_cast<Char_T_ *>(
-                (reinterpret_cast<char *>(&storage_) + 2));
+            return reinterpret_cast<Char_T_ *>((reinterpret_cast<char *>(&storage_) + 2));
 #endif
         }
 #endif

@@ -68,23 +68,20 @@ static int RunTests() {
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
     if (failed == 0) {
-        TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_PASS << "All good."
-                             << QENTEM_OUTPUT_END_COLOR << '\n';
+        TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_PASS << "All good." << QENTEM_OUTPUT_END_COLOR << '\n';
         return 0;
     }
 
     total = (passed + failed);
 
-    TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Not good!"
-                         << QENTEM_OUTPUT_END_COLOR << " " << failed
+    TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Not good!" << QENTEM_OUTPUT_END_COLOR << " " << failed
                          << " out of " << total << " failed.\n";
 
     return 1;
 }
 
 static void PrintInfo() {
-    TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_MAIN << "Configuration"
-                         << QENTEM_OUTPUT_END_COLOR << '\n';
+    TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_MAIN << "Configuration" << QENTEM_OUTPUT_END_COLOR << '\n';
 
 #ifdef QENTEM_64BIT_ARCH
     TestHelper::Stream() << "Arch: 64BIT";
@@ -108,8 +105,7 @@ static void PrintInfo() {
     TestHelper::Stream() << "\nSSE2: On";
 #endif
 
-    TestHelper::Stream() << "\nSize of SizeT: " << sizeof(Qentem::SizeT)
-                         << "\n\n";
+    TestHelper::Stream() << "\nSize of SizeT: " << sizeof(Qentem::SizeT) << "\n\n";
 }
 } // namespace Test
 } // namespace Qentem

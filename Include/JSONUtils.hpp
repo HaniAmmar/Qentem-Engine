@@ -34,9 +34,7 @@ template <typename>
 class JSONotation;
 
 template <typename Char_T_>
-QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_         *content,
-                                              SizeT                  length,
-                                              StringStream<Char_T_> &buffer) {
+QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T_> &buffer) {
     using JSONotation_T_ = JSONotation<Char_T_>;
 
     SizeT offset  = 0;
@@ -89,9 +87,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_         *content,
                         ++offset;
 
                         if ((length - offset) > 3) {
-                            unsigned int code =
-                                Digit<Char_T_>::HexStringToNumber(
-                                    (content + offset), 4);
+                            unsigned int code = Digit<Char_T_>::HexStringToNumber((content + offset), 4);
                             offset += 4;
                             offset2 = offset;
 
@@ -105,9 +101,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_         *content,
                                 code = (code ^ 0xD800U) << 10U;
                                 offset += 2;
 
-                                code += Digit<Char_T_>::HexStringToNumber(
-                                            (content + offset), 4) &
-                                        0x3FFU;
+                                code += Digit<Char_T_>::HexStringToNumber((content + offset), 4) & 0x3FFU;
                                 code += 0x10000U;
 
                                 Unicode::ToUTF(code, buffer);
@@ -156,8 +150,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_         *content,
 }
 
 template <typename Char_T_>
-static void EscapeJSON(const Char_T_ *content, SizeT length,
-                       StringStream<Char_T_> &buffer) {
+static void EscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T_> &buffer) {
     using JSONotation_T_ = JSONotation<Char_T_>;
 
     SizeT offset  = 0;
@@ -265,20 +258,20 @@ class JSONotation {
 
     static constexpr unsigned char TrueStringLength = 4;
     static const Char_T_          *GetTrueString() noexcept {
-        static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e'};
-        return &(val[0]);
+                 static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e'};
+                 return &(val[0]);
     }
 
     static constexpr unsigned char FalseStringLength = 5;
     static const Char_T_          *GetFalseString() noexcept {
-        static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e'};
-        return &(val[0]);
+                 static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e'};
+                 return &(val[0]);
     }
 
     static constexpr unsigned char NullStringLength = 4;
     static const Char_T_          *GetNullString() noexcept {
-        static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l'};
-        return &(val[0]);
+                 static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l'};
+                 return &(val[0]);
     }
 };
 

@@ -220,8 +220,7 @@ static int TestEngine1() {
     ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
     EQ_VALUE(ret, 0, "return");
 
-    ret =
-        Engine::Find(find_, find_len, content, (content_len - 1), content_len);
+    ret = Engine::Find(find_, find_len, content, (content_len - 1), content_len);
     EQ_VALUE(ret, 0, "return");
 
     find_       = "ABC";

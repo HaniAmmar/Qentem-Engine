@@ -91,41 +91,21 @@ class Value {
         }
     }
 
-    explicit Value(VObject &&obj) noexcept
-        : object_{static_cast<VObject &&>(obj)} {
-        setTypeToObject();
-    }
+    explicit Value(VObject &&obj) noexcept : object_{static_cast<VObject &&>(obj)} { setTypeToObject(); }
 
-    explicit Value(VArray &&arr) noexcept
-        : array_{static_cast<VArray &&>(arr)} {
-        setTypeToArray();
-    }
+    explicit Value(VArray &&arr) noexcept : array_{static_cast<VArray &&>(arr)} { setTypeToArray(); }
 
-    explicit Value(VString &&str) noexcept
-        : string_{static_cast<VString &&>(str)} {
-        setTypeToString();
-    }
+    explicit Value(VString &&str) noexcept : string_{static_cast<VString &&>(str)} { setTypeToString(); }
 
-    explicit Value(const VObject &obj) noexcept : object_{obj} {
-        setTypeToObject();
-    }
+    explicit Value(const VObject &obj) noexcept : object_{obj} { setTypeToObject(); }
 
-    explicit Value(const VArray &arr) noexcept : array_{arr} {
-        setTypeToArray();
-    }
+    explicit Value(const VArray &arr) noexcept : array_{arr} { setTypeToArray(); }
 
-    explicit Value(const VString &str) noexcept : string_{str} {
-        setTypeToString();
-    }
+    explicit Value(const VString &str) noexcept : string_{str} { setTypeToString(); }
 
-    explicit Value(const Char_T_ *str, SizeT length) noexcept
-        : string_{str, length} {
-        setTypeToString();
-    }
+    explicit Value(const Char_T_ *str, SizeT length) noexcept : string_{str, length} { setTypeToString(); }
 
-    explicit Value(unsigned long long num) noexcept : number_{num} {
-        setTypeToUInt64();
-    }
+    explicit Value(unsigned long long num) noexcept : number_{num} { setTypeToUInt64(); }
 
     explicit Value(long long num) noexcept : number_{num} { setTypeToInt64(); }
 
@@ -134,8 +114,7 @@ class Value {
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        constexpr bool is_float =
-            (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
+        constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
 
         if (is_unsigned) {
             number_.SetNumber(static_cast<unsigned long long>(num));
@@ -327,8 +306,7 @@ class Value {
     template <typename Number_T_>
     inline Value &operator=(Number_T_ num) noexcept {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        constexpr bool is_float =
-            (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
+        constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
 
         if (!IsNumber() && !IsUndefined()) {
             reset();
@@ -400,14 +378,11 @@ class Value {
                 initArray();
             }
 
-            array_ +=
-                static_cast<Value &&>(Value{static_cast<VObject &&>(obj)});
+            array_ += static_cast<Value &&>(Value{static_cast<VObject &&>(obj)});
         }
     }
 
-    void operator+=(const VObject &obj) {
-        *this += static_cast<VObject &&>(VObject(obj));
-    }
+    void operator+=(const VObject &obj) { *this += static_cast<VObject &&>(VObject(obj)); }
 
     void operator+=(VArray &&arr) {
         if (!(IsArray())) {
@@ -422,9 +397,7 @@ class Value {
         }
     }
 
-    void operator+=(const VArray &arr) {
-        (*this) += static_cast<VArray &&>(VArray(arr));
-    }
+    void operator+=(const VArray &arr) { (*this) += static_cast<VArray &&>(VArray(arr)); }
 
     void operator+=(VString &&str) {
         if (!(IsArray())) {
@@ -435,13 +408,9 @@ class Value {
         array_ += Value{static_cast<VString &&>(str)};
     }
 
-    void operator+=(const VString &str) {
-        *this += static_cast<VString &&>(VString(str));
-    }
+    void operator+=(const VString &str) { *this += static_cast<VString &&>(VString(str)); }
 
-    void operator+=(const Char_T_ *str) {
-        *this += static_cast<VString &&>(VString(str));
-    }
+    void operator+=(const Char_T_ *str) { *this += static_cast<VString &&>(VString(str)); }
 
     template <typename Number_T_>
     void operator+=(Number_T_ num) {
@@ -618,44 +587,27 @@ class Value {
         return (type > val.Type());
     }
 
-    inline bool IsUndefined() const noexcept {
-        return (Type() == ValueType::Undefined);
-    }
+    inline bool IsUndefined() const noexcept { return (Type() == ValueType::Undefined); }
 
-    inline bool IsObject() const noexcept {
-        return (Type() == ValueType::Object);
-    }
+    inline bool IsObject() const noexcept { return (Type() == ValueType::Object); }
 
-    inline bool IsArray() const noexcept {
-        return (Type() == ValueType::Array);
-    }
+    inline bool IsArray() const noexcept { return (Type() == ValueType::Array); }
 
-    inline bool IsString() const noexcept {
-        return (Type() == ValueType::String);
-    }
+    inline bool IsString() const noexcept { return (Type() == ValueType::String); }
 
     inline bool IsNumber() const noexcept {
-        return ((Type() == ValueType::UInt64) || (Type() == ValueType::Int64) ||
-                (Type() == ValueType::Double));
+        return ((Type() == ValueType::UInt64) || (Type() == ValueType::Int64) || (Type() == ValueType::Double));
     }
 
-    inline bool IsUInt64() const noexcept {
-        return (Type() == ValueType::UInt64);
-    }
+    inline bool IsUInt64() const noexcept { return (Type() == ValueType::UInt64); }
 
-    inline bool IsInt64() const noexcept {
-        return (Type() == ValueType::Int64);
-    }
+    inline bool IsInt64() const noexcept { return (Type() == ValueType::Int64); }
 
-    inline bool IsDouble() const noexcept {
-        return (Type() == ValueType::Double);
-    }
+    inline bool IsDouble() const noexcept { return (Type() == ValueType::Double); }
 
     inline bool IsTrue() const noexcept { return (Type() == ValueType::True); }
 
-    inline bool IsFalse() const noexcept {
-        return (Type() == ValueType::False);
-    }
+    inline bool IsFalse() const noexcept { return (Type() == ValueType::False); }
 
     inline bool IsNull() const noexcept { return (Type() == ValueType::Null); }
 
@@ -677,9 +629,8 @@ class Value {
         }
 
         if (IsArray() && val.IsArray()) {
-            for (Value *src_val = val.array_.Storage(),
-                       *end     = (src_val + val.array_.Size());
-                 src_val < end; src_val++) {
+            for (Value *src_val = val.array_.Storage(), *end = (src_val + val.array_.Size()); src_val < end;
+                 src_val++) {
                 if (!(src_val->IsUndefined())) {
                     array_ += static_cast<Value &&>(*src_val);
                 }
@@ -696,9 +647,8 @@ class Value {
         }
 
         if (IsArray() && val.IsArray()) {
-            for (Value *src_val = val.array_.Storage(),
-                       *end     = (src_val + val.array_.Size());
-                 src_val < end; src_val++) {
+            for (Value *src_val = val.array_.Storage(), *end = (src_val + val.array_.Size()); src_val < end;
+                 src_val++) {
                 if (!(src_val->IsUndefined())) {
                     array_ += *src_val;
                 }
@@ -747,8 +697,7 @@ class Value {
 
         SizeT index;
 
-        if ((type == ValueType::Array) &&
-            (Digit<Char_T_>::StringToNumber(index, key, length)) &&
+        if ((type == ValueType::Array) && (Digit<Char_T_>::StringToNumber(index, key, length)) &&
             (index < array_.Size())) {
             Value *val = (array_.Storage() + index);
 
@@ -810,8 +759,7 @@ class Value {
 
     // To get a pointer to a key and its length.
     template <typename Number_T_>
-    bool SetKeyCharAndLength(SizeT index, const Char_T_ *&key,
-                             Number_T_ &length) const noexcept {
+    bool SetKeyCharAndLength(SizeT index, const Char_T_ *&key, Number_T_ &length) const noexcept {
         const VString *val = GetKey(index);
 
         if (val != nullptr) {
@@ -825,8 +773,7 @@ class Value {
 
     // To get a pointer to the string and its length.
     template <typename Number_T_>
-    bool SetCharAndLength(const Char_T_ *&key,
-                          Number_T_      &length) const noexcept {
+    bool SetCharAndLength(const Char_T_ *&key, Number_T_ &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
                 key    = string_.First();
@@ -876,26 +823,22 @@ class Value {
             }
 
             case ValueType::Double: {
-                value = Digit<Char_T_>::NumberToString(
-                    number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
+                value = Digit<Char_T_>::NumberToString(number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
                 return true;
             }
 
             case ValueType::True: {
-                value = VString(JSONotation_T_::GetTrueString(),
-                                JSONotation_T_::TrueStringLength);
+                value = VString(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
                 return true;
             }
 
             case ValueType::False: {
-                value = VString(JSONotation_T_::GetFalseString(),
-                                JSONotation_T_::FalseStringLength);
+                value = VString(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
                 return true;
             }
 
             case ValueType::Null: {
-                value = VString(JSONotation_T_::GetNullString(),
-                                JSONotation_T_::NullStringLength);
+                value = VString(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
                 return true;
             }
 
@@ -913,8 +856,7 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(ss, number_.GetUInt64(),
-                                                     1);
+                Digit<Char_T_>::NumberToStringStream(ss, number_.GetUInt64(), 1);
                 return true;
             }
 
@@ -924,26 +866,22 @@ class Value {
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(
-                    ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
+                Digit<Char_T_>::NumberToStringStream(ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
                 return true;
             }
 
             case ValueType::True: {
-                ss.Insert(JSONotation_T_::GetTrueString(),
-                          JSONotation_T_::TrueStringLength);
+                ss.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
                 return true;
             }
 
             case ValueType::False: {
-                ss.Insert(JSONotation_T_::GetFalseString(),
-                          JSONotation_T_::FalseStringLength);
+                ss.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
                 return true;
             }
 
             case ValueType::Null: {
-                ss.Insert(JSONotation_T_::GetNullString(),
-                          JSONotation_T_::NullStringLength);
+                ss.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
                 return true;
             }
 
@@ -1008,8 +946,7 @@ class Value {
             case ValueType::String: {
                 double num;
 
-                if (Digit<Char_T_>::StringToNumber(num, string_.First(),
-                                                   string_.Length())) {
+                if (Digit<Char_T_>::StringToNumber(num, string_.First(), string_.Length())) {
                     value = static_cast<Number_T_>(num);
                     return true;
                 }
@@ -1063,14 +1000,12 @@ class Value {
             }
 
             case ValueType::String: {
-                if (string_.IsEqual(JSONotation_T_::GetTrueString(),
-                                    JSONotation_T_::TrueStringLength)) {
+                if (string_.IsEqual(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (string_.IsEqual(JSONotation_T_::GetFalseString(),
-                                    JSONotation_T_::FalseStringLength)) {
+                if (string_.IsEqual(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1174,8 +1109,7 @@ class Value {
 #endif
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T_ *key,
-                 const SizeT length) const noexcept {
+    bool GroupBy(Value &groupedValue, const Char_T_ *key, const SizeT length) const noexcept {
         using V_item_ = HAItem<Value, Char_T_>;
         VObject new_sub_obj;
         VString grouped_key;
@@ -1198,11 +1132,9 @@ class Value {
                 }
 
                 SizeT count = 0;
-                for (const V_item_ *obj_item = _item->object_.First(),
-                                   *obj_end  = _item->object_.End();
+                for (const V_item_ *obj_item = _item->object_.First(), *obj_end = _item->object_.End();
                      obj_item != obj_end; obj_item++) {
-                    if ((obj_item == nullptr) ||
-                        obj_item->Value.IsUndefined()) {
+                    if ((obj_item == nullptr) || obj_item->Value.IsUndefined()) {
                         return false;
                     }
 
@@ -1215,8 +1147,7 @@ class Value {
                     ++count;
                 }
 
-                groupedValue.object_[static_cast<VString &&>(grouped_key)] +=
-                    static_cast<VObject &&>(new_sub_obj);
+                groupedValue.object_[static_cast<VString &&>(grouped_key)] += static_cast<VObject &&>(new_sub_obj);
             }
 
             return true;
@@ -1246,8 +1177,7 @@ class Value {
 
         ss += JSONotation_T_::SCurlyChar;
 
-        for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size());
-             h_item != end; h_item++) {
+        for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size()); h_item != end; h_item++) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 ss += JSONotation_T_::QuoteChar;
                 JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), ss);
@@ -1269,8 +1199,7 @@ class Value {
     static void stringifyArray(const VArray &arr, StringStream<Char_T_> &ss) {
         ss += JSONotation_T_::SSquareChar;
 
-        for (const Value *item = arr.First(), *end = (item + arr.Size());
-             item != end; item++) {
+        for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
             if (!(item->IsUndefined())) {
                 stringifyValue(*item, ss);
                 ss += JSONotation_T_::CommaChar;
@@ -1304,38 +1233,32 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(
-                    ss, val.number_.GetUInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetUInt64(), 1);
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(),
-                                                     1);
+                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(), 1);
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(
-                    ss, val.number_.GetDouble(), 1);
+                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetDouble(), 1);
                 break;
             }
 
             case ValueType::False: {
-                ss.Insert(JSONotation_T_::GetFalseString(),
-                          JSONotation_T_::FalseStringLength);
+                ss.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                ss.Insert(JSONotation_T_::GetTrueString(),
-                          JSONotation_T_::TrueStringLength);
+                ss.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                ss.Insert(JSONotation_T_::GetNullString(),
-                          JSONotation_T_::NullStringLength);
+                ss.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
                 break;
             }
 
@@ -1465,15 +1388,11 @@ class Value {
 
         inline void SetNumber(double num) noexcept { number_.d = num; }
 
-        inline void SetNumber(unsigned long long num) noexcept {
-            number_.ull = num;
-        }
+        inline void SetNumber(unsigned long long num) noexcept { number_.ull = num; }
 
         inline void SetNumber(long long num) noexcept { number_.sll = num; }
 
-        inline unsigned long long GetUInt64() const noexcept {
-            return number_.ull;
-        }
+        inline unsigned long long GetUInt64() const noexcept { return number_.ull; }
 
         inline long long GetInt64() const noexcept { return number_.sll; }
         inline double    GetDouble() const noexcept { return number_.d; }

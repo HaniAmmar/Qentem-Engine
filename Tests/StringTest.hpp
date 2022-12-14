@@ -89,8 +89,7 @@ static int TestString1() {
     EQ_VALUE(str2.Length(), str1.Length(), "Length");
     NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
     NOT_EQ_TO(str2.First(), str1.First(), "First()", str1.First());
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()),
-            "IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual");
 
     str2.Reset();
     str1 = "efg";         // Copy
@@ -98,15 +97,13 @@ static int TestString1() {
     EQ_VALUE(str2.Length(), str1.Length(), "Length");
     NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
     NOT_EQ_TO(str2.First(), str1.First(), "First()", str1.First());
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()),
-            "IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual");
 
     str1 = "hig";         // Copy
     str2 = String8(str1); // Copy over a value
     EQ_VALUE(str2.Length(), str1.Length(), "Length");
     NOT_EQ_TO(str2.First(), str1.First(), "First()", str1.First());
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()),
-            "IsEqual");
+    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual");
 
     length = str1.Length();
     str2   = String8(static_cast<String8 &&>(str1));

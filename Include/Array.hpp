@@ -43,8 +43,7 @@ class Array {
         }
     }
 
-    Array(Array &&src) noexcept
-        : index_(src.Size()), capacity_(src.Capacity()) {
+    Array(Array &&src) noexcept : index_(src.Size()), capacity_(src.Capacity()) {
         storage_.Move(static_cast<QPointer<Type_> &&>(src.storage_));
         src.setSize(0);
         src.setCapacity(0);
@@ -124,8 +123,7 @@ class Array {
             }
 
             if (src.IsNotEmpty()) {
-                Memory::Copy((Storage() + Size()), src.First(),
-                             src.Size() * sizeof(Type_));
+                Memory::Copy((Storage() + Size()), src.First(), src.Size() * sizeof(Type_));
             }
 
             setSize(n_size);
@@ -152,9 +150,7 @@ class Array {
         ++index_;
     }
 
-    inline void operator+=(const Type_ &item) {
-        *this += static_cast<Type_ &&>(Type_(item));
-    }
+    inline void operator+=(const Type_ &item) { *this += static_cast<Type_ &&>(Type_(item)); }
 
     inline Array &Insert(Array &&src) {
         *this += static_cast<Array &&>(src);
@@ -229,14 +225,10 @@ class Array {
         }
     }
 
-    void Swap(Type_ &item1, Type_ &item2) noexcept {
-        Memory::Swap(item1, item2);
-    }
+    void Swap(Type_ &item1, Type_ &item2) noexcept { Memory::Swap(item1, item2); }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
-    void Sort(bool ascend = true) noexcept {
-        Memory::QuickSort<Type_, SizeT>(Storage(), 0, Size(), ascend);
-    }
+    void Sort(bool ascend = true) noexcept { Memory::QuickSort<Type_, SizeT>(Storage(), 0, Size(), ascend); }
 
     void Compress() {
         // Remove excess storage;
@@ -250,16 +242,15 @@ class Array {
 
         if (new_size > Size()) {
             Type_ *current = Storage();
-            Memory::Construct((current + Size()), (current + new_size),
-                              Type_());
+            Memory::Construct((current + Size()), (current + new_size), Type_());
         }
 
         setSize(Capacity());
     }
 
-    inline Type_ *Storage() const noexcept { return storage_.GetPointer(); }
-    inline SizeT  Size() const noexcept { return index_; }
-    inline SizeT  Capacity() const noexcept { return capacity_; }
+    inline Type_       *Storage() const noexcept { return storage_.GetPointer(); }
+    inline SizeT        Size() const noexcept { return index_; }
+    inline SizeT        Capacity() const noexcept { return capacity_; }
     inline const Type_ *First() const noexcept { return Storage(); }
     inline const Type_ *End() const noexcept { return (First() + Size()); }
     inline bool         IsEmpty() const noexcept { return (Size() == 0); }

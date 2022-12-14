@@ -285,12 +285,10 @@ static int TestParse1() {
     EQ_VALUE(value.Stringify(), R"([{},null,[],[]])", "Stringify()");
 
     value = JSON::Parse(R"([true,false,null,123,"ABC",[],{}])");
-    EQ_VALUE(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])", "Stringify()");
 
     value = JSON::Parse(R"([{},[],"a",1.5,null,false,true])");
-    EQ_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])", "Stringify()");
 
     value = JSON::Parse(R"([["]"],["]"]])");
     EQ_VALUE(value.Stringify(), R"([["]"],["]"]])", "Stringify()");
@@ -344,8 +342,7 @@ static int TestParse2() {
     EQ_VALUE(value.Stringify(), R"({"ABC":[]})", "Stringify()");
 
     value = JSON::Parse(R"({"5vn7b83y98t3wrupwmwa4ataw": {         } })");
-    EQ_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()");
 
     value = JSON::Parse(R"({      "A":true,"B":true})");
     EQ_VALUE(value.Stringify(), R"({"A":true,"B":true})", "Stringify()");
@@ -492,76 +489,56 @@ static int TestParse2() {
     EQ_VALUE(value.Stringify(), R"({"cc":{},"rr":{}})", "Stringify()");
 
     value = JSON::Parse(R"({"A":true,"y":{},"AA":false})");
-    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})", "Stringify()");
 
     value = JSON::Parse(R"({"A":false,"y":[],"B":null})");
-    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})", "Stringify()");
 
     value = JSON::Parse(R"({"A":null,"y":{},"ABC":"ABC"})");
-    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()");
 
     value = JSON::Parse(R"({"t":null,"Y":789,"A":"ABC"})");
-    EQ_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})", "Stringify()");
 
     value = JSON::Parse(R"({"A":"ABC","y":[],"key-u":{}})");
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()");
 
     value = JSON::Parse(R"({"X":[],"Y":{},"key-u":498})");
-    EQ_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})", "Stringify()");
 
     value = JSON::Parse(R"({"X":{},"y":[],"A":true})");
     EQ_VALUE(value.Stringify(), R"({"X":{},"y":[],"A":true})", "Stringify()");
 
     value = JSON::Parse(R"({"{}}":true,"y":{},"AA":0,"k-300":[]})");
-    EQ_VALUE(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()");
 
     value = JSON::Parse(R"({"B1":false,"y":[],"[A]":null,"k-300":{}})");
-    EQ_VALUE(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()");
 
     value = JSON::Parse(R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})");
-    EQ_VALUE(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()");
 
     value = JSON::Parse(R"({"x":"ABC","[]]":[],"key-u":{},"A":null})");
-    EQ_VALUE(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()");
 
     value = JSON::Parse(R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})");
-    EQ_VALUE(value.Stringify(),
-             R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()");
 
     value = JSON::Parse(R"({"X":{},"A":null,"key-u":[],"k-300":[]})");
-    EQ_VALUE(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()");
 
-    value = JSON::Parse(
-        R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})");
-    EQ_VALUE(value.Stringify(),
-             R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})",
-             "Stringify()");
+    value = JSON::Parse(R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})");
+    EQ_VALUE(value.Stringify(), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()");
 
-    value = JSON::Parse(
-        R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})");
-    EQ_VALUE(
-        value.Stringify(),
-        R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
-        "Stringify()");
+    value = JSON::Parse(R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})");
+    EQ_VALUE(value.Stringify(), R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
+             "Stringify()");
 
     value = JSON::Parse(R"({"a":{"c":"}"},"b":{"d":"}"}})");
-    EQ_VALUE(value.Stringify(), R"({"a":{"c":"}"},"b":{"d":"}"}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"a":{"c":"}"},"b":{"d":"}"}})", "Stringify()");
 
     value = JSON::Parse(R"({"a":{"c":"{}"},"b":{"d":"{}"}})");
-    EQ_VALUE(value.Stringify(), R"({"a":{"c":"{}"},"b":{"d":"{}"}})",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"({"a":{"c":"{}"},"b":{"d":"{}"}})", "Stringify()");
 
     END_SUB_TEST;
 }
@@ -642,15 +619,13 @@ static int TestParse3() {
     EQ_VALUE(value.Stringify(), R"([[[],[]]])", "Stringify()");
 
     value = JSON::Parse(R"(["oo",[[],[],[{},[]]],"bk"])");
-    EQ_VALUE(value.Stringify(), R"(["oo",[[],[],[{},[]]],"bk"])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["oo",[[],[],[{},[]]],"bk"])", "Stringify()");
 
     value = JSON::Parse(R"([{},[]])");
     EQ_VALUE(value.Stringify(), R"([{},[]])", "Stringify()");
 
     value = JSON::Parse(R"(["aa",[[{}],["ww","ee"]],"bb"])");
-    EQ_VALUE(value.Stringify(), R"(["aa",[[{}],["ww","ee"]],"bb"])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["aa",[[{}],["ww","ee"]],"bb"])", "Stringify()");
 
     value = JSON::Parse(R"({"aa":44,"dd":"bb"})");
     EQ_VALUE(value.Stringify(), R"({"aa":44,"dd":"bb"})", "Stringify()");
@@ -728,12 +703,10 @@ static int TestParse3() {
     EQ_VALUE(value.Stringify(), R"(["k,","e","W","u"])", "Stringify()");
 
     value = JSON::Parse(R"([{"a":{}},[{},[1,2,3],["aa","cc"]]])");
-    EQ_VALUE(value.Stringify(), R"([{"a":{}},[{},[1,2,3],["aa","cc"]]])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([{"a":{}},[{},[1,2,3],["aa","cc"]]])", "Stringify()");
 
     value = JSON::Parse(R"(["s\"s\"s\"s\"s\"s\"s\"s\"s\"\\\\\\\\\\\\"])");
-    EQ_VALUE(value.Stringify(),
-             R"(["s\"s\"s\"s\"s\"s\"s\"s\"s\"\\\\\\\\\\\\"])", "Stringify()");
+    EQ_VALUE(value.Stringify(), R"(["s\"s\"s\"s\"s\"s\"s\"s\"s\"\\\\\\\\\\\\"])", "Stringify()");
 
     value = JSON::Parse(
         R"(["s\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""])");
@@ -758,12 +731,10 @@ static int TestParse3() {
     EQ_VALUE(value.Stringify(), R"([{"[]{}":1}])", "Stringify()");
 
     value = JSON::Parse(R"([[["1","2","3"],"c","d"],"a",["1"]])");
-    EQ_VALUE(value.Stringify(), R"([[["1","2","3"],"c","d"],"a",["1"]])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[["1","2","3"],"c","d"],"a",["1"]])", "Stringify()");
 
     value = JSON::Parse(R"([[[1,2,3],40,50],4,[0.5],5])");
-    EQ_VALUE(value.Stringify(), R"([[[1,2,3],40,50],4,[0.5],5])",
-             "Stringify()");
+    EQ_VALUE(value.Stringify(), R"([[[1,2,3],40,50],4,[0.5],5])", "Stringify()");
 
     value = JSON::Parse(R"([[[[],30]]])");
     EQ_VALUE(value.Stringify(), R"([[[[],30]]])", "Stringify()");
@@ -789,157 +760,107 @@ static int TestParse3() {
 static int TestParse4() {
     Value<char>         value;
     const String<char> *key_ptr;
-    const char *        str1;
+    const char         *str1;
 
     value = JSON::Parse(R"(["\r"])");
-    EQ_TRUE(
-        StringUtils::IsEqual("\r", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\r", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"({"x":   "\n"})");
-    EQ_TRUE(
-        StringUtils::IsEqual("\n", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\n", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({"\""   :"x"       })");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual("\"", key_ptr->First(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\"", key_ptr->First(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({    "\n":   "\f"})");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual("\n", key_ptr->First(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\n", key_ptr->First(), value[0].Length()), "IsEqual()");
 
-    EQ_TRUE(
-        StringUtils::IsEqual("\f", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\f", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"(["\/\/"])");
-    EQ_TRUE(
-        StringUtils::IsEqual("//", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("//", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\r\r"})");
-    EQ_TRUE(StringUtils::IsEqual("\r\r", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\r\r", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({"\b\b":"x"})");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual("\b\b", key_ptr->First(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\b\b", key_ptr->First(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\":"\"\""})");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual(R"(\\)", key_ptr->First(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual(R"(\\)", key_ptr->First(), value[0].Length()), "IsEqual()");
 
-    EQ_TRUE(StringUtils::IsEqual(R"("")", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual(R"("")", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"(["\t\t\t"])");
-    EQ_TRUE(StringUtils::IsEqual("\t\t\t", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\t\t\t", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\f\f\f"})");
-    EQ_TRUE(StringUtils::IsEqual("\f\f\f", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\f\f\f", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({"\\\\\\":"x"})");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual(R"(\\\)", key_ptr->First(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual(R"(\\\)", key_ptr->First(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({"\/\/\/":"\n\n\n"})");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual("///", key_ptr->First(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("///", key_ptr->First(), value[0].Length()), "IsEqual()");
 
-    EQ_TRUE(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"([" \""])");
-    EQ_TRUE(StringUtils::IsEqual(" \"", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual(" \"", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"([" \t "])");
-    EQ_TRUE(StringUtils::IsEqual(" \t ", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual(" \t ", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"(["\\ \\"])");
-    EQ_TRUE(StringUtils::IsEqual("\\ \\", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\\ \\", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"(["\"\\\/\b\f\n\r\t"])");
-    EQ_TRUE(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value = JSON::Parse(R"({"x":"\t\r\n\f\b\/\\\""})");
-    EQ_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     value   = JSON::Parse(R"({"\t\r\n\f\b\/\\\"":"\"\\\/\b\f\n\r\t"})");
     key_ptr = value.GetKey(0);
     NOT_EQ_TO(key_ptr, nullptr, "GetKey(0)", "null");
-    EQ_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"", key_ptr->First(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\t\r\n\f\b/\\\"", key_ptr->First(), value[0].Length()), "IsEqual()");
 
-    EQ_TRUE(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     str1  = R"(["\u003D"])";
     value = JSON::Parse(str1);
-    EQ_TRUE(
-        StringUtils::IsEqual("=", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("=", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     str1  = R"(["\u00a1"])";
     value = JSON::Parse(str1, 10);
-    EQ_TRUE(
-        StringUtils::IsEqual("¡", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("¡", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     String<char> str(R"(["\u08A7"])");
     value = JSON::Parse(str.First(), str.Length());
-    EQ_TRUE(
-        StringUtils::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     str   = R"(["\ud802\uDE7B"])";
     value = JSON::Parse(str.First(), str.Length());
-    EQ_TRUE(
-        StringUtils::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()),
-        "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     str   = R"(["\uD83E\uFC59"])";
     value = JSON::Parse(str.First(), str.Length());
-    EQ_TRUE(StringUtils::IsEqual("🡙", value[0].StringStorage(),
-                                 value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("🡙", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     str   = R"(["\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7"])";
     value = JSON::Parse(str.First(), str.Length());
-    EQ_TRUE(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ",
-                                 value[0].StringStorage(), value[0].Length()),
-            "IsEqual()");
+    EQ_TRUE(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ", value[0].StringStorage(), value[0].Length()), "IsEqual()");
 
     END_SUB_TEST;
 }

@@ -34,7 +34,7 @@ static void escapeJSON(const char *str, StringStream<char> &buffer) {
 }
 
 static int TestEscapeJSON() {
-    const char *       str;
+    const char        *str;
     StringStream<char> buffer;
     /*
      * "
@@ -342,8 +342,8 @@ static int TestEscapeJSON() {
 
 static int TestUnEscapeJSON1() {
     StringStream<char> buffer;
-    const char *       str1;
-    const char *       str2;
+    const char        *str1;
+    const char        *str2;
     SizeT              len1;
     SizeT              len2;
 
@@ -648,8 +648,8 @@ static int TestUnEscapeJSON1() {
 
 static int TestUnEscapeJSON2() {
     StringStream<char> buffer;
-    const char *       str1;
-    const char *       str2;
+    const char        *str1;
+    const char        *str2;
     SizeT              len1;
     SizeT              len2;
 

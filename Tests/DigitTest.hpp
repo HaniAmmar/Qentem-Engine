@@ -687,12 +687,10 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_ulong, 10), "0000000001", "return");
 
     number_ulong = 4;
-    EQ_VALUE(DigitC::NumberToString(number_ulong, 50), "00000000000000000004",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_ulong, 50), "00000000000000000004", "return");
 
     number_int = -7;
-    EQ_VALUE(DigitC::NumberToString(number_int, 50), "-0000000000000000007",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_int, 50), "-0000000000000000007", "return");
 
     number_uint = 10;
     EQ_VALUE(DigitC::NumberToString(number_uint, 2), "10", "return");
@@ -712,8 +710,7 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), ".0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "0.0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), ".00000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), ".00000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "00.00", "return");
 
     number_double = 1;
@@ -722,8 +719,7 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "1.0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "1.0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "001", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "1.00000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "1.00000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "01.00", "return");
 
     number_double = 15;
@@ -732,22 +728,17 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "15.0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "15.0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "015", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "15.00000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "15.00000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "15.00", "return");
 
     number_double = 12345;
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "12345", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "12345", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "12345.0",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "12345.0",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "12345.0", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "12345.0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "12345", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "12345.00000",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "12345.00",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "12345.00000", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "12345.00", "return");
 
     number_double = 1.1;
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "1.1", "return");
@@ -755,8 +746,7 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "1.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "1.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "001.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "1.10000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "1.10000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "01.10", "return");
 
     number_double = 100.5;
@@ -765,10 +755,8 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "100.5", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "100.5", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "100.50000",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "100.50",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "100.50000", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "100.50", "return");
 
     number_double = 1.123456;
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "1.1", "return");
@@ -776,8 +764,7 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "1.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "1.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "001.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "1.10000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "1.10000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "01.10", "return");
 
     number_double = 80.123456;
@@ -786,25 +773,17 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "80.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "80.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "080.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "80.10000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "80.10000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "80.10", "return");
 
     number_double = 12345.123456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "12345.1",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "12345.1",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "12345.1",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "12345.1",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "12345.1",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "12345.10000",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "12345.10",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "12345.1", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "12345.1", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "12345.1", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "12345.1", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "12345.1", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "12345.10000", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "12345.10", "return");
 
     number_double = 1.123456;
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "1.1", "return");
@@ -812,8 +791,7 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "1.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "1.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "001.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "1.10000",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "1.10000", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "01.10", "return");
 
     number_double = 100.123456;
@@ -822,10 +800,8 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "100.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "100.1", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "100.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "100.10000",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "100.10",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "100.10000", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "100.10", "return");
 
     number_double = 100.523456;
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "100.5", "return");
@@ -833,10 +809,8 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "100.5", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "100.5", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "100.50000",
-             "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "100.50",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "100.50000", "return");
+    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "100.50", "return");
 
     END_SUB_TEST;
 }
@@ -982,21 +956,17 @@ static int TestNumberToString3() {
     number = -456789.0024;
     EQ_VALUE(DigitC::NumberToString(number, 0, 0, 3), "-456789.002", "return");
 
-    EQ_VALUE(DigitC::NumberToString(18446744073709551615ULL),
-             "18446744073709551615", "return");
+    EQ_VALUE(DigitC::NumberToString(18446744073709551615ULL), "18446744073709551615", "return");
 
-    EQ_VALUE(DigitC::NumberToString(-9223372036854775807LL),
-             "-9223372036854775807", "return");
+    EQ_VALUE(DigitC::NumberToString(-9223372036854775807LL), "-9223372036854775807", "return");
 
-    EQ_VALUE(DigitC::NumberToString(9223372036854775807LL),
-             "9223372036854775807", "return");
+    EQ_VALUE(DigitC::NumberToString(9223372036854775807LL), "9223372036854775807", "return");
     END_SUB_TEST;
 }
 
 static int TestNumberToString4() {
     double number = -123456;
-    EQ_VALUE(DigitC::NumberToString(number, 30, 0, 0), "-000000000000000123456",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 30, 0, 0), "-000000000000000123456", "return");
 
     number = -2;
     EQ_VALUE(DigitC::NumberToString(number, 0, 0, 0), "-2", "return");
@@ -1014,12 +984,10 @@ static int TestNumberToString4() {
     EQ_VALUE(DigitC::NumberToString(number, 0, 0, 10), "-55.0055", "return");
 
     number = -0.123455678987455;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "-0.123455678987455",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "-0.123455678987455", "return");
 
     number = -0.123455678987452;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "-0.123455678987452",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "-0.123455678987452", "return");
     number = 0.999999;
     EQ_VALUE(DigitC::NumberToString(number, 0, 0, 5), "1", "return");
     EQ_VALUE(DigitC::NumberToString(number, 1, 0, 6), "0.999999", "return");
@@ -1029,12 +997,10 @@ static int TestNumberToString4() {
     EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "1.23e-12", "return");
 
     number = -2.00000000000099;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "-2.00000000000099",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "-2.00000000000099", "return");
 
     number = 3.9999999999999;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "3.9999999999999",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "3.9999999999999", "return");
 
     number = 99.1005099;
     EQ_VALUE(DigitC::NumberToString(number, 1, 0, 10), "99.1005099", "return");
@@ -1043,8 +1009,7 @@ static int TestNumberToString4() {
     EQ_VALUE(DigitC::NumberToString(number, 1, 0, 7), "99.1005099", "return");
 
     number = 871.080055555;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 9), "871.080055555",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 9), "871.080055555", "return");
 
     number = 0.00056599999999999999;
     EQ_VALUE(DigitC::NumberToString(number, 1, 0, 3), "1e-3", "return");
@@ -1052,15 +1017,12 @@ static int TestNumberToString4() {
     EQ_VALUE(DigitC::NumberToString(number), "5.66e-4", "return");
 
     number = 3.99999999999909;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "3.99999999999909",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "3.99999999999909", "return");
 
     number = 2.00000000000015;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "2.00000000000015",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "2.00000000000015", "return");
 
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "2.00000000000015",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "2.00000000000015", "return");
 
     EQ_VALUE(DigitC::NumberToString(7.0, 1, 3, 3), "7.000", "return");
 
@@ -1078,20 +1040,16 @@ static int TestNumberToString4() {
 
     EQ_VALUE(DigitC::NumberToString(-8.1, 3, 3, 3), "-008.100", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.93002099999999999, 1, 3, 3), "0.930",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.93002099999999999, 1, 3, 3), "0.930", "return");
 
-    EQ_VALUE(DigitC::NumberToString(-9223372036854775807.0, 1),
-             "-9223372036854775808", "return");
+    EQ_VALUE(DigitC::NumberToString(-9223372036854775807.0, 1), "-9223372036854775808", "return");
 
-    EQ_VALUE(DigitC::NumberToString(-0.9223372036854775, 1, 1),
-             "-0.9223372036854775", "return");
+    EQ_VALUE(DigitC::NumberToString(-0.9223372036854775, 1, 1), "-0.9223372036854775", "return");
     EQ_VALUE(DigitC::NumberToString(-92233.0, 10), "-0000092233", "return");
 
     EQ_VALUE(DigitC::NumberToString(-92233.0, 1), "-92233", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775, 1),
-             "0.9223372036854775", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775, 1), "0.9223372036854775", "return");
 
     EQ_VALUE(DigitC::NumberToString(0.9999, 1, 1, 3), "1.0", "return");
     EQ_VALUE(DigitC::NumberToString(-0.9999, 1, 1, 3), "-1.0", "return");
@@ -1107,14 +1065,11 @@ static int TestNumberToString4() {
     EQ_VALUE(DigitC::NumberToString(0.9999, 1, 1), "0.9999", "return");
     EQ_VALUE(DigitC::NumberToString(-0.9999, 1, 1), "-0.9999", "return");
 
-    EQ_VALUE(DigitC::NumberToString(12345678912345.345, 1, 1, 2),
-             "12345678912345.35", "return");
+    EQ_VALUE(DigitC::NumberToString(12345678912345.345, 1, 1, 2), "12345678912345.35", "return");
 
-    EQ_VALUE(DigitC::NumberToString(45.12345678912345, 1, 1, 14),
-             "45.12345678912345", "return");
+    EQ_VALUE(DigitC::NumberToString(45.12345678912345, 1, 1, 14), "45.12345678912345", "return");
 
-    EQ_VALUE(DigitC::NumberToString(45.12345678912345, 1, 1, 3), "45.123",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(45.12345678912345, 1, 1, 3), "45.123", "return");
 
     EQ_VALUE(DigitC::NumberToString(-10.9999, 1, 1, 0), "-10.9999", "return");
     EQ_VALUE(DigitC::NumberToString(10.9999, 1, 1, 0), "10.9999", "return");
@@ -1132,8 +1087,7 @@ static int TestNumberToString5() {
 
     EQ_VALUE(DigitC::NumberToString(15e100), "1.5e101", "return");
 
-    EQ_VALUE(DigitC::NumberToString(1.6866831148613157e308),
-             "1.686683114861316e308", "return");
+    EQ_VALUE(DigitC::NumberToString(1.6866831148613157e308), "1.686683114861316e308", "return");
 
     EQ_VALUE(DigitC::NumberToString(99999999999999999999.0), "1e20", "return");
 
@@ -1151,53 +1105,37 @@ static int TestNumberToString5() {
 
     EQ_VALUE(DigitC::NumberToString(1.000009), "1.000009", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 1), "0.9",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 1), "0.9", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 2), "0.92",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 2), "0.92", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 3), "0.922",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 3), "0.922", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 4), "0.9223",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 4), "0.9223", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 5), "0.92234",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 5), "0.92234", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 6), "0.922337",
-             "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 6), "0.922337", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 7),
-             "0.9223372", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 7), "0.9223372", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 8),
-             "0.9223372", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 8), "0.9223372", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 9),
-             "0.922337204", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 9), "0.922337204", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 10),
-             "0.9223372037", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 10), "0.9223372037", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 11),
-             "0.92233720369", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 11), "0.92233720369", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 12),
-             "0.922337203685", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 12), "0.922337203685", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 13),
-             "0.9223372036855", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 13), "0.9223372036855", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 14),
-             "0.92233720368548", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 14), "0.92233720368548", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 15),
-             "0.922337203685478", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 15), "0.922337203685478", "return");
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 16),
-             "0.9223372036854776", "return");
+    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 16), "0.9223372036854776", "return");
 
     END_SUB_TEST;
 }

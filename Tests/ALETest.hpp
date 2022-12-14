@@ -60,15 +60,13 @@ class ALEHelper {
         return items;
     }
 
-    static bool FindItem(const Value_T_ *&item, const char *content,
-                         SizeT length) noexcept {
+    static bool FindItem(const Value_T_ *&item, const char *content, SizeT length) noexcept {
         static const Array<Value_T_> &items = GetItems();
 
         for (SizeT i = 0; i < items.Size(); i++) {
             item = (items.First() + i);
 
-            if ((item->NameLength == length) &&
-                StringUtils::IsEqual(item->Name, content, length)) {
+            if ((item->NameLength == length) && StringUtils::IsEqual(item->Name, content, length)) {
                 return true;
             }
         }
@@ -76,8 +74,7 @@ class ALEHelper {
         return false;
     }
 
-    static bool ALESetNumber(double &number, const char *content,
-                             SizeT length) noexcept {
+    static bool ALESetNumber(double &number, const char *content, SizeT length) noexcept {
         const Value_T_ *item;
 
         if (FindItem(item, content, length) && (item->Str == nullptr)) {
@@ -88,13 +85,12 @@ class ALEHelper {
         return false;
     }
 
-    bool ALEIsEqual(bool &result, const char *content, ALE::Number left,
-                    ALE::Number right, bool left_evaluated,
+    bool ALEIsEqual(bool &result, const char *content, ALE::Number left, ALE::Number right, bool left_evaluated,
                     bool right_evaluated) const noexcept {
         using ALEOperations_T_ = ALEOperations<char>;
 
-        const char *    left_content  = (content + left.Content.Offset);
-        const char *    right_content = (content + right.Content.Offset);
+        const char     *left_content  = (content + left.Content.Offset);
+        const char     *right_content = (content + right.Content.Offset);
         const Value_T_ *item;
         SizeT           left_length  = left.Content.Length;
         SizeT           right_length = right.Content.Length;
@@ -124,8 +120,7 @@ class ALEHelper {
                     left_length -= 2;
                 }
 
-                left_evaluated =
-                    ALE::Evaluate(left.Number, left_content, left_length, this);
+                left_evaluated = ALE::Evaluate(left.Number, left_content, left_length, this);
                 if (!left_evaluated && is_number) {
                     return false;
                 }
@@ -157,8 +152,7 @@ class ALEHelper {
                     right_length -= 2;
                 }
 
-                if (!(ALE::Evaluate(right.Number, right_content, right_length,
-                                    this))) {
+                if (!(ALE::Evaluate(right.Number, right_content, right_length, this))) {
                     return false;
                 }
             }
@@ -167,9 +161,7 @@ class ALEHelper {
         if (is_number) {
             result = (left.Number == right.Number);
         } else {
-            result = ((left_length == right_length) &&
-                      StringUtils::IsEqual(left_content, right_content,
-                                           right_length));
+            result = ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
         }
 
         return true;
@@ -2905,9 +2897,8 @@ static int TestALE11() {
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 1, "number");
 
-    content =
-        R"(2  * 1 * 3 + 1 - 4 + (10 - 5 - 6 + 1 + 1 + 1 + 1) * (8 / 4 + 1) -1 - -1 + 2 == 14)";
-    number = ALE::Evaluate(content);
+    content = R"(2  * 1 * 3 + 1 - 4 + (10 - 5 - 6 + 1 + 1 + 1 + 1) * (8 / 4 + 1) -1 - -1 + 2 == 14)";
+    number  = ALE::Evaluate(content);
     EQ_VALUE(number, 1, "number");
 
     content = "((2*4) + 1)";

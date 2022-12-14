@@ -27,8 +27,7 @@ struct ALEHelper {
         return false;
     }
 
-    bool ALESetNumber(double &number, const char *content,
-                      SizeT length) const noexcept {
+    bool ALESetNumber(double &number, const char *content, SizeT length) const noexcept {
         const Value *value = nullptr;
 
         if (length > 2) {
@@ -40,8 +39,7 @@ struct ALEHelper {
         return ((value != nullptr) && ALESetNumber(number, value));
     }
 
-    bool ALEIsEqual(bool &result, const char *content, ALE::Number left,
-                    ALE::Number right, bool left_evaluated,
+    bool ALEIsEqual(bool &result, const char *content, ALE::Number left, ALE::Number right, bool left_evaluated,
                     bool right_evaluated) const noexcept {
         const Value *value_left  = nullptr;
         const Value *value_right = nullptr;
@@ -69,12 +67,9 @@ struct ALEHelper {
             } else {
                 // 2 = (...)
                 if (*left_content != '(') {
-                    left_evaluated = Digit::StringToNumber(
-                        left.Number, left_content, left_length);
+                    left_evaluated = Digit::StringToNumber(left.Number, left_content, left_length);
                 } else {
-                    left_evaluated =
-                        ALE::Evaluate(left.Number, (++left_content),
-                                      (left_length -= 2), this);
+                    left_evaluated = ALE::Evaluate(left.Number, (++left_content), (left_length -= 2), this);
                 }
 
                 if (!left_evaluated && is_number) {
@@ -100,35 +95,29 @@ struct ALEHelper {
                 }
             } else if (is_number) {
                 if (*right_content != '(') {
-                    if (!(Digit::StringToNumber(right.Number, right_content,
-                                                right_length))) {
+                    if (!(Digit::StringToNumber(right.Number, right_content, right_length))) {
                         return false;
                     }
-                } else if (!(ALE::Evaluate(right.Number, (++right_content),
-                                           (right_length - 2), this))) {
+                } else if (!(ALE::Evaluate(right.Number, (++right_content), (right_length - 2), this))) {
                     return false;
                 }
             }
         }
 
         if (is_number) {
-            if (!left_evaluated && ((value_left == nullptr) ||
-                                    !(ALESetNumber(left.Number, value_left)))) {
+            if (!left_evaluated && ((value_left == nullptr) || !(ALESetNumber(left.Number, value_left)))) {
                 return false;
             }
 
-            if ((value_right != nullptr) &&
-                !(ALESetNumber(right.Number, value_right))) {
+            if ((value_right != nullptr) && !(ALESetNumber(right.Number, value_right))) {
                 return false;
             }
         } else {
-            if ((value_left != nullptr) &&
-                !(value_left->SetCharAndLength(left_content, left_length))) {
+            if ((value_left != nullptr) && !(value_left->SetCharAndLength(left_content, left_length))) {
                 return false;
             }
 
-            if ((value_right != nullptr) &&
-                !(value_right->SetCharAndLength(right_content, right_length))) {
+            if ((value_right != nullptr) && !(value_right->SetCharAndLength(right_content, right_length))) {
                 return false;
             }
         }
@@ -136,9 +125,7 @@ struct ALEHelper {
         if (is_number) {
             result = (left.Number == right.Number);
         } else {
-            result = ((left_length == right_length) &&
-                      StringUtils::IsEqual(left_content, right_content,
-                                           right_length));
+            result = ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
         }
 
         return true;

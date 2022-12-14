@@ -48,15 +48,12 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_SET_TO_ONE_32 _mm256_set1_epi32
 #define QENTEM_SIMD_SET_TO_ONE_64 _mm256_set1_epi64x
 #define QENTEM_SIMD_STOREU _mm256_storeu_si256
-#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                       \
-    static_cast<QENTEM_SIMD_NUMBER_T>(                                         \
-        _mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
-#define QENTEM_SIMD_COMPARE_16_MASK(a, b)                                      \
-    static_cast<QENTEM_SIMD_NUMBER_T>(                                         \
-        _mm256_movemask_epi8(_mm256_cmpeq_epi16(a, b)))
-#define QENTEM_SIMD_COMPARE_32_MASK(a, b)                                      \
-    static_cast<QENTEM_SIMD_NUMBER_T>(                                         \
-        _mm256_movemask_epi8(_mm256_cmpeq_epi32(a, b)))
+#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                                                               \
+    static_cast<QENTEM_SIMD_NUMBER_T>(_mm256_movemask_epi8(_mm256_cmpeq_epi8(a, b)))
+#define QENTEM_SIMD_COMPARE_16_MASK(a, b)                                                                              \
+    static_cast<QENTEM_SIMD_NUMBER_T>(_mm256_movemask_epi8(_mm256_cmpeq_epi16(a, b)))
+#define QENTEM_SIMD_COMPARE_32_MASK(a, b)                                                                              \
+    static_cast<QENTEM_SIMD_NUMBER_T>(_mm256_movemask_epi8(_mm256_cmpeq_epi32(a, b)))
 #elif defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
 using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_SIZE 16U
@@ -70,12 +67,9 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_SET_TO_ONE_32 _mm_set1_epi32
 #define QENTEM_SIMD_SET_TO_ONE_64 _mm_set1_epi64x
 #define QENTEM_SIMD_STOREU _mm_storeu_si128
-#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                       \
-    static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
-#define QENTEM_SIMD_COMPARE_16_MASK(a, b)                                      \
-    static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
-#define QENTEM_SIMD_COMPARE_32_MASK(a, b)                                      \
-    static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi32(a, b)))
+#define QENTEM_SIMD_COMPARE_8_MASK(a, b) static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi8(a, b)))
+#define QENTEM_SIMD_COMPARE_16_MASK(a, b) static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi16(a, b)))
+#define QENTEM_SIMD_COMPARE_32_MASK(a, b) static_cast<QENTEM_SIMD_NUMBER_T>(_mm_movemask_epi8(_mm_cmpeq_epi32(a, b)))
 #elif defined(QENTEM_MSIMD128) && (QENTEM_MSIMD128 == 1)
 using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_SIZE 16U
@@ -89,12 +83,9 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
 #define QENTEM_SIMD_SET_TO_ONE_32 wasm_i32x4_splat
 #define QENTEM_SIMD_SET_TO_ONE_64 wasm_i64x2_splat
 #define QENTEM_SIMD_STOREU wasm_v128_store
-#define QENTEM_SIMD_COMPARE_8_MASK(a, b)                                       \
-    static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i8x16_eq(a, b)))
-#define QENTEM_SIMD_COMPARE_16_MASK(a, b)                                      \
-    static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i16x8_eq(a, b)))
-#define QENTEM_SIMD_COMPARE_32_MASK(a, b)                                      \
-    static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i32x4_eq(a, b)))
+#define QENTEM_SIMD_COMPARE_8_MASK(a, b) static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i8x16_eq(a, b)))
+#define QENTEM_SIMD_COMPARE_16_MASK(a, b) static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i16x8_eq(a, b)))
+#define QENTEM_SIMD_COMPARE_32_MASK(a, b) static_cast<QENTEM_SIMD_NUMBER_T>(wasm_i8x16_bitmask(wasm_i32x4_eq(a, b)))
 #endif
 
 #ifdef _MSC_VER
@@ -126,9 +117,7 @@ inline static unsigned long CLZ(unsigned long long value) noexcept {
 
 inline static unsigned int CTZ(unsigned long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0)
-                ? static_cast<unsigned int>(index)
-                : 32U);
+    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(index) : 32U);
 }
 
 inline static unsigned long CLZ(unsigned long value) noexcept {
@@ -138,9 +127,7 @@ inline static unsigned long CLZ(unsigned long value) noexcept {
 
 inline static unsigned int CTZ(unsigned int value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0)
-                ? static_cast<unsigned int>(index)
-                : 32U);
+    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(index) : 32U);
 }
 
 inline static unsigned long CLZ(unsigned int value) noexcept {
@@ -163,9 +150,7 @@ inline static unsigned long CLZ(Number_T value) noexcept {
 }
 #endif
 
-inline static unsigned int CTZ(unsigned int value) noexcept {
-    return static_cast<unsigned int>(__builtin_ctz(value));
-}
+inline static unsigned int CTZ(unsigned int value) noexcept { return static_cast<unsigned int>(__builtin_ctz(value)); }
 
 inline static unsigned int CLZ(unsigned int value) noexcept {
     constexpr unsigned int bits = (sizeof(int) * 8) - 1;
@@ -179,18 +164,14 @@ template <typename Char_T_, typename SIMDValue, int CharSize>
 struct SMIDCompare_T {};
 
 template <typename Char_T_, typename SIMDValue>
-inline static QENTEM_SIMD_NUMBER_T SMIDCompare(const SIMDValue &val1,
-                                               const SIMDValue &val2) noexcept {
-    return SMIDCompare_T<Char_T_, SIMDValue,
-                         static_cast<int>(sizeof(Char_T_))>::Compare(val1,
-                                                                     val2);
+inline static QENTEM_SIMD_NUMBER_T SMIDCompare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+    return SMIDCompare_T<Char_T_, SIMDValue, static_cast<int>(sizeof(Char_T_))>::Compare(val1, val2);
 }
 
 // char
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 1> {
-    inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1,
-                                               const SIMDValue &val2) noexcept {
+    inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         return QENTEM_SIMD_COMPARE_8_MASK(val1, val2);
     }
 };
@@ -198,8 +179,7 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 1> {
 // char16
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 2> {
-    inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1,
-                                               const SIMDValue &val2) noexcept {
+    inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         QENTEM_SIMD_NUMBER_T bits16 = QENTEM_SIMD_COMPARE_16_MASK(val1, val2);
         QENTEM_SIMD_NUMBER_T bits   = 0;
         unsigned int         count  = 0;
@@ -218,8 +198,7 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 2> {
 // wchar_t
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 4> {
-    inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1,
-                                               const SIMDValue &val2) noexcept {
+    inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         QENTEM_SIMD_NUMBER_T bits32 = QENTEM_SIMD_COMPARE_32_MASK(val1, val2);
         QENTEM_SIMD_NUMBER_T bits   = 0;
         unsigned int         count  = 0;
@@ -242,16 +221,13 @@ struct SMIDSetToOne_T {};
 
 template <typename Char_T_>
 inline static QENTEM_SIMD_VAR SMIDSetToOne(const Char_T_ value) noexcept {
-    return SMIDSetToOne_T<Char_T_, static_cast<int>(sizeof(Char_T_))>::Set(
-        value);
+    return SMIDSetToOne_T<Char_T_, static_cast<int>(sizeof(Char_T_))>::Set(value);
 }
 
 // char
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 1> {
-    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {
-        return QENTEM_SIMD_SET_TO_ONE_8(value);
-    }
+    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept { return QENTEM_SIMD_SET_TO_ONE_8(value); }
 };
 
 // char16
@@ -265,15 +241,12 @@ struct SMIDSetToOne_T<Char_T_, 2> {
 // wchar_t
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 4> {
-    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {
-        return QENTEM_SIMD_SET_TO_ONE_32(value);
-    }
+    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept { return QENTEM_SIMD_SET_TO_ONE_32(value); }
 };
 
 template <typename Char_T_, typename Number_T_>
 inline constexpr Number_T_ SMIDNextOffset() noexcept {
-    return static_cast<Number_T_>(QENTEM_SIMD_SIZE /
-                                  static_cast<Number_T_>(sizeof(Char_T_)));
+    return static_cast<Number_T_>(QENTEM_SIMD_SIZE / static_cast<Number_T_>(sizeof(Char_T_)));
 }
 #endif
 

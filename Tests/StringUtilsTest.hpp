@@ -94,8 +94,7 @@ static int TestCount() {
     length = StringUtils::Count("1234567812345678123456781234567");
     EQ_VALUE(length, 31, "length");
 
-    length = StringUtils::Count(
-        "123456781234567812345678123456781234567812345678123456781234567");
+    length = StringUtils::Count("123456781234567812345678123456781234567812345678123456781234567");
     EQ_VALUE(length, 63, "length");
 
     END_SUB_TEST;
@@ -470,17 +469,12 @@ static int TestIsEqual() {
     EQ_TRUE(StringUtils::IsEqual("abc", "abcdefgh", 3), "IsEqual");
     EQ_TRUE(StringUtils::IsEqual("abcdefgh", "a", 1), "IsEqual");
     EQ_TRUE(StringUtils::IsEqual("abcdefgh", "abc", 3), "IsEqual");
-    EQ_TRUE(StringUtils::IsEqual("0123456789123456", "0123456789123456", 16),
+    EQ_TRUE(StringUtils::IsEqual("0123456789123456", "0123456789123456", 16), "IsEqual");
+    EQ_TRUE(StringUtils::IsEqual("01234567891234560123456789123456", "01234567891234560123456789123456", 32),
             "IsEqual");
-    EQ_TRUE(StringUtils::IsEqual("01234567891234560123456789123456",
-                                 "01234567891234560123456789123456", 32),
+    EQ_TRUE(StringUtils::IsEqual("0123456789123456012345678912345601234567891234560123456789123456",
+                                 "0123456789123456012345678912345601234567891234560123456789123456", 64),
             "IsEqual");
-    EQ_TRUE(
-        StringUtils::IsEqual(
-            "0123456789123456012345678912345601234567891234560123456789123456",
-            "0123456789123456012345678912345601234567891234560123456789123456",
-            64),
-        "IsEqual");
 
     EQ_FALSE(StringUtils::IsEqual("a", "b", 1), "IsEqual");
     EQ_FALSE(StringUtils::IsEqual("ab", "ba", 2), "IsEqual");
@@ -490,45 +484,28 @@ static int TestIsEqual() {
     EQ_FALSE(StringUtils::IsEqual("abcdefgh", "b", 1), "IsEqual");
     EQ_FALSE(StringUtils::IsEqual("abcdefgh", "cde", 3), "IsEqual");
 
-    EQ_FALSE(StringUtils::IsEqual("01234567891234568", "0123456789123456", 17),
+    EQ_FALSE(StringUtils::IsEqual("01234567891234568", "0123456789123456", 17), "IsEqual");
+    EQ_FALSE(StringUtils::IsEqual("012345678912345601234567891234567", "012345678912345601234567891234568", 33),
              "IsEqual");
-    EQ_FALSE(StringUtils::IsEqual("012345678912345601234567891234567",
-                                  "012345678912345601234567891234568", 33),
+    EQ_FALSE(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                  "00234567829123456012345678912345601234567891234560123456789123456", 65),
              "IsEqual");
-    EQ_FALSE(
-        StringUtils::IsEqual(
-            "01234567829123456012345678912345601234567891234560123456789123456",
-            "00234567829123456012345678912345601234567891234560123456789123456",
-            65),
-        "IsEqual");
 
-    EQ_FALSE(
-        StringUtils::IsEqual(
-            "01234567829123456012345678912345601234567891234560123456789123456",
-            "01234567829123456012345678912345601234567891234560123456789123457",
-            65),
-        "IsEqual");
+    EQ_FALSE(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                  "01234567829123456012345678912345601234567891234560123456789123457", 65),
+             "IsEqual");
 
-    EQ_FALSE(
-        StringUtils::IsEqual(
-            "01234567829123456012345678912345601234567891234560123456789123456",
-            "01234567829123456012345678912345601234567891235560123456789123456",
-            65),
-        "IsEqual");
+    EQ_FALSE(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                  "01234567829123456012345678912345601234567891235560123456789123456", 65),
+             "IsEqual");
 
-    EQ_FALSE(
-        StringUtils::IsEqual(
-            "01234567829123456012345678912345601234567891234560123456789123456",
-            "01234567829123456012335678912345601234567891234560123456789123456",
-            65),
-        "IsEqual");
+    EQ_FALSE(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                  "01234567829123456012335678912345601234567891234560123456789123456", 65),
+             "IsEqual");
 
-    EQ_FALSE(
-        StringUtils::IsEqual(
-            "a2345678912345678912345678912345612340678912345678912345678912345w",
-            "a2345678912345678912345678912345612345678912345678912345678912345w",
-            65),
-        "IsEqual");
+    EQ_FALSE(StringUtils::IsEqual("a2345678912345678912345678912345612340678912345678912345678912345w",
+                                  "a2345678912345678912345678912345612345678912345678912345678912345w", 65),
+             "IsEqual");
 
     END_SUB_TEST;
 }
@@ -541,20 +518,14 @@ static int TestIsBigger() {
     EQ_TRUE(StringUtils::IsBigger("a", "A", 1, 1, true), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("aa", "aA", 2, 2, false), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("aa", "aA", 2, 2, true), "IsBigger");
-    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8, 8, true),
-            "IsBigger");
-    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8, 8, false),
-            "IsBigger");
-    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8, 8, true),
-            "IsBigger");
-    EQ_TRUE(StringUtils::IsBigger("201811111", "20189999", 4, 4, true),
-            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8, 8, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8, 8, false), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8, 8, true), "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("201811111", "20189999", 4, 4, true), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("2018", "2018", 4, 4, true), "IsBigger");
-    EQ_TRUE(StringUtils::IsBigger("201911111", "20189999", 4, 4, true),
-            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("201911111", "20189999", 4, 4, true), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("2019", "2018", 4, 4, false), "IsBigger");
-    EQ_TRUE(StringUtils::IsBigger("201911111", "20189999", 4, 4, false),
-            "IsBigger");
+    EQ_TRUE(StringUtils::IsBigger("201911111", "20189999", 4, 4, false), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("2019", "2018", 4, 4, true), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("2019", "2018", 3, 3, true), "IsBigger");
     EQ_TRUE(StringUtils::IsBigger("2021", "2018", 4, 4, true), "IsBigger");
@@ -567,20 +538,14 @@ static int TestIsBigger() {
     EQ_FALSE(StringUtils::IsBigger("A", "a", 1, 1, true), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("aA", "aa", 2, 2, false), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("aA", "aa", 2, 2, true), "IsBigger");
-    EQ_FALSE(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8, 8, true),
-             "IsBigger");
-    EQ_FALSE(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8, 8, false),
-             "IsBigger");
-    EQ_FALSE(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8, 8, false),
-             "IsBigger");
-    EQ_FALSE(StringUtils::IsBigger("201811111", "20189999", 4, 4, false),
-             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8, 8, true), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8, 8, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8, 8, false), "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("201811111", "20189999", 4, 4, false), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("2018", "2018", 4, 4, false), "IsBigger");
-    EQ_FALSE(StringUtils::IsBigger("20189999", "201911111", 4, 4, true),
-             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("20189999", "201911111", 4, 4, true), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("2018", "2019", 4, 4, false), "IsBigger");
-    EQ_FALSE(StringUtils::IsBigger("20189999", "201911111", 4, 4, false),
-             "IsBigger");
+    EQ_FALSE(StringUtils::IsBigger("20189999", "201911111", 4, 4, false), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("2018", "2019", 4, 4, true), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("2018", "2019", 3, 3, false), "IsBigger");
     EQ_FALSE(StringUtils::IsBigger("2019", "2018", 3, 3, false), "IsBigger");
@@ -605,8 +570,7 @@ static int TestIsLess() {
     EQ_TRUE(StringUtils::IsLess("2018", "2018", 4, 4, true), "IsLess");
     EQ_TRUE(StringUtils::IsLess("20189999", "201911111", 4, 4, true), "IsLess");
     EQ_TRUE(StringUtils::IsLess("2018", "2019", 4, 4, false), "IsLess");
-    EQ_TRUE(StringUtils::IsLess("20189999", "201911111", 4, 4, false),
-            "IsLess");
+    EQ_TRUE(StringUtils::IsLess("20189999", "201911111", 4, 4, false), "IsLess");
     EQ_TRUE(StringUtils::IsLess("2018", "2019", 4, 4, true), "IsLess");
     EQ_TRUE(StringUtils::IsLess("2018", "2019", 3, 3, true), "IsLess");
     EQ_TRUE(StringUtils::IsLess("2018", "2021", 4, 4, true), "IsLess");
@@ -620,18 +584,13 @@ static int TestIsLess() {
     EQ_FALSE(StringUtils::IsLess("aa", "aA", 2, 2, false), "IsLess");
     EQ_FALSE(StringUtils::IsLess("aa", "aA", 2, 2, true), "IsLess");
     EQ_FALSE(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8, 8, true), "IsLess");
-    EQ_FALSE(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8, 8, false),
-             "IsLess");
-    EQ_FALSE(StringUtils::IsLess("abcdefgh", "abcdefgh", 8, 8, false),
-             "IsLess");
-    EQ_FALSE(StringUtils::IsLess("201811111", "20189999", 4, 4, false),
-             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8, 8, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("abcdefgh", "abcdefgh", 8, 8, false), "IsLess");
+    EQ_FALSE(StringUtils::IsLess("201811111", "20189999", 4, 4, false), "IsLess");
     EQ_FALSE(StringUtils::IsLess("2018", "2018", 4, 4, false), "IsLess");
-    EQ_FALSE(StringUtils::IsLess("20199999", "201811111", 4, 4, true),
-             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("20199999", "201811111", 4, 4, true), "IsLess");
     EQ_FALSE(StringUtils::IsLess("2019", "2018", 4, 4, false), "IsLess");
-    EQ_FALSE(StringUtils::IsLess("201911111", "20189999", 4, 4, false),
-             "IsLess");
+    EQ_FALSE(StringUtils::IsLess("201911111", "20189999", 4, 4, false), "IsLess");
     EQ_FALSE(StringUtils::IsLess("2019", "2018", 4, 4, true), "IsLess");
     EQ_FALSE(StringUtils::IsLess("2019", "2018", 3, 3, false), "IsLess");
     EQ_FALSE(StringUtils::IsLess("2018", "2019", 3, 3, false), "IsLess");
