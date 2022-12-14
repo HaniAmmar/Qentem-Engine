@@ -37,14 +37,12 @@ namespace Qentem {
  */
 template <typename Char_T_>
 class String {
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    static constexpr SizeT short_string_max = ((6 + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
-#endif
-
   public:
+    static constexpr SizeT ShortStringMax = ((6 + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
+
     String() = default;
 
-    String(String &&src) noexcept : free_(src.free_), length_(src.length_) {
+    String(String &&src) noexcept : padding_(src.padding_), length_(src.length_) {
         storage_.Move(static_cast<QPointer<Char_T_> &&>(src.storage_));
         src.clearLength();
     }
@@ -52,13 +50,14 @@ class String {
     String(const String &src) { copyString(src.First(), src.Length()); }
 
     explicit String(SizeT len) {
+        Char_T_ *ns = allocate(len + 1);
+        ns[len]     = 0;
         setLength(len);
-        allocate(len + 1)[len] = 0;
     }
 
     String(Char_T_ *str, SizeT len) noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        if (len < short_string_max) {
+        if (len < ShortStringMax) {
             copyString(str, len);
             Memory::Deallocate(str);
             return;
@@ -70,15 +69,15 @@ class String {
 
     String(const Char_T_ *str, SizeT len) { copyString(str, len); }
 
-    explicit String(const Char_T_ *str) { copyString(str, StringUtils::Count(str)); }
+    String(const Char_T_ *str) { copyString(str, StringUtils::Count(str)); }
 
     ~String() { deallocate(Storage()); }
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate(Storage());
-            free_   = src.free_;
-            length_ = src.length_;
+            padding_ = src.padding_;
+            length_  = src.length_;
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
             storage_.SetLowTag(src.storage_.GetLowTag());
 #endif
@@ -133,23 +132,7 @@ class String {
 
     inline String operator+(const String &src) const { return Merge(*this, src); }
 
-    String operator+(const Char_T_ *str) const {
-        const SizeT src_len = Length();
-
-        const SizeT len = StringUtils::Count(str);
-        String      ns  = String{src_len + len};
-        Char_T_    *des = ns.Storage();
-
-        if (IsNotEmpty()) {
-            Memory::Copy(des, First(), (src_len * sizeof(Char_T_)));
-        }
-
-        if (len != 0) {
-            Memory::Copy((des + src_len), str, (len * sizeof(Char_T_)));
-        }
-
-        return ns;
-    }
+    String operator+(const Char_T_ *str) const { return merge(First(), Length(), str, StringUtils::Count(str)); }
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, String src) {
@@ -234,7 +217,7 @@ class String {
         Char_T_    *src = Storage();
         const SizeT len = Length();
 
-        if (len < short_string_max) {
+        if (len < ShortStringMax) {
             str = Memory::Allocate<Char_T_>(len + 1);
             Memory::Copy(str, src, ((len + 1) * sizeof(Char_T_)));
         } else {
@@ -263,9 +246,9 @@ class String {
     inline Char_T_ *Storage() const noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         const SizeT len = Length();
-        if ((len != 0) && (len < short_string_max)) {
+        if ((len != 0) && (len < ShortStringMax)) {
 #ifndef QENTEM_BIG_ENDIAN
-            return const_cast<Char_T_ *>(reinterpret_cast<const Char_T_ *>(&free_));
+            return const_cast<Char_T_ *>(reinterpret_cast<const Char_T_ *>(&padding_));
 #else
             // Two tags at the start
             return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) + 2));
@@ -278,9 +261,9 @@ class String {
     inline const Char_T_ *First() const noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         const SizeT len = Length();
-        if ((len != 0) && (len < short_string_max)) {
+        if ((len != 0) && (len < ShortStringMax)) {
 #ifndef QENTEM_BIG_ENDIAN
-            return reinterpret_cast<const Char_T_ *>(&free_);
+            return reinterpret_cast<const Char_T_ *>(&padding_);
 #else
             // Two tags at the start
             return reinterpret_cast<const Char_T_ *>(reinterpret_cast<const char *>(&storage_) + 2);
@@ -304,36 +287,39 @@ class String {
     }
 
     static String Merge(const String &src1, const String &src2) {
-        const SizeT ns_len = (src1.Length() + src2.Length());
-        String      ns     = String{ns_len};
-        Char_T_    *des    = ns.Storage();
-
-        if (src1.IsNotEmpty()) {
-            Memory::Copy(des, src1.First(), (src1.Length() * sizeof(Char_T_)));
-        }
-
-        if (src2.IsNotEmpty()) {
-            Memory::Copy((des + src1.Length()), src2.First(), (src2.Length() * sizeof(Char_T_)));
-        }
-
-        return ns;
+        return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
 
-    void Insert(const Char_T_ *str, SizeT len) {
+    void Insert(const Char_T_ *str, const SizeT len) {
         if ((str != nullptr) && (len != 0)) {
             const SizeT src_len = Length();
             const SizeT new_len = (src_len + len);
-            Char_T_    *src     = Storage();
-            Char_T_    *des     = allocate(new_len + 1);
+
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+            Char_T_ *src = Storage();
+            Char_T_  n_src[ShortStringMax];
+
+            if (src_len <= ShortStringMax) {
+                for (SizeT i = 0; i < src_len; i++) {
+                    n_src[i] = src[i];
+                }
+
+                src = &(n_src[0]);
+            }
+#else
+            Char_T_ *src = Storage();
+#endif
+
+            Char_T_ *ns = allocate(new_len + 1);
 
             if (src != nullptr) {
-                Memory::Copy(des, src, (src_len * sizeof(Char_T_)));
+                Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
                 deallocate(src);
             }
 
-            Memory::Copy((des + src_len), str, (len * sizeof(Char_T_)));
+            Memory::Copy((ns + src_len), str, (len * sizeof(Char_T_)));
+            ns[new_len] = 0;
             setLength(new_len);
-            des[new_len] = 0;
         }
     }
 
@@ -358,7 +344,7 @@ class String {
 
     void setLength(SizeT new_length) noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        if (new_length < short_string_max) {
+        if (new_length < ShortStringMax) {
             storage_.SetLowTag(static_cast<unsigned char>(new_length));
         } else {
             storage_.SetLowTag(0);
@@ -369,12 +355,13 @@ class String {
 #endif
     }
 
-    void     setStorage(Char_T_ *ptr) noexcept { storage_.SetPointer(ptr); }
+    void setStorage(Char_T_ *ptr) noexcept { storage_.SetPointer(ptr); }
+
     Char_T_ *allocate(SizeT new_size) {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        if (new_size <= short_string_max) {
+        if (new_size <= ShortStringMax) {
 #ifndef QENTEM_BIG_ENDIAN
-            return reinterpret_cast<Char_T_ *>(&free_);
+            return reinterpret_cast<Char_T_ *>(&padding_);
 #else
             // Two tags at the start
             return reinterpret_cast<Char_T_ *>((reinterpret_cast<char *>(&storage_) + 2));
@@ -382,14 +369,14 @@ class String {
         }
 #endif
 
-        Char_T_ *new_storage = Memory::Allocate<Char_T_>(new_size);
-        setStorage(new_storage);
-        return new_storage;
+        Char_T_ *ns = Memory::Allocate<Char_T_>(new_size);
+        setStorage(ns);
+        return ns;
     }
 
     void deallocate(Char_T_ *old_storage) {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        if (Length() >= short_string_max) {
+        if (Length() >= ShortStringMax) {
             Memory::Deallocate(old_storage);
         }
 #else
@@ -399,21 +386,35 @@ class String {
 
     void clearStorage() noexcept { setStorage(nullptr); }
 
-    void copyString(const Char_T_ *str, SizeT len) {
+    static String merge(const Char_T_ *str1, const SizeT len1, const Char_T_ *str2, const SizeT len2) {
+        String   ns  = String{(len1 + len2)};
+        Char_T_ *des = ns.Storage();
+
+        if (len1 != 0) {
+            Memory::Copy(des, str1, (len1 * sizeof(Char_T_)));
+        }
+
+        if (len2 != 0) {
+            Memory::Copy((des + len1), str2, (len2 * sizeof(Char_T_)));
+        }
+
+        return ns;
+    }
+
+    void copyString(const Char_T_ *str, const SizeT len) {
+        Char_T_ *ns = allocate(len + 1);
+        Memory::Copy(ns, str, (len * sizeof(Char_T_)));
+        ns[len] = 0;
         setLength(len);
-        Char_T_ *des;
-        des = allocate(len + 1);
-        Memory::Copy(des, str, (len * sizeof(Char_T_)));
-        des[len] = 0;
     }
 
 #ifndef QENTEM_BIG_ENDIAN
-    SizeT             free_{0};
+    SizeT             padding_{0};
     SizeT             length_{0};
     QPointer<Char_T_> storage_{};
 #else
     QPointer<Char_T_> storage_{};
-    SizeT free_{0};
+    SizeT padding_{0};
     SizeT length_{0};
 #endif
 };

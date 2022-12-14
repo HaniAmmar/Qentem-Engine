@@ -51,7 +51,7 @@ static int TestString1() {
     str1 = String8("abcd");
     EQ_VALUE(str1.Length(), 4, "Length");
     NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
+    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]"); // Dose it have /0 at the end?
     EQ_VALUE(str1, "abcd", "str1");
     NOT_EQ_TO(str1, "abcdef", "str1", "abcdef");
 
@@ -279,6 +279,31 @@ static int TestString2() {
     EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     EQ_VALUE(str2, "abcdef", "str2");
 
+    // String8::ShortStringMax;
+
+    str1.Reset();
+    for (SizeT i = 3; i < String8::ShortStringMax; i++) {
+        str1 += "A";
+    }
+
+    str1 += "_";
+    EQ_VALUE(str1.Length(), 12, "Length");
+    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
+    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
+    EQ_VALUE(str1, "AAAAAAAAAAA_", "str1");
+
+    str1 += "B";
+    EQ_VALUE(str1.Length(), 13, "Length");
+    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
+    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
+    EQ_VALUE(str1, "AAAAAAAAAAA_B", "str1");
+
+    str1 += "_C";
+    EQ_VALUE(str1.Length(), 15, "Length");
+    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
+    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
+    EQ_VALUE(str1, "AAAAAAAAAAA_B_C", "str1");
+
     str1.Reset();
     str1 += "a";
     EQ_VALUE(str1.Length(), 1, "Length");
@@ -326,6 +351,13 @@ static int TestString2() {
     NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
     EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     EQ_VALUE(str1, "abcdefghigkl123", "str1");
+
+    str1 = "aaaaaaaaaaaaaaaaaaaaaaaa";
+    str1 += "aaaaaaaaaaaaaaaaaaaaaaaa";
+    EQ_VALUE(str1.Length(), 48, "Length");
+    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
+    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
+    EQ_VALUE(str1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "str1");
 
     str1.Reset();
     str1 = "1234";
