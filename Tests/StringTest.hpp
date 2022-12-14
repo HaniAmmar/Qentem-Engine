@@ -279,7 +279,16 @@ static int TestString2() {
     EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     EQ_VALUE(str2, "abcdef", "str2");
 
-    // String8::ShortStringMax;
+    str1.Reset();
+    for (SizeT i = 0; i < String8::ShortStringMax; i++) {
+        str1 += "A";
+    }
+
+    str1 += "_";
+    EQ_VALUE(str1.Length(), (String8::ShortStringMax + 1), "Length");
+    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
+    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
+    EQ_VALUE(str1, "AAAAAAAAAAAAAA_", "str1");
 
     str1.Reset();
     for (SizeT i = 3; i < String8::ShortStringMax; i++) {
@@ -287,7 +296,7 @@ static int TestString2() {
     }
 
     str1 += "_";
-    EQ_VALUE(str1.Length(), 12, "Length");
+    EQ_VALUE(str1.Length(), (String8::ShortStringMax - 2), "Length");
     NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
     EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     EQ_VALUE(str1, "AAAAAAAAAAA_", "str1");

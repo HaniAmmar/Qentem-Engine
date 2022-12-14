@@ -38,7 +38,7 @@ namespace Qentem {
 template <typename Char_T_>
 class String {
   public:
-    static constexpr SizeT ShortStringMax = ((6 + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
+    static constexpr SizeT ShortStringMax = ((6 + (sizeof(void *))) / sizeof(Char_T_));
 
     String() = default;
 
@@ -299,7 +299,7 @@ class String {
             Char_T_ *src = Storage();
             Char_T_  n_src[ShortStringMax];
 
-            if (src_len <= ShortStringMax) {
+            if (src_len < ShortStringMax) {
                 for (SizeT i = 0; i < src_len; i++) {
                     n_src[i] = src[i];
                 }
