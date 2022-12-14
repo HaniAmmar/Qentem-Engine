@@ -27,8 +27,6 @@
 #ifndef QENTEM_TEMPLATE_H_
 #define QENTEM_TEMPLATE_H_
 
-// TODO: Add autoescape
-
 namespace Qentem {
 
 /*
