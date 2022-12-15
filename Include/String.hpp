@@ -50,9 +50,11 @@ class String {
     String(const String &src) { copyString(src.First(), src.Length()); }
 
     explicit String(SizeT len) {
-        Char_T_ *ns = allocate(len + 1);
-        ns[len]     = 0;
-        setLength(len);
+        if (len != 0) {
+            Char_T_ *ns = allocate(len + 1);
+            ns[len]     = 0;
+            setLength(len);
+        }
     }
 
     String(Char_T_ *str, SizeT len) noexcept {
