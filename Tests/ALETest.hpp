@@ -87,7 +87,7 @@ class ALEHelper {
 
     bool ALEIsEqual(bool &result, const char *content, ALE::Number left, ALE::Number right, bool left_evaluated,
                     bool right_evaluated) const noexcept {
-        using ALEOperations_T_ = ALEOperations<char>;
+        using ALEExpressions_T_ = ALEExpressions<char>;
 
         const char     *left_content  = (content + left.Content.Offset);
         const char     *right_content = (content + right.Content.Offset);
@@ -98,7 +98,7 @@ class ALEHelper {
         bool is_number = (left_evaluated || right_evaluated);
 
         if (!left_evaluated) {
-            if (*left_content == ALEOperations_T_::BracketStart) {
+            if (*left_content == ALEExpressions_T_::BracketStart) {
                 if (!FindItem(item, left_content, left_length)) {
                     return false;
                 }
@@ -115,7 +115,7 @@ class ALEHelper {
                     left_length  = item->StrLength;
                 }
             } else {
-                if (*left_content == ALEOperations_T_::ParenthesStart) {
+                if (*left_content == ALEExpressions_T_::ParenthesStart) {
                     ++left_content;
                     left_length -= 2;
                 }
@@ -130,7 +130,7 @@ class ALEHelper {
         }
 
         if (!right_evaluated) {
-            if (*right_content == ALEOperations_T_::BracketStart) {
+            if (*right_content == ALEExpressions_T_::BracketStart) {
                 if (!FindItem(item, right_content, right_length)) {
                     return false;
                 }
@@ -147,7 +147,7 @@ class ALEHelper {
                 }
 
             } else if (is_number) {
-                if (*right_content == ALEOperations_T_::ParenthesStart) {
+                if (*right_content == ALEExpressions_T_::ParenthesStart) {
                     ++right_content;
                     right_length -= 2;
                 }

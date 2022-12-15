@@ -39,7 +39,7 @@ template <typename>
 class ALEBasicHelper;
 
 template <typename>
-class ALEOperations;
+class ALEExpressions;
 
 class ALE {
   public:
@@ -59,7 +59,7 @@ class ALE {
         } Content{};
     };
 
-    enum class Operation {
+    enum class Expression {
         None = 0U,
         Or,             // ||
         And,            // &&
@@ -80,16 +80,18 @@ class ALE {
 
     template <typename Char_T_, typename Helper_T_>
     static bool Evaluate(double &number, const Char_T_ *content, SizeT length, const Helper_T_ *callback) noexcept {
-        Number    num;
-        Operation current_op = Operation::None;
-        SizeT     offset     = 0;
+        Number     num;
+        Expression current_exp = Expression::None;
+        SizeT      offset      = 0;
 
-        if (parse(current_op, num, content, offset, length, callback)) {
-            number = num.Number;
-            return true;
+        const bool result = parse(current_exp, num, content, offset, length, callback);
+        number            = num.Number;
+
+        if (!result) {
+            number = 0;
         }
 
-        return false;
+        return result;
     }
 
     template <typename Char_T_, typename Helper_T_>
@@ -101,11 +103,9 @@ class ALE {
     static double Evaluate(const Char_T_ *content, SizeT length, const Helper_T_ *callback) noexcept {
         double number;
 
-        if (Evaluate(number, content, length, callback)) {
-            return number;
-        }
+        Evaluate(number, content, length, callback);
 
-        return 0;
+        return number;
     }
 
     template <typename Char_T_, typename Helper_T_>
@@ -128,11 +128,9 @@ class ALE {
     inline static double Evaluate(const Char_T_ *content, SizeT length) noexcept {
         double number;
 
-        if (Evaluate(number, content, length)) {
-            return number;
-        }
+        Evaluate(number, content, length);
 
-        return 0;
+        return number;
     }
 
     template <typename Char_T_>
@@ -142,45 +140,45 @@ class ALE {
 
   private:
     template <typename Char_T_, typename Helper_T_>
-    static bool parse(Operation &current_op, Number &left, const Char_T_ *content, SizeT &offset,
+    static bool parse(Expression &current_exp, Number &left, const Char_T_ *content, SizeT &offset,
                       const SizeT end_offset, const Helper_T_ *callback) noexcept {
-        Number    right;
-        SizeT     previous_offset = offset;
-        Operation op_w;
-        Operation op              = nextOperation(op_w, content, offset, end_offset);
-        bool      left_evaluated  = false;
-        bool      right_evaluated = false;
+        Number     right;
+        SizeT      previous_offset = offset;
+        Expression op_w;
+        Expression exp             = nextExpression(op_w, content, offset, end_offset);
+        bool       left_evaluated  = false;
+        bool       right_evaluated = false;
 
-        if (getNumber(left, content, previous_offset, (offset - previous_offset), callback, op)) {
-            advance(op, offset);
+        if (getNumber(left, content, previous_offset, (offset - previous_offset), callback, exp)) {
+            advance(exp, offset);
             previous_offset = offset;
 
             while (offset < end_offset) {
-                Operation       next_op_w;
-                const Operation next_op = nextOperation(next_op_w, content, offset, end_offset);
+                Expression       next_exp_w;
+                const Expression next_exp = nextExpression(next_exp_w, content, offset, end_offset);
 
-                if (next_op_w > op_w) {
-                    Operation tmp_op = op;
-                    right_evaluated  = (op_w == Operation::Equal);
+                if (next_exp_w > op_w) {
+                    Expression tmp_exp = exp;
+                    right_evaluated    = (op_w == Expression::Equal);
 
-                    if (parse(tmp_op, right, content, previous_offset, end_offset, callback) &&
-                        process(content, left, right, left_evaluated, right_evaluated, op, callback)) {
-                        op             = tmp_op;
+                    if (parse(tmp_exp, right, content, previous_offset, end_offset, callback) &&
+                        process(content, left, right, left_evaluated, right_evaluated, exp, callback)) {
+                        exp            = tmp_exp;
                         offset         = previous_offset;
                         left_evaluated = true;
                         continue;
                     }
-                } else if (getNumber(right, content, previous_offset, (offset - previous_offset), callback, op) &&
-                           process(content, left, right, left_evaluated, right_evaluated, op, callback)) {
-                    advance(next_op, offset);
+                } else if (getNumber(right, content, previous_offset, (offset - previous_offset), callback, exp) &&
+                           process(content, left, right, left_evaluated, right_evaluated, exp, callback)) {
+                    advance(next_exp, offset);
 
-                    if (next_op_w < current_op) {
-                        current_op = next_op;
+                    if (next_exp_w < current_exp) {
+                        current_exp = next_exp;
                         return true;
                     }
 
-                    op              = next_op;
-                    op_w            = next_op_w;
+                    exp             = next_exp;
+                    op_w            = next_exp_w;
                     previous_offset = offset;
                     left_evaluated  = true;
                     continue;
@@ -189,187 +187,188 @@ class ALE {
                 return false;
             }
 
-            return (op == Operation::None);
+            return (exp == Expression::None);
         }
 
         return false;
     }
 
-    static void advance(Operation op, SizeT &offset) {
+    static void advance(Expression exp, SizeT &offset) {
         ++offset;
 
-        if ((op >= Operation::Or) && (op <= Operation::LessOrEqual)) {
+        if ((exp >= Expression::Or) && (exp <= Expression::LessOrEqual)) {
             ++offset;
         }
     }
 
     template <typename Char_T_>
-    static Operation nextOperation(Operation &weight, const Char_T_ *content, SizeT &offset,
-                                   const SizeT end_offset) noexcept {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
+    static Expression nextExpression(Expression &weight, const Char_T_ *content, SizeT &offset,
+                                     const SizeT end_offset) noexcept {
+        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
         while (offset < end_offset) {
             switch (content[offset]) {
-                case ALEOperations_T_::OrOp: { // ||
-                    if (content[(offset + 1)] == ALEOperations_T_::OrOp) {
-                        weight = Operation::And;
-                        return Operation::Or;
+                case ALEExpressions_T_::OrOp: { // ||
+                    if (content[(offset + 1)] == ALEExpressions_T_::OrOp) {
+                        weight = Expression::And;
+                        return Expression::Or;
                     }
 
-                    weight = Operation::None;
-                    return Operation::Error;
+                    weight = Expression::None;
+                    return Expression::Error;
                 }
 
-                case ALEOperations_T_::AndOp: { // &&
-                    if (content[(offset + 1)] == ALEOperations_T_::AndOp) {
-                        weight = Operation::And;
-                        return Operation::And;
+                case ALEExpressions_T_::AndOp: { // &&
+                    if (content[(offset + 1)] == ALEExpressions_T_::AndOp) {
+                        weight = Expression::And;
+                        return Expression::And;
                     }
 
-                    weight = Operation::None;
-                    return Operation::Error;
+                    weight = Expression::None;
+                    return Expression::Error;
                 }
 
-                case ALEOperations_T_::BiggerOp: { // > or >=
-                    weight = Operation::BiggerOrEqual;
+                case ALEExpressions_T_::BiggerOp: { // > or >=
+                    weight = Expression::BiggerOrEqual;
 
-                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
-                        return Operation::BiggerOrEqual;
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                        return Expression::BiggerOrEqual;
                     }
 
-                    return Operation::Bigger;
+                    return Expression::Bigger;
                 }
 
-                case ALEOperations_T_::LessOp: { // < or <=
-                    weight = Operation::LessOrEqual;
+                case ALEExpressions_T_::LessOp: { // < or <=
+                    weight = Expression::LessOrEqual;
 
-                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
-                        return Operation::LessOrEqual;
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                        return Expression::LessOrEqual;
                     }
 
-                    return Operation::Less;
+                    return Expression::Less;
                 }
 
-                case ALEOperations_T_::NotOp: { // !=
-                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
-                        weight = Operation::Equal;
-                        return Operation::NotEqual;
+                case ALEExpressions_T_::NotOp: { // !=
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                        weight = Expression::Equal;
+                        return Expression::NotEqual;
                     }
 
-                    weight = Operation::None;
-                    return Operation::Error;
+                    weight = Expression::None;
+                    return Expression::Error;
                 }
 
-                case ALEOperations_T_::EqualOp: { // ==
-                    if (content[(offset + 1)] == ALEOperations_T_::EqualOp) {
-                        weight = Operation::Equal;
-                        return Operation::Equal;
+                case ALEExpressions_T_::EqualOp: { // ==
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                        weight = Expression::Equal;
+                        return Expression::Equal;
                     }
 
-                    weight = Operation::None;
-                    return Operation::Error;
+                    weight = Expression::None;
+                    return Expression::Error;
                 }
 
-                case ALEOperations_T_::SubtractOp: {
-                    if (isOperation(content, offset)) {
-                        weight = Operation::Addition;
-                        return Operation::Subtraction;
-                    }
-
-                    break;
-                }
-
-                case ALEOperations_T_::AddOp: {
-                    if (isOperation(content, offset)) {
-                        weight = Operation::Addition;
-                        return Operation::Addition;
+                case ALEExpressions_T_::SubtractOp: {
+                    if (isExpression(content, offset)) {
+                        weight = Expression::Addition;
+                        return Expression::Subtraction;
                     }
 
                     break;
                 }
 
-                case ALEOperations_T_::DivideOp: {
-                    weight = Operation::Multiplication;
-                    return Operation::Division;
+                case ALEExpressions_T_::AddOp: {
+                    if (isExpression(content, offset)) {
+                        weight = Expression::Addition;
+                        return Expression::Addition;
+                    }
+
+                    break;
                 }
 
-                case ALEOperations_T_::MultipleOp: {
-                    weight = Operation::Multiplication;
-                    return Operation::Multiplication;
+                case ALEExpressions_T_::DivideOp: {
+                    weight = Expression::Multiplication;
+                    return Expression::Division;
                 }
 
-                case ALEOperations_T_::RemainderOp: {
-                    weight = Operation::Remainder;
-                    return Operation::Remainder;
+                case ALEExpressions_T_::MultipleOp: {
+                    weight = Expression::Multiplication;
+                    return Expression::Multiplication;
                 }
 
-                case ALEOperations_T_::ExponentOp: {
-                    weight = Operation::Exponent;
-                    return Operation::Exponent;
+                case ALEExpressions_T_::RemainderOp: {
+                    weight = Expression::Remainder;
+                    return Expression::Remainder;
                 }
 
-                case ALEOperations_T_::ParenthesStart: {
+                case ALEExpressions_T_::ExponentOp: {
+                    weight = Expression::Exponent;
+                    return Expression::Exponent;
+                }
+
+                case ALEExpressions_T_::ParenthesStart: {
                     // (...) are evaluated to numbers.
 
                     ++offset;
-                    offset = Engine::SkipInnerPatterns<Char_T_>(
-                        ALEOperations_T_::ParenthesStart, ALEOperations_T_::ParenthesEnd, content, offset, end_offset);
+                    offset = Engine::SkipInnerPatterns<Char_T_>(ALEExpressions_T_::ParenthesStart,
+                                                                ALEExpressions_T_::ParenthesEnd, content, offset,
+                                                                end_offset);
 
                     if (offset != 0) {
                         continue;
                     }
 
                     offset = end_offset;
-                    weight = Operation::None;
-                    return Operation::Error;
+                    weight = Expression::None;
+                    return Expression::Error;
                 }
 
-                case ALEOperations_T_::BracketStart: {
+                case ALEExpressions_T_::BracketStart: {
                     // {...} are evaluated by callback to a number or
                     // string.
 
                     ++offset;
-                    offset = Engine::FindOne<Char_T_>(ALEOperations_T_::BracketEnd, content, offset, end_offset);
+                    offset = Engine::FindOne<Char_T_>(ALEExpressions_T_::BracketEnd, content, offset, end_offset);
 
                     if (offset != 0) {
                         continue;
                     }
 
                     offset = end_offset;
-                    weight = Operation::None;
-                    return Operation::Error;
+                    weight = Expression::None;
+                    return Expression::Error;
                 }
             }
 
             ++offset;
         }
 
-        weight = Operation::None;
-        return Operation::None;
+        weight = Expression::None;
+        return Expression::None;
     }
 
     template <typename Char_T_>
-    static bool isOperation(const Char_T_ *content, SizeT offset) noexcept {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
+    static bool isExpression(const Char_T_ *content, SizeT offset) noexcept {
+        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
         while (offset != 0) {
             --offset;
 
             switch (content[offset]) {
-                case ALEOperations_T_::SpaceChar: {
+                case ALEExpressions_T_::SpaceChar: {
                     break;
                 }
 
-                case ALEOperations_T_::ParenthesEnd:
-                case ALEOperations_T_::BracketEnd: {
+                case ALEExpressions_T_::ParenthesEnd:
+                case ALEExpressions_T_::BracketEnd: {
                     // (...) and {} are numbers.
                     return true;
                 }
 
                 default: {
                     // A number
-                    return ((content[offset] < ALEOperations_T_::ColonChar) &&
-                            (content[offset] > ALEOperations_T_::SlashChar));
+                    return ((content[offset] < ALEExpressions_T_::ColonChar) &&
+                            (content[offset] > ALEExpressions_T_::SlashChar));
                 }
             }
         }
@@ -379,32 +378,32 @@ class ALE {
 
     template <typename Char_T_, typename Helper_T_>
     static bool getNumber(Number &val, const Char_T_ *content, SizeT offset, SizeT length, const Helper_T_ *callback,
-                          Operation op) noexcept {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
+                          Expression exp) noexcept {
+        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
-        if (op == Operation::Error) {
+        if (exp == Expression::Error) {
             return false;
         }
 
         StringUtils::Trim(content, offset, length);
 
-        if ((op == Operation::Equal) || (op == Operation::NotEqual)) {
+        if ((exp == Expression::Equal) || (exp == Expression::NotEqual)) {
             val.Content.Offset = static_cast<unsigned int>(offset);
             val.Content.Length = static_cast<unsigned int>(length);
             return true;
         }
 
         switch (content[offset]) {
-            case ALEOperations_T_::ParenthesStart: {
+            case ALEExpressions_T_::ParenthesStart: {
                 length += offset;
                 ++offset;
                 --length;
 
-                Operation current_op = Operation::None;
-                return parse(current_op, val, content, offset, length, callback);
+                Expression current_exp = Expression::None;
+                return parse(current_exp, val, content, offset, length, callback);
             }
 
-            case ALEOperations_T_::BracketStart: {
+            case ALEExpressions_T_::BracketStart: {
                 return (callback->ALESetNumber(val.Number, (content + offset), length));
             }
 
@@ -416,9 +415,9 @@ class ALE {
 
     template <typename Char_T_, typename Helper_T_>
     static bool process(const Char_T_ *content, Number &left, Number right, bool left_evaluated, bool right_evaluated,
-                        Operation op, const Helper_T_ *callback) noexcept {
-        switch (op) {
-            case Operation::Exponent: { // ^
+                        Expression exp, const Helper_T_ *callback) noexcept {
+        switch (exp) {
+            case Expression::Exponent: { // ^
                 if (right.Number != 0.0) {
                     // NOTE: Needs more work to evaluate fractions
                     if (left.Number != 0.0) {
@@ -451,18 +450,18 @@ class ALE {
                 break;
             }
 
-            case Operation::Remainder: { // %
+            case Expression::Remainder: { // %
                 left.Number = static_cast<double>(static_cast<unsigned long long>(left.Number) %
                                                   static_cast<unsigned long long>(right.Number));
                 break;
             }
 
-            case Operation::Multiplication: { // *
+            case Expression::Multiplication: { // *
                 left.Number *= right.Number;
                 break;
             }
 
-            case Operation::Division: { // /
+            case Expression::Division: { // /
                 if (right.Number != 0.0) {
                     left.Number /= right.Number;
                     break;
@@ -471,52 +470,52 @@ class ALE {
                 return false;
             }
 
-            case Operation::Addition: { // +
+            case Expression::Addition: { // +
                 left.Number += right.Number;
                 break;
             }
 
-            case Operation::Subtraction: { // -
+            case Expression::Subtraction: { // -
                 left.Number -= right.Number;
                 break;
             }
 
-            case Operation::Less: { // <
+            case Expression::Less: { // <
                 left.Number = (left.Number < right.Number) ? 1 : 0;
                 break;
             }
 
-            case Operation::LessOrEqual: { // <=
+            case Expression::LessOrEqual: { // <=
                 left.Number = (left.Number <= right.Number) ? 1 : 0;
                 break;
             }
 
-            case Operation::Bigger: { // >
+            case Expression::Bigger: { // >
                 left.Number = (left.Number > right.Number) ? 1 : 0;
                 break;
             }
 
-            case Operation::BiggerOrEqual: { // >=
+            case Expression::BiggerOrEqual: { // >=
                 left.Number = (left.Number >= right.Number) ? 1 : 0;
                 break;
             }
 
-            case Operation::And: { // &&
+            case Expression::And: { // &&
                 left.Number = ((left.Number > 0) && (right.Number > 0)) ? 1 : 0;
                 break;
             }
 
-            case Operation::Or: { // ||
+            case Expression::Or: { // ||
                 left.Number = ((left.Number > 0) || (right.Number > 0)) ? 1 : 0;
                 break;
             }
 
-            case Operation::Equal:      // ==
-            case Operation::NotEqual: { // !=
+            case Expression::Equal:      // ==
+            case Expression::NotEqual: { // !=
                 bool is_equal;
 
                 if (callback->ALEIsEqual(is_equal, content, left, right, left_evaluated, right_evaluated)) {
-                    if (op == Operation::Equal) {
+                    if (exp == Expression::Equal) {
                         left.Number = (is_equal ? 1 : 0);
                     } else {
                         left.Number = (is_equal ? 0 : 1);
@@ -549,12 +548,12 @@ class ALEBasicHelper {
 
     static bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left, ALE::Number right,
                            bool left_evaluated, bool right_evaluated) noexcept {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
+        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
         if (!left_evaluated) {
             const Char_T_ *left_content = (content + left.Content.Offset);
 
-            if (*left_content != ALEOperations_T_::ParenthesStart) {
+            if (*left_content != ALEExpressions_T_::ParenthesStart) {
                 if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content, left.Content.Length))) {
                     return false;
                 }
@@ -566,7 +565,7 @@ class ALEBasicHelper {
         if (!right_evaluated) {
             const Char_T_ *right_content = (content + right.Content.Offset);
 
-            if (*right_content != ALEOperations_T_::ParenthesStart) {
+            if (*right_content != ALEExpressions_T_::ParenthesStart) {
                 if (!(Digit<Char_T_>::StringToNumber(right.Number, right_content, right.Content.Length))) {
                     return false;
                 }
@@ -581,7 +580,7 @@ class ALEBasicHelper {
 };
 
 template <typename Char_T_>
-class ALEOperations {
+class ALEExpressions {
   public:
     static constexpr Char_T_ RemainderOp = '%';
     static constexpr Char_T_ MultipleOp  = '*';

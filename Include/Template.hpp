@@ -1371,7 +1371,7 @@ class Template_CV {
 
     bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left, ALE::Number right, bool left_evaluated,
                     bool right_evaluated) const noexcept {
-        using ALEOperations_T_ = ALEOperations<Char_T_>;
+        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
         const Value_T_ *value_left  = nullptr;
         const Value_T_ *value_right = nullptr;
@@ -1398,7 +1398,7 @@ class Template_CV {
                     is_number = true;
                 }
             } else {
-                if (*left_content != ALEOperations_T_::ParenthesStart) {
+                if (*left_content != ALEExpressions_T_::ParenthesStart) {
                     left_evaluated = Digit<Char_T_>::StringToNumber(left.Number, left_content, left_length);
                 } else {
                     left_evaluated = ALE::Evaluate(left.Number, (++left_content), (left_length -= 2), this);
@@ -1427,7 +1427,7 @@ class Template_CV {
                     is_number = true;
                 }
             } else if (is_number) {
-                if (*right_content != ALEOperations_T_::ParenthesStart) {
+                if (*right_content != ALEExpressions_T_::ParenthesStart) {
                     if (!(Digit<Char_T_>::StringToNumber(right.Number, right_content, right_length))) {
                         return false;
                     }
