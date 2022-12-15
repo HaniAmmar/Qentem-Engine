@@ -388,8 +388,8 @@ class ALE {
         StringUtils::Trim(content, offset, length);
 
         if ((exp == Expression::Equal) || (exp == Expression::NotEqual)) {
-            val.Content.Offset = static_cast<unsigned int>(offset);
-            val.Content.Length = static_cast<unsigned int>(length);
+            val.Content.Offset = static_cast<SizeT>(offset);
+            val.Content.Length = static_cast<SizeT>(length);
             return true;
         }
 
