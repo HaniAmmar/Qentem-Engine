@@ -144,8 +144,8 @@ class ALE {
                       const SizeT end_offset, const Helper_T_ *callback) noexcept {
         Number     right;
         SizeT      previous_offset = offset;
-        Expression op_w;
-        Expression exp             = nextExpression(op_w, content, offset, end_offset);
+        Expression exp_weight;
+        Expression exp             = nextExpression(exp_weight, content, offset, end_offset);
         bool       left_evaluated  = false;
         bool       right_evaluated = false;
 
@@ -154,12 +154,12 @@ class ALE {
             previous_offset = offset;
 
             while (offset < end_offset) {
-                Expression       next_exp_w;
-                const Expression next_exp = nextExpression(next_exp_w, content, offset, end_offset);
+                Expression       next_exp_weight;
+                const Expression next_exp = nextExpression(next_exp_weight, content, offset, end_offset);
 
-                if (next_exp_w > op_w) {
+                if (next_exp_weight > exp_weight) {
                     Expression tmp_exp = exp;
-                    right_evaluated    = (op_w == Expression::Equal);
+                    right_evaluated    = (exp_weight == Expression::Equal);
 
                     if (parse(tmp_exp, right, content, previous_offset, end_offset, callback) &&
                         process(content, left, right, left_evaluated, right_evaluated, exp, callback)) {
@@ -172,13 +172,13 @@ class ALE {
                            process(content, left, right, left_evaluated, right_evaluated, exp, callback)) {
                     advance(next_exp, offset);
 
-                    if (next_exp_w < current_exp) {
+                    if (next_exp_weight < current_exp) {
                         current_exp = next_exp;
                         return true;
                     }
 
                     exp             = next_exp;
-                    op_w            = next_exp_w;
+                    exp_weight      = next_exp_weight;
                     previous_offset = offset;
                     left_evaluated  = true;
                     continue;
@@ -208,8 +208,8 @@ class ALE {
 
         while (offset < end_offset) {
             switch (content[offset]) {
-                case ALEExpressions_T_::OrOp: { // ||
-                    if (content[(offset + 1)] == ALEExpressions_T_::OrOp) {
+                case ALEExpressions_T_::OrExp: { // ||
+                    if (content[(offset + 1)] == ALEExpressions_T_::OrExp) {
                         weight = Expression::And;
                         return Expression::Or;
                     }
@@ -218,8 +218,8 @@ class ALE {
                     return Expression::Error;
                 }
 
-                case ALEExpressions_T_::AndOp: { // &&
-                    if (content[(offset + 1)] == ALEExpressions_T_::AndOp) {
+                case ALEExpressions_T_::AndExp: { // &&
+                    if (content[(offset + 1)] == ALEExpressions_T_::AndExp) {
                         weight = Expression::And;
                         return Expression::And;
                     }
@@ -228,28 +228,28 @@ class ALE {
                     return Expression::Error;
                 }
 
-                case ALEExpressions_T_::BiggerOp: { // > or >=
+                case ALEExpressions_T_::BiggerExp: { // > or >=
                     weight = Expression::BiggerOrEqual;
 
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
                         return Expression::BiggerOrEqual;
                     }
 
                     return Expression::Bigger;
                 }
 
-                case ALEExpressions_T_::LessOp: { // < or <=
+                case ALEExpressions_T_::LessExp: { // < or <=
                     weight = Expression::LessOrEqual;
 
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
                         return Expression::LessOrEqual;
                     }
 
                     return Expression::Less;
                 }
 
-                case ALEExpressions_T_::NotOp: { // !=
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                case ALEExpressions_T_::NotExp: { // !=
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
                         weight = Expression::Equal;
                         return Expression::NotEqual;
                     }
@@ -258,8 +258,8 @@ class ALE {
                     return Expression::Error;
                 }
 
-                case ALEExpressions_T_::EqualOp: { // ==
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualOp) {
+                case ALEExpressions_T_::EqualExp: { // ==
+                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
                         weight = Expression::Equal;
                         return Expression::Equal;
                     }
@@ -268,7 +268,7 @@ class ALE {
                     return Expression::Error;
                 }
 
-                case ALEExpressions_T_::SubtractOp: {
+                case ALEExpressions_T_::SubtractExp: {
                     if (isExpression(content, offset)) {
                         weight = Expression::Addition;
                         return Expression::Subtraction;
@@ -277,7 +277,7 @@ class ALE {
                     break;
                 }
 
-                case ALEExpressions_T_::AddOp: {
+                case ALEExpressions_T_::AddExp: {
                     if (isExpression(content, offset)) {
                         weight = Expression::Addition;
                         return Expression::Addition;
@@ -286,22 +286,22 @@ class ALE {
                     break;
                 }
 
-                case ALEExpressions_T_::DivideOp: {
+                case ALEExpressions_T_::DivideExp: {
                     weight = Expression::Multiplication;
                     return Expression::Division;
                 }
 
-                case ALEExpressions_T_::MultipleOp: {
+                case ALEExpressions_T_::MultipleExp: {
                     weight = Expression::Multiplication;
                     return Expression::Multiplication;
                 }
 
-                case ALEExpressions_T_::RemainderOp: {
+                case ALEExpressions_T_::RemainderExp: {
                     weight = Expression::Remainder;
                     return Expression::Remainder;
                 }
 
-                case ALEExpressions_T_::ExponentOp: {
+                case ALEExpressions_T_::ExponentExp: {
                     weight = Expression::Exponent;
                     return Expression::Exponent;
                 }
@@ -582,23 +582,23 @@ class ALEBasicHelper {
 template <typename Char_T_>
 class ALEExpressions {
   public:
-    static constexpr Char_T_ RemainderOp = '%';
-    static constexpr Char_T_ MultipleOp  = '*';
-    static constexpr Char_T_ DivideOp    = '/';
-    static constexpr Char_T_ AddOp       = '+';
-    static constexpr Char_T_ SubtractOp  = '-';
-    static constexpr Char_T_ EqualOp     = '=';
-    static constexpr Char_T_ NotOp       = '!';
-    static constexpr Char_T_ LessOp      = '<';
-    static constexpr Char_T_ BiggerOp    = '>';
-    static constexpr Char_T_ AndOp       = '&';
-    static constexpr Char_T_ OrOp        = '|';
+    static constexpr Char_T_ RemainderExp = '%';
+    static constexpr Char_T_ MultipleExp  = '*';
+    static constexpr Char_T_ DivideExp    = '/';
+    static constexpr Char_T_ AddExp       = '+';
+    static constexpr Char_T_ SubtractExp  = '-';
+    static constexpr Char_T_ EqualExp     = '=';
+    static constexpr Char_T_ NotExp       = '!';
+    static constexpr Char_T_ LessExp      = '<';
+    static constexpr Char_T_ BiggerExp    = '>';
+    static constexpr Char_T_ AndExp       = '&';
+    static constexpr Char_T_ OrExp        = '|';
 
     static constexpr Char_T_ ParenthesStart = '(';
     static constexpr Char_T_ ParenthesEnd   = ')';
     static constexpr Char_T_ BracketStart   = '{';
     static constexpr Char_T_ BracketEnd     = '}';
-    static constexpr Char_T_ ExponentOp     = '^';
+    static constexpr Char_T_ ExponentExp    = '^';
     static constexpr Char_T_ SpaceChar      = ' ';
     static constexpr Char_T_ ColonChar      = ':';
     static constexpr Char_T_ SlashChar      = '/';
