@@ -198,6 +198,13 @@ inline static void Destruct(Type_ *item, const Type_ *end) noexcept {
     }
 }
 
+template <typename Type_>
+inline static void Destruct(Type_ *item) noexcept {
+    if (item != nullptr) {
+        item->~Type_();
+    }
+}
+
 inline static void Deallocate(void *ptr) noexcept { ::operator delete(ptr); }
 
 } // namespace Memory

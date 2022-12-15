@@ -33,24 +33,28 @@ namespace Qentem {
  * Tags:
  *
  *  - {var:s|n}
+ *
  *      - var: Variable, s: String, n: Number.
  *
  *
  *  - {raw:s|n}
- *      - raw: Same as var but without escaping, s: String, n: Number.
+ *
+ *      - raw: Same as {var:...} but without escaping, s: String, n: Number.
  *
  *
  *  - {math:var|e|n}
+ *
  *      - var|e|n: Raw variable, Equation or Number.
  *
  *
  *  - {if case="var|s" true="var|var|s" false="var|var|s"}
+ *
  *      - Inline if,  var: Raw variable, var: Variable, s: String.
  *
  *
  *  <...>
- *  - <loop set="s"? value="s"? repeat="var|n"? index="var|n"? group="s"?
- *           sort="ascend|descend"?>...</loop>
+ *  - <loop set="s"? value="s"? repeat="var|n"? index="var|n"? group="s"? sort="ascend|descend"?>...</loop>
+ *
  *      - s: String, n: Number, var: Raw ariable,
  *      - set: child name in the passed colloction: Optional.
  *      - value: the current value in the colloction: Optional.
@@ -59,12 +63,17 @@ namespace Qentem {
  *      - index: starting index.
  *      - group: group an array using sub value of an object.
  *      - sort: sort an array or object (ascend or descend).
+ *      - ?: means optional.
+ *      - ...: means inner content.
  *
  *
  *  - <if case="var|e|n">...<else(if)? ... >?...</if>
+ *
  *      - var|e|n: Raw variable, Equation or Number.
  *      - <else if ....> same as if: Optional.
  *      - <else> no case: Optional.
+ *      - ?: means optional.
+ *      - ...: means inner content.
  */
 
 /*
@@ -210,7 +219,7 @@ class Template {
 
     template <typename Char_T_>
     struct LoopInfo_T {
-        const StringStream<Char_T_>  Content;
+        const StringStream<Char_T_>  InnerTemplate;
         const Array<TagBit<Char_T_>> SubTags;
         const unsigned short         SetOffset;
         const unsigned short         SetLength;
@@ -273,18 +282,21 @@ class Template {
             switch (GetType()) {
                 case TagType::Loop: {
                     LoopInfo_ *loop_info = static_cast<LoopInfo_ *>(info_.GetPointer());
+                    Memory::Destruct(loop_info);
                     Memory::Deallocate(loop_info);
                     break;
                 }
 
                 case TagType::If: {
                     IfInfo_ *if_info = static_cast<IfInfo_ *>(info_.GetPointer());
+                    Memory::Destruct(if_info);
                     Memory::Deallocate(if_info);
                     break;
                 }
 
                 case TagType::InLineIf: {
                     InlineIfInfo_ *inline_if_info = static_cast<InlineIfInfo_ *>(info_.GetPointer());
+                    Memory::Destruct(inline_if_info);
                     Memory::Deallocate(inline_if_info);
                     break;
                 }
@@ -652,7 +664,6 @@ class Template_CV {
                         renderIf((content + content_offset), if_info);
                     } else {
                         generateIfCases((content + content_offset), (tag->EndOffset() - content_offset), if_info);
-
                         tag->SetInfo(if_info);
                     }
 
@@ -832,7 +843,7 @@ class Template_CV {
         bool           break_loop        = false;
 
         Array<TagBit>         sub_tags;
-        StringStream<Char_T_> inner_content;
+        StringStream<Char_T_> inner_template;
         unsigned char         set_offset    = 0;
         unsigned char         set_length    = 0;
         unsigned char         index_offset  = 0;
@@ -934,13 +945,13 @@ class Template_CV {
                     break;
                 }
 
-                inner_content.Insert((content + previous_offset), ((offset - loop_value_length) - previous_offset));
+                inner_template.Insert((content + previous_offset), ((offset - loop_value_length) - previous_offset));
 
-                inner_content.Insert(TemplatePatterns_C_::GetVariablePrefix(),
-                                     TemplatePatterns_C_::VariablePrefixLength);
+                inner_template.Insert(TemplatePatterns_C_::GetVariablePrefix(),
+                                      TemplatePatterns_C_::VariablePrefixLength);
 
                 SizeT    lvl    = level_;
-                Char_T_ *buffer = inner_content.Buffer(level_ + 1);
+                Char_T_ *buffer = inner_template.Buffer(level_ + 1);
 
                 while (true) {
                     buffer[lvl] = TemplatePatterns_C_::TildeChar;
@@ -968,19 +979,19 @@ class Template_CV {
                 }
 
                 if ((content[(sub_offset - 1)] == TemplatePatterns_C_::VariableIndexSuffix)) {
-                    inner_content.Insert((content + offset), (sub_offset - offset));
+                    inner_template.Insert((content + offset), (sub_offset - offset));
                 }
 
                 previous_offset = sub_offset;
-                inner_content += TemplatePatterns_C_::InLineSuffix;
+                inner_template += TemplatePatterns_C_::InLineSuffix;
             }
         }
 
-        inner_content.Insert((content + previous_offset), (length - previous_offset));
+        inner_template.Insert((content + previous_offset), (length - previous_offset));
 
-        parse(sub_tags, inner_content.First(), inner_content.Length());
+        parse(sub_tags, inner_template.First(), inner_template.Length());
 
-        loop_info = Memory::AllocateInit<LoopInfo_>(static_cast<StringStream<Char_T_> &&>(inner_content),
+        loop_info = Memory::AllocateInit<LoopInfo_>(static_cast<StringStream<Char_T_> &&>(inner_template),
                                                     static_cast<Array<TagBit> &&>(sub_tags), set_offset, set_length,
                                                     index_offset, index_length, repeat_offset, repeat_length,
                                                     group_offset, group_length, sort_offset, sort_length);
@@ -1047,8 +1058,8 @@ class Template_CV {
 
         // Stage 4: Render
         Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
-        const Char_T_ *loop_content = loop_info->Content.First();
-        const SizeT    loop_length  = loop_info->Content.Length();
+        const Char_T_ *loop_content = loop_info->InnerTemplate.First();
+        const SizeT    loop_length  = loop_info->InnerTemplate.Length();
         const bool     is_object    = loop_set->IsObject();
 
         while (true) {
@@ -1478,8 +1489,7 @@ template <typename Char_T_>
 class TemplatePatterns {
   public:
     /*
-     *InLineSuffixLength and InLinePrefixLength should not be more than
-     *1
+     *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
     static constexpr SizeT InLineSuffixLength = 1U;

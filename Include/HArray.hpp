@@ -71,7 +71,11 @@ class HArray {
         }
     }
 
-    ~HArray() { deallocate(getHashTable()); }
+    ~HArray() {
+        HAItem_T_ *storage = Storage();
+        Memory::Destruct(storage, End());
+        deallocate(getHashTable());
+    }
 
     HArray(HArray &&src) noexcept : index_(src.Size()), capacity_(src.Capacity()) {
         hashTable_.Move(static_cast<QPointer<SizeT> &&>(src.hashTable_));
@@ -83,6 +87,8 @@ class HArray {
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
+            HAItem_T_ *storage = Storage();
+            Memory::Destruct(storage, End());
             deallocate(getHashTable());
 
             setSize(src.Size());
@@ -378,6 +384,8 @@ class HArray {
         HAItem_T_ *current = Storage();
 
         if (current != nullptr) {
+            HAItem_T_ *storage = Storage();
+            Memory::Destruct(storage, End());
             deallocate(getHashTable());
             clearStorage();
             setCapacity(0);
