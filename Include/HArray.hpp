@@ -39,10 +39,10 @@ namespace Qentem {
 
 template <typename Value_, typename Char_T_>
 struct HAItem {
+    Value_          Value;
     String<Char_T_> Key;
     SizeT           Next;
     SizeT           Hash;
-    Value_          Value;
 
     inline bool operator<(const HAItem &item) const noexcept { return (Key < item.Key); }
 

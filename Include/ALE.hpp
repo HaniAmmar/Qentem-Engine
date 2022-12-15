@@ -54,9 +54,9 @@ class ALE {
         double Number;
 
         struct {
-            unsigned int Offset;
-            unsigned int Length;
-        } Content{0, 0};
+            SizeT Offset{0};
+            SizeT Length{0};
+        } Content{};
     };
 
     enum class Operation {

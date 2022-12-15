@@ -229,20 +229,20 @@ class Template {
         const unsigned short         RepeatLength;
         const unsigned short         GroupOffset;
         const unsigned short         GroupLength;
-        const unsigned short         SortOffset;
-        const unsigned short         SortLength;
+        const SizeT                  SortOffset;
+        const SizeT                  SortLength;
     };
 
     template <typename Char_T_>
     struct InlineIfInfo_T {
         const Array<TagBit<Char_T_>> TrueSubTags;
         const Array<TagBit<Char_T_>> FalseSubTags;
-        const unsigned int           CaseOffset;
-        const unsigned int           CaseLength;
-        const unsigned int           TrueOffset;
-        const unsigned int           TrueLength;
-        const unsigned int           FalseOffset;
-        const unsigned int           FalseLength;
+        const SizeT                  CaseOffset;
+        const SizeT                  CaseLength;
+        const SizeT                  TrueOffset;
+        const SizeT                  TrueLength;
+        const SizeT                  FalseOffset;
+        const SizeT                  FalseLength;
     };
 
     template <typename Char_T_>
@@ -272,7 +272,7 @@ class Template {
 
         TagBit(TagBit &&tag) noexcept
             : info_(static_cast<QPointer<void> &&>(tag.info_)), offset_(tag.offset_), end_offset_(tag.end_offset_) {
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
             type_ = tag.type_;
 #endif
             tag.setType(TagType::None);
@@ -311,10 +311,10 @@ class Template {
         inline void *GetPointer() const noexcept { return info_.GetPointer(); }
 
         inline TagType GetType() const noexcept {
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
-            return type_;
-#else
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
             return static_cast<TagType>(info_.GetHighTag());
+#else
+            return type_;
 #endif
         }
 
@@ -323,17 +323,17 @@ class Template {
 
       private:
         void setType(TagType type) noexcept {
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
-            type_ = type;
-#else
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
             info_.SetHighTag(static_cast<unsigned char>(type));
+#else
+            type_ = type;
 #endif
         }
 
         QPointer<void> info_{};
         SizeT          offset_{0};
         SizeT          end_offset_{0};
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
         TagType type_{};
 #endif
     };

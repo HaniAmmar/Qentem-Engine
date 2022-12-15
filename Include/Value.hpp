@@ -54,7 +54,7 @@ class Value {
     Value() noexcept : number_{} {}
 
     Value(Value &&val) noexcept : number_{val.number_} {
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
         setType(val.Type());
 #endif
         val.setTypeToUndefined();
@@ -1372,7 +1372,7 @@ class Value {
 
             default: {
                 number_ = val.number_;
-#if !defined(QENTEM_POINTER_TAGGING) || QENTEM_POINTER_TAGGING != 1
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
                 setType(val.Type());
 #endif
             }
@@ -1385,44 +1385,43 @@ class Value {
 
         template <typename Number_T_>
         explicit VNumber(const Number_T_ &num) noexcept : number_{num} {}
-
-        inline void SetNumber(double num) noexcept { number_.d = num; }
-
-        inline void SetNumber(unsigned long long num) noexcept { number_.ull = num; }
-
-        inline void SetNumber(long long num) noexcept { number_.sll = num; }
-
+        inline void               SetNumber(double num) noexcept { number_.d = num; }
+        inline void               SetNumber(unsigned long long num) noexcept { number_.ull = num; }
+        inline void               SetNumber(long long num) noexcept { number_.sll = num; }
         inline unsigned long long GetUInt64() const noexcept { return number_.ull; }
-
-        inline long long GetInt64() const noexcept { return number_.sll; }
-        inline double    GetDouble() const noexcept { return number_.d; }
+        inline long long          GetInt64() const noexcept { return number_.sll; }
+        inline double             GetDouble() const noexcept { return number_.d; }
 
       private:
         union Number_T_ {
-            Number_T_() noexcept : padding_{0} {}
+            Number_T_() = default;
             explicit Number_T_(unsigned long long num) noexcept : ull{num} {}
             explicit Number_T_(long long num) noexcept : sll{num} {}
             explicit Number_T_(double num) noexcept : d{num} {}
 
-            unsigned long long ull;
+            unsigned long long ull{0};
             long long          sll;
             double             d;
-            SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
 #ifndef QENTEM_BIG_ENDIAN
-        Number_T_   number_;
+        Number_T_ number_;
+
+      public:
         const void *padding_{nullptr};
 #else
+      private:
         const void *padding_{nullptr};
-        Number_T_   number_;
+
+      public:
+        Number_T_ number_;
 #endif
     };
 
     struct VType_ {
 #ifndef QENTEM_BIG_ENDIAN
       private:
-        SizeT padding_[2]{0};
+        const void *padding_{nullptr};
 
       public:
         QPointer<void> Value{};
@@ -1431,7 +1430,7 @@ class Value {
         QPointer<void> Value{};
 
       private:
-        SizeT padding_[2]{0};
+        const void *padding_{nullptr};
 #endif
     };
 
