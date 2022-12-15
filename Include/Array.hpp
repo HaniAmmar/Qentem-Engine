@@ -68,6 +68,7 @@ class Array {
         Type_ *storage = Storage();
         Memory::Destruct(storage, End());
         deallocate(storage);
+        clearStorage();
     }
 
     Array &operator=(Array &&src) noexcept {

@@ -75,6 +75,7 @@ class HArray {
         HAItem_T_ *storage = Storage();
         Memory::Destruct(storage, End());
         deallocate(getHashTable());
+        clearStorage();
     }
 
     HArray(HArray &&src) noexcept : index_(src.Size()), capacity_(src.Capacity()) {
