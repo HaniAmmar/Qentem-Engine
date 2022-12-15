@@ -600,7 +600,7 @@ class Template_CV {
 
             switch (tag->GetType()) {
                 case TagType::Variable: {
-                    const SizeT content_offset = tag->Offset() + TemplatePatterns_C_::VariablePrefixLength;
+                    const SizeT content_offset = (tag->Offset() + TemplatePatterns_C_::VariablePrefixLength);
 
                     renderVariable((content + content_offset),
                                    ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
@@ -608,7 +608,7 @@ class Template_CV {
                 }
 
                 case TagType::RawVariable: {
-                    const SizeT content_offset = tag->Offset() + TemplatePatterns_C_::VariablePrefixLength;
+                    const SizeT content_offset = (tag->Offset() + TemplatePatterns_C_::VariablePrefixLength);
 
                     renderRawVariable((content + content_offset),
                                       ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
@@ -616,7 +616,7 @@ class Template_CV {
                 }
 
                 case TagType::Math: {
-                    const SizeT content_offset = tag->Offset() + TemplatePatterns_C_::MathPrefixLength;
+                    const SizeT content_offset = (tag->Offset() + TemplatePatterns_C_::MathPrefixLength);
 
                     renderMath((content + content_offset),
                                ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
@@ -624,48 +624,51 @@ class Template_CV {
                 }
 
                 case TagType::Loop: {
-                    const SizeT content_offset = tag->Offset() + TemplatePatterns_C_::LoopPrefixLength;
-                    LoopInfo_  *loop_info      = static_cast<LoopInfo_ *>(tag->GetPointer());
+                    const SizeT    content_offset = (tag->Offset() + TemplatePatterns_C_::LoopPrefixLength);
+                    const Char_T_ *loop_content   = (content + content_offset);
+                    LoopInfo_     *loop_info      = static_cast<LoopInfo_ *>(tag->GetPointer());
 
-                    if (loop_info != nullptr) { // Cached
-                        renderLoop((content + content_offset), loop_info);
-                    } else {
+                    if (loop_info == nullptr) {
                         generateLoopContent(
-                            (content + content_offset),
-                            ((tag->EndOffset() - TemplatePatterns_C_::LoopSuffixLength) - content_offset), loop_info);
+                            loop_content, ((tag->EndOffset() - TemplatePatterns_C_::LoopSuffixLength) - content_offset),
+                            loop_info);
                         tag->SetInfo(loop_info);
                     }
+
+                    renderLoop(loop_content, loop_info);
 
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    const SizeT    content_offset = tag->Offset() + TemplatePatterns_C_::InLineIfPrefixLength;
-                    InlineIfInfo_ *inline_if_info = static_cast<InlineIfInfo_ *>(tag->GetPointer());
+                    const SizeT    content_offset    = (tag->Offset() + TemplatePatterns_C_::InLineIfPrefixLength);
+                    const Char_T_ *inline_if_content = (content + content_offset);
+                    InlineIfInfo_ *inline_if_info    = static_cast<InlineIfInfo_ *>(tag->GetPointer());
 
-                    if (inline_if_info != nullptr) {
-                        renderInLineIf((content + content_offset), inline_if_info);
-                    } else {
+                    if (inline_if_info == nullptr) {
                         generateInLineIfInfo(
-                            (content + content_offset),
+                            inline_if_content,
                             ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset),
                             inline_if_info);
                         tag->SetInfo(inline_if_info);
                     }
 
+                    renderInLineIf(inline_if_content, inline_if_info);
+
                     break;
                 }
 
                 case TagType::If: {
-                    const SizeT content_offset = tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
-                    IfInfo_    *if_info        = static_cast<IfInfo_ *>(tag->GetPointer());
+                    const SizeT    content_offset  = tag->Offset() + TemplatePatterns_C_::IfPrefixLength;
+                    const Char_T_ *if_info_content = (content + content_offset);
+                    IfInfo_       *if_info         = static_cast<IfInfo_ *>(tag->GetPointer());
 
-                    if (if_info != nullptr) {
-                        renderIf((content + content_offset), if_info);
-                    } else {
-                        generateIfCases((content + content_offset), (tag->EndOffset() - content_offset), if_info);
+                    if (if_info == nullptr) {
+                        generateIfCases(if_info_content, (tag->EndOffset() - content_offset), if_info);
                         tag->SetInfo(if_info);
                     }
+
+                    renderIf(if_info_content, if_info);
 
                     break;
                 }
@@ -830,11 +833,6 @@ class Template_CV {
         const SizeT start_offset =
             Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content, SizeT(0), length);
 
-        if (start_offset == 0) {
-            // The syntax is wrong.
-            return;
-        }
-
         const Char_T_ *loop_value        = nullptr;
         SizeT          loop_value_length = 0;
         SizeT          len               = 0;
@@ -995,8 +993,6 @@ class Template_CV {
                                                     static_cast<Array<TagBit> &&>(sub_tags), set_offset, set_length,
                                                     index_offset, index_length, repeat_offset, repeat_length,
                                                     group_offset, group_length, sort_offset, sort_length);
-
-        renderLoop(content, loop_info);
     }
 
     QENTEM_NOINLINE void renderLoop(const Char_T_ *content, LoopInfo_ *loop_info) const {
@@ -1148,8 +1144,6 @@ class Template_CV {
         inline_if_info = Memory::AllocateInit<InlineIfInfo_>(
             static_cast<Array<TagBit> &&>(true_subtags), static_cast<Array<TagBit> &&>(false_subtags), case_offset,
             case_length, true_offset, true_length, false_offset, false_length);
-
-        renderInLineIf(content, inline_if_info);
     }
 
     QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content, InlineIfInfo_ *inline_if_info) const {
@@ -1227,8 +1221,6 @@ class Template_CV {
 
             case_offset = else_offset;
         }
-
-        renderIf(content, if_info);
     }
 
     static SizeT nextElse(const Char_T_ *content, SizeT offset, SizeT length) noexcept {
