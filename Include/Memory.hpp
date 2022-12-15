@@ -108,55 +108,64 @@ inline static void Swap(Type_ &item1, Type_ &item2) noexcept {
 }
 
 template <typename Type_, typename Number_T_>
-inline static void QuickSortAscend(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
-    Type_    *item  = (arr + start);
-    Number_T_ index = start;
+struct QuickSort {
+  private:
+    inline static void ascendSort(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
+        Type_    *item  = (arr + start);
+        Number_T_ index = start;
 
-    for (Number_T_ x = (start + 1); x < end; x++) {
-        if (!((*(arr + x)) > *item)) {
-            ++index;
-            Swap((*(arr + index)), ((*(arr + x))));
+        for (Number_T_ x = (start + 1); x < end; x++) {
+            if (!((*(arr + x)) > *item)) {
+                ++index;
+                Swap((*(arr + index)), ((*(arr + x))));
+            }
+        }
+
+        Swap((*(arr + index)), (*(arr + start)));
+
+        if (start < end) {
+            ascendSort(arr, start, index);
+            ascendSort(arr, (index + 1), end);
         }
     }
 
-    Swap((*(arr + index)), (*(arr + start)));
+    inline static void descendSort(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
+        Type_    *item  = (arr + start);
+        Number_T_ index = start;
 
-    if (start < end) {
-        QuickSortAscend(arr, start, index);
-        QuickSortAscend(arr, (index + 1), end);
-    }
-}
+        for (Number_T_ x = (start + 1); x < end; x++) {
+            if (!((*(arr + x)) < *item)) {
+                ++index;
+                Swap((*(arr + index)), ((*(arr + x))));
+            }
+        }
 
-template <typename Type_, typename Number_T_>
-inline static void QuickSortDescend(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
-    Type_    *item  = (arr + start);
-    Number_T_ index = start;
+        Swap((*(arr + index)), (*(arr + start)));
 
-    for (Number_T_ x = (start + 1); x < end; x++) {
-        if (!((*(arr + x)) < *item)) {
-            ++index;
-            Swap((*(arr + index)), ((*(arr + x))));
+        if (start < end) {
+            descendSort(arr, start, index);
+            descendSort(arr, (index + 1), end);
         }
     }
 
-    Swap((*(arr + index)), (*(arr + start)));
-
-    if (start < end) {
-        QuickSortDescend(arr, start, index);
-        QuickSortDescend(arr, (index + 1), end);
-    }
-}
-
-template <typename Type_, typename Number_T_>
-inline static void QuickSort(Type_ *arr, Number_T_ start, Number_T_ end, bool ascend) noexcept {
-    if (start < end) {
-        if (ascend) {
-            QuickSortAscend(arr, start, end);
-        } else {
-            QuickSortDescend(arr, start, end);
+  public:
+    inline static void Sort(Type_ *arr, Number_T_ start, Number_T_ end, bool ascend) noexcept {
+        if (start < end) {
+            if (ascend) {
+                ascendSort(arr, start, end);
+            } else {
+                descendSort(arr, start, end);
+            }
         }
     }
-}
+
+    QuickSort()                             = delete;
+    QuickSort(QuickSort &&)                 = delete;
+    QuickSort(const QuickSort &)            = delete;
+    QuickSort &operator=(QuickSort &&)      = delete;
+    QuickSort &operator=(const QuickSort &) = delete;
+    ~QuickSort()                            = delete;
+};
 
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {

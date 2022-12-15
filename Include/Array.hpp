@@ -237,7 +237,7 @@ class Array {
     void Swap(Type_ &item1, Type_ &item2) noexcept { Memory::Swap(item1, item2); }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
-    void Sort(bool ascend = true) noexcept { Memory::QuickSort<Type_, SizeT>(Storage(), 0, Size(), ascend); }
+    void Sort(bool ascend = true) noexcept { Memory::QuickSort<Type_, SizeT>::Sort(Storage(), 0, Size(), ascend); }
 
     void Compress() {
         // Remove excess storage;

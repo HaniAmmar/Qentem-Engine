@@ -412,7 +412,7 @@ class HArray {
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(bool ascend = true) noexcept {
-        Memory::QuickSort<HAItem_T_, SizeT>(Storage(), 0, Size(), ascend);
+        Memory::QuickSort<HAItem_T_, SizeT>::Sort(Storage(), 0, Size(), ascend);
         Memory::SetToZero(getHashTable(), (sizeof(SizeT) * Capacity()));
         generateHash();
     }
