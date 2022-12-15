@@ -308,57 +308,6 @@ class Digit {
         }
     };
 
-    template <typename Number_T_>
-    static bool stringToSignedFloat(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-        number = 0;
-
-        if (length != 0) {
-            if (((length > 1) && ((str[0] == DigitChars::ZeroChar) && (str[1] != DigitChars::DotChar)))) {
-                number = 0;
-                return false; // No leanding zeros.
-            }
-
-            switch (str[0]) {
-                case DigitChars::MinusChar: {
-                    SizeT n_offset = 1;
-                    StringUtils::TrimLeft(str, n_offset, length);
-                    length -= n_offset;
-
-                    if ((length != 0) && stringToSignedFloat(number, &(str[n_offset]), length)) {
-                        number *= -1;
-                        return true;
-                    }
-
-                    break;
-                }
-
-                case DigitChars::PlusChar: {
-                    SizeT offset = 1;
-                    StringUtils::TrimLeft(str, offset, length);
-                    length -= offset;
-
-                    if (length != 0) {
-                        return stringToSignedFloat(number, &(str[offset]), length);
-                    }
-
-                    break;
-                }
-
-                default: {
-                    int exponent = 0;
-
-                    if (parseExponent(exponent, str, length) && stringToFloat(number, exponent, str, length)) {
-                        return true;
-                    }
-                }
-            }
-
-            number = 0;
-        }
-
-        return false;
-    }
-
     QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str, SizeT &length) noexcept {
         SizeT offset = (length - 1);
 
@@ -428,6 +377,57 @@ class Digit {
         }
 
         return true;
+    }
+
+    template <typename Number_T_>
+    static bool stringToSignedFloat(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
+        number = 0;
+
+        if (length != 0) {
+            if (((length > 1) && ((str[0] == DigitChars::ZeroChar) && (str[1] != DigitChars::DotChar)))) {
+                number = 0;
+                return false; // No leanding zeros.
+            }
+
+            switch (str[0]) {
+                case DigitChars::MinusChar: {
+                    SizeT n_offset = 1;
+                    StringUtils::TrimLeft(str, n_offset, length);
+                    length -= n_offset;
+
+                    if ((length != 0) && stringToSignedFloat(number, &(str[n_offset]), length)) {
+                        number *= -1;
+                        return true;
+                    }
+
+                    break;
+                }
+
+                case DigitChars::PlusChar: {
+                    SizeT offset = 1;
+                    StringUtils::TrimLeft(str, offset, length);
+                    length -= offset;
+
+                    if (length != 0) {
+                        return stringToSignedFloat(number, &(str[offset]), length);
+                    }
+
+                    break;
+                }
+
+                default: {
+                    int exponent = 0;
+
+                    if (parseExponent(exponent, str, length) && stringToFloat(number, exponent, str, length)) {
+                        return true;
+                    }
+                }
+            }
+
+            number = 0;
+        }
+
+        return false;
     }
 
     template <typename Number_T_>
