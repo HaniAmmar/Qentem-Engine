@@ -41,6 +41,9 @@ class ALEBasicHelper;
 template <typename>
 class ALEExpressions;
 
+template <typename, typename>
+class ALESub;
+
 class ALE {
   public:
     ALE()                       = delete;
@@ -69,10 +72,10 @@ class ALE {
         LessOrEqual,    // <=
         Bigger,         // >
         Less,           // <
-        Subtraction,    // -
         Addition,       // +
-        Division,       // /
+        Subtraction,    // -
         Multiplication, // *
+        Division,       // /
         Remainder,      // %
         Exponent,       // ^
         Error           // X
@@ -80,18 +83,17 @@ class ALE {
 
     template <typename Char_T_, typename Helper_T_>
     static bool Evaluate(double &number, const Char_T_ *content, SizeT length, const Helper_T_ *callback) noexcept {
-        Number     num;
-        Expression current_exp = Expression::None;
-        SizeT      offset      = 0;
+        const ALESub<Char_T_, Helper_T_> ale_sub = ALESub<Char_T_, Helper_T_>(callback, content);
 
-        const bool result = parse(current_exp, num, content, offset, length, callback);
-        number            = num.Number;
+        Number num;
 
-        if (!result) {
-            number = 0;
+        if (ale_sub.Parse(num, 0, length)) {
+            number = num.Number;
+            return true;
         }
 
-        return result;
+        number = 0;
+        return false;
     }
 
     template <typename Char_T_, typename Helper_T_>
@@ -140,211 +142,344 @@ class ALE {
 
   private:
     template <typename Char_T_, typename Helper_T_>
-    static bool parse(Expression &current_exp, Number &left, const Char_T_ *content, SizeT &offset,
-                      const SizeT end_offset, const Helper_T_ *callback) noexcept {
-        Number     right;
-        SizeT      previous_offset = offset;
-        Expression exp_weight;
-        Expression exp             = nextExpression(exp_weight, content, offset, end_offset);
-        bool       left_evaluated  = false;
-        bool       right_evaluated = false;
+    struct ALESub {
+        ALESub(const Helper_T_ *helper, const Char_T_ *content) noexcept : helper_(helper), content_(content) {}
 
-        if (getNumber(left, content, previous_offset, (offset - previous_offset), callback, exp)) {
-            advance(exp, offset);
-            previous_offset = offset;
+        bool Parse(Number &number, SizeT offset, const SizeT length) const noexcept {
+            SizeT      num_offset    = offset;
+            Expression expr          = getExpression(offset, length);
+            Expression previous_expr = Expression::None;
+            return SubParse(number, offset, num_offset, length, expr, previous_expr);
+        }
 
-            while (offset < end_offset) {
-                Expression       next_exp_weight;
-                const Expression next_exp = nextExpression(next_exp_weight, content, offset, end_offset);
+        bool SubParse(Number &left, SizeT &offset, SizeT num_offset, const SizeT length, Expression &expr,
+                      Expression previous_expr) const noexcept {
+            Number     right;
+            Expression next_expr;
+            bool       left_evaluated  = false;
+            bool       right_evaluated = false;
 
-                if (next_exp_weight > exp_weight) {
-                    Expression tmp_exp = exp;
-                    right_evaluated    = (exp_weight == Expression::Equal);
+            if ((expr != Expression::Error) &&
+                getNumber(left, num_offset, (offset - num_offset), left_evaluated, expr)) {
+                while (offset < length) {
+                    advance(expr, offset);
+                    num_offset = offset;
+                    next_expr  = getExpression(offset, length);
 
-                    if (parse(tmp_exp, right, content, previous_offset, end_offset, callback) &&
-                        process(content, left, right, left_evaluated, right_evaluated, exp, callback)) {
-                        exp            = tmp_exp;
-                        offset         = previous_offset;
-                        left_evaluated = true;
-                        continue;
+                    if (expr >= next_expr) {
+                        if (!getNumber(right, num_offset, (offset - num_offset), right_evaluated, expr) ||
+                            !process(left, right, left_evaluated, right_evaluated, expr)) {
+                            return false;
+                        }
+
+                        expr = next_expr;
+
+                        if (previous_expr >= next_expr) {
+                            break;
+                        }
+                    } else {
+                        if (!SubParse(right, offset, num_offset, length, next_expr, expr) ||
+                            !process(left, right, left_evaluated, true, expr)) {
+                            return false;
+                        }
+
+                        expr = next_expr;
                     }
-                } else if (getNumber(right, content, previous_offset, (offset - previous_offset), callback, exp) &&
-                           process(content, left, right, left_evaluated, right_evaluated, exp, callback)) {
-                    advance(next_exp, offset);
-
-                    if (next_exp_weight < current_exp) {
-                        current_exp = next_exp;
-                        return true;
-                    }
-
-                    exp             = next_exp;
-                    exp_weight      = next_exp_weight;
-                    previous_offset = offset;
-                    left_evaluated  = true;
-                    continue;
                 }
 
-                return false;
+                return true;
             }
 
-            return (exp == Expression::None);
+            return false;
         }
 
-        return false;
-    }
+        bool getNumber(Number &val, SizeT offset, SizeT length, bool &evaluated, const Expression expr) const noexcept {
+            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
-    static void advance(Expression exp, SizeT &offset) {
-        ++offset;
+            StringUtils::Trim(content_, offset, length);
 
-        if ((exp >= Expression::Or) && (exp <= Expression::LessOrEqual)) {
-            ++offset;
-        }
-    }
+            if ((expr == Expression::Equal) || (expr == Expression::NotEqual)) {
+                val.Content.Offset = offset;
+                val.Content.Length = length;
+                evaluated          = false;
+                return true;
+            }
 
-    template <typename Char_T_>
-    static Expression nextExpression(Expression &weight, const Char_T_ *content, SizeT &offset,
-                                     const SizeT end_offset) noexcept {
-        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+            evaluated = true;
 
-        while (offset < end_offset) {
-            switch (content[offset]) {
-                case ALEExpressions_T_::OrExp: { // ||
-                    if (content[(offset + 1)] == ALEExpressions_T_::OrExp) {
-                        weight = Expression::And;
-                        return Expression::Or;
-                    }
-
-                    weight = Expression::None;
-                    return Expression::Error;
-                }
-
-                case ALEExpressions_T_::AndExp: { // &&
-                    if (content[(offset + 1)] == ALEExpressions_T_::AndExp) {
-                        weight = Expression::And;
-                        return Expression::And;
-                    }
-
-                    weight = Expression::None;
-                    return Expression::Error;
-                }
-
-                case ALEExpressions_T_::BiggerExp: { // > or >=
-                    weight = Expression::BiggerOrEqual;
-
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
-                        return Expression::BiggerOrEqual;
-                    }
-
-                    return Expression::Bigger;
-                }
-
-                case ALEExpressions_T_::LessExp: { // < or <=
-                    weight = Expression::LessOrEqual;
-
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
-                        return Expression::LessOrEqual;
-                    }
-
-                    return Expression::Less;
-                }
-
-                case ALEExpressions_T_::NotExp: { // !=
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
-                        weight = Expression::Equal;
-                        return Expression::NotEqual;
-                    }
-
-                    weight = Expression::None;
-                    return Expression::Error;
-                }
-
-                case ALEExpressions_T_::EqualExp: { // ==
-                    if (content[(offset + 1)] == ALEExpressions_T_::EqualExp) {
-                        weight = Expression::Equal;
-                        return Expression::Equal;
-                    }
-
-                    weight = Expression::None;
-                    return Expression::Error;
-                }
-
-                case ALEExpressions_T_::SubtractExp: {
-                    if (isExpression(content, offset)) {
-                        weight = Expression::Addition;
-                        return Expression::Subtraction;
-                    }
-
-                    break;
-                }
-
-                case ALEExpressions_T_::AddExp: {
-                    if (isExpression(content, offset)) {
-                        weight = Expression::Addition;
-                        return Expression::Addition;
-                    }
-
-                    break;
-                }
-
-                case ALEExpressions_T_::DivideExp: {
-                    weight = Expression::Multiplication;
-                    return Expression::Division;
-                }
-
-                case ALEExpressions_T_::MultipleExp: {
-                    weight = Expression::Multiplication;
-                    return Expression::Multiplication;
-                }
-
-                case ALEExpressions_T_::RemainderExp: {
-                    weight = Expression::Remainder;
-                    return Expression::Remainder;
-                }
-
-                case ALEExpressions_T_::ExponentExp: {
-                    weight = Expression::Exponent;
-                    return Expression::Exponent;
-                }
-
+            switch (content_[offset]) {
                 case ALEExpressions_T_::ParenthesStart: {
-                    // (...) are evaluated to numbers.
+                    // getExpression check for closed parenthes, so "length" will never go over the actual length.
+                    length += offset;
+                    ++offset; // passing (
+                    --length; // before )
 
-                    ++offset;
-                    offset = Engine::SkipInnerPatterns<Char_T_>(ALEExpressions_T_::ParenthesStart,
-                                                                ALEExpressions_T_::ParenthesEnd, content, offset,
-                                                                end_offset);
-
-                    if (offset != 0) {
-                        continue;
-                    }
-
-                    offset = end_offset;
-                    weight = Expression::None;
-                    return Expression::Error;
+                    return Parse(val, offset, length);
                 }
 
                 case ALEExpressions_T_::BracketStart: {
-                    // {...} are evaluated by callback to a number or
-                    // string.
+                    return (helper_->ALESetNumber(val.Number, (content_ + offset), length));
+                }
 
-                    ++offset;
-                    offset = Engine::FindOne<Char_T_>(ALEExpressions_T_::BracketEnd, content, offset, end_offset);
+                default: {
+                    return (Digit<Char_T_>::StringToNumber(val.Number, (content_ + offset), length));
+                }
+            }
+        }
 
-                    if (offset != 0) {
-                        continue;
+        bool process(Number &left, Number right, bool left_evaluated, bool right_evaluated,
+                     Expression expr) const noexcept {
+            switch (expr) {
+                case Expression::Exponent: { // ^
+                    if (right.Number != 0.0) {
+                        // TODO: Needs more work to evaluate fractions
+                        if (left.Number != 0.0) {
+                            const bool neg = (right.Number < 0);
+
+                            if (neg) {
+                                right.Number *= -1;
+                            }
+
+                            if (right.Number < 1) {
+                                return false;
+                            }
+
+                            unsigned int times = static_cast<unsigned int>(right.Number);
+                            const double num   = left.Number;
+
+                            while (--times != 0) {
+                                left.Number *= num;
+                            }
+
+                            if (neg) {
+                                left.Number = (1 / left.Number);
+                            }
+                        }
+
+                        break;
                     }
 
-                    offset = end_offset;
-                    weight = Expression::None;
-                    return Expression::Error;
+                    left.Number = 1;
+                    break;
+                }
+
+                case Expression::Remainder: { // %
+                    left.Number = static_cast<double>(static_cast<unsigned long long>(left.Number) %
+                                                      static_cast<unsigned long long>(right.Number));
+                    break;
+                }
+
+                case Expression::Multiplication: { // *
+                    left.Number *= right.Number;
+                    break;
+                }
+
+                case Expression::Division: { // /
+                    if (right.Number != 0.0) {
+                        left.Number /= right.Number;
+                        break;
+                    }
+
+                    return false;
+                }
+
+                case Expression::Addition: { // +
+                    left.Number += right.Number;
+                    break;
+                }
+
+                case Expression::Subtraction: { // -
+                    left.Number -= right.Number;
+                    break;
+                }
+
+                case Expression::Less: { // <
+                    left.Number = (left.Number < right.Number) ? 1 : 0;
+                    break;
+                }
+
+                case Expression::LessOrEqual: { // <=
+                    left.Number = (left.Number <= right.Number) ? 1 : 0;
+                    break;
+                }
+
+                case Expression::Bigger: { // >
+                    left.Number = (left.Number > right.Number) ? 1 : 0;
+                    break;
+                }
+
+                case Expression::BiggerOrEqual: { // >=
+                    left.Number = (left.Number >= right.Number) ? 1 : 0;
+                    break;
+                }
+
+                case Expression::And: { // &&
+                    left.Number = ((left.Number > 0) && (right.Number > 0)) ? 1 : 0;
+                    break;
+                }
+
+                case Expression::Or: { // ||
+                    left.Number = ((left.Number > 0) || (right.Number > 0)) ? 1 : 0;
+                    break;
+                }
+
+                case Expression::Equal:      // ==
+                case Expression::NotEqual: { // !=
+                    bool is_equal;
+
+                    if (helper_->ALEIsEqual(is_equal, content_, left, right, left_evaluated, right_evaluated)) {
+                        if (expr == Expression::Equal) {
+                            left.Number = (is_equal ? 1 : 0);
+                        } else {
+                            left.Number = (is_equal ? 0 : 1);
+                        }
+
+                        break;
+                    }
+
+                    return false;
+                }
+
+                default: {
                 }
             }
 
-            ++offset;
+            return true;
         }
 
-        weight = Expression::None;
-        return Expression::None;
+        Expression getExpression(SizeT &offset, const SizeT length) const noexcept {
+            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+
+            while (offset < length) {
+                switch (content_[offset]) {
+                    case ALEExpressions_T_::OrExp: { // ||
+                        if (content_[(offset + 1)] == ALEExpressions_T_::OrExp) {
+                            return Expression::Or;
+                        }
+
+                        return Expression::Error;
+                    }
+
+                    case ALEExpressions_T_::AndExp: { // &&
+                        if (content_[(offset + 1)] == ALEExpressions_T_::AndExp) {
+                            return Expression::And;
+                        }
+
+                        return Expression::Error;
+                    }
+
+                    case ALEExpressions_T_::BiggerExp: { // > or >=
+                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                            return Expression::BiggerOrEqual;
+                        }
+
+                        return Expression::Bigger;
+                    }
+
+                    case ALEExpressions_T_::LessExp: { // < or <=
+                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                            return Expression::LessOrEqual;
+                        }
+
+                        return Expression::Less;
+                    }
+
+                    case ALEExpressions_T_::NotExp: { // !=
+                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                            return Expression::NotEqual;
+                        }
+
+                        return Expression::Error;
+                    }
+
+                    case ALEExpressions_T_::EqualExp: { // ==
+                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                            return Expression::Equal;
+                        }
+
+                        return Expression::Error;
+                    }
+
+                    case ALEExpressions_T_::SubtractExp: {
+                        if (isExpression(content_, offset)) {
+                            return Expression::Subtraction;
+                        }
+
+                        break;
+                    }
+
+                    case ALEExpressions_T_::AddExp: {
+                        if (isExpression(content_, offset)) {
+                            return Expression::Addition;
+                        }
+
+                        break;
+                    }
+
+                    case ALEExpressions_T_::DivideExp: {
+                        return Expression::Division;
+                    }
+
+                    case ALEExpressions_T_::MultipleExp: {
+                        return Expression::Multiplication;
+                    }
+
+                    case ALEExpressions_T_::RemainderExp: {
+                        return Expression::Remainder;
+                    }
+
+                    case ALEExpressions_T_::ExponentExp: {
+                        return Expression::Exponent;
+                    }
+
+                    case ALEExpressions_T_::ParenthesStart: {
+                        // (...) are evaluated to numbers.
+
+                        ++offset;
+                        offset = Engine::SkipInnerPatterns<Char_T_>(ALEExpressions_T_::ParenthesStart,
+                                                                    ALEExpressions_T_::ParenthesEnd, content_, offset,
+                                                                    length);
+
+                        if (offset != 0) {
+                            continue;
+                        }
+
+                        return Expression::Error;
+                    }
+
+                    case ALEExpressions_T_::BracketStart: {
+                        // {...} are evaluated by callback to a number or
+                        // string.
+
+                        ++offset;
+                        offset = Engine::FindOne<Char_T_>(ALEExpressions_T_::BracketEnd, content_, offset, length);
+
+                        if (offset != 0) {
+                            continue;
+                        }
+
+                        offset = length;
+                        return Expression::Error;
+                    }
+                }
+
+                ++offset;
+            }
+
+            return Expression::None;
+        }
+
+      private:
+        const Helper_T_ *helper_;
+        const Char_T_   *content_;
+    };
+
+    inline static void advance(Expression expr, SizeT &offset) {
+        ++offset;
+
+        if ((expr >= Expression::Or) && (expr <= Expression::LessOrEqual)) {
+            ++offset;
+        }
     }
 
     template <typename Char_T_>
@@ -374,164 +509,6 @@ class ALE {
         }
 
         return false;
-    }
-
-    template <typename Char_T_, typename Helper_T_>
-    static bool getNumber(Number &val, const Char_T_ *content, SizeT offset, SizeT length, const Helper_T_ *callback,
-                          Expression exp) noexcept {
-        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
-
-        if (exp == Expression::Error) {
-            return false;
-        }
-
-        StringUtils::Trim(content, offset, length);
-
-        if ((exp == Expression::Equal) || (exp == Expression::NotEqual)) {
-            val.Content.Offset = static_cast<SizeT>(offset);
-            val.Content.Length = static_cast<SizeT>(length);
-            return true;
-        }
-
-        switch (content[offset]) {
-            case ALEExpressions_T_::ParenthesStart: {
-                length += offset;
-                ++offset;
-                --length;
-
-                Expression current_exp = Expression::None;
-                return parse(current_exp, val, content, offset, length, callback);
-            }
-
-            case ALEExpressions_T_::BracketStart: {
-                return (callback->ALESetNumber(val.Number, (content + offset), length));
-            }
-
-            default: {
-                return (Digit<Char_T_>::StringToNumber(val.Number, (content + offset), length));
-            }
-        }
-    }
-
-    template <typename Char_T_, typename Helper_T_>
-    static bool process(const Char_T_ *content, Number &left, Number right, bool left_evaluated, bool right_evaluated,
-                        Expression exp, const Helper_T_ *callback) noexcept {
-        switch (exp) {
-            case Expression::Exponent: { // ^
-                if (right.Number != 0.0) {
-                    // NOTE: Needs more work to evaluate fractions
-                    if (left.Number != 0.0) {
-                        const bool neg = (right.Number < 0);
-
-                        if (neg) {
-                            right.Number *= -1;
-                        }
-
-                        if (right.Number < 1) {
-                            return false;
-                        }
-
-                        unsigned int times = static_cast<unsigned int>(right.Number);
-                        const double num   = left.Number;
-
-                        while (--times != 0) {
-                            left.Number *= num;
-                        }
-
-                        if (neg) {
-                            left.Number = (1 / left.Number);
-                        }
-                    }
-
-                    break;
-                }
-
-                left.Number = 1;
-                break;
-            }
-
-            case Expression::Remainder: { // %
-                left.Number = static_cast<double>(static_cast<unsigned long long>(left.Number) %
-                                                  static_cast<unsigned long long>(right.Number));
-                break;
-            }
-
-            case Expression::Multiplication: { // *
-                left.Number *= right.Number;
-                break;
-            }
-
-            case Expression::Division: { // /
-                if (right.Number != 0.0) {
-                    left.Number /= right.Number;
-                    break;
-                }
-
-                return false;
-            }
-
-            case Expression::Addition: { // +
-                left.Number += right.Number;
-                break;
-            }
-
-            case Expression::Subtraction: { // -
-                left.Number -= right.Number;
-                break;
-            }
-
-            case Expression::Less: { // <
-                left.Number = (left.Number < right.Number) ? 1 : 0;
-                break;
-            }
-
-            case Expression::LessOrEqual: { // <=
-                left.Number = (left.Number <= right.Number) ? 1 : 0;
-                break;
-            }
-
-            case Expression::Bigger: { // >
-                left.Number = (left.Number > right.Number) ? 1 : 0;
-                break;
-            }
-
-            case Expression::BiggerOrEqual: { // >=
-                left.Number = (left.Number >= right.Number) ? 1 : 0;
-                break;
-            }
-
-            case Expression::And: { // &&
-                left.Number = ((left.Number > 0) && (right.Number > 0)) ? 1 : 0;
-                break;
-            }
-
-            case Expression::Or: { // ||
-                left.Number = ((left.Number > 0) || (right.Number > 0)) ? 1 : 0;
-                break;
-            }
-
-            case Expression::Equal:      // ==
-            case Expression::NotEqual: { // !=
-                bool is_equal;
-
-                if (callback->ALEIsEqual(is_equal, content, left, right, left_evaluated, right_evaluated)) {
-                    if (exp == Expression::Equal) {
-                        left.Number = (is_equal ? 1 : 0);
-                    } else {
-                        left.Number = (is_equal ? 0 : 1);
-                    }
-
-                    break;
-                }
-
-                return false;
-            }
-
-            default: {
-            }
-        }
-
-        return true;
     }
 };
 
