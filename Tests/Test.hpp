@@ -84,28 +84,31 @@ static void PrintInfo() {
     TestHelper::Stream() << QENTEM_OUTPUT_START_COLOR_MAIN << "Configuration" << QENTEM_OUTPUT_END_COLOR << '\n';
 
 #ifdef QENTEM_64BIT_ARCH
-    TestHelper::Stream() << "Arch: 64BIT";
+    TestHelper::Stream() << "Arch: 64BIT\n";
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    TestHelper::Stream() << "\nTagged Pointers: On\n";
+    TestHelper::Stream() << "Tagged Pointers: On\n";
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+    TestHelper::Stream() << "Short string optimization: On\n";
+#endif
 #endif
 #endif
 
     TestHelper::Stream() << "Endianness: ";
 
 #ifndef QENTEM_BIG_ENDIAN
-    TestHelper::Stream() << "Little-endian";
+    TestHelper::Stream() << "Little-endian\n";
 #else
-    TestHelper::Stream() << "Big-endian";
+    TestHelper::Stream() << "Big-endian\n";
 #endif
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-    TestHelper::Stream() << "\nAVX2: On";
+    TestHelper::Stream() << "AVX2: On\n";
 #endif
 #if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-    TestHelper::Stream() << "\nSSE2: On";
+    TestHelper::Stream() << "SSE2: On\n";
 #endif
 
-    TestHelper::Stream() << "\nSize of SizeT: " << sizeof(Qentem::SizeT) << "\n\n";
+    TestHelper::Stream() << "Size of SizeT: " << sizeof(Qentem::SizeT) << "\n\n";
 }
 } // namespace Test
 } // namespace Qentem
