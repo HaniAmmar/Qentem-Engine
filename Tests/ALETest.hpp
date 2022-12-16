@@ -2897,6 +2897,10 @@ static int TestALE11() {
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 1, "number");
 
+    content = "10==2+2*2^2";
+    number  = ALE::Evaluate(content);
+    EQ_VALUE(number, 1, "number");
+
     content = R"(2  * 1 * 3 + 1 - 4 + (10 - 5 - 6 + 1 + 1 + 1 + 1) * (8 / 4 + 1) -1 - -1 + 2 == 14)";
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 1, "number");
