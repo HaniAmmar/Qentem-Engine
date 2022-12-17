@@ -298,6 +298,18 @@ static int TestEngine2() {
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     EQ_VALUE(ret, 3, "return");
 
+    ret = Engine::FindOne('1', "00000001", 0u, 8u);
+    EQ_VALUE(ret, 8u, "return");
+
+    ret = Engine::FindOne('1', "0000000000000001", 0u, 16u);
+    EQ_VALUE(ret, 16u, "return");
+
+    ret = Engine::FindOne('1', "00000000000000000000000000000001", 0u, 32u);
+    EQ_VALUE(ret, 32u, "return");
+
+    ret = Engine::FindOne('1', "0000000000000000000000000000000000000000000000000000000000000001", 0u, 64u);
+    EQ_VALUE(ret, 64u, "return");
+
     END_SUB_TEST;
 }
 
