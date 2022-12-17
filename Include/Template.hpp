@@ -948,7 +948,11 @@ class Template_CV {
 
         if (loop_value != nullptr) {
             while (true) {
-                offset = Engine::Find<Char_T_>(loop_value, loop_value_length, content, previous_offset, length);
+                if (loop_value_length > 1u) {
+                    offset = Engine::Find<Char_T_>(loop_value, loop_value_length, content, previous_offset, length);
+                } else {
+                    offset = Engine::FindOne<Char_T_>(*loop_value, content, previous_offset, length);
+                }
 
                 if (offset == 0) {
                     break;
