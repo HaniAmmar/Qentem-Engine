@@ -288,28 +288,25 @@ static int TestArray3() {
     const char *str2_cstr = str2.First();
 
     strings += static_cast<String<char> &&>(str1);
-    String<char> *storage_str = strings.Storage();
 
-    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
+    EQ_TO(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
 
     strings.Insert(static_cast<String<char> &&>(str2));
-    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
+    EQ_TO(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
 
     strings += str1;
-    NOT_EQ_TO(storage_str[2].First(), str1_cstr, "storage_str[2].First()", "str1_cstr");
+    NOT_EQ_TO(strings.Storage()[2].First(), str1_cstr, "storage_str[2].First()", "str1_cstr");
 
     strings.Insert(str2);
-    NOT_EQ_TO(storage_str[3].First(), str2_cstr, "storage_str[3].First()", "str2_cstr");
+    NOT_EQ_TO(strings.Storage()[3].First(), str2_cstr, "storage_str[3].First()", "str2_cstr");
 
     // Checking move after expanding.
     for (SizeT i = 0; i < 16; i++) {
         strings += String<char>("");
     }
 
-    storage_str = strings.Storage();
-    EQ_TO(storage_str[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
-
-    EQ_TO(storage_str[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
+    EQ_TO(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
+    EQ_TO(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
 
     END_SUB_TEST;
 }

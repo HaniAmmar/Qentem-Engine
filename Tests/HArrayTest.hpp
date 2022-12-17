@@ -213,7 +213,7 @@ static int TestHArray2() {
     NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
     NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
     NOT_EQ_TO(numbers1.GetKey(6), numbers2.GetKey(6), "numbers1.GetKey(6)", "numbers2.GetKey(6)");
-    NOT_EQ_TO(key->First(), str_c, "str_c", "GetKey(6)->First()");
+    NOT_EQ_TO(numbers2.GetKey(6)->First(), str_c, "str_c", "GetKey(6)->First()");
 
     numbers2 = static_cast<HashArray &&>(numbers1);
     EQ_VALUE(numbers1.Size(), 0, "Size");
