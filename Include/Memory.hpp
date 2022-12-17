@@ -111,38 +111,38 @@ template <typename Type_, typename Number_T_>
 struct QuickSort {
   private:
     inline static void ascendSort(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
-        Type_    *item  = (arr + start);
-        Number_T_ index = start;
-
-        for (Number_T_ x = (start + 1); x < end; x++) {
-            if (!((*(arr + x)) > *item)) {
-                ++index;
-                Swap((*(arr + index)), ((*(arr + x))));
-            }
-        }
-
-        Swap((*(arr + index)), (*(arr + start)));
-
         if (start < end) {
+            Type_    *item  = (arr + start);
+            Number_T_ index = start;
+
+            for (Number_T_ x = (start + 1); x < end; x++) {
+                if (!((*(arr + x)) > *item)) {
+                    ++index;
+                    Swap((*(arr + index)), ((*(arr + x))));
+                }
+            }
+
+            Swap((*(arr + index)), (*(arr + start)));
+
             ascendSort(arr, start, index);
             ascendSort(arr, (index + 1), end);
         }
     }
 
     inline static void descendSort(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
-        Type_    *item  = (arr + start);
-        Number_T_ index = start;
-
-        for (Number_T_ x = (start + 1); x < end; x++) {
-            if (!((*(arr + x)) < *item)) {
-                ++index;
-                Swap((*(arr + index)), ((*(arr + x))));
-            }
-        }
-
-        Swap((*(arr + index)), (*(arr + start)));
-
         if (start < end) {
+            Type_    *item  = (arr + start);
+            Number_T_ index = start;
+
+            for (Number_T_ x = (start + 1); x < end; x++) {
+                if (!((*(arr + x)) < *item)) {
+                    ++index;
+                    Swap((*(arr + index)), ((*(arr + x))));
+                }
+            }
+
+            Swap((*(arr + index)), (*(arr + start)));
+
             descendSort(arr, start, index);
             descendSort(arr, (index + 1), end);
         }
@@ -150,12 +150,10 @@ struct QuickSort {
 
   public:
     inline static void Sort(Type_ *arr, Number_T_ start, Number_T_ end, bool ascend) noexcept {
-        if (start < end) {
-            if (ascend) {
-                ascendSort(arr, start, end);
-            } else {
-                descendSort(arr, start, end);
-            }
+        if (ascend) {
+            ascendSort(arr, start, end);
+        } else {
+            descendSort(arr, start, end);
         }
     }
 
