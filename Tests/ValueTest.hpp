@@ -705,7 +705,6 @@ static int TestNumberValue4() {
     EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
     EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
     EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
     EQ_VALUE(double_var, -10.5, "double_var");
     EQ_VALUE(long_var, -10, "long_var");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
@@ -735,7 +734,6 @@ static int TestNumberValue4() {
     EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
     EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
     EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
     EQ_VALUE(double_var, -10, "double_var");
     EQ_VALUE(long_var, -10, "long_var");
     value1.Reset();
@@ -761,7 +759,6 @@ static int TestNumberValue4() {
     EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
     EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
     EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
     EQ_VALUE(double_var, -10.5, "double_var");
     EQ_VALUE(long_var, -10, "long_var");
     value1.Reset();
@@ -791,7 +788,6 @@ static int TestNumberValue4() {
     EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
     EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
     EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
     EQ_VALUE(double_var, -10, "double_var");
     EQ_VALUE(long_var, -10, "long_var");
     EQ_TRUE(value1.SetString(str_var), "SetString()");
