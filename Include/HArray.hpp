@@ -66,7 +66,7 @@ class HArray {
 
     explicit HArray(SizeT size) {
         if (size != 0) {
-            setCapacity(algineSize(size));
+            setCapacity(aligneSize(size));
             allocate();
         }
     }
@@ -117,7 +117,7 @@ class HArray {
         const HAItem_T_ *end    = (item + src.Size());
 
         if (n_size > Capacity()) {
-            resize(algineSize(n_size));
+            resize(aligneSize(n_size));
         }
 
         while (item != end) {
@@ -149,7 +149,7 @@ class HArray {
         const HAItem_T_ *end    = item + src.Size();
 
         if (n_size > Capacity()) {
-            resize(algineSize(n_size));
+            resize(aligneSize(n_size));
         }
 
         while (item != end) {
@@ -375,7 +375,7 @@ class HArray {
         }
 
         if (size != 0) {
-            setCapacity(algineSize(size));
+            setCapacity(aligneSize(size));
             allocate();
         }
     }
@@ -401,7 +401,7 @@ class HArray {
             setSize(new_size);
         }
 
-        new_size = algineSize(new_size);
+        new_size = aligneSize(new_size);
         resize(new_size);
     }
 
@@ -419,7 +419,7 @@ class HArray {
         if (size == 0) {
             Reset();
         } else {
-            const SizeT n_cap = algineSize(size);
+            const SizeT n_cap = aligneSize(size);
 
             if ((size < Size()) || (n_cap < Capacity())) {
                 resize(n_cap);
@@ -480,10 +480,10 @@ class HArray {
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
-    void grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 1)); }
+    void grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
 
-    SizeT algineSize(SizeT n_size) noexcept {
-        const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
+    SizeT aligneSize(SizeT n_size) noexcept {
+        const SizeT size = (SizeT{1U} << Platform::CLZ((n_size != 1) ? n_size : 2U));
 
         if (size < n_size) {
             return (size << 1U);
@@ -545,7 +545,7 @@ class HArray {
             const HAItem_T_ *src_item = src.First();
             const HAItem_T_ *end      = (src_item + src.Size());
 
-            setCapacity(algineSize(src.Size()));
+            setCapacity(aligneSize(src.Size()));
 
             HAItem_T_       *des_item = allocate();
             const HAItem_T_ *des_src  = des_item;
