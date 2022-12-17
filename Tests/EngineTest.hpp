@@ -45,36 +45,32 @@ static int TestEngine1() {
     content     = "A";
     content_len = 1;
     find_       = "A";
-    find_len    = 1;
 
     ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
     EQ_VALUE(ret, 1, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 1, "return");
-
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
     EQ_VALUE(ret, 0, "return");
 
     content     = "AAAAA";
     content_len = 5;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
     EQ_VALUE(ret, 2, "return");
 
-    ret = Engine::Find(find_, find_len, content, content_len, content_len);
+    ret = Engine::FindOne(*find_, content, content_len, content_len);
     EQ_VALUE(ret, 0, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
     EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
     EQ_VALUE(ret, 4, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{4}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
     EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
     EQ_VALUE(ret, 0, "return");
 
     content     = "  A A        A";
@@ -92,22 +88,22 @@ static int TestEngine1() {
     ret = Engine::FindOne(*find_, content, SizeT{7}, content_len);
     EQ_VALUE(ret, 14, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
     EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
     EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
     EQ_VALUE(ret, 3, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
     EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{4}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
     EQ_VALUE(ret, 5, "return");
 
-    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
     EQ_VALUE(ret, 14, "return");
 
     content     = "A";
