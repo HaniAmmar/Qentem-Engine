@@ -89,14 +89,13 @@ class Digit {
      * number of digits is less than "mini"
      */
     template <typename Number_T_>
-    inline static String<Char_T_> NumberToString(Number_T_ number, unsigned int min = 1) noexcept {
+    inline static String<Char_T_> NumberToString(Number_T_ number, unsigned int min = 1) {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
         return NumberToStringHelper<Number_T_, is_unsigned>::NumberToString(number, min);
     }
 
     template <typename Number_T_>
-    inline static void NumberToStringStream(StringStream<Char_T_> &ss, Number_T_ number,
-                                            unsigned int min = 1) noexcept {
+    inline static void NumberToStringStream(StringStream<Char_T_> &ss, Number_T_ number, unsigned int min = 1) {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
         NumberToStringStreamHelper<Number_T_, is_unsigned>::NumberToStringStream(ss, number, min);
     }

@@ -301,6 +301,9 @@ class JSONParser {
 
                             offset = length;
                         }
+
+                        default: {
+                        }
                     }
 
                     ++offset;

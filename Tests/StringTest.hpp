@@ -384,7 +384,7 @@ static int TestString2() {
         const unsigned int max = 8;
         unsigned int       index{0};
 
-        void operator<<(const char *c) {
+        void operator<<(const char *c) noexcept {
             while (index < max) {
                 str[index] = *c;
                 ++index;

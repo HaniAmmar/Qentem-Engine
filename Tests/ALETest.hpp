@@ -45,7 +45,7 @@ class ALEHelper {
         SizeT       StrLength;
     };
 
-    static Array<Value_T_> &GetItems() noexcept {
+    static Array<Value_T_> &GetItems() {
         static Array<Value_T_> items;
 
         if (items.IsEmpty()) {
@@ -60,7 +60,7 @@ class ALEHelper {
         return items;
     }
 
-    static bool FindItem(const Value_T_ *&item, const char *content, SizeT length) noexcept {
+    static bool FindItem(const Value_T_ *&item, const char *content, SizeT length) {
         static const Array<Value_T_> &items = GetItems();
 
         for (SizeT i = 0; i < items.Size(); i++) {

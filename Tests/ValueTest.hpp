@@ -34,7 +34,7 @@ using VStringStream = StringStream<char>;
 using VHArray       = HArray<ValueC, char>;
 using VArray        = Array<ValueC>;
 
-static const char *GetStingOfType(ValueType type) {
+static const char *GetStingOfType(ValueType type) noexcept {
     switch (type) {
         case ValueType::Object:
             return "Object";
@@ -437,7 +437,7 @@ static int TestNumberValue1() {
     EQ_VALUE(value2.GetNumber(), 1213, "GetNumber()");
 
     value2 = 10;
-    value2 = double(785);
+    value2 = double{785};
     EQ_VALUE(value2.GetNumber(), 785, "GetNumber()");
 
     value2 = vu_int{0};
@@ -5579,13 +5579,13 @@ static int TestGroupValue() {
     value.Reset();
     value2.Reset();
 
-    value2 += unsigned(4);
-    value2 += unsigned(1);
-    value2 += unsigned(3);
-    value2 += unsigned(5);
-    value2 += unsigned(2);
-    value2 += unsigned(7);
-    value2 += unsigned(6);
+    value2 += unsigned{4};
+    value2 += unsigned{1};
+    value2 += unsigned{3};
+    value2 += unsigned{5};
+    value2 += unsigned{2};
+    value2 += unsigned{7};
+    value2 += unsigned{6};
 
     value = value2;
     value.Sort();

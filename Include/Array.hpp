@@ -37,19 +37,19 @@ class Array {
   public:
     Array() = default;
 
-    explicit Array(SizeT size) : capacity_(size) {
+    explicit Array(SizeT size) : capacity_{size} {
         if (size != 0) {
             allocate();
         }
     }
 
-    Array(Array &&src) noexcept : index_(src.Size()), capacity_(src.Capacity()) {
+    Array(Array &&src) noexcept : index_{src.Size()}, capacity_{src.Capacity()} {
         storage_.Move(static_cast<QPointer<Type_> &&>(src.storage_));
         src.setSize(0);
         src.setCapacity(0);
     }
 
-    Array(const Array &src) : capacity_(src.Size()) {
+    Array(const Array &src) : capacity_{src.Size()} {
         if (Capacity() != 0) {
             setSize(src.Size());
             Type_       *des  = allocate();
@@ -66,9 +66,8 @@ class Array {
 
     ~Array() {
         Type_ *storage = Storage();
-        Memory::Destruct(storage, End());
+        Memory::Destruct(storage, (storage + Size()));
         deallocate(storage);
-        clearStorage();
     }
 
     Array &operator=(Array &&src) noexcept {
@@ -180,13 +179,14 @@ class Array {
     }
 
     void Clear() noexcept {
-        Memory::Destruct(Storage(), End());
+        Type_ *storage = Storage();
+        Memory::Destruct(storage, (storage + Size()));
         setSize(0);
     }
 
     void Reset() noexcept {
         Type_ *storage = Storage();
-        Memory::Destruct(storage, End());
+        Memory::Destruct(storage, (storage + Size()));
         deallocate(storage);
         clearStorage();
         setSize(0);
@@ -282,7 +282,8 @@ class Array {
         setStorage(new_storage);
         return new_storage;
     }
-    void deallocate(Type_ *old_storage) { Memory::Deallocate(old_storage); }
+
+    void deallocate(Type_ *old_storage) noexcept { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }

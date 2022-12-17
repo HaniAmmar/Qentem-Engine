@@ -106,7 +106,7 @@ static int TestHArray2() {
     EQ_TO(numbers1.End(), (numbers1.First() + 1), "End()", "null");
     EQ_VALUE(numbers1["key1"], 1, "key1");
 
-    SizeT cap        = numbers1.Capacity();
+    const SizeT cap  = numbers1.Capacity();
     numbers1["key1"] = 20;
     EQ_VALUE(numbers1.Size(), 1, "Size");
     EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
@@ -688,7 +688,7 @@ static int TestHArray7() {
 }
 
 static int TestHArray8() {
-    SizeT id = 100;
+    constexpr SizeT id = 100;
 
     HArray<SizeT, char> list(id);
 
@@ -710,8 +710,8 @@ static int TestHArray8() {
         EQ_TO(list.Find(key1), nullptr, "value", "null");
         EQ_FALSE(list.Rename(key1, key2), "Rename()");
 
-        SizeT *y = list.Find(key2);
-        SizeT  w = id + 1;
+        const SizeT *y = list.Find(key2);
+        SizeT        w = id + 1;
 
         if (y != nullptr) {
             w = *y;
@@ -736,8 +736,8 @@ static int TestHArray8() {
         String<char> key1("k-");
         key1 += Digit<char>::NumberToString(i);
 
-        SizeT *y = list.Find(key1);
-        SizeT  w = id + 1;
+        const SizeT *y = list.Find(key1);
+        SizeT        w = id + 1;
 
         if (y != nullptr) {
             w = *y;
@@ -757,7 +757,7 @@ static int TestHArray8() {
 }
 
 static int TestHArray9() {
-    SizeT id = 10;
+    constexpr SizeT id = 10;
 
     HArray<SizeT, char>                list(id);
     const Qentem::HAItem<SizeT, char> *item;
@@ -827,7 +827,7 @@ static int TestHArray9() {
 }
 
 static int TestHArray10() {
-    SizeT id = 10;
+    constexpr SizeT id = 10;
 
     HArray<SizeT, char> list(id);
 

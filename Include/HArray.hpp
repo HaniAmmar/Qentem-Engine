@@ -73,12 +73,11 @@ class HArray {
 
     ~HArray() {
         HAItem_T_ *storage = Storage();
-        Memory::Destruct(storage, End());
+        Memory::Destruct(storage, (storage + Size()));
         deallocate(getHashTable());
-        clearStorage();
     }
 
-    HArray(HArray &&src) noexcept : index_(src.Size()), capacity_(src.Capacity()) {
+    HArray(HArray &&src) noexcept : index_{src.Size()}, capacity_{src.Capacity()} {
         hashTable_.Move(static_cast<QPointer<SizeT> &&>(src.hashTable_));
         src.setSize(0);
         src.setCapacity(0);
@@ -129,7 +128,7 @@ class HArray {
                 if (des_item == nullptr) {
                     des_item = insert(index, static_cast<Key_T_ &&>(item->Key), item->Hash);
                 } else {
-                    item->Key.~Key_T_();
+                    Memory::Destruct(&(item->Key));
                 }
 
                 des_item->Value = static_cast<Value_ &&>(item->Value);
@@ -254,7 +253,7 @@ class HArray {
     }
 
     const Key_T_ *GetKey(SizeT index) const noexcept {
-        HAItem_T_ *src = Storage();
+        const HAItem_T_ *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
             return &((src + index)->Key);
@@ -264,7 +263,7 @@ class HArray {
     }
 
     const HAItem_T_ *GetItem(SizeT index) const noexcept {
-        HAItem_T_ *src = Storage();
+        const HAItem_T_ *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
             return (src + index);
@@ -368,7 +367,7 @@ class HArray {
         return false;
     }
 
-    bool Rename(const Key_T_ &from, const Key_T_ &to) const noexcept { return Rename(from, Key_T_(to)); }
+    bool Rename(const Key_T_ &from, const Key_T_ &to) const { return Rename(from, Key_T_(to)); }
 
     void Reserve(SizeT size) {
         if (Storage() != nullptr) {
@@ -382,16 +381,12 @@ class HArray {
     }
 
     void Reset() noexcept {
-        HAItem_T_ *current = Storage();
-
-        if (current != nullptr) {
-            HAItem_T_ *storage = Storage();
-            Memory::Destruct(storage, End());
-            deallocate(getHashTable());
-            clearStorage();
-            setCapacity(0);
-            setSize(0);
-        }
+        HAItem_T_ *storage = Storage();
+        Memory::Destruct(storage, (storage + Size()));
+        deallocate(getHashTable());
+        clearStorage();
+        setCapacity(0);
+        setSize(0);
     }
 
     void Resize(SizeT new_size) {
@@ -481,7 +476,7 @@ class HArray {
         return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }
 
-    void deallocate(SizeT *hash_table) { Memory::Deallocate(hash_table); }
+    void deallocate(SizeT *hash_table) noexcept { Memory::Deallocate(hash_table); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }

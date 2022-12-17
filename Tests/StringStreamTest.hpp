@@ -100,7 +100,7 @@ static int TestStringStream() {
     EQ_VALUE(ss1, "abc", "StringStream");
     ss1.Reset();
 
-    SizeT lss = ss1.Capacity();
+    const SizeT lss = ss1.Capacity();
 
     ss1.Clear();
     EQ_VALUE(ss1.Length(), 0, "Length");
@@ -162,8 +162,8 @@ static int TestStringStream() {
     ss2.Insert("bcdef", 1);
     ss2.Insert("cdef", 1);
 
-    char *e_str    = ss2.Eject();
-    bool  is_equal = StringUtils::IsEqual(e_str, "abc", 3);
+    char      *e_str    = ss2.Eject();
+    const bool is_equal = StringUtils::IsEqual(e_str, "abc", 3);
     Memory::Deallocate(e_str);
 
     EQ_TRUE(is_equal, "is_equal");
@@ -262,7 +262,7 @@ static int TestStringStream() {
         const unsigned int max = 8;
         unsigned int       index{0};
 
-        void operator<<(const char c) {
+        void operator<<(const char c) noexcept {
             str[index] = c;
             ++index;
         }

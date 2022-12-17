@@ -137,6 +137,9 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
             case JSONotation_T_::CarriageControlChar: {
                 return 0;
             }
+
+            default: {
+            }
         }
 
         ++offset;
@@ -213,9 +216,15 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T
                         buffer += JSONotation_T_::T_Char;
                         break;
                     }
+
+                    default: {
+                    }
                 }
 
                 break;
+            }
+
+            default: {
             }
         }
 

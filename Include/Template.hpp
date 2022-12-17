@@ -359,7 +359,7 @@ class Template_CV {
 
     static void Process(const Char_T_ *content, SizeT length, const Value_T_ *root_value, StringStream<Char_T_> *ss,
                         Array<TagBit> &tags_cache) {
-        Template_CV temp{ss, root_value};
+        const Template_CV temp{ss, root_value};
 
         if (tags_cache.IsEmpty()) {
             parse(tags_cache, content, length);
@@ -495,6 +495,9 @@ class Template_CV {
                             }
                         }
                     }
+
+                    default: {
+                    }
                 }
             } else if (content[offset] == TemplatePatterns_C_::MultiLinePrefix) {
                 const SizeT current_offset = (offset + 1);
@@ -587,6 +590,9 @@ class Template_CV {
                             TagBit{TagType::Math, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
                         offset = end_offset;
                     }
+                }
+
+                default: {
                 }
             }
         }
@@ -722,6 +728,9 @@ class Template_CV {
                     ss_->Insert(TemplatePatterns_C_::GetHTMLSingleQuote(), TemplatePatterns_C_::HTMLSingleQuoteLength);
                     break;
                 }
+
+                default: {
+                }
             }
         }
 
@@ -831,7 +840,7 @@ class Template_CV {
 
     QENTEM_NOINLINE void generateLoopContent(const Char_T_ *content, SizeT length, LoopInfo_ *&loop_info) const {
         const SizeT start_offset =
-            Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content, SizeT(0), length);
+            Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content, SizeT{0}, length);
 
         const Char_T_ *loop_value        = nullptr;
         SizeT          loop_value_length = 0;
@@ -919,6 +928,9 @@ class Template_CV {
                         break_loop  = true;
                         break;
                     }
+
+                    default: {
+                    }
                 }
 
                 if (break_loop) {
@@ -995,7 +1007,7 @@ class Template_CV {
                                                     group_offset, group_length, sort_offset, sort_length);
     }
 
-    QENTEM_NOINLINE void renderLoop(const Char_T_ *content, LoopInfo_ *loop_info) const {
+    QENTEM_NOINLINE void renderLoop(const Char_T_ *content, const LoopInfo_ *loop_info) const {
         // Stage 3: Data
         Value_T_        grouped_set;
         const Value_T_ *loop_set   = root_value_;
@@ -1127,6 +1139,9 @@ class Template_CV {
                         break_loop   = true;
                         break;
                     }
+
+                    default: {
+                    }
                 }
             } while (!break_loop && (--tmp_offset > previous_offset));
 
@@ -1146,7 +1161,7 @@ class Template_CV {
             case_length, true_offset, true_length, false_offset, false_length);
     }
 
-    QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content, InlineIfInfo_ *inline_if_info) const {
+    QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content, const InlineIfInfo_ *inline_if_info) const {
         if (inline_if_info->CaseLength != 0) {
             double result;
 
@@ -1256,7 +1271,10 @@ class Template_CV {
     }
 
     void renderIf(const Char_T_ *content, IfInfo_ *if_info) const {
-        for (IfCase_ *item = if_info->Storage(), *end = (item + if_info->Size()); item < end; item++) {
+        IfCase_       *item = if_info->Storage();
+        const IfCase_ *end  = (item + if_info->Size());
+
+        while (item < end) {
             double result;
 
             if ((item->CaseLength == 0) ||
@@ -1268,6 +1286,8 @@ class Template_CV {
                 process((content + item->ContentOffset), item->ContentLength, item->SubTags);
                 break;
             }
+
+            ++item;
         }
     }
 
@@ -1466,7 +1486,7 @@ class Template_CV {
 
     Template_CV(StringStream<Char_T_> *ss, const Value_T_ *root_value, const Template_CV *parent = nullptr,
                 SizeT level = 0) noexcept
-        : ss_(ss), root_value_(root_value), parent_(parent), level_(level) {}
+        : ss_{ss}, root_value_{root_value}, parent_{parent}, level_{level} {}
 
     StringStream<Char_T_> *ss_;
     const Value_T_        *root_value_;

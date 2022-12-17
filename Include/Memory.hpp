@@ -179,7 +179,7 @@ inline static Type_ *AllocateInit() {
 
 // Allocate and move constructor
 template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(Values_T_ &&...values) {
+inline static Type_ *AllocateInit(Values_T_ &&...values) noexcept {
     return new Type_{static_cast<Values_T_ &&>(values)...};
 }
 
@@ -197,12 +197,12 @@ inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
 
 // Copy constructor
 template <typename Type_>
-inline static void Construct(Type_ *ptr, const Type_ &value) noexcept {
+inline static void Construct(Type_ *ptr, const Type_ &value) {
     new (ptr) Type_{value};
 }
 
 template <typename Type_>
-inline static void Construct(Type_ *ptr, const Type_ *end, const Type_ &value) noexcept {
+inline static void Construct(Type_ *ptr, const Type_ *end, const Type_ &value) {
     while (ptr < end) {
         new (ptr) Type_{value};
         ++ptr;
@@ -210,7 +210,7 @@ inline static void Construct(Type_ *ptr, const Type_ *end, const Type_ &value) n
 }
 
 template <typename Type_, typename... Values_T_>
-inline static void ConstructValues(Type_ *ptr, Values_T_ &&...values) {
+inline static void ConstructValues(Type_ *ptr, Values_T_ &&...values) noexcept {
     new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
 }
 

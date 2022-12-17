@@ -259,11 +259,11 @@ static int TestEngine1() {
 }
 
 static int TestEngine2() {
-    SizeT       ret;
-    SizeT       content_len = 16;
-    SizeT       find_len    = 3;
-    const char *content     = "ABABABABABAAABAB";
-    const char *find_       = "ABC";
+    SizeT           ret;
+    SizeT           content_len = 16;
+    constexpr SizeT find_len    = 3;
+    const char     *content     = "ABABABABABAAABAB";
+    const char     *find_       = "ABC";
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     EQ_VALUE(ret, 0, "return");

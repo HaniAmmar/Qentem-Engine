@@ -143,17 +143,16 @@ class ALE {
   private:
     template <typename Char_T_, typename Helper_T_>
     struct ALESub {
-        ALESub(const Helper_T_ *helper, const Char_T_ *content) noexcept : helper_(helper), content_(content) {}
+        ALESub(const Helper_T_ *helper, const Char_T_ *content) noexcept : helper_{helper}, content_{content} {}
 
         bool Parse(Number &number, SizeT offset, const SizeT length) const noexcept {
-            SizeT      num_offset    = offset;
-            Expression expr          = getExpression(offset, length);
-            Expression previous_expr = Expression::None;
-            return SubParse(number, offset, num_offset, length, expr, previous_expr);
+            const SizeT num_offset = offset;
+            Expression  expr       = getExpression(offset, length);
+            return SubParse(number, offset, num_offset, length, expr, Expression::None);
         }
 
         bool SubParse(Number &left, SizeT &offset, SizeT num_offset, const SizeT length, Expression &expr,
-                      Expression previous_expr) const noexcept {
+                      const Expression previous_expr) const noexcept {
             Number     right;
             Expression next_expr;
             bool       left_evaluated  = false;
@@ -461,6 +460,9 @@ class ALE {
                         offset = length;
                         return Expression::Error;
                     }
+
+                    default: {
+                    }
                 }
 
                 ++offset;
@@ -474,7 +476,7 @@ class ALE {
         const Char_T_   *content_;
     };
 
-    inline static void advance(Expression expr, SizeT &offset) {
+    inline static void advance(Expression expr, SizeT &offset) noexcept {
         ++offset;
 
         if ((expr >= Expression::Or) && (expr <= Expression::LessOrEqual)) {

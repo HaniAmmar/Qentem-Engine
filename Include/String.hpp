@@ -57,7 +57,7 @@ class String {
         }
     }
 
-    String(Char_T_ *str, SizeT len) noexcept {
+    String(Char_T_ *str, SizeT len) {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (len < ShortStringMax) {
             copyString(str, len);
@@ -212,7 +212,7 @@ class String {
         clearStorage();
     }
 
-    Char_T_ *Eject() noexcept {
+    Char_T_ *Eject() {
         Char_T_ *str;
 
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
@@ -296,10 +296,10 @@ class String {
         if ((str != nullptr) && (len != 0)) {
             const SizeT src_len = Length();
             const SizeT new_len = (src_len + len);
+            Char_T_    *src     = Storage();
 
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-            Char_T_ *src = Storage();
-            Char_T_  n_src[ShortStringMax];
+            Char_T_ n_src[ShortStringMax];
 
             if (src_len < ShortStringMax) {
                 for (SizeT i = 0; i < src_len; i++) {
@@ -308,8 +308,6 @@ class String {
 
                 src = &(n_src[0]);
             }
-#else
-            Char_T_ *src = Storage();
 #endif
 
             Char_T_ *ns = allocate(new_len + 1);
@@ -376,7 +374,7 @@ class String {
         return ns;
     }
 
-    void deallocate(Char_T_ *old_storage) {
+    void deallocate(Char_T_ *old_storage) noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (Length() >= ShortStringMax) {
             Memory::Deallocate(old_storage);

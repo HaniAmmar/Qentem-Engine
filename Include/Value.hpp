@@ -103,7 +103,7 @@ class Value {
 
     explicit Value(const VString &str) noexcept : string_{str} { setTypeToString(); }
 
-    explicit Value(const Char_T_ *str, SizeT length) noexcept : string_{str, length} { setTypeToString(); }
+    explicit Value(const Char_T_ *str, SizeT length) : string_{str, length} { setTypeToString(); }
 
     explicit Value(unsigned long long num) noexcept : number_{num} { setTypeToUInt64(); }
 
@@ -198,7 +198,7 @@ class Value {
         return *this;
     }
 
-    Value &operator=(VObject &&obj) {
+    Value &operator=(VObject &&obj) noexcept {
         if (IsObject()) {
             object_ = static_cast<VObject &&>(obj);
             return *this;
@@ -228,7 +228,7 @@ class Value {
         return *this;
     }
 
-    Value &operator=(VArray &&arr) {
+    Value &operator=(VArray &&arr) noexcept {
         if (IsArray()) {
             array_ = static_cast<VArray &&>(arr);
             return *this;
@@ -258,7 +258,7 @@ class Value {
         return *this;
     }
 
-    Value &operator=(VString &&str) {
+    Value &operator=(VString &&str) noexcept {
         if (IsString()) {
             string_ = static_cast<VString &&>(str);
             return *this;
@@ -629,11 +629,15 @@ class Value {
         }
 
         if (IsArray() && val.IsArray()) {
-            for (Value *src_val = val.array_.Storage(), *end = (src_val + val.array_.Size()); src_val < end;
-                 src_val++) {
+            Value       *src_val = val.array_.Storage();
+            const Value *end     = (src_val + val.array_.Size());
+
+            while (src_val < end) {
                 if (!(src_val->IsUndefined())) {
                     array_ += static_cast<Value &&>(*src_val);
                 }
+
+                ++src_val;
             }
         } else if (IsObject() && val.IsObject()) {
             object_ += static_cast<VObject &&>(val.object_);
@@ -641,13 +645,14 @@ class Value {
 
         val.Reset();
     }
-    void Merge(Value &val) {
+
+    void Merge(const Value &val) {
         if (IsUndefined()) {
             initArray();
         }
 
         if (IsArray() && val.IsArray()) {
-            for (Value *src_val = val.array_.Storage(), *end = (src_val + val.array_.Size()); src_val < end;
+            for (const Value *src_val = val.array_.Storage(), *end = (src_val + val.array_.Size()); src_val < end;
                  src_val++) {
                 if (!(src_val->IsUndefined())) {
                     array_ += *src_val;
@@ -1109,7 +1114,7 @@ class Value {
 #endif
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T_ *key, const SizeT length) const noexcept {
+    bool GroupBy(Value &groupedValue, const Char_T_ *key, const SizeT length) const {
         using V_item_ = HAItem<Value, Char_T_>;
         VObject new_sub_obj;
         VString grouped_key;
@@ -1156,12 +1161,12 @@ class Value {
         return false;
     }
 
-    bool GroupBy(Value &groupedValue, const Char_T_ *key) const noexcept {
+    bool GroupBy(Value &groupedValue, const Char_T_ *key) const {
         return GroupBy(groupedValue, key, StringUtils::Count(key));
     }
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
-    void Sort(bool ascend = true) {
+    void Sort(bool ascend = true) noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -1286,22 +1291,22 @@ class Value {
     inline void setTypeToFalse() noexcept { setType(ValueType::False); }
     inline void setTypeToNull() noexcept { setType(ValueType::Null); }
 
-    inline void initObject() {
+    inline void initObject() noexcept {
         Memory::Construct(&object_, VObject());
         setTypeToObject();
     }
 
-    inline void initArray() {
+    inline void initArray() noexcept {
         Memory::Construct(&array_, VArray());
         setTypeToArray();
     }
 
-    inline void initString() {
+    inline void initString() noexcept {
         Memory::Construct(&string_, VString());
         setTypeToString();
     }
 
-    inline void initValue(VObject &&obj) {
+    inline void initValue(VObject &&obj) noexcept {
         Memory::Construct(&object_, static_cast<VObject &&>(obj));
         setTypeToObject();
     }
@@ -1311,7 +1316,7 @@ class Value {
         setTypeToObject();
     }
 
-    inline void initValue(VArray &&arr) {
+    inline void initValue(VArray &&arr) noexcept {
         Memory::Construct(&array_, static_cast<VArray &&>(arr));
         setTypeToArray();
     }
@@ -1321,7 +1326,7 @@ class Value {
         setTypeToArray();
     }
 
-    inline void initValue(VString &&str) {
+    inline void initValue(VString &&str) noexcept {
         Memory::Construct(&string_, static_cast<VString &&>(str));
         setTypeToString();
     }
@@ -1331,7 +1336,7 @@ class Value {
         setTypeToString();
     }
 
-    void reset() {
+    void reset() noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 object_.Reset();
@@ -1438,7 +1443,7 @@ class Value {
         VObject object_;
         VArray  array_;
         VString string_;
-        VNumber number_{double(0)};
+        VNumber number_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         VType_ type_;
     };

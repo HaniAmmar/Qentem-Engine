@@ -94,7 +94,7 @@ static int TestHexConv() {
 }
 
 template <typename Number_T_>
-bool StringToNumberCount(Number_T_ &num, const char *str) {
+bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
     return DigitC::StringToNumber(num, str, StringUtils::Count(str));
 }
 

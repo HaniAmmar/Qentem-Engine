@@ -33,7 +33,7 @@ template <typename Char_T_, int S>
 struct UnicodeToUTF {};
 
 template <typename Char_T_>
-static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
+static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) {
     UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode, ss);
 }
 
@@ -41,7 +41,7 @@ static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
 template <typename Char_T_>
 class UnicodeToUTF<Char_T_, 1> {
   public:
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
+    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) {
         /*
          * ToUTF(0xC3D, ss);
          * ToUTF(0x00A1, ss);
@@ -72,7 +72,7 @@ class UnicodeToUTF<Char_T_, 1> {
 template <typename Char_T_>
 class UnicodeToUTF<Char_T_, 2> {
   public:
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept {
+    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) {
         if (unicode < 0x10000U) {
             ss += static_cast<Char_T_>(unicode);
         } else {
@@ -87,7 +87,7 @@ class UnicodeToUTF<Char_T_, 2> {
 template <typename Char_T_>
 class UnicodeToUTF<Char_T_, 4> {
   public:
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) noexcept { ss += static_cast<Char_T_>(unicode); }
+    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) { ss += static_cast<Char_T_>(unicode); }
 };
 
 } // namespace Unicode

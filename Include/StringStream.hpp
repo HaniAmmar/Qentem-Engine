@@ -48,7 +48,7 @@ class StringStream {
     }
 
     StringStream(StringStream &&src) noexcept
-        : storage_(src.Storage()), length_(src.Length()), capacity_(src.Capacity()) {
+        : storage_{src.Storage()}, length_{src.Length()}, capacity_{src.Capacity()} {
         src.setLength(0);
         src.setCapacity(0);
         src.clearStorage();
@@ -125,9 +125,7 @@ class StringStream {
     }
 
     inline void operator+=(const StringStream<Char_T_> &src) { insert(src.First(), src.Length()); }
-
     inline void operator+=(const String<Char_T_> &src) { insert(src.First(), src.Length()); }
-
     inline void operator+=(const Char_T_ *str) { insert(str, StringUtils::Count(str)); }
 
     template <typename Stream_T_>
@@ -190,9 +188,7 @@ class StringStream {
     }
 
     inline bool operator!=(const StringStream &ss) const noexcept { return (!(*this == ss)); }
-
     inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
-
     inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
 
     inline bool IsEqual(const Char_T_ *str, const SizeT length) const noexcept {
@@ -204,7 +200,6 @@ class StringStream {
     }
 
     inline void Insert(const Char_T_ *str, const SizeT length) { insert(str, length); }
-
     inline void Clear() noexcept { setLength(0); }
 
     void Reset() noexcept {
@@ -221,7 +216,7 @@ class StringStream {
     }
 
     // Set the needed length to write directly to the buffer,
-    Char_T_ *Buffer(const SizeT len) noexcept {
+    Char_T_ *Buffer(const SizeT len) {
         const SizeT current_offset = Length();
         length_ += len;
 
@@ -283,7 +278,7 @@ class StringStream {
   private:
     void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
     void allocate() { setStorage(Memory::Allocate<Char_T_>(Capacity())); }
-    void deallocate(Char_T_ *old_storage) { Memory::Deallocate(old_storage); }
+    void deallocate(Char_T_ *old_storage) noexcept { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(const SizeT new_length) noexcept { length_ = new_length; }
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }

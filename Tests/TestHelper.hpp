@@ -61,21 +61,21 @@ class TestHelper_T {
 
     static Stream_T_ &Stream() { return (*GetStream()); }
 
-    static Stream_T_ *&GetStream() {
+    static Stream_T_ *&GetStream() noexcept {
         static Stream_T_ *out_stream = nullptr;
         return out_stream;
     }
 
     static void SetStream(Stream_T_ &out) { GetStream() = &out; }
 
-    static unsigned long &LineNumber() {
+    static unsigned long &LineNumber() noexcept {
         static unsigned long line = 0;
 
         return line;
     }
 
     template <typename Char_T_>
-    static const Char_T_ *&TestGroupName() {
+    static const Char_T_ *&TestGroupName() noexcept {
         static const Char_T_ *name = nullptr;
 
         return name;
@@ -200,27 +200,28 @@ using TestHelper = TestHelper_T<QENTEM_OUTPUT_STREAM_TYPE>;
 
 class EmptyStream {
     template <typename Stream_T_, typename Value_T_>
-    friend Stream_T_ &operator<<(Stream_T_ &out, const Value_T_ &val) {
+    friend Stream_T_ &operator<<(Stream_T_ &out, const Value_T_ &val) noexcept {
         (void)val;
         return out;
     }
 
     template <typename Stream_T_>
-    friend Stream_T_ &operator<<(Stream_T_ &out, const void *val) {
+    friend Stream_T_ &operator<<(Stream_T_ &out, const void *val) noexcept {
         (void)val;
         return out;
     }
 };
 
 QENTEM_MAYBE_UNUSED
-static int TestError_1() { return 1; }
+static int TestError_1() noexcept { return 1; }
 
 QENTEM_MAYBE_UNUSED
 static int TestError() {
     using TestHelperEmptyStream = TestHelper_T<EmptyStream>;
-    EmptyStream es;
-    int         n = 0;
-    int         m = 1;
+
+    EmptyStream   es;
+    constexpr int n = 0;
+    constexpr int m = 1;
 
     TestHelperEmptyStream::SetStream(es);
     TestHelperEmptyStream::PrintErrorMessage1(false, "", n);

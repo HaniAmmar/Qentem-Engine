@@ -255,8 +255,8 @@ static int TestArray3() {
         numbers1 += i;
     }
 
-    SizeT *storage1 = numbers1.Storage();
-    SizeT *storage2 = numbers1.Storage();
+    const SizeT *storage1 = numbers1.Storage();
+    const SizeT *storage2 = numbers1.Storage();
 
     EQ_VALUE(numbers1.Size(), 8, "Size");
     EQ_TRUE((numbers1.Capacity() >= 8), "(numbers1.Capacity() >= 8)");
