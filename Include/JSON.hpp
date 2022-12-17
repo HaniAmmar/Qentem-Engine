@@ -187,7 +187,7 @@ class JSONParser {
                 ++offset;
 
                 const Char_T_ *str = (content + offset);
-                SizeT          len = UnEscapeJSON(str, length, buffer_);
+                SizeT          len = UnEscapeJSON(str, (length - offset), buffer_);
 
                 if (len == 0) {
                     break;
