@@ -36,7 +36,6 @@ class QPointer {
     QPointer &operator=(const QPointer &src) = delete;
 
     explicit QPointer(Type_ *ptr) noexcept : ptr_{ptr} {}
-
     QPointer(QPointer &&src) noexcept : ptr_{src.ptr_} { src.ptr_ = nullptr; }
 
     QPointer &operator=(QPointer &&src) noexcept {

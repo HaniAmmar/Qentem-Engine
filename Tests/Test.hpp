@@ -88,7 +88,7 @@ static void PrintInfo() {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     TestHelper::Stream() << "Tagged Pointers: On\n";
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    TestHelper::Stream() << "Short string optimization: On\n";
+    TestHelper::Stream() << "Short String Optimization: On\n";
 #endif
 #endif
 #endif
@@ -96,9 +96,9 @@ static void PrintInfo() {
     TestHelper::Stream() << "Endianness: ";
 
 #ifndef QENTEM_BIG_ENDIAN
-    TestHelper::Stream() << "Little-endian\n";
+    TestHelper::Stream() << "Little-Endian\n";
 #else
-    TestHelper::Stream() << "Big-endian\n";
+    TestHelper::Stream() << "Big-Endian\n";
 #endif
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)

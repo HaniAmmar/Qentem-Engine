@@ -261,10 +261,10 @@ class Template {
         using InlineIfInfo_ = InlineIfInfo_T<Char_T_>;
 
       public:
-        TagBit() = default;
-
+        TagBit()                             = delete;
         TagBit(const TagBit &tag)            = delete;
         TagBit &operator=(const TagBit &tag) = delete;
+        TagBit &operator=(TagBit &&)         = delete;
 
         TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept : offset_(offset), end_offset_(end_offset) {
             setType(type);
@@ -306,8 +306,7 @@ class Template {
             }
         }
 
-        void SetInfo(void *ptr) noexcept { info_.SetPointer(ptr); }
-
+        void         SetInfo(void *ptr) noexcept { info_.SetPointer(ptr); }
         inline void *GetPointer() const noexcept { return info_.GetPointer(); }
 
         inline TagType GetType() const noexcept {
