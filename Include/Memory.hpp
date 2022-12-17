@@ -29,45 +29,45 @@
 namespace Qentem {
 namespace Memory {
 
-inline static void SetToZero(void *ptr, SizeT size) noexcept {
+// size = the number of bytes
+template <typename Number_T_>
+inline static void SetToZero(void *ptr, Number_T_ size) noexcept {
+    Number_T_ offset = 0;
+
 #ifdef QENTEM_SIMD_ENABLED
-    const SizeT m_size    = (size >> QENTEM_SIMD_SHIFT_SIZE);
-    const SizeT remaining = (size ^ (m_size << QENTEM_SIMD_SHIFT_SIZE));
+    const Number_T_ m_size = (size >> QENTEM_SIMD_SHIFT_SIZE);
 
     if (m_size != 0) {
+        offset += (QENTEM_SIMD_SIZE * m_size);
+        const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_ZERO;
         QENTEM_SIMD_VAR       *m_ptr  = static_cast<QENTEM_SIMD_VAR *>(ptr);
         const QENTEM_SIMD_VAR *end    = (m_ptr + m_size);
-        const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_ZERO;
 
         do {
             QENTEM_SIMD_STOREU(m_ptr, m_zero);
             ++m_ptr;
         } while (m_ptr != end);
-
-        if (remaining == 0) {
-            return;
-        }
     }
-
-    char       *des = (static_cast<char *>(ptr) + (size - remaining));
-    const char *end = (des + remaining);
-#else
-    char       *des = static_cast<char *>(ptr);
-    const char *end = (des + size);
 #endif
 
-    while (des != end) {
-        *des = 0;
-        ++des;
+    char *src = static_cast<char *>(ptr);
+
+    while (offset < size) {
+        src[offset] = 0;
+        ++offset;
     }
 }
 
-inline static void Copy(void *to, const void *from, SizeT size) noexcept {
+// size = the number of bytes
+template <typename Number_T_>
+inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
+    Number_T_ offset = 0;
+
 #ifdef QENTEM_SIMD_ENABLED
-    const SizeT m_size    = (size >> QENTEM_SIMD_SHIFT_SIZE);
-    const SizeT remaining = (size ^ (m_size << QENTEM_SIMD_SHIFT_SIZE));
+    const Number_T_ m_size = (size >> QENTEM_SIMD_SHIFT_SIZE);
 
     if (m_size != 0) {
+        offset += (QENTEM_SIMD_SIZE * m_size);
         QENTEM_SIMD_VAR       *m_to   = static_cast<QENTEM_SIMD_VAR *>(to);
         const QENTEM_SIMD_VAR *m_form = static_cast<const QENTEM_SIMD_VAR *>(from);
         const QENTEM_SIMD_VAR *end    = (m_form + m_size);
@@ -77,26 +77,15 @@ inline static void Copy(void *to, const void *from, SizeT size) noexcept {
             ++m_form;
             ++m_to;
         } while (m_form != end);
-
-        if (remaining == 0) {
-            return;
-        }
     }
-
-    const SizeT start = (size - remaining);
-    const char *src   = static_cast<const char *>(from) + start;
-    const char *end   = (src + remaining);
-    char       *des   = static_cast<char *>(to) + start;
-#else
-    const char *src = static_cast<const char *>(from);
-    const char *end = (src + size);
-    char       *des = static_cast<char *>(to);
 #endif
 
-    while (src != end) {
-        *des = *src;
-        ++des;
-        ++src;
+    char       *des = static_cast<char *>(to);
+    const char *src = static_cast<const char *>(from);
+
+    while (offset < size) {
+        des[offset] = src[offset];
+        ++offset;
     }
 }
 
