@@ -40,10 +40,6 @@
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
 #endif
-
-#else
-#undef QENTEM_POINTER_TAGGING
-
 #endif
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
@@ -51,6 +47,8 @@
 // Short string optimization
 #define QENTEM_SSO 1
 #endif
+#else
+#undef QENTEM_SSO
 #endif
 
 #ifndef QENTEM_AVX2
