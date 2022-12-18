@@ -20,8 +20,7 @@
  * SOFTWARE.
  */
 
-#include "StringStream.hpp"
-
+// #include "StringStream.hpp"
 // static Qentem::StringStream<char> test_ss;
 // #define QENTEM_OUTPUT_STREAM_TYPE Qentem::StringStream<char>
 // #define QENTEM_OUTPUT_STREAM test_ss
