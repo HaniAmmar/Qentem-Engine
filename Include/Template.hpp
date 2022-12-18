@@ -725,9 +725,9 @@ class Template_CV {
 
             if ((loop_key_ != nullptr) && (*content == TemplatePatterns_C_::TildeChar)) {
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-                escapeHTMLSpecialChars(loop_key_, loop_key_length);
+                escapeHTMLSpecialChars(loop_key_, loop_key_length_);
 #else
-                ss_->Insert(loop_key_, loop_key_length);
+                ss_->Insert(loop_key_, loop_key_length_);
 #endif
             }
         }
@@ -1039,22 +1039,30 @@ class Template_CV {
         Template_CV    loop_template{ss_, root_value_, this, (level_ + 1)};
         const Char_T_ *loop_content = loop_info->InnerTemplate.First();
         const SizeT    loop_length  = loop_info->InnerTemplate.Length();
-        const bool     is_object    = loop_set->IsObject();
 
-        while (true) {
-            loop_template.loop_value_ = loop_set->GetValue(loop_index);
+        if (loop_set->IsObject()) {
+            while (true) {
+                loop_template.loop_value_ = loop_set->GetValue(loop_index);
+                loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length_);
+                loop_template.process(loop_content, loop_length, loop_info->SubTags);
 
-            if (is_object) {
-                loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length);
+                if ((--loop_size) == 0) {
+                    break;
+                }
+
+                ++loop_index;
             }
+        } else {
+            while (true) {
+                loop_template.loop_value_ = loop_set->GetValue(loop_index);
+                loop_template.process(loop_content, loop_length, loop_info->SubTags);
 
-            loop_template.process(loop_content, loop_length, loop_info->SubTags);
+                if ((--loop_size) == 0) {
+                    break;
+                }
 
-            if ((--loop_size) == 0) {
-                break;
+                ++loop_index;
             }
-
-            ++loop_index;
         }
     }
 
@@ -1464,7 +1472,7 @@ class Template_CV {
     const Template_CV     *parent_;
     const Value_T_        *loop_value_{nullptr};
     const Char_T_         *loop_key_{nullptr};
-    SizeT                  loop_key_length{0};
+    SizeT                  loop_key_length_{0};
     const SizeT            level_;
 };
 
