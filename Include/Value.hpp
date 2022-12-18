@@ -1395,18 +1395,19 @@ class Value {
         inline void               SetNumber(long long num) noexcept { number_.sll = num; }
         inline unsigned long long GetUInt64() const noexcept { return number_.ull; }
         inline long long          GetInt64() const noexcept { return number_.sll; }
-        inline double             GetDouble() const noexcept { return number_.d; }
+        inline double             GetDouble() const noexcept { return number_.dou; }
 
       private:
         union Number_T_ {
             Number_T_() = default;
             explicit Number_T_(unsigned long long num) noexcept : ull{num} {}
             explicit Number_T_(long long num) noexcept : sll{num} {}
-            explicit Number_T_(double num) noexcept : d{num} {}
+            explicit Number_T_(double num) noexcept : dou{num} {}
 
             unsigned long long ull{0};
             long long          sll;
-            double             d;
+            double             dou;
+            SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
 #ifndef QENTEM_BIG_ENDIAN
