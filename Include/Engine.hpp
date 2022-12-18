@@ -81,35 +81,6 @@ class Engine {
     }
 
     /*
-     * Returns the location of two given characters.
-     */
-#ifdef QENTEM_SIMD_ENABLED
-    template <typename Char_T_, typename Number_T_>
-    static QENTEM_SIMD_NUMBER_T FindTwo(const Char_T_ char_1, const Char_T_ char_2, const Char_T_ *content,
-                                        Number_T_ &offset, const Number_T_ end_before) noexcept {
-        content += offset;
-        const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
-        const QENTEM_SIMD_VAR m_char_2 = Platform::SMIDSetToOne(char_2);
-
-        while (offset < end_before) {
-            const QENTEM_SIMD_VAR m_content = QENTEM_SIMD_LOAD(reinterpret_cast<const QENTEM_SIMD_VAR *>(content));
-
-            const QENTEM_SIMD_NUMBER_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content) |
-                                              Platform::SMIDCompare<Char_T_>(m_char_2, m_content);
-
-            if (bits != 0) {
-                return bits;
-            }
-
-            offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
-            content += Platform::SMIDNextOffset<Char_T_, Number_T_>();
-        }
-
-        return 0;
-    }
-#endif
-
-    /*
      * Returns the (index+length) of a given pattern.
      * pattern_length should be bigger than 1;
      */

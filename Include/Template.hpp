@@ -384,43 +384,8 @@ class Template_CV {
 
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT length) {
         SizeT offset = 0;
-#ifdef QENTEM_SIMD_ENABLED
-        SizeT                m_offset = 0;
-        QENTEM_SIMD_NUMBER_T bits     = 0;
 
-        while (true) {
-            while (true) {
-                if ((bits == 0) && (offset < length)) {
-                    bits = Engine::FindTwo<Char_T_>(TemplatePatterns_C_::InLinePrefix,
-                                                    TemplatePatterns_C_::MultiLinePrefix, content, m_offset, length);
-                }
-
-                if (bits == 0) {
-                    return;
-                }
-
-                const SizeT index       = Platform::CTZ(bits);
-                const SizeT next_offset = (index + m_offset);
-                bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
-
-                if (bits == 0) {
-                    m_offset += Platform::SMIDNextOffset<Char_T_, SizeT>();
-                }
-
-                if (next_offset < offset) {
-                    continue;
-                }
-
-                if (next_offset < length) {
-                    offset = next_offset;
-                    break;
-                }
-
-                return;
-            }
-#else
         while (offset < length) {
-#endif
             if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
                 const SizeT current_offset = (offset + 1);
 
@@ -531,9 +496,8 @@ class Template_CV {
                     }
                 }
             }
-#ifndef QENTEM_SIMD_ENABLED
+
             ++offset;
-#endif
         }
     }
 
