@@ -229,20 +229,20 @@ class Template {
         const unsigned short         RepeatLength;
         const unsigned short         GroupOffset;
         const unsigned short         GroupLength;
-        const SizeT                  SortOffset;
-        const SizeT                  SortLength;
+        const unsigned short         SortOffset;
+        const unsigned short         SortLength;
     };
 
     template <typename Char_T_>
     struct InlineIfInfo_T {
         const Array<TagBit<Char_T_>> TrueSubTags;
         const Array<TagBit<Char_T_>> FalseSubTags;
-        const SizeT                  CaseOffset;
-        const SizeT                  CaseLength;
-        const SizeT                  TrueOffset;
-        const SizeT                  TrueLength;
-        const SizeT                  FalseOffset;
-        const SizeT                  FalseLength;
+        const unsigned short         CaseOffset;
+        const unsigned short         CaseLength;
+        const unsigned short         TrueOffset;
+        const unsigned short         TrueLength;
+        const unsigned short         FalseOffset;
+        const unsigned short         FalseLength;
     };
 
     template <typename Char_T_>
@@ -818,16 +818,16 @@ class Template_CV {
 
         Array<TagBit>         sub_tags;
         StringStream<Char_T_> inner_template;
-        unsigned char         set_offset    = 0;
-        unsigned char         set_length    = 0;
-        unsigned char         index_offset  = 0;
-        unsigned char         index_length  = 0;
-        unsigned char         repeat_offset = 0;
-        unsigned char         repeat_length = 0;
-        unsigned char         group_offset  = 0;
-        unsigned char         group_length  = 0;
-        unsigned char         sort_offset   = 0;
-        unsigned char         sort_length   = 0;
+        unsigned short        set_offset    = 0;
+        unsigned short        set_length    = 0;
+        unsigned short        index_offset  = 0;
+        unsigned short        index_length  = 0;
+        unsigned short        repeat_offset = 0;
+        unsigned short        repeat_length = 0;
+        unsigned short        group_offset  = 0;
+        unsigned short        group_length  = 0;
+        unsigned short        sort_offset   = 0;
+        unsigned short        sort_length   = 0;
 
         // Stage 1: Info extraction
         while (true) {
@@ -855,13 +855,13 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::SetChar: {
-                        set_offset = static_cast<unsigned char>(offset);
-                        set_length = static_cast<unsigned char>(len);
+                        set_offset = static_cast<unsigned short>(offset);
+                        set_length = static_cast<unsigned short>(len);
 
                         if ((content[offset] == TemplatePatterns_C_::InLinePrefix) &&
                             (len > TemplatePatterns_C_::VariableFulllength)) {
                             set_offset += TemplatePatterns_C_::VariablePrefixLength;
-                            set_length -= static_cast<unsigned char>(TemplatePatterns_C_::VariableFulllength);
+                            set_length -= static_cast<unsigned short>(TemplatePatterns_C_::VariableFulllength);
                         }
 
                         break_loop = true;
@@ -869,29 +869,29 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::IndexChar: {
-                        index_offset = static_cast<unsigned char>(offset);
-                        index_length = static_cast<unsigned char>(len);
+                        index_offset = static_cast<unsigned short>(offset);
+                        index_length = static_cast<unsigned short>(len);
                         break_loop   = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::RepeatChar: {
-                        repeat_offset = static_cast<unsigned char>(offset);
-                        repeat_length = static_cast<unsigned char>(len);
+                        repeat_offset = static_cast<unsigned short>(offset);
+                        repeat_length = static_cast<unsigned short>(len);
                         break_loop    = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::GroupChar: {
-                        group_offset = static_cast<unsigned char>(offset);
-                        group_length = static_cast<unsigned char>(len);
+                        group_offset = static_cast<unsigned short>(offset);
+                        group_length = static_cast<unsigned short>(len);
                         break_loop   = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::SortChar: {
-                        sort_offset = static_cast<unsigned char>(offset);
-                        sort_length = static_cast<unsigned char>(len);
+                        sort_offset = static_cast<unsigned short>(offset);
+                        sort_length = static_cast<unsigned short>(len);
                         break_loop  = true;
                         break;
                     }
@@ -1068,14 +1068,14 @@ class Template_CV {
 
     QENTEM_NOINLINE void generateInLineIfInfo(const Char_T_ *content, SizeT length,
                                               InlineIfInfo_ *&inline_if_info) const {
-        Array<TagBit> true_subtags;
-        Array<TagBit> false_subtags;
-        unsigned int  case_offset  = 0;
-        unsigned int  case_length  = 0;
-        unsigned int  true_offset  = 0;
-        unsigned int  true_length  = 0;
-        unsigned int  false_offset = 0;
-        unsigned int  false_length = 0;
+        Array<TagBit>  true_subtags;
+        Array<TagBit>  false_subtags;
+        unsigned short case_offset  = 0;
+        unsigned short case_length  = 0;
+        unsigned short true_offset  = 0;
+        unsigned short true_length  = 0;
+        unsigned short false_offset = 0;
+        unsigned short false_length = 0;
 
         SizeT offset          = 0;
         SizeT previous_offset = 0;
@@ -1099,22 +1099,22 @@ class Template_CV {
             do {
                 switch (content[tmp_offset]) {
                     case TemplatePatterns_C_::CaseChar: {
-                        case_offset = static_cast<unsigned int>(offset);
-                        case_length = static_cast<unsigned int>(len);
+                        case_offset = static_cast<unsigned short>(offset);
+                        case_length = static_cast<unsigned short>(len);
                         break_loop  = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::TrueChar: {
-                        true_offset = static_cast<unsigned int>(offset);
-                        true_length = static_cast<unsigned int>(len);
+                        true_offset = static_cast<unsigned short>(offset);
+                        true_length = static_cast<unsigned short>(len);
                         break_loop  = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::FalseChar: {
-                        false_offset = static_cast<unsigned int>(offset);
-                        false_length = static_cast<unsigned int>(len);
+                        false_offset = static_cast<unsigned short>(offset);
+                        false_length = static_cast<unsigned short>(len);
                         break_loop   = true;
                         break;
                     }
