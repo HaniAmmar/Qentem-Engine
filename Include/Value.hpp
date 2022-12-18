@@ -1390,23 +1390,23 @@ class Value {
 
         template <typename Number_T_>
         explicit VNumber(const Number_T_ &num) noexcept : number_{num} {}
-        inline void               SetNumber(double num) noexcept { number_.d = num; }
+        inline void               SetNumber(double num) noexcept { number_.ddl = num; }
         inline void               SetNumber(unsigned long long num) noexcept { number_.ull = num; }
         inline void               SetNumber(long long num) noexcept { number_.sll = num; }
         inline unsigned long long GetUInt64() const noexcept { return number_.ull; }
         inline long long          GetInt64() const noexcept { return number_.sll; }
-        inline double             GetDouble() const noexcept { return number_.dou; }
+        inline double             GetDouble() const noexcept { return number_.ddl; }
 
       private:
         union Number_T_ {
             Number_T_() = default;
             explicit Number_T_(unsigned long long num) noexcept : ull{num} {}
             explicit Number_T_(long long num) noexcept : sll{num} {}
-            explicit Number_T_(double num) noexcept : dou{num} {}
+            explicit Number_T_(double num) noexcept : ddl{num} {}
 
             unsigned long long ull{0};
             long long          sll;
-            double             dou;
+            double             ddl;
             SizeT              padding_[2]; // Just in case SizeT is set to long
         };
 
@@ -1427,7 +1427,7 @@ class Value {
     struct VType_ {
 #ifndef QENTEM_BIG_ENDIAN
       private:
-        const void *padding_{nullptr};
+        SizeT padding_[2]{0};
 
       public:
         QPointer<void> Value{};
@@ -1436,7 +1436,7 @@ class Value {
         QPointer<void> Value{};
 
       private:
-        const void *padding_{nullptr};
+        SizeT padding_[2]{0};
 #endif
     };
 
