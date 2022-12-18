@@ -57,8 +57,9 @@ class ALE {
         double Number;
 
         struct {
-            SizeT Offset{0};
-            SizeT Length{0};
+            // int is half the size of double. DONT change the type, or it will break.
+            unsigned int Offset{0};
+            unsigned int Length{0};
         } Content{};
     };
 
@@ -198,8 +199,8 @@ class ALE {
             StringUtils::Trim(content_, offset, length);
 
             if ((expr == Expression::Equal) || (expr == Expression::NotEqual)) {
-                val.Content.Offset = offset;
-                val.Content.Length = length;
+                val.Content.Offset = static_cast<unsigned int>(offset);
+                val.Content.Length = static_cast<unsigned int>(length);
                 evaluated          = false;
                 return true;
             }
@@ -533,10 +534,11 @@ class ALEBasicHelper {
             const Char_T_ *left_content = (content + left.Content.Offset);
 
             if (*left_content != ALEExpressions_T_::ParenthesStart) {
-                if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content, left.Content.Length))) {
+                if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content,
+                                                     static_cast<SizeT>(left.Content.Length)))) {
                     return false;
                 }
-            } else if (!(ALE::Evaluate(left.Number, (++left_content), (left.Content.Length - 2)))) {
+            } else if (!(ALE::Evaluate(left.Number, (++left_content), static_cast<SizeT>(left.Content.Length - 2u)))) {
                 return false;
             }
         }
@@ -545,10 +547,12 @@ class ALEBasicHelper {
             const Char_T_ *right_content = (content + right.Content.Offset);
 
             if (*right_content != ALEExpressions_T_::ParenthesStart) {
-                if (!(Digit<Char_T_>::StringToNumber(right.Number, right_content, right.Content.Length))) {
+                if (!(Digit<Char_T_>::StringToNumber(right.Number, right_content,
+                                                     static_cast<SizeT>(right.Content.Length)))) {
                     return false;
                 }
-            } else if (!(ALE::Evaluate(right.Number, (++right_content), (right.Content.Length - 2)))) {
+            } else if (!(ALE::Evaluate(right.Number, (++right_content),
+                                       static_cast<SizeT>(right.Content.Length - 2u)))) {
                 return false;
             }
         }
