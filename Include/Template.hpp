@@ -458,6 +458,8 @@ class Template_CV {
                                 continue;
                             }
                         }
+
+                        break;
                     }
 
                     default: {
@@ -553,6 +555,8 @@ class Template_CV {
                             TagBit{TagType::Math, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
                         offset = end_offset;
                     }
+
+                    break;
                 }
 
                 default: {
