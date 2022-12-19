@@ -55,8 +55,10 @@ class Value {
     Value(Value &&val) noexcept : number_{val.number_} {
 #if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
         setType(val.Type());
-#endif
         val.setTypeToUndefined();
+#else
+        val.number_.ClearAll();
+#endif
     }
 
     Value(const Value &val) { copyValue(val); }
@@ -64,6 +66,11 @@ class Value {
     ~Value() {
         if (!IsUndefined()) {
             reset();
+            // #if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
+            //             setTypeToUndefined();
+            // #else
+            //             number_.ClearAll();
+            // #endif
         }
     }
 
@@ -137,18 +144,19 @@ class Value {
     }
 
     Value &operator=(Value &&val) noexcept {
-        constexpr unsigned long long num = 0;
-
         if (this != &val) {
             if (!IsUndefined()) {
                 reset();
             }
 
             number_ = val.number_;
-            setType(val.Type());
 
-            val.number_ = VNumber{num};
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
+            setType(val.Type());
             val.setTypeToUndefined();
+#else
+            val.number_.ClearAll();
+#endif
         }
 
         return *this;
@@ -185,12 +193,14 @@ class Value {
                 }
             } else {
                 reset();
-
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
+                setTypeToUndefined();
+#else
+                number_.ClearAll();
+#endif
                 if (!(val.IsUndefined())) {
                     copyValue(val);
                 }
-
-                setType(val.Type());
             }
         }
 
@@ -208,7 +218,6 @@ class Value {
         }
 
         initValue(static_cast<VObject &&>(obj));
-        setTypeToObject();
         return *this;
     }
 
@@ -223,7 +232,6 @@ class Value {
         }
 
         initValue(obj);
-        setTypeToObject();
         return *this;
     }
 
@@ -238,7 +246,6 @@ class Value {
         }
 
         initValue(static_cast<VArray &&>(arr));
-        setTypeToArray();
         return *this;
     }
 
@@ -253,7 +260,6 @@ class Value {
         }
 
         initValue(arr);
-        setTypeToArray();
         return *this;
     }
 
@@ -268,7 +274,6 @@ class Value {
         }
 
         initValue(static_cast<VString &&>(str));
-        setTypeToString();
         return *this;
     }
 
@@ -283,7 +288,6 @@ class Value {
         }
 
         initValue(str);
-        setTypeToString();
         return *this;
     }
 
@@ -298,7 +302,6 @@ class Value {
         }
 
         initValue(VString{str});
-        setTypeToString();
         return *this;
     }
 
@@ -1056,7 +1059,11 @@ class Value {
 
     void Reset() noexcept {
         reset();
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
         setTypeToUndefined();
+#else
+        number_.ClearAll();
+#endif
     }
 
     void Compress() {
@@ -1382,9 +1389,7 @@ class Value {
 
             default: {
                 number_ = val.number_;
-#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
                 setType(val.Type());
-#endif
             }
         }
     }
@@ -1392,6 +1397,16 @@ class Value {
     struct VNumber {
       public:
         VNumber() = default;
+
+        explicit VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, padding_{v_num.padding_} {}
+        VNumber &operator=(const VNumber &v_num) {
+            if (this != &v_num) {
+                number_  = v_num.number_;
+                padding_ = v_num.padding_;
+            }
+
+            return *this;
+        }
 
         template <typename Number_T_>
         explicit VNumber(const Number_T_ &num) noexcept : number_{num} {}
@@ -1401,6 +1416,13 @@ class Value {
         inline unsigned long long GetUInt64() const noexcept { return number_.ull; }
         inline long long          GetInt64() const noexcept { return number_.sll; }
         inline double             GetDouble() const noexcept { return number_.ddl; }
+
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        inline void ClearAll() noexcept {
+            number_.ull = 0;
+            padding_    = nullptr;
+        }
+#endif
 
       private:
         union Number_T_ {
@@ -1416,16 +1438,11 @@ class Value {
         };
 
 #ifndef QENTEM_BIG_ENDIAN
-        Number_T_ number_;
-
-      public:
+        Number_T_   number_;
         const void *padding_{nullptr};
 #else
-      private:
         const void *padding_{nullptr};
-
-      public:
-        Number_T_ number_;
+        Number_T_   number_;
 #endif
     };
 
