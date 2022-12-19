@@ -2948,6 +2948,11 @@ static int TestALE11() {
     number = ALE::Evaluate(content);
     EQ_VALUE(number, 14, "number");
 
+    content = R"(2  * 1 * 3 + 1 - 4 + (10 - 5 - 6 + 1 + 1 + 1 + 1) * (8 / 4 + 1) -
+        1 - -1 + 2 == ((5/5+1)*2+1)+3*3)";
+    number  = ALE::Evaluate(content);
+    EQ_VALUE(number, 1, "number");
+
     END_SUB_TEST;
 }
 
