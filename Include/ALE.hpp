@@ -541,7 +541,7 @@ class ALEBasicHelper {
                                                      static_cast<SizeT>(left.Content.Length)))) {
                     return false;
                 }
-            } else if (!(ALE::Evaluate(left.Number, (++left_content), static_cast<SizeT>(left.Content.Length - 2u)))) {
+            } else if (!(ALE::Evaluate(left.Number, (++left_content), static_cast<SizeT>(left.Content.Length - 2U)))) {
                 return false;
             }
         }
@@ -555,7 +555,7 @@ class ALEBasicHelper {
                     return false;
                 }
             } else if (!(ALE::Evaluate(right.Number, (++right_content),
-                                       static_cast<SizeT>(right.Content.Length - 2u)))) {
+                                       static_cast<SizeT>(right.Content.Length - 2U)))) {
                 return false;
             }
         }
