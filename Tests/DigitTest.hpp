@@ -1156,6 +1156,8 @@ static int RunDigitTests() {
     START_TEST("NumberToString Test 4", TestNumberToString4);
     START_TEST("NumberToString Test 5", TestNumberToString5);
 
+    // TODO: Add NumberToStringStream test
+
     END_TEST("Digit.hpp");
 }
 
