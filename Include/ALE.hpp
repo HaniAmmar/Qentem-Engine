@@ -149,26 +149,30 @@ class ALE {
         bool Parse(Number &number, SizeT offset, const SizeT length) const noexcept {
             const SizeT num_offset = offset;
             Expression  expr       = getExpression(offset, length);
-            return SubParse(number, offset, num_offset, length, expr, Expression::None);
+            return subParse(number, offset, num_offset, length, expr, Expression::None);
         }
 
-        bool SubParse(Number &left, SizeT &offset, SizeT num_offset, const SizeT length, Expression &expr,
+      private:
+        bool subParse(Number &left, SizeT &offset, SizeT num_offset, const SizeT length, Expression &expr,
                       const Expression previous_expr) const noexcept {
             Number     right;
             Expression next_expr;
-            bool       left_evaluated  = false;
-            bool       right_evaluated = false;
+            const bool no_equal = ((expr != Expression::Equal) && (expr != Expression::NotEqual));
 
-            if ((expr != Expression::Error) &&
-                getNumber(left, num_offset, (offset - num_offset), left_evaluated, expr)) {
+            if ((expr != Expression::Error) && getNumber(left, num_offset, (offset - num_offset), expr)) {
                 while (offset < length) {
-                    advance(expr, offset);
+                    ++offset;
+
+                    if (expr < Expression::Bigger) {
+                        ++offset;
+                    }
+
                     num_offset = offset;
                     next_expr  = getExpression(offset, length);
 
                     if (expr >= next_expr) {
-                        if (!getNumber(right, num_offset, (offset - num_offset), right_evaluated, expr) ||
-                            !process(left, right, left_evaluated, right_evaluated, expr)) {
+                        if (!getNumber(right, num_offset, (offset - num_offset), expr) ||
+                            !process(left, right, no_equal, false, expr)) {
                             return false;
                         }
 
@@ -178,8 +182,8 @@ class ALE {
                             break;
                         }
                     } else {
-                        if (!SubParse(right, offset, num_offset, length, next_expr, expr) ||
-                            !process(left, right, left_evaluated, true, expr)) {
+                        if (!subParse(right, offset, num_offset, length, next_expr, expr) ||
+                            !process(left, right, no_equal, true, expr)) {
                             return false;
                         }
 
@@ -193,7 +197,7 @@ class ALE {
             return false;
         }
 
-        bool getNumber(Number &val, SizeT offset, SizeT length, bool &evaluated, const Expression expr) const noexcept {
+        bool getNumber(Number &val, SizeT offset, SizeT length, const Expression expr) const noexcept {
             using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
             StringUtils::Trim(content_, offset, length);
@@ -201,11 +205,8 @@ class ALE {
             if ((expr == Expression::Equal) || (expr == Expression::NotEqual)) {
                 val.Content.Offset = static_cast<unsigned int>(offset);
                 val.Content.Length = static_cast<unsigned int>(length);
-                evaluated          = false;
                 return true;
             }
-
-            evaluated = true;
 
             switch (content_[offset]) {
                 case ALEExpressions_T_::ParenthesStart: {
@@ -472,18 +473,9 @@ class ALE {
             return Expression::None;
         }
 
-      private:
         const Helper_T_ *helper_;
         const Char_T_   *content_;
     };
-
-    inline static void advance(Expression expr, SizeT &offset) noexcept {
-        ++offset;
-
-        if ((expr >= Expression::Or) && (expr <= Expression::LessOrEqual)) {
-            ++offset;
-        }
-    }
 
     template <typename Char_T_>
     static bool isExpression(const Char_T_ *content, SizeT offset) noexcept {
