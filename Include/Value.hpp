@@ -23,7 +23,6 @@
 #include "Array.hpp"
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
-#include "Platform.hpp"
 
 #ifndef QENTEM_VALUE_H_
 #define QENTEM_VALUE_H_
@@ -814,89 +813,95 @@ class Value {
         switch (Type()) {
             case ValueType::String: {
                 value = string_;
-                return true;
+                break;
             }
 
             case ValueType::UInt64: {
                 value = Digit<Char_T_>::NumberToString(number_.GetUInt64(), 1);
-                return true;
+                break;
             }
 
             case ValueType::Int64: {
                 value = Digit<Char_T_>::NumberToString(number_.GetInt64(), 1);
-                return true;
+                break;
             }
 
             case ValueType::Double: {
                 value = Digit<Char_T_>::NumberToString(number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
-                return true;
+                break;
             }
 
             case ValueType::True: {
                 value = VString(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
-                return true;
+                break;
             }
 
             case ValueType::False: {
                 value = VString(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
-                return true;
+                break;
             }
 
             case ValueType::Null: {
                 value = VString(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
-                return true;
+                break;
             }
 
             default: {
                 return false;
             }
         }
+
+        return true;
     }
 
-    bool CopyStringValueTo(StringStream<Char_T_> &ss) const {
+    template <typename StringStream_T_>
+    bool CopyStringValueTo(StringStream_T_ &ss) const {
         switch (Type()) {
             case ValueType::String: {
-                ss += string_;
-                return true;
+                ss.Insert(string_.First(), string_.Length());
+                break;
             }
 
             case ValueType::UInt64: {
                 Digit<Char_T_>::NumberToStringStream(ss, number_.GetUInt64(), 1);
-                return true;
+                break;
             }
 
             case ValueType::Int64: {
                 Digit<Char_T_>::NumberToStringStream(ss, number_.GetInt64(), 1);
-                return true;
+                break;
             }
 
             case ValueType::Double: {
                 Digit<Char_T_>::NumberToStringStream(ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
-                return true;
+                break;
             }
 
             case ValueType::True: {
                 ss.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
-                return true;
+                break;
             }
 
             case ValueType::False: {
                 ss.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
-                return true;
+                break;
             }
 
             case ValueType::Null: {
                 ss.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
-                return true;
+                break;
             }
 
             default: {
                 return false;
             }
         }
+
+        return true;
     }
 
-    bool CopyKeyByIndexTo(StringStream<Char_T_> &ss, SizeT index) const {
+    template <typename StringStream_T_>
+    bool CopyKeyByIndexTo(StringStream_T_ &ss, SizeT index) const {
         if (IsObject()) {
             const VString *key = object_.GetKey(index);
 
