@@ -79,6 +79,7 @@ static int TestStringStream() {
     EQ_VALUE(ss2.Length(), 3, "Length");
     EQ_TRUE((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)");
     EQ_VALUE(ss2.GetString(), "abc", "GetString()");
+    String<char> sss;
 
     ss2 += String<char>("abc");
     EQ_VALUE(ss2.Length(), 3, "Length");
@@ -236,6 +237,14 @@ static int TestStringStream() {
     ss2 = ss1;
     EQ_VALUE(ss2.Length(), 5, "Length");
     EQ_VALUE(ss2, "abcde", "StringStream");
+
+    ss2.Reset();
+
+    /////////
+    str               = "abc";
+    const char *ss2_p = ss2.First();
+    str               = ss2.GetString();
+    EQ_VALUE(ss2_p, str.First(), "StringStream");
 
     /////////
 
