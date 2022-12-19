@@ -237,17 +237,18 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T
 template <typename Char_T_>
 class JSONotation {
   public:
-    static constexpr Char_T_ QuoteChar   = '"';
-    static constexpr Char_T_ CommaChar   = ',';
-    static constexpr Char_T_ ColonChar   = ':';
-    static constexpr Char_T_ SCurlyChar  = '{'; // Start
-    static constexpr Char_T_ ECurlyChar  = '}'; // End
-    static constexpr Char_T_ SSquareChar = '['; // Start
-    static constexpr Char_T_ ESquareChar = ']'; // End
-    static constexpr Char_T_ SlashChar   = '/';
-    static constexpr Char_T_ BSlashChar  = '\\';
-    static constexpr Char_T_ SpaceChar   = ' ';
-    static constexpr Char_T_ DotChar     = '.';
+    static constexpr Char_T_ QuoteChar    = '"';
+    static constexpr Char_T_ CommaChar    = ',';
+    static constexpr Char_T_ ColonChar    = ':';
+    static constexpr Char_T_ SCurlyChar   = '{'; // Start
+    static constexpr Char_T_ ECurlyChar   = '}'; // End
+    static constexpr Char_T_ SSquareChar  = '['; // Start
+    static constexpr Char_T_ ESquareChar  = ']'; // End
+    static constexpr Char_T_ SlashChar    = '/';
+    static constexpr Char_T_ BSlashChar   = '\\';
+    static constexpr Char_T_ SpaceChar    = ' ';
+    static constexpr Char_T_ DotChar      = '.';
+    static constexpr Char_T_ NegativeChar = '-';
 
     static constexpr Char_T_ LineControlChar      = '\n';
     static constexpr Char_T_ TabControlChar       = '\t';

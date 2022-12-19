@@ -258,7 +258,7 @@ class JSONParser {
             default: {
                 const SizeT    num_offset      = offset;
                 const Char_T_ *num_content     = (content + num_offset);
-                const bool     is_not_negative = (content[offset] != '-');
+                const bool     is_not_negative = (content[offset] != JSONotation_T_::NegativeChar);
                 bool           is_float        = false;
 
                 while (offset < length) {
