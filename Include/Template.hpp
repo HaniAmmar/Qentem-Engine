@@ -171,7 +171,7 @@ namespace Qentem {
  * <if case="{case}">...<if case="{case2}" />...</if></if>
  */
 
-template <typename, typename>
+template <typename, typename, typename>
 class Template_CV;
 
 template <typename>
@@ -182,28 +182,29 @@ class Template {
     template <typename>
     struct TagBit;
 
-    template <typename Char_T_, typename Value_T_, typename Number_T_>
-    inline static void Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value,
-                              StringStream<Char_T_> *ss, Array<TagBit<Char_T_>> *tags_cache) {
-        Template_CV<Char_T_, Value_T_>::Process(content, static_cast<SizeT>(length), root_value, ss, *tags_cache);
+    template <typename Char_T_, typename Value_T_, typename Number_T_, typename StringStream_T_>
+    inline static void Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value, StringStream_T_ *ss,
+                              Array<TagBit<Char_T_>> *tags_cache) {
+        Template_CV<Char_T_, Value_T_, StringStream_T_>::Process(content, static_cast<SizeT>(length), root_value, ss,
+                                                                 *tags_cache);
     }
 
-    template <typename Char_T_, typename Value_T_, typename Number_T_>
+    template <typename Char_T_, typename Value_T_, typename Number_T_, typename StringStream_T_>
     inline static void Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value,
-                              StringStream<Char_T_> *ss) {
+                              StringStream_T_ *ss) {
         Array<TagBit<Char_T_>> tags_cache;
         Render(content, length, root_value, ss, &tags_cache);
     }
 
-    template <typename Char_T_, typename Value_T_, typename Number_T_>
-    inline static StringStream<Char_T_> Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value) {
-        StringStream<Char_T_> ss;
+    template <typename Char_T_, typename Value_T_, typename Number_T_, typename StringStream_T_ = StringStream<Char_T_>>
+    inline static StringStream_T_ Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value) {
+        StringStream_T_ ss;
         Render(content, length, root_value, &ss);
         return ss;
     }
 
-    template <typename Char_T_, typename Value_T_>
-    inline static StringStream<Char_T_> Render(const Char_T_ *content, const Value_T_ *root_value) {
+    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
+    inline static StringStream_T_ Render(const Char_T_ *content, const Value_T_ *root_value) {
         return Render(content, StringUtils::Count(content), root_value);
     }
 
@@ -256,10 +257,6 @@ class Template {
 
     template <typename Char_T_>
     struct TagBit {
-        using LoopInfo_     = LoopInfo_T<Char_T_>;
-        using IfInfo_       = Array<IfCase_T<Char_T_>>;
-        using InlineIfInfo_ = InlineIfInfo_T<Char_T_>;
-
       public:
         TagBit()                             = delete;
         TagBit(const TagBit &tag)            = delete;
@@ -281,21 +278,22 @@ class Template {
         ~TagBit() {
             switch (GetType()) {
                 case TagType::Loop: {
-                    LoopInfo_ *loop_info = static_cast<LoopInfo_ *>(info_.GetPointer());
+                    LoopInfo_T<Char_T_> *loop_info = static_cast<LoopInfo_T<Char_T_> *>(info_.GetPointer());
                     Memory::Destruct(loop_info);
                     Memory::Deallocate(loop_info);
                     break;
                 }
 
                 case TagType::If: {
-                    IfInfo_ *if_info = static_cast<IfInfo_ *>(info_.GetPointer());
+                    Array<IfCase_T<Char_T_>> *if_info = static_cast<Array<IfCase_T<Char_T_>> *>(info_.GetPointer());
                     Memory::Destruct(if_info);
                     Memory::Deallocate(if_info);
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    InlineIfInfo_ *inline_if_info = static_cast<InlineIfInfo_ *>(info_.GetPointer());
+                    InlineIfInfo_T<Char_T_> *inline_if_info =
+                        static_cast<InlineIfInfo_T<Char_T_> *>(info_.GetPointer());
                     Memory::Destruct(inline_if_info);
                     Memory::Deallocate(inline_if_info);
                     break;
@@ -338,7 +336,7 @@ class Template {
     };
 };
 
-template <typename Char_T_, typename Value_T_>
+template <typename Char_T_, typename Value_T_, typename StringStream_T_>
 class Template_CV {
   private:
     friend class Qentem::ALE;
@@ -356,7 +354,7 @@ class Template_CV {
   public:
     Template_CV() = delete;
 
-    static void Process(const Char_T_ *content, SizeT length, const Value_T_ *root_value, StringStream<Char_T_> *ss,
+    static void Process(const Char_T_ *content, SizeT length, const Value_T_ *root_value, StringStream_T_ *ss,
                         Array<TagBit> &tags_cache) {
         const Template_CV temp{ss, root_value};
 
@@ -816,18 +814,18 @@ class Template_CV {
         SizeT          previous_offset   = 0;
         bool           break_loop        = false;
 
-        Array<TagBit>         sub_tags;
-        StringStream<Char_T_> inner_template;
-        unsigned short        set_offset    = 0;
-        unsigned short        set_length    = 0;
-        unsigned short        index_offset  = 0;
-        unsigned short        index_length  = 0;
-        unsigned short        repeat_offset = 0;
-        unsigned short        repeat_length = 0;
-        unsigned short        group_offset  = 0;
-        unsigned short        group_length  = 0;
-        unsigned short        sort_offset   = 0;
-        unsigned short        sort_length   = 0;
+        Array<TagBit>   sub_tags;
+        StringStream_T_ inner_template;
+        unsigned short  set_offset    = 0;
+        unsigned short  set_length    = 0;
+        unsigned short  index_offset  = 0;
+        unsigned short  index_length  = 0;
+        unsigned short  repeat_offset = 0;
+        unsigned short  repeat_length = 0;
+        unsigned short  group_offset  = 0;
+        unsigned short  group_length  = 0;
+        unsigned short  sort_offset   = 0;
+        unsigned short  sort_length   = 0;
 
         // Stage 1: Info extraction
         while (true) {
@@ -972,7 +970,7 @@ class Template_CV {
 
         parse(sub_tags, inner_template.First(), inner_template.Length());
 
-        loop_info = Memory::AllocateInit<LoopInfo_>(static_cast<StringStream<Char_T_> &&>(inner_template),
+        loop_info = Memory::AllocateInit<LoopInfo_>(static_cast<StringStream_T_ &&>(inner_template),
                                                     static_cast<Array<TagBit> &&>(sub_tags), set_offset, set_length,
                                                     index_offset, index_length, repeat_offset, repeat_length,
                                                     group_offset, group_length, sort_offset, sort_length);
@@ -1278,16 +1276,16 @@ class Template_CV {
             SizeT tmp    = 1;
 
             if (*key != TemplatePatterns_C_::TildeChar) {
-                value = root_value_;
-
                 if ((key[(length - 1)] != TemplatePatterns_C_::VariableIndexSuffix)) {
-                    return value->GetValue(key, length);
+                    return root_value_->GetValue(key, length);
                 }
 
                 // [...]
                 while ((key[tmp] != TemplatePatterns_C_::VariableIndexPrefix) && (tmp < length)) {
                     ++tmp;
                 }
+
+                value = root_value_;
             } else {
                 const Template_CV *obj = this;
                 SizeT              lvl = 0;
@@ -1305,12 +1303,13 @@ class Template_CV {
                     return obj->loop_value_;
                 }
 
-                value  = obj->loop_value_;
-                offset = (lvl + 1);
                 // [...]
                 while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
                 }
+
+                value  = obj->loop_value_;
+                offset = (lvl + 1);
             }
 
             while (true) {
@@ -1463,17 +1462,17 @@ class Template_CV {
         return true;
     }
 
-    Template_CV(StringStream<Char_T_> *ss, const Value_T_ *root_value, const Template_CV *parent = nullptr,
+    Template_CV(StringStream_T_ *ss, const Value_T_ *root_value, const Template_CV *parent = nullptr,
                 SizeT level = 0) noexcept
         : ss_{ss}, root_value_{root_value}, parent_{parent}, level_{level} {}
 
-    StringStream<Char_T_> *ss_;
-    const Value_T_        *root_value_;
-    const Template_CV     *parent_;
-    const Value_T_        *loop_value_{nullptr};
-    const Char_T_         *loop_key_{nullptr};
-    SizeT                  loop_key_length_{0};
-    const SizeT            level_;
+    StringStream_T_   *ss_;
+    const Value_T_    *root_value_;
+    const Template_CV *parent_;
+    const Value_T_    *loop_value_{nullptr};
+    const Char_T_     *loop_key_{nullptr};
+    SizeT              loop_key_length_{0};
+    const SizeT        level_;
 };
 
 template <typename Char_T_>
