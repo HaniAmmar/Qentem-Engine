@@ -157,9 +157,14 @@ class ALE {
                       const Expression previous_expr) const noexcept {
             Number     right;
             Expression next_expr;
-            const bool no_equal = ((expr != Expression::Equal) && (expr != Expression::NotEqual));
 
-            if ((expr != Expression::Error) && getNumber(left, num_offset, (offset - num_offset), expr)) {
+            if (expr != Expression::Error) {
+                const bool no_equal = ((expr != Expression::Equal) && (expr != Expression::NotEqual));
+
+                if (!getValue(left, num_offset, (offset - num_offset), no_equal)) {
+                    return false;
+                }
+
                 while (offset < length) {
                     ++offset;
 
@@ -171,7 +176,8 @@ class ALE {
                     next_expr  = getExpression(offset, length);
 
                     if (expr >= next_expr) {
-                        if (!getNumber(right, num_offset, (offset - num_offset), expr) ||
+                        if (!getValue(right, num_offset, (offset - num_offset),
+                                      ((expr != Expression::Equal) && (expr != Expression::NotEqual))) ||
                             !process(left, right, no_equal, false, expr)) {
                             return false;
                         }
@@ -179,7 +185,7 @@ class ALE {
                         expr = next_expr;
 
                         if (previous_expr >= next_expr) {
-                            break;
+                            return true;
                         }
                     } else {
                         if (!subParse(right, offset, num_offset, length, next_expr, expr) ||
@@ -197,16 +203,21 @@ class ALE {
             return false;
         }
 
-        bool getNumber(Number &val, SizeT offset, SizeT length, const Expression expr) const noexcept {
-            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
-
+        bool getValue(Number &val, SizeT offset, SizeT length, bool no_equal) const noexcept {
             StringUtils::Trim(content_, offset, length);
 
-            if ((expr == Expression::Equal) || (expr == Expression::NotEqual)) {
-                val.Content.Offset = static_cast<unsigned int>(offset);
-                val.Content.Length = static_cast<unsigned int>(length);
-                return true;
+            if (no_equal) {
+                return getNumber(val, offset, length);
             }
+
+            val.Content.Offset = static_cast<unsigned int>(offset);
+            val.Content.Length = static_cast<unsigned int>(length);
+
+            return true;
+        }
+
+        bool getNumber(Number &val, SizeT offset, SizeT length) const noexcept {
+            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
 
             switch (content_[offset]) {
                 case ALEExpressions_T_::ParenthesStart: {
