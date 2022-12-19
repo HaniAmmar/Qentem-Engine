@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_UNICODE_H_
