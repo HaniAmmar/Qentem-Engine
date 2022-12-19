@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "StringStream.hpp"
+#include "String.hpp"
 
 #ifndef QENTEM_DIGIT_H_
 #define QENTEM_DIGIT_H_
@@ -94,10 +94,10 @@ class Digit {
         return NumberToStringHelper<Number_T_, is_unsigned>::NumberToString(number, min);
     }
 
-    template <typename Number_T_>
-    inline static void NumberToStringStream(StringStream<Char_T_> &ss, Number_T_ number, unsigned int min = 1) {
+    template <typename Number_T_, typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &ss, Number_T_ number, unsigned int min = 1) {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        NumberToStringStreamHelper<Number_T_, is_unsigned>::NumberToStringStream(ss, number, min);
+        NumberToStringStreamHelper<Number_T_, StringStream_T_, is_unsigned>::NumberToStringStream(ss, number, min);
     }
 
     /*
@@ -118,12 +118,14 @@ class Digit {
         return NumberToString(static_cast<double>(f_number), min, r_min, precision);
     }
 
-    inline static void NumberToStringStream(StringStream<Char_T_> &ss, double number, unsigned int min = 1,
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &ss, double number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
         doubleToString(ss, number, min, r_min, precision);
     }
 
-    inline static void NumberToStringStream(StringStream<Char_T_> &ss, float f_number, unsigned int min = 1,
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &ss, float f_number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
         NumberToStringStream(ss, static_cast<double>(f_number), min, r_min, precision);
     }
@@ -286,18 +288,18 @@ class Digit {
         }
     };
 
-    template <typename Number_T_, bool IS_UNSIGNED>
+    template <typename Number_T_, typename StringStream_T_, bool IS_UNSIGNED>
     class NumberToStringStreamHelper {
       public:
-        inline static void NumberToStringStream(StringStream<Char_T_> &ss, Number_T_ number, unsigned int min = 1) {
+        inline static void NumberToStringStream(StringStream_T_ &ss, Number_T_ number, unsigned int min = 1) {
             intToString(ss, number, min, false);
         }
     };
 
-    template <typename Number_T_>
-    class NumberToStringStreamHelper<Number_T_, false> {
+    template <typename Number_T_, typename StringStream_T_>
+    class NumberToStringStreamHelper<Number_T_, StringStream_T_, false> {
       public:
-        inline static void NumberToStringStream(StringStream<Char_T_> &ss, Number_T_ number, unsigned int min = 1) {
+        inline static void NumberToStringStream(StringStream_T_ &ss, Number_T_ number, unsigned int min = 1) {
             if (number < 0) {
                 number *= -1;
                 intToString(ss, number, min, true);
@@ -801,8 +803,9 @@ class Digit {
         return dstring.Storage();
     }
 
-    inline static Char_T_ *getCharForNumber(StringStream<Char_T_> &dstring, SizeT length) {
-        return dstring.Buffer(length);
+    template <typename StringStream_T_>
+    inline static Char_T_ *getCharForNumber(StringStream_T_ &string, SizeT length) {
+        return string.Buffer(length);
     }
 
     QENTEM_NOINLINE static void extractExponent(double &number, int &exponent) noexcept {
