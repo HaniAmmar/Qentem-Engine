@@ -84,11 +84,11 @@ class QPointer {
     struct Bits {
 #ifndef QENTEM_BIG_ENDIAN
         unsigned long long num_ : 48;
-        unsigned long long low_ : 8;
-        unsigned long long high_ : 8;
+        unsigned char      low_;
+        unsigned char      high_;
 #else
-        unsigned long long high_ : 8;
-        unsigned long long low_ : 8;
+        unsigned char      high_;
+        unsigned char      low_;
         unsigned long long num_ : 48;
 #endif
     };
