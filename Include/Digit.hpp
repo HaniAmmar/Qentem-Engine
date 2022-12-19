@@ -41,21 +41,21 @@ class Digit {
   private:
     class DigitChars {
       public:
-        static constexpr Char_T_ ZeroChar  = '0';
-        static constexpr Char_T_ NineChar  = '9';
-        static constexpr Char_T_ SevenChar = '7';
-        static constexpr Char_T_ E_Char    = 'e';
-        static constexpr Char_T_ UE_Char   = 'E';
-        static constexpr Char_T_ DotChar   = '.';
-        static constexpr Char_T_ PlusChar  = '+';
-        static constexpr Char_T_ MinusChar = '-';
-        static constexpr Char_T_ ColonChar = ':';
-        static constexpr Char_T_ SlashChar = '/';
-        static constexpr Char_T_ UA_Char   = 'A';
-        static constexpr Char_T_ UF_Char   = 'F';
-        static constexpr Char_T_ A_Char    = 'a';
-        static constexpr Char_T_ F_Char    = 'f';
-        static constexpr Char_T_ UW_Char   = 'W';
+        static constexpr Char_T_ ZeroChar     = '0';
+        static constexpr Char_T_ NineChar     = '9';
+        static constexpr Char_T_ SevenChar    = '7';
+        static constexpr Char_T_ E_Char       = 'e';
+        static constexpr Char_T_ UE_Char      = 'E';
+        static constexpr Char_T_ DotChar      = '.';
+        static constexpr Char_T_ PositiveChar = '+';
+        static constexpr Char_T_ NegativeChar = '-';
+        static constexpr Char_T_ ColonChar    = ':';
+        static constexpr Char_T_ SlashChar    = '/';
+        static constexpr Char_T_ UA_Char      = 'A';
+        static constexpr Char_T_ UF_Char      = 'F';
+        static constexpr Char_T_ A_Char       = 'a';
+        static constexpr Char_T_ F_Char       = 'f';
+        static constexpr Char_T_ UW_Char      = 'W';
     };
 
   public:
@@ -195,7 +195,7 @@ class Digit {
                 return false; // No leanding zeros.
             }
 
-            if (str[0] == DigitChars::PlusChar) {
+            if (str[0] == DigitChars::PositiveChar) {
                 SizeT offset = 1;
                 StringUtils::TrimLeft(str, offset, length);
                 length -= offset;
@@ -223,7 +223,7 @@ class Digit {
             }
 
             switch (s_str[0]) {
-                case DigitChars::MinusChar: {
+                case DigitChars::NegativeChar: {
                     SizeT offset = 1;
                     StringUtils::TrimLeft(s_str, offset, length);
                     length -= offset;
@@ -236,7 +236,7 @@ class Digit {
                     break;
                 }
 
-                case DigitChars::PlusChar: {
+                case DigitChars::PositiveChar: {
                     SizeT offset = 1;
                     StringUtils::TrimLeft(s_str, offset, length);
                     length -= offset;
@@ -338,14 +338,14 @@ class Digit {
                             continue;
                         }
 
-                        case DigitChars::MinusChar:
-                        case DigitChars::PlusChar: {
+                        case DigitChars::NegativeChar:
+                        case DigitChars::PositiveChar: {
                             if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) || (sign != 0)) {
                                 // No number, or double sign.
                                 return false;
                             }
 
-                            sign = ((c == DigitChars::MinusChar) ? -1 : 1);
+                            sign = ((c == DigitChars::NegativeChar) ? -1 : 1);
                             break;
                         }
 
@@ -391,7 +391,7 @@ class Digit {
             }
 
             switch (str[0]) {
-                case DigitChars::MinusChar: {
+                case DigitChars::NegativeChar: {
                     SizeT n_offset = 1;
                     StringUtils::TrimLeft(str, n_offset, length);
                     length -= n_offset;
@@ -404,7 +404,7 @@ class Digit {
                     break;
                 }
 
-                case DigitChars::PlusChar: {
+                case DigitChars::PositiveChar: {
                     SizeT offset = 1;
                     StringUtils::TrimLeft(str, offset, length);
                     length -= offset;
@@ -564,7 +564,7 @@ class Digit {
         }
 
         if (negative) {
-            tmp[offset] = DigitChars::MinusChar;
+            tmp[offset] = DigitChars::NegativeChar;
             ++offset;
         }
 
@@ -740,7 +740,7 @@ class Digit {
 
             if (exponent < 0) {
                 exponent *= -1;
-                tmp2[offset] = DigitChars::MinusChar;
+                tmp2[offset] = DigitChars::NegativeChar;
                 ++offset;
             }
 
@@ -780,7 +780,7 @@ class Digit {
         unsigned int offset2 = 0;
 
         if (negative) {
-            str[0] = DigitChars::MinusChar;
+            str[0] = DigitChars::NegativeChar;
             ++offset;
             ++offset2;
         }
