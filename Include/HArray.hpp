@@ -73,7 +73,7 @@ class HArray {
 
     ~HArray() {
         HAItem_T_ *storage = Storage();
-        Memory::Destruct(storage, (storage + Size()));
+        Memory::Dispose(storage, (storage + Size()));
         deallocate(getHashTable());
     }
 
@@ -88,7 +88,7 @@ class HArray {
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
             HAItem_T_ *storage = Storage();
-            Memory::Destruct(storage, End());
+            Memory::Dispose(storage, End());
             deallocate(getHashTable());
 
             setSize(src.Size());
@@ -128,7 +128,7 @@ class HArray {
                 if (des_item == nullptr) {
                     des_item = insert(index, static_cast<Key_T_ &&>(item->Key), item->Hash);
                 } else {
-                    Memory::Destruct(&(item->Key));
+                    Memory::Dispose(&(item->Key));
                 }
 
                 des_item->Value = static_cast<Value_ &&>(item->Value);
@@ -382,7 +382,7 @@ class HArray {
 
     void Reset() noexcept {
         HAItem_T_ *storage = Storage();
-        Memory::Destruct(storage, (storage + Size()));
+        Memory::Dispose(storage, (storage + Size()));
         deallocate(getHashTable());
         clearStorage();
         setCapacity(0);
@@ -397,7 +397,7 @@ class HArray {
 
         if (Size() > new_size) {
             // Shrink
-            Memory::Destruct((Storage() + new_size), End());
+            Memory::Dispose((Storage() + new_size), End());
             setSize(new_size);
         }
 
@@ -517,8 +517,8 @@ class HArray {
 
         item->Next = 0;
         item->Hash = hash;
-        Memory::Construct(&(item->Key), static_cast<Key_T_ &&>(key));
-        Memory::Construct(&(item->Value), Value_());
+        Memory::Initialize(&(item->Key), static_cast<Key_T_ &&>(key));
+        Memory::Initialize(&(item->Value), Value_());
 
         return item;
     }
@@ -552,7 +552,7 @@ class HArray {
 
             do {
                 if (src_item->Hash != 0) {
-                    Memory::Construct(des_item, *src_item);
+                    Memory::Initialize(des_item, *src_item);
                     ++des_item;
                 }
 
@@ -577,7 +577,7 @@ class HArray {
 
         while (item != end) {
             if (item->Hash != 0) {
-                Memory::Construct(des_item, static_cast<HAItem_T_ &&>(*item));
+                Memory::Initialize(des_item, static_cast<HAItem_T_ &&>(*item));
                 ++des_item;
             }
 

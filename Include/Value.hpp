@@ -1304,47 +1304,47 @@ class Value {
     inline void setTypeToNull() noexcept { setType(ValueType::Null); }
 
     inline void initObject() noexcept {
-        Memory::Construct(&object_, VObject());
+        Memory::Initialize(&object_, VObject());
         setTypeToObject();
     }
 
     inline void initArray() noexcept {
-        Memory::Construct(&array_, VArray());
+        Memory::Initialize(&array_, VArray());
         setTypeToArray();
     }
 
     inline void initString() noexcept {
-        Memory::Construct(&string_, VString());
+        Memory::Initialize(&string_, VString());
         setTypeToString();
     }
 
     inline void initValue(VObject &&obj) noexcept {
-        Memory::Construct(&object_, static_cast<VObject &&>(obj));
+        Memory::Initialize(&object_, static_cast<VObject &&>(obj));
         setTypeToObject();
     }
 
     inline void initValue(const VObject &obj) {
-        Memory::Construct(&object_, obj);
+        Memory::Initialize(&object_, obj);
         setTypeToObject();
     }
 
     inline void initValue(VArray &&arr) noexcept {
-        Memory::Construct(&array_, static_cast<VArray &&>(arr));
+        Memory::Initialize(&array_, static_cast<VArray &&>(arr));
         setTypeToArray();
     }
 
     inline void initValue(const VArray &arr) {
-        Memory::Construct(&array_, arr);
+        Memory::Initialize(&array_, arr);
         setTypeToArray();
     }
 
     inline void initValue(VString &&str) noexcept {
-        Memory::Construct(&string_, static_cast<VString &&>(str));
+        Memory::Initialize(&string_, static_cast<VString &&>(str));
         setTypeToString();
     }
 
     inline void initValue(const VString &str) {
-        Memory::Construct(&string_, str);
+        Memory::Initialize(&string_, str);
         setTypeToString();
     }
 

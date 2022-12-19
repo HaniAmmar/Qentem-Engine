@@ -57,7 +57,7 @@ class Array {
             const Type_ *end  = (item + src.Size());
 
             while (item != end) {
-                Memory::Construct(des, *item);
+                Memory::Initialize(des, *item);
                 ++des;
                 ++item;
             }
@@ -66,14 +66,14 @@ class Array {
 
     ~Array() {
         Type_ *storage = Storage();
-        Memory::Destruct(storage, (storage + Size()));
+        Memory::Dispose(storage, (storage + Size()));
         deallocate(storage);
     }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
             Type_ *storage = Storage();
-            Memory::Destruct(storage, End());
+            Memory::Dispose(storage, End());
             deallocate(storage);
 
             setSize(src.Size());
@@ -97,7 +97,7 @@ class Array {
             const Type_ *end  = (item + src.Size());
 
             while (item != end) {
-                Memory::Construct(des, *item);
+                Memory::Initialize(des, *item);
                 ++des;
                 ++item;
             }
@@ -152,7 +152,7 @@ class Array {
             resize(Capacity() << 1U);
         }
 
-        Memory::Construct((Storage() + Size()), static_cast<Type_ &&>(item));
+        Memory::Initialize((Storage() + Size()), static_cast<Type_ &&>(item));
         ++index_;
     }
 
@@ -180,13 +180,13 @@ class Array {
 
     void Clear() noexcept {
         Type_ *storage = Storage();
-        Memory::Destruct(storage, (storage + Size()));
+        Memory::Dispose(storage, (storage + Size()));
         setSize(0);
     }
 
     void Reset() noexcept {
         Type_ *storage = Storage();
-        Memory::Destruct(storage, (storage + Size()));
+        Memory::Dispose(storage, (storage + Size()));
         deallocate(storage);
         clearStorage();
         setSize(0);
@@ -219,7 +219,7 @@ class Array {
 
         if (Size() > new_size) {
             // Shrink
-            Memory::Destruct((Storage() + new_size), End());
+            Memory::Dispose((Storage() + new_size), End());
             setSize(new_size);
         }
 
@@ -251,7 +251,7 @@ class Array {
 
         if (new_size > Size()) {
             Type_ *current = Storage();
-            Memory::Construct((current + Size()), (current + new_size), Type_());
+            Memory::Initialize((current + Size()), (current + new_size), Type_());
         }
 
         setSize(Capacity());
@@ -313,7 +313,7 @@ class Array {
         const Type_ *end  = (item + src.Size());
 
         while (item != end) {
-            Memory::Construct(des, *item);
+            Memory::Initialize(des, *item);
             ++des;
             ++item;
         }

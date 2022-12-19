@@ -279,14 +279,14 @@ class Template {
             switch (GetType()) {
                 case TagType::Loop: {
                     LoopInfo_T<Char_T_> *loop_info = static_cast<LoopInfo_T<Char_T_> *>(info_.GetPointer());
-                    Memory::Destruct(loop_info);
+                    Memory::Dispose(loop_info);
                     Memory::Deallocate(loop_info);
                     break;
                 }
 
                 case TagType::If: {
                     Array<IfCase_T<Char_T_>> *if_info = static_cast<Array<IfCase_T<Char_T_>> *>(info_.GetPointer());
-                    Memory::Destruct(if_info);
+                    Memory::Dispose(if_info);
                     Memory::Deallocate(if_info);
                     break;
                 }
@@ -294,7 +294,7 @@ class Template {
                 case TagType::InLineIf: {
                     InlineIfInfo_T<Char_T_> *inline_if_info =
                         static_cast<InlineIfInfo_T<Char_T_> *>(info_.GetPointer());
-                    Memory::Destruct(inline_if_info);
+                    Memory::Dispose(inline_if_info);
                     Memory::Deallocate(inline_if_info);
                     break;
                 }

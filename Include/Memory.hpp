@@ -164,32 +164,35 @@ inline static Type_ *AllocateInit() {
     return new Type_();
 }
 
-// Allocate and move constructor
+// Allocate and move
 template <typename Type_, typename... Values_T_>
 inline static Type_ *AllocateInit(Values_T_ &&...values) noexcept {
     return new Type_{static_cast<Values_T_ &&>(values)...};
 }
 
-// Allocate and copy constructor
+// Allocate and copy
 template <typename Type_, typename... Values_T_>
 inline static Type_ *AllocateInit(const Values_T_ &...values) {
     return new Type_(values...);
 }
 
-// Move constructor
+inline static void Deallocate(void *ptr) noexcept { ::operator delete(ptr); }
+
+// Move initializer
 template <typename Type_>
-inline static void Construct(Type_ *ptr, Type_ &&value) noexcept {
+inline static void Initialize(Type_ *ptr, Type_ &&value) noexcept {
     new (ptr) Type_{static_cast<Type_ &&>(value)};
 }
 
-// Copy constructor
+// Copy initializer
 template <typename Type_>
-inline static void Construct(Type_ *ptr, const Type_ &value) {
+inline static void Initialize(Type_ *ptr, const Type_ &value) {
     new (ptr) Type_{value};
 }
 
+// Range copy initializer
 template <typename Type_>
-inline static void Construct(Type_ *ptr, const Type_ *end, const Type_ &value) {
+inline static void Initialize(Type_ *ptr, const Type_ *end, const Type_ &value) {
     while (ptr < end) {
         new (ptr) Type_{value};
         ++ptr;
@@ -197,17 +200,17 @@ inline static void Construct(Type_ *ptr, const Type_ *end, const Type_ &value) {
 }
 
 template <typename Type_, typename... Values_T_>
-inline static void ConstructValues(Type_ *ptr, Values_T_ &&...values) noexcept {
+inline static void InitializeValues(Type_ *ptr, Values_T_ &&...values) noexcept {
     new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
 }
 
 template <typename Type_, typename... Values_T_>
-inline static void ConstructValues(Type_ *ptr, const Values_T_ &...values) {
+inline static void InitializeValues(Type_ *ptr, const Values_T_ &...values) {
     new (ptr) Type_{values...};
 }
 
 template <typename Type_>
-inline static void Destruct(Type_ *item, const Type_ *end) noexcept {
+inline static void Dispose(Type_ *item, const Type_ *end) noexcept {
     while (item < end) {
         if (item != nullptr) {
             item->~Type_();
@@ -218,13 +221,11 @@ inline static void Destruct(Type_ *item, const Type_ *end) noexcept {
 }
 
 template <typename Type_>
-inline static void Destruct(Type_ *item) noexcept {
+inline static void Dispose(Type_ *item) noexcept {
     if (item != nullptr) {
         item->~Type_();
     }
 }
-
-inline static void Deallocate(void *ptr) noexcept { ::operator delete(ptr); }
 
 } // namespace Memory
 } // namespace Qentem
