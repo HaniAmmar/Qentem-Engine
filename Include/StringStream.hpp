@@ -253,7 +253,9 @@ class StringStream {
         // }
 
         String<Char_T_> str{First(), len};
-        Reset();
+        setLength(0);
+        setCapacity(0);
+        clearStorage();
 
         return str;
     }
