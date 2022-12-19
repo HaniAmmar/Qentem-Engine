@@ -241,7 +241,9 @@ struct SMIDSetToOne_T<Char_T_, 2> {
 // wchar_t
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 4> {
-    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept { return QENTEM_SIMD_SET_TO_ONE_32(value); }
+    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {
+        return QENTEM_SIMD_SET_TO_ONE_32(static_cast<int>(value));
+    }
 };
 
 template <typename Char_T_, typename Number_T_>
