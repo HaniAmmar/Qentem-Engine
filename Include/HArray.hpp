@@ -170,7 +170,7 @@ class HArray {
 
     Value_ &operator[](const Char_T_ *key) {
         if (Size() == Capacity()) {
-            grow();
+            expand();
         }
 
         const SizeT len  = StringUtils::Count(key);
@@ -187,7 +187,7 @@ class HArray {
 
     Value_ &operator[](Key_T_ &&key) {
         if (Size() == Capacity()) {
-            grow();
+            expand();
         }
 
         const Char_T_ *str = key.First();
@@ -206,7 +206,7 @@ class HArray {
 
     Value_ &operator[](const Key_T_ &key) {
         if (Size() == Capacity()) {
-            grow();
+            expand();
         }
 
         const Char_T_ *str = key.First();
@@ -225,7 +225,7 @@ class HArray {
 
     void Insert(Key_T_ &&key, Value_ &&val) {
         if (Size() == Capacity()) {
-            grow();
+            expand();
         }
 
         const Char_T_ *str = key.First();
@@ -480,7 +480,7 @@ class HArray {
     void clearStorage() noexcept { setStorage(nullptr); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
-    void grow() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
+    void expand() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
 
     SizeT aligneSize(SizeT n_size) noexcept {
         const SizeT size = (SizeT{1U} << Platform::CLZ((n_size != 1) ? n_size : 2U));
