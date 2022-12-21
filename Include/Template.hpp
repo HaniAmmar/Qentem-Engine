@@ -653,52 +653,54 @@ class Template_CV {
         }
     }
 
-    void escapeHTMLSpecialChars(const Char_T_ *str, SizeT len) const {
+    void escapeHTMLSpecialChars(const Char_T_ *str, SizeT length) const {
         SizeT offset = 0;
+        SizeT index  = 0;
 
-        for (SizeT i = 0; i < len; i++) {
-            switch (str[i]) {
+        while (index < length) {
+            switch (str[index]) {
                 case '&': {
-                    ss_->Insert((str + offset), (i - offset));
-                    offset = (i + 1);
+                    ss_->Insert((str + offset), (index - offset));
                     ss_->Insert(TemplatePatterns_C_::GetHTMLAnd(), TemplatePatterns_C_::HTMLAndLength);
+                    offset = (++index);
                     break;
                 }
 
                 case '<': {
-                    ss_->Insert((str + offset), (i - offset));
-                    offset = (i + 1);
+                    ss_->Insert((str + offset), (index - offset));
                     ss_->Insert(TemplatePatterns_C_::GetHTMLLess(), TemplatePatterns_C_::HTMLLessLength);
+                    offset = (++index);
                     break;
                 }
 
                 case '>': {
-                    ss_->Insert((str + offset), (i - offset));
-                    offset = (i + 1);
+                    ss_->Insert((str + offset), (index - offset));
                     ss_->Insert(TemplatePatterns_C_::GetHTMLBigger(), TemplatePatterns_C_::HTMLBiggerLength);
+                    offset = (++index);
                     break;
                 }
 
                 case '"': {
-                    ss_->Insert((str + offset), (i - offset));
-                    offset = (i + 1);
+                    ss_->Insert((str + offset), (index - offset));
                     ss_->Insert(TemplatePatterns_C_::GetHTMLQuote(), TemplatePatterns_C_::HTMLQuoteLength);
+                    offset = (++index);
                     break;
                 }
 
                 case '\'': {
-                    ss_->Insert((str + offset), (i - offset));
-                    offset = (i + 1);
+                    ss_->Insert((str + offset), (index - offset));
                     ss_->Insert(TemplatePatterns_C_::GetHTMLSingleQuote(), TemplatePatterns_C_::HTMLSingleQuoteLength);
+                    offset = (++index);
                     break;
                 }
 
                 default: {
+                    ++index;
                 }
             }
         }
 
-        ss_->Insert((str + offset), (len - offset));
+        ss_->Insert((str + offset), (length - offset));
     }
 
     void renderVariable(const Char_T_ *content, SizeT length) const {
