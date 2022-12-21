@@ -66,11 +66,6 @@ class Value {
     ~Value() {
         if (!IsUndefined()) {
             reset();
-            // #if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
-            //             setTypeToUndefined();
-            // #else
-            //             number_.ClearAll();
-            // #endif
         }
     }
 
@@ -98,23 +93,14 @@ class Value {
     }
 
     explicit Value(VObject &&obj) noexcept : object_{static_cast<VObject &&>(obj)} { setTypeToObject(); }
-
     explicit Value(VArray &&arr) noexcept : array_{static_cast<VArray &&>(arr)} { setTypeToArray(); }
-
     explicit Value(VString &&str) noexcept : string_{static_cast<VString &&>(str)} { setTypeToString(); }
-
     explicit Value(const VObject &obj) noexcept : object_{obj} { setTypeToObject(); }
-
     explicit Value(const VArray &arr) noexcept : array_{arr} { setTypeToArray(); }
-
     explicit Value(const VString &str) noexcept : string_{str} { setTypeToString(); }
-
     explicit Value(const Char_T_ *str, SizeT length) : string_{str, length} { setTypeToString(); }
-
     explicit Value(unsigned long long num) noexcept : number_{num} { setTypeToUInt64(); }
-
     explicit Value(long long num) noexcept : number_{num} { setTypeToInt64(); }
-
     explicit Value(double num) noexcept : number_{num} { setTypeToDouble(); }
 
     template <typename Number_T_>
@@ -352,7 +338,7 @@ class Value {
     }
 
     void operator+=(Value &&val) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -363,7 +349,7 @@ class Value {
     }
 
     void operator+=(const Value &val) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -375,7 +361,7 @@ class Value {
         if (IsObject()) {
             object_ += static_cast<VObject &&>(obj);
         } else {
-            if (!(IsArray())) {
+            if (!IsArray()) {
                 Reset();
                 initArray();
             }
@@ -387,7 +373,7 @@ class Value {
     void operator+=(const VObject &obj) { *this += static_cast<VObject &&>(VObject(obj)); }
 
     void operator+=(VArray &&arr) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -402,7 +388,7 @@ class Value {
     void operator+=(const VArray &arr) { (*this) += static_cast<VArray &&>(VArray(arr)); }
 
     void operator+=(VString &&str) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -411,12 +397,11 @@ class Value {
     }
 
     void operator+=(const VString &str) { *this += static_cast<VString &&>(VString(str)); }
-
     void operator+=(const Char_T_ *str) { *this += static_cast<VString &&>(VString(str)); }
 
     template <typename Number_T_>
     void operator+=(Number_T_ num) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -425,7 +410,7 @@ class Value {
     }
 
     void operator+=(NullType) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -434,7 +419,7 @@ class Value {
     }
 
     void operator+=(bool is_true) {
-        if (!(IsArray())) {
+        if (!IsArray()) {
             Reset();
             initArray();
         }
@@ -443,7 +428,7 @@ class Value {
     }
 
     Value &operator[](const Char_T_ *key) {
-        if (!(IsObject())) {
+        if (!IsObject()) {
             Reset();
             initObject();
         }
@@ -452,7 +437,7 @@ class Value {
     }
 
     Value &operator[](VString &&key) {
-        if (!(IsObject())) {
+        if (!IsObject()) {
             Reset();
             initObject();
         }
@@ -461,7 +446,7 @@ class Value {
     }
 
     Value &operator[](const VString &key) {
-        if (!(IsObject())) {
+        if (!IsObject()) {
             Reset();
             initObject();
         }
@@ -589,28 +574,30 @@ class Value {
         return (type > val.Type());
     }
 
-    inline bool IsUndefined() const noexcept { return (Type() == ValueType::Undefined); }
-
-    inline bool IsObject() const noexcept { return (Type() == ValueType::Object); }
-
-    inline bool IsArray() const noexcept { return (Type() == ValueType::Array); }
-
-    inline bool IsString() const noexcept { return (Type() == ValueType::String); }
-
     inline bool IsNumber() const noexcept {
-        return ((Type() == ValueType::UInt64) || (Type() == ValueType::Int64) || (Type() == ValueType::Double));
+        switch (Type()) {
+            case ValueType::UInt64:
+            case ValueType::Int64:
+            case ValueType::Double: {
+                return true;
+                break;
+            }
+
+            default: {
+                return false;
+            } break;
+        }
     }
 
+    inline bool IsUndefined() const noexcept { return (Type() == ValueType::Undefined); }
+    inline bool IsObject() const noexcept { return (Type() == ValueType::Object); }
+    inline bool IsArray() const noexcept { return (Type() == ValueType::Array); }
+    inline bool IsString() const noexcept { return (Type() == ValueType::String); }
     inline bool IsUInt64() const noexcept { return (Type() == ValueType::UInt64); }
-
     inline bool IsInt64() const noexcept { return (Type() == ValueType::Int64); }
-
     inline bool IsDouble() const noexcept { return (Type() == ValueType::Double); }
-
     inline bool IsTrue() const noexcept { return (Type() == ValueType::True); }
-
     inline bool IsFalse() const noexcept { return (Type() == ValueType::False); }
-
     inline bool IsNull() const noexcept { return (Type() == ValueType::Null); }
 
     SizeT Size() const noexcept {
