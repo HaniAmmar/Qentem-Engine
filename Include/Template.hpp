@@ -1275,7 +1275,7 @@ class Template_CV {
                 }
 
                 // [...]
-                while ((key[tmp] != TemplatePatterns_C_::VariableIndexPrefix) && (tmp < length)) {
+                while ((tmp < length) && (key[tmp] != TemplatePatterns_C_::VariableIndexPrefix)) {
                     ++tmp;
                 }
 
@@ -1293,6 +1293,10 @@ class Template_CV {
                     obj = obj->parent_;
                 }
 
+                if (lvl > level_) {
+                    return nullptr;
+                }
+
                 if ((key[(length - 1)] != TemplatePatterns_C_::VariableIndexSuffix)) {
                     return obj->loop_value_;
                 }
@@ -1306,11 +1310,7 @@ class Template_CV {
                 offset = (lvl + 1);
             }
 
-            while (true) {
-                if (value == nullptr) {
-                    break;
-                }
-
+            while (value != nullptr) {
                 value = value->GetValue((key + offset), (tmp - offset));
 
                 ++tmp;
