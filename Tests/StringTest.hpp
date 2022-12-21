@@ -279,6 +279,7 @@ static int TestString2() {
     EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
     EQ_VALUE(str2, "abcdef", "str2");
 
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
     str1.Reset();
     for (SizeT i = 0; i < String8::ShortStringMax; i++) {
         str1 += "A";
@@ -312,6 +313,7 @@ static int TestString2() {
     NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
     EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
     EQ_VALUE(str1, "AAAAAAAAAAA_B_C", "str1");
+#endif
 
     str1.Reset();
     str1 += "a";
