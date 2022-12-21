@@ -653,7 +653,6 @@ class Template_CV {
         }
     }
 
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
     void escapeHTMLSpecialChars(const Char_T_ *str, SizeT len) const {
         SizeT offset = 0;
 
@@ -701,7 +700,6 @@ class Template_CV {
 
         ss_->Insert((str + offset), (len - offset));
     }
-#endif
 
     void renderVariable(const Char_T_ *content, SizeT length) const {
         const Value_T_ *value = findValue(content, length);
