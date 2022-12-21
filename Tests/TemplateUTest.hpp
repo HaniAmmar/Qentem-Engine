@@ -221,6 +221,24 @@ static int TestVariableUTag1() {
     content = uR"({var:6key3]})";
     EQ_VALUE(Template::Render(content, &value), uR"({var:6key3]})", uR"(Render())");
 
+    content = uR"({var:~2})";
+    EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
+
+    content = uR"({var:~~~~~~~2})";
+    EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
+
+    content = uR"({var:~2]})";
+    EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
+
+    content = uR"({var:~[2]]})";
+    EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
+
+    content = uR"({var:~~~~~~~~2]})";
+    EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
+
+    content = uR"({var:~~~~~~~~[2]})";
+    EQ_VALUE(Template::Render(content, &value), uR"()", uR"(Render())");
+
     END_SUB_TEST;
 }
 

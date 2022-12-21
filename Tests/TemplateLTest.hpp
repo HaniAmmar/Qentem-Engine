@@ -221,6 +221,24 @@ static int TestVariableLTag1() {
     content = LR"({var:6key3]})";
     EQ_VALUE(Template::Render(content, &value), LR"({var:6key3]})", LR"(Render())");
 
+    content = LR"({var:~2})";
+    EQ_VALUE(Template::Render(content, &value), LR"()", LR"(Render())");
+
+    content = LR"({var:~~~~~~~2})";
+    EQ_VALUE(Template::Render(content, &value), LR"()", LR"(Render())");
+
+    content = LR"({var:~2]})";
+    EQ_VALUE(Template::Render(content, &value), LR"()", LR"(Render())");
+
+    content = LR"({var:~[2]]})";
+    EQ_VALUE(Template::Render(content, &value), LR"()", LR"(Render())");
+
+    content = LR"({var:~~~~~~~~2]})";
+    EQ_VALUE(Template::Render(content, &value), LR"()", LR"(Render())");
+
+    content = LR"({var:~~~~~~~~[2]})";
+    EQ_VALUE(Template::Render(content, &value), LR"()", LR"(Render())");
+
     END_SUB_TEST;
 }
 
