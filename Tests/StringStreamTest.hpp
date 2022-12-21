@@ -241,10 +241,11 @@ static int TestStringStream() {
     ss2.Reset();
 
     /////////
-    str               = "abc";
+    ss2 += "123456789123456789";
     const char *ss2_p = ss2.First();
     str               = ss2.GetString();
     EQ_VALUE(ss2_p, str.First(), "StringStream");
+    EQ_VALUE(str, "123456789123456789", "StringStream");
 
     /////////
 
