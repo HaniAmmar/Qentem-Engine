@@ -310,12 +310,11 @@ class HArray {
     }
 
     inline Value_ *Find(const Key_T_ &key) const noexcept { return Find(key.First(), key.Length()); }
+    inline void    Remove(const Char_T_ *key) const noexcept { Remove(key, StringUtils::Count(key)); }
 
     inline void Remove(const Char_T_ *key, SizeT length) const noexcept {
         remove(key, length, StringUtils::Hash(key, length));
     }
-
-    inline void Remove(const Char_T_ *key) const noexcept { Remove(key, StringUtils::Count(key)); }
 
     inline void Remove(const Key_T_ &key) const noexcept {
         const Char_T_ *str = key.First();

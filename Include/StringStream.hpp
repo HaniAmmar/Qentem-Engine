@@ -37,7 +37,6 @@ class StringStream {
 
   public:
     StringStream() = default;
-
     ~StringStream() { Memory::Deallocate(Storage()); }
 
     explicit StringStream(SizeT size) {
@@ -187,10 +186,6 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, len);
     }
 
-    inline bool operator!=(const StringStream &ss) const noexcept { return (!(*this == ss)); }
-    inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
-    inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
-
     inline bool IsEqual(const Char_T_ *str, const SizeT length) const noexcept {
         if (Length() != length) {
             return false;
@@ -199,6 +194,9 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, length);
     }
 
+    inline bool operator!=(const StringStream &ss) const noexcept { return (!(*this == ss)); }
+    inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
+    inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
     inline void Insert(const Char_T_ *str, const SizeT length) { insert(str, length); }
     inline void Clear() noexcept { setLength(0); }
 
