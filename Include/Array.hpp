@@ -49,39 +49,25 @@ class Array {
         src.setCapacity(0);
     }
 
-    Array(const Array &src) : capacity_{src.Size()} {
-        if (Capacity() != 0) {
-            setSize(src.Size());
-            Type_       *des  = allocate();
-            const Type_ *item = src.First();
-            const Type_ *end  = (item + src.Size());
-
-            while (item != end) {
-                Memory::Initialize(des, *item);
-                ++des;
-                ++item;
-            }
-        }
-    }
+    Array(const Array &src) : capacity_{src.Size()} { copyArray(src); }
 
     ~Array() {
         Type_ *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
-        deallocate(storage);
+        Memory::Deallocate(storage);
     }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
             Type_ *storage = Storage();
             Memory::Dispose(storage, End());
-            deallocate(storage);
+            Memory::Deallocate(storage);
 
             setSize(src.Size());
             setCapacity(src.Capacity());
-            storage_ = static_cast<QPointer<Type_> &&>(src.storage_);
-
             src.setSize(0);
             src.setCapacity(0);
+            storage_ = static_cast<QPointer<Type_> &&>(src.storage_);
         }
 
         return *this;
@@ -89,18 +75,14 @@ class Array {
 
     Array &operator=(const Array &src) {
         if (this != &src) {
-            Reserve(src.Size());
-            setSize(src.Size());
-            Type_ *des = Storage();
+            Type_ *storage = Storage();
+            Memory::Dispose(storage, End());
+            Memory::Deallocate(storage);
+            setStorage(nullptr);
+            setSize(0);
+            setCapacity(src.Size());
 
-            const Type_ *item = src.First();
-            const Type_ *end  = (item + src.Size());
-
-            while (item != end) {
-                Memory::Initialize(des, *item);
-                ++des;
-                ++item;
-            }
+            copyArray(src);
         }
 
         return *this;
@@ -116,8 +98,6 @@ class Array {
 
     void operator+=(Array &&src) {
         if (Capacity() == 0) {
-            // If the array hasn't allocated any memory, then there is no need
-            // for the rest.
             setSize(src.Size());
             setCapacity(src.Capacity());
             setStorage(src.Storage());
@@ -133,20 +113,20 @@ class Array {
             }
 
             setSize(n_size);
-            src.deallocate(src.Storage());
+            Memory::Deallocate(src.Storage());
         }
 
         src.setSize(0);
         src.setCapacity(0);
-        src.storage_.Reset();
+        src.clearStorage();
     }
 
-    void operator+=(const Array &src) { copyArray(src); }
+    void operator+=(const Array &src) { addArray(src); }
 
     void operator+=(Type_ &&item) {
         if (Size() == Capacity()) {
             if (Capacity() == 0) {
-                setCapacity(1);
+                setCapacity(1U);
             }
 
             resize(Capacity() << 1U);
@@ -164,7 +144,7 @@ class Array {
     }
 
     inline Array &Insert(const Array &src) {
-        copyArray(src);
+        addArray(src);
         return *this;
     }
 
@@ -187,7 +167,7 @@ class Array {
     void Reset() noexcept {
         Type_ *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
-        deallocate(storage);
+        Memory::Deallocate(storage);
         clearStorage();
         setSize(0);
         setCapacity(0);
@@ -197,7 +177,7 @@ class Array {
         setSize(0);
         setCapacity(0);
         Type_ *tmp = Storage();
-        storage_.Reset();
+        clearStorage();
 
         return tmp;
     }
@@ -283,8 +263,7 @@ class Array {
         return new_storage;
     }
 
-    void deallocate(Type_ *old_storage) noexcept { Memory::Deallocate(old_storage); }
-    void clearStorage() noexcept { setStorage(nullptr); }
+    void clearStorage() noexcept { storage_.Reset(); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
@@ -297,10 +276,10 @@ class Array {
             Memory::Copy(des, src, (Size() * sizeof(Type_)));
         }
 
-        deallocate(src);
+        Memory::Deallocate(src);
     }
 
-    void copyArray(const Array &src) {
+    void addArray(const Array &src) {
         const SizeT n_size = (Size() + src.Size());
 
         if (n_size > Capacity()) {
@@ -308,14 +287,29 @@ class Array {
         }
 
         index_ += src.Size();
-        Type_       *des  = Storage();
-        const Type_ *item = src.First();
-        const Type_ *end  = (item + src.Size());
+        Type_       *storage = Storage();
+        const Type_ *item    = src.First();
+        const Type_ *end     = (item + src.Size());
 
         while (item != end) {
-            Memory::Initialize(des, *item);
-            ++des;
+            Memory::Initialize(storage, *item);
+            ++storage;
             ++item;
+        }
+    }
+
+    void copyArray(const Array &src) {
+        if (Capacity() != 0) {
+            setSize(src.Size());
+            Type_       *storage = allocate();
+            const Type_ *item    = src.First();
+            const Type_ *end     = (item + src.Size());
+
+            while (item != end) {
+                Memory::Initialize(storage, *item);
+                ++storage;
+                ++item;
+            }
         }
     }
 

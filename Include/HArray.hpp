@@ -74,7 +74,7 @@ class HArray {
     ~HArray() {
         HAItem_T_ *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
-        deallocate(getHashTable());
+        Memory::Deallocate(getHashTable());
     }
 
     HArray(HArray &&src) noexcept : index_{src.Size()}, capacity_{src.Capacity()} {
@@ -83,20 +83,19 @@ class HArray {
         src.setCapacity(0);
     }
 
-    HArray(const HArray &src) { copyArray(src); }
+    HArray(const HArray &src) { copyTable(src); }
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
             HAItem_T_ *storage = Storage();
             Memory::Dispose(storage, End());
-            deallocate(getHashTable());
+            Memory::Deallocate(getHashTable());
 
             setSize(src.Size());
             setCapacity(src.Capacity());
-            hashTable_ = static_cast<QPointer<SizeT> &&>(src.hashTable_);
-
             src.setSize(0);
             src.setCapacity(0);
+            hashTable_ = static_cast<QPointer<SizeT> &&>(src.hashTable_);
         }
 
         return *this;
@@ -104,8 +103,14 @@ class HArray {
 
     HArray &operator=(const HArray &src) {
         if (this != &src) {
-            Reset();
-            copyArray(src);
+            HAItem_T_ *storage = Storage();
+            Memory::Dispose(storage, (storage + Size()));
+            Memory::Deallocate(getHashTable());
+            setHashTable(nullptr);
+            setCapacity(0);
+            setSize(0);
+
+            copyTable(src);
         }
 
         return *this;
@@ -123,15 +128,15 @@ class HArray {
         while (item != end) {
             if (item->Hash != 0) {
                 SizeT     *index;
-                HAItem_T_ *des_item = find(index, item->Key.First(), item->Key.Length(), item->Hash);
+                HAItem_T_ *storage_item = find(index, item->Key.First(), item->Key.Length(), item->Hash);
 
-                if (des_item == nullptr) {
-                    des_item = insert(index, static_cast<Key_T_ &&>(item->Key), item->Hash);
+                if (storage_item == nullptr) {
+                    storage_item = insert(index, static_cast<Key_T_ &&>(item->Key), item->Hash);
                 } else {
                     Memory::Dispose(&(item->Key));
                 }
 
-                des_item->Value = static_cast<Value_ &&>(item->Value);
+                storage_item->Value = static_cast<Value_ &&>(item->Value);
             }
 
             ++item;
@@ -139,8 +144,8 @@ class HArray {
 
         src.setCapacity(0);
         src.setSize(0);
-        src.deallocate(src.getHashTable());
-        src.hashTable_.Reset();
+        Memory::Deallocate(src.getHashTable());
+        src.clearHashTable();
     }
 
     void operator+=(const HArray &src) {
@@ -155,13 +160,13 @@ class HArray {
         while (item != end) {
             if (item->Hash != 0) {
                 SizeT     *index;
-                HAItem_T_ *des_item = find(index, item->Key.First(), item->Key.Length(), item->Hash);
+                HAItem_T_ *storage_item = find(index, item->Key.First(), item->Key.Length(), item->Hash);
 
-                if (des_item == nullptr) {
-                    des_item = insert(index, Key_T_(item->Key), item->Hash);
+                if (storage_item == nullptr) {
+                    storage_item = insert(index, Key_T_(item->Key), item->Hash);
                 }
 
-                des_item->Value = Value_(item->Value);
+                storage_item->Value = Value_(item->Value);
             }
 
             ++item;
@@ -383,8 +388,8 @@ class HArray {
     void Reset() noexcept {
         HAItem_T_ *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
-        deallocate(getHashTable());
-        clearStorage();
+        Memory::Deallocate(getHashTable());
+        clearHashTable();
         setCapacity(0);
         setSize(0);
     }
@@ -465,28 +470,27 @@ class HArray {
   private:
     SizeT  getBase() const noexcept { return (Capacity() - 1); }
     SizeT *getHashTable() const noexcept { return hashTable_.GetPointer(); }
-    void   setStorage(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
+    void   setHashTable(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
 
     HAItem_T_ *allocate() {
         const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_T_)) * Capacity());
         SizeT      *ht   = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
-        setStorage(ht);
+        setHashTable(ht);
         Memory::SetToZero(ht, (sizeof(SizeT) * Capacity()));
 
         return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }
 
-    void deallocate(SizeT *hash_table) noexcept { Memory::Deallocate(hash_table); }
-    void clearStorage() noexcept { setStorage(nullptr); }
+    void clearHashTable() noexcept { hashTable_.Reset(); }
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
     void expand() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
 
     SizeT aligneSize(SizeT n_size) noexcept {
-        const SizeT size = (SizeT{1U} << Platform::CLZ((n_size != 1) ? n_size : 2U));
+        const SizeT size = (SizeT{1U} << Platform::CLZ((n_size != SizeT{1U}) ? n_size : SizeT{2U}));
 
         if (size < n_size) {
-            return (size << 1U);
+            return (size << SizeT{1U});
         }
 
         return size;
@@ -539,27 +543,26 @@ class HArray {
         }
     }
 
-    void copyArray(const HArray &src) {
-        // The function Reset() has to be called before this.
+    void copyTable(const HArray &src) {
         if (src.Size() != 0) {
             const HAItem_T_ *src_item = src.First();
             const HAItem_T_ *end      = (src_item + src.Size());
 
             setCapacity(aligneSize(src.Size()));
 
-            HAItem_T_       *des_item = allocate();
-            const HAItem_T_ *des_src  = des_item;
+            HAItem_T_       *storage_item = allocate();
+            const HAItem_T_ *storage_src  = storage_item;
 
             do {
                 if (src_item->Hash != 0) {
-                    Memory::Initialize(des_item, *src_item);
-                    ++des_item;
+                    Memory::Initialize(storage_item, *src_item);
+                    ++storage_item;
                 }
 
                 ++src_item;
             } while (src_item != end);
 
-            setSize(static_cast<SizeT>(des_item - des_src));
+            setSize(static_cast<SizeT>(storage_item - storage_src));
             generateHash();
         }
     }
@@ -570,22 +573,22 @@ class HArray {
 
         setCapacity(new_size);
 
-        HAItem_T_       *des      = allocate();
-        HAItem_T_       *des_item = des;
-        HAItem_T_       *item     = src;
-        const HAItem_T_ *end      = (item + Size());
+        HAItem_T_       *storage      = allocate();
+        HAItem_T_       *storage_item = storage;
+        HAItem_T_       *item         = src;
+        const HAItem_T_ *end          = (item + Size());
 
         while (item != end) {
             if (item->Hash != 0) {
-                Memory::Initialize(des_item, static_cast<HAItem_T_ &&>(*item));
-                ++des_item;
+                Memory::Initialize(storage_item, static_cast<HAItem_T_ &&>(*item));
+                ++storage_item;
             }
 
             ++item;
         }
 
-        setSize(static_cast<SizeT>(des_item - des));
-        deallocate(ht);
+        setSize(static_cast<SizeT>(storage_item - storage));
+        Memory::Deallocate(ht);
         generateHash();
     }
 

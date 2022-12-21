@@ -1083,6 +1083,9 @@ class Value {
             if (size != array_.Capacity()) {
                 if (size == 0) {
                     array_.Reset();
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+                    setTypeToArray();
+#endif
                     return;
                 }
 

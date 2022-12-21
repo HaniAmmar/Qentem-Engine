@@ -85,7 +85,8 @@ class String {
 #endif
             storage_ = static_cast<QPointer<Char_T_> &&>(src.storage_);
 
-            src.Reset();
+            src.clearLength();
+            src.clearStorage();
         }
 
         return *this;
@@ -133,8 +134,7 @@ class String {
     }
 
     inline String operator+(const String &src) const { return Merge(*this, src); }
-
-    String operator+(const Char_T_ *str) const { return merge(First(), Length(), str, StringUtils::Count(str)); }
+    String        operator+(const Char_T_ *str) const { return merge(First(), Length(), str, StringUtils::Count(str)); }
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, String src) {
@@ -163,7 +163,6 @@ class String {
     }
 
     inline bool operator!=(const String &string) const noexcept { return (!(*this == string)); }
-
     inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
 
     inline bool operator<(const String &string) const noexcept {
@@ -260,23 +259,9 @@ class String {
         return storage_.GetPointer();
     }
 
-    inline const Char_T_ *First() const noexcept {
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        const SizeT len = Length();
-        if ((len != 0) && (len < ShortStringMax)) {
-#ifndef QENTEM_BIG_ENDIAN
-            return reinterpret_cast<const Char_T_ *>(&padding_);
-#else
-            // Two tags at the start
-            return reinterpret_cast<const Char_T_ *>(reinterpret_cast<const char *>(&storage_) + 2);
-#endif
-        }
-#endif
-        return storage_.GetPointer();
-    }
-
-    inline bool IsEmpty() const noexcept { return (Length() == 0); }
-    inline bool IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline const Char_T_ *First() const noexcept { return Storage(); }
+    inline bool           IsEmpty() const noexcept { return (Length() == 0); }
+    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
     inline const Char_T_ *Last() const noexcept {
         const Char_T_ *src = First();
@@ -384,7 +369,7 @@ class String {
 #endif
     }
 
-    void clearStorage() noexcept { setStorage(nullptr); }
+    void clearStorage() noexcept { storage_.Reset(); }
 
     static String merge(const Char_T_ *str1, const SizeT len1, const Char_T_ *str2, const SizeT len2) {
         String   ns  = String{(len1 + len2)};

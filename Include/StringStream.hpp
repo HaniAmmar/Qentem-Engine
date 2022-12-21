@@ -38,7 +38,7 @@ class StringStream {
   public:
     StringStream() = default;
 
-    ~StringStream() { deallocate(Storage()); }
+    ~StringStream() { Memory::Deallocate(Storage()); }
 
     explicit StringStream(SizeT size) {
         if (size != 0) {
@@ -64,7 +64,7 @@ class StringStream {
 
     StringStream &operator=(StringStream &&src) noexcept {
         if (this != &src) {
-            deallocate(Storage());
+            Memory::Deallocate(Storage());
             setStorage(src.Storage());
             setLength(src.Length());
             setCapacity(src.Capacity());
@@ -81,7 +81,7 @@ class StringStream {
         if (this != &src) {
             setLength(0);
             setCapacity(0);
-            deallocate(Storage());
+            Memory::Deallocate(Storage());
             clearStorage();
             Insert(src.First(), src.Length());
         }
@@ -92,7 +92,7 @@ class StringStream {
     StringStream &operator=(const Char_T_ *str) {
         setLength(0);
         setCapacity(0);
-        deallocate(Storage());
+        Memory::Deallocate(Storage());
         clearStorage();
         insert(str, StringUtils::Count(str));
 
@@ -102,7 +102,7 @@ class StringStream {
     StringStream &operator=(const String<Char_T_> &src) {
         setLength(0);
         setCapacity(0);
-        deallocate(Storage());
+        Memory::Deallocate(Storage());
         clearStorage();
         insert(src.First(), src.Length());
 
@@ -205,7 +205,7 @@ class StringStream {
     void Reset() noexcept {
         setLength(0);
         setCapacity(0);
-        deallocate(Storage());
+        Memory::Deallocate(Storage());
         clearStorage();
     }
 
@@ -247,15 +247,13 @@ class StringStream {
     String<Char_T_> GetString() {
         const SizeT len = Length();
 
-        // if (Capacity() > len) {
-        //     Storage()[len]  = 0;
-        //     return String<Char_T_>(Eject(), len);
-        // }
+        if (Capacity() > len) {
+            Storage()[len] = 0;
+            return String<Char_T_>(Eject(), len);
+        }
 
         String<Char_T_> str{First(), len};
-        setLength(0);
-        setCapacity(0);
-        clearStorage();
+        Reset();
 
         return str;
     }
@@ -280,7 +278,6 @@ class StringStream {
   private:
     void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
     void allocate() { setStorage(Memory::Allocate<Char_T_>(Capacity())); }
-    void deallocate(Char_T_ *old_storage) noexcept { Memory::Deallocate(old_storage); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(const SizeT new_length) noexcept { length_ = new_length; }
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
@@ -307,7 +304,7 @@ class StringStream {
         allocate();
 
         Memory::Copy(Storage(), src, (src_cap * sizeof(Char_T_)));
-        deallocate(src);
+        Memory::Deallocate(src);
     }
 
     Char_T_ *storage_{nullptr};
