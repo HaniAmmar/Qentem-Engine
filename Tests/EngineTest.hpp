@@ -1050,7 +1050,7 @@ static int TestEngine7() {
     /////////////////////////////////////////////////////////////////////////////////////////
 
     content = R"((())";
-    find_Engine701("(", 1, ")", 1, items, content, 0, 125);
+    find_Engine701("(", 1, ")", 1, items, content, 0, 4);
     EQ_VALUE(ss, "", "stringify");
     ss.Clear();
     items.Clear();
