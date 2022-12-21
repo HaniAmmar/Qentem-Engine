@@ -807,25 +807,24 @@ class Template_CV {
         const SizeT start_offset =
             Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content, SizeT{0}, length);
 
-        const Char_T_ *loop_value        = nullptr;
-        SizeT          loop_value_length = 0;
-        SizeT          len               = 0;
-        SizeT          offset            = 0;
-        SizeT          previous_offset   = 0;
-        bool           break_loop        = false;
-
+        const Char_T_  *loop_value = nullptr;
         Array<TagBit>   sub_tags;
         StringStream_T_ inner_template;
-        unsigned short  set_offset    = 0;
-        unsigned short  set_length    = 0;
-        unsigned short  index_offset  = 0;
-        unsigned short  index_length  = 0;
-        unsigned short  repeat_offset = 0;
-        unsigned short  repeat_length = 0;
-        unsigned short  group_offset  = 0;
-        unsigned short  group_length  = 0;
-        unsigned short  sort_offset   = 0;
-        unsigned short  sort_length   = 0;
+        SizeT           loop_value_length = 0;
+        SizeT           len               = 0;
+        SizeT           offset            = 0;
+        SizeT           previous_offset   = 0;
+        unsigned short  set_offset        = 0;
+        unsigned short  set_length        = 0;
+        unsigned short  index_offset      = 0;
+        unsigned short  index_length      = 0;
+        unsigned short  repeat_offset     = 0;
+        unsigned short  repeat_length     = 0;
+        unsigned short  group_offset      = 0;
+        unsigned short  group_length      = 0;
+        unsigned short  sort_offset       = 0;
+        unsigned short  sort_length       = 0;
+        bool            break_loop        = false;
 
         // Stage 1: Info extraction
         while (true) {
@@ -1068,17 +1067,16 @@ class Template_CV {
                                               InlineIfInfo_ *&inline_if_info) const {
         Array<TagBit>  true_subtags;
         Array<TagBit>  false_subtags;
-        unsigned short case_offset  = 0;
-        unsigned short case_length  = 0;
-        unsigned short true_offset  = 0;
-        unsigned short true_length  = 0;
-        unsigned short false_offset = 0;
-        unsigned short false_length = 0;
-
-        SizeT offset          = 0;
-        SizeT previous_offset = 0;
-        SizeT len             = 0;
-        bool  break_loop;
+        SizeT          offset          = 0;
+        SizeT          previous_offset = 0;
+        SizeT          len             = 0;
+        unsigned short case_offset     = 0;
+        unsigned short case_length     = 0;
+        unsigned short true_offset     = 0;
+        unsigned short true_length     = 0;
+        unsigned short false_offset    = 0;
+        unsigned short false_length    = 0;
+        bool           break_loop;
 
         while (true) {
             break_loop = false;
@@ -1170,49 +1168,45 @@ class Template_CV {
         // The content without </if>
         const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);
 
-        while (true) {
+        do {
             case_length = getQuoted(content, case_offset, length);
 
-            if (case_length == 0) {
-                return;
-            }
+            if (case_length != 0) {
+                content_offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content,
+                                                          (case_offset + case_length + 1), length2);
 
-            content_offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content,
-                                                      (case_offset + case_length + 1), length2);
+                if (content_offset != 0) {
+                    SizeT else_offset = nextElse(content, content_offset, length);
 
-            if (content_offset == 0) {
-                return;
-            }
+                    if (else_offset == 0) {
+                        content_length = (length2 - content_offset);
+                        if_info->Insert(
+                            IfCase_{Array<TagBit>(), case_offset, case_length, content_offset, content_length});
+                        break;
+                    }
 
-            SizeT else_offset = nextElse(content, content_offset, length);
+                    content_length = ((else_offset - TemplatePatterns_C_::ElsePrefixLength) - content_offset);
+                    if_info->Insert(IfCase_{Array<TagBit>(), case_offset, case_length, content_offset, content_length});
 
-            if (else_offset == 0) {
-                content_length = (length2 - content_offset);
-                if_info->Insert(IfCase_{Array<TagBit>(), case_offset, case_length, content_offset, content_length});
-                break;
-            }
+                    if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
+                        else_offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content,
+                                                               else_offset, length2);
 
-            content_length = ((else_offset - TemplatePatterns_C_::ElsePrefixLength) - content_offset);
-            if_info->Insert(IfCase_{Array<TagBit>(), case_offset, case_length, content_offset, content_length});
+                        if (else_offset != 0) {
+                            if_info->Insert(
+                                IfCase_{Array<TagBit>(), case_offset, 0, else_offset, (length2 - else_offset)});
+                        }
 
-            if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
-                else_offset =
-                    Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content, else_offset, length2);
+                        break;
+                    }
 
-                if (else_offset == 0) {
-                    return;
+                    case_offset = else_offset;
+                    continue;
                 }
-
-                case_length    = 0;
-                content_offset = else_offset;
-                content_length = (length2 - else_offset);
-
-                if_info->Insert(IfCase_{Array<TagBit>(), case_offset, case_length, content_offset, content_length});
-                break;
             }
 
-            case_offset = else_offset;
-        }
+            break;
+        } while (true);
     }
 
     static SizeT nextElse(const Char_T_ *content, SizeT offset, SizeT length) noexcept {
