@@ -1051,6 +1051,7 @@ static int TestEngine7() {
 
     content = R"((())";
     find_Engine701("(", 1, ")", 1, items, content, 0, 4);
+    to_JSON(ss, items, content);
     EQ_VALUE(ss, "", "stringify");
     ss.Clear();
     items.Clear();
