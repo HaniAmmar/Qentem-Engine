@@ -1,6 +1,3 @@
 #include "ALETest.hpp"
 
-int main() {
-    Qentem::Test::TestHelper::Init();
-    return Qentem::Test::RunALETests();
-}
+int main() { return Qentem::Test::RunALETests(); }

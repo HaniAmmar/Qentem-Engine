@@ -1,6 +1,3 @@
 #include "ValueTest.hpp"
 
-int main() {
-    Qentem::Test::TestHelper::Init();
-    return Qentem::Test::RunValueTests();
-}
+int main() { return Qentem::Test::RunValueTests(); }

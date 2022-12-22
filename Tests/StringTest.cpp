@@ -1,6 +1,3 @@
 #include "StringTest.hpp"
 
-int main() {
-    Qentem::Test::TestHelper::Init();
-    return Qentem::Test::RunStringTests();
-}
+int main() { return Qentem::Test::RunStringTests(); }

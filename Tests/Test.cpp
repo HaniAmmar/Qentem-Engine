@@ -28,7 +28,6 @@
 #include "Test.hpp"
 
 int main() {
-    Qentem::Test::TestHelper::Init();
     Qentem::Test::PrintInfo();
 
     // for (int i = 0; i < 100000; i++) {

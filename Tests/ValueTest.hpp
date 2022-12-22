@@ -71,7 +71,8 @@ static const char *GetStingOfType(ValueType type) noexcept {
 #define EQ_VALUE_TYPE(left, right, name)                                                                               \
     do {                                                                                                               \
         if ((left) != (right)) {                                                                                       \
-            TestHelper::PrintErrorMessage2(false, name, GetStingOfType(left), GetStingOfType(right), __LINE__);        \
+            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, GetStingOfType(left),                    \
+                                           GetStingOfType(right), __LINE__);                                           \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
