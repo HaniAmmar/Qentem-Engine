@@ -183,24 +183,24 @@ class Template {
     struct TagBit;
 
     template <typename Char_T_, typename Value_T_, typename Number_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value, StringStream_T_ *ss,
-                              Array<TagBit<Char_T_>> *tags_cache) {
-        Template_CV<Char_T_, Value_T_, StringStream_T_>::Process(content, static_cast<SizeT>(length), root_value, ss,
-                                                                 *tags_cache);
+    inline static void Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value,
+                              StringStream_T_ *stream, Array<TagBit<Char_T_>> *tags_cache) {
+        Template_CV<Char_T_, Value_T_, StringStream_T_>::Process(content, static_cast<SizeT>(length), root_value,
+                                                                 stream, *tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename Number_T_, typename StringStream_T_>
     inline static void Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value,
-                              StringStream_T_ *ss) {
+                              StringStream_T_ *stream) {
         Array<TagBit<Char_T_>> tags_cache;
-        Render(content, length, root_value, ss, &tags_cache);
+        Render(content, length, root_value, stream, &tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename Number_T_, typename StringStream_T_ = StringStream<Char_T_>>
     inline static StringStream_T_ Render(const Char_T_ *content, Number_T_ length, const Value_T_ *root_value) {
-        StringStream_T_ ss;
-        Render(content, length, root_value, &ss);
-        return ss;
+        StringStream_T_ stream;
+        Render(content, length, root_value, &stream);
+        return stream;
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
@@ -354,9 +354,9 @@ class Template_CV {
   public:
     Template_CV() = delete;
 
-    static void Process(const Char_T_ *content, SizeT length, const Value_T_ *root_value, StringStream_T_ *ss,
+    static void Process(const Char_T_ *content, SizeT length, const Value_T_ *root_value, StringStream_T_ *stream,
                         Array<TagBit> &tags_cache) {
-        const Template_CV temp{ss, root_value};
+        const Template_CV temp{stream, root_value};
 
         if (tags_cache.IsEmpty()) {
             parse(tags_cache, content, length);
@@ -1440,9 +1440,9 @@ class Template_CV {
         return true;
     }
 
-    Template_CV(StringStream_T_ *ss, const Value_T_ *root_value, const Template_CV *parent = nullptr,
+    Template_CV(StringStream_T_ *stream, const Value_T_ *root_value, const Template_CV *parent = nullptr,
                 SizeT level = 0) noexcept
-        : ss_{ss}, root_value_{root_value}, parent_{parent}, level_{level} {}
+        : ss_{stream}, root_value_{root_value}, parent_{parent}, level_{level} {}
 
     StringStream_T_   *ss_;
     const Value_T_    *root_value_;

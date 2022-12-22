@@ -32,37 +32,37 @@ template <typename Char_T_, int S>
 struct UnicodeToUTF {};
 
 template <typename Char_T_>
-static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) {
-    UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode, ss);
+static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
+    UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode, stream);
 }
 
 // UTF8
 template <typename Char_T_>
 class UnicodeToUTF<Char_T_, 1> {
   public:
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) {
+    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
         /*
-         * ToUTF(0xC3D, ss);
-         * ToUTF(0x00A1, ss);
-         * ToUTF(0x08A7, ss);
-         * ToUTF(0x10A7B, ss);
+         * ToUTF(0xC3D, stream);
+         * ToUTF(0x00A1, stream);
+         * ToUTF(0x08A7, stream);
+         * ToUTF(0x10A7B, stream);
          */
 
         if (unicode < 0x80U) {
-            ss += static_cast<Char_T_>(unicode);
+            stream += static_cast<Char_T_>(unicode);
         } else {
             if (unicode < 0x800U) {
-                ss += static_cast<Char_T_>(0xC0U | (unicode >> 6U));
+                stream += static_cast<Char_T_>(0xC0U | (unicode >> 6U));
             } else if (unicode < 0x10000U) {
-                ss += static_cast<Char_T_>(0xE0U | (unicode >> 12U));
-                ss += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
+                stream += static_cast<Char_T_>(0xE0U | (unicode >> 12U));
+                stream += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
             } else {
-                ss += static_cast<Char_T_>(0xF0U | (unicode >> 18U));
-                ss += static_cast<Char_T_>(0x80U | ((unicode >> 12U) & 0x3FU));
-                ss += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
+                stream += static_cast<Char_T_>(0xF0U | (unicode >> 18U));
+                stream += static_cast<Char_T_>(0x80U | ((unicode >> 12U) & 0x3FU));
+                stream += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
             }
 
-            ss += static_cast<Char_T_>(0x80U | (unicode & 0x3FU));
+            stream += static_cast<Char_T_>(0x80U | (unicode & 0x3FU));
         }
     }
 };
@@ -71,13 +71,13 @@ class UnicodeToUTF<Char_T_, 1> {
 template <typename Char_T_>
 class UnicodeToUTF<Char_T_, 2> {
   public:
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) {
+    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
         if (unicode < 0x10000U) {
-            ss += static_cast<Char_T_>(unicode);
+            stream += static_cast<Char_T_>(unicode);
         } else {
             unicode -= 0x10000;
-            ss += static_cast<Char_T_>(0xD800U | (unicode >> 10U));
-            ss += static_cast<Char_T_>(0xDC00U | (unicode & 0x3FFU));
+            stream += static_cast<Char_T_>(0xD800U | (unicode >> 10U));
+            stream += static_cast<Char_T_>(0xDC00U | (unicode & 0x3FFU));
         }
     }
 };
@@ -86,7 +86,7 @@ class UnicodeToUTF<Char_T_, 2> {
 template <typename Char_T_>
 class UnicodeToUTF<Char_T_, 4> {
   public:
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &ss) { ss += static_cast<Char_T_>(unicode); }
+    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) { stream += static_cast<Char_T_>(unicode); }
 };
 
 } // namespace Unicode

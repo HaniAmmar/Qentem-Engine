@@ -845,40 +845,40 @@ class Value {
     }
 
     template <typename StringStream_T_>
-    bool CopyStringValueTo(StringStream_T_ &ss) const {
+    bool CopyStringValueTo(StringStream_T_ &stream) const {
         switch (Type()) {
             case ValueType::String: {
-                ss.Insert(string_.First(), string_.Length());
+                stream.Insert(string_.First(), string_.Length());
                 break;
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(ss, number_.GetUInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, number_.GetUInt64(), 1);
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(ss, number_.GetInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, number_.GetInt64(), 1);
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(ss, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
+                Digit<Char_T_>::NumberToStringStream(stream, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
                 break;
             }
 
             case ValueType::True: {
-                ss.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
+                stream.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                ss.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
+                stream.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                ss.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
+                stream.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
                 break;
             }
 
@@ -891,12 +891,12 @@ class Value {
     }
 
     template <typename StringStream_T_>
-    bool CopyKeyByIndexTo(StringStream_T_ &ss, SizeT index) const {
+    bool CopyKeyByIndexTo(StringStream_T_ &stream, SizeT index) const {
         if (IsObject()) {
             const VString *key = object_.GetKey(index);
 
             if (key != nullptr) {
-                ss += *key;
+                stream += *key;
             }
 
             return true;
@@ -1095,17 +1095,17 @@ class Value {
     }
 
     inline VString Stringify() const {
-        StringStream<Char_T_> ss;
+        StringStream<Char_T_> stream;
 
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            stringifyObject(this->object_, ss);
+            stringifyObject(this->object_, stream);
         } else if (type == ValueType::Array) {
-            stringifyArray(this->array_, ss);
+            stringifyArray(this->array_, stream);
         }
 
-        return ss.GetString();
+        return stream.GetString();
     }
 
     inline ValueType Type() const noexcept {
@@ -1179,93 +1179,93 @@ class Value {
     }
 
   private:
-    static void stringifyObject(const VObject &obj, StringStream<Char_T_> &ss) {
+    static void stringifyObject(const VObject &obj, StringStream<Char_T_> &stream) {
         using V_item_ = HAItem<Value, Char_T_>;
 
-        ss += JSONotation_T_::SCurlyChar;
+        stream += JSONotation_T_::SCurlyChar;
 
         for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size()); h_item != end; h_item++) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
-                ss += JSONotation_T_::QuoteChar;
-                JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), ss);
-                ss += JSONotation_T_::QuoteChar;
-                ss += JSONotation_T_::ColonChar;
+                stream += JSONotation_T_::QuoteChar;
+                JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
+                stream += JSONotation_T_::QuoteChar;
+                stream += JSONotation_T_::ColonChar;
 
-                stringifyValue(h_item->Value, ss);
-                ss += JSONotation_T_::CommaChar;
+                stringifyValue(h_item->Value, stream);
+                stream += JSONotation_T_::CommaChar;
             }
         }
 
-        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
-            ss.StepBack(1);
+        if (*(stream.Last()) == JSONotation_T_::CommaChar) {
+            stream.StepBack(1);
         }
 
-        ss += JSONotation_T_::ECurlyChar;
+        stream += JSONotation_T_::ECurlyChar;
     }
 
-    static void stringifyArray(const VArray &arr, StringStream<Char_T_> &ss) {
-        ss += JSONotation_T_::SSquareChar;
+    static void stringifyArray(const VArray &arr, StringStream<Char_T_> &stream) {
+        stream += JSONotation_T_::SSquareChar;
 
         for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
             if (!(item->IsUndefined())) {
-                stringifyValue(*item, ss);
-                ss += JSONotation_T_::CommaChar;
+                stringifyValue(*item, stream);
+                stream += JSONotation_T_::CommaChar;
             }
         }
 
-        if (*(ss.Last()) == JSONotation_T_::CommaChar) {
-            ss.StepBack(1);
+        if (*(stream.Last()) == JSONotation_T_::CommaChar) {
+            stream.StepBack(1);
         }
 
-        ss += JSONotation_T_::ESquareChar;
+        stream += JSONotation_T_::ESquareChar;
     }
 
-    static void stringifyValue(const Value &val, StringStream<Char_T_> &ss) {
+    static void stringifyValue(const Value &val, StringStream<Char_T_> &stream) {
         switch (val.Type()) {
             case ValueType::Object: {
-                stringifyObject(val.object_, ss);
+                stringifyObject(val.object_, stream);
                 break;
             }
 
             case ValueType::Array: {
-                stringifyArray(val.array_, ss);
+                stringifyArray(val.array_, stream);
                 break;
             }
 
             case ValueType::String: {
-                ss += JSONotation_T_::QuoteChar;
-                JSON::EscapeJSON(val.string_.First(), val.string_.Length(), ss);
-                ss += JSONotation_T_::QuoteChar;
+                stream += JSONotation_T_::QuoteChar;
+                JSON::EscapeJSON(val.string_.First(), val.string_.Length(), stream);
+                stream += JSONotation_T_::QuoteChar;
                 break;
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetUInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetUInt64(), 1);
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetInt64(), 1);
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(ss, val.number_.GetDouble(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetDouble(), 1);
                 break;
             }
 
             case ValueType::False: {
-                ss.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
+                stream.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                ss.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
+                stream.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                ss.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
+                stream.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
                 break;
             }
 

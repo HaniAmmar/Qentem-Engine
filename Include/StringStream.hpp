@@ -160,12 +160,12 @@ class StringStream {
         return out;
     }
 
-    inline bool operator==(const StringStream &ss) const noexcept {
-        if (Length() != ss.Length()) {
+    inline bool operator==(const StringStream &stream) const noexcept {
+        if (Length() != stream.Length()) {
             return false;
         }
 
-        return StringUtils::IsEqual(First(), ss.First(), Length());
+        return StringUtils::IsEqual(First(), stream.First(), Length());
     }
 
     inline bool operator==(const String<Char_T_> &string) const noexcept {
@@ -194,7 +194,7 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, length);
     }
 
-    inline bool operator!=(const StringStream &ss) const noexcept { return (!(*this == ss)); }
+    inline bool operator!=(const StringStream &stream) const noexcept { return (!(*this == stream)); }
     inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
     inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
     inline void Insert(const Char_T_ *str, const SizeT length) { insert(str, length); }

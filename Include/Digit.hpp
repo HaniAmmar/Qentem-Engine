@@ -95,9 +95,9 @@ class Digit {
     }
 
     template <typename Number_T_, typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &ss, Number_T_ number, unsigned int min = 1) {
+    inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        NumberToStringStreamHelper<Number_T_, StringStream_T_, is_unsigned>::NumberToStringStream(ss, number, min);
+        NumberToStringStreamHelper<Number_T_, StringStream_T_, is_unsigned>::NumberToStringStream(stream, number, min);
     }
 
     /*
@@ -119,15 +119,15 @@ class Digit {
     }
 
     template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &ss, double number, unsigned int min = 1,
+    inline static void NumberToStringStream(StringStream_T_ &stream, double number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
-        doubleToString(ss, number, min, r_min, precision);
+        doubleToString(stream, number, min, r_min, precision);
     }
 
     template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &ss, float f_number, unsigned int min = 1,
+    inline static void NumberToStringStream(StringStream_T_ &stream, float f_number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
-        NumberToStringStream(ss, static_cast<double>(f_number), min, r_min, precision);
+        NumberToStringStream(stream, static_cast<double>(f_number), min, r_min, precision);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -291,20 +291,20 @@ class Digit {
     template <typename Number_T_, typename StringStream_T_, bool IS_UNSIGNED>
     class NumberToStringStreamHelper {
       public:
-        inline static void NumberToStringStream(StringStream_T_ &ss, Number_T_ number, unsigned int min = 1) {
-            intToString(ss, number, min, false);
+        inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
+            intToString(stream, number, min, false);
         }
     };
 
     template <typename Number_T_, typename StringStream_T_>
     class NumberToStringStreamHelper<Number_T_, StringStream_T_, false> {
       public:
-        inline static void NumberToStringStream(StringStream_T_ &ss, Number_T_ number, unsigned int min = 1) {
+        inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
             if (number < 0) {
                 number *= -1;
-                intToString(ss, number, min, true);
+                intToString(stream, number, min, true);
             } else {
-                intToString(ss, number, min, false);
+                intToString(stream, number, min, false);
             }
         }
     };

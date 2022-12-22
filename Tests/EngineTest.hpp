@@ -945,35 +945,35 @@ struct Item2__ {
     Array<Item2__> SubItems;
 };
 
-static void to_JSON(StringStream<char> &ss, const Array<Item2__> &items, const char *content) {
+static void to_JSON(StringStream<char> &stream, const Array<Item2__> &items, const char *content) {
     if (items.IsEmpty()) {
         return;
     }
 
-    ss += '{';
+    stream += '{';
 
     for (SizeT i = 0; i < items.Size(); i++) {
-        ss += '"';
-        ss.Insert((content + items.Storage()[i].Offset), items.Storage()[i].Length);
-        ss += "\":{";
+        stream += '"';
+        stream.Insert((content + items.Storage()[i].Offset), items.Storage()[i].Length);
+        stream += "\":{";
 
-        ss += "\"O\":";
-        ss += Digit<char>::NumberToString(items.Storage()[i].Offset);
-        ss += ",\"L\":";
-        ss += Digit<char>::NumberToString(items.Storage()[i].Length);
+        stream += "\"O\":";
+        stream += Digit<char>::NumberToString(items.Storage()[i].Offset);
+        stream += ",\"L\":";
+        stream += Digit<char>::NumberToString(items.Storage()[i].Length);
 
         if (items.Storage()[i].SubItems.IsNotEmpty()) {
-            ss += ",\"S\":";
-            to_JSON(ss, items.Storage()[i].SubItems, content);
+            stream += ",\"S\":";
+            to_JSON(stream, items.Storage()[i].SubItems, content);
         }
 
-        ss += '}';
-        ss += ',';
+        stream += '}';
+        stream += ',';
     }
 
-    ss.StepBack(1);
+    stream.StepBack(1);
 
-    ss += '}';
+    stream += '}';
 }
 
 void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT r_tag_len, Array<Item2__> &items,
@@ -1021,18 +1021,18 @@ void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT
 
 static int TestEngine7() {
     Array<Item2__>     items;
-    StringStream<char> ss;
+    StringStream<char> stream;
     const char        *content;
     const char        *result;
     /////////////////////////////////////////////////////////////////////////////////////////
 
     content = "[[[ [[[  [[[  [[[  ]]]  ]]]  ]]] ]]] [[[]]] [[[[[[]]]]]] [[[-]]]    [[[X]]]";
     find_Engine701("[[[", 3, "]]]", 3, items, content, 0, 75);
-    to_JSON(ss, items, content);
+    to_JSON(stream, items, content);
     result =
         R"({"[[[ [[[  [[[  [[[  ]]]  ]]]  ]]] ]]]":{"O":0,"L":36,"S":{"[[[  [[[  [[[  ]]]  ]]]  ]]]":{"O":4,"L":28,"S":{"[[[  [[[  ]]]  ]]]":{"O":9,"L":18,"S":{"[[[  ]]]":{"O":14,"L":8}}}}}}},"[[[]]]":{"O":37,"L":6},"[[[[[[]]]]]]":{"O":44,"L":12,"S":{"[[[]]]":{"O":47,"L":6}}},"[[[-]]]":{"O":57,"L":7},"[[[X]]]":{"O":68,"L":7}})";
-    EQ_VALUE(ss, result, "stringify");
-    ss.Clear();
+    EQ_VALUE(stream, result, "stringify");
+    stream.Clear();
     items.Clear();
 
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -1040,20 +1040,20 @@ static int TestEngine7() {
     content =
         R"((....) () (( )(  )(   )(    )) ((((((())))))) (A(B)C(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)U(V)W) (1(2(3(4(5(6(7)8)9)10)10)12)13))";
     find_Engine701("(", 1, ")", 1, items, content, 0, 125);
-    to_JSON(ss, items, content);
+    to_JSON(stream, items, content);
     result =
         R"j({"(....)":{"O":0,"L":6},"()":{"O":7,"L":2},"(( )(  )(   )(    ))":{"O":10,"L":20,"S":{"( )":{"O":11,"L":3},"(  )":{"O":14,"L":4},"(   )":{"O":18,"L":5},"(    )":{"O":23,"L":6}}},"((((((()))))))":{"O":31,"L":14,"S":{"(((((())))))":{"O":32,"L":12,"S":{"((((()))))":{"O":33,"L":10,"S":{"(((())))":{"O":34,"L":8,"S":{"((()))":{"O":35,"L":6,"S":{"(())":{"O":36,"L":4,"S":{"()":{"O":37,"L":2}}}}}}}}}}}}},"(A(B)C(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)U(V)W)":{"O":46,"L":47,"S":{"(B)":{"O":48,"L":3},"(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)":{"O":52,"L":35,"S":{"(E)":{"O":54,"L":3},"(G(H)I(G(K(L)M)N)O(P)Q)":{"O":58,"L":23,"S":{"(H)":{"O":60,"L":3},"(G(K(L)M)N)":{"O":64,"L":11,"S":{"(K(L)M)":{"O":66,"L":7,"S":{"(L)":{"O":68,"L":3}}}}},"(P)":{"O":76,"L":3}}},"(S)":{"O":82,"L":3}}},"(V)":{"O":88,"L":3}}},"(1(2(3(4(5(6(7)8)9)10)10)12)13)":{"O":94,"L":31,"S":{"(2(3(4(5(6(7)8)9)10)10)12)":{"O":96,"L":26,"S":{"(3(4(5(6(7)8)9)10)10)":{"O":98,"L":21,"S":{"(4(5(6(7)8)9)10)":{"O":100,"L":16,"S":{"(5(6(7)8)9)":{"O":102,"L":11,"S":{"(6(7)8)":{"O":104,"L":7,"S":{"(7)":{"O":106,"L":3}}}}}}}}}}}}}})j";
-    EQ_VALUE(ss, result, "stringify");
-    ss.Clear();
+    EQ_VALUE(stream, result, "stringify");
+    stream.Clear();
     items.Clear();
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
     content = R"((())";
     find_Engine701("(", 1, ")", 1, items, content, 0, 4);
-    to_JSON(ss, items, content);
-    EQ_VALUE(ss, "", "stringify");
-    ss.Clear();
+    to_JSON(stream, items, content);
+    EQ_VALUE(stream, "", "stringify");
+    stream.Clear();
     items.Clear();
 
     /////////////////////////////////////////////////////////////////////////////////////////
