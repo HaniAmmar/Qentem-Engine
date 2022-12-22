@@ -9,18 +9,18 @@
 -   [Requirements](#requirements)
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
--   [JSON Example](#json-example)
 -   [Template Example](#template-example)
     -   [JavaScript Module](#javascript-module)
     -   [Python Module](#python-module)
     -   [PHP Module](#php-module)
+-   [JSON Example](#json-example)
 -   [ALE Example](#ale-example)
 -   [Tests](#tests)
 -   [License](#license)
 
 ## Introduction
 
-Qentem Engine is a self-contained library for rendering HTML templates, designed to work in the back-end or the font-end `WASM`. It is capable of rendering HTML pages in normal applications. It has a PHP module that uses the `z_val` for variable replacement, but it evaluates if statements through custom arithmetic and logic algorithm; for security and performance reasons. The client-side module `WASM` has a compact `Value` container and a fast JSON parser.
+Qentem Engine is a self-contained library for rendering HTML templates, designed to work in the back-end or the font-end, and because it has no specific requirement and easy to use, it can be includes in any C++ or C project, or even JAVA. There are a few modules made for PHP, Python and Javascript, in case rendering HTML in C++ is not the norm. The library has a built in fast JSON parser, and has its own logic and arithmetic evaluator which is responsable for evaluating `if`, or calculating long algorithms. In addition to all of that, it can be compiled to `WASM`, and tested directly in the browser, with all of its features like: nested loops, nested if conditions, inline if and variable replacement with auto-escape for HTML special characters.
 
 ## Features
 -   General
@@ -29,6 +29,7 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
     -   Supports 32-bit and 64-bit architecture, little and big-endian.
     -   Low memory usage.
     -   No exceptions (try, catch and throw).
+    -   Short string optimization.
 
 -   JSON
     -   Fast parser.
@@ -40,10 +41,10 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
 -   Template engine
     -   Fast template rendering.
     -   Safe evaluation.
-    -   Variable replacement with HTML auto-escape.
+    -   Variable replacement with HTML auto-escape (Optional: on by default).
     -   Raw variable replacement **without** HTML auto-escape.
-    -   Nested loop (with data grouping and sorting).
-    -   Nested if condition.
+    -   Nested loops (with data grouping and sorting).
+    -   Nested if conditions.
     -   Inline if.
     -   Math tag.
 
@@ -58,6 +59,91 @@ Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/
 ## Live Testing
 
 Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool)
+
+## Template Example
+
+```cpp
+#include "JSON.hpp"
+#include "Template.hpp"
+
+#include <iostream>
+
+using Qentem::Template;
+using Qentem::Value;
+
+int main() {
+    auto value = Qentem::JSON::Parse(R"(
+[
+    {
+        "major": "Computer Science",
+        "students": [
+            { "Name": "Oliver", "GPA": 3.2 },
+            { "Name": "Jonah", "GPA": 3.8 },
+            { "Name": "Jack", "GPA": 2.8 }
+        ]
+    },
+    {
+        "major": "Math",
+        "students": [
+            { "Name": "Maxim", "GPA": 3.0 },
+            { "Name": "Cole", "GPA": 2.5 },
+            { "Name": "Claire", "GPA": 2.4 }
+        ]
+    }
+]
+    )");
+
+    const char *content = R"(
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Qentem Example</title>
+</head>
+
+<body>
+    <div>
+        <h2>Students' list:</h2>
+        <loop value="department_val">
+            <h3>Major: department_val[major]</h3>
+            <ul>
+            <loop set="department_val[students]" value="student_val">
+                <li>
+                    <span>Name: student_val[Name]</span>
+                    <span>
+                        GPA: student_val[GPA]
+                        <if case="student_val[GPA] < 2.5"> (Inform adviser!)
+                        <elseif case="student_val[GPA] >= 3.5" /> (President's List!)
+                        <elseif case="student_val[GPA] >= 3.0" /> (Dean's List!)
+                        </if>
+                    </span>
+                </li>
+            </loop>
+            </ul>
+        </loop>
+    </div>
+</body>
+
+</html>
+)";
+
+    std::cout << Template::Render(content, &value) << '\n';
+}
+```
+
+### JavaScript Module
+
+JavaScript module: [JQen](https://github.com/HaniAmmar/JQen)
+
+### Python Module
+
+Python module: [PiQen](https://github.com/HaniAmmar/PiQen)
+
+### PHP Module
+
+PHP module: [BQen](https://github.com/HaniAmmar/BQen)
 
 ## JSON Example
 
@@ -217,91 +303,6 @@ int main() {
 }
 ```
 
-## Template Example
-
-```cpp
-#include "JSON.hpp"
-#include "Template.hpp"
-
-#include <iostream>
-
-using Qentem::Template;
-using Qentem::Value;
-
-int main() {
-    auto value = Qentem::JSON::Parse(R"(
-[
-    {
-        "major": "Computer Science",
-        "students": [
-            { "Name": "Oliver", "GPA": 3.2 },
-            { "Name": "Jonah", "GPA": 3.8 },
-            { "Name": "Jack", "GPA": 2.8 }
-        ]
-    },
-    {
-        "major": "Math",
-        "students": [
-            { "Name": "Maxim", "GPA": 3.0 },
-            { "Name": "Cole", "GPA": 2.5 },
-            { "Name": "Claire", "GPA": 2.4 }
-        ]
-    }
-]
-    )");
-
-    const char *content = R"(
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Qentem Example</title>
-</head>
-
-<body>
-    <div>
-        <h2>Students' list:</h2>
-        <loop value="department_val">
-            <h3>Major: department_val[major]</h3>
-            <ul>
-            <loop set="department_val[students]" value="student_val">
-                <li>
-                    <span>Name: student_val[Name]</span>
-                    <span>
-                        GPA: student_val[GPA]
-                        <if case="student_val[GPA] < 2.5"> (Inform adviser!)
-                        <elseif case="student_val[GPA] >= 3.5" /> (President's List!)
-                        <elseif case="student_val[GPA] >= 3.0" /> (Dean's List!)
-                        </if>
-                    </span>
-                </li>
-            </loop>
-            </ul>
-        </loop>
-    </div>
-</body>
-
-</html>
-)";
-
-    std::cout << Template::Render(content, &value) << '\n';
-}
-```
-
-### JavaScript Module
-
-JavaScript module is @ [JQen](https://github.com/HaniAmmar/JQen)
-
-### Python Module
-
-Python module is @ [PiQen](https://github.com/HaniAmmar/PiQen)
-
-### PHP Module
-
-PHP module is @ [BQen](https://github.com/HaniAmmar/BQen)
-
 ## ALE Example
 
 ```cpp
@@ -347,7 +348,7 @@ int main() {
 
 ## Tests
 
-The tests are ~15k lines of code; ~5 times the size of the library. To run the tests:
+There are over 15k lines of code for testing; 5 times the size of the library, and some of tests can be used as examples. To run the tests:
 
 -   cmake
     -   Linux
