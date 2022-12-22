@@ -21,7 +21,6 @@
  */
 
 #include "Memory.hpp"
-#include "Platform.hpp"
 #include "QPointer.hpp"
 
 #ifndef QENTEM_ARRAY_H_

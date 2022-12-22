@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-#include "Platform.hpp"
-#include "QPointer.hpp"
 #include "String.hpp"
 
 #ifndef QENTEM_HARRAY_H_

@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-#include "Platform.hpp"
 #include "String.hpp"
 
 #ifndef QENTEM_STRINGSTREAM_H_

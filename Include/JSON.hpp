@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-#include "Platform.hpp"
 #include "Value.hpp"
 
 #ifndef QENTEM_JSON_H_

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "Memory.hpp"
+#include "Common.hpp"
 
 #ifndef QENTEM_Q_POINTER_H_
 #define QENTEM_Q_POINTER_H_

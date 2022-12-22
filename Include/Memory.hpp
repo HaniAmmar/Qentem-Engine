@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
 #include "Platform.hpp"
 
 #ifndef QENTEM_MEMORY_H_
