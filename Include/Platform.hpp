@@ -25,8 +25,8 @@
 #ifndef QENTEM_PLATFORM_H_
 #define QENTEM_PLATFORM_H_
 
-#if QENTEM_AVX2 == 1 || QENTEM_SSE2 == 1 || QENTEM_MSIMD128 == 1
-#if QENTEM_MSIMD128 == 1
+#if (QENTEM_AVX2 == 1) || (QENTEM_SSE2 == 1) || (QENTEM_MSIMD128 == 1)
+#if (QENTEM_MSIMD128 == 1)
 #include <wasm_simd128.h>
 #else
 #include <immintrin.h>
