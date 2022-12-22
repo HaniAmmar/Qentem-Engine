@@ -70,10 +70,8 @@ static const char *GetStingOfType(ValueType type) noexcept {
 
 #define EQ_VALUE_TYPE(left, right, name)                                                                               \
     do {                                                                                                               \
-        const auto &_tmp_left    = left;                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
-        if ((_tmp_left) != (right)) {                                                                                  \
-            TestHelper::PrintErrorMessage2(false, name, GetStingOfType(_tmp_left), GetStingOfType(right));             \
+        if ((left) != (right)) {                                                                                       \
+            TestHelper::PrintErrorMessage2(false, name, GetStingOfType(left), GetStingOfType(right), __LINE__);        \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)

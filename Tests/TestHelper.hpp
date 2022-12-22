@@ -68,31 +68,26 @@ class TestHelper_T {
 
     static void SetStream(Stream_T_ &out) { GetStream() = &out; }
 
-    static unsigned long &LineNumber() noexcept {
-        static unsigned long line = 0;
-
-        return line;
-    }
-
     template <typename Char_T_>
     static const Char_T_ *&TestGroupName() noexcept {
         static const Char_T_ *name = nullptr;
-
         return name;
     }
 
     template <typename Char_T_, typename Value_T_>
-    QENTEM_NOINLINE static void PrintErrorMessage1(bool equal, const Char_T_ *name, const Value_T_ &value) {
+    QENTEM_NOINLINE static void PrintErrorMessage1(bool equal, const Char_T_ *name, const Value_T_ &value,
+                                                   unsigned long line) {
+        // (out <<) will copy the value, but at that point, it will not matter.
         Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed" << QENTEM_OUTPUT_END_COLOR << ": "
-                 << TestGroupName<Char_T_>() << "\n At line :" << LineNumber() << ": `" << name << "` should"
+                 << TestGroupName<Char_T_>() << "\n At line :" << line << ": `" << name << "` should"
                  << (equal ? " not " : " ") << "equal `" << value << "`\n\n";
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE static void PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
-                                                   const Value2_T_ &value2) {
+                                                   const Value2_T_ &value2, unsigned long line) {
         Stream() << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed" << QENTEM_OUTPUT_END_COLOR << ": "
-                 << TestGroupName<Char_T_>() << "\n At line :" << LineNumber() << ": `" << name << "` should"
+                 << TestGroupName<Char_T_>() << "\n At line :" << line << ": `" << name << "` should"
                  << (equal ? " not " : " ") << "equal `" << value2 << "`\n Returned Value: `" << value1 << "`\n\n";
     }
 
@@ -127,65 +122,55 @@ using TestHelper = TestHelper_T<QENTEM_OUTPUT_STREAM_TYPE>;
 
 #define START_TEST(name, func)                                                                                         \
     do {                                                                                                               \
-        if (!TestHelper::StartTest(name, func)) {                                                                      \
+        if (!(TestHelper::StartTest(name, func))) {                                                                    \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
 
 #define EQ_TO(left, right, name, value)                                                                                \
     do {                                                                                                               \
-        const auto &_tmp_left    = left;                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
-        if ((_tmp_left) != (right)) {                                                                                  \
-            TestHelper::PrintErrorMessage2(false, name, _tmp_left, value);                                             \
+        if ((left) != (right)) {                                                                                       \
+            TestHelper::PrintErrorMessage2(false, name, left, value, __LINE__);                                        \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
 
 #define NOT_EQ_TO(left, right, name, value)                                                                            \
     do {                                                                                                               \
-        const auto &_tmp_left    = left;                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
-        if ((_tmp_left) == (right)) {                                                                                  \
-            TestHelper::PrintErrorMessage2(true, name, _tmp_left, value);                                              \
+        if ((left) == (right)) {                                                                                       \
+            TestHelper::PrintErrorMessage2(true, name, left, value, __LINE__);                                         \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
 
 #define EQ_VALUE(left, right, name)                                                                                    \
     do {                                                                                                               \
-        const auto &_tmp_left    = left;                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
-        if ((_tmp_left) != (right)) {                                                                                  \
-            TestHelper::PrintErrorMessage2(false, name, _tmp_left, right);                                             \
+        if ((left) != (right)) {                                                                                       \
+            TestHelper::PrintErrorMessage2(false, name, left, right, __LINE__);                                        \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
 
 #define NOT_EQ_VALUE(left, right, name)                                                                                \
     do {                                                                                                               \
-        const auto &_tmp_left    = left;                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
-        if ((_tmp_left) == (right)) {                                                                                  \
-            TestHelper::PrintErrorMessage2(true, name, _tmp_left, right);                                              \
+        if ((left) == (right)) {                                                                                       \
+            TestHelper::PrintErrorMessage2(true, name, left, right, __LINE__);                                         \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
 
 #define EQ_TRUE(condition, name)                                                                                       \
     do {                                                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
         if (!(condition)) {                                                                                            \
-            TestHelper::PrintErrorMessage1(false, name, "true");                                                       \
+            TestHelper::PrintErrorMessage1(false, name, "true", __LINE__);                                             \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
 
 #define EQ_FALSE(condition, name)                                                                                      \
     do {                                                                                                               \
-        TestHelper::LineNumber() = __LINE__;                                                                           \
         if (condition) {                                                                                               \
-            TestHelper::PrintErrorMessage1(true, name, "true");                                                        \
+            TestHelper::PrintErrorMessage1(true, name, "true", __LINE__);                                              \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -224,8 +209,8 @@ static int TestError() {
     constexpr int m = 1;
 
     TestHelperEmptyStream::SetStream(es);
-    TestHelperEmptyStream::PrintErrorMessage1(false, "", n);
-    TestHelperEmptyStream::PrintErrorMessage2(false, "", n, m);
+    TestHelperEmptyStream::PrintErrorMessage1(false, "", n, __LINE__);
+    TestHelperEmptyStream::PrintErrorMessage2(false, "", n, m, __LINE__);
 
     EQ_FALSE(TestHelperEmptyStream::StartTest("Test StartTest()", TestError_1), "StartTest()");
 
