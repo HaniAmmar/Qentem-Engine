@@ -262,6 +262,13 @@ static int TestArray3() {
     EQ_TRUE((numbers1.Capacity() >= 8), "(numbers1.Capacity() >= 8)");
     NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
 
+    SizeT sum = 0;
+    for (const SizeT &num : numbers1) {
+        sum += num;
+    }
+
+    EQ_VALUE(sum, 28U, "sum");
+
     numbers2.Insert(storage1[0]).Insert(storage1[1]);
 
     for (SizeT i = 2; i < 8; i++) {
