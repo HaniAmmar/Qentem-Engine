@@ -246,6 +246,10 @@ class Array {
     inline bool         IsEmpty() const noexcept { return (Size() == 0); }
     inline bool         IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
+    // For STL
+    inline const Type_ *begin() const noexcept { return First(); }
+    inline const Type_ *end() const noexcept { return End(); }
+
     inline const Type_ *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - 1));
