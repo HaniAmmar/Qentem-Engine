@@ -316,7 +316,7 @@ class Template {
         }
 
         inline SizeT Offset() const noexcept { return offset_; }
-        inline SizeT EndOffset() const noexcept { return end_offset_; }
+        inline SizeT StopOffset() const noexcept { return end_offset_; }
 
       private:
         void setType(TagType type) noexcept {
@@ -373,7 +373,7 @@ class Template_CV {
             TagBit       *start = tags_cache.Storage();
             const TagBit *end   = (start + tags_cache.Size());
             render(start, end, content);
-            offset = (end - 1)->EndOffset();
+            offset = (end - 1)->StopOffset();
         }
 
         // Add the remaining string.
@@ -574,7 +574,7 @@ class Template_CV {
                     const SizeT content_offset = (tag->Offset() + TemplatePatterns_C_::VariablePrefixLength);
 
                     renderVariable((content + content_offset),
-                                   ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
+                                   ((tag->StopOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
                     break;
                 }
 
@@ -582,7 +582,7 @@ class Template_CV {
                     const SizeT content_offset = (tag->Offset() + TemplatePatterns_C_::VariablePrefixLength);
 
                     renderRawVariable((content + content_offset),
-                                      ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
+                                      ((tag->StopOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
                     break;
                 }
 
@@ -590,7 +590,7 @@ class Template_CV {
                     const SizeT content_offset = (tag->Offset() + TemplatePatterns_C_::MathPrefixLength);
 
                     renderMath((content + content_offset),
-                               ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
+                               ((tag->StopOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset));
                     break;
                 }
 
@@ -601,8 +601,8 @@ class Template_CV {
 
                     if (loop_info == nullptr) {
                         generateLoopContent(
-                            loop_content, ((tag->EndOffset() - TemplatePatterns_C_::LoopSuffixLength) - content_offset),
-                            loop_info);
+                            loop_content,
+                            ((tag->StopOffset() - TemplatePatterns_C_::LoopSuffixLength) - content_offset), loop_info);
                         tag->SetInfo(loop_info);
                     }
 
@@ -619,7 +619,7 @@ class Template_CV {
                     if (inline_if_info == nullptr) {
                         generateInLineIfInfo(
                             inline_if_content,
-                            ((tag->EndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset),
+                            ((tag->StopOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset),
                             inline_if_info);
                         tag->SetInfo(inline_if_info);
                     }
@@ -635,7 +635,7 @@ class Template_CV {
                     IfInfo_       *if_info         = static_cast<IfInfo_ *>(tag->GetPointer());
 
                     if (if_info == nullptr) {
-                        generateIfCases(if_info_content, (tag->EndOffset() - content_offset), if_info);
+                        generateIfCases(if_info_content, (tag->StopOffset() - content_offset), if_info);
                         tag->SetInfo(if_info);
                     }
 
@@ -648,7 +648,7 @@ class Template_CV {
                 }
             }
 
-            previous_offset = tag->EndOffset();
+            previous_offset = tag->StopOffset();
             ++tag;
         }
     }
