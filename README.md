@@ -20,7 +20,7 @@
 
 ## Introduction
 
-Qentem Engine is a self-contained library for rendering HTML templates, designed to work in the back-end or the font-end, and because it has no specific requirement and easy to use, it can be includes in any C++ or C project, or even JAVA. There are a few modules made for PHP, Python and Javascript, in case rendering HTML in C++ is not the norm. The library has a built in fast JSON parser, and has its own logic and arithmetic evaluator which is responsable for evaluating `if`, or calculating long algorithms. In addition to all of that, it can be compiled to `WASM`, and tested directly in the browser, with all of its features like: nested loops, nested if conditions, inline if and variable replacement with auto-escape for HTML special characters.
+Qentem Engine is a self-contained library for rendering HTML templates, designed to work in the back-end or the font-end, and because it has no specific requirement and easy to use, it can be includes in any C++ or C project, or even JAVA. There are a few modules made for PHP, Python and Javascript, in case rendering HTML in C++ is not the norm. The library has a built-in fast JSON parser, and has its own logic and arithmetic evaluator which is responsable for evaluating `if`, or calculating long algorithms. In addition to all of that, it can be compiled to `WASM`, and tested directly in the browser, with all of its features like: nested loops, nested if conditions, inline if and variable replacement with auto-escape for HTML special characters.
 
 ## Features
 -   General
@@ -348,7 +348,7 @@ int main() {
 
 ## Tests
 
-There are over 15k lines of code for testing; 5 times the size of the library, and some of tests can be used as examples. To run the tests:
+There are over 15k lines of code for testing; 5 times the size of the library, and some tests can be used as examples. To run the tests:
 
 -   cmake
     -   Linux
