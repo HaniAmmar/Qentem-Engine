@@ -199,7 +199,8 @@ class Array {
 
         if (Size() > new_size) {
             // Shrink
-            Memory::Dispose((Storage() + new_size), End());
+            Type_ *storage = Storage();
+            Memory::Dispose((storage + new_size), (storage + Size()));
             setSize(new_size);
         }
 
@@ -287,28 +288,28 @@ class Array {
         }
 
         index_ += src.Size();
-        Type_       *storage = Storage();
-        const Type_ *item    = src.First();
-        const Type_ *end     = (item + src.Size());
+        Type_       *storage  = Storage();
+        const Type_ *src_item = src.First();
+        const Type_ *src_end  = (src_item + src.Size());
 
-        while (item != end) {
-            Memory::Initialize(storage, *item);
+        while (src_item != src_end) {
+            Memory::Initialize(storage, *src_item);
             ++storage;
-            ++item;
+            ++src_item;
         }
     }
 
     void copyArray(const Array &src) {
         if (Capacity() != 0) {
             setSize(src.Size());
-            Type_       *storage = allocate();
-            const Type_ *item    = src.First();
-            const Type_ *end     = (item + src.Size());
+            Type_       *storage  = allocate();
+            const Type_ *src_item = src.First();
+            const Type_ *src_end  = (src_item + src.Size());
 
-            while (item != end) {
-                Memory::Initialize(storage, *item);
+            while (src_item != src_end) {
+                Memory::Initialize(storage, *src_item);
                 ++storage;
-                ++item;
+                ++src_item;
             }
         }
     }

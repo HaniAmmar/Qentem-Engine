@@ -117,29 +117,29 @@ class HArray {
     }
 
     void operator+=(HArray &&src) {
-        const SizeT      n_size = (Size() + src.Size());
-        HAItem_T_       *item   = src.Storage();
-        const HAItem_T_ *end    = (item + src.Size());
+        const SizeT      n_size   = (Size() + src.Size());
+        HAItem_T_       *src_item = src.Storage();
+        const HAItem_T_ *src_end  = (src_item + src.Size());
 
         if (n_size > Capacity()) {
             resize(aligneSize(n_size));
         }
 
-        while (item != end) {
-            if (item->Hash != 0) {
+        while (src_item != src_end) {
+            if (src_item->Hash != 0) {
                 SizeT     *index;
-                HAItem_T_ *storage_item = find(index, item->Key.First(), item->Key.Length(), item->Hash);
+                HAItem_T_ *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
-                    storage_item = insert(index, static_cast<Key_T_ &&>(item->Key), item->Hash);
+                    storage_item = insert(index, static_cast<Key_T_ &&>(src_item->Key), src_item->Hash);
                 } else {
-                    Memory::Dispose(&(item->Key));
+                    Memory::Dispose(&(src_item->Key));
                 }
 
-                storage_item->Value = static_cast<Value_ &&>(item->Value);
+                storage_item->Value = static_cast<Value_ &&>(src_item->Value);
             }
 
-            ++item;
+            ++src_item;
         }
 
         src.setCapacity(0);
@@ -149,27 +149,27 @@ class HArray {
     }
 
     void operator+=(const HArray &src) {
-        const SizeT      n_size = (Size() + src.Size());
-        const HAItem_T_ *item   = src.First();
-        const HAItem_T_ *end    = item + src.Size();
+        const SizeT      n_size   = (Size() + src.Size());
+        const HAItem_T_ *src_item = src.First();
+        const HAItem_T_ *src_end  = src_item + src.Size();
 
         if (n_size > Capacity()) {
             resize(aligneSize(n_size));
         }
 
-        while (item != end) {
-            if (item->Hash != 0) {
+        while (src_item != src_end) {
+            if (src_item->Hash != 0) {
                 SizeT     *index;
-                HAItem_T_ *storage_item = find(index, item->Key.First(), item->Key.Length(), item->Hash);
+                HAItem_T_ *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
-                    storage_item = insert(index, Key_T_(item->Key), item->Hash);
+                    storage_item = insert(index, Key_T_(src_item->Key), src_item->Hash);
                 }
 
-                storage_item->Value = Value_(item->Value);
+                storage_item->Value = Value_(src_item->Value);
             }
 
-            ++item;
+            ++src_item;
         }
     }
 
@@ -496,12 +496,12 @@ class HArray {
     }
 
     HAItem_T_ *find(SizeT *&index, const Char_T_ *key, SizeT length, SizeT hash) const noexcept {
-        SizeT     *ht  = getHashTable();
-        HAItem_T_ *src = reinterpret_cast<HAItem_T_ *>(ht + Capacity());
-        index          = (ht + (hash & getBase()));
+        SizeT     *ht      = getHashTable();
+        HAItem_T_ *storage = reinterpret_cast<HAItem_T_ *>(ht + Capacity());
+        index              = (ht + (hash & getBase()));
 
         while (*index != 0) {
-            HAItem_T_ *item = (src + (*index) - 1);
+            HAItem_T_ *item = (storage + (*index) - 1);
 
             if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
                 return item;
@@ -545,7 +545,7 @@ class HArray {
     void copyTable(const HArray &src) {
         if (src.Size() != 0) {
             const HAItem_T_ *src_item = src.First();
-            const HAItem_T_ *end      = (src_item + src.Size());
+            const HAItem_T_ *src_end  = (src_item + src.Size());
 
             setCapacity(aligneSize(src.Size()));
 
@@ -559,7 +559,7 @@ class HArray {
                 }
 
                 ++src_item;
-            } while (src_item != end);
+            } while (src_item != src_end);
 
             setSize(static_cast<SizeT>(storage_item - storage_src));
             generateHash();
