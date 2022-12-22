@@ -263,7 +263,7 @@ class Template {
         TagBit &operator=(const TagBit &tag) = delete;
         TagBit &operator=(TagBit &&)         = delete;
 
-        TagBit(TagType type, SizeT offset, SizeT end_offset) noexcept : offset_(offset), end_offset_(end_offset) {
+        TagBit(TagType type, SizeT offset, SizeT stop_offset) noexcept : offset_(offset), end_offset_(stop_offset) {
             setType(type);
         }
 
@@ -392,13 +392,13 @@ class Template_CV {
                         if (StringUtils::IsEqual((TemplatePatterns_C_::GetVariablePrefix() + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::VariablePrefixLength - 2))) {
-                            const SizeT end_offset = Engine::FindOne<Char_T_>(
+                            const SizeT stop_offset = Engine::FindOne<Char_T_>(
                                 TemplatePatterns_C_::InLineSuffix, content,
                                 (current_offset + TemplatePatterns_C_::VariablePrefixLength), length);
 
-                            if (end_offset != 0) {
-                                tags_cache += TagBit{TagType::Variable, offset, end_offset};
-                                offset = end_offset;
+                            if (stop_offset != 0) {
+                                tags_cache += TagBit{TagType::Variable, offset, stop_offset};
+                                offset = stop_offset;
                                 continue;
                             }
                         }
@@ -410,13 +410,13 @@ class Template_CV {
                         if (StringUtils::IsEqual((TemplatePatterns_C_::GetRawVariablePrefix() + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::RawVariablePrefixLength - 2))) {
-                            const SizeT end_offset = Engine::FindOne<Char_T_>(
+                            const SizeT stop_offset = Engine::FindOne<Char_T_>(
                                 TemplatePatterns_C_::InLineSuffix, content,
                                 (current_offset + TemplatePatterns_C_::RawVariablePrefixLength), length);
 
-                            if (end_offset != 0) {
-                                tags_cache += TagBit{TagType::RawVariable, offset, end_offset};
-                                offset = end_offset;
+                            if (stop_offset != 0) {
+                                tags_cache += TagBit{TagType::RawVariable, offset, stop_offset};
+                                offset = stop_offset;
                                 continue;
                             }
                         }
@@ -428,13 +428,13 @@ class Template_CV {
                         if (StringUtils::IsEqual((TemplatePatterns_C_::GetMathPrefix() + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                            const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
+                            const SizeT stop_offset = Engine::SkipInnerPatterns<Char_T_>(
                                 TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
                                 (current_offset + TemplatePatterns_C_::MathPrefixLength - 1), length);
 
-                            if (end_offset != 0) {
-                                tags_cache += TagBit{TagType::Math, offset, end_offset};
-                                offset = end_offset;
+                            if (stop_offset != 0) {
+                                tags_cache += TagBit{TagType::Math, offset, stop_offset};
+                                offset = stop_offset;
                                 continue;
                             }
                         }
@@ -446,13 +446,13 @@ class Template_CV {
                         if (StringUtils::IsEqual((TemplatePatterns_C_::GetInLineIfPrefix() + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::InLineIfPrefixLength - 2))) {
-                            const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
+                            const SizeT stop_offset = Engine::SkipInnerPatterns<Char_T_>(
                                 TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
                                 (current_offset + TemplatePatterns_C_::InLineIfPrefixLength - 1), length);
 
-                            if (end_offset != 0) {
-                                tags_cache += TagBit{TagType::InLineIf, offset, end_offset};
-                                offset = end_offset;
+                            if (stop_offset != 0) {
+                                tags_cache += TagBit{TagType::InLineIf, offset, stop_offset};
+                                offset = stop_offset;
                                 continue;
                             }
                         }
@@ -469,28 +469,28 @@ class Template_CV {
                 if (content[current_offset] == TemplatePatterns_C_::Loop_2ND_Char) { // <loop
                     if (StringUtils::IsEqual((TemplatePatterns_C_::GetLoopPrefix() + 2), (content + current_offset + 1),
                                              (TemplatePatterns_C_::LoopPrefixLength - 2))) {
-                        const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
+                        const SizeT stop_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::GetLoopPrefix(), TemplatePatterns_C_::LoopPrefixLength,
                             TemplatePatterns_C_::GetLoopSuffix(), TemplatePatterns_C_::LoopSuffixLength, content,
                             (current_offset + TemplatePatterns_C_::InLineIfPrefixLength - 1), length);
 
-                        if (end_offset != 0) {
-                            tags_cache += TagBit{TagType::Loop, offset, end_offset};
-                            offset = end_offset;
+                        if (stop_offset != 0) {
+                            tags_cache += TagBit{TagType::Loop, offset, stop_offset};
+                            offset = stop_offset;
                             continue;
                         }
                     }
                 } else if (content[current_offset] == TemplatePatterns_C_::If_2ND_Char) { // <if
                     if (StringUtils::IsEqual((TemplatePatterns_C_::GetIfPrefix() + 2), (content + current_offset + 1),
                                              (TemplatePatterns_C_::IfPrefixLength - 2))) {
-                        const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
+                        const SizeT stop_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::GetIfPrefix(), TemplatePatterns_C_::IfPrefixLength,
                             TemplatePatterns_C_::GetIfSuffix(), TemplatePatterns_C_::IfSuffixLength, content,
                             current_offset, length);
 
-                        if (end_offset != 0) {
-                            tags_cache += TagBit{TagType::If, offset, end_offset};
-                            offset = end_offset;
+                        if (stop_offset != 0) {
+                            tags_cache += TagBit{TagType::If, offset, stop_offset};
+                            offset = stop_offset;
                             continue;
                         }
                     }
@@ -516,14 +516,14 @@ class Template_CV {
                 case TemplatePatterns_C_::Var_2ND_Char: {
                     if (StringUtils::IsEqual((TemplatePatterns_C_::GetVariablePrefix() + 2), (content + offset + 1),
                                              (TemplatePatterns_C_::VariablePrefixLength - 2))) {
-                        const SizeT end_offset =
+                        const SizeT stop_offset =
                             Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
                                                      (offset + TemplatePatterns_C_::VariablePrefixLength), length);
-                        // end_offset cannot be zero
+                        // stop_offset cannot be zero
 
                         tags_cache +=
-                            TagBit{TagType::Variable, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
-                        offset = end_offset;
+                            TagBit{TagType::Variable, (offset - TemplatePatterns_C_::InLinePrefixLength), stop_offset};
+                        offset = stop_offset;
                     }
 
                     break;
@@ -532,12 +532,12 @@ class Template_CV {
                 case TemplatePatterns_C_::Raw_2ND_Char: {
                     if (StringUtils::IsEqual((TemplatePatterns_C_::GetRawVariablePrefix() + 2), (content + offset + 1),
                                              (TemplatePatterns_C_::RawVariablePrefixLength - 2))) {
-                        const SizeT end_offset =
+                        const SizeT stop_offset =
                             Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
                                                      (offset + TemplatePatterns_C_::RawVariablePrefixLength), length);
                         tags_cache += TagBit{TagType::RawVariable, (offset - TemplatePatterns_C_::InLinePrefixLength),
-                                             end_offset};
-                        offset = end_offset;
+                                             stop_offset};
+                        offset = stop_offset;
                     }
 
                     break;
@@ -546,12 +546,12 @@ class Template_CV {
                 case TemplatePatterns_C_::Math_2ND_Char: {
                     if (StringUtils::IsEqual((TemplatePatterns_C_::GetMathPrefix() + 2), (content + offset + 1),
                                              (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                        const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
+                        const SizeT stop_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
                             (offset + TemplatePatterns_C_::MathPrefixLength - 1), length);
                         tags_cache +=
-                            TagBit{TagType::Math, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
-                        offset = end_offset;
+                            TagBit{TagType::Math, (offset - TemplatePatterns_C_::InLinePrefixLength), stop_offset};
+                        offset = stop_offset;
                     }
 
                     break;
@@ -786,15 +786,15 @@ class Template_CV {
                                            TemplatePatterns_C_::VariablePrefixLength, content, offset, length);
 
             if (offset != 0) {
-                const SizeT end_offset =
+                const SizeT stop_offset =
                     Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content, offset, length);
 
-                if (end_offset == 0) {
+                if (stop_offset == 0) {
                     return false;
                 }
 
                 const Value_T_ *value =
-                    findValue((content + offset), ((end_offset - TemplatePatterns_C_::InLineSuffixLength) - offset));
+                    findValue((content + offset), ((stop_offset - TemplatePatterns_C_::InLineSuffixLength) - offset));
 
                 return ((value != nullptr) && (value->SetNumber(number)));
             }

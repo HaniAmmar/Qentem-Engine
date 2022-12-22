@@ -977,16 +977,16 @@ static void to_JSON(StringStream<char> &ss, const Array<Item2__> &items, const c
 }
 
 void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT r_tag_len, Array<Item2__> &items,
-                    const char *content, SizeT offset, SizeT end_offset) {
+                    const char *content, SizeT offset, SizeT stop_offset) {
     const SizeT l_r_len      = (l_tag_len + r_tag_len);
     SizeT       e_tag_offset = offset;
     SizeT       s_tag_offset;
 
-    while (offset < end_offset) {
+    while (offset < stop_offset) {
         if (l_tag_len == 1) {
-            s_tag_offset = Engine::FindOne(l_tag[0], content, e_tag_offset, end_offset);
+            s_tag_offset = Engine::FindOne(l_tag[0], content, e_tag_offset, stop_offset);
         } else {
-            s_tag_offset = Engine::Find(l_tag, l_tag_len, content, e_tag_offset, end_offset);
+            s_tag_offset = Engine::Find(l_tag, l_tag_len, content, e_tag_offset, stop_offset);
         }
 
         if (s_tag_offset == 0) {
@@ -994,10 +994,10 @@ void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT
         }
 
         if (l_tag_len == 1) {
-            e_tag_offset = Engine::SkipInnerPatterns(l_tag[0], r_tag[0], content, s_tag_offset, end_offset);
+            e_tag_offset = Engine::SkipInnerPatterns(l_tag[0], r_tag[0], content, s_tag_offset, stop_offset);
         } else {
             e_tag_offset =
-                Engine::SkipInnerPatterns(l_tag, l_tag_len, r_tag, r_tag_len, content, s_tag_offset, end_offset);
+                Engine::SkipInnerPatterns(l_tag, l_tag_len, r_tag, r_tag_len, content, s_tag_offset, stop_offset);
         }
 
         if (e_tag_offset == 0) {
