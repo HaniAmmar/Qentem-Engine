@@ -53,7 +53,7 @@ struct HAItem {
 /*|                Hash Table                 |*/
 /*|____________________|______________________|*/
 /*|     Positions      |       Items          |*/
-/*| 0, 1 , 2, ... n-1  | item0, item 1, ...   |*/
+/*| 0, 1 , 2, ... n-1  | item 0, item 1, ...  |*/
 /*|____________________|______________________|*/
 
 template <typename Value_, typename Char_T_>
@@ -446,15 +446,13 @@ class HArray {
         return size;
     }
 
-    inline SizeT Size() const noexcept { return index_; }
-    inline SizeT Capacity() const noexcept { return capacity_; }
-
+    inline SizeT      Size() const noexcept { return index_; }
+    inline SizeT      Capacity() const noexcept { return capacity_; }
     inline HAItem_T_ *Storage() const noexcept { return reinterpret_cast<HAItem_T_ *>(getHashTable() + Capacity()); }
-
-    inline bool             IsEmpty() const noexcept { return (Size() == 0); }
-    inline bool             IsNotEmpty() const noexcept { return !(IsEmpty()); }
     inline const HAItem_T_ *First() const noexcept { return Storage(); }
     inline const HAItem_T_ *End() const noexcept { return (First() + Size()); }
+    inline bool             IsEmpty() const noexcept { return (Size() == 0); }
+    inline bool             IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
     inline const HAItem_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
