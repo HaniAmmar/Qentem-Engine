@@ -51,7 +51,7 @@ class QPointer {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         bits_.number_ = (QPointer(pointer)).bits_.number_;
 #else
-        pointer_ = ptr;
+        pointer_ = pointer;
 #endif
     }
 
