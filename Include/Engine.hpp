@@ -45,10 +45,10 @@ class Engine {
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content, Number_T_ offset,
-                             const Number_T_ end_before) noexcept {
+                             const Number_T_ stop_offset) noexcept {
 #ifdef QENTEM_SIMD_ENABLED
-        if (offset < end_before) {
-            SizeT m_size = ((end_before - offset) >> QENTEM_SIMD_SHIFT_SIZE);
+        if (offset < stop_offset) {
+            SizeT m_size = ((stop_offset - offset) >> QENTEM_SIMD_SHIFT_SIZE);
 
             if (m_size != 0) {
                 const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
@@ -69,7 +69,7 @@ class Engine {
         }
 #endif
 
-        while (offset < end_before) {
+        while (offset < stop_offset) {
             if (char_1 == content[offset]) {
                 return (offset + 1);
             }
@@ -86,13 +86,13 @@ class Engine {
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ Find(const Char_T_ *pattern, const SizeT pattern_length, const Char_T_ *content, Number_T_ offset,
-                          Number_T_ end_before) noexcept {
-        if ((offset < end_before) && ((offset + pattern_length) <= end_before)) {
+                          Number_T_ stop_offset) noexcept {
+        if ((offset < stop_offset) && ((offset + pattern_length) <= stop_offset)) {
             const SizeT len_one_less = (pattern_length - 1);
-            end_before -= len_one_less;
+            stop_offset -= len_one_less;
 
 #ifdef QENTEM_SIMD_ENABLED
-            SizeT m_size = ((end_before - offset) >> QENTEM_SIMD_SHIFT_SIZE);
+            SizeT m_size = ((stop_offset - offset) >> QENTEM_SIMD_SHIFT_SIZE);
 
             if (m_size != 0) {
                 const Char_T_        *content_ofs     = (content + offset);
@@ -125,7 +125,7 @@ class Engine {
             }
 #endif
 
-            while (offset < end_before) {
+            while (offset < stop_offset) {
                 if ((*pattern == content[offset]) && (pattern[len_one_less] == content[offset + len_one_less])) {
                     Number_T_ tmp_offset = 1;
 
@@ -150,7 +150,7 @@ class Engine {
      * {.{..{...}..}.}; then this function can skip inner brackets:
      *
      * return SkipInnerPatterns("{", 1, "}", 1,
-     *                          content, offset, end_before, max_end_before);
+     *                          content, offset, stop_offset, max_end_before);
      *
      */
     template <typename Char_T_, typename Number_T_>

@@ -52,10 +52,10 @@ class StringUtils {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static void TrimLeft(const Char_T_ *str, Number_T_ &offset, Number_T_ end_before) noexcept {
+    static void TrimLeft(const Char_T_ *str, Number_T_ &offset, Number_T_ stop_offset) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
-        while (offset < end_before) {
+        while (offset < stop_offset) {
             const Char_T_ c = str[offset];
 
             if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
@@ -67,16 +67,18 @@ class StringUtils {
         }
     }
 
+    // offset: the starting offset
+    // length: the number of characters
     template <typename Char_T_, typename Number_T_>
     static void Trim(const Char_T_ *str, Number_T_ &offset, Number_T_ &length) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         if (length != 0) {
-            Number_T_ end_before = (length + offset);
-            TrimLeft(str, offset, end_before);
+            Number_T_ stop_offset = (length + offset);
+            TrimLeft(str, offset, stop_offset);
 
-            while (--end_before > offset) {
-                const Char_T_ c = str[end_before];
+            while (--stop_offset > offset) {
+                const Char_T_ c = str[stop_offset];
 
                 if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
                     (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
@@ -84,8 +86,8 @@ class StringUtils {
                 }
             }
 
-            ++end_before;
-            length = (end_before - offset);
+            ++stop_offset;
+            length = (stop_offset - offset);
         }
     }
 
