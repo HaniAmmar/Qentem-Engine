@@ -266,22 +266,22 @@ class JSONotation {
     static constexpr Char_T_ E_Char  = 'e';
     static constexpr Char_T_ CE_Char = 'E';
 
-    static constexpr unsigned char TrueStringLength = 4;
-    static const Char_T_          *GetTrueString() noexcept {
-                 static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e', '\0'};
-                 return &(val[0]);
+    static constexpr SizeT TrueStringLength = 4U;
+    static const Char_T_  *GetTrueString() noexcept {
+         static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e', '\0'};
+         return &(val[0]);
     }
 
-    static constexpr unsigned char FalseStringLength = 5;
-    static const Char_T_          *GetFalseString() noexcept {
-                 static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e', '\0'};
-                 return &(val[0]);
+    static constexpr SizeT FalseStringLength = 5U;
+    static const Char_T_  *GetFalseString() noexcept {
+         static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e', '\0'};
+         return &(val[0]);
     }
 
-    static constexpr unsigned char NullStringLength = 4;
-    static const Char_T_          *GetNullString() noexcept {
-                 static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l', '\0'};
-                 return &(val[0]);
+    static constexpr SizeT NullStringLength = 4U;
+    static const Char_T_  *GetNullString() noexcept {
+         static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l', '\0'};
+         return &(val[0]);
     }
 };
 
