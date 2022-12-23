@@ -586,7 +586,7 @@ class Digit {
         Char_T_            tmp2[QENTEM_FLOAT_NUMBER_MAX_SIZE_];
         unsigned long long fraction        = 0;
         unsigned int       fraction_length = 0;
-        unsigned int       stop_offset     = max_length;
+        unsigned int       end_offset      = max_length;
         unsigned int       offset          = 0;
         int                exponent        = 0;
         const bool         negative        = (number < 0);
@@ -608,14 +608,14 @@ class Digit {
         unsigned long long tmp_number = left_number;
 
         while (tmp_number != 0) {
-            --stop_offset;
-            tmp[stop_offset] = (Char_T_(tmp_number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
+            --end_offset;
+            tmp[end_offset] = (Char_T_(tmp_number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
             tmp_number /= QENTEM_DECIMAL_BASE_;
         }
 
-        unsigned int left_length = (max_length - stop_offset);
+        unsigned int left_length = (max_length - end_offset);
 
-        if (stop_offset != 0) { // Full
+        if (end_offset != 0) { // Full
             number -= static_cast<double>(left_number);
 
             if (number != 0) {
@@ -648,15 +648,15 @@ class Digit {
                 if ((precision == 0) && (fraction == 1)) {
                     fraction = 0;
                     ++left_number;
-                    stop_offset = max_length;
+                    end_offset = max_length;
 
                     while (left_number != 0) {
-                        --stop_offset;
-                        tmp[stop_offset] = (Char_T_(left_number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
+                        --end_offset;
+                        tmp[end_offset] = (Char_T_(left_number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
                         left_number /= QENTEM_DECIMAL_BASE_;
                     }
 
-                    left_length = (max_length - stop_offset);
+                    left_length = (max_length - end_offset);
                 }
 
                 fraction_length = precision;
@@ -673,31 +673,31 @@ class Digit {
             ++fraction_length; // One for DotChar
         }
 
-        while (stop_offset < max_length) {
-            tmp2[offset] = tmp[stop_offset];
+        while (end_offset < max_length) {
+            tmp2[offset] = tmp[end_offset];
             ++offset;
-            ++stop_offset;
+            ++end_offset;
         }
 
         if (fraction_length != 0) {
-            stop_offset = --fraction_length;
+            end_offset = --fraction_length;
 
             while (fraction != 0) {
-                --stop_offset;
-                tmp[stop_offset] = (Char_T_(fraction % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
+                --end_offset;
+                tmp[end_offset] = (Char_T_(fraction % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
                 fraction /= QENTEM_DECIMAL_BASE_;
             }
 
-            if (((stop_offset == 0) && (exponent == 0)) || (left_length != 0) || no_exponent) {
-                unsigned int offset2 = stop_offset;
+            if (((end_offset == 0) && (exponent == 0)) || (left_length != 0) || no_exponent) {
+                unsigned int offset2 = end_offset;
 
                 tmp2[offset] = DigitChars::DotChar;
                 ++offset;
 
-                while (stop_offset != 0) {
+                while (end_offset != 0) {
                     tmp2[offset] = DigitChars::ZeroChar;
                     ++offset;
-                    --stop_offset;
+                    --end_offset;
                 }
 
                 while (offset2 < fraction_length) {
@@ -715,21 +715,21 @@ class Digit {
                 offset = (negative) ? 1 : 0;
                 --exponent;
                 ++left_length;
-                exponent -= static_cast<int>(stop_offset);
+                exponent -= static_cast<int>(end_offset);
 
-                tmp2[offset] = tmp[stop_offset];
+                tmp2[offset] = tmp[end_offset];
                 ++offset;
-                ++stop_offset;
+                ++end_offset;
 
-                if (stop_offset != fraction_length) {
+                if (end_offset != fraction_length) {
                     tmp2[offset] = DigitChars::DotChar;
                     ++offset;
 
                     do {
-                        tmp2[offset] = tmp[stop_offset];
+                        tmp2[offset] = tmp[end_offset];
                         ++offset;
-                        ++stop_offset;
-                    } while (stop_offset < fraction_length);
+                        ++end_offset;
+                    } while (end_offset < fraction_length);
                 }
             }
         }
@@ -744,39 +744,39 @@ class Digit {
                 ++offset;
             }
 
-            stop_offset = 4;
+            end_offset = 4;
 
             while (exponent != 0) {
-                --stop_offset;
-                tmp[stop_offset] =
+                --end_offset;
+                tmp[end_offset] =
                     static_cast<Char_T_>(static_cast<Char_T_>(exponent % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
                 exponent /= QENTEM_DECIMAL_BASE_;
             }
 
-            while (stop_offset < 4) {
-                tmp2[offset] = tmp[stop_offset];
+            while (end_offset < 4) {
+                tmp2[offset] = tmp[end_offset];
                 ++offset;
-                ++stop_offset;
+                ++end_offset;
             }
         }
 
-        stop_offset = offset;
-        offset      = 0;
+        end_offset = offset;
+        offset     = 0;
 
         if (min >= left_length) {
             min -= left_length;
-            stop_offset += min;
+            end_offset += min;
 
-            if (stop_offset > QENTEM_FLOAT_NUMBER_MAX_SIZE_) {
+            if (end_offset > QENTEM_FLOAT_NUMBER_MAX_SIZE_) {
                 min += QENTEM_FLOAT_NUMBER_MAX_SIZE_;
-                min         = (min - stop_offset);
-                stop_offset = QENTEM_FLOAT_NUMBER_MAX_SIZE_;
+                min        = (min - end_offset);
+                end_offset = QENTEM_FLOAT_NUMBER_MAX_SIZE_;
             }
         } else {
             min = 0;
         }
 
-        Char_T_     *str     = getCharForNumber(dstring, stop_offset);
+        Char_T_     *str     = getCharForNumber(dstring, end_offset);
         unsigned int offset2 = 0;
 
         if (negative) {
@@ -791,7 +791,7 @@ class Digit {
             --min;
         }
 
-        while (offset != stop_offset) {
+        while (offset != end_offset) {
             str[offset] = tmp2[offset2];
             ++offset;
             ++offset2;
