@@ -268,19 +268,19 @@ class JSONotation {
 
     static constexpr unsigned char TrueStringLength = 4;
     static const Char_T_          *GetTrueString() noexcept {
-                 static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e'};
+                 static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e', '\0'};
                  return &(val[0]);
     }
 
     static constexpr unsigned char FalseStringLength = 5;
     static const Char_T_          *GetFalseString() noexcept {
-                 static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e'};
+                 static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e', '\0'};
                  return &(val[0]);
     }
 
     static constexpr unsigned char NullStringLength = 4;
     static const Char_T_          *GetNullString() noexcept {
-                 static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l'};
+                 static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l', '\0'};
                  return &(val[0]);
     }
 };

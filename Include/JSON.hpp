@@ -205,16 +205,12 @@ class JSONParser {
             }
 
             case JSONotation_T_::T_Char: {
-                static const Char_T_ *true_string = JSONotation_T_::GetTrueString();
-
-                SizeT tmp_offset = 0;
+                const Char_T_ *true_string = JSONotation_T_::GetTrueString();
 
                 do {
-                    ++offset;
-                    ++tmp_offset;
-                } while ((content[offset] == true_string[tmp_offset]));
+                } while ((content[++offset] == *(++true_string)));
 
-                if (tmp_offset == JSONotation_T_::TrueStringLength) {
+                if (*(true_string) == 0) {
                     return VValue{true};
                 }
 
@@ -222,16 +218,12 @@ class JSONParser {
             }
 
             case JSONotation_T_::F_Char: {
-                static const Char_T_ *false_string = JSONotation_T_::GetFalseString();
-
-                SizeT tmp_offset = 0;
+                const Char_T_ *false_string = JSONotation_T_::GetFalseString();
 
                 do {
-                    ++offset;
-                    ++tmp_offset;
-                } while ((content[offset] == false_string[tmp_offset]));
+                } while ((content[++offset] == *(++false_string)));
 
-                if (tmp_offset == JSONotation_T_::FalseStringLength) {
+                if (*(false_string) == 0) {
                     return VValue{false};
                 }
 
@@ -239,15 +231,12 @@ class JSONParser {
             }
 
             case JSONotation_T_::N_Char: {
-                static const Char_T_ *null_string = JSONotation_T_::GetNullString();
-                SizeT                 tmp_offset  = 0;
+                const Char_T_ *null_string = JSONotation_T_::GetNullString();
 
                 do {
-                    ++offset;
-                    ++tmp_offset;
-                } while ((content[offset] == null_string[tmp_offset]));
+                } while ((content[++offset] == *(++null_string)));
 
-                if (tmp_offset == JSONotation_T_::NullStringLength) {
+                if (*(null_string) == 0) {
                     return VValue{nullptr};
                 }
 
