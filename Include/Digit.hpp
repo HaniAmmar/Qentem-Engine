@@ -229,7 +229,7 @@ class Digit {
                     length -= offset;
 
                     if ((length != 0) && stringToSignedInt(number, &(s_str[offset]), length)) {
-                        number *= -1;
+                        number = -number;
                         return true;
                     }
 
@@ -278,7 +278,7 @@ class Digit {
             String<Char_T_> str;
 
             if (number < 0) {
-                number *= -1;
+                number = -number;
                 intToString(str, number, min, true);
             } else {
                 intToString(str, number, min, false);
@@ -301,7 +301,7 @@ class Digit {
       public:
         inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
             if (number < 0) {
-                number *= -1;
+                number = -number;
                 intToString(stream, number, min, true);
             } else {
                 intToString(stream, number, min, false);
@@ -370,7 +370,7 @@ class Digit {
                 }
 
                 if (sign == -1) {
-                    exponent *= -1;
+                    exponent = -exponent;
                 }
 
                 length = offset;
@@ -397,7 +397,7 @@ class Digit {
                     length -= n_offset;
 
                     if ((length != 0) && stringToSignedFloat(number, &(str[n_offset]), length)) {
-                        number *= -1;
+                        number = -number;
                         return true;
                     }
 
@@ -498,7 +498,7 @@ class Digit {
 
             if (exponent < 0) {
                 negative = true;
-                exponent *= -1;
+                exponent = -exponent;
             }
 
             do {
@@ -593,7 +593,7 @@ class Digit {
         const bool         no_exponent     = (r_min != 0);
 
         if (negative) {
-            number *= -1;
+            number = -number;
             ++offset;
         }
 
@@ -739,7 +739,7 @@ class Digit {
             ++offset;
 
             if (exponent < 0) {
-                exponent *= -1;
+                exponent     = -exponent;
                 tmp2[offset] = DigitChars::NegativeChar;
                 ++offset;
             }

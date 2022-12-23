@@ -311,7 +311,7 @@ class JSONParser {
         }
 
         offset = length;
-        return VValue();
+        return VValue{};
     }
 
     StringStream<Char_T_> buffer_{};

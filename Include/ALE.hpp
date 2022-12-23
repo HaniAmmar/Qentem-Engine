@@ -249,7 +249,7 @@ class ALE {
                             const bool neg = (right.Number < 0);
 
                             if (neg) {
-                                right.Number *= -1;
+                                right.Number = -right.Number; // neg ASM
                             }
 
                             if (right.Number < 1) {
