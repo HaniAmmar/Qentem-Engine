@@ -137,7 +137,7 @@ class String {
     String        operator+(const Char_T_ *str) const { return merge(First(), Length(), str, StringUtils::Count(str)); }
 
     template <typename Stream_T_>
-    friend Stream_T_ &operator<<(Stream_T_ &out, String src) {
+    friend Stream_T_ &operator<<(Stream_T_ &out, const String &src) {
         out << src.First();
         return out;
     }
