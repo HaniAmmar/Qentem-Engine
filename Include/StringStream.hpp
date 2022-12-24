@@ -128,12 +128,15 @@ class StringStream {
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const StringStream &src) {
-        const Char_T_ *str = src.First();
-        const Char_T_ *end = (str + src.Length());
+        const SizeT len = src.Length();
 
-        while (str != end) {
-            out << *str;
-            ++str;
+        if (src.Capacity() > len) {
+            src.Storage()[len] = 0;
+            out << src.First();
+        } else {
+            StringStream n_src = src;
+            n_src += '\0';
+            out << n_src.First();
         }
 
         return out;
