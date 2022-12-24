@@ -268,20 +268,36 @@ static int TestStringStream() {
     EQ_VALUE(ss2, "12345678", "StringStream");
 
     struct SimpleStream {
-        char               str[8]{0};
-        const unsigned int max = 8;
+        char               str[16]{0};
+        const unsigned int max = 16;
         unsigned int       index{0};
 
-        void operator<<(const char c) noexcept {
-            str[index] = c;
-            ++index;
+        void operator<<(const char *string) noexcept {
+            for (SizeT i = 0; i < max; i++) {
+                const char c = string[index];
+
+                if (c == 0) {
+                    break;
+                }
+
+                str[index] = c;
+                ++index;
+            }
         }
     };
 
     SimpleStream sis;
     sis << ss2;
+    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8), "SimpleStream");
 
-    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "123456", 6), "SimpleStream");
+    ss2 << n_str;
+    EQ_VALUE(ss2, "1234567812345678", "StringStream");
+    EQ_VALUE(ss2.Capacity(), 16, "Capacity");
+
+    sis.index = 0;
+    sis << ss2;
+
+    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "1234567812345678", 16), "SimpleStream");
 
     END_SUB_TEST;
 }
