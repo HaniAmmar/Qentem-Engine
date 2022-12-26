@@ -155,6 +155,7 @@ struct QuickSort {
 
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
+    // TODO: Build Allocator
     return static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
 }
 

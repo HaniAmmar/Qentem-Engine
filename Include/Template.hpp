@@ -220,6 +220,7 @@ class Template {
 
     template <typename Char_T_>
     struct LoopInfo_T {
+        // TODO: Remove StringStream;
         const StringStream<Char_T_>  InnerTemplate;
         const Array<TagBit<Char_T_>> SubTags;
         const unsigned short         SetOffset;
@@ -367,6 +368,7 @@ class Template_CV {
 
   private:
     void process(const Char_T_ *content, SizeT length, const Array<TagBit> &tags_cache) const {
+        // TODO: merge with render
         SizeT offset = 0;
 
         if (tags_cache.IsNotEmpty()) {
@@ -564,6 +566,7 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE void render(TagBit *tag, const TagBit *end, const Char_T_ *content) const {
+        // TODO: unify all render* function to receive (void *) for _info; to remove switch()
         SizeT previous_offset = 0;
 
         while (tag != end) {
