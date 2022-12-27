@@ -86,7 +86,7 @@ class HArray {
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
             HAItem_T_ *storage = Storage();
-            Memory::Dispose(storage, End());
+            Memory::Dispose(storage, (storage + Size()));
             Memory::Deallocate(getHashTable());
 
             setSize(src.Size());
@@ -399,7 +399,8 @@ class HArray {
 
         if (Size() > new_size) {
             // Shrink
-            Memory::Dispose((Storage() + new_size), End());
+            HAItem_T_ *storage = Storage();
+            Memory::Dispose((storage + new_size), (storage + Size()));
             setSize(new_size);
         }
 
@@ -451,6 +452,10 @@ class HArray {
     inline const HAItem_T_ *End() const noexcept { return (First() + Size()); }
     inline bool             IsEmpty() const noexcept { return (Size() == 0); }
     inline bool             IsNotEmpty() const noexcept { return !(IsEmpty()); }
+
+    // For STL
+    inline const HAItem_T_ *begin() const noexcept { return First(); }
+    inline const HAItem_T_ *end() const noexcept { return End(); }
 
     inline const HAItem_T_ *Last() const noexcept {
         if (IsNotEmpty()) {

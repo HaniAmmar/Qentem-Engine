@@ -59,7 +59,7 @@ class Array {
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
             Type_ *storage = Storage();
-            Memory::Dispose(storage, End());
+            Memory::Dispose(storage, (storage + Size()));
             Memory::Deallocate(storage);
 
             setSize(src.Size());
@@ -75,7 +75,7 @@ class Array {
     Array &operator=(const Array &src) {
         if (this != &src) {
             Type_ *storage = Storage();
-            Memory::Dispose(storage, End());
+            Memory::Dispose(storage, (storage + Size()));
             Memory::Deallocate(storage);
             setStorage(nullptr);
             setSize(0);

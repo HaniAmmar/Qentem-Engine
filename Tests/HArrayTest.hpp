@@ -903,7 +903,6 @@ static int TestHArraySort() {
     strings["2019"] = 2019;
     strings["2018"] = 2018;
     strings["2021"] = 2021;
-    strings["2021"] = 2021;
     strings["2018"] = 2018;
 
     strings.Sort();
@@ -914,11 +913,9 @@ static int TestHArraySort() {
     EQ_VALUE(strings["2019"], 2019, "strings[2019]");
     EQ_VALUE(strings["2020"], 2020, "strings[2020]");
     EQ_VALUE(strings["2021"], 2021, "strings[2021]");
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
 
     strings.Sort(false);
 
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
     EQ_VALUE(strings["2021"], 2021, "strings[2021]");
     EQ_VALUE(strings["2020"], 2020, "strings[2020]");
     EQ_VALUE(strings["2019"], 2019, "strings[2019]");
@@ -933,18 +930,24 @@ static int TestHArraySort() {
     strings["2019"] = 2019;
     strings["2018"] = 2018;
     strings["2021"] = 2021;
-    strings["2021"] = 2021;
     strings["2018"] = 2018;
 
     strings.Sort(false);
 
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
     EQ_VALUE(strings["2021"], 2021, "strings[2021]");
     EQ_VALUE(strings["2020"], 2020, "strings[2020]");
     EQ_VALUE(strings["2019"], 2019, "strings[2019]");
     EQ_VALUE(strings["2018"], 2018, "strings[2018]");
     EQ_VALUE(strings["2018"], 2018, "strings[2018]");
     EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+
+    SizeT total;
+
+    for (auto &item : strings) {
+        total += item.Value;
+    }
+
+    EQ_VALUE(total, 42862, "total");
 
     END_SUB_TEST;
 }
