@@ -30,7 +30,7 @@ namespace Memory {
 
 // size = the number of bytes
 template <typename Number_T_>
-inline static void SetToZero(void *ptr, Number_T_ size) noexcept {
+inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
@@ -38,18 +38,18 @@ inline static void SetToZero(void *ptr, Number_T_ size) noexcept {
 
     if (m_size != 0) {
         offset += (QENTEM_SIMD_SIZE * m_size);
-        const QENTEM_SIMD_VAR  m_zero = QENTEM_SIMD_ZERO;
-        QENTEM_SIMD_VAR       *m_ptr  = static_cast<QENTEM_SIMD_VAR *>(ptr);
-        const QENTEM_SIMD_VAR *end    = (m_ptr + m_size);
+        const QENTEM_SIMD_VAR  m_zero    = QENTEM_SIMD_ZERO;
+        QENTEM_SIMD_VAR       *m_pointer = static_cast<QENTEM_SIMD_VAR *>(pointer);
+        const QENTEM_SIMD_VAR *end       = (m_pointer + m_size);
 
         do {
-            QENTEM_SIMD_STOREU(m_ptr, m_zero);
-            ++m_ptr;
-        } while (m_ptr != end);
+            QENTEM_SIMD_STOREU(m_pointer, m_zero);
+            ++m_pointer;
+        } while (m_pointer != end);
     }
 #endif
 
-    char *src = static_cast<char *>(ptr);
+    char *src = static_cast<char *>(pointer);
 
     while (offset < size) {
         src[offset] = 0;
@@ -87,6 +87,8 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
         ++offset;
     }
 }
+
+/////////////////////////////////////////////////////////////////////
 
 template <typename Type_>
 inline static void Swap(Type_ &item1, Type_ &item2) noexcept {
@@ -153,61 +155,77 @@ struct QuickSort {
     ~QuickSort()                            = delete;
 };
 
+/////////////////////////////////////////////////////////////////////
+
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
     // TODO: Build Allocator
     return static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
 }
 
+// Initializer
+template <typename Type_>
+inline static void Initialize(Type_ *pointer) noexcept {
+    new (pointer) Type_{};
+}
+
+// Move initializer
+template <typename Type_>
+inline static void Initialize(Type_ *pointer, Type_ &&value) noexcept {
+    new (pointer) Type_{static_cast<Type_ &&>(value)};
+}
+
+// Copy initializer
+template <typename Type_>
+inline static void Initialize(Type_ *pointer, const Type_ &value) noexcept {
+    new (pointer) Type_{value};
+}
+
+// Range copy initializer
+template <typename Type_>
+inline static void Initialize(Type_ *pointer, const Type_ *end, const Type_ &value) noexcept {
+    while (pointer < end) {
+        new (pointer) Type_{value};
+        ++pointer;
+    }
+}
+
+template <typename Type_, typename... Values_T_>
+inline static void InitializeValues(Type_ *pointer, Values_T_ &&...values) noexcept {
+    new (pointer) Type_{static_cast<Values_T_ &&>(values)...};
+}
+
+template <typename Type_, typename... Values_T_>
+inline static void InitializeValues(Type_ *pointer, const Values_T_ &...values) noexcept {
+    new (pointer) Type_{values...};
+}
+
 template <typename Type_>
 inline static Type_ *AllocateInit() {
-    return new Type_();
+    Type_ *pointer = Allocate<Type_>(1);
+    Initialize(pointer);
+    return pointer;
+    // return new Type_{ };
 }
 
 // Allocate and move
 template <typename Type_, typename... Values_T_>
 inline static Type_ *AllocateInit(Values_T_ &&...values) noexcept {
-    return new Type_{static_cast<Values_T_ &&>(values)...};
+    Type_ *pointer = Allocate<Type_>(1);
+    InitializeValues(pointer, static_cast<Values_T_ &&>(values)...);
+    return pointer;
+    // return new Type_{static_cast<Values_T_ &&>(values)...};
 }
 
 // Allocate and copy
 template <typename Type_, typename... Values_T_>
 inline static Type_ *AllocateInit(const Values_T_ &...values) {
-    return new Type_(values...);
+    Type_ *pointer = Allocate<Type_>(1);
+    InitializeValues(pointer, values...);
+    return pointer;
 }
 
-inline static void Deallocate(void *ptr) noexcept { ::operator delete(ptr); }
-
-// Move initializer
-template <typename Type_>
-inline static void Initialize(Type_ *ptr, Type_ &&value) noexcept {
-    new (ptr) Type_{static_cast<Type_ &&>(value)};
-}
-
-// Copy initializer
-template <typename Type_>
-inline static void Initialize(Type_ *ptr, const Type_ &value) {
-    new (ptr) Type_{value};
-}
-
-// Range copy initializer
-template <typename Type_>
-inline static void Initialize(Type_ *ptr, const Type_ *end, const Type_ &value) {
-    while (ptr < end) {
-        new (ptr) Type_{value};
-        ++ptr;
-    }
-}
-
-template <typename Type_, typename... Values_T_>
-inline static void InitializeValues(Type_ *ptr, Values_T_ &&...values) noexcept {
-    new (ptr) Type_{static_cast<Values_T_ &&>(values)...};
-}
-
-template <typename Type_, typename... Values_T_>
-inline static void InitializeValues(Type_ *ptr, const Values_T_ &...values) {
-    new (ptr) Type_{values...};
-}
+inline static void Deallocate(void *pointer) { ::operator delete(pointer); }
 
 template <typename Type_>
 inline static void Dispose(Type_ *item, const Type_ *end) noexcept {
