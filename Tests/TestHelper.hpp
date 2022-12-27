@@ -60,19 +60,19 @@ class TestHelper {
 
     template <typename Stream_T_, typename Char_T_, typename Value_T_>
     QENTEM_NOINLINE static void PrintErrorMessage1(Stream_T_ &stream, bool equal, const Char_T_ *name,
-                                                   const Value_T_ &value, unsigned long line) {
+                                                   const Value_T_ &value, const char *file, unsigned long line) {
         // (out <<) will copy the value, but at that point, it will not matter.
         stream << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed" << QENTEM_OUTPUT_END_COLOR << ": "
-               << TestGroupName<Char_T_>() << "\n At line :" << line << ": `" << name << "` should"
+               << TestGroupName<Char_T_>() << "\n  " << file << ":" << line << ": `" << name << "` should"
                << (equal ? " not " : " ") << "equal `" << value << "`\n\n";
     }
 
     template <typename Stream_T_, typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE static void PrintErrorMessage2(Stream_T_ &stream, bool equal, const Char_T_ *name,
-                                                   const Value1_T_ &value1, const Value2_T_ &value2,
+                                                   const Value1_T_ &value1, const Value2_T_ &value2, const char *file,
                                                    unsigned long line) {
         stream << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed" << QENTEM_OUTPUT_END_COLOR << ": "
-               << TestGroupName<Char_T_>() << "\n At line :" << line << ": `" << name << "` should"
+               << TestGroupName<Char_T_>() << "\n  " << file << ":" << line << ": `" << name << "` should"
                << (equal ? " not " : " ") << "equal `" << value2 << "`\n Returned Value: `" << value1 << "`\n\n";
     }
 
@@ -113,7 +113,7 @@ class TestHelper {
 #define EQ_TO(left, right, name, value)                                                                                \
     do {                                                                                                               \
         if ((left) != (right)) {                                                                                       \
-            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, left, value, __LINE__);                  \
+            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, left, value, __FILE__, __LINE__);        \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -121,7 +121,7 @@ class TestHelper {
 #define NOT_EQ_TO(left, right, name, value)                                                                            \
     do {                                                                                                               \
         if ((left) == (right)) {                                                                                       \
-            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, true, name, left, value, __LINE__);                   \
+            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, true, name, left, value, __FILE__, __LINE__);         \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -129,7 +129,7 @@ class TestHelper {
 #define EQ_VALUE(left, right, name)                                                                                    \
     do {                                                                                                               \
         if ((left) != (right)) {                                                                                       \
-            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, left, right, __LINE__);                  \
+            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, left, right, __FILE__, __LINE__);        \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -137,7 +137,7 @@ class TestHelper {
 #define NOT_EQ_VALUE(left, right, name)                                                                                \
     do {                                                                                                               \
         if ((left) == (right)) {                                                                                       \
-            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, true, name, left, right, __LINE__);                   \
+            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, true, name, left, right, __FILE__, __LINE__);         \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -145,7 +145,7 @@ class TestHelper {
 #define EQ_TRUE(condition, name)                                                                                       \
     do {                                                                                                               \
         if (!(condition)) {                                                                                            \
-            TestHelper::PrintErrorMessage1(QENTEM_OUTPUT_STREAM, false, name, "true", __LINE__);                       \
+            TestHelper::PrintErrorMessage1(QENTEM_OUTPUT_STREAM, false, name, "true", __FILE__, __LINE__);             \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -153,7 +153,7 @@ class TestHelper {
 #define EQ_FALSE(condition, name)                                                                                      \
     do {                                                                                                               \
         if (condition) {                                                                                               \
-            TestHelper::PrintErrorMessage1(QENTEM_OUTPUT_STREAM, true, name, "true", __LINE__);                        \
+            TestHelper::PrintErrorMessage1(QENTEM_OUTPUT_STREAM, true, name, "true", __FILE__, __LINE__);              \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
@@ -189,8 +189,8 @@ static int TestError() {
     constexpr int n = 0;
     constexpr int m = 1;
 
-    TestHelper::PrintErrorMessage1(stream, false, "", n, __LINE__);
-    TestHelper::PrintErrorMessage2(stream, false, "", n, m, __LINE__);
+    TestHelper::PrintErrorMessage1(stream, false, "", n, __FILE__, __LINE__);
+    TestHelper::PrintErrorMessage2(stream, false, "", n, m, __FILE__, __LINE__);
 
     EQ_FALSE(TestHelper::StartTest(stream, "Test StartTest()", TestError_1), "StartTest()");
 

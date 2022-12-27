@@ -72,7 +72,7 @@ static const char *GetStingOfType(ValueType type) noexcept {
     do {                                                                                                               \
         if ((left) != (right)) {                                                                                       \
             TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, GetStingOfType(left),                    \
-                                           GetStingOfType(right), __LINE__);                                           \
+                                           GetStingOfType(right), __FILE__, __LINE__);                                 \
             return 1;                                                                                                  \
         }                                                                                                              \
     } while (false)
