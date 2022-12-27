@@ -1,3 +1,8 @@
 #include "UnicodeTest.hpp"
 
-int main() { return Qentem::Test::RunUnicodeTests(); }
+int main() {
+    int ret = Qentem::Test::RunUnicodeTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
+}

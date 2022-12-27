@@ -1,3 +1,8 @@
 #include "ArrayTest.hpp"
 
-int main() { return Qentem::Test::RunArrayTests(); }
+int main() {
+    int ret = Qentem::Test::RunArrayTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
+}

@@ -23,6 +23,8 @@
 #ifndef QENTEM_TEST_H_
 #define QENTEM_TEST_H_
 
+#include "TestHelper.hpp"
+
 #include "ALETest.hpp"
 #include "ArrayTest.hpp"
 #include "DigitTest.hpp"
@@ -37,7 +39,6 @@
 #include "TemplateLTest.hpp"
 #include "TemplateTest.hpp"
 #include "TemplateUTest.hpp"
-#include "TestHelper.hpp"
 #include "UnicodeTest.hpp"
 #include "ValueTest.hpp"
 

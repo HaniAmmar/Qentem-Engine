@@ -22,6 +22,12 @@
 
 #include "Common.hpp"
 
+#if defined(__APPLE__)
+#include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
+
 #ifndef QENTEM_ENABLE_COLORED_OUTPUT
 #define QENTEM_ENABLE_COLORED_OUTPUT 1
 #endif
@@ -98,6 +104,74 @@ class TestHelper {
     QENTEM_NOINLINE static void EndTest(Stream_T_ &stream, const Char_T_ *name) {
         stream << QENTEM_OUTPUT_START_COLOR_MAIN << name << QENTEM_OUTPUT_START_COLOR_PASS << " Passed all tests"
                << QENTEM_OUTPUT_END_COLOR << "\n\n";
+    }
+
+    static SizeT &AllocateHit() noexcept {
+        static SizeT count = 0;
+        return count;
+    }
+
+    static SizeT &DeallocateHit() noexcept {
+        static SizeT count = 0;
+        return count;
+    }
+
+    static void AddMemorySize(void *pointer) noexcept {
+        size_t &m_size = GetMemorySize();
+        size_t &m_peak = GetMemoryPeak();
+
+        ++(AllocateHit());
+
+#if defined(_WIN32) || defined(_WIN64)
+        m_size += _msize(pointer);
+#elif defined(__APPLE__)
+        m_size += malloc_size(pointer);
+#else
+        m_size += malloc_usable_size(pointer);
+#endif
+
+        if (m_size > m_peak) {
+            m_peak = m_size;
+        }
+    }
+
+    static void RemoveMemorySize(void *pointer) noexcept {
+        size_t &m_size = GetMemorySize();
+
+        ++(DeallocateHit());
+
+#if defined(_WIN32) || defined(_WIN64)
+        m_size -= _msize(pointer);
+#elif defined(__APPLE__)
+        m_size -= malloc_size(pointer);
+#else
+        m_size -= malloc_usable_size(pointer);
+#endif
+    }
+
+    static size_t &GetMemorySize() noexcept {
+        static size_t size = 0;
+        return size;
+    }
+
+    static size_t &GetMemoryPeak() noexcept {
+        static size_t peak = 0;
+        return peak;
+    }
+
+    static void PrintMemoryStatus() {
+        QENTEM_OUTPUT_STREAM << "\nMemory: " << (static_cast<double>(GetMemorySize()) / 1024)
+                             << " KB, Peak: " << (static_cast<double>(GetMemoryPeak()) / 1024) << " KB\n";
+        QENTEM_OUTPUT_STREAM << "Allocations: " << AllocateHit() << ", Deallocations: " << DeallocateHit() << ".";
+
+        SizeT remain = (AllocateHit() - DeallocateHit());
+
+        if (remain != 0) {
+            QENTEM_OUTPUT_STREAM << " " << QENTEM_OUTPUT_START_COLOR_ERROR << (AllocateHit() - DeallocateHit())
+                                 << " not deallocated." << QENTEM_OUTPUT_END_COLOR;
+        }
+
+        QENTEM_OUTPUT_STREAM << '\n';
     }
 };
 

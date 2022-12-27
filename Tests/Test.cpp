@@ -50,5 +50,8 @@ int main() {
     //     Qentem::Test::RunTemplateLTests();
     // }
 
-    return Qentem::Test::RunTests();
+    int ret = Qentem::Test::RunTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
 }

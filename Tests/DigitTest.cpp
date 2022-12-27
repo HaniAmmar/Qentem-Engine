@@ -1,3 +1,8 @@
 #include "DigitTest.hpp"
 
-int main() { return Qentem::Test::RunDigitTests(); }
+int main() {
+    int ret = Qentem::Test::RunDigitTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
+}

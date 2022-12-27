@@ -1,3 +1,8 @@
 #include "StringStreamTest.hpp"
 
-int main() { return Qentem::Test::RunStringStreamTests(); }
+int main() {
+    int ret = Qentem::Test::RunStringStreamTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
+}

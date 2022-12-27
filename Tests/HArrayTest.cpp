@@ -1,3 +1,8 @@
 #include "HArrayTest.hpp"
 
-int main() { return Qentem::Test::RunHArrayTests(); }
+int main() {
+    int ret = Qentem::Test::RunHArrayTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
+}

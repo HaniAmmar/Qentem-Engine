@@ -1,3 +1,8 @@
 #include "TemplateUTest.hpp"
 
-int main() { return Qentem::Test::RunTemplateUTests(); }
+int main() {
+    int ret = Qentem::Test::RunTemplateUTests();
+    Qentem::Test::TestHelper::PrintMemoryStatus();
+
+    return ret;
+}

@@ -156,11 +156,15 @@ struct QuickSort {
 };
 
 /////////////////////////////////////////////////////////////////////
-
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
+    Type_ *pointer = static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
+
+#ifdef QENTEM_TESTHELPER_H_
+    Test::TestHelper::AddMemorySize(pointer);
+#endif
     // TODO: Build Allocator
-    return static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
+    return pointer;
 }
 
 // Initializer
@@ -205,7 +209,7 @@ inline static Type_ *AllocateInit() {
     Type_ *pointer = Allocate<Type_>(1);
     Initialize(pointer);
     return pointer;
-    // return new Type_{ };
+    // return new Type_{};
 }
 
 // Allocate and move
@@ -223,9 +227,17 @@ inline static Type_ *AllocateInit(const Values_T_ &...values) {
     Type_ *pointer = Allocate<Type_>(1);
     InitializeValues(pointer, values...);
     return pointer;
+    // return new Type_{values...};
 }
 
-inline static void Deallocate(void *pointer) { ::operator delete(pointer); }
+inline static void Deallocate(void *pointer) {
+#ifdef QENTEM_TESTHELPER_H_
+    if (pointer != nullptr) {
+        Test::TestHelper::RemoveMemorySize(pointer);
+    }
+#endif
+    ::operator delete(pointer);
+}
 
 template <typename Type_>
 inline static void Dispose(Type_ *item, const Type_ *end) noexcept {
