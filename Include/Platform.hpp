@@ -142,9 +142,18 @@ inline static unsigned long CTZ(unsigned long value) noexcept {
     return static_cast<unsigned long>(__builtin_ctzl(value));
 }
 
+inline static unsigned long long CTZ(unsigned long long value) noexcept {
+    return static_cast<unsigned long long>(__builtin_ctzl(value));
+}
+
 inline static unsigned long CLZ(unsigned long value) noexcept {
     constexpr unsigned long bits = (sizeof(long) * 8) - 1;
     return (bits - static_cast<unsigned long>(__builtin_clzl(value)));
+}
+
+inline static unsigned long long CLZ(unsigned long long value) noexcept {
+    constexpr unsigned long long bits = (sizeof(long) * 8) - 1;
+    return (bits - static_cast<unsigned long long>(__builtin_clzl(value)));
 }
 #endif
 
