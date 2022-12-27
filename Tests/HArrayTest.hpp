@@ -941,13 +941,13 @@ static int TestHArraySort() {
     EQ_VALUE(strings["2018"], 2018, "strings[2018]");
     EQ_VALUE(strings["2017"], 2017, "strings[2017]");
 
-    SizeT total;
+    SizeT total = 0;
 
     for (auto &item : strings) {
         total += item.Value;
     }
 
-    EQ_VALUE(total, 42862, "total");
+    EQ_VALUE(total, 10095, "total");
 
     END_SUB_TEST;
 }
