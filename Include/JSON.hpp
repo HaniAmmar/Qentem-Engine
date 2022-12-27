@@ -141,7 +141,7 @@ class JSONParser {
 
             if (c == JSONotation_T_::ESquareChar) {
                 ++offset;
-                arr.Compress();
+                // arr.Compress();
                 return VValue{static_cast<VArray &&>(arr)};
             }
 
