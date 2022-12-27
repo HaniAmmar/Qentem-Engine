@@ -165,15 +165,7 @@ class TestHelper {
         QENTEM_OUTPUT_STREAM << "\nMemory: " << (static_cast<double>(GetMemorySize()) / 1024)
                              << " KB, Peak: " << (static_cast<double>(GetMemoryPeak()) / 1024) << " KB\n";
         QENTEM_OUTPUT_STREAM << "Allocations: " << AllocateHit() << ", Deallocations: " << DeallocateHit() << ".";
-
-        SizeT remain = (AllocateHit() - DeallocateHit());
-
-        if (remain != 0) {
-            QENTEM_OUTPUT_STREAM << " " << QENTEM_OUTPUT_START_COLOR_ERROR << (AllocateHit() - DeallocateHit())
-                                 << " not deallocated." << QENTEM_OUTPUT_END_COLOR;
-        }
-
-        QENTEM_OUTPUT_STREAM << '\n';
+        QENTEM_OUTPUT_STREAM << " " << (AllocateHit() - DeallocateHit()) << " remaining.\n";
     }
 };
 
@@ -267,7 +259,6 @@ static int TestError() {
 
     TestHelper::PrintErrorMessage1(stream, false, "", n, __FILE__, __LINE__);
     TestHelper::PrintErrorMessage2(stream, false, "", n, m, __FILE__, __LINE__);
-
     EQ_FALSE(TestHelper::StartTest(stream, "Test StartTest()", TestError_1), "StartTest()");
 
     END_SUB_TEST;
