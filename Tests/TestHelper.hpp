@@ -24,6 +24,8 @@
 
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
+#elif defined(__FreeBSD__)
+#include <malloc_np.h>
 #else
 #include <malloc.h>
 #endif
