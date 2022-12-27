@@ -45,26 +45,20 @@ class ALEHelper {
         SizeT       StrLength;
     };
 
-    static Array<Value_T_> &GetItems() {
-        static Array<Value_T_> items;
-
-        if (items.IsEmpty()) {
-            items += Value_T_{"{1}", 3, 6, nullptr, 0};
-            items += Value_T_{"{A}", 3, 6, nullptr, 0};
-            items += Value_T_{"{AB}", 4, 13, nullptr, 0};
-            items += Value_T_{"{ABC}", 5, 26, nullptr, 0};
-            items += Value_T_{"{Q}", 3, 0, "Qentem", 6};
-            items += Value_T_{"{QA}", 4, 0, "Qentem ALE", 10};
+    void SetItems() {
+        if (items_.IsEmpty()) {
+            items_ += Value_T_{"{1}", 3, 6, nullptr, 0};
+            items_ += Value_T_{"{A}", 3, 6, nullptr, 0};
+            items_ += Value_T_{"{AB}", 4, 13, nullptr, 0};
+            items_ += Value_T_{"{ABC}", 5, 26, nullptr, 0};
+            items_ += Value_T_{"{Q}", 3, 0, "Qentem", 6};
+            items_ += Value_T_{"{QA}", 4, 0, "Qentem ALE", 10};
         }
-
-        return items;
     }
 
-    static bool FindItem(const Value_T_ *&item, const char *content, SizeT length) {
-        static const Array<Value_T_> &items = GetItems();
-
-        for (SizeT i = 0; i < items.Size(); i++) {
-            item = (items.First() + i);
+    bool FindItem(const Value_T_ *&item, const char *content, SizeT length) const noexcept {
+        for (SizeT i = 0; i < items_.Size(); i++) {
+            item = (items_.First() + i);
 
             if ((item->NameLength == length) && StringUtils::IsEqual(item->Name, content, length)) {
                 return true;
@@ -74,7 +68,7 @@ class ALEHelper {
         return false;
     }
 
-    static bool ALESetNumber(double &number, const char *content, SizeT length) noexcept {
+    bool ALESetNumber(double &number, const char *content, SizeT length) const noexcept {
         const Value_T_ *item;
 
         if (FindItem(item, content, length) && (item->Str == nullptr)) {
@@ -166,6 +160,9 @@ class ALEHelper {
 
         return true;
     }
+
+  private:
+    Array<Value_T_> items_;
 };
 
 static int TestALE1() {
@@ -3145,6 +3142,9 @@ static int TestALE13() {
     double      number = -1;
     const char *content;
     bool        is_valid;
+    ALEHelper   ale;
+
+    ale.SetItems();
 
     content  = "{1} + 5";
     is_valid = ALE::Evaluate(number, content);
@@ -3209,8 +3209,6 @@ static int TestALE13() {
     content = "a";
     number  = ALE::Evaluate(content);
     EQ_VALUE(number, 0, "number");
-
-    ALEHelper ale;
 
     content = "a";
     number  = ALE::Evaluate(content, &ale);
@@ -3352,6 +3350,8 @@ static int TestALE14() {
     const char *content;
     bool        is_valid;
     ALEHelper   ale;
+
+    ale.SetItems();
 
     content = "3*{A}^3";
     number  = ALE::Evaluate(content, &ale);
@@ -3646,6 +3646,8 @@ static int TestALE15() {
     bool        is_valid;
     ALEHelper   ale;
 
+    ale.SetItems();
+
     content  = "{Q}   ==Qentem";
     is_valid = ALE::Evaluate(number, content, &ale);
     EQ_VALUE(number, 1, "number");
@@ -3815,6 +3817,8 @@ static int TestALE16() {
     const char *content;
     bool        is_valid;
     ALEHelper   ale;
+
+    ale.SetItems();
 
     content  = "2      {A}";
     is_valid = ALE::Evaluate(number, content, &ale);
