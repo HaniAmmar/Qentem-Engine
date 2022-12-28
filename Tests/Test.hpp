@@ -104,6 +104,12 @@ static void PrintInfo() {
     QENTEM_OUTPUT_STREAM << "Big-Endian\n";
 #endif
 
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
+    QENTEM_OUTPUT_STREAM << "Autoescape HTML: On\n";
+#else
+    QENTEM_OUTPUT_STREAM << "Autoescape HTML: Off\n";
+#endif
+
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
     QENTEM_OUTPUT_STREAM << "AVX2: On\n";
 #endif
@@ -111,7 +117,7 @@ static void PrintInfo() {
     QENTEM_OUTPUT_STREAM << "SSE2: On\n";
 #endif
 
-    QENTEM_OUTPUT_STREAM << "Size of SizeT: " << sizeof(Qentem::SizeT) << "\n\n";
+    QENTEM_OUTPUT_STREAM << "SizeT size: " << sizeof(SizeT) << "\n\n";
 }
 } // namespace Test
 } // namespace Qentem
