@@ -146,19 +146,17 @@ inline static unsigned int CTZ(Number_T_ value) noexcept {
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
-    constexpr unsigned int size = (sizeof(long) * 8U);
-    return (size - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
+    return ((sizeof(Number_T_) * 8U) - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
 }
 #endif
 
 inline static unsigned int CTZ(unsigned int value) noexcept {
-    unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned long>(value)));
+    unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
     return ((index != (sizeof(int) * 8)) ? ++index : 0);
 }
 
 inline static unsigned int CLZ(unsigned int value) noexcept {
-    constexpr unsigned int size = (sizeof(int) * 8U);
-    return (size - static_cast<unsigned int>(__builtin_clz(value)));
+    return ((sizeof(int) * 8U) - static_cast<unsigned int>(__builtin_clz(value)));
 }
 #endif
 
