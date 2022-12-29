@@ -59,7 +59,7 @@ class Engine {
                     const QENTEM_SIMD_NUMBER_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
 
                     if (bits != 0) {
-                        return (Platform::CTZ(bits) + offset + 1);
+                        return (Platform::CTZ(bits) + offset);
                     }
 
                     offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
@@ -108,7 +108,7 @@ class Engine {
                     bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
 
                     while (bits != 0) {
-                        const Number_T_ index         = Platform::CTZ(bits);
+                        const Number_T_ index         = Platform::CTZ(bits) - 1;
                         const Number_T_ pattern_index = (index + offset + pattern_length);
 
                         if ((len_one_less == 1) || StringUtils::IsEqual(pattern, (content_ofs + index), len_one_less)) {

@@ -210,7 +210,7 @@ class Array {
         const SizeT n_size = (size + Size());
 
         if (n_size > Capacity()) {
-            resize((SizeT{2} << Platform::CLZ(n_size)));
+            resize((SizeT{1} << Platform::CLZ(n_size)));
         }
     }
 

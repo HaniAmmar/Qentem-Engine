@@ -487,7 +487,7 @@ class HArray {
     void expand() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
 
     SizeT aligneSize(SizeT n_size) noexcept {
-        const SizeT size = (SizeT{1U} << Platform::CLZ((n_size != SizeT{1U}) ? n_size : SizeT{2U}));
+        const SizeT size = (SizeT{1U} << (Platform::CLZ(n_size >> 1U)));
 
         if (size < n_size) {
             return (size << SizeT{1U});

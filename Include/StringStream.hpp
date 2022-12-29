@@ -282,7 +282,7 @@ class StringStream {
     void setLength(const SizeT new_length) noexcept { length_ = new_length; }
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
-    SizeT algineSize(SizeT n_size) noexcept { return (SizeT{2} << Platform::CLZ(n_size | 4U)); }
+    SizeT algineSize(SizeT n_size) noexcept { return (SizeT{1} << Platform::CLZ(n_size | 4U)); }
 
     void insert(const Char_T_ *str, const SizeT len) {
         if (len != 0) {

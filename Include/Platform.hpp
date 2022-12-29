@@ -104,64 +104,61 @@ namespace Platform {
 
 #ifdef _MSC_VER
 #ifdef QENTEM_64BIT_ARCH
-inline static unsigned long CTZ(unsigned long long value) noexcept {
+inline static unsigned int CTZ(unsigned long long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward64(&index, value) != 0) ? index : 64UL);
+    return ((_BitScanForward64(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
 
-inline static unsigned long CLZ(unsigned long long value) noexcept {
+inline static unsigned int CLZ(unsigned long long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanReverse64(&index, value) != 0) ? index : 0);
+    return ((_BitScanReverse(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
 #endif
 
 inline static unsigned int CTZ(unsigned long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(index) : 32U);
+    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
 
-inline static unsigned long CLZ(unsigned long value) noexcept {
+inline static unsigned int CLZ(unsigned long value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanReverse(&index, value) != 0) ? index : 0);
+    return ((_BitScanReverse(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
 
 inline static unsigned int CTZ(unsigned int value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(index) : 32U);
+    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
 
-inline static unsigned long CLZ(unsigned int value) noexcept {
+inline static unsigned int CLZ(unsigned int value) noexcept {
     unsigned long index = 0;
-    return ((_BitScanReverse(&index, value) != 0) ? index : 0);
+    return ((_BitScanReverse(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
 
 #else
 
 #ifdef QENTEM_64BIT_ARCH
-inline static unsigned long CTZ(unsigned long value) noexcept {
-    return static_cast<unsigned long>(__builtin_ctzl(value));
+template <typename Number_T_>
+inline static unsigned int CTZ(Number_T_ value) noexcept {
+    unsigned int index = static_cast<unsigned int>(__builtin_ctzl(static_cast<unsigned long>(value)));
+    return ((index != (sizeof(Number_T_) * 8)) ? ++index : 0);
 }
 
-inline static unsigned long long CTZ(unsigned long long value) noexcept {
-    return static_cast<unsigned long long>(__builtin_ctzl(value));
-}
-
-inline static unsigned long CLZ(unsigned long value) noexcept {
-    constexpr unsigned long bits = (sizeof(long) * 8) - 1;
-    return (bits - static_cast<unsigned long>(__builtin_clzl(value)));
-}
-
-inline static unsigned long long CLZ(unsigned long long value) noexcept {
-    constexpr unsigned long long bits = (sizeof(long) * 8) - 1;
-    return (bits - static_cast<unsigned long long>(__builtin_clzl(value)));
+template <typename Number_T_>
+inline static unsigned int CLZ(Number_T_ value) noexcept {
+    constexpr unsigned int size = (sizeof(long) * 8U);
+    return (size - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
 }
 #endif
 
-inline static unsigned int CTZ(unsigned int value) noexcept { return static_cast<unsigned int>(__builtin_ctz(value)); }
+inline static unsigned int CTZ(unsigned int value) noexcept {
+    unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned long>(value)));
+    return ((index != (sizeof(int) * 8)) ? ++index : 0);
+}
 
 inline static unsigned int CLZ(unsigned int value) noexcept {
-    constexpr unsigned int bits = (sizeof(int) * 8) - 1;
-    return (bits - static_cast<unsigned int>(__builtin_clz(value)));
+    constexpr unsigned int size = (sizeof(int) * 8U);
+    return (size - static_cast<unsigned int>(__builtin_clz(value)));
 }
 #endif
 
