@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-#include "StringStream.hpp"
 #include "TestHelper.hpp"
+
+#include "StringStream.hpp"
 
 #ifndef QENTEM_STRINGSTREAM_TESTS_H_
 #define QENTEM_STRINGSTREAM_TESTS_H_

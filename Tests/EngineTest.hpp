@@ -20,11 +20,12 @@
  * SOFTWARE.
  */
 
+#include "TestHelper.hpp"
+
 #include "Array.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
 #include "StringStream.hpp"
-#include "TestHelper.hpp"
 
 #ifndef QENTEM_ENGINE_TESTS_H_
 #define QENTEM_ENGINE_TESTS_H_

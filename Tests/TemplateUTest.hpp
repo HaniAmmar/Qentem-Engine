@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
+#include "TestHelper.hpp"
+
 #include "JSON.hpp"
 #include "Template.hpp"
-#include "TestHelper.hpp"
 
 #ifndef QENTEM_TEMPLATE_U_TESTS_H_
 #define QENTEM_TEMPLATE_U_TESTS_H_

@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
+#include "TestHelper.hpp"
+
 #include "Digit.hpp"
 #include "HArray.hpp"
-#include "TestHelper.hpp"
 
 #ifndef QENTEM_HARRAY_TESTS_H_
 #define QENTEM_HARRAY_TESTS_H_

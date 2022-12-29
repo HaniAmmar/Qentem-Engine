@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-#include "JSON.hpp"
 #include "TestHelper.hpp"
+
+#include "JSON.hpp"
 
 #ifndef QENTEM_JSON_TESTS_H_
 #define QENTEM_JSON_TESTS_H_

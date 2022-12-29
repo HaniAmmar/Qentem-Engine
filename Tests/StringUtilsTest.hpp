@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-#include "StringUtils.hpp"
 #include "TestHelper.hpp"
+
+#include "StringUtils.hpp"
 
 #ifndef QENTEM_STRINGUTILS_TESTS_H_
 #define QENTEM_STRINGUTILS_TESTS_H_

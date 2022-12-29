@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
+#include "TestHelper.hpp"
+
 #include "ALE.hpp"
 #include "Array.hpp"
-#include "TestHelper.hpp"
 
 #ifndef QENTEM_ALE_TESTS_H_
 #define QENTEM_ALE_TESTS_H_

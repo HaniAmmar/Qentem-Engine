@@ -21,6 +21,7 @@
  */
 
 #include "TestHelper.hpp"
+
 #include "Value.hpp"
 
 #ifndef QENTEM_VALUE_TESTS_H_

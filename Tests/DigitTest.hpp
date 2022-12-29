@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-#include "Digit.hpp"
 #include "TestHelper.hpp"
+
+#include "Digit.hpp"
 
 #ifndef QENTEM_DIGIT_TESTS_H_
 #define QENTEM_DIGIT_TESTS_H_

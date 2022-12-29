@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-#include "JSONUtils.hpp"
 #include "TestHelper.hpp"
+
+#include "JSONUtils.hpp"
 
 #ifndef QENTEM_JSONUTILS_TESTS_H_
 #define QENTEM_JSONUTILS_TESTS_H_

@@ -20,14 +20,17 @@
  * SOFTWARE.
  */
 
-#include "Memory.hpp"
 #include "TestHelper.hpp"
+
+#include "Memory.hpp"
 
 #ifndef QENTEM_MEMORY_TESTS_H_
 #define QENTEM_MEMORY_TESTS_H_
 
 namespace Qentem {
 namespace Test {
+
+// No tests needed for now; if Memory.hpp has a bug, every thing else will break.
 
 static int RunMemoryTests() {
     STARTING_TEST("Memory.hpp");

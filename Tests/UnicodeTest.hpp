@@ -21,6 +21,7 @@
  */
 
 #include "TestHelper.hpp"
+
 #include "Unicode.hpp"
 
 #ifndef QENTEM_UNICODE_TESTS_H_
