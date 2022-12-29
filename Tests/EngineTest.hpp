@@ -941,9 +941,10 @@ static int TestEngine6() {
 }
 
 struct Item2__ {
+    Array<Item2__> SubItems;
     SizeT          Offset{0};
     SizeT          Length{0};
-    Array<Item2__> SubItems;
+    SizeT          padding_[2]{0};
 };
 
 static void to_JSON(StringStream<char> &stream, const Array<Item2__> &items, const char *content) {
