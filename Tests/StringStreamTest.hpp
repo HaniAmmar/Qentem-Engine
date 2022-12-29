@@ -121,7 +121,7 @@ static int TestStringStream() {
     ss1.Reset();
     ss1 = static_cast<StringStream<char> &&>(ss2); // Move
     EQ_VALUE(ss1.Length(), 1, "Length");
-    EQ_TRUE((ss1.Capacity() >= 1), "(ss1.Capacity() >= 1)");
+    EQ_TRUE((ss1.Capacity() >= 8), "(ss1.Capacity() >= 1)");
     EQ_VALUE(ss1, "a", "StringStream");
     ss1.Reset();
 
