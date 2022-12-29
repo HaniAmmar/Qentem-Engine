@@ -223,6 +223,8 @@ class Template {
         // TODO: Remove StringStream;
         const StringStream<Char_T_>  InnerTemplate;
         const Array<TagBit<Char_T_>> SubTags;
+        void                        *padding_1;
+        int                          padding_2;
         const unsigned short         SetOffset;
         const unsigned short         SetLength;
         const unsigned short         IndexOffset;
@@ -239,6 +241,9 @@ class Template {
     struct InlineIfInfo_T {
         const Array<TagBit<Char_T_>> TrueSubTags;
         const Array<TagBit<Char_T_>> FalseSubTags;
+        void                        *padding_1;
+        void                        *padding_2;
+        int                          padding_3;
         const unsigned short         CaseOffset;
         const unsigned short         CaseLength;
         const unsigned short         TrueOffset;
@@ -974,10 +979,10 @@ class Template_CV {
 
         parse(sub_tags, inner_template.First(), inner_template.Length());
 
-        loop_info = Memory::AllocateInit<LoopInfo_>(static_cast<StringStream_T_ &&>(inner_template),
-                                                    static_cast<Array<TagBit> &&>(sub_tags), set_offset, set_length,
-                                                    index_offset, index_length, repeat_offset, repeat_length,
-                                                    group_offset, group_length, sort_offset, sort_length);
+        loop_info = Memory::AllocateInit<LoopInfo_>(
+            static_cast<StringStream_T_ &&>(inner_template), static_cast<Array<TagBit> &&>(sub_tags), nullptr, 0,
+            set_offset, set_length, index_offset, index_length, repeat_offset, repeat_length, group_offset,
+            group_length, sort_offset, sort_length);
     }
 
     QENTEM_NOINLINE void renderLoop(const Char_T_ *content, const LoopInfo_ *loop_info) const {
@@ -1137,8 +1142,8 @@ class Template_CV {
         }
 
         inline_if_info = Memory::AllocateInit<InlineIfInfo_>(
-            static_cast<Array<TagBit> &&>(true_subtags), static_cast<Array<TagBit> &&>(false_subtags), case_offset,
-            case_length, true_offset, true_length, false_offset, false_length);
+            static_cast<Array<TagBit> &&>(true_subtags), static_cast<Array<TagBit> &&>(false_subtags), nullptr, nullptr,
+            0, case_offset, case_length, true_offset, true_length, false_offset, false_length);
     }
 
     QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content, const InlineIfInfo_ *inline_if_info) const {
