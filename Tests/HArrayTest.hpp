@@ -762,6 +762,8 @@ static int TestHArray9() {
 
     HArray<SizeT, char>                list(id);
     const Qentem::HAItem<SizeT, char> *item;
+    const Qentem::HAItem<SizeT, char> *item2;
+    const SizeT                       *value;
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
@@ -769,10 +771,21 @@ static int TestHArray9() {
 
         list[key] = i;
         item      = list.GetItem(i);
+        item2     = list.GetItem(item->Key.First(), item->Key.Length(), item->Hash);
+        value     = list.GetValue(item->Key.First(), item->Key.Length(), item->Hash);
 
         NOT_EQ_TO(item, nullptr, "item", "null");
         EQ_TO(item->Key, key, "value", key.First());
         EQ_TO(item->Value, i, "value", i);
+        NOT_EQ_TO(item2, nullptr, "value", "null");
+        EQ_TO(item, item2, "item", item);
+        NOT_EQ_TO(value, nullptr, "value", "null");
+        EQ_TO(item2->Value, *value, "value", item2->Value);
+
+        item2 = list.GetItem(item->Key.First(), item->Key.Length(), i);
+        value = list.GetValue(item->Key.First(), item->Key.Length(), i);
+        EQ_TO(item2, nullptr, "value", "null");
+        EQ_TO(value, nullptr, "value", "null");
     }
 
     item = list.GetItem(id);
