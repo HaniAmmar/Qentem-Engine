@@ -300,6 +300,11 @@ static int TestStringStream() {
 
     EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "1234567812345678", 16), "SimpleStream");
 
+    ss2.StepBack(1);
+    sis.index = 0;
+    sis << ss2;
+    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "1234567", 7), "SimpleStream");
+
     END_SUB_TEST;
 }
 
