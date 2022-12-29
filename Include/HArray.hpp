@@ -64,8 +64,7 @@ class HArray {
 
     explicit HArray(SizeT size) {
         if (size != 0) {
-            setCapacity(aligneSize(size));
-            allocate();
+            allocate(size);
         }
     }
 
@@ -120,7 +119,7 @@ class HArray {
         const HAItem_T_ *src_end  = (src_item + src.Size());
 
         if (n_size > Capacity()) {
-            resize(aligneSize(n_size));
+            resize(n_size);
         }
 
         while (src_item != src_end) {
@@ -152,7 +151,7 @@ class HArray {
         const HAItem_T_ *src_end  = src_item + src.Size();
 
         if (n_size > Capacity()) {
-            resize(aligneSize(n_size));
+            resize(n_size);
         }
 
         while (src_item != src_end) {
@@ -377,8 +376,7 @@ class HArray {
         }
 
         if (size != 0) {
-            setCapacity(aligneSize(size));
-            allocate();
+            allocate(size);
         }
     }
 
@@ -404,7 +402,6 @@ class HArray {
             setSize(new_size);
         }
 
-        new_size = aligneSize(new_size);
         resize(new_size);
     }
 
@@ -422,7 +419,7 @@ class HArray {
         if (size == 0) {
             Reset();
         } else {
-            const SizeT n_cap = aligneSize(size);
+            const SizeT n_cap = Memory::AligneSize(size);
 
             if ((size < Size()) || (n_cap < Capacity())) {
                 resize(n_cap);
@@ -472,11 +469,14 @@ class HArray {
     SizeT *getHashTable() const noexcept { return hashTable_.GetPointer(); }
     void   setHashTable(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
 
-    HAItem_T_ *allocate() {
-        const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_T_)) * Capacity());
+    HAItem_T_ *allocate(SizeT new_cpacity) {
+        new_cpacity = Memory::AligneSize(new_cpacity);
+        setCapacity(new_cpacity);
+
+        const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_T_)) * new_cpacity);
         SizeT      *ht   = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
         setHashTable(ht);
-        Memory::SetToZero(ht, (sizeof(SizeT) * Capacity()));
+        Memory::SetToZero(ht, (sizeof(SizeT) * new_cpacity));
 
         return reinterpret_cast<HAItem_T_ *>(ht + Capacity());
     }
@@ -485,16 +485,6 @@ class HArray {
     void setSize(SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(SizeT new_capacity) noexcept { capacity_ = new_capacity; }
     void expand() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
-
-    SizeT aligneSize(SizeT n_size) noexcept {
-        const SizeT size = (SizeT{1U} << (Platform::CLZ(n_size >> 1U)));
-
-        if (size < n_size) {
-            return (size << SizeT{1U});
-        }
-
-        return size;
-    }
 
     HAItem_T_ *find(SizeT *&index, const Char_T_ *key, SizeT length, SizeT hash) const noexcept {
         SizeT     *ht      = getHashTable();
@@ -545,12 +535,9 @@ class HArray {
 
     void copyTable(const HArray &src) {
         if (src.Size() != 0) {
-            const HAItem_T_ *src_item = src.First();
-            const HAItem_T_ *src_end  = (src_item + src.Size());
-
-            setCapacity(aligneSize(src.Size()));
-
-            HAItem_T_       *storage_item = allocate();
+            const HAItem_T_ *src_item     = src.First();
+            const HAItem_T_ *src_end      = (src_item + src.Size());
+            HAItem_T_       *storage_item = allocate(src.Size());
             const HAItem_T_ *storage_src  = storage_item;
 
             do {
@@ -568,12 +555,9 @@ class HArray {
     }
 
     void resize(SizeT new_size) {
-        SizeT     *ht  = getHashTable();
-        HAItem_T_ *src = Storage();
-
-        setCapacity(new_size);
-
-        HAItem_T_       *storage      = allocate();
+        SizeT           *ht           = getHashTable();
+        HAItem_T_       *src          = Storage();
+        HAItem_T_       *storage      = allocate(new_size);
         HAItem_T_       *storage_item = storage;
         HAItem_T_       *item         = src;
         const HAItem_T_ *end          = (item + Size());

@@ -32,7 +32,7 @@ namespace Qentem {
  */
 template <typename Char_T_>
 class StringStream {
-    static constexpr SizeT initial_size = 8;
+    static constexpr SizeT initial_size = 4; // <<2 = 16
 
   public:
     StringStream() = default;
@@ -40,8 +40,7 @@ class StringStream {
 
     explicit StringStream(SizeT size) {
         if (size != 0) {
-            setCapacity(algineSize(size));
-            allocate();
+            allocate(size);
         }
     }
 
@@ -54,8 +53,7 @@ class StringStream {
 
     StringStream(const StringStream &src) {
         if (src.Length() != 0) {
-            setCapacity(algineSize(src.Length()));
-            allocate();
+            allocate(src.Length());
             insert(src.First(), src.Length());
         }
     }
@@ -220,8 +218,8 @@ class StringStream {
         const SizeT current_offset = Length();
         length_ += len;
 
-        if (Length() > Capacity()) {
-            expand(algineSize(Length()));
+        if (length_ > Capacity()) {
+            expand(length_);
         }
 
         return (Storage() + current_offset);
@@ -231,7 +229,7 @@ class StringStream {
         len += Length();
 
         if (len > Capacity()) {
-            expand(algineSize(len));
+            expand(len);
         }
     }
 
@@ -277,12 +275,15 @@ class StringStream {
 
   private:
     void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
-    void allocate() { setStorage(Memory::Allocate<Char_T_>(Capacity())); }
     void clearStorage() noexcept { setStorage(nullptr); }
     void setLength(const SizeT new_length) noexcept { length_ = new_length; }
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
-    SizeT algineSize(SizeT n_size) noexcept { return (SizeT{1} << Platform::CLZ(n_size | 4U)); }
+    void allocate(SizeT size) {
+        size = Memory::AligneSize(size, 4U);
+        setCapacity(size);
+        setStorage(Memory::Allocate<Char_T_>(size));
+    }
 
     void insert(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
@@ -290,7 +291,7 @@ class StringStream {
             length_ += len;
 
             if (Capacity() < Length()) {
-                expand(algineSize(Length()));
+                expand(Length());
             }
 
             Memory::Copy((Storage() + current_offset), str, (len * sizeof(Char_T_)));
@@ -299,9 +300,8 @@ class StringStream {
 
     void expand(const SizeT new_capacity) {
         const SizeT src_cap = Capacity();
-        setCapacity(new_capacity);
-        Char_T_ *src = Storage();
-        allocate();
+        Char_T_    *src     = Storage();
+        allocate(new_capacity);
 
         Memory::Copy(Storage(), src, (src_cap * sizeof(Char_T_)));
         Memory::Deallocate(src);
