@@ -158,7 +158,7 @@ inline static unsigned int CLZ(Number_T_ value) noexcept {
 
 inline static unsigned int CTZ(unsigned int value) noexcept {
     if (value != 0) {
-        unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
+        unsigned int index = static_cast<unsigned int>(__builtin_ctz(value));
         return ++index;
     }
 
