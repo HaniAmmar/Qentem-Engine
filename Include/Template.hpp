@@ -613,43 +613,44 @@ class Template_CV {
         }
     }
 
-    void escapeHTMLSpecialChars(const Char_T_ *str, SizeT length) const {
+    static void escapeHTMLSpecialChars(StringStream_T_ &stream, const Char_T_ *str, SizeT length) {
         SizeT offset = 0;
         SizeT index  = 0;
 
         while (index < length) {
             switch (str[index]) {
                 case '&': {
-                    ss_->Insert((str + offset), (index - offset));
-                    ss_->Insert(TemplatePatterns_C_::GetHTMLAnd(), TemplatePatterns_C_::HTMLAndLength);
+                    stream.Insert((str + offset), (index - offset));
+                    stream.Insert(TemplatePatterns_C_::GetHTMLAnd(), TemplatePatterns_C_::HTMLAndLength);
                     offset = (++index);
                     break;
                 }
 
                 case '<': {
-                    ss_->Insert((str + offset), (index - offset));
-                    ss_->Insert(TemplatePatterns_C_::GetHTMLLess(), TemplatePatterns_C_::HTMLLessLength);
+                    stream.Insert((str + offset), (index - offset));
+                    stream.Insert(TemplatePatterns_C_::GetHTMLLess(), TemplatePatterns_C_::HTMLLessLength);
                     offset = (++index);
                     break;
                 }
 
                 case '>': {
-                    ss_->Insert((str + offset), (index - offset));
-                    ss_->Insert(TemplatePatterns_C_::GetHTMLBigger(), TemplatePatterns_C_::HTMLBiggerLength);
+                    stream.Insert((str + offset), (index - offset));
+                    stream.Insert(TemplatePatterns_C_::GetHTMLBigger(), TemplatePatterns_C_::HTMLBiggerLength);
                     offset = (++index);
                     break;
                 }
 
                 case '"': {
-                    ss_->Insert((str + offset), (index - offset));
-                    ss_->Insert(TemplatePatterns_C_::GetHTMLQuote(), TemplatePatterns_C_::HTMLQuoteLength);
+                    stream.Insert((str + offset), (index - offset));
+                    stream.Insert(TemplatePatterns_C_::GetHTMLQuote(), TemplatePatterns_C_::HTMLQuoteLength);
                     offset = (++index);
                     break;
                 }
 
                 case '\'': {
-                    ss_->Insert((str + offset), (index - offset));
-                    ss_->Insert(TemplatePatterns_C_::GetHTMLSingleQuote(), TemplatePatterns_C_::HTMLSingleQuoteLength);
+                    stream.Insert((str + offset), (index - offset));
+                    stream.Insert(TemplatePatterns_C_::GetHTMLSingleQuote(),
+                                  TemplatePatterns_C_::HTMLSingleQuoteLength);
                     offset = (++index);
                     break;
                 }
@@ -660,7 +661,7 @@ class Template_CV {
             }
         }
 
-        ss_->Insert((str + offset), (length - offset));
+        stream.Insert((str + offset), (length - offset));
     }
 
     void renderVariable(const Char_T_ *content, const TagBit *tag) const {
@@ -676,7 +677,7 @@ class Template_CV {
                 const Char_T_ *str;
                 SizeT          len;
                 value->SetCharAndLength(str, len);
-                escapeHTMLSpecialChars(str, len);
+                escapeHTMLSpecialChars(*ss_, str, len);
                 return;
             }
 #endif
@@ -687,7 +688,7 @@ class Template_CV {
 
             if ((loop_key_ != nullptr) && (*content == TemplatePatterns_C_::TildeChar)) {
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-                escapeHTMLSpecialChars(loop_key_, loop_key_length_);
+                escapeHTMLSpecialChars(*ss_, loop_key_, loop_key_length_);
 #else
                 ss_->Insert(loop_key_, loop_key_length_);
 #endif
