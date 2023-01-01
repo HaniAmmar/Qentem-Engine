@@ -421,26 +421,26 @@ class Digit {
         return true;
     }
 
-    template <typename Number_T_>
-    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+    template <typename Number_T_, typename Number2_T_>
+    QENTEM_NOINLINE static void intToString(Char_T_ *storage, Number_T_ &offset, Number2_T_ number) {
         static constexpr char lookup_table[] = {"000102030405060708091011121314151617181920212223242526272829"
                                                 "303132333435363738394041424344454647484950515253545556575859"
                                                 "606162636465666768697071727374757677787980818283848586878889"
                                                 "90919293949596979899"};
 
-        while (number >= Number_T_(100)) {
-            offset -= SizeT(2);
-            const SizeT index          = (static_cast<SizeT>(number % Number_T_(100)) << 1U);
-            storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
-            storage[offset + SizeT(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
-            number /= Number_T_(100);
+        while (number >= Number2_T_(100)) {
+            offset -= Number_T_(2);
+            const SizeT index              = (static_cast<SizeT>(number % Number2_T_(100)) << 1U);
+            storage[offset]                = static_cast<Char_T_>(lookup_table[index]);
+            storage[offset + Number_T_(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
+            number /= Number2_T_(100);
         }
 
-        if (number < Number_T_(10)) {
+        if (number < Number2_T_(10)) {
             --offset;
             storage[offset] = static_cast<Char_T_>(number) + DigitChars::ZeroChar;
         } else {
-            offset -= SizeT(2);
+            offset -= Number_T_(2);
             const SizeT index          = (static_cast<SizeT>(number) << 1U);
             storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
             storage[offset + SizeT(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
