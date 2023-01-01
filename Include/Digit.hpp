@@ -84,20 +84,51 @@ class Digit {
         return value;
     }
 
-    /*
-     * "min" is the minimum digits. Zeros will be added to the left side, if the
-     * number of digits is less than "mini"
-     */
     template <typename Number_T_>
-    inline static String<Char_T_> NumberToString(Number_T_ number, unsigned int min = 1) {
-        constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        return NumberToStringHelper<Number_T_, is_unsigned>::NumberToString(number, min);
+    inline static String<Char_T_> NumberToString(Number_T_ number) {
+        String<Char_T_> str;
+        NumberToStringStream(str, number);
+        return str;
     }
 
-    template <typename Number_T_, typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
-        constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        NumberToStringStreamHelper<Number_T_, StringStream_T_, is_unsigned>::NumberToStringStream(stream, number, min);
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned short number) {
+        unsignedIntToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned int number) {
+        unsignedIntToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned long number) {
+        unsignedIntToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned long long number) {
+        unsignedIntToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, short number) {
+        intToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, int number) {
+        intToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, long number) {
+        intToString(stream, number);
+    }
+
+    template <typename StringStream_T_>
+    inline static void NumberToStringStream(StringStream_T_ &stream, long long number) {
+        intToString(stream, number);
     }
 
     /*
@@ -115,7 +146,9 @@ class Digit {
 
     inline static String<Char_T_> NumberToString(float f_number, unsigned int min = 1, unsigned int r_min = 0,
                                                  unsigned int precision = 0) {
-        return NumberToString(static_cast<double>(f_number), min, r_min, precision);
+        String<Char_T_> str;
+        doubleToString(str, static_cast<double>(f_number), min, r_min, precision);
+        return str;
     }
 
     template <typename StringStream_T_>
@@ -127,7 +160,7 @@ class Digit {
     template <typename StringStream_T_>
     inline static void NumberToStringStream(StringStream_T_ &stream, float f_number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
-        NumberToStringStream(stream, static_cast<double>(f_number), min, r_min, precision);
+        doubleToString(stream, static_cast<double>(f_number), min, r_min, precision);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -168,20 +201,21 @@ class Digit {
     };
 
     template <typename Number_T_>
-    static bool stringToInt(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-        Number_T_ postion = 1;
+    inline static bool stringToInt(Number_T_ &number, const Char_T_ *str, const SizeT length) noexcept {
+        SizeT offset = 0;
 
-        do {
-            --length;
-            const Char_T_ c = str[length];
+        while (offset < length) {
+            const Char_T_ chr = str[offset];
+            ++offset;
 
-            if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
-                number += ((static_cast<Number_T_>(c) - DigitChars::ZeroChar) * postion);
-                postion *= QENTEM_DECIMAL_BASE_;
-            } else {
+            if ((chr < DigitChars::SlashChar) || (chr > DigitChars::ColonChar)) {
+                number = 0;
                 return false;
             }
-        } while (length != 0);
+
+            number = (number << 3U) + (number << 1U);
+            number += (static_cast<Number_T_>(chr - DigitChars::ZeroChar));
+        }
 
         return true;
     }
@@ -195,19 +229,16 @@ class Digit {
                 return false; // No leanding zeros.
             }
 
-            if (str[0] == DigitChars::PositiveChar) {
+            if (str[0] != DigitChars::PositiveChar) {
+                return stringToInt(number, str, length);
+            }
+
+            if (length > 1) {
                 SizeT offset = 1;
                 StringUtils::TrimLeft(str, offset, length);
                 length -= offset;
-
-                if (length != 0) {
-                    return stringToUnsignedInt(number, &(str[offset]), length);
-                }
-            } else if (stringToInt(number, str, length)) {
-                return true;
+                return stringToUnsignedInt(number, &(str[offset]), length);
             }
-
-            number = 0;
         }
 
         return false;
@@ -228,7 +259,7 @@ class Digit {
                     StringUtils::TrimLeft(s_str, offset, length);
                     length -= offset;
 
-                    if ((length != 0) && stringToSignedInt(number, &(s_str[offset]), length)) {
+                    if (stringToSignedInt(number, &(s_str[offset]), length)) {
                         number = -number;
                         return true;
                     }
@@ -240,144 +271,16 @@ class Digit {
                     SizeT offset = 1;
                     StringUtils::TrimLeft(s_str, offset, length);
                     length -= offset;
-
-                    if (length != 0) {
-                        return stringToSignedInt(number, &(s_str[offset]), length);
-                    }
-
-                    break;
+                    return stringToSignedInt(number, &(s_str[offset]), length);
                 }
 
                 default: {
-                    if (stringToInt(number, s_str, length)) {
-                        return true;
-                    }
+                    return stringToInt(number, s_str, length);
                 }
             }
-
-            number = 0;
         }
 
         return false;
-    }
-
-    template <typename Number_T_, bool IS_UNSIGNED>
-    class NumberToStringHelper {
-      public:
-        inline static String<Char_T_> NumberToString(Number_T_ number, unsigned int min = 1) {
-            String<Char_T_> str;
-            intToString(str, number, min, false);
-            return str;
-        }
-    };
-
-    template <typename Number_T_>
-    class NumberToStringHelper<Number_T_, false> {
-      public:
-        inline static String<Char_T_> NumberToString(Number_T_ number, unsigned int min = 1) {
-            String<Char_T_> str;
-
-            if (number < 0) {
-                number = -number;
-                intToString(str, number, min, true);
-            } else {
-                intToString(str, number, min, false);
-            }
-
-            return str;
-        }
-    };
-
-    template <typename Number_T_, typename StringStream_T_, bool IS_UNSIGNED>
-    class NumberToStringStreamHelper {
-      public:
-        inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
-            intToString(stream, number, min, false);
-        }
-    };
-
-    template <typename Number_T_, typename StringStream_T_>
-    class NumberToStringStreamHelper<Number_T_, StringStream_T_, false> {
-      public:
-        inline static void NumberToStringStream(StringStream_T_ &stream, Number_T_ number, unsigned int min = 1) {
-            if (number < 0) {
-                number = -number;
-                intToString(stream, number, min, true);
-            } else {
-                intToString(stream, number, min, false);
-            }
-        }
-    };
-
-    QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str, SizeT &length) noexcept {
-        SizeT offset = (length - 1);
-
-        if (offset != 0) {
-            SizeT offset2    = 0;
-            SizeT MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
-            int   sign       = 0;
-
-            do {
-                const Char_T_ c = str[offset];
-
-                if ((c < DigitChars::ZeroChar) || (c > DigitChars::NineChar)) {
-                    switch (c) {
-                        case DigitChars::DotChar: {
-                            return true;
-                        }
-
-                        case DigitChars::E_Char:
-                        case DigitChars::UE_Char: {
-                            if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
-                                // No number.
-                                return false;
-                            }
-
-                            offset2    = offset;
-                            MAX_LENGTH = 0;
-                            continue;
-                        }
-
-                        case DigitChars::NegativeChar:
-                        case DigitChars::PositiveChar: {
-                            if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) || (sign != 0)) {
-                                // No number, or double sign.
-                                return false;
-                            }
-
-                            sign = ((c == DigitChars::NegativeChar) ? -1 : 1);
-                            break;
-                        }
-
-                        default: {
-                            return false;
-                        }
-                    }
-                }
-
-                --MAX_LENGTH;
-                --offset;
-            } while ((offset != 0) && (MAX_LENGTH != 0));
-
-            if (offset2 != 0) {
-                if (sign != 0) {
-                    ++offset2;
-                }
-
-                while (++offset2 < length) {
-                    exponent *= QENTEM_DECIMAL_BASE_;
-                    exponent += static_cast<int>(str[offset2] - DigitChars::ZeroChar);
-                }
-
-                if (sign == -1) {
-                    exponent = -exponent;
-                }
-
-                length = offset;
-            }
-        }
-
-        return true;
     }
 
     template <typename Number_T_>
@@ -396,7 +299,7 @@ class Digit {
                     StringUtils::TrimLeft(str, n_offset, length);
                     length -= n_offset;
 
-                    if ((length != 0) && stringToSignedFloat(number, &(str[n_offset]), length)) {
+                    if (stringToSignedFloat(number, &(str[n_offset]), length)) {
                         number = -number;
                         return true;
                     }
@@ -408,12 +311,7 @@ class Digit {
                     SizeT offset = 1;
                     StringUtils::TrimLeft(str, offset, length);
                     length -= offset;
-
-                    if (length != 0) {
-                        return stringToSignedFloat(number, &(str[offset]), length);
-                    }
-
-                    break;
+                    return stringToSignedFloat(number, &(str[offset]), length);
                 }
 
                 default: {
@@ -523,10 +421,36 @@ class Digit {
         return true;
     }
 
-    template <typename String_T_, typename Number_T_>
-    QENTEM_NOINLINE static void intToString(String_T_ &dstring, Number_T_ number, SizeT min, bool negative) {
-        Char_T_ tmp[QENTEM_INT_NUMBER_MAX_SIZE_];
-        SizeT   offset = 0;
+    template <typename Number_T_>
+    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+        static constexpr char lookup_table[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                                "303132333435363738394041424344454647484950515253545556575859"
+                                                "606162636465666768697071727374757677787980818283848586878889"
+                                                "90919293949596979899"};
+
+        while (number >= Number_T_(100)) {
+            offset -= SizeT(2);
+            const SizeT index          = (static_cast<SizeT>(number % Number_T_(100)) << 1U);
+            storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
+            storage[offset + SizeT(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
+            number /= Number_T_(100);
+        }
+
+        if (number < Number_T_(10)) {
+            --offset;
+            storage[offset] = static_cast<Char_T_>(number) + DigitChars::ZeroChar;
+        } else {
+            offset -= SizeT(2);
+            const SizeT index          = (static_cast<SizeT>(number) << 1U);
+            storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
+            storage[offset + SizeT(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
+        }
+    }
+
+    template <typename Stream_T_, typename Number_T_>
+    inline static void unsignedIntToString(Stream_T_ &stream, Number_T_ number) {
+        Char_T_ storage[QENTEM_INT_NUMBER_MAX_SIZE_];
+        SizeT   offset = QENTEM_INT_NUMBER_MAX_SIZE_;
 
         /*
          *   18446744073709551615 MAX unsigned long long   20
@@ -535,46 +459,46 @@ class Digit {
          *   4294967295           MAX unsigned int         10
          *  -2147483647           MAX int                  10 + (-|+) = 11
          *
-         *  65535                 MAX unsigned short       5
+         *   65535                MAX unsigned short       5
          *  -32767                MAX short                5 + (-|+) = 6
          */
 
-        while (number != 0) {
-            tmp[offset] = (Char_T_(number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
-            ++offset;
-            number /= QENTEM_DECIMAL_BASE_;
+        intToString(&(storage[0]), offset, number);
+
+        stream.Insert(&(storage[offset]), (QENTEM_INT_NUMBER_MAX_SIZE_ - offset));
+    }
+
+    template <typename Stream_T_, typename Number_T_>
+    inline static void intToString(Stream_T_ &stream, Number_T_ number) {
+        Char_T_ storage[QENTEM_INT_NUMBER_MAX_SIZE_];
+        SizeT   offset = QENTEM_INT_NUMBER_MAX_SIZE_;
+
+        /*
+         *   18446744073709551615 MAX unsigned long long   20
+         *  -9223372036854775807  MAX long long            19 + (-|+) = 20
+         *
+         *   4294967295           MAX unsigned int         10
+         *  -2147483647           MAX int                  10 + (-|+) = 11
+         *
+         *   65535                MAX unsigned short       5
+         *  -32767                MAX short                5 + (-|+) = 6
+         */
+
+        bool negative = false;
+
+        if (number < 0) {
+            number   = -number;
+            negative = true;
         }
 
-        if (min > offset) {
-            min -= offset;
-
-            if ((offset + min) > QENTEM_INT_NUMBER_MAX_SIZE_) {
-                min = QENTEM_INT_NUMBER_MAX_SIZE_ - offset;
-            }
-
-            if (negative) {
-                --min;
-            }
-
-            while (min != 0) {
-                tmp[offset] = DigitChars::ZeroChar;
-                ++offset;
-                --min;
-            }
-        }
+        intToString(&(storage[0]), offset, number);
 
         if (negative) {
-            tmp[offset] = DigitChars::NegativeChar;
-            ++offset;
-        }
-
-        Char_T_ *str = getCharForNumber(dstring, offset);
-
-        while (offset != 0) {
             --offset;
-            *str = tmp[offset];
-            ++str;
+            storage[offset] = DigitChars::NegativeChar;
         }
+
+        stream.Insert(&(storage[offset]), (QENTEM_INT_NUMBER_MAX_SIZE_ - offset));
     }
 
     template <typename String_T_>
@@ -604,13 +528,10 @@ class Digit {
         }
 
         unsigned long long left_number = static_cast<unsigned long long>(number);
+        unsigned long long tmp_number  = left_number;
 
-        unsigned long long tmp_number = left_number;
-
-        while (tmp_number != 0) {
-            --end_offset;
-            tmp[end_offset] = (Char_T_(tmp_number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
-            tmp_number /= QENTEM_DECIMAL_BASE_;
+        if (tmp_number != 0) {
+            intToString(&(tmp[0]), end_offset, tmp_number);
         }
 
         unsigned int left_length = (max_length - end_offset);
@@ -650,11 +571,7 @@ class Digit {
                     ++left_number;
                     end_offset = max_length;
 
-                    while (left_number != 0) {
-                        --end_offset;
-                        tmp[end_offset] = (Char_T_(left_number % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
-                        left_number /= QENTEM_DECIMAL_BASE_;
-                    }
+                    intToString(&(tmp[0]), end_offset, left_number);
 
                     left_length = (max_length - end_offset);
                 }
@@ -682,10 +599,8 @@ class Digit {
         if (fraction_length != 0) {
             end_offset = --fraction_length;
 
-            while (fraction != 0) {
-                --end_offset;
-                tmp[end_offset] = (Char_T_(fraction % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
-                fraction /= QENTEM_DECIMAL_BASE_;
+            if (end_offset != 0) {
+                intToString(&(tmp[0]), end_offset, fraction);
             }
 
             if (((end_offset == 0) && (exponent == 0)) || (left_length != 0) || no_exponent) {
@@ -746,12 +661,7 @@ class Digit {
 
             end_offset = 4;
 
-            while (exponent != 0) {
-                --end_offset;
-                tmp[end_offset] =
-                    static_cast<Char_T_>(static_cast<Char_T_>(exponent % QENTEM_DECIMAL_BASE_) + DigitChars::ZeroChar);
-                exponent /= QENTEM_DECIMAL_BASE_;
-            }
+            intToString(&(tmp[0]), end_offset, exponent);
 
             while (end_offset < 4) {
                 tmp2[offset] = tmp[end_offset];
@@ -839,14 +749,85 @@ class Digit {
     }
 
     static unsigned long long extractFraction(double number, unsigned int precision) noexcept {
-        static const double mul[] = {1,    1E2,  1E3,  1E4,  1E5,  1E6,  1E7,  1E8, 1E9,
-                                     1E10, 1E11, 1E12, 1E13, 1E14, 1E15, 1E16, 1E17};
+        static constexpr double mul[] = {1,    1E2,  1E3,  1E4,  1E5,  1E6,  1E7,  1E8, 1E9,
+                                         1E10, 1E11, 1E12, 1E13, 1E14, 1E15, 1E16, 1E17};
 
         if (precision < 17U) {
             return static_cast<unsigned long long>(number * mul[precision]);
         }
 
         return static_cast<unsigned long long>(number * 1E18);
+    }
+
+    QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str, SizeT &length) noexcept {
+        SizeT offset = (length - 1);
+
+        if (offset != 0) {
+            SizeT offset2    = 0;
+            SizeT MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
+            int   sign       = 0;
+
+            do {
+                const Char_T_ c = str[offset];
+
+                if ((c < DigitChars::ZeroChar) || (c > DigitChars::NineChar)) {
+                    switch (c) {
+                        case DigitChars::DotChar: {
+                            return true;
+                        }
+
+                        case DigitChars::E_Char:
+                        case DigitChars::UE_Char: {
+                            if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
+                                // No number.
+                                return false;
+                            }
+
+                            offset2    = offset;
+                            MAX_LENGTH = 0;
+                            continue;
+                        }
+
+                        case DigitChars::NegativeChar:
+                        case DigitChars::PositiveChar: {
+                            if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) || (sign != 0)) {
+                                // No number, or double sign.
+                                return false;
+                            }
+
+                            sign = ((c == DigitChars::NegativeChar) ? -1 : 1);
+                            break;
+                        }
+
+                        default: {
+                            return false;
+                        }
+                    }
+                }
+
+                --MAX_LENGTH;
+                --offset;
+            } while ((offset != 0) && (MAX_LENGTH != 0));
+
+            if (offset2 != 0) {
+                if (sign != 0) {
+                    ++offset2;
+                }
+
+                while (++offset2 < length) {
+                    exponent *= QENTEM_DECIMAL_BASE_;
+                    exponent += static_cast<int>(str[offset2] - DigitChars::ZeroChar);
+                }
+
+                if (sign == -1) {
+                    exponent = -exponent;
+                }
+
+                length = offset;
+            }
+        }
+
+        return true;
     }
 };
 
