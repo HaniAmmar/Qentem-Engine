@@ -807,12 +807,12 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                value = Digit<Char_T_>::NumberToString(number_.GetUInt64(), 1);
+                value = Digit<Char_T_>::NumberToString(number_.GetUInt64());
                 break;
             }
 
             case ValueType::Int64: {
-                value = Digit<Char_T_>::NumberToString(number_.GetInt64(), 1);
+                value = Digit<Char_T_>::NumberToString(number_.GetInt64());
                 break;
             }
 
@@ -853,12 +853,12 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(stream, number_.GetUInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, number_.GetUInt64());
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(stream, number_.GetInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, number_.GetInt64());
                 break;
             }
 
@@ -1240,17 +1240,17 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetUInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetUInt64());
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetInt64(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetDouble(), 1);
+                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetDouble());
                 break;
             }
 
