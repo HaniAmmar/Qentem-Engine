@@ -682,31 +682,27 @@ static int TestNumberToString1() {
     EQ_VALUE(DigitC::NumberToString(number_long), "100000", "return");
 
     number_uint = 0;
-    EQ_VALUE(DigitC::NumberToString(number_uint, 0), "", "return");
+    EQ_VALUE(DigitC::NumberToString(number_uint), "0", "return");
 
     number_ulong = 1;
-    EQ_VALUE(DigitC::NumberToString(number_ulong, 10), "0000000001", "return");
+    EQ_VALUE(DigitC::NumberToString(number_ulong), "1", "return");
 
     number_ulong = 4;
-    EQ_VALUE(DigitC::NumberToString(number_ulong, 50), "00000000000000000004", "return");
+    EQ_VALUE(DigitC::NumberToString(number_ulong), "4", "return");
 
     number_int = -7;
-    EQ_VALUE(DigitC::NumberToString(number_int, 50), "-0000000000000000007", "return");
+    EQ_VALUE(DigitC::NumberToString(number_int), "-7", "return");
 
     number_uint = 10;
-    EQ_VALUE(DigitC::NumberToString(number_uint, 2), "10", "return");
+    EQ_VALUE(DigitC::NumberToString(number_uint), "10", "return");
 
     number_ulong = 3;
-    EQ_VALUE(DigitC::NumberToString(number_ulong, 5), "00003", "return");
-
-    number_ulong = 3;
-    EQ_VALUE(DigitC::NumberToString(number_ulong, 5), "00003", "return");
+    EQ_VALUE(DigitC::NumberToString(number_ulong), "3", "return");
 
     number_float = 1;
-    EQ_VALUE(DigitC::NumberToString(number_float, 1), "1", "return");
+    EQ_VALUE(DigitC::NumberToString(number_float), "1", "return");
 
     number_double = 0;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), ".0", "return");
     EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "0.0", "return");
