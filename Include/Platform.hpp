@@ -103,6 +103,7 @@ namespace Qentem {
 namespace Platform {
 
 #ifdef _MSC_VER
+
 #ifdef QENTEM_64BIT_ARCH
 inline static unsigned int CTZ(unsigned long long value) noexcept {
     unsigned long index = 0;
@@ -113,7 +114,8 @@ inline static unsigned int CLZ(unsigned long long value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse64(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
-#endif
+
+#else
 
 inline static unsigned int CTZ(unsigned long value) noexcept {
     unsigned long index = 0;
@@ -134,13 +136,14 @@ inline static unsigned int CLZ(unsigned int value) noexcept {
     unsigned long index = 0;
     return ((_BitScanReverse(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
 }
+#endif
 
 #else
 
 #ifdef QENTEM_64BIT_ARCH
 template <typename Number_T_>
 inline static unsigned int CTZ(Number_T_ value) noexcept {
-    if (value != 0) {
+    if (value > 0) {
         unsigned int index = static_cast<unsigned int>(__builtin_ctzl(static_cast<unsigned long>(value)));
         return ++index;
     }
@@ -150,24 +153,31 @@ inline static unsigned int CTZ(Number_T_ value) noexcept {
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
-    return (value != 0) ? ((sizeof(Number_T_) * 8U) -
-                           static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))))
-                        : 0;
+    return (value > 0)
+               ? ((sizeof(long) * 8U) - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))))
+               : 0;
 }
-#endif
 
-inline static unsigned int CTZ(unsigned int value) noexcept {
-    if (value != 0) {
-        unsigned int index = static_cast<unsigned int>(__builtin_ctz(value));
+#else
+
+template <typename Number_T_>
+inline static unsigned int CLZ(Number_T_ value) noexcept {
+    if (value > 0) {
+        unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
         return ++index;
     }
 
     return 0;
 }
 
-inline static unsigned int CLZ(unsigned int value) noexcept {
-    return (value != 0) ? ((sizeof(int) * 8U) - static_cast<unsigned int>(__builtin_clz(value))) : 0;
+template <typename Number_T_>
+inline static unsigned int CLZ(Number_T_ value) noexcept {
+    return (value > 0)
+               ? ((sizeof(int) * 8U) - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))))
+               : 0;
 }
+
+#endif
 #endif
 
 #ifdef QENTEM_SIMD_ENABLED
