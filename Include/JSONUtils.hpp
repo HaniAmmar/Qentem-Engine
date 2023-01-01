@@ -31,7 +31,7 @@ namespace Qentem {
 namespace JSON {
 
 template <typename>
-class JSONotation;
+struct JSONotation;
 
 template <typename Char_T_>
 QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T_> &buffer) {
@@ -234,8 +234,14 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T
     buffer.Insert((content + offset2), (offset - offset2));
 }
 
+template <typename Char_T_, int S>
+struct JSONotationStrings {};
+
 template <typename Char_T_>
-class JSONotation {
+struct JSONotation {
+  private:
+    static constexpr int size_ = static_cast<int>(sizeof(Char_T_));
+
   public:
     static constexpr Char_T_ QuoteChar    = '"';
     static constexpr Char_T_ CommaChar    = ',';
@@ -266,23 +272,35 @@ class JSONotation {
     static constexpr Char_T_ E_Char  = 'e';
     static constexpr Char_T_ CE_Char = 'E';
 
-    static constexpr SizeT       TrueStringLength = 4U;
-    inline static const Char_T_ *GetTrueString() noexcept {
-        static constexpr const Char_T_ val[] = {'t', 'r', 'u', 'e', '\0'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          TrueStringLength = 4U;
+    static constexpr const Char_T_ *TrueString       = &(JSONotationStrings<Char_T_, size_>::TrueString[0]);
 
-    static constexpr SizeT       FalseStringLength = 5U;
-    inline static const Char_T_ *GetFalseString() noexcept {
-        static constexpr const Char_T_ val[] = {'f', 'a', 'l', 's', 'e', '\0'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          FalseStringLength = 5U;
+    static constexpr const Char_T_ *FalseString       = &(JSONotationStrings<Char_T_, size_>::FalseString[0]);
 
-    static constexpr SizeT       NullStringLength = 4U;
-    inline static const Char_T_ *GetNullString() noexcept {
-        static constexpr const Char_T_ val[] = {'n', 'u', 'l', 'l', '\0'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          NullStringLength = 4U;
+    static constexpr const Char_T_ *NullString       = &(JSONotationStrings<Char_T_, size_>::NullString[0]);
+};
+
+template <typename Char_T_>
+struct JSONotationStrings<Char_T_, 1> {
+    static constexpr const Char_T_ *FalseString = "false";
+    static constexpr const Char_T_ *TrueString  = "true";
+    static constexpr const Char_T_ *NullString  = "null";
+};
+
+template <typename Char_T_>
+struct JSONotationStrings<Char_T_, 2> {
+    static constexpr const Char_T_ *FalseString = u"false";
+    static constexpr const Char_T_ *TrueString  = u"true";
+    static constexpr const Char_T_ *NullString  = u"null";
+};
+
+template <typename Char_T_>
+struct JSONotationStrings<Char_T_, 4> {
+    static constexpr const Char_T_ *FalseString = L"false";
+    static constexpr const Char_T_ *TrueString  = L"true";
+    static constexpr const Char_T_ *NullString  = L"null";
 };
 
 } // namespace JSON

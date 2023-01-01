@@ -200,7 +200,7 @@ class JSONParser {
             }
 
             case JSONotation_T_::T_Char: {
-                const Char_T_ *true_string = JSONotation_T_::GetTrueString();
+                const Char_T_ *true_string = JSONotation_T_::TrueString;
 
                 do {
                 } while ((content[++offset] == *(++true_string)));
@@ -213,7 +213,7 @@ class JSONParser {
             }
 
             case JSONotation_T_::F_Char: {
-                const Char_T_ *false_string = JSONotation_T_::GetFalseString();
+                const Char_T_ *false_string = JSONotation_T_::FalseString;
 
                 do {
                 } while ((content[++offset] == *(++false_string)));
@@ -226,7 +226,7 @@ class JSONParser {
             }
 
             case JSONotation_T_::N_Char: {
-                const Char_T_ *null_string = JSONotation_T_::GetNullString();
+                const Char_T_ *null_string = JSONotation_T_::NullString;
 
                 do {
                 } while ((content[++offset] == *(++null_string)));

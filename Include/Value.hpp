@@ -776,19 +776,19 @@ class Value {
             }
 
             case ValueType::True: {
-                key    = JSONotation_T_::GetTrueString();
+                key    = JSONotation_T_::TrueString;
                 length = JSONotation_T_::TrueStringLength;
                 return true;
             }
 
             case ValueType::False: {
-                key    = JSONotation_T_::GetFalseString();
+                key    = JSONotation_T_::FalseString;
                 length = JSONotation_T_::FalseStringLength;
                 return true;
             }
 
             case ValueType::Null: {
-                key    = JSONotation_T_::GetNullString();
+                key    = JSONotation_T_::NullString;
                 length = JSONotation_T_::NullStringLength;
                 return true;
             }
@@ -822,17 +822,17 @@ class Value {
             }
 
             case ValueType::True: {
-                value = VString(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
+                value = VString(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                value = VString(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
+                value = VString(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                value = VString(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
+                value = VString(JSONotation_T_::NullString, JSONotation_T_::NullStringLength);
                 break;
             }
 
@@ -868,17 +868,17 @@ class Value {
             }
 
             case ValueType::True: {
-                stream.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
+                stream.Insert(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                stream.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
+                stream.Insert(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
+                stream.Insert(JSONotation_T_::NullString, JSONotation_T_::NullStringLength);
                 break;
             }
 
@@ -1000,12 +1000,12 @@ class Value {
             }
 
             case ValueType::String: {
-                if (string_.IsEqual(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength)) {
+                if (string_.IsEqual(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (string_.IsEqual(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength)) {
+                if (string_.IsEqual(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1255,17 +1255,17 @@ class Value {
             }
 
             case ValueType::False: {
-                stream.Insert(JSONotation_T_::GetFalseString(), JSONotation_T_::FalseStringLength);
+                stream.Insert(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                stream.Insert(JSONotation_T_::GetTrueString(), JSONotation_T_::TrueStringLength);
+                stream.Insert(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Insert(JSONotation_T_::GetNullString(), JSONotation_T_::NullStringLength);
+                stream.Insert(JSONotation_T_::NullString, JSONotation_T_::NullStringLength);
                 break;
             }
 
