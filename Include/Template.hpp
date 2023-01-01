@@ -1442,118 +1442,118 @@ class TemplatePatterns {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr Char_T_ Var_2ND_Char         = 'v'; // Second character
-    static constexpr SizeT   VariablePrefixLength = 5U;
-    static constexpr SizeT   VariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
-    static const Char_T_    *GetVariablePrefix() noexcept {
-           static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
-           return &(val[0]);
+    static constexpr Char_T_     Var_2ND_Char         = 'v'; // Second character
+    static constexpr SizeT       VariablePrefixLength = 5U;
+    static constexpr SizeT       VariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
+    inline static const Char_T_ *GetVariablePrefix() noexcept {
+        static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
+        return &(val[0]);
     }
 
     // {raw:
-    static constexpr Char_T_ Raw_2ND_Char            = 'r'; // Second character
-    static constexpr SizeT   RawVariablePrefixLength = 5U;
-    static constexpr SizeT   RawVariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
-    static const Char_T_    *GetRawVariablePrefix() noexcept {
-           static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
-           return &(val[0]);
+    static constexpr Char_T_     Raw_2ND_Char            = 'r'; // Second character
+    static constexpr SizeT       RawVariablePrefixLength = 5U;
+    static constexpr SizeT       RawVariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
+    inline static const Char_T_ *GetRawVariablePrefix() noexcept {
+        static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
+        return &(val[0]);
     }
 
     // {math:
-    static constexpr Char_T_ Math_2ND_Char    = 'm'; // Second character
-    static constexpr SizeT   MathPrefixLength = 6U;
-    static constexpr SizeT   MathFulllength   = (MathPrefixLength + InLineSuffixLength);
-    static const Char_T_    *GetMathPrefix() noexcept {
-           static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
-           return &(val[0]);
+    static constexpr Char_T_     Math_2ND_Char    = 'm'; // Second character
+    static constexpr SizeT       MathPrefixLength = 6U;
+    static constexpr SizeT       MathFulllength   = (MathPrefixLength + InLineSuffixLength);
+    inline static const Char_T_ *GetMathPrefix() noexcept {
+        static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
+        return &(val[0]);
     }
 
     // {if:
-    static constexpr Char_T_ InlineIf_2ND_Char    = 'i'; // Second character
-    static constexpr SizeT   InLineIfPrefixLength = 3U;
-    static const Char_T_    *GetInLineIfPrefix() noexcept {
-           static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
-           return &(val[0]);
+    static constexpr Char_T_     InlineIf_2ND_Char    = 'i'; // Second character
+    static constexpr SizeT       InLineIfPrefixLength = 3U;
+    inline static const Char_T_ *GetInLineIfPrefix() noexcept {
+        static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
+        return &(val[0]);
     }
 
     // <loop
-    static constexpr Char_T_ Loop_2ND_Char    = 'l'; // Second character
-    static constexpr SizeT   LoopPrefixLength = 5U;
-    static const Char_T_    *GetLoopPrefix() noexcept {
-           static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
-           return &(val[0]);
+    static constexpr Char_T_     Loop_2ND_Char    = 'l'; // Second character
+    static constexpr SizeT       LoopPrefixLength = 5U;
+    inline static const Char_T_ *GetLoopPrefix() noexcept {
+        static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
+        return &(val[0]);
     }
 
     // </loop>
-    static constexpr SizeT LoopSuffixLength = 7U;
-    static const Char_T_  *GetLoopSuffix() noexcept {
-         static constexpr Char_T_ val[] = {'<', '/', 'l', 'o', 'o', 'p', '>'};
-         return &(val[0]);
+    static constexpr SizeT       LoopSuffixLength = 7U;
+    inline static const Char_T_ *GetLoopSuffix() noexcept {
+        static constexpr Char_T_ val[] = {'<', '/', 'l', 'o', 'o', 'p', '>'};
+        return &(val[0]);
     }
 
     // <if
-    static constexpr Char_T_ If_2ND_Char    = 'i'; // Second character
-    static constexpr SizeT   IfPrefixLength = 3U;
-    static const Char_T_    *GetIfPrefix() noexcept {
-           static constexpr Char_T_ val[] = {'<', 'i', 'f'};
-           return &(val[0]);
+    static constexpr Char_T_     If_2ND_Char    = 'i'; // Second character
+    static constexpr SizeT       IfPrefixLength = 3U;
+    inline static const Char_T_ *GetIfPrefix() noexcept {
+        static constexpr Char_T_ val[] = {'<', 'i', 'f'};
+        return &(val[0]);
     }
 
     // </if>
-    static constexpr SizeT IfSuffixLength = 5U;
-    static const Char_T_  *GetIfSuffix() noexcept {
-         static constexpr Char_T_ val[] = {'<', '/', 'i', 'f', '>'};
-         return &(val[0]);
+    static constexpr SizeT       IfSuffixLength = 5U;
+    inline static const Char_T_ *GetIfSuffix() noexcept {
+        static constexpr Char_T_ val[] = {'<', '/', 'i', 'f', '>'};
+        return &(val[0]);
     }
 
     // <else
-    static constexpr Char_T_ ElseIfChar       = 'i'; // else[i]f
-    static constexpr SizeT   ElsePrefixLength = 5U;
-    static const Char_T_    *GetElsePrefix() noexcept {
-           static constexpr Char_T_ val[] = {'<', 'e', 'l', 's', 'e'};
-           return &(val[0]);
+    static constexpr Char_T_     ElseIfChar       = 'i'; // else[i]f
+    static constexpr SizeT       ElsePrefixLength = 5U;
+    inline static const Char_T_ *GetElsePrefix() noexcept {
+        static constexpr Char_T_ val[] = {'<', 'e', 'l', 's', 'e'};
+        return &(val[0]);
     }
 
     // />
-    static constexpr SizeT ElseSuffixLength = 2U;
-    static const Char_T_  *GetElseSuffix() noexcept {
-         static constexpr Char_T_ val[] = {'/', '>'};
-         return &(val[0]);
+    static constexpr SizeT       ElseSuffixLength = 2U;
+    inline static const Char_T_ *GetElseSuffix() noexcept {
+        static constexpr Char_T_ val[] = {'/', '>'};
+        return &(val[0]);
     }
 
     // &amp; &
-    static constexpr SizeT HTMLAndLength = 5U;
-    static const Char_T_  *GetHTMLAnd() noexcept {
-         static constexpr Char_T_ val[] = {'&', 'a', 'm', 'p', ';'};
-         return &(val[0]);
+    static constexpr SizeT       HTMLAndLength = 5U;
+    inline static const Char_T_ *GetHTMLAnd() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'a', 'm', 'p', ';'};
+        return &(val[0]);
     }
 
     // &lt; <
-    static constexpr SizeT HTMLLessLength = 4U;
-    static const Char_T_  *GetHTMLLess() noexcept {
-         static constexpr Char_T_ val[] = {'&', 'l', 't', ';'};
-         return &(val[0]);
+    static constexpr SizeT       HTMLLessLength = 4U;
+    inline static const Char_T_ *GetHTMLLess() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'l', 't', ';'};
+        return &(val[0]);
     }
 
     // &gt; >
-    static constexpr SizeT HTMLBiggerLength = 4U;
-    static const Char_T_  *GetHTMLBigger() noexcept {
-         static constexpr Char_T_ val[] = {'&', 'g', 't', ';'};
-         return &(val[0]);
+    static constexpr SizeT       HTMLBiggerLength = 4U;
+    inline static const Char_T_ *GetHTMLBigger() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'g', 't', ';'};
+        return &(val[0]);
     }
 
     // &quot; "
-    static constexpr SizeT HTMLQuoteLength = 6U;
-    static const Char_T_  *GetHTMLQuote() noexcept {
-         static constexpr Char_T_ val[] = {'&', 'q', 'u', 'o', 't', ';'};
-         return &(val[0]);
+    static constexpr SizeT       HTMLQuoteLength = 6U;
+    inline static const Char_T_ *GetHTMLQuote() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'q', 'u', 'o', 't', ';'};
+        return &(val[0]);
     }
 
     // &apos; ' (HTML5)
-    static constexpr SizeT HTMLSingleQuoteLength = 6U;
-    static const Char_T_  *GetHTMLSingleQuote() noexcept {
-         static constexpr Char_T_ val[] = {'&', 'a', 'p', 'o', 's', ';'};
-         return &(val[0]);
+    static constexpr SizeT       HTMLSingleQuoteLength = 6U;
+    inline static const Char_T_ *GetHTMLSingleQuote() noexcept {
+        static constexpr Char_T_ val[] = {'&', 'a', 'p', 'o', 's', ';'};
+        return &(val[0]);
     }
 
     static constexpr Char_T_ QuoteChar = '"';
