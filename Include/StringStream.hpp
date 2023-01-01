@@ -280,7 +280,7 @@ class StringStream {
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     void allocate(SizeT size) {
-        size = Memory::AligneSize(size, 4U);
+        size = (Memory::AligneSize(size, 4U) << 1U);
         setCapacity(size);
         setStorage(Memory::Allocate<Char_T_>(size));
     }
