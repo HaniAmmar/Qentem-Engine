@@ -175,7 +175,7 @@ template <typename, typename, typename>
 class Template_CV;
 
 template <typename>
-class TemplatePatterns;
+struct TemplatePatterns;
 
 class Template {
   public:
@@ -431,7 +431,7 @@ class Template_CV {
 
                 switch (content[current_offset]) {
                     case TemplatePatterns_C_::Var_2ND_Char: {
-                        if (StringUtils::IsEqual((TemplatePatterns_C_::GetVariablePrefix() + 2),
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::VariablePrefix + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::VariablePrefixLength - 2))) {
                             const SizeT end_offset = Engine::FindOne<Char_T_>(
@@ -449,7 +449,7 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::Raw_2ND_Char: {
-                        if (StringUtils::IsEqual((TemplatePatterns_C_::GetRawVariablePrefix() + 2),
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::RawVariablePrefix + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::RawVariablePrefixLength - 2))) {
                             const SizeT end_offset = Engine::FindOne<Char_T_>(
@@ -467,8 +467,7 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::Math_2ND_Char: {
-                        if (StringUtils::IsEqual((TemplatePatterns_C_::GetMathPrefix() + 2),
-                                                 (content + current_offset + 1),
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::MathPrefix + 2), (content + current_offset + 1),
                                                  (TemplatePatterns_C_::MathPrefixLength - 2))) {
                             const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
                                 TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
@@ -485,7 +484,7 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::InlineIf_2ND_Char: {
-                        if (StringUtils::IsEqual((TemplatePatterns_C_::GetInLineIfPrefix() + 2),
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::InLineIfPrefix + 2),
                                                  (content + current_offset + 1),
                                                  (TemplatePatterns_C_::InLineIfPrefixLength - 2))) {
                             const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
@@ -511,11 +510,11 @@ class Template_CV {
                 const SizeT current_offset = (offset + 1);
 
                 if (content[current_offset] == TemplatePatterns_C_::Loop_2ND_Char) { // <loop
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::GetLoopPrefix() + 2), (content + current_offset + 1),
+                    if (StringUtils::IsEqual((TemplatePatterns_C_::LoopPrefix + 2), (content + current_offset + 1),
                                              (TemplatePatterns_C_::LoopPrefixLength - 2))) {
                         const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
-                            TemplatePatterns_C_::GetLoopPrefix(), TemplatePatterns_C_::LoopPrefixLength,
-                            TemplatePatterns_C_::GetLoopSuffix(), TemplatePatterns_C_::LoopSuffixLength, content,
+                            TemplatePatterns_C_::LoopPrefix, TemplatePatterns_C_::LoopPrefixLength,
+                            TemplatePatterns_C_::LoopSuffix, TemplatePatterns_C_::LoopSuffixLength, content,
                             (current_offset + TemplatePatterns_C_::InLineIfPrefixLength - 1), length);
 
                         if (end_offset != 0) {
@@ -527,12 +526,12 @@ class Template_CV {
                         }
                     }
                 } else if (content[current_offset] == TemplatePatterns_C_::If_2ND_Char) { // <if
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::GetIfPrefix() + 2), (content + current_offset + 1),
+                    if (StringUtils::IsEqual((TemplatePatterns_C_::IfPrefix + 2), (content + current_offset + 1),
                                              (TemplatePatterns_C_::IfPrefixLength - 2))) {
                         const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
-                            TemplatePatterns_C_::GetIfPrefix(), TemplatePatterns_C_::IfPrefixLength,
-                            TemplatePatterns_C_::GetIfSuffix(), TemplatePatterns_C_::IfSuffixLength, content,
-                            current_offset, length);
+                            TemplatePatterns_C_::IfPrefix, TemplatePatterns_C_::IfPrefixLength,
+                            TemplatePatterns_C_::IfSuffix, TemplatePatterns_C_::IfSuffixLength, content, current_offset,
+                            length);
 
                         if (end_offset != 0) {
                             tags_cache += TagBit{TagType::If, offset, end_offset};
@@ -562,7 +561,7 @@ class Template_CV {
 
             switch (content[offset]) {
                 case TemplatePatterns_C_::Var_2ND_Char: {
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::GetVariablePrefix() + 2), (content + offset + 1),
+                    if (StringUtils::IsEqual((TemplatePatterns_C_::VariablePrefix + 2), (content + offset + 1),
                                              (TemplatePatterns_C_::VariablePrefixLength - 2))) {
                         const SizeT end_offset =
                             Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
@@ -578,7 +577,7 @@ class Template_CV {
                 }
 
                 case TemplatePatterns_C_::Raw_2ND_Char: {
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::GetRawVariablePrefix() + 2), (content + offset + 1),
+                    if (StringUtils::IsEqual((TemplatePatterns_C_::RawVariablePrefix + 2), (content + offset + 1),
                                              (TemplatePatterns_C_::RawVariablePrefixLength - 2))) {
                         const SizeT end_offset =
                             Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
@@ -592,7 +591,7 @@ class Template_CV {
                 }
 
                 case TemplatePatterns_C_::Math_2ND_Char: {
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::GetMathPrefix() + 2), (content + offset + 1),
+                    if (StringUtils::IsEqual((TemplatePatterns_C_::MathPrefix + 2), (content + offset + 1),
                                              (TemplatePatterns_C_::MathPrefixLength - 2))) {
                         const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
@@ -619,36 +618,35 @@ class Template_CV {
             switch (str[index]) {
                 case '&': {
                     stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns_C_::GetHTMLAnd(), TemplatePatterns_C_::HTMLAndLength);
+                    stream.Insert(TemplatePatterns_C_::HTMLAnd, TemplatePatterns_C_::HTMLAndLength);
                     offset = (++index);
                     break;
                 }
 
                 case '<': {
                     stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns_C_::GetHTMLLess(), TemplatePatterns_C_::HTMLLessLength);
+                    stream.Insert(TemplatePatterns_C_::HTMLLess, TemplatePatterns_C_::HTMLLessLength);
                     offset = (++index);
                     break;
                 }
 
                 case '>': {
                     stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns_C_::GetHTMLBigger(), TemplatePatterns_C_::HTMLBiggerLength);
+                    stream.Insert(TemplatePatterns_C_::HTMLBigger, TemplatePatterns_C_::HTMLBiggerLength);
                     offset = (++index);
                     break;
                 }
 
                 case '"': {
                     stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns_C_::GetHTMLQuote(), TemplatePatterns_C_::HTMLQuoteLength);
+                    stream.Insert(TemplatePatterns_C_::HTMLQuote, TemplatePatterns_C_::HTMLQuoteLength);
                     offset = (++index);
                     break;
                 }
 
                 case '\'': {
                     stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns_C_::GetHTMLSingleQuote(),
-                                  TemplatePatterns_C_::HTMLSingleQuoteLength);
+                    stream.Insert(TemplatePatterns_C_::HTMLSingleQuote, TemplatePatterns_C_::HTMLSingleQuoteLength);
                     offset = (++index);
                     break;
                 }
@@ -752,7 +750,7 @@ class Template_CV {
     QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content, const SizeT length) const noexcept {
         if (length > TemplatePatterns_C_::VariableFulllength) {
             SizeT offset = 0;
-            offset       = Engine::Find<Char_T_>(TemplatePatterns_C_::GetVariablePrefix(),
+            offset       = Engine::Find<Char_T_>(TemplatePatterns_C_::VariablePrefix,
                                            TemplatePatterns_C_::VariablePrefixLength, content, offset, length);
 
             if (offset != 0) {
@@ -891,7 +889,7 @@ class Template_CV {
                 info->InnerTemplate.Insert((content + previous_offset),
                                            ((offset - loop_value_length) - previous_offset));
 
-                info->InnerTemplate.Insert(TemplatePatterns_C_::GetVariablePrefix(),
+                info->InnerTemplate.Insert(TemplatePatterns_C_::VariablePrefix,
                                            TemplatePatterns_C_::VariablePrefixLength);
 
                 Char_T_ *buffer = info->InnerTemplate.Buffer(level + 1);
@@ -1179,15 +1177,15 @@ class Template_CV {
         SizeT else_offset = 0;
 
         while (true) {
-            else_offset = Engine::Find<Char_T_>(TemplatePatterns_C_::GetElsePrefix(),
-                                                TemplatePatterns_C_::ElsePrefixLength, content, offset, length);
+            else_offset = Engine::Find<Char_T_>(TemplatePatterns_C_::ElsePrefix, TemplatePatterns_C_::ElsePrefixLength,
+                                                content, offset, length);
 
             if (else_offset == 0) {
                 // No <else.
                 break;
             }
 
-            const SizeT next_if = Engine::Find<Char_T_>(TemplatePatterns_C_::GetIfPrefix(),
+            const SizeT next_if = Engine::Find<Char_T_>(TemplatePatterns_C_::IfPrefix,
                                                         TemplatePatterns_C_::IfPrefixLength, content, offset, length);
 
             if ((next_if == 0) || (else_offset < next_if)) {
@@ -1195,8 +1193,8 @@ class Template_CV {
                 break;
             }
 
-            offset = Engine::Find<Char_T_>(TemplatePatterns_C_::GetIfSuffix(), TemplatePatterns_C_::IfSuffixLength,
-                                           content, next_if, length);
+            offset = Engine::Find<Char_T_>(TemplatePatterns_C_::IfSuffix, TemplatePatterns_C_::IfSuffixLength, content,
+                                           next_if, length);
 
             if (else_offset > offset) {
                 // <else came after the child if.
@@ -1422,8 +1420,14 @@ class Template_CV {
     const SizeT        level_;
 };
 
+template <typename Char_T_, int S>
+struct TPStrings {};
+
 template <typename Char_T_>
-class TemplatePatterns {
+struct TemplatePatterns {
+  private:
+    static constexpr int size_ = static_cast<int>(sizeof(Char_T_));
+
   public:
     /*
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
@@ -1442,119 +1446,74 @@ class TemplatePatterns {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr Char_T_     Var_2ND_Char         = 'v'; // Second character
-    static constexpr SizeT       VariablePrefixLength = 5U;
-    static constexpr SizeT       VariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
-    inline static const Char_T_ *GetVariablePrefix() noexcept {
-        static constexpr Char_T_ val[] = {'{', 'v', 'a', 'r', ':'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        Var_2ND_Char         = 'v'; // Second character
+    static constexpr SizeT          VariablePrefixLength = 5U;
+    static constexpr SizeT          VariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
+    static constexpr const Char_T_ *VariablePrefix       = TPStrings<Char_T_, size_>::VariablePrefix;
 
     // {raw:
-    static constexpr Char_T_     Raw_2ND_Char            = 'r'; // Second character
-    static constexpr SizeT       RawVariablePrefixLength = 5U;
-    static constexpr SizeT       RawVariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
-    inline static const Char_T_ *GetRawVariablePrefix() noexcept {
-        static constexpr Char_T_ val[] = {'{', 'r', 'a', 'w', ':'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        Raw_2ND_Char            = 'r'; // Second character
+    static constexpr SizeT          RawVariablePrefixLength = 5U;
+    static constexpr SizeT          RawVariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
+    static constexpr const Char_T_ *RawVariablePrefix       = TPStrings<Char_T_, size_>::RawVariablePrefix;
 
     // {math:
-    static constexpr Char_T_     Math_2ND_Char    = 'm'; // Second character
-    static constexpr SizeT       MathPrefixLength = 6U;
-    static constexpr SizeT       MathFulllength   = (MathPrefixLength + InLineSuffixLength);
-    inline static const Char_T_ *GetMathPrefix() noexcept {
-        static constexpr Char_T_ val[] = {'{', 'm', 'a', 't', 'h', ':'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        Math_2ND_Char    = 'm'; // Second character
+    static constexpr SizeT          MathPrefixLength = 6U;
+    static constexpr SizeT          MathFulllength   = (MathPrefixLength + InLineSuffixLength);
+    static constexpr const Char_T_ *MathPrefix       = TPStrings<Char_T_, size_>::MathPrefix;
 
     // {if:
-    static constexpr Char_T_     InlineIf_2ND_Char    = 'i'; // Second character
-    static constexpr SizeT       InLineIfPrefixLength = 3U;
-    inline static const Char_T_ *GetInLineIfPrefix() noexcept {
-        static constexpr Char_T_ val[] = {'{', 'i', 'f', ':'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        InlineIf_2ND_Char    = 'i'; // Second character
+    static constexpr SizeT          InLineIfPrefixLength = 3U;
+    static constexpr const Char_T_ *InLineIfPrefix       = TPStrings<Char_T_, size_>::InLineIfPrefix;
 
     // <loop
-    static constexpr Char_T_     Loop_2ND_Char    = 'l'; // Second character
-    static constexpr SizeT       LoopPrefixLength = 5U;
-    inline static const Char_T_ *GetLoopPrefix() noexcept {
-        static constexpr Char_T_ val[] = {'<', 'l', 'o', 'o', 'p'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        Loop_2ND_Char    = 'l'; // Second character
+    static constexpr SizeT          LoopPrefixLength = 5U;
+    static constexpr const Char_T_ *LoopPrefix       = TPStrings<Char_T_, size_>::LoopPrefix;
 
     // </loop>
-    static constexpr SizeT       LoopSuffixLength = 7U;
-    inline static const Char_T_ *GetLoopSuffix() noexcept {
-        static constexpr Char_T_ val[] = {'<', '/', 'l', 'o', 'o', 'p', '>'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          LoopSuffixLength = 7U;
+    static constexpr const Char_T_ *LoopSuffix       = TPStrings<Char_T_, size_>::LoopSuffix;
 
     // <if
-    static constexpr Char_T_     If_2ND_Char    = 'i'; // Second character
-    static constexpr SizeT       IfPrefixLength = 3U;
-    inline static const Char_T_ *GetIfPrefix() noexcept {
-        static constexpr Char_T_ val[] = {'<', 'i', 'f'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        If_2ND_Char    = 'i'; // Second character
+    static constexpr SizeT          IfPrefixLength = 3U;
+    static constexpr const Char_T_ *IfPrefix       = TPStrings<Char_T_, size_>::IfPrefix;
 
     // </if>
-    static constexpr SizeT       IfSuffixLength = 5U;
-    inline static const Char_T_ *GetIfSuffix() noexcept {
-        static constexpr Char_T_ val[] = {'<', '/', 'i', 'f', '>'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          IfSuffixLength = 5U;
+    static constexpr const Char_T_ *IfSuffix       = TPStrings<Char_T_, size_>::IfSuffix;
 
     // <else
-    static constexpr Char_T_     ElseIfChar       = 'i'; // else[i]f
-    static constexpr SizeT       ElsePrefixLength = 5U;
-    inline static const Char_T_ *GetElsePrefix() noexcept {
-        static constexpr Char_T_ val[] = {'<', 'e', 'l', 's', 'e'};
-        return &(val[0]);
-    }
+    static constexpr Char_T_        ElseIfChar       = 'i'; // else[i]f
+    static constexpr SizeT          ElsePrefixLength = 5U;
+    static constexpr const Char_T_ *ElsePrefix       = TPStrings<Char_T_, size_>::ElsePrefix;
 
     // />
-    static constexpr SizeT       ElseSuffixLength = 2U;
-    inline static const Char_T_ *GetElseSuffix() noexcept {
-        static constexpr Char_T_ val[] = {'/', '>'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          ElseSuffixLength = 2U;
+    static constexpr const Char_T_ *ElseSuffix       = TPStrings<Char_T_, size_>::ElseSuffix;
 
     // &amp; &
-    static constexpr SizeT       HTMLAndLength = 5U;
-    inline static const Char_T_ *GetHTMLAnd() noexcept {
-        static constexpr Char_T_ val[] = {'&', 'a', 'm', 'p', ';'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          HTMLAndLength = 5U;
+    static constexpr const Char_T_ *HTMLAnd       = TPStrings<Char_T_, size_>::HTMLAnd;
 
     // &lt; <
-    static constexpr SizeT       HTMLLessLength = 4U;
-    inline static const Char_T_ *GetHTMLLess() noexcept {
-        static constexpr Char_T_ val[] = {'&', 'l', 't', ';'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          HTMLLessLength = 4U;
+    static constexpr const Char_T_ *HTMLLess       = TPStrings<Char_T_, size_>::HTMLLess;
 
     // &gt; >
-    static constexpr SizeT       HTMLBiggerLength = 4U;
-    inline static const Char_T_ *GetHTMLBigger() noexcept {
-        static constexpr Char_T_ val[] = {'&', 'g', 't', ';'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          HTMLBiggerLength = 4U;
+    static constexpr const Char_T_ *HTMLBigger       = TPStrings<Char_T_, size_>::HTMLBigger;
 
     // &quot; "
-    static constexpr SizeT       HTMLQuoteLength = 6U;
-    inline static const Char_T_ *GetHTMLQuote() noexcept {
-        static constexpr Char_T_ val[] = {'&', 'q', 'u', 'o', 't', ';'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          HTMLQuoteLength = 6U;
+    static constexpr const Char_T_ *HTMLQuote       = TPStrings<Char_T_, size_>::HTMLQuote;
 
     // &apos; ' (HTML5)
-    static constexpr SizeT       HTMLSingleQuoteLength = 6U;
-    inline static const Char_T_ *GetHTMLSingleQuote() noexcept {
-        static constexpr Char_T_ val[] = {'&', 'a', 'p', 'o', 's', ';'};
-        return &(val[0]);
-    }
+    static constexpr SizeT          HTMLSingleQuoteLength = 6U;
+    static constexpr const Char_T_ *HTMLSingleQuote       = TPStrings<Char_T_, size_>::HTMLSingleQuote;
 
     static constexpr Char_T_ QuoteChar = '"';
 
@@ -1574,6 +1533,63 @@ class TemplatePatterns {
 
     // Var
     static constexpr Char_T_ TildeChar = '~'; // Tilde
+};
+
+template <typename Char_T_>
+struct TPStrings<Char_T_, 1> {
+    static constexpr const Char_T_ *VariablePrefix    = "{var:";
+    static constexpr const Char_T_ *RawVariablePrefix = "{raw:";
+    static constexpr const Char_T_ *MathPrefix        = "{math:";
+    static constexpr const Char_T_ *InLineIfPrefix    = "{if:";
+    static constexpr const Char_T_ *LoopPrefix        = "<loop";
+    static constexpr const Char_T_ *LoopSuffix        = "</loop>";
+    static constexpr const Char_T_ *IfPrefix          = "<if";
+    static constexpr const Char_T_ *IfSuffix          = "</if>";
+    static constexpr const Char_T_ *ElsePrefix        = "<else";
+    static constexpr const Char_T_ *ElseSuffix        = "/>";
+    static constexpr const Char_T_ *HTMLAnd           = "&amp;";
+    static constexpr const Char_T_ *HTMLLess          = "&lt;";
+    static constexpr const Char_T_ *HTMLBigger        = "&gt;";
+    static constexpr const Char_T_ *HTMLQuote         = "&quot;";
+    static constexpr const Char_T_ *HTMLSingleQuote   = "&apos;";
+};
+
+template <typename Char_T_>
+struct TPStrings<Char_T_, 2> {
+    static constexpr const Char_T_ *VariablePrefix    = u"{var:";
+    static constexpr const Char_T_ *RawVariablePrefix = u"{raw:";
+    static constexpr const Char_T_ *MathPrefix        = u"{math:";
+    static constexpr const Char_T_ *InLineIfPrefix    = u"{if:";
+    static constexpr const Char_T_ *LoopPrefix        = u"<loop";
+    static constexpr const Char_T_ *LoopSuffix        = u"</loop>";
+    static constexpr const Char_T_ *IfPrefix          = u"<if";
+    static constexpr const Char_T_ *IfSuffix          = u"</if>";
+    static constexpr const Char_T_ *ElsePrefix        = u"<else";
+    static constexpr const Char_T_ *ElseSuffix        = u"/>";
+    static constexpr const Char_T_ *HTMLAnd           = u"&amp;";
+    static constexpr const Char_T_ *HTMLLess          = u"&lt;";
+    static constexpr const Char_T_ *HTMLBigger        = u"&gt;";
+    static constexpr const Char_T_ *HTMLQuote         = u"&quot;";
+    static constexpr const Char_T_ *HTMLSingleQuote   = u"&apos;";
+};
+
+template <typename Char_T_>
+struct TPStrings<Char_T_, 4> {
+    static constexpr const Char_T_ *VariablePrefix    = L"{var:";
+    static constexpr const Char_T_ *RawVariablePrefix = L"{raw:";
+    static constexpr const Char_T_ *MathPrefix        = L"{math:";
+    static constexpr const Char_T_ *InLineIfPrefix    = L"{if:";
+    static constexpr const Char_T_ *LoopPrefix        = L"<loop";
+    static constexpr const Char_T_ *LoopSuffix        = L"</loop>";
+    static constexpr const Char_T_ *IfPrefix          = L"<if";
+    static constexpr const Char_T_ *IfSuffix          = L"</if>";
+    static constexpr const Char_T_ *ElsePrefix        = L"<else";
+    static constexpr const Char_T_ *ElseSuffix        = L"/>";
+    static constexpr const Char_T_ *HTMLAnd           = L"&amp;";
+    static constexpr const Char_T_ *HTMLLess          = L"&lt;";
+    static constexpr const Char_T_ *HTMLBigger        = L"&gt;";
+    static constexpr const Char_T_ *HTMLQuote         = L"&quot;";
+    static constexpr const Char_T_ *HTMLSingleQuote   = L"&apos;";
 };
 
 } // namespace Qentem
