@@ -242,14 +242,12 @@ class Template {
         Array<TagBit<Char_T_>> TrueSubTags;
         Array<TagBit<Char_T_>> FalseSubTags;
         void                  *padding_1;
-        void                  *padding_2;
-        int                    padding_3;
-        unsigned short         CaseOffset;
-        unsigned short         CaseLength;
-        unsigned short         TrueOffset;
-        unsigned short         TrueLength;
-        unsigned short         FalseOffset;
-        unsigned short         FalseLength;
+        SizeT                  CaseOffset;
+        SizeT                  CaseLength;
+        SizeT                  TrueOffset;
+        SizeT                  TrueLength;
+        SizeT                  FalseOffset;
+        SizeT                  FalseLength;
     };
 
     template <typename Char_T_>
@@ -1059,22 +1057,22 @@ class Template_CV {
             do {
                 switch (content[tmp_offset]) {
                     case TemplatePatterns_C_::CaseChar: {
-                        info->CaseOffset = static_cast<unsigned short>(offset);
-                        info->CaseLength = static_cast<unsigned short>(tmp_length);
+                        info->CaseOffset = offset;
+                        info->CaseLength = tmp_length;
                         break_loop       = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::TrueChar: {
-                        info->TrueOffset = static_cast<unsigned short>(offset);
-                        info->TrueLength = static_cast<unsigned short>(tmp_length);
+                        info->TrueOffset = offset;
+                        info->TrueLength = tmp_length;
                         break_loop       = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::FalseChar: {
-                        info->FalseOffset = static_cast<unsigned short>(offset);
-                        info->FalseLength = static_cast<unsigned short>(tmp_length);
+                        info->FalseOffset = offset;
+                        info->FalseLength = tmp_length;
                         break_loop        = true;
                         break;
                     }
@@ -1233,7 +1231,7 @@ class Template_CV {
         }
     }
 
-    QENTEM_NOINLINE const Value_T_ *findValue(const Char_T_ *key, SizeT length) const noexcept {
+    const Value_T_ *findValue(const Char_T_ *key, SizeT length) const noexcept {
         const Value_T_ *value = nullptr;
 
         if (length != 0) {
