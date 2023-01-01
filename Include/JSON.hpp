@@ -31,19 +31,14 @@ namespace JSON {
 template <typename>
 class JSONParser;
 
-template <typename Char_T_>
-inline static Value<Char_T_> Parse(const Char_T_ *content, SizeT length) {
-    return JSONParser<Char_T_>::Parse(content, length);
-}
-
 template <typename Char_T_, typename Number_T>
 inline static Value<Char_T_> Parse(const Char_T_ *content, Number_T length) {
-    return Parse(content, static_cast<SizeT>(length));
+    return JSONParser<Char_T_>::Parse(content, static_cast<SizeT>(length));
 }
 
 template <typename Char_T_>
 inline static Value<Char_T_> Parse(const Char_T_ *content) {
-    return Parse(content, StringUtils::Count(content));
+    return JSONParser<Char_T_>::Parse(content, StringUtils::Count(content));
 }
 
 template <typename Char_T_>
