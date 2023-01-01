@@ -38,8 +38,7 @@ static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
 
 // UTF8
 template <typename Char_T_>
-class UnicodeToUTF<Char_T_, 1> {
-  public:
+struct UnicodeToUTF<Char_T_, 1> {
     static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
         /*
          * ToUTF(0xC3D, stream);
@@ -69,8 +68,7 @@ class UnicodeToUTF<Char_T_, 1> {
 
 // UTF16
 template <typename Char_T_>
-class UnicodeToUTF<Char_T_, 2> {
-  public:
+struct UnicodeToUTF<Char_T_, 2> {
     static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
         if (unicode < 0x10000U) {
             stream += static_cast<Char_T_>(unicode);
@@ -84,8 +82,7 @@ class UnicodeToUTF<Char_T_, 2> {
 
 // UTF32
 template <typename Char_T_>
-class UnicodeToUTF<Char_T_, 4> {
-  public:
+struct UnicodeToUTF<Char_T_, 4> {
     static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) { stream += static_cast<Char_T_>(unicode); }
 };
 
