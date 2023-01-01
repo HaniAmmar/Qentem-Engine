@@ -43,7 +43,7 @@ class StringUtils {
         Number_T_ len = 0;
 
         if (str != nullptr) {
-            while (str[len] != 0) {
+            while (*(str++) != 0) {
                 ++len;
             };
         }
