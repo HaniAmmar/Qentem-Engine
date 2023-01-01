@@ -180,7 +180,7 @@ class Digit {
     class StringToNumberHelper {
       public:
         inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-            return stringToSignedFloat(number, str, length);
+            return stringToFloat(number, str, length);
         }
     };
 
@@ -284,7 +284,7 @@ class Digit {
     }
 
     template <typename Number_T_>
-    static bool stringToSignedFloat(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
+    static bool stringToFloat(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
         number = 0;
 
         if (length != 0) {
@@ -299,7 +299,7 @@ class Digit {
                     StringUtils::TrimLeft(str, n_offset, length);
                     length -= n_offset;
 
-                    if (stringToSignedFloat(number, &(str[n_offset]), length)) {
+                    if (stringToFloat(number, &(str[n_offset]), length)) {
                         number = -number;
                         return true;
                     }
@@ -311,7 +311,7 @@ class Digit {
                     SizeT offset = 1;
                     StringUtils::TrimLeft(str, offset, length);
                     length -= offset;
-                    return stringToSignedFloat(number, &(str[offset]), length);
+                    return stringToFloat(number, &(str[offset]), length);
                 }
 
                 default: {
@@ -760,71 +760,68 @@ class Digit {
     }
 
     QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str, SizeT &length) noexcept {
-        SizeT offset = (length - 1);
+        SizeT        offset     = (length - 1);
+        SizeT        offset2    = 0;
+        SizeT        MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
+        unsigned int sign       = 0;
 
-        if (offset != 0) {
-            SizeT offset2    = 0;
-            SizeT MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
-            int   sign       = 0;
+        while ((offset != 0) && (MAX_LENGTH != 0)) {
+            const Char_T_ c = str[offset];
 
-            do {
-                const Char_T_ c = str[offset];
+            if ((c < DigitChars::ZeroChar) || (c > DigitChars::NineChar)) {
+                switch (c) {
+                    case DigitChars::DotChar: {
+                        return true;
+                    }
 
-                if ((c < DigitChars::ZeroChar) || (c > DigitChars::NineChar)) {
-                    switch (c) {
-                        case DigitChars::DotChar: {
-                            return true;
-                        }
-
-                        case DigitChars::E_Char:
-                        case DigitChars::UE_Char: {
-                            if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
-                                // No number.
-                                return false;
-                            }
-
-                            offset2    = offset;
-                            MAX_LENGTH = 0;
-                            continue;
-                        }
-
-                        case DigitChars::NegativeChar:
-                        case DigitChars::PositiveChar: {
-                            if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) || (sign != 0)) {
-                                // No number, or double sign.
-                                return false;
-                            }
-
-                            sign = ((c == DigitChars::NegativeChar) ? -1 : 1);
-                            break;
-                        }
-
-                        default: {
+                    case DigitChars::E_Char:
+                    case DigitChars::UE_Char: {
+                        if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
+                            // No number.
                             return false;
                         }
+
+                        offset2    = offset;
+                        MAX_LENGTH = 0;
+                        continue;
+                    }
+
+                    case DigitChars::NegativeChar:
+                    case DigitChars::PositiveChar: {
+                        if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) || (sign != 0)) {
+                            // No number, or double sign.
+                            return false;
+                        }
+
+                        sign = ((c == DigitChars::NegativeChar) ? 2 : 1);
+                        break;
+                    }
+
+                    default: {
+                        return false;
                     }
                 }
-
-                --MAX_LENGTH;
-                --offset;
-            } while ((offset != 0) && (MAX_LENGTH != 0));
-
-            if (offset2 != 0) {
-                if (sign != 0) {
-                    ++offset2;
-                }
-
-                while (++offset2 < length) {
-                    exponent *= QENTEM_DECIMAL_BASE_;
-                    exponent += static_cast<int>(str[offset2] - DigitChars::ZeroChar);
-                }
-
-                if (sign == -1) {
-                    exponent = -exponent;
-                }
-
-                length = offset;
             }
+
+            --MAX_LENGTH;
+            --offset;
+        }
+
+        if (offset2 != 0) {
+            if (sign != 0) {
+                ++offset2;
+            }
+
+            while (++offset2 < length) {
+                exponent *= (exponent << 3U) + (exponent << 1U);
+                exponent += static_cast<int>(str[offset2] - DigitChars::ZeroChar);
+            }
+
+            if (sign == 2) {
+                exponent = -exponent;
+            }
+
+            length = offset;
         }
 
         return true;
