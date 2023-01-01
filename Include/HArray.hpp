@@ -243,6 +243,8 @@ class HArray {
         item->Value = static_cast<Value_ &&>(val);
     }
 
+    inline Value_ *GetValue(const Key_T_ &key) const noexcept { return GetValue(key.First(), key.Length()); }
+
     Value_ *GetValue(const SizeT index) const noexcept {
         HAItem_T_ *src = Storage();
 
@@ -251,6 +253,10 @@ class HArray {
         }
 
         return nullptr;
+    }
+
+    Value_ *GetValue(const Char_T_ *key, const SizeT length) const noexcept {
+        return GetValue(key, length, StringUtils::Hash(key, length));
     }
 
     Value_ *GetValue(const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
@@ -274,6 +280,13 @@ class HArray {
         return nullptr;
     }
 
+    inline const HAItem_T_ *GetItem(const Key_T_ &key) const noexcept {
+        const Char_T_ *str = key.First();
+        const SizeT    len = key.Length();
+
+        return GetItem(str, len, StringUtils::Hash(str, len));
+    }
+
     const HAItem_T_ *GetItem(const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT     *index;
         HAItem_T_ *item = find(index, key, length, hash);
@@ -295,14 +308,6 @@ class HArray {
         return nullptr;
     }
 
-    const HAItem_T_ *GetItem(const Key_T_ &key) const noexcept {
-        const Char_T_ *str = key.First();
-        const SizeT    len = key.Length();
-
-        SizeT *index;
-        return find(index, str, len, StringUtils::Hash(str, len));
-    }
-
     bool GetKeyIndex(SizeT &index, const Char_T_ *str, const SizeT len) const noexcept {
         SizeT *sub_index;
         if (find(sub_index, str, len, StringUtils::Hash(str, len)) != nullptr) {
@@ -314,21 +319,7 @@ class HArray {
         return false;
     }
 
-    Value_ *Find(const Char_T_ *key, const SizeT length) const noexcept {
-        if (Size() != 0) {
-            SizeT     *index;
-            HAItem_T_ *item = find(index, key, length, StringUtils::Hash(key, length));
-
-            if (item != nullptr) {
-                return &(item->Value);
-            }
-        }
-
-        return nullptr;
-    }
-
-    inline Value_ *Find(const Key_T_ &key) const noexcept { return Find(key.First(), key.Length()); }
-    inline void    Remove(const Char_T_ *key) const noexcept { Remove(key, StringUtils::Count(key)); }
+    inline void Remove(const Char_T_ *key) const noexcept { Remove(key, StringUtils::Count(key)); }
 
     inline void Remove(const Char_T_ *key, SizeT length) const noexcept {
         remove(key, length, StringUtils::Hash(key, length));

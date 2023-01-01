@@ -466,7 +466,7 @@ static int TestHArray4() {
         String<char> key = Digit<char>::NumberToString(i);
 
         numbers1.Insert(Digit<char>::NumberToString(i), static_cast<SizeT &&>(SizeT{i}));
-        value = numbers1.Find(key);
+        value = numbers1.GetValue(key);
         NOT_EQ_TO(value, nullptr, "value", "null");
         EQ_VALUE(*value, i, key.First());
     }
@@ -485,7 +485,7 @@ static int TestHArray5() {
 
         numbers1[key] = i;
 
-        value = numbers1.Find(key.First(), key.Length());
+        value = numbers1.GetValue(key.First(), key.Length());
         NOT_EQ_TO(value, nullptr, "value", "null");
         EQ_VALUE(*value, i, key.First());
     }
@@ -495,7 +495,7 @@ static int TestHArray5() {
     for (SizeT i = 1; i < 1001; i++) {
         numbers1[Digit<char>::NumberToString(i)] = i;
 
-        value = numbers1.Find(Digit<char>::NumberToString(i));
+        value = numbers1.GetValue(Digit<char>::NumberToString(i));
         NOT_EQ_TO(value, nullptr, "value", "null");
         EQ_VALUE(*value, i, key.First());
     }
@@ -504,7 +504,7 @@ static int TestHArray5() {
         EQ_VALUE(numbers1[Digit<char>::NumberToString(i)], i, "key.First()");
     }
 
-    value = numbers1.Find("10", 2);
+    value = numbers1.GetValue("10", 2);
     NOT_EQ_TO(value, nullptr, "value", "null");
     EQ_VALUE(*value, 10, "10");
 
@@ -513,7 +513,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 1; i < 11; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -526,7 +526,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 1; i < 101; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -538,7 +538,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 101; i < 201; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -551,7 +551,7 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 0; i < 1001; i++) {
-        EQ_TO(numbers1.Find(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
     }
 
     numbers1.Compress();
@@ -708,10 +708,10 @@ static int TestHArray8() {
         key2 += "-k";
 
         EQ_TRUE(list.Rename(key1, key2), "Rename()");
-        EQ_TO(list.Find(key1), nullptr, "value", "null");
+        EQ_TO(list.GetValue(key1), nullptr, "value", "null");
         EQ_FALSE(list.Rename(key1, key2), "Rename()");
 
-        const SizeT *y = list.Find(key2);
+        const SizeT *y = list.GetValue(key2);
         SizeT        w = id + 1;
 
         if (y != nullptr) {
@@ -737,7 +737,7 @@ static int TestHArray8() {
         String<char> key1("k-");
         key1 += Digit<char>::NumberToString(i);
 
-        const SizeT *y = list.Find(key1);
+        const SizeT *y = list.GetValue(key1);
         SizeT        w = id + 1;
 
         if (y != nullptr) {
@@ -751,7 +751,7 @@ static int TestHArray8() {
         String<char> key2 = Digit<char>::NumberToString(i);
         key2 += "-k";
 
-        EQ_TO(list.Find(key2), nullptr, "value", "null");
+        EQ_TO(list.GetValue(key2), nullptr, "value", "null");
     }
 
     END_SUB_TEST;
@@ -797,7 +797,7 @@ static int TestHArray9() {
 
         list.RemoveIndex(i);
 
-        EQ_TO(list.Find(key), nullptr, "value", "null");
+        EQ_TO(list.GetValue(key), nullptr, "value", "null");
     }
 
     list.Reset();
@@ -816,7 +816,7 @@ static int TestHArray9() {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
         key += Digit<char>::NumberToString(i);
-        EQ_TO(list.Find(key), nullptr, "value", "null");
+        EQ_TO(list.GetValue(key), nullptr, "value", "null");
     }
 
     // No clear
@@ -834,7 +834,7 @@ static int TestHArray9() {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
         key += Digit<char>::NumberToString(i);
-        EQ_TO(list.Find(key), nullptr, "value", "null");
+        EQ_TO(list.GetValue(key), nullptr, "value", "null");
     }
 
     END_SUB_TEST;

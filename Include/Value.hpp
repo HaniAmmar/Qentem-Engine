@@ -680,7 +680,7 @@ class Value {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            Value *val = object_.Find(key, length);
+            Value *val = object_.GetValue(key, length);
 
             if ((val != nullptr) && !(val->IsUndefined())) {
                 return val;
