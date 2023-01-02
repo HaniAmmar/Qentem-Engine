@@ -179,6 +179,13 @@ struct TemplatePatterns;
 
 class Template {
   public:
+    Template()                            = delete;
+    Template(Template &&)                 = delete;
+    Template(const Template &)            = delete;
+    Template &operator=(Template &&)      = delete;
+    Template &operator=(const Template &) = delete;
+    ~Template()                           = delete;
+
     template <typename>
     struct TagBit;
 
@@ -1575,21 +1582,21 @@ struct TPStrings<Char_T_, 2> {
 
 template <typename Char_T_>
 struct TPStrings<Char_T_, 4> {
-    static constexpr const Char_T_ *VariablePrefix    = L"{var:";
-    static constexpr const Char_T_ *RawVariablePrefix = L"{raw:";
-    static constexpr const Char_T_ *MathPrefix        = L"{math:";
-    static constexpr const Char_T_ *InLineIfPrefix    = L"{if:";
-    static constexpr const Char_T_ *LoopPrefix        = L"<loop";
-    static constexpr const Char_T_ *LoopSuffix        = L"</loop>";
-    static constexpr const Char_T_ *IfPrefix          = L"<if";
-    static constexpr const Char_T_ *IfSuffix          = L"</if>";
-    static constexpr const Char_T_ *ElsePrefix        = L"<else";
-    static constexpr const Char_T_ *ElseSuffix        = L"/>";
-    static constexpr const Char_T_ *HTMLAnd           = L"&amp;";
-    static constexpr const Char_T_ *HTMLLess          = L"&lt;";
-    static constexpr const Char_T_ *HTMLBigger        = L"&gt;";
-    static constexpr const Char_T_ *HTMLQuote         = L"&quot;";
-    static constexpr const Char_T_ *HTMLSingleQuote   = L"&apos;";
+    static constexpr const Char_T_ *VariablePrefix    = U"{var:";
+    static constexpr const Char_T_ *RawVariablePrefix = U"{raw:";
+    static constexpr const Char_T_ *MathPrefix        = U"{math:";
+    static constexpr const Char_T_ *InLineIfPrefix    = U"{if:";
+    static constexpr const Char_T_ *LoopPrefix        = U"<loop";
+    static constexpr const Char_T_ *LoopSuffix        = U"</loop>";
+    static constexpr const Char_T_ *IfPrefix          = U"<if";
+    static constexpr const Char_T_ *IfSuffix          = U"</if>";
+    static constexpr const Char_T_ *ElsePrefix        = U"<else";
+    static constexpr const Char_T_ *ElseSuffix        = U"/>";
+    static constexpr const Char_T_ *HTMLAnd           = U"&amp;";
+    static constexpr const Char_T_ *HTMLLess          = U"&lt;";
+    static constexpr const Char_T_ *HTMLBigger        = U"&gt;";
+    static constexpr const Char_T_ *HTMLQuote         = U"&quot;";
+    static constexpr const Char_T_ *HTMLSingleQuote   = U"&apos;";
 };
 
 } // namespace Qentem

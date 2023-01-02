@@ -298,9 +298,9 @@ struct JSONotationStrings<Char_T_, 2> {
 
 template <typename Char_T_>
 struct JSONotationStrings<Char_T_, 4> {
-    static constexpr const Char_T_ *FalseString = L"false";
-    static constexpr const Char_T_ *TrueString  = L"true";
-    static constexpr const Char_T_ *NullString  = L"null";
+    static constexpr const Char_T_ *FalseString = U"false";
+    static constexpr const Char_T_ *TrueString  = U"true";
+    static constexpr const Char_T_ *NullString  = U"null";
 };
 
 } // namespace JSON

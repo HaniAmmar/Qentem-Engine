@@ -217,7 +217,7 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 2> {
     }
 };
 
-// wchar_t
+// char32_t
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 4> {
     inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
@@ -260,7 +260,7 @@ struct SMIDSetToOne_T<Char_T_, 2> {
     }
 };
 
-// wchar_t
+// char32_t
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 4> {
     inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {

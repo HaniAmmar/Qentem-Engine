@@ -473,7 +473,7 @@ void TestNumberValue2(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10", "str_var", __LINE__);
@@ -491,7 +491,7 @@ void TestNumberValue2(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -505,7 +505,7 @@ void TestNumberValue2(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -519,7 +519,7 @@ void TestNumberValue2(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 }
@@ -566,7 +566,7 @@ void TestNumberValue3(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10", "str_var", __LINE__);
@@ -594,7 +594,7 @@ void TestNumberValue3(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -620,7 +620,7 @@ void TestNumberValue3(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -646,7 +646,7 @@ void TestNumberValue3(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 }
@@ -675,7 +675,7 @@ void TestNumberValue4(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10.5, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10.5", "str_var", __LINE__);
@@ -708,7 +708,7 @@ void TestNumberValue4(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -733,7 +733,7 @@ void TestNumberValue4(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10.5, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -758,7 +758,7 @@ void TestNumberValue4(TestHelper &helper) {
     helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
     helper.Equal(double_var, 10U, "double_var", __LINE__);
-    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(long_var, 10, "long_var", __LINE__);
     helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10", "str_var", __LINE__);

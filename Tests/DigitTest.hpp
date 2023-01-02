@@ -201,7 +201,7 @@ void TestStringToNumber2(TestHelper &helper) {
 
     str   = "1e-";
     valid = StringToNumberCount(number_long, str);
-    helper.Equal(number_long, 0U, "number", __LINE__);
+    helper.Equal(number_long, 0, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e+";
