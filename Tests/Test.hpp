@@ -82,7 +82,7 @@ static int RunTests() {
 }
 
 static void PrintInfo() {
-    QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_MAIN << "Configuration" << QENTEM_OUTPUT_END_COLOR << '\n';
+    QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_MAIN << "Configurations" << QENTEM_OUTPUT_END_COLOR << ":\n";
 
 #ifdef QENTEM_64BIT_ARCH
     QENTEM_OUTPUT_STREAM << "Arch: 64BIT\n";

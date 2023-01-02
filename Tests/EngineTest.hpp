@@ -33,7 +33,7 @@
 namespace Qentem {
 namespace Test {
 
-static int TestEngine1() {
+void TestEngine1(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 0;
     SizeT       find_len    = 3;
@@ -41,71 +41,71 @@ static int TestEngine1() {
     const char *find_       = "ABC";
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, SizeT{1});
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "A";
     content_len = 1;
     find_       = "A";
 
     ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 1, "return");
+    helper.Equal(ret, 1U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "AAAAA";
     content_len = 5;
 
     ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 2, "return");
+    helper.Equal(ret, 2U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, content_len, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 5, "return");
+    helper.Equal(ret, 5U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "  A A        A";
     content_len = 14;
 
     ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 5, "return");
+    helper.Equal(ret, 5U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 14, "return");
+    helper.Equal(ret, 14U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 5, "return");
+    helper.Equal(ret, 5U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 5, "return");
+    helper.Equal(ret, 5U, "return", __LINE__);
 
     ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 14, "return");
+    helper.Equal(ret, 14U, "return", __LINE__);
 
     content     = "A";
     content_len = 1;
@@ -113,112 +113,112 @@ static int TestEngine1() {
     find_len    = 2;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content = "AA";
     ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content = "A   A   A";
     ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content = "  A   A   A  ";
     ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "AB";
     content_len = 2;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 2, "return");
+    helper.Equal(ret, 2U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = " AB";
     content_len = 3;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     content     = "AAB";
     content_len = 3;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     content     = "AAAB";
     content_len = 4;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     content     = "AAAAAAAAAB";
     content_len = 10;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 10, "return");
+    helper.Equal(ret, 10U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 10, "return");
+    helper.Equal(ret, 10U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 10, "return");
+    helper.Equal(ret, 10U, "return", __LINE__);
 
     content     = "  AB";
     content_len = 4;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 4, "return");
+    helper.Equal(ret, 4U, "return", __LINE__);
 
     content     = "        AB";
     content_len = 10;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 10, "return");
+    helper.Equal(ret, 10U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 10, "return");
+    helper.Equal(ret, 10U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 10, "return");
+    helper.Equal(ret, 10U, "return", __LINE__);
 
     content     = "AAAAAAAAA";
     content_len = 9;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, (content_len - 1), content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     find_       = "ABC";
     find_len    = 3;
@@ -226,36 +226,34 @@ static int TestEngine1() {
     content_len = 3;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "BCBA";
     content_len = 4;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "123456789123456CBA";
     content_len = 18;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "ADC";
     content_len = 3;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "123456789123456ADC";
     content_len = 18;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
-
-    END_SUB_TEST;
+    helper.Equal(ret, 0U, "return", __LINE__);
 }
 
-static int TestEngine2() {
+void TestEngine2(TestHelper &helper) {
     SizeT           ret;
     SizeT           content_len = 16;
     constexpr SizeT find_len    = 3;
@@ -263,681 +261,671 @@ static int TestEngine2() {
     const char     *find_       = "ABC";
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "ABABABABABAAABABC";
     content_len = 17;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 17, "return");
+    helper.Equal(ret, 17U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{15}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::Find(find_, find_len, content, SizeT{14}, content_len);
-    EQ_VALUE(ret, 17, "return");
+    helper.Equal(ret, 17U, "return", __LINE__);
 
     content     = "ABABABABABCABAAAB";
     content_len = 17;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, SizeT{11}, "return");
+    helper.Equal(ret, SizeT{11}, "return", __LINE__);
 
     content     = "   ABC   ";
     content_len = 9;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 6, "return");
+    helper.Equal(ret, 6U, "return", __LINE__);
 
     content     = "ABC   ";
     content_len = 6;
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne('1', "00000001", 0u, 8u);
-    EQ_VALUE(ret, 8u, "return");
+    helper.Equal(ret, 8u, "return", __LINE__);
 
     ret = Engine::FindOne('1', "0000000000000001", 0u, 16u);
-    EQ_VALUE(ret, 16u, "return");
+    helper.Equal(ret, 16u, "return", __LINE__);
 
     ret = Engine::FindOne('1', "00000000000000000000000000000001", 0u, 32u);
-    EQ_VALUE(ret, 32u, "return");
+    helper.Equal(ret, 32u, "return", __LINE__);
 
     ret = Engine::FindOne('1', "0000000000000000000000000000000000000000000000000000000000000001", 0u, 64u);
-    EQ_VALUE(ret, 64u, "return");
-
-    END_SUB_TEST;
+    helper.Equal(ret, 64u, "return", __LINE__);
 }
 
-static int TestEngine3() {
+void TestEngine3(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 0;
     const char *content     = "";
 
     ret = Engine::SkipInnerPatterns(char(0), char(0), content, SizeT{0}, SizeT{0});
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "   (  ";
     content_len = 6;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "((((((((";
     content_len = 8;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "()";
     content_len = 2;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 2, "return");
+    helper.Equal(ret, 2U, "return", __LINE__);
 
     content     = " ()";
     content_len = 3;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = " ()             ";
     content_len = 16;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "return");
+    helper.Equal(ret, 0U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 3, "return");
+    helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "return");
-
-    END_SUB_TEST;
+    helper.Equal(ret, 0U, "return", __LINE__);
 }
 
-static int TestEngine4() {
+void TestEngine4(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 12;
     const char *content     = "{{{{{{}}}}}}";
 
     ret = Engine::FindOne('}', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 7, "FindOne");
+    helper.Equal(ret, 7U, "FindOne", __LINE__);
 
     ret = Engine::SkipInnerPatterns('x', 'y', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 12, "SkipInnerPatterns()");
+    helper.Equal(ret, 12U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 11, "SkipInnerPatterns()");
+    helper.Equal(ret, 11U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 10, "SkipInnerPatterns()");
+    helper.Equal(ret, 10U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 9, "SkipInnerPatterns()");
+    helper.Equal(ret, 9U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 8, "SkipInnerPatterns()");
+    helper.Equal(ret, 8U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 7, "SkipInnerPatterns()");
+    helper.Equal(ret, 7U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 8, "SkipInnerPatterns()");
+    helper.Equal(ret, 8U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 9, "SkipInnerPatterns()");
+    helper.Equal(ret, 9U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{9}, content_len);
-    EQ_VALUE(ret, 10, "SkipInnerPatterns()");
+    helper.Equal(ret, 10U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{10}, content_len);
-    EQ_VALUE(ret, 11, "SkipInnerPatterns()");
+    helper.Equal(ret, 11U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{11}, content_len);
-    EQ_VALUE(ret, 12, "SkipInnerPatterns()");
+    helper.Equal(ret, 12U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{12}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{13}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{14}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{100}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{7});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{8});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{9});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{10});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{11});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "{}";
     content_len = 2;
     ret         = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 2, "SkipInnerPatterns()");
+    helper.Equal(ret, 2U, "SkipInnerPatterns()", __LINE__);
 
     content     = "{   }";
     content_len = 5;
     ret         = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 5, "SkipInnerPatterns()");
+    helper.Equal(ret, 5U, "SkipInnerPatterns()", __LINE__);
 
     content     = "{{{}{{}{}{}{}}}}{}";
     content_len = 18;
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 16, "SkipInnerPatterns()");
+    helper.Equal(ret, 16U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 15, "SkipInnerPatterns()");
+    helper.Equal(ret, 15U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 4, "SkipInnerPatterns()");
+    helper.Equal(ret, 4U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 15, "SkipInnerPatterns()");
+    helper.Equal(ret, 15U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 14, "SkipInnerPatterns()");
+    helper.Equal(ret, 14U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 7, "SkipInnerPatterns()");
+    helper.Equal(ret, 7U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 14, "SkipInnerPatterns()");
+    helper.Equal(ret, 14U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 9, "SkipInnerPatterns()");
+    helper.Equal(ret, 9U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{9}, content_len);
-    EQ_VALUE(ret, 14, "SkipInnerPatterns()");
+    helper.Equal(ret, 14U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{10}, content_len);
-    EQ_VALUE(ret, 11, "SkipInnerPatterns()");
+    helper.Equal(ret, 11U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{11}, content_len);
-    EQ_VALUE(ret, 14, "SkipInnerPatterns()");
+    helper.Equal(ret, 14U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{12}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{13}, content_len);
-    EQ_VALUE(ret, 14, "SkipInnerPatterns()");
+    helper.Equal(ret, 14U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{14}, content_len);
-    EQ_VALUE(ret, 15, "SkipInnerPatterns()");
+    helper.Equal(ret, 15U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{15}, content_len);
-    EQ_VALUE(ret, 16, "SkipInnerPatterns()");
+    helper.Equal(ret, 16U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{100}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, SizeT{14});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{13});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, SizeT{12});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{3}, SizeT{11});
-    EQ_VALUE(ret, 4, "SkipInnerPatterns()");
+    helper.Equal(ret, 4U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{4}, SizeT{10});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{5}, SizeT{9});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{6}, SizeT{8});
-    EQ_VALUE(ret, 7, "SkipInnerPatterns()");
+    helper.Equal(ret, 7U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{7}, SizeT{7});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, SizeT{6});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{5});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, SizeT{4});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{3});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{2});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, SizeT{1});
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
-
-    END_SUB_TEST;
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-static int TestEngine5() {
+void TestEngine5(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 18;
     const char *content     = "       )          ";
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = " ()             ";
     content_len = 16;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "(())";
     content_len = 4;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 4, "SkipInnerPatterns()");
+    helper.Equal(ret, 4U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 4, "SkipInnerPatterns()");
+    helper.Equal(ret, 4U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "      (())";
     content_len = 10;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 10, "SkipInnerPatterns()");
+    helper.Equal(ret, 10U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 10, "SkipInnerPatterns()");
+    helper.Equal(ret, 10U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{9}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{10}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "      (()) ";
     content_len = 11;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 10, "SkipInnerPatterns()");
+    helper.Equal(ret, 10U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 10, "SkipInnerPatterns()");
+    helper.Equal(ret, 10U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{9}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{10}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{11}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{12}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{13}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{500}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "( (())";
     content_len = 6;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 6, "SkipInnerPatterns()");
+    helper.Equal(ret, 6U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 6, "SkipInnerPatterns()");
+    helper.Equal(ret, 6U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "( ( ( ( ( ( (())";
     content_len = 16;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{9}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{10}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{11}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{12}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{13}, content_len);
-    EQ_VALUE(ret, 16, "SkipInnerPatterns()");
+    helper.Equal(ret, 16U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{14}, content_len);
-    EQ_VALUE(ret, 16, "SkipInnerPatterns()");
+    helper.Equal(ret, 16U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{15}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{16}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{500}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "(()";
     content_len = 3;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
-
-    END_SUB_TEST;
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-static int TestEngine6() {
+void TestEngine6(TestHelper &helper) {
     SizeT           ret;
     constexpr SizeT content_len = 50;
     const char     *content     = "{-{-{-     -}{-{-  -}{-   -}{- -}{- -}-}-}-}{- -}";
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{0}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{1}, content_len);
-    EQ_VALUE(ret, 44, "SkipInnerPatterns()");
+    helper.Equal(ret, 44U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{2}, content_len);
-    EQ_VALUE(ret, 44, "SkipInnerPatterns()");
+    helper.Equal(ret, 44U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{3}, content_len);
-    EQ_VALUE(ret, 42, "SkipInnerPatterns()");
+    helper.Equal(ret, 42U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{4}, content_len);
-    EQ_VALUE(ret, 42, "SkipInnerPatterns()");
+    helper.Equal(ret, 42U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{5}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{6}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{7}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{8}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{9}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{10}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{11}, content_len);
-    EQ_VALUE(ret, 13, "SkipInnerPatterns()");
+    helper.Equal(ret, 13U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{12}, content_len);
-    EQ_VALUE(ret, 42, "SkipInnerPatterns()");
+    helper.Equal(ret, 42U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{13}, content_len);
-    EQ_VALUE(ret, 42, "SkipInnerPatterns()");
+    helper.Equal(ret, 42U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{14}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{15}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{16}, content_len);
-    EQ_VALUE(ret, 21, "SkipInnerPatterns()");
+    helper.Equal(ret, 21U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{17}, content_len);
-    EQ_VALUE(ret, 21, "SkipInnerPatterns()");
+    helper.Equal(ret, 21U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{18}, content_len);
-    EQ_VALUE(ret, 21, "SkipInnerPatterns()");
+    helper.Equal(ret, 21U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{19}, content_len);
-    EQ_VALUE(ret, 21, "SkipInnerPatterns()");
+    helper.Equal(ret, 21U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{20}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{21}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{22}, content_len);
-    EQ_VALUE(ret, 28, "SkipInnerPatterns()");
+    helper.Equal(ret, 28U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{23}, content_len);
-    EQ_VALUE(ret, 28, "SkipInnerPatterns()");
+    helper.Equal(ret, 28U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{24}, content_len);
-    EQ_VALUE(ret, 28, "SkipInnerPatterns()");
+    helper.Equal(ret, 28U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{25}, content_len);
-    EQ_VALUE(ret, 28, "SkipInnerPatterns()");
+    helper.Equal(ret, 28U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{26}, content_len);
-    EQ_VALUE(ret, 28, "SkipInnerPatterns()");
+    helper.Equal(ret, 28U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{27}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{28}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{29}, content_len);
-    EQ_VALUE(ret, 33, "SkipInnerPatterns()");
+    helper.Equal(ret, 33U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{30}, content_len);
-    EQ_VALUE(ret, 33, "SkipInnerPatterns()");
+    helper.Equal(ret, 33U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{31}, content_len);
-    EQ_VALUE(ret, 33, "SkipInnerPatterns()");
+    helper.Equal(ret, 33U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{32}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{33}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{34}, content_len);
-    EQ_VALUE(ret, 38, "SkipInnerPatterns()");
+    helper.Equal(ret, 38U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{35}, content_len);
-    EQ_VALUE(ret, 38, "SkipInnerPatterns()");
+    helper.Equal(ret, 38U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{36}, content_len);
-    EQ_VALUE(ret, 38, "SkipInnerPatterns()");
+    helper.Equal(ret, 38U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{37}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{38}, content_len);
-    EQ_VALUE(ret, 40, "SkipInnerPatterns()");
+    helper.Equal(ret, 40U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{39}, content_len);
-    EQ_VALUE(ret, 42, "SkipInnerPatterns()");
+    helper.Equal(ret, 42U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{40}, content_len);
-    EQ_VALUE(ret, 42, "SkipInnerPatterns()");
+    helper.Equal(ret, 42U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{41}, content_len);
-    EQ_VALUE(ret, 44, "SkipInnerPatterns()");
+    helper.Equal(ret, 44U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{42}, content_len);
-    EQ_VALUE(ret, 44, "SkipInnerPatterns()");
+    helper.Equal(ret, 44U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{43}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{45}, content_len);
-    EQ_VALUE(ret, 49, "SkipInnerPatterns()");
+    helper.Equal(ret, 49U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{46}, content_len);
-    EQ_VALUE(ret, 49, "SkipInnerPatterns()");
+    helper.Equal(ret, 49U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{47}, content_len);
-    EQ_VALUE(ret, 49, "SkipInnerPatterns()");
+    helper.Equal(ret, 49U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{48}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{49}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{50}, content_len);
-    EQ_VALUE(ret, 0, "SkipInnerPatterns()");
-
-    END_SUB_TEST;
+    helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
 struct Item2__ {
@@ -1021,7 +1009,7 @@ void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT
     }
 }
 
-static int TestEngine7() {
+void TestEngine7(TestHelper &helper) {
     Array<Item2__>     items;
     StringStream<char> stream;
     const char        *content;
@@ -1029,11 +1017,11 @@ static int TestEngine7() {
     /////////////////////////////////////////////////////////////////////////////////////////
 
     content = "[[[ [[[  [[[  [[[  ]]]  ]]]  ]]] ]]] [[[]]] [[[[[[]]]]]] [[[-]]]    [[[X]]]";
-    find_Engine701("[[[", 3, "]]]", 3, items, content, 0, 75);
+    find_Engine701("[[[", 3U, "]]]", 3U, items, content, 0U, 75);
     to_JSON(stream, items, content);
     result =
         R"({"[[[ [[[  [[[  [[[  ]]]  ]]]  ]]] ]]]":{"O":0,"L":36,"S":{"[[[  [[[  [[[  ]]]  ]]]  ]]]":{"O":4,"L":28,"S":{"[[[  [[[  ]]]  ]]]":{"O":9,"L":18,"S":{"[[[  ]]]":{"O":14,"L":8}}}}}}},"[[[]]]":{"O":37,"L":6},"[[[[[[]]]]]]":{"O":44,"L":12,"S":{"[[[]]]":{"O":47,"L":6}}},"[[[-]]]":{"O":57,"L":7},"[[[X]]]":{"O":68,"L":7}})";
-    EQ_VALUE(stream, result, "stringify");
+    helper.Equal(stream, result, "stringify", __LINE__);
     stream.Clear();
     items.Clear();
 
@@ -1041,39 +1029,40 @@ static int TestEngine7() {
 
     content =
         R"((....) () (( )(  )(   )(    )) ((((((())))))) (A(B)C(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)U(V)W) (1(2(3(4(5(6(7)8)9)10)10)12)13))";
-    find_Engine701("(", 1, ")", 1, items, content, 0, 125);
+    find_Engine701("(", 1U, ")", 1U, items, content, 0U, 125);
     to_JSON(stream, items, content);
     result =
         R"j({"(....)":{"O":0,"L":6},"()":{"O":7,"L":2},"(( )(  )(   )(    ))":{"O":10,"L":20,"S":{"( )":{"O":11,"L":3},"(  )":{"O":14,"L":4},"(   )":{"O":18,"L":5},"(    )":{"O":23,"L":6}}},"((((((()))))))":{"O":31,"L":14,"S":{"(((((())))))":{"O":32,"L":12,"S":{"((((()))))":{"O":33,"L":10,"S":{"(((())))":{"O":34,"L":8,"S":{"((()))":{"O":35,"L":6,"S":{"(())":{"O":36,"L":4,"S":{"()":{"O":37,"L":2}}}}}}}}}}}}},"(A(B)C(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)U(V)W)":{"O":46,"L":47,"S":{"(B)":{"O":48,"L":3},"(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)":{"O":52,"L":35,"S":{"(E)":{"O":54,"L":3},"(G(H)I(G(K(L)M)N)O(P)Q)":{"O":58,"L":23,"S":{"(H)":{"O":60,"L":3},"(G(K(L)M)N)":{"O":64,"L":11,"S":{"(K(L)M)":{"O":66,"L":7,"S":{"(L)":{"O":68,"L":3}}}}},"(P)":{"O":76,"L":3}}},"(S)":{"O":82,"L":3}}},"(V)":{"O":88,"L":3}}},"(1(2(3(4(5(6(7)8)9)10)10)12)13)":{"O":94,"L":31,"S":{"(2(3(4(5(6(7)8)9)10)10)12)":{"O":96,"L":26,"S":{"(3(4(5(6(7)8)9)10)10)":{"O":98,"L":21,"S":{"(4(5(6(7)8)9)10)":{"O":100,"L":16,"S":{"(5(6(7)8)9)":{"O":102,"L":11,"S":{"(6(7)8)":{"O":104,"L":7,"S":{"(7)":{"O":106,"L":3}}}}}}}}}}}}}})j";
-    EQ_VALUE(stream, result, "stringify");
+    helper.Equal(stream, result, "stringify", __LINE__);
     stream.Clear();
     items.Clear();
 
     /////////////////////////////////////////////////////////////////////////////////////////
 
     content = R"((())";
-    find_Engine701("(", 1, ")", 1, items, content, 0, 4);
+    find_Engine701("(", 1U, ")", 1U, items, content, 0U, 4);
     to_JSON(stream, items, content);
-    EQ_VALUE(stream, "", "stringify");
+    helper.Equal(stream, "", "stringify", __LINE__);
     stream.Clear();
     items.Clear();
 
     /////////////////////////////////////////////////////////////////////////////////////////
-    END_SUB_TEST;
 }
 
 static int RunEngineTests() {
-    STARTING_TEST("Engine.hpp");
+    TestHelper helper{"Engine.hpp", __FILE__};
 
-    START_TEST("Engine Test 1", TestEngine1);
-    START_TEST("Engine Test 2", TestEngine2);
-    START_TEST("Engine Test 3", TestEngine3);
-    START_TEST("Engine Test 4", TestEngine4);
-    START_TEST("Engine Test 5", TestEngine5);
-    START_TEST("Engine Test 6", TestEngine6);
-    START_TEST("Engine Test 6", TestEngine7);
+    helper.PrintGroupName();
 
-    END_TEST("Engine.hpp");
+    helper.Test("Engine Test 1", TestEngine1);
+    helper.Test("Engine Test 2", TestEngine2);
+    helper.Test("Engine Test 3", TestEngine3);
+    helper.Test("Engine Test 4", TestEngine4);
+    helper.Test("Engine Test 5", TestEngine5);
+    helper.Test("Engine Test 6", TestEngine6);
+    helper.Test("Engine Test 6", TestEngine7);
+
+    return helper.EndTests();
 }
 
 } // namespace Test

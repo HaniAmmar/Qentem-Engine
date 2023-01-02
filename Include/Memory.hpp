@@ -171,7 +171,7 @@ inline static Type_ *Allocate(SizeT size) {
     Type_ *pointer = static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
 
 #ifdef QENTEM_TESTHELPER_H_
-    Test::TestHelper::AddMemorySize(pointer);
+    TestHelper::AddMemorySize(pointer);
 #endif
     // TODO: Build Allocator
     return pointer;
@@ -243,7 +243,7 @@ inline static Type_ *AllocateInit(const Values_T_ &...values) {
 inline static void Deallocate(void *pointer) {
 #ifdef QENTEM_TESTHELPER_H_
     if (pointer != nullptr) {
-        Test::TestHelper::RemoveMemorySize(pointer);
+        TestHelper::RemoveMemorySize(pointer);
     }
 #endif
     ::operator delete(pointer);

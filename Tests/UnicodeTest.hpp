@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-static int TestToUTF8() {
+void TestToUTF8(TestHelper &helper) {
     /*
      * HEX         UNICODE      BINARY
      * 0x0000      0            00000000
@@ -55,227 +55,221 @@ static int TestToUTF8() {
     StringStream<QChar> stream;
 
     Unicode::ToUTF(0x0000, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), 0, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), 0U, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x003D, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), '=', "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), '=', "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x007F, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{127}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{127}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x0080, stream);
-    EQ_VALUE(stream.Length(), 2, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{194}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{128}, "*(stream.First()+1)");
+    helper.Equal(stream.Length(), 2U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{194}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{128}, "*(stream.First()+1)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x00A1, stream);
-    EQ_VALUE(stream.Length(), 2, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{194}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{161}, "*(stream.First()+1)");
+    helper.Equal(stream.Length(), 2U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{194}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{161}, "*(stream.First()+1)", __LINE__);
     const auto *v00A1 = "¡";
-    EQ_VALUE(stream, reinterpret_cast<const QChar *>(v00A1), "stream == v00A1");
+    helper.Equal(stream, reinterpret_cast<const QChar *>(v00A1), "stream == v00A1", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x07FF, stream);
-    EQ_VALUE(stream.Length(), 2, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{223}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{191}, "*(stream.First()+1)");
+    helper.Equal(stream.Length(), 2U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{223}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{191}, "*(stream.First()+1)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x0800, stream);
-    EQ_VALUE(stream.Length(), 3, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{224}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{160}, "*(stream.First()+1)");
-    EQ_VALUE(*(stream.First() + 2), QChar{128}, "*(stream.First() + 2)");
+    helper.Equal(stream.Length(), 3U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{224}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{160}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(*(stream.First() + 2), QChar{128}, "*(stream.First() + 2)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x08A7, stream);
-    EQ_VALUE(stream.Length(), 3, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{224}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{162}, "*(stream.First()+1)");
-    EQ_VALUE(*(stream.First() + 2), QChar{167}, "*(stream.First() + 2)");
+    helper.Equal(stream.Length(), 3U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{224}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{162}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(*(stream.First() + 2), QChar{167}, "*(stream.First() + 2)", __LINE__);
     const auto *v08A7 = "ࢧ";
-    EQ_VALUE(stream, reinterpret_cast<const QChar *>(v08A7), "stream == v08A7");
+    helper.Equal(stream, reinterpret_cast<const QChar *>(v08A7), "stream == v08A7", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0xFFFF, stream);
-    EQ_VALUE(stream.Length(), 3, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{239}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{191}, "*(stream.First()+1)");
-    EQ_VALUE(*(stream.First() + 2), QChar{191}, "*(stream.First() + 2)");
+    helper.Equal(stream.Length(), 3U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{239}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{191}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(*(stream.First() + 2), QChar{191}, "*(stream.First() + 2)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x10000, stream);
-    EQ_VALUE(stream.Length(), 4, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{240}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{144}, "*(stream.First()+1)");
-    EQ_VALUE(*(stream.First() + 2), QChar{128}, "*(stream.First() + 2)");
-    EQ_VALUE(*(stream.First() + 3), QChar{128}, "*(stream.First() + 3)");
+    helper.Equal(stream.Length(), 4U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{240}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{144}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(*(stream.First() + 2), QChar{128}, "*(stream.First() + 2)", __LINE__);
+    helper.Equal(*(stream.First() + 3), QChar{128}, "*(stream.First() + 3)", __LINE__);
     const auto *v10000 = "𐀀";
-    EQ_VALUE(stream, reinterpret_cast<const QChar *>(v10000), "stream == v10000");
+    helper.Equal(stream, reinterpret_cast<const QChar *>(v10000), "stream == v10000", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x10A7B, stream);
-    EQ_VALUE(stream.Length(), 4, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{240}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{144}, "*(stream.First()+1)");
-    EQ_VALUE(*(stream.First() + 2), QChar{169}, "*(stream.First() + 2)");
-    EQ_VALUE(*(stream.First() + 3), QChar{187}, "*(stream.First() + 3)");
+    helper.Equal(stream.Length(), 4U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{240}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{144}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(*(stream.First() + 2), QChar{169}, "*(stream.First() + 2)", __LINE__);
+    helper.Equal(*(stream.First() + 3), QChar{187}, "*(stream.First() + 3)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0xE01EF, stream);
-    EQ_VALUE(stream.Length(), 4, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{243}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{160}, "*(stream.First()+1)");
-    EQ_VALUE(*(stream.First() + 2), QChar{135}, "*(stream.First() + 2)");
-    EQ_VALUE(*(stream.First() + 3), QChar{175}, "*(stream.First() + 3)");
+    helper.Equal(stream.Length(), 4U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{243}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{160}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(*(stream.First() + 2), QChar{135}, "*(stream.First() + 2)", __LINE__);
+    helper.Equal(*(stream.First() + 3), QChar{175}, "*(stream.First() + 3)", __LINE__);
     stream.Clear();
-
-    END_SUB_TEST;
 }
 
-static int TestToUTF16() {
+void TestToUTF16(TestHelper &helper) {
     using QChar = char16_t;
 
     StringStream<QChar> stream;
 
     Unicode::ToUTF(0x0000, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), 0, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), 0U, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x003D, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), u'=', "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), u'=', "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x007F, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{127}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{127}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x0080, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{128}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{128}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x00A1, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{161}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{161}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x07FF, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{2047}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{2047}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x0800, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{2048}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{2048}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x08A7, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{2215}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{2215}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0xFFFF, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{65535}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{65535}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x10000, stream);
-    EQ_VALUE(stream.Length(), 2, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{55296}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{56320}, "*(stream.First()+1)");
+    helper.Equal(stream.Length(), 2U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{55296}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{56320}, "*(stream.First()+1)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x10A7B, stream);
-    EQ_VALUE(stream.Length(), 2, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{55298}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{56955}, "*(stream.First()+1)");
+    helper.Equal(stream.Length(), 2U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{55298}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{56955}, "*(stream.First()+1)", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0xE01EF, stream);
-    EQ_VALUE(stream.Length(), 2, "stream.Length()");
-    EQ_VALUE(*(stream.First()), QChar{56128}, "stream.First()");
-    EQ_VALUE(*(stream.First() + 1), QChar{56815}, "*(stream.First()+1)");
+    helper.Equal(stream.Length(), 2U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), QChar{56128}, "stream.First()", __LINE__);
+    helper.Equal(*(stream.First() + 1), QChar{56815}, "*(stream.First()+1)", __LINE__);
     stream.Clear();
-
-    END_SUB_TEST;
 }
 
-static int TestToUTF32() {
+void TestToUTF32(TestHelper &helper) {
     StringStream<char32_t> stream;
 
     Unicode::ToUTF(0x0000, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), 0, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), 0U, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x003D, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), U'=', "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), U'=', "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x007F, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{127}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{127}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x0080, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{128}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{128}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x00A1, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{161}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{161}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x07FF, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{2047}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{2047}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x0800, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{2048}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{2048}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x08A7, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{2215}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{2215}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0xFFFF, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{65535}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{65535}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x10000, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{65536}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{65536}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0x10A7B, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{68219}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{68219}, "stream.First()", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF(0xE01EF, stream);
-    EQ_VALUE(stream.Length(), 1, "stream.Length()");
-    EQ_VALUE(*(stream.First()), char32_t{917999}, "stream.First()");
+    helper.Equal(stream.Length(), 1U, "stream.Length()", __LINE__);
+    helper.Equal(*(stream.First()), char32_t{917999}, "stream.First()", __LINE__);
     stream.Clear();
-
-    END_SUB_TEST;
 }
 
 // static String<char> decToHex(SizeT code) {
@@ -324,13 +318,15 @@ static int RunUnicodeTests() {
     // convertTo4Hex(0x1F859);
     // convertTo4Hex(0x10283);
 
-    STARTING_TEST("Unicode.hpp");
+    TestHelper helper{"Unicode.hpp", __FILE__};
 
-    START_TEST("ToUTF 8 Test", TestToUTF8);
-    START_TEST("ToUTF 16 Test", TestToUTF16);
-    START_TEST("ToUTF 32 Test", TestToUTF32);
+    helper.PrintGroupName();
 
-    END_TEST("Unicode.hpp");
+    helper.Test("ToUTF 8 Test", TestToUTF8);
+    helper.Test("ToUTF 16 Test", TestToUTF16);
+    helper.Test("ToUTF 32 Test", TestToUTF32);
+
+    return helper.EndTests();
 }
 
 } // namespace Test

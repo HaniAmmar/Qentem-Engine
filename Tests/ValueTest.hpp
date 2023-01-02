@@ -35,7 +35,7 @@ using VStringStream = StringStream<char>;
 using VHArray       = HArray<ValueC, char>;
 using VArray        = Array<ValueC>;
 
-static const char *GetStingOfType(ValueType type) noexcept {
+static const char *GetTypeString(ValueType type) noexcept {
     switch (type) {
         case ValueType::Object:
             return "Object";
@@ -69,31 +69,30 @@ static const char *GetStingOfType(ValueType type) noexcept {
     }
 }
 
-#define EQ_VALUE_TYPE(left, right, name)                                                                               \
-    do {                                                                                                               \
-        if ((left) != (right)) {                                                                                       \
-            TestHelper::PrintErrorMessage2(QENTEM_OUTPUT_STREAM, false, name, GetStingOfType(left),                    \
-                                           GetStingOfType(right), __FILE__, __LINE__);                                 \
-            return 1;                                                                                                  \
-        }                                                                                                              \
-    } while (false)
-
-static int TestGetStingOfType() {
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Undefined), "Undefined", 9), "Undefined");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Object), "Object", 6), "Object");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Array), "Array", 5), "Array");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::String), "String", 6), "String");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::UInt64), "UInt64", 6), "UInt64");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Int64), "Int64", 5), "Int64");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Double), "Double", 6), "Double");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::True), "True", 4), "True");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::False), "False", 5), "False");
-    EQ_TRUE(StringUtils::IsEqual(GetStingOfType(ValueType::Null), "Null", 4), "Null");
-
-    END_SUB_TEST;
+template <typename Char_T_, typename Value1_T_, typename Value2_T_>
+QENTEM_NOINLINE void ValueTypeEqual(Value1_T_ left, Value2_T_ right, const Char_T_ *name, unsigned long line,
+                                    TestHelper &helper) {
+    if (left != right) {
+        helper.SetError(true);
+        TestHelper::PrintErrorMessage2(false, name, GetTypeString(left), GetTypeString(right), helper.GetFileFullname(),
+                                       line);
+    }
 }
 
-static int TestEmptyValue() {
+void TestGetTypeString(TestHelper &helper) {
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Undefined), "Undefined", 9), "Undefined", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Object), "Object", 6), "Object", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Array), "Array", 5), "Array", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::String), "String", 6), "String", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::UInt64), "UInt64", 6), "UInt64", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Int64), "Int64", 5), "Int64", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Double), "Double", 6), "Double", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::True), "True", 4), "True", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::False), "False", 5), "False", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Null), "Null", 4), "Null", __LINE__);
+}
+
+void TestEmptyValue(TestHelper &helper) {
     ValueC value1;
 
     VStringStream ss_var;
@@ -103,62 +102,60 @@ static int TestEmptyValue() {
     double        num_var;
     bool          bool_var;
 
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_FALSE(value1.IsObject(), "IsObject()");
-    EQ_FALSE(value1.IsArray(), "IsArray()");
-    EQ_FALSE(value1.IsString(), "IsString()");
-    EQ_FALSE(value1.IsNumber(), "IsNumber()");
-    EQ_FALSE(value1.IsTrue(), "IsTrue()");
-    EQ_FALSE(value1.IsFalse(), "IsFalse()");
-    EQ_FALSE(value1.IsNull(), "IsNull()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::Undefined, "Type()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(10), nullptr, "GetValue(10)", "null");
-    EQ_TO(value1.GetValue("", 0), nullptr,
-          "GetValue("
-          ", 0)",
-          "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
-    EQ_FALSE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
-    EQ_TO(value1.GetKey(10), nullptr, "GetKey(10)", "null");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
+    helper.EqualsFalse(value1.IsObject(), "IsObject()", __LINE__);
+    helper.EqualsFalse(value1.IsArray(), "IsArray()", __LINE__);
+    helper.EqualsFalse(value1.IsString(), "IsString()", __LINE__);
+    helper.EqualsFalse(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.EqualsFalse(value1.IsTrue(), "IsTrue()", __LINE__);
+    helper.EqualsFalse(value1.IsFalse(), "IsFalse()", __LINE__);
+    helper.EqualsFalse(value1.IsNull(), "IsNull()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::Undefined, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetValue(10), nullptr, "GetValue(10)", "null", __LINE__);
+    helper.Equal(value1.GetValue("", 0), nullptr,
+                 "GetValue("
+                 ", 0)",
+                 "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)", __LINE__);
+    helper.EqualsFalse(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()", __LINE__);
+    helper.Equal(value1.GetKey(10), nullptr, "GetKey(10)", "null", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsFalse(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(value1.GetNumber(), 0U, "GetNumber()", __LINE__);
+    helper.EqualsFalse(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
 
     value1 = ValueC{ValueType::Object};
-    EQ_TRUE(value1.IsObject(), "IsObject()");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
 
     value1 = ValueC{ValueType::Array};
-    EQ_TRUE(value1.IsArray(), "IsArray()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
 
     value1 = ValueC{ValueType::String};
-    EQ_TRUE(value1.IsString(), "IsString()");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
 
     value1 = ValueC{ValueType::UInt64};
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
 
     value1 = ValueC{ValueType::Int64};
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
 
     value1 = ValueC{ValueType::Double};
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
 }
 
-static int TestTrueValue() {
+void TestTrueValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -170,65 +167,63 @@ static int TestTrueValue() {
     bool          bool_var;
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::True, "Type()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
-    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
-    EQ_TRUE(StringUtils::IsEqual("true", c_str_var, c_str_len), "value1.SetCharAndLength()");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
-    EQ_VALUE(ss_var, "true", "ss_var");
-    EQ_VALUE(value1.GetNumber(), 1, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, 1, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::True, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)", __LINE__);
+    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual("true", c_str_var, c_str_len), "value1.SetCharAndLength()", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "true", "str_var", __LINE__);
+    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.Equal(ss_var, "true", "ss_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 1U, "GetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, 1U, "num_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
+    helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = true;
     value2 = true;
     value2 = value1;
-    EQ_TRUE(value2.IsTrue(), "IsTrue()");
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value2.IsTrue(), "IsTrue()", __LINE__);
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
 
     value1 = true;
     value2 = ValueC{value1};
-    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value2.IsTrue(), "IsTrue()", __LINE__);
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TRUE(value2.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
+    helper.EqualsTrue(value2.IsTrue(), "IsTrue()", __LINE__);
 
     value1 = true;
     ValueC value3(static_cast<ValueC &&>(value1));
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
-    EQ_TRUE(value3.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
 
     value3 = true;
-    EQ_TRUE(value3.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
 
     value3 = ValueC{ValueType::True};
-    EQ_TRUE(value3.IsTrue(), "IsTrue()");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
 }
 
-static int TestFalseValue() {
+void TestFalseValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -240,65 +235,63 @@ static int TestFalseValue() {
     bool          bool_var;
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::False, "Type()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
-    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
-    EQ_TRUE(StringUtils::IsEqual("false", c_str_var, c_str_len), "value1.SetCharAndLength()");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "false", "str_var");
-    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
-    EQ_VALUE(ss_var, "false", "ss_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::False, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)", __LINE__);
+    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual("false", c_str_var, c_str_len), "value1.SetCharAndLength()", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "false", "str_var", __LINE__);
+    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.Equal(ss_var, "false", "ss_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 0U, "GetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, 0U, "num_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
+    helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = false;
     value2 = false;
     value2 = value1;
-    EQ_TRUE(value2.IsFalse(), "IsFalse()");
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value2.IsFalse(), "IsFalse()", __LINE__);
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
 
     value1 = false;
     value2 = ValueC{value1};
-    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value2.IsFalse(), "IsFalse()", __LINE__);
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TRUE(value2.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
+    helper.EqualsTrue(value2.IsFalse(), "IsFalse()", __LINE__);
 
     value1 = false;
     ValueC value3(static_cast<ValueC &&>(value1));
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
-    EQ_TRUE(value3.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value3.IsFalse(), "IsFalse()", __LINE__);
 
     value3 = false;
-    EQ_TRUE(value3.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value3.IsFalse(), "IsFalse()", __LINE__);
 
     value3 = ValueC{ValueType::False};
-    EQ_TRUE(value3.IsFalse(), "IsFalse()");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value3.IsFalse(), "IsFalse()", __LINE__);
 }
 
-static int TestNullValue() {
+void TestNullValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -310,65 +303,63 @@ static int TestNullValue() {
     bool          bool_var;
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::Null, "Type()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_FALSE(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)");
-    EQ_TRUE(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()");
-    EQ_TRUE(StringUtils::IsEqual("null", c_str_var, c_str_len), "value1.SetCharAndLength()");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "null", "str_var");
-    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
-    EQ_VALUE(ss_var, "null", "ss_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, 0, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::Null, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), "CopyKeyByIndexTo(0)", __LINE__);
+    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), "SetCharAndLength()", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual("null", c_str_var, c_str_len), "value1.SetCharAndLength()", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "null", "str_var", __LINE__);
+    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.Equal(ss_var, "null", "ss_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 0U, "GetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, 0U, "num_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
+    helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = nullptr;
     value2 = nullptr;
     value2 = value1;
-    EQ_TRUE(value2.IsNull(), "IsNull()");
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value2.IsNull(), "IsNull()", __LINE__);
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
 
     value1 = nullptr;
     value2 = ValueC{value1};
-    EQ_TRUE(value2.IsNull(), "IsNull()");
+    helper.EqualsTrue(value2.IsNull(), "IsNull()", __LINE__);
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_TRUE(value2.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
+    helper.EqualsTrue(value2.IsNull(), "IsNull()", __LINE__);
 
     value1 = nullptr;
     ValueC value3(static_cast<ValueC &&>(value1));
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
-    EQ_TRUE(value3.IsNull(), "IsNull()");
+    helper.EqualsTrue(value3.IsNull(), "IsNull()", __LINE__);
 
     value3 = nullptr;
-    EQ_TRUE(value3.IsNull(), "IsNull()");
+    helper.EqualsTrue(value3.IsNull(), "IsNull()", __LINE__);
 
     value3 = ValueC{ValueType::Null};
-    EQ_TRUE(value3.IsNull(), "IsNull()");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value3.IsNull(), "IsNull()", __LINE__);
 }
 
-static int TestNumberValue1() {
+void TestNumberValue1(TestHelper &helper) {
     using vu_int = unsigned int;
 
     ValueC value1;
@@ -382,80 +373,78 @@ static int TestNumberValue1() {
     bool          bool_var;
 
     value1 = 33;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "33", "str_var");
-    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
-    EQ_VALUE(ss_var, "33", "ss_var");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, 33, "num_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false", __LINE__);
+    helper.Equal(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "33", "str_var", __LINE__);
+    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.Equal(ss_var, "33", "ss_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, 33U, "num_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
+    helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = 45;
     value2 = -10;
     value2 = value1;
-    EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_TRUE(value2.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "45", "str_var");
-    EQ_VALUE(value2.GetNumber(), 45, "GetNumber()");
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, 45, "num_var");
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
-    EQ_VALUE(value1.GetNumber(), 45, "GetNumber()");
+    helper.EqualsTrue(value2.IsNumber(), "IsNumber()", __LINE__);
+    helper.EqualsTrue(value2.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "45", "str_var", __LINE__);
+    helper.Equal(value2.GetNumber(), 45U, "GetNumber()", __LINE__);
+    helper.EqualsTrue(value2.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, 45U, "num_var", __LINE__);
+    helper.EqualsTrue(value2.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 45U, "GetNumber()", __LINE__);
 
     value1.Reset();
 
     value1 = vu_int{10};
     value2 = ValueC{value1};
-    EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.Equal(value2.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-    EQ_VALUE(value2.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
+    helper.Equal(value2.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value2 = 1213;
-    EQ_VALUE(value2.GetNumber(), 1213, "GetNumber()");
+    helper.Equal(value2.GetNumber(), 1213U, "GetNumber()", __LINE__);
 
     value2 = 10;
     value2 = double{785};
-    EQ_VALUE(value2.GetNumber(), 785, "GetNumber()");
+    helper.Equal(value2.GetNumber(), 785U, "GetNumber()", __LINE__);
 
     value2 = vu_int{0};
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
+    helper.EqualsTrue(value2.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
 
     value2 = int{-8};
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
+    helper.EqualsTrue(value2.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
 
     value2 = ValueC{double{3.75}};
-    EQ_TRUE(value2.IsNumber(), "IsNumber()");
-    EQ_VALUE(value2.GetNumber(), 3.75, "GetNumber()");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value2.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value2.GetNumber(), 3.75, "GetNumber()", __LINE__);
 }
 
-static int TestNumberValue2() {
+void TestNumberValue2(TestHelper &helper) {
     using vu_short     = unsigned short;
     using vu_int       = unsigned int;
     using vu_long      = unsigned long;
@@ -472,72 +461,70 @@ static int TestNumberValue2() {
     /////////////////// unsigned
 
     value1 = ValueC{vu_short{10}};
-    EQ_VALUE_TYPE(value1.Type(), ValueType::UInt64, "Type()");
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_FALSE(value1.IsInt64(), "IsInt64()");
-    EQ_FALSE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "10", "str_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
+    ValueTypeEqual(value1.Type(), ValueType::UInt64, "Type()", __LINE__, helper);
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "10", "str_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{vu_int{10}};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{vu_long{10}};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{vu_long_long{10}};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
-
-    END_SUB_TEST;
 }
 
-static int TestNumberValue3() {
+void TestNumberValue3(TestHelper &helper) {
     using v_long_long = long long;
 
     ValueC  value1;
@@ -551,122 +538,120 @@ static int TestNumberValue3() {
     /////////////////// signed
 
     value1 = ValueC{short{-10}};
-    EQ_VALUE_TYPE(value1.Type(), ValueType::Int64, "Type()");
-    EQ_FALSE(value1.IsUInt64(), "IsUInt64()");
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_FALSE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, -10, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "-10", "str_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
+    ValueTypeEqual(value1.Type(), ValueType::Int64, "Type()", __LINE__, helper);
+    helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "-10", "str_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{short{10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "10", "str_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "10", "str_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{int{-10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, -10, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{int{10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{long{-10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, -10, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{long{10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{long{-10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, -10, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{v_long_long{10}};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
-
-    END_SUB_TEST;
 }
 
-static int TestNumberValue4() {
+void TestNumberValue4(TestHelper &helper) {
     ValueC  value1;
     VString str_var;
     bool    bool_var;
@@ -678,127 +663,126 @@ static int TestNumberValue4() {
     /////////////////// float
 
     value1 = ValueC{float{10.5}};
-    EQ_VALUE_TYPE(value1.Type(), ValueType::Double, "Type()");
-    EQ_FALSE(value1.IsUInt64(), "IsUInt64()");
-    EQ_FALSE(value1.IsInt64(), "IsInt64()");
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), 10.5, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10.5, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10.5, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "10.5", "str_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
+    ValueTypeEqual(value1.Type(), ValueType::Double, "Type()", __LINE__, helper);
+    helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10.5, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10.5, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10.5, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "10.5", "str_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{float{-10.5}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10.5, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10.5, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_VALUE(double_var, -10.5, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "-10.5", "str_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10.5, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10.5, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10.5, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "-10.5", "str_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{float{10}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{float{-10}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_VALUE(double_var, -10, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{10.5}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), 10.5, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10.5, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10.5, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10.5, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10.5, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10.5, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{-10.5}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10.5, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10.5, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_VALUE(double_var, -10.5, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10.5, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10.5, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10.5, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{10}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), 10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), 10, "GetInt64()");
-    EQ_VALUE(value1.GetUInt64(), 10, "GetUInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(ulong_var), "SetNumber()");
-    EQ_VALUE(double_var, 10, "double_var");
-    EQ_VALUE(long_var, 10, "long_var");
-    EQ_VALUE(ulong_var, 10, "ulong_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "10", "str_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), 10U, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), 10U, "GetInt64()", __LINE__);
+    helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(ulong_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, 10U, "double_var", __LINE__);
+    helper.Equal(long_var, 10U, "long_var", __LINE__);
+    helper.Equal(ulong_var, 10U, "ulong_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "10", "str_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{-10}};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
-    EQ_VALUE(value1.GetDouble(), -10, "GetDouble()");
-    EQ_VALUE(value1.GetInt64(), -10, "GetInt64()");
-    EQ_TRUE(value1.SetNumber(double_var), "SetNumber()");
-    EQ_TRUE(value1.SetNumber(long_var), "SetNumber()");
-    EQ_VALUE(double_var, -10, "double_var");
-    EQ_VALUE(long_var, -10, "long_var");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "-10", "str_var");
-    EQ_TRUE(value1.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
+    helper.Equal(value1.GetDouble(), -10, "GetDouble()", __LINE__);
+    helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(double_var), "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(long_var), "SetNumber()", __LINE__);
+    helper.Equal(double_var, -10, "double_var", __LINE__);
+    helper.Equal(long_var, -10, "long_var", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "-10", "str_var", __LINE__);
+    helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
     value1.Reset();
-    END_SUB_TEST;
 }
 
-static int TestNumberValue5() {
+void TestNumberValue5(TestHelper &helper) {
     using vu_short     = unsigned short;
     using vu_int       = unsigned int;
     using vu_long      = unsigned long;
@@ -809,53 +793,51 @@ static int TestNumberValue5() {
     ValueC value1;
 
     value1 = vu_short{10};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value1 = -10;
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
 
     value1 = -10.5;
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10.5, "GetNumber()");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10.5, "GetNumber()", __LINE__);
 
     value1 = vu_int{10};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value1 = float{10};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value1 = int{10};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value1 = vu_long{10};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value1 = long{-10};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
 
     value1 = vu_long_long{10};
-    EQ_TRUE(value1.IsUInt64(), "IsUInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
+    helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 
     value1 = double{-10};
-    EQ_TRUE(value1.IsDouble(), "IsDouble()");
-    EQ_VALUE(value1.GetNumber(), -10, "GetNumber()");
+    helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
+    helper.Equal(value1.GetNumber(), -10, "GetNumber()", __LINE__);
 
     value1 = v_long_long{10};
-    EQ_TRUE(value1.IsInt64(), "IsInt64()");
-    EQ_VALUE(value1.GetNumber(), 10, "GetNumber()");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
+    helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 }
 
-static int TestStringValue() {
+void TestStringValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -867,111 +849,110 @@ static int TestStringValue() {
     bool          bool_var;
 
     value1 = "-ABCDEF0123456789ABCDEF0123456789-";
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::String, "Type()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), true, "SetCharAndLength()", "true");
-    EQ_TO(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), true, "value1.StringStorage()",
-          "value1.SetCharAndLength()");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value1.GetString()), "-ABCDEF0123456789ABCDEF0123456789-", "GetString()");
-    NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), "IsEqual()");
-    EQ_VALUE(value1.Length(), 34, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "-ABCDEF0123456789ABCDEF0123456789-", "str_var");
-    EQ_TRUE(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()");
-    EQ_VALUE(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", "ss_var");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
-    EQ_VALUE(value1.Stringify(), "", "Stringify()");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::String, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false", __LINE__);
+    helper.Equal(value1.SetCharAndLength(c_str_var, c_str_len), true, "SetCharAndLength()", "true", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), true, "value1.StringStorage()",
+                 "value1.SetCharAndLength()", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(*(value1.GetString()), "-ABCDEF0123456789ABCDEF0123456789-", "GetString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1.StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "IsEqual()", __LINE__);
+    helper.Equal(value1.Length(), 34U, "Length()", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "-ABCDEF0123456789ABCDEF0123456789-", "str_var", __LINE__);
+    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.Equal(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", "ss_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 0U, "GetNumber()", __LINE__);
+    helper.EqualsFalse(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = "45";
     value2 = "-50";
-    EQ_TRUE(value2.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, -50, "num_var");
-    EQ_VALUE(value2.GetNumber(), -50, "GetNumber()");
+    helper.EqualsTrue(value2.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, -50, "num_var", __LINE__);
+    helper.Equal(value2.GetNumber(), -50, "GetNumber()", __LINE__);
 
     value2 = value1;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value1.GetString()), "45", "GetString()");
-    NOT_EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_TRUE(StringUtils::IsEqual(value1.StringStorage(), "45", 2), "IsEqual()");
-    EQ_VALUE(value1.Length(), 2, "Length()");
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "45", "str_var");
-    EQ_TRUE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_VALUE(num_var, 45, "num_var");
-    EQ_VALUE(value1.GetNumber(), 45, "GetNumber()");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(value2.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "45", "str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(*(value1.GetString()), "45", "GetString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1.StringStorage(), "45", 2), "IsEqual()", __LINE__);
+    helper.Equal(value1.Length(), 2U, "Length()", __LINE__);
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "45", "str_var", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.Equal(num_var, 45U, "num_var", __LINE__);
+    helper.Equal(value1.GetNumber(), 45U, "GetNumber()", __LINE__);
+    helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(value2.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "45", "str_var", __LINE__);
 
     value1 = "true";
     value2 = ValueC{value1};
-    EQ_TRUE(value2.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "true", "str_var");
-    EQ_VALUE(value2.GetNumber(), 0, "GetNumber()");
+    helper.EqualsTrue(value2.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "true", "str_var", __LINE__);
+    helper.Equal(value2.GetNumber(), 0U, "GetNumber()", __LINE__);
     bool_var = false;
-    EQ_TRUE(value2.GetBool(bool_var), "GetBool()");
-    EQ_TRUE(bool_var, "bool_var");
+    helper.EqualsTrue(value2.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsTrue(bool_var, "bool_var", __LINE__);
 
-    EQ_TRUE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "true", "str_var");
+    helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "true", "str_var", __LINE__);
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    EQ_TRUE(value2.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "true", "str_var");
+    helper.EqualsTrue(value2.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "true", "str_var", __LINE__);
 
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = "false";
     ValueC value3(static_cast<ValueC &&>(value1));
-    EQ_VALUE(value3.Length(), 5, "Length()");
-    EQ_TRUE(value3.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "false", "str_var");
+    helper.Equal(value3.Length(), 5U, "Length()", __LINE__);
+    helper.EqualsTrue(value3.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "false", "str_var", __LINE__);
     bool_var = true;
-    EQ_TRUE(value3.GetBool(bool_var), "GetBool()");
-    EQ_FALSE(bool_var, "bool_var");
+    helper.EqualsTrue(value3.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.EqualsFalse(bool_var, "bool_var", __LINE__);
 
     str_var           = "qen";
     const char *c_str = str_var.First();
     value3            = str_var; // Copy of a string
-    EQ_TRUE(value3.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "qen", "str_var");
-    NOT_EQ_TO(value3.StringStorage(), c_str, "str_var.First()", "c_str");
+    helper.EqualsTrue(value3.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "qen", "str_var", __LINE__);
+    helper.NotEqual(value3.StringStorage(), c_str, "str_var.First()", "c_str", __LINE__);
 
     value3 = ValueC{VString("ABC")};
-    EQ_TRUE(value3.IsString(), "IsString()");
-    NOT_EQ_TO(value3.GetString(), nullptr, "GetString()", "null");
-    EQ_VALUE(*(value3.GetString()), "ABC", "GetString()");
+    helper.EqualsTrue(value3.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value3.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(*(value3.GetString()), "ABC", "GetString()", __LINE__);
 
     value3 = VString("123");
-    EQ_TRUE(value3.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "123", "str_var");
+    helper.EqualsTrue(value3.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "123", "str_var", __LINE__);
 
     value3 = 321;
     value3 = "321";
-    EQ_TRUE(value3.IsString(), "IsString()");
-    EQ_TRUE(value3.SetString(str_var), "SetString()");
-    EQ_VALUE(str_var, "321", "str_var");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(value3.IsString(), "IsString()", __LINE__);
+    helper.EqualsTrue(value3.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(str_var, "321", "str_var", __LINE__);
 }
 
-static int TestArrayValue() {
+void TestArrayValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -988,33 +969,33 @@ static int TestArrayValue() {
     storage = arr_var.First();
 
     value1 = arr_var; // Copy.
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::Array, "Type()");
-    EQ_VALUE(value1.Size(), 5, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
-    EQ_TO(value1.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()", "storage");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
-    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::Array, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 5U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false", __LINE__);
+    helper.Equal(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false", __LINE__);
+    helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsFalse(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(value1.GetNumber(), 0U, "GetNumber()", __LINE__);
+    helper.EqualsFalse(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
+    helper.Equal(value1.Stringify(), "[]", "Stringify()", __LINE__);
 
     arr_var.Reset();
     value1 = arr_var;
-    EQ_VALUE(value1.Stringify(), "[]", "Stringify()");
+    helper.Equal(value1.Stringify(), "[]", "Stringify()", __LINE__);
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(10);
@@ -1026,18 +1007,18 @@ static int TestArrayValue() {
     value1 = static_cast<VArray &&>(arr_var); // Move
     value2 = static_cast<VArray &&>(arr_var2);
     value2 = value1;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 10, "Size()");
-    EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_TO(value1.GetValue(9), nullptr, "GetValue(9)", "null");
-    EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 10U, "Size()", __LINE__);
+    helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value1.GetValue(9), nullptr, "GetValue(9)", "null", __LINE__);
+    helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
-    EQ_VALUE(value2.Size(), 10, "Size()");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.Equal(value2.Size(), 10U, "Size()", __LINE__);
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value2.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
@@ -1045,22 +1026,22 @@ static int TestArrayValue() {
     value1  = static_cast<VArray &&>(arr_var);
 
     value2 = ValueC{value1};
-    EQ_TRUE(value2.IsArray(), "IsArray()");
-    EQ_VALUE(value2.Size(), 7, "Size()");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value2.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value2.Size(), 7U, "Size()", __LINE__);
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value2.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 7, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 7U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value2.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
@@ -1068,37 +1049,37 @@ static int TestArrayValue() {
     value1  = static_cast<VArray &&>(arr_var);
 
     ValueC value3(static_cast<ValueC &&>(value1));
-    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.NotEqual(value3.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value3.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(3);
     storage = arr_var.First();
     value3  = arr_var; // Copy
-    EQ_VALUE(value3.Size(), 3, "Size()");
-    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.Equal(value3.Size(), 3U, "Size()", __LINE__);
+    helper.NotEqual(value3.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value3.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
     value3  = static_cast<VArray &&>(arr_var); // Move
-    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value3.GetArray()->First(), storage, "GetArray()->First()", "storage");
+    helper.NotEqual(value3.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value3.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     value3 = ValueC{VArray(3)};
-    EQ_TRUE(value3.IsArray(), "IsArray()");
-    NOT_EQ_TO(value3.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_VALUE(value3.GetArray()->Capacity(), 3, "GetArray()->Capacity()");
+    helper.EqualsTrue(value3.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value3.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value3.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value3.GetArray()->Capacity(), 3U, "GetArray()->Capacity()", __LINE__);
 
     value1[0] = 1;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_VALUE(value1[0].GetNumber(), 1, R"(value1[0].GetNumber())");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value1[0].GetNumber(), 1U, R"(value1[0].GetNumber())", __LINE__);
 
     value1.Reset();
 
@@ -1106,13 +1087,13 @@ static int TestArrayValue() {
     value1[1] = 2;
     value1[2] = 3;
 
-    EQ_VALUE(value1.Size(), 3, "value1.Size()");
+    helper.Equal(value1.Size(), 3U, "value1.Size()", __LINE__);
 
     value2 = value1;
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    EQ_VALUE(value2[0].GetNumber(), 1, "value2[0].GetNumber()");
-    EQ_VALUE(value2[1].GetNumber(), 2, "value2[1].GetNumber()");
-    EQ_VALUE(value2[2].GetNumber(), 3, "value2[2].GetNumber()");
+    helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
+    helper.Equal(value2[0].GetNumber(), 1U, "value2[0].GetNumber()", __LINE__);
+    helper.Equal(value2[1].GetNumber(), 2U, "value2[1].GetNumber()", __LINE__);
+    helper.Equal(value2[2].GetNumber(), 3U, "value2[2].GetNumber()", __LINE__);
 
     value1[0] = 11;
     value1[1] = 22;
@@ -1121,30 +1102,33 @@ static int TestArrayValue() {
     value1[2] = static_cast<VString &&>(str_var);
 
     value2 = value1;
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
-    EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen");
+    helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
+    helper.Equal(value2[0].GetNumber(), 11U, "value2[0].GetNumber()", __LINE__);
+    helper.Equal(value2[1].GetNumber(), 22U, "value2[1].GetNumber()", __LINE__);
+    helper.NotEqual(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen",
+                 __LINE__);
 
     value2[3] = 44;
     value2[4] = 55;
-    EQ_VALUE(value2.Size(), 5, "value2.Size()");
-    EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
-    EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen");
-    EQ_VALUE(value2[3].GetNumber(), 44, "value2[3].GetNumber()");
-    EQ_VALUE(value2[4].GetNumber(), 55, "value2[4].GetNumber()");
+    helper.Equal(value2.Size(), 5U, "value2.Size()", __LINE__);
+    helper.Equal(value2[0].GetNumber(), 11U, "value2[0].GetNumber()", __LINE__);
+    helper.Equal(value2[1].GetNumber(), 22U, "value2[1].GetNumber()", __LINE__);
+    helper.NotEqual(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen",
+                 __LINE__);
+    helper.Equal(value2[3].GetNumber(), 44U, "value2[3].GetNumber()", __LINE__);
+    helper.Equal(value2[4].GetNumber(), 55U, "value2[4].GetNumber()", __LINE__);
 
     value2 = value1;
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    EQ_VALUE(value2[0].GetNumber(), 11, "value2[0].GetNumber()");
-    EQ_VALUE(value2[1].GetNumber(), 22, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen");
-    EQ_TO(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null");
-    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
+    helper.Equal(value2[0].GetNumber(), 11U, "value2[0].GetNumber()", __LINE__);
+    helper.Equal(value2[1].GetNumber(), 22U, "value2[1].GetNumber()", __LINE__);
+    helper.NotEqual(value2[2].StringStorage(), c_str_var, "value2[2].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, "value2[2].StringStorage()", "Qen",
+                 __LINE__);
+    helper.Equal(value2.GetValue(3), nullptr, "value2.GetValue(3)", "null", __LINE__);
+    helper.Equal(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null", __LINE__);
 
     ////////////////////
     str_var   = "-ABCDEF0123456789ABCDEF0123456789-";
@@ -1159,42 +1143,40 @@ static int TestArrayValue() {
     val_ptr[3] = static_cast<VString &&>(str_var);
 
     value2 = arr_var;
-    EQ_VALUE(value2.Size(), 4, "value2.Size()");
-    EQ_VALUE(value2[0].GetNumber(), 10, "value2[0].GetNumber()");
-    EQ_VALUE(value2[1].GetNumber(), 20, "value2[1].GetNumber()");
-    EQ_VALUE(value2[2].GetNumber(), 30, "value2[1].GetNumber()");
-    NOT_EQ_TO(value2[3].StringStorage(), c_str_var, "value2[3].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value2[3].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value2[3].StringStorage()", "-ABCDEF0123456789ABCDEF0123456789-");
-    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
+    helper.Equal(value2[0].GetNumber(), 10U, "value2[0].GetNumber()", __LINE__);
+    helper.Equal(value2[1].GetNumber(), 20U, "value2[1].GetNumber()", __LINE__);
+    helper.Equal(value2[2].GetNumber(), 30U, "value2[1].GetNumber()", __LINE__);
+    helper.NotEqual(value2[3].StringStorage(), c_str_var, "value2[3].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2[3].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value2[3].StringStorage()", "-ABCDEF0123456789ABCDEF0123456789-", __LINE__);
+    helper.Equal(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null", __LINE__);
 
     ////////////////////
 
     arr_var.Clear();
     arr_var.Resize(5);
     value2 = static_cast<VArray &&>(arr_var);
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value2.GetArray()->Capacity(), 5, "value2.Size()");
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value2.GetArray()->Capacity(), 5U, "value2.Size()", __LINE__);
 
     value2 += 1;
 
     value2.Compress();
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value2.GetArray()->Capacity(), 1, "Capacity()");
-    EQ_VALUE(value2.GetArray()->Size(), 1, "Size()");
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value2.GetArray()->Capacity(), 1U, "Capacity()", __LINE__);
+    helper.Equal(value2.GetArray()->Size(), 1U, "Size()", __LINE__);
 
     arr_var.Reset();
     arr_var.Reserve(10);
     value2 = static_cast<VArray &&>(arr_var);
     value2.Compress();
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value2.GetArray()->Capacity(), 0, "Capacity()");
-    EQ_VALUE(value2.GetArray()->Size(), 0, "Size()");
-
-    END_SUB_TEST;
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value2.GetArray()->Capacity(), 0U, "Capacity()", __LINE__);
+    helper.Equal(value2.GetArray()->Size(), 0U, "Size()", __LINE__);
 }
 
-static int TestObjectValue1() {
+void TestObjectValue1(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1218,34 +1200,34 @@ static int TestObjectValue1() {
     storage = h_arr_var.First();
 
     value1 = h_arr_var; // Copy.
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_VALUE_TYPE(value1.Type(), ValueType::Object, "Type()");
-    EQ_VALUE(value1.Size(), 5, "Size()");
-    NOT_EQ_TO(value1.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value1.GetValue(4), nullptr, "GetValue(4)", "null");
-    NOT_EQ_TO(value1.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value1.GetKey(4), nullptr, "GetKey(4)", "null");
-    NOT_EQ_TO(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false");
-    NOT_EQ_TO(value1.CopyKeyByIndexTo(ss_var, 4), false, "CopyKeyByIndexTo(4)", "false");
-    EQ_TO(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()", "storage");
-    EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetString(), nullptr, "GetString()", "null");
-    EQ_TO(value1.StringStorage(), nullptr, "StringStorage()", "null");
-    EQ_VALUE(value1.Length(), 0, "Length()");
-    EQ_FALSE(value1.SetString(str_var), "SetString()");
-    EQ_VALUE(value1.GetNumber(), 0, "GetNumber()");
-    EQ_FALSE(value1.SetNumber(num_var), "SetNumber()");
-    EQ_FALSE(value1.GetBool(bool_var), "GetBool()");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    ValueTypeEqual(value1.Type(), ValueType::Object, "Type()", __LINE__, helper);
+    helper.Equal(value1.Size(), 5U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.NotEqual(value1.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
+    helper.NotEqual(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.NotEqual(value1.GetKey(4), nullptr, "GetKey(4)", "null", __LINE__);
+    helper.NotEqual(value1.CopyKeyByIndexTo(ss_var, 0), false, "CopyKeyByIndexTo(0)", "false", __LINE__);
+    helper.NotEqual(value1.CopyKeyByIndexTo(ss_var, 4), false, "CopyKeyByIndexTo(4)", "false", __LINE__);
+    helper.Equal(value1.SetCharAndLength(c_str_var, c_str_len), false, "SetCharAndLength()", "false", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
+    helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
+    helper.Equal(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);
+    helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
+    helper.EqualsFalse(value1.SetString(str_var), "SetString()", __LINE__);
+    helper.Equal(value1.GetNumber(), 0U, "GetNumber()", __LINE__);
+    helper.EqualsFalse(value1.SetNumber(num_var), "SetNumber()", __LINE__);
+    helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
 
     h_arr_var.Reset();
     value1 = h_arr_var;
-    EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
+    helper.Equal(value1.Stringify(), "{}", "Stringify()", __LINE__);
 
     value1.Reset();
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value2 = h_arr_var;
 
@@ -1260,16 +1242,16 @@ static int TestObjectValue1() {
 
     value1 = static_cast<VHArray &&>(h_arr_var); // Move
     value2 = value1;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_VALUE(value1.Size(), 10, "Size()");
-    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value1.Size(), 10U, "Size()", __LINE__);
+    helper.Equal(value1.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     value1 = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_VALUE(value1.Stringify(), "{}", "Stringify()");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value1.Stringify(), "{}", "Stringify()", __LINE__);
 
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value2.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value2.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     h_arr_var.Reset();
     // Testing empty values
@@ -1280,7 +1262,7 @@ static int TestObjectValue1() {
     }
 
     value2 = h_arr_var;
-    EQ_VALUE(value2.Size(), 10, "Size()");
+    helper.Equal(value2.Size(), 10U, "Size()", __LINE__);
 
     h_arr_var.Reset();
     for (SizeT i = 0; i < 7; i++) {
@@ -1293,19 +1275,19 @@ static int TestObjectValue1() {
     value1  = static_cast<VHArray &&>(h_arr_var);
 
     value2 = ValueC{value1};
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_VALUE(value2.Size(), 7, "Size()");
-    NOT_EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value2.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value2.Size(), 7U, "Size()", __LINE__);
+    helper.NotEqual(value2.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     h_arr_var.Reset();
     value2 = h_arr_var;
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_TO(value1.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value2.IsObject(), "IsObject()", __LINE__);
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value1.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     h_arr_var.Reset();
     value1 = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
 
     for (unsigned int i = 0; i < 7; i++) {
         VString key("Key_");
@@ -1318,18 +1300,16 @@ static int TestObjectValue1() {
 
     value2.Reset();
     value2 = static_cast<ValueC &&>(value1);
-    EQ_TRUE(value2.IsObject(), "IsObject()");
-    EQ_TO(value2.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value2.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value2.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     h_arr_var.Reset();
     value2 = h_arr_var;
-    EQ_VALUE(value2.Stringify(), "{}", "Stringify()");
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
-
-    END_SUB_TEST;
+    helper.Equal(value2.Stringify(), "{}", "Stringify()", __LINE__);
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 }
 
-static int TestObjectValue2() {
+void TestObjectValue2(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1352,14 +1332,14 @@ static int TestObjectValue2() {
     value1  = static_cast<VHArray &&>(h_arr_var);
 
     ValueC value3(static_cast<ValueC &&>(value1));
-    EQ_TRUE(value3.IsObject(), "IsObject()");
-    EQ_VALUE(value3.Size(), 7, "Size()");
-    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value3.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value3.Size(), 7U, "Size()", __LINE__);
+    helper.Equal(value3.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     h_arr_var.Reset();
     value3 = h_arr_var;
-    EQ_VALUE(value3.Stringify(), "{}", "Stringify()");
-    EQ_TRUE(value1.IsUndefined(), "isUndefined()");
+    helper.Equal(value3.Stringify(), "{}", "Stringify()", __LINE__);
+    helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     h_arr_var.Reset();
     for (unsigned int i = 0; i < 3; i++) {
@@ -1370,10 +1350,10 @@ static int TestObjectValue2() {
 
     storage = h_arr_var.First();
     value3  = h_arr_var; // Copy
-    EQ_VALUE(value3.Size(), 3, "Size()");
-    NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.Equal(value3.Size(), 3U, "Size()", __LINE__);
+    helper.NotEqual(value3.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value3.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     for (unsigned int i = 0; i < 13; i++) {
         VString key("Key_");
@@ -1383,24 +1363,24 @@ static int TestObjectValue2() {
 
     storage = h_arr_var.First();
     value3  = static_cast<VHArray &&>(h_arr_var); // Move
-    EQ_TRUE(value3.IsObject(), "IsObject()");
-    EQ_VALUE(value3.Size(), 13, "Size()");
-    NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value3.GetObject()->First(), storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value3.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value3.Size(), 13U, "Size()", __LINE__);
+    helper.NotEqual(value3.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value3.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     value3 = ValueC{VHArray(4)};
-    EQ_TRUE(value3.IsObject(), "IsObject()");
-    NOT_EQ_TO(value3.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value3.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_VALUE(value3.GetObject()->Capacity(), 4, "GetArray()->Capacity()");
+    helper.EqualsTrue(value3.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value3.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.NotEqual(value3.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value3.GetObject()->Capacity(), 4U, "GetArray()->Capacity()", __LINE__);
 
     value1.Reset();
     value1[""] = 1;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_VALUE(value1[""].GetNumber(), 1, R"(value1[""].GetNumber())");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value1[""].GetNumber(), 1U, R"(value1[""].GetNumber())", __LINE__);
 
     value1.Reset();
 
@@ -1408,13 +1388,13 @@ static int TestObjectValue2() {
     value1["k2"] = 2;
     value1["k3"] = 3;
 
-    EQ_VALUE(value1.Size(), 3, "value1.Size()");
+    helper.Equal(value1.Size(), 3U, "value1.Size()", __LINE__);
 
     value3 = value1;
-    EQ_VALUE(value3.Size(), 3, "value3.Size()");
-    EQ_VALUE(value3["k1"].GetNumber(), 1, "value3[\"k1\"].GetNumber()");
-    EQ_VALUE(value3["k2"].GetNumber(), 2, "value3[\"k2\"].GetNumber()");
-    EQ_VALUE(value3["k3"].GetNumber(), 3, "value3[\"k3\"].GetNumber()");
+    helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
+    helper.Equal(value3["k1"].GetNumber(), 1U, "value3[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value3["k2"].GetNumber(), 2U, "value3[\"k2\"].GetNumber()", __LINE__);
+    helper.Equal(value3["k3"].GetNumber(), 3U, "value3[\"k3\"].GetNumber()", __LINE__);
 
     value1["k1"] = 11;
     value1["k2"] = 22;
@@ -1423,31 +1403,34 @@ static int TestObjectValue2() {
     value1["k3"] = static_cast<VString &&>(str_var);
 
     value3 = value1;
-    EQ_VALUE(value3.Size(), 3, "value3.Size()");
-    EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
-    EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var, "value3[\"k3\"].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()", "Qen");
+    helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
+    helper.Equal(value3["k1"].GetNumber(), 11U, "value3[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value3["k2"].GetNumber(), 22U, "value3[\"k2\"].GetNumber()", __LINE__);
+    helper.NotEqual(value3["k3"].StringStorage(), c_str_var, "value3[\"k3\"].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()",
+                 "Qen", __LINE__);
 
     value3["k4"] = 44;
     value3["k5"] = 55;
-    EQ_VALUE(value3.Size(), 5, "value3.Size()");
-    EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
-    EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value3["k3"].StringStorage(), c_str_var, "value3[\"k3\"].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()", "Qen");
-    EQ_VALUE(value3["k4"].GetNumber(), 44, "value3[\"k4\"].GetNumber()");
-    EQ_VALUE(value3["k5"].GetNumber(), 55, "value3[\"k5\"].GetNumber()");
+    helper.Equal(value3.Size(), 5U, "value3.Size()", __LINE__);
+    helper.Equal(value3["k1"].GetNumber(), 11U, "value3[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value3["k2"].GetNumber(), 22U, "value3[\"k2\"].GetNumber()", __LINE__);
+    helper.NotEqual(value3["k3"].StringStorage(), c_str_var, "value3[\"k3\"].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()",
+                 "Qen", __LINE__);
+    helper.Equal(value3["k4"].GetNumber(), 44U, "value3[\"k4\"].GetNumber()", __LINE__);
+    helper.Equal(value3["k5"].GetNumber(), 55U, "value3[\"k5\"].GetNumber()", __LINE__);
 
     value3 = value1;
-    EQ_VALUE(value3.Size(), 3, "value3.Size()");
-    EQ_VALUE(value3["k1"].GetNumber(), 11, "value3[\"k1\"].GetNumber()");
-    EQ_VALUE(value3["k2"].GetNumber(), 22, "value3[\"k2\"].GetNumber()");
-    EQ_TO(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()", "Qen");
-    EQ_TO(value3.GetValue("k4", 2), nullptr, "value3.GetValue(\"k4\", 2)", "null");
-    EQ_TO(value3.GetValue(3), nullptr, "value3.GetValue(3)", "null");
-    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)", "null");
-    EQ_TO(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null");
+    helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
+    helper.Equal(value3["k1"].GetNumber(), 11U, "value3[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value3["k2"].GetNumber(), 22U, "value3[\"k2\"].GetNumber()", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), true, "value3[\"k3\"].StringStorage()",
+                 "Qen", __LINE__);
+    helper.Equal(value3.GetValue("k4", 2), nullptr, "value3.GetValue(\"k4\", 2)", "null", __LINE__);
+    helper.Equal(value3.GetValue(3), nullptr, "value3.GetValue(3)", "null", __LINE__);
+    helper.Equal(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)", "null", __LINE__);
+    helper.Equal(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null", __LINE__);
 
     ////////////////////
     h_arr_var[VString("w1")] = 10;
@@ -1458,15 +1441,15 @@ static int TestObjectValue2() {
     h_arr_var[VString("w4")] = static_cast<VString &&>(str_var);
 
     value3 = h_arr_var;
-    EQ_VALUE(value3.Size(), 4, "value3.Size()");
-    EQ_VALUE(value3["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value3["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value3["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value3["w4"].StringStorage(), c_str_var, "value3[\"w4\"].StringStorage()", "c_str_var");
-    EQ_TO(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value3[\"w4\"].StringStorage()", "Qen");
-    EQ_TO(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)", "null");
-    EQ_TO(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null");
+    helper.Equal(value3.Size(), 4U, "value3.Size()", __LINE__);
+    helper.Equal(value3["w1"].GetNumber(), 10U, "[\"w1\"].GetNumber()", __LINE__);
+    helper.Equal(value3["w2"].GetNumber(), 20U, "[\"w2\"].GetNumber()", __LINE__);
+    helper.Equal(value3["w3"].GetNumber(), 30U, "[\"w3\"].GetNumber()", __LINE__);
+    helper.NotEqual(value3["w4"].StringStorage(), c_str_var, "value3[\"w4\"].StringStorage()", "c_str_var", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value3[\"w4\"].StringStorage()", "Qen", __LINE__);
+    helper.Equal(value3.GetValue("k5", 2), nullptr, "value3.GetValue(\"k5\", 2)", "null", __LINE__);
+    helper.Equal(value3.GetValue(4), nullptr, "value3.GetValue(4)", "null", __LINE__);
     ////////////////////
 
     h_arr_var.Reserve(10);
@@ -1475,17 +1458,15 @@ static int TestObjectValue2() {
     h_arr_var[VString("w3")] = 30;
 
     value3 = static_cast<VHArray &&>(h_arr_var);
-    EQ_VALUE(value3.Size(), 3, "value3.Size()");
+    helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
 
     value3.Compress();
-    NOT_EQ_TO(value3.GetObject(), nullptr, "GetArray()", "null");
-    EQ_VALUE(value3.GetObject()->Size(), 3, "Size()");
-    EQ_TRUE(value3.GetObject()->Capacity() >= 3, "GetObject()->Capacity() >= 3");
-
-    END_SUB_TEST;
+    helper.NotEqual(value3.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value3.GetObject()->Size(), 3U, "Size()", __LINE__);
+    helper.EqualsTrue(value3.GetObject()->Capacity() >= 3U, "GetObject()->Capacity() >= 3", __LINE__);
 }
 
-static int TestMoveValue1() {
+void TestMoveValue1(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -1506,22 +1487,22 @@ static int TestMoveValue1() {
     value1 = true;
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = true;
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = true;
 
     value1 = 11;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 11, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 11U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1530,8 +1511,8 @@ static int TestMoveValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1540,10 +1521,10 @@ static int TestMoveValue1() {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1552,10 +1533,10 @@ static int TestMoveValue1() {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<VHArray &&>(h_arr_var);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1563,22 +1544,22 @@ static int TestMoveValue1() {
     value1 = false;
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = false;
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = false;
 
     value1 = -90;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), -90, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), -90, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1587,8 +1568,8 @@ static int TestMoveValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1597,10 +1578,10 @@ static int TestMoveValue1() {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1609,10 +1590,10 @@ static int TestMoveValue1() {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<VHArray &&>(h_arr_var);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1620,22 +1601,22 @@ static int TestMoveValue1() {
     value1 = nullptr;
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = nullptr;
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = nullptr;
 
     value1 = 7.5;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 7.5, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1644,8 +1625,8 @@ static int TestMoveValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1654,10 +1635,10 @@ static int TestMoveValue1() {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1666,10 +1647,10 @@ static int TestMoveValue1() {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<VHArray &&>(h_arr_var);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1677,21 +1658,21 @@ static int TestMoveValue1() {
     value1 = 13;
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = 40;
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = 33;
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1700,8 +1681,8 @@ static int TestMoveValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1710,10 +1691,10 @@ static int TestMoveValue1() {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1722,10 +1703,10 @@ static int TestMoveValue1() {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<VHArray &&>(h_arr_var);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1733,29 +1714,29 @@ static int TestMoveValue1() {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = 4;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 4, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 4U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1764,10 +1745,10 @@ static int TestMoveValue1() {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1776,10 +1757,10 @@ static int TestMoveValue1() {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<VHArray &&>(h_arr_var);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1787,29 +1768,29 @@ static int TestMoveValue1() {
     value1 = VArray(1);
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VArray(1);
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VArray(1);
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VArray(1);
 
     value1 = 33;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1818,8 +1799,8 @@ static int TestMoveValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1828,18 +1809,16 @@ static int TestMoveValue1() {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = static_cast<VHArray &&>(h_arr_var);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestMoveValue2() {
+void TestMoveValue2(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -1859,29 +1838,29 @@ static int TestMoveValue2() {
     value1 = VHArray(1);
 
     value1 = true;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VHArray(1);
 
     value1 = false;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VHArray(1);
 
     value1 = nullptr;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VHArray(1);
 
     value1 = 33;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1890,8 +1869,8 @@ static int TestMoveValue2() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = static_cast<VString &&>(str_var);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1900,18 +1879,16 @@ static int TestMoveValue2() {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestMoveValue3() {
+void TestMoveValue3(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1934,7 +1911,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1942,7 +1919,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1950,8 +1927,8 @@ static int TestMoveValue3() {
 
     value2 = 11;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 11, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 11U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1961,8 +1938,8 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1972,10 +1949,10 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<VArray &&>(arr_var);
     value1      = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -1985,10 +1962,10 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -1997,7 +1974,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2005,7 +1982,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2013,8 +1990,8 @@ static int TestMoveValue3() {
 
     value2 = -90;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), -90, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), -90, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2024,8 +2001,8 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2035,10 +2012,10 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<VArray &&>(arr_var);
     value1      = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2048,10 +2025,10 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2060,7 +2037,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2068,7 +2045,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2076,8 +2053,8 @@ static int TestMoveValue3() {
 
     value2 = 7.5;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 7.5, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2087,8 +2064,8 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2098,10 +2075,10 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<VArray &&>(arr_var);
     value1      = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2111,10 +2088,10 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2123,7 +2100,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2131,7 +2108,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2139,7 +2116,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2149,8 +2126,8 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2160,10 +2137,10 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<VArray &&>(arr_var);
     value1      = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2173,10 +2150,10 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2185,7 +2162,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2193,7 +2170,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2201,7 +2178,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2209,8 +2186,8 @@ static int TestMoveValue3() {
 
     value2 = 4;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 4, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 4U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2220,10 +2197,10 @@ static int TestMoveValue3() {
     arr_storage = arr_var.First();
     value2      = static_cast<VArray &&>(arr_var);
     value1      = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2233,10 +2210,10 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2245,7 +2222,7 @@ static int TestMoveValue3() {
 
     value2 = true;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2253,7 +2230,7 @@ static int TestMoveValue3() {
 
     value2 = false;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2261,7 +2238,7 @@ static int TestMoveValue3() {
 
     value2 = nullptr;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2269,8 +2246,8 @@ static int TestMoveValue3() {
 
     value2 = 33;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2280,8 +2257,8 @@ static int TestMoveValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2291,18 +2268,16 @@ static int TestMoveValue3() {
     h_arr_storage = h_arr_var.First();
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestMoveValue4() {
+void TestMoveValue4(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -2324,7 +2299,7 @@ static int TestMoveValue4() {
 
     value2 = true;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2332,7 +2307,7 @@ static int TestMoveValue4() {
 
     value2 = false;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2340,7 +2315,7 @@ static int TestMoveValue4() {
 
     value2 = nullptr;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2348,8 +2323,8 @@ static int TestMoveValue4() {
 
     value2 = 33;
     value1 = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2359,8 +2334,8 @@ static int TestMoveValue4() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsString(), "IsString()");
-    EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2370,18 +2345,16 @@ static int TestMoveValue4() {
     arr_storage = arr_var.First();
     value2      = static_cast<VArray &&>(arr_var);
     value1      = static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestCopyValue1() {
+void TestCopyValue1(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -2404,8 +2377,8 @@ static int TestCopyValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2414,9 +2387,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2425,10 +2398,10 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2437,9 +2410,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2452,10 +2425,10 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2465,8 +2438,8 @@ static int TestCopyValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2475,9 +2448,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2486,10 +2459,10 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2498,9 +2471,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2513,10 +2486,10 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2526,8 +2499,8 @@ static int TestCopyValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2536,9 +2509,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -2547,10 +2520,10 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2559,9 +2532,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -2574,10 +2547,10 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2587,8 +2560,8 @@ static int TestCopyValue1() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2597,9 +2570,9 @@ static int TestCopyValue1() {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = 33;
 
@@ -2608,10 +2581,10 @@ static int TestCopyValue1() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2620,9 +2593,9 @@ static int TestCopyValue1() {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = 34;
 
@@ -2635,18 +2608,16 @@ static int TestCopyValue1() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestCopyValue2() {
+void TestCopyValue2(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -2668,9 +2639,9 @@ static int TestCopyValue2() {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -2679,10 +2650,10 @@ static int TestCopyValue2() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2691,9 +2662,9 @@ static int TestCopyValue2() {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -2706,10 +2677,10 @@ static int TestCopyValue2() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2719,8 +2690,8 @@ static int TestCopyValue2() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2729,9 +2700,9 @@ static int TestCopyValue2() {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VArray(1);
 
@@ -2744,10 +2715,10 @@ static int TestCopyValue2() {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2757,8 +2728,8 @@ static int TestCopyValue2() {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2767,9 +2738,9 @@ static int TestCopyValue2() {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VHArray(1);
 
@@ -2778,16 +2749,15 @@ static int TestCopyValue2() {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
     ////////////////////////////////////////////
-    END_SUB_TEST;
 }
 
-static int TestCopyValue3() {
+void TestCopyValue3(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -2810,7 +2780,7 @@ static int TestCopyValue3() {
 
     value2 = false;
     value1 = value2;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2818,7 +2788,7 @@ static int TestCopyValue3() {
 
     value2 = nullptr;
     value1 = value2;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2826,8 +2796,8 @@ static int TestCopyValue3() {
 
     value2 = 11;
     value1 = value2;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 11, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 11U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2837,8 +2807,8 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2848,9 +2818,9 @@ static int TestCopyValue3() {
     value2 = VArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2861,10 +2831,10 @@ static int TestCopyValue3() {
     value2      = static_cast<VArray &&>(arr_var);
     value1      = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2874,9 +2844,9 @@ static int TestCopyValue3() {
     value2 = VHArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2891,10 +2861,10 @@ static int TestCopyValue3() {
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2903,7 +2873,7 @@ static int TestCopyValue3() {
 
     value2 = true;
     value1 = value2;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2911,7 +2881,7 @@ static int TestCopyValue3() {
 
     value2 = nullptr;
     value1 = value2;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2919,8 +2889,8 @@ static int TestCopyValue3() {
 
     value2 = -90;
     value1 = value2;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), -90, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), -90, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2930,8 +2900,8 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2941,9 +2911,9 @@ static int TestCopyValue3() {
     value2 = VArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2954,10 +2924,10 @@ static int TestCopyValue3() {
     value2      = static_cast<VArray &&>(arr_var);
     value1      = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -2967,9 +2937,9 @@ static int TestCopyValue3() {
     value2 = VHArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2984,10 +2954,10 @@ static int TestCopyValue3() {
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -2996,7 +2966,7 @@ static int TestCopyValue3() {
 
     value2 = true;
     value1 = value2;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3004,7 +2974,7 @@ static int TestCopyValue3() {
 
     value2 = false;
     value1 = value2;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3012,8 +2982,8 @@ static int TestCopyValue3() {
 
     value2 = 7.5;
     value1 = value2;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 7.5, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 7.5, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3023,8 +2993,8 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3034,9 +3004,9 @@ static int TestCopyValue3() {
     value2 = VArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -3047,10 +3017,10 @@ static int TestCopyValue3() {
     value2      = static_cast<VArray &&>(arr_var);
     value1      = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3060,9 +3030,9 @@ static int TestCopyValue3() {
     value2 = VHArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -3077,10 +3047,10 @@ static int TestCopyValue3() {
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3089,7 +3059,7 @@ static int TestCopyValue3() {
 
     value2 = true;
     value1 = value2;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3097,7 +3067,7 @@ static int TestCopyValue3() {
 
     value2 = false;
     value1 = value2;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3105,7 +3075,7 @@ static int TestCopyValue3() {
 
     value2 = nullptr;
     value1 = value2;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3115,8 +3085,8 @@ static int TestCopyValue3() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3126,9 +3096,9 @@ static int TestCopyValue3() {
     value2 = VArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = 10e10;
 
@@ -3139,10 +3109,10 @@ static int TestCopyValue3() {
     value2      = static_cast<VArray &&>(arr_var);
     value1      = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3152,9 +3122,9 @@ static int TestCopyValue3() {
     value2 = VHArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = 9.1;
 
@@ -3169,18 +3139,16 @@ static int TestCopyValue3() {
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestCopyValue4() {
+void TestCopyValue4(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -3203,7 +3171,7 @@ static int TestCopyValue4() {
 
     value2 = true;
     value1 = value2;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3211,7 +3179,7 @@ static int TestCopyValue4() {
 
     value2 = false;
     value1 = value2;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3219,7 +3187,7 @@ static int TestCopyValue4() {
 
     value2 = nullptr;
     value1 = value2;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3227,8 +3195,8 @@ static int TestCopyValue4() {
 
     value2 = 4;
     value1 = value2;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 4, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 4U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3238,9 +3206,9 @@ static int TestCopyValue4() {
     value2 = VArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -3251,10 +3219,10 @@ static int TestCopyValue4() {
     value2      = static_cast<VArray &&>(arr_var);
     value1      = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3264,9 +3232,9 @@ static int TestCopyValue4() {
     value2 = VHArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -3281,10 +3249,10 @@ static int TestCopyValue4() {
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3293,7 +3261,7 @@ static int TestCopyValue4() {
 
     value2 = true;
     value1 = value2;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3301,7 +3269,7 @@ static int TestCopyValue4() {
 
     value2 = false;
     value1 = value2;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3309,7 +3277,7 @@ static int TestCopyValue4() {
 
     value2 = nullptr;
     value1 = value2;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3317,8 +3285,8 @@ static int TestCopyValue4() {
 
     value2 = 33;
     value1 = value2;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3328,8 +3296,8 @@ static int TestCopyValue4() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3339,9 +3307,9 @@ static int TestCopyValue4() {
     value2 = VHArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VArray(1);
 
@@ -3356,10 +3324,10 @@ static int TestCopyValue4() {
     value2        = static_cast<VHArray &&>(h_arr_var);
     value1        = value2;
 
-    EQ_TRUE(value1.IsObject(), "IsObject()");
-    NOT_EQ_TO(value1.GetObject(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null");
-    NOT_EQ_TO(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage");
+    helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
+    helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetObject()->First(), h_arr_storage, "GetObject()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
@@ -3368,7 +3336,7 @@ static int TestCopyValue4() {
 
     value2 = true;
     value1 = value2;
-    EQ_TRUE(value1.IsTrue(), "IsTrue()");
+    helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3376,7 +3344,7 @@ static int TestCopyValue4() {
 
     value2 = false;
     value1 = value2;
-    EQ_TRUE(value1.IsFalse(), "IsFalse()");
+    helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3384,7 +3352,7 @@ static int TestCopyValue4() {
 
     value2 = nullptr;
     value1 = value2;
-    EQ_TRUE(value1.IsNull(), "IsNull()");
+    helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3392,8 +3360,8 @@ static int TestCopyValue4() {
 
     value2 = 33;
     value1 = value2;
-    EQ_TRUE(value1.IsNumber(), "IsNumber()");
-    EQ_VALUE(value1.GetNumber(), 33, "GetNumber()");
+    helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
+    helper.Equal(value1.GetNumber(), 33U, "GetNumber()", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3403,8 +3371,8 @@ static int TestCopyValue4() {
     c_str_var = str_var.First();
     value2    = static_cast<VString &&>(str_var);
     value1    = value2;
-    EQ_TRUE(value1.IsString(), "IsString()");
-    NOT_EQ_TO(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var");
+    helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
+    helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
 
     /////////////
@@ -3414,9 +3382,9 @@ static int TestCopyValue4() {
     value2 = VArray(1);
     value1 = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     value1.Reset();
     value1 = VHArray(1);
 
@@ -3427,18 +3395,16 @@ static int TestCopyValue4() {
     value2      = static_cast<VArray &&>(arr_var);
     value1      = value2;
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
     value1.Reset();
 
     ////////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestIndexOperator1() {
+void TestIndexOperator1(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -3449,20 +3415,20 @@ static int TestIndexOperator1() {
     value = VHArray(1); // Test changing type
 
     value[0] = 5;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 5, "value[0]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 5U, "value[0]", __LINE__);
 
     value[0] = 20;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 20U, "value[0]", __LINE__);
 
     value[1] = 30;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
-    EQ_VALUE(value[1].GetNumber(), 30, "value[1]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 20U, "value[0]", __LINE__);
+    helper.Equal(value[1].GetNumber(), 30U, "value[1]", __LINE__);
 
     value[0]               = 50;
     value[1]               = 100;
@@ -3471,51 +3437,51 @@ static int TestIndexOperator1() {
     value[vu_long_long{4}] = 400;
     value[vu_int{5}]       = 500;
 
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 6, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 50, "value[0]");
-    EQ_VALUE(value[1].GetNumber(), 100, "value[1]");
-    EQ_VALUE(value[2].GetNumber(), 200, "value[2]");
-    EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
-    EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
-    EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
-    NOT_EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
-    NOT_EQ_TO(value.GetValue(2), nullptr, "GetValue(2)", "null");
-    NOT_EQ_TO(value.GetValue(3), nullptr, "GetValue(3)", "null");
-    NOT_EQ_TO(value.GetValue(4), nullptr, "GetValue(4)", "null");
-    NOT_EQ_TO(value.GetValue(5), nullptr, "GetValue(5)", "null");
-    NOT_EQ_TO(value.GetValue("5", 1), nullptr, "GetValue(\"5\")", "null");
-    EQ_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
-    EQ_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
-    EQ_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");
-    EQ_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
-    EQ_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
-    EQ_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
-    EQ_TO(value.GetValue(6), nullptr, "GetValue(6)", "null");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 6U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 50U, "value[0]", __LINE__);
+    helper.Equal(value[1].GetNumber(), 100U, "value[1]", __LINE__);
+    helper.Equal(value[2].GetNumber(), 200U, "value[2]", __LINE__);
+    helper.Equal(value[3].GetNumber(), 300U, "value[3]", __LINE__);
+    helper.Equal(value[4].GetNumber(), 400U, "value[4]", __LINE__);
+    helper.Equal(value[5].GetNumber(), 500U, "value[5]", __LINE__);
+    helper.NotEqual(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(1), nullptr, "GetValue(1)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(2), nullptr, "GetValue(2)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(3), nullptr, "GetValue(3)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(5), nullptr, "GetValue(5)", "null", __LINE__);
+    helper.NotEqual(value.GetValue("5", 1), nullptr, "GetValue(\"5\")", "null", __LINE__);
+    helper.Equal(value.GetValue(0)->GetNumber(), 50U, "GetValue(0)", __LINE__);
+    helper.Equal(value.GetValue(1)->GetNumber(), 100U, "GetValue(1)", __LINE__);
+    helper.Equal(value.GetValue(2)->GetNumber(), 200U, "GetValue(2)", __LINE__);
+    helper.Equal(value.GetValue(3)->GetNumber(), 300U, "GetValue(3)", __LINE__);
+    helper.Equal(value.GetValue(4)->GetNumber(), 400U, "GetValue(4)", __LINE__);
+    helper.Equal(value.GetValue(5)->GetNumber(), 500U, "GetValue(5)", __LINE__);
+    helper.Equal(value.GetValue(6), nullptr, "GetValue(6)", "null", __LINE__);
 
     //////////////////////////////////////////
     value.Reset();
 
     value["A"] = 7.5;
-    EQ_TRUE(value.IsObject(), "IsObject()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 7.5, "value[0]");
-    EQ_VALUE(value["A"].GetNumber(), 7.5, "value[\"A\"]");
+    helper.EqualsTrue(value.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 7.5, "value[0]", __LINE__);
+    helper.Equal(value["A"].GetNumber(), 7.5, "value[\"A\"]", __LINE__);
 
     value["A"] = 59;
-    EQ_TRUE(value.IsObject(), "IsObject()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 59, "value[0]");
-    EQ_VALUE(value["A"].GetNumber(), 59, "value[\"A\"]");
+    helper.EqualsTrue(value.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 59U, "value[0]", __LINE__);
+    helper.Equal(value["A"].GetNumber(), 59U, "value[\"A\"]", __LINE__);
 
     value["B"] = 60;
-    EQ_TRUE(value.IsObject(), "IsObject()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 59, "value[0]");
-    EQ_VALUE(value["A"].GetNumber(), 59, "value[\"A\"]");
-    EQ_VALUE(value[1].GetNumber(), 60, "value[1]");
-    EQ_VALUE(value["B"].GetNumber(), 60, "value[\"B\"]");
+    helper.EqualsTrue(value.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 59U, "value[0]", __LINE__);
+    helper.Equal(value["A"].GetNumber(), 59U, "value[\"A\"]", __LINE__);
+    helper.Equal(value[1].GetNumber(), 60U, "value[1]", __LINE__);
+    helper.Equal(value["B"].GetNumber(), 60U, "value[\"B\"]", __LINE__);
 
     value[0]                   = 50;
     value["B"]                 = 100;
@@ -3524,71 +3490,69 @@ static int TestIndexOperator1() {
     value["EFEFE"]             = 400;
     value[VString("FGHIGKLM")] = 500;
 
-    EQ_TRUE(value.IsObject(), "IsObject()");
-    EQ_VALUE(value.Size(), 6, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 50, "value[0]");
-    EQ_VALUE(value[1].GetNumber(), 100, "value[1]");
-    EQ_VALUE(value[2].GetNumber(), 200, "value[2]");
-    EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
-    EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
-    EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
-    EQ_VALUE(value["A"].GetNumber(), 50, "value[\"A\"]");
-    EQ_VALUE(value["B"].GetNumber(), 100, "value[\"B\"]");
-    EQ_VALUE(value["C"].GetNumber(), 200, "value[\"C\"]");
-    EQ_VALUE(value["D"].GetNumber(), 300, "value[\"D\"]");
-    EQ_VALUE(value["EFEFE"].GetNumber(), 400, "value[\"EFEFE\"]");
-    EQ_VALUE(value["FGHIGKLM"].GetNumber(), 500, "value[\"FGHIGKLM\"]");
-    NOT_EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    NOT_EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
-    NOT_EQ_TO(value.GetValue(2), nullptr, "GetValue(2)", "null");
-    NOT_EQ_TO(value.GetValue(3), nullptr, "GetValue(3)", "null");
-    NOT_EQ_TO(value.GetValue(4), nullptr, "GetValue(4)", "null");
-    NOT_EQ_TO(value.GetValue(5), nullptr, "GetValue(5)", "null");
-    EQ_VALUE(value.GetValue(0)->GetNumber(), 50, "GetValue(0)");
-    EQ_VALUE(value.GetValue(1)->GetNumber(), 100, "GetValue(1)");
-    EQ_VALUE(value.GetValue(2)->GetNumber(), 200, "GetValue(2)");
-    EQ_VALUE(value.GetValue(3)->GetNumber(), 300, "GetValue(3)");
-    EQ_VALUE(value.GetValue(4)->GetNumber(), 400, "GetValue(4)");
-    EQ_VALUE(value.GetValue(5)->GetNumber(), 500, "GetValue(5)");
+    helper.EqualsTrue(value.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value.Size(), 6U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 50U, "value[0]", __LINE__);
+    helper.Equal(value[1].GetNumber(), 100U, "value[1]", __LINE__);
+    helper.Equal(value[2].GetNumber(), 200U, "value[2]", __LINE__);
+    helper.Equal(value[3].GetNumber(), 300U, "value[3]", __LINE__);
+    helper.Equal(value[4].GetNumber(), 400U, "value[4]", __LINE__);
+    helper.Equal(value[5].GetNumber(), 500U, "value[5]", __LINE__);
+    helper.Equal(value["A"].GetNumber(), 50U, "value[\"A\"]", __LINE__);
+    helper.Equal(value["B"].GetNumber(), 100U, "value[\"B\"]", __LINE__);
+    helper.Equal(value["C"].GetNumber(), 200U, "value[\"C\"]", __LINE__);
+    helper.Equal(value["D"].GetNumber(), 300U, "value[\"D\"]", __LINE__);
+    helper.Equal(value["EFEFE"].GetNumber(), 400U, "value[\"EFEFE\"]", __LINE__);
+    helper.Equal(value["FGHIGKLM"].GetNumber(), 500U, "value[\"FGHIGKLM\"]", __LINE__);
+    helper.NotEqual(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(1), nullptr, "GetValue(1)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(2), nullptr, "GetValue(2)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(3), nullptr, "GetValue(3)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
+    helper.NotEqual(value.GetValue(5), nullptr, "GetValue(5)", "null", __LINE__);
+    helper.Equal(value.GetValue(0)->GetNumber(), 50U, "GetValue(0)", __LINE__);
+    helper.Equal(value.GetValue(1)->GetNumber(), 100U, "GetValue(1)", __LINE__);
+    helper.Equal(value.GetValue(2)->GetNumber(), 200U, "GetValue(2)", __LINE__);
+    helper.Equal(value.GetValue(3)->GetNumber(), 300U, "GetValue(3)", __LINE__);
+    helper.Equal(value.GetValue(4)->GetNumber(), 400U, "GetValue(4)", __LINE__);
+    helper.Equal(value.GetValue(5)->GetNumber(), 500U, "GetValue(5)", __LINE__);
 
-    NOT_EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(value.GetKey(1), nullptr, "GetKey(1)", "null");
-    NOT_EQ_TO(value.GetKey(2), nullptr, "GetKey(2)", "null");
-    NOT_EQ_TO(value.GetKey(3), nullptr, "GetKey(3)", "null");
-    NOT_EQ_TO(value.GetKey(4), nullptr, "GetKey(4)", "null");
-    NOT_EQ_TO(value.GetKey(5), nullptr, "GetKey(5)", "null");
+    helper.NotEqual(value.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.NotEqual(value.GetKey(1), nullptr, "GetKey(1)", "null", __LINE__);
+    helper.NotEqual(value.GetKey(2), nullptr, "GetKey(2)", "null", __LINE__);
+    helper.NotEqual(value.GetKey(3), nullptr, "GetKey(3)", "null", __LINE__);
+    helper.NotEqual(value.GetKey(4), nullptr, "GetKey(4)", "null", __LINE__);
+    helper.NotEqual(value.GetKey(5), nullptr, "GetKey(5)", "null", __LINE__);
 
-    EQ_TRUE(value.GetKey(0)->IsEqual("A", 1), "GetKey(0)->IsEqual()");
-    EQ_TRUE(value.GetKey(1)->IsEqual("B", 1), "GetKey(1)->IsEqual()");
-    EQ_TRUE(value.GetKey(2)->IsEqual("C", 1), "GetKey(2)->IsEqual()");
-    EQ_TRUE(value.GetKey(3)->IsEqual("D", 1), "GetKey(3)->IsEqual()");
-    EQ_TRUE(value.GetKey(4)->IsEqual("EFEFE", 5), "GetKey(4)->IsEqual()");
-    EQ_TRUE(value.GetKey(5)->IsEqual("FGHIGKLM", 8), "GetKey(5)->IsEqual()");
+    helper.EqualsTrue(value.GetKey(0)->IsEqual("A", 1), "GetKey(0)->IsEqual()", __LINE__);
+    helper.EqualsTrue(value.GetKey(1)->IsEqual("B", 1), "GetKey(1)->IsEqual()", __LINE__);
+    helper.EqualsTrue(value.GetKey(2)->IsEqual("C", 1), "GetKey(2)->IsEqual()", __LINE__);
+    helper.EqualsTrue(value.GetKey(3)->IsEqual("D", 1), "GetKey(3)->IsEqual()", __LINE__);
+    helper.EqualsTrue(value.GetKey(4)->IsEqual("EFEFE", 5), "GetKey(4)->IsEqual()", __LINE__);
+    helper.EqualsTrue(value.GetKey(5)->IsEqual("FGHIGKLM", 8), "GetKey(5)->IsEqual()", __LINE__);
 
-    EQ_TO(value.GetValue(6), nullptr, "GetValue(6)", "null");
+    helper.Equal(value.GetValue(6), nullptr, "GetValue(6)", "null", __LINE__);
 
     value.Reset();
 
     value[VString("C")] = 4;
-    EQ_TRUE(value.IsObject(), "IsObject()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 4, "value[0]");
-    EQ_VALUE(value[VString("C")].GetNumber(), 4, "value[\"C\"]");
+    helper.EqualsTrue(value.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 4U, "value[0]", __LINE__);
+    helper.Equal(value[VString("C")].GetNumber(), 4U, "value[\"C\"]", __LINE__);
 
     value.Reset();
 
     value[str2] = 5;
-    EQ_TRUE(value.IsObject(), "IsObject()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 5, "value[0]");
-    EQ_VALUE(value[str2].GetNumber(), 5, "value[\"C\"]");
+    helper.EqualsTrue(value.IsObject(), "IsObject()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 5U, "value[0]", __LINE__);
+    helper.Equal(value[str2].GetNumber(), 5U, "value[\"C\"]", __LINE__);
 
     //////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestIndexOperator2() {
+void TestIndexOperator2(TestHelper &helper) {
     ValueC  value;
     ValueC *value_ptr;
 
@@ -3597,33 +3561,31 @@ static int TestIndexOperator2() {
     value["CCCC"] = 30;
 
     value_ptr = value.GetValue("A", 1);
-    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"A\", 1)", "null");
-    EQ_VALUE(value_ptr->GetNumber(), 10, "GetValue(\"A\", 1)");
+    helper.NotEqual(value_ptr, nullptr, "GetValue(\"A\", 1)", "null", __LINE__);
+    helper.Equal(value_ptr->GetNumber(), 10U, "GetValue(\"A\", 1)", __LINE__);
 
     value_ptr = value.GetValue("ABCDEF", 1);
-    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"ABCDEF\", 1)", "null");
-    EQ_VALUE(value_ptr->GetNumber(), 10, "GetValue(\"ABCDEF\", 1)");
+    helper.NotEqual(value_ptr, nullptr, "GetValue(\"ABCDEF\", 1)", "null", __LINE__);
+    helper.Equal(value_ptr->GetNumber(), 10U, "GetValue(\"ABCDEF\", 1)", __LINE__);
 
     value_ptr = value.GetValue("BB", 2);
-    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"BB\", 2)", "null");
-    EQ_VALUE(value_ptr->GetNumber(), 20, "GetValue(\"BB\", 2)");
+    helper.NotEqual(value_ptr, nullptr, "GetValue(\"BB\", 2)", "null", __LINE__);
+    helper.Equal(value_ptr->GetNumber(), 20U, "GetValue(\"BB\", 2)", __LINE__);
 
     value_ptr = value.GetValue("CCCC", 4);
-    NOT_EQ_TO(value_ptr, nullptr, "GetValue(\"CCCC\", 4)", "null");
-    EQ_VALUE(value_ptr->GetNumber(), 30, "GetValue(\"CCCC\", 4)");
+    helper.NotEqual(value_ptr, nullptr, "GetValue(\"CCCC\", 4)", "null", __LINE__);
+    helper.Equal(value_ptr->GetNumber(), 30U, "GetValue(\"CCCC\", 4)", __LINE__);
     ////////////////////
-    EQ_TO(value.GetValue("a", 1), nullptr, "GetValue(\"a\", 1)", "null");
-    EQ_TO(value.GetValue("ABCDEF", 6), nullptr, "GetValue(\"ABCDEF\", 1)", "null");
-    EQ_TO(value.GetValue("b", 1), nullptr, "GetValue(\"b\", 1)", "null");
-    EQ_TO(value.GetValue("bb", 2), nullptr, "GetValue(\"bb\", 2)", "null");
+    helper.Equal(value.GetValue("a", 1), nullptr, "GetValue(\"a\", 1)", "null", __LINE__);
+    helper.Equal(value.GetValue("ABCDEF", 6), nullptr, "GetValue(\"ABCDEF\", 1)", "null", __LINE__);
+    helper.Equal(value.GetValue("b", 1), nullptr, "GetValue(\"b\", 1)", "null", __LINE__);
+    helper.Equal(value.GetValue("bb", 2), nullptr, "GetValue(\"bb\", 2)", "null", __LINE__);
 
-    EQ_TO(value.GetValue("CCC", 3), nullptr, "GetValue(\"CCCC\", 3)", "null");
+    helper.Equal(value.GetValue("CCC", 3), nullptr, "GetValue(\"CCCC\", 3)", "null", __LINE__);
     ////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestAddition1() {
+void TestAddition1(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -3632,15 +3594,15 @@ static int TestAddition1() {
     VString str2("DEFG");
 
     value += 20;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 20U, "value[0]", __LINE__);
 
     value += 30;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 20, "value[0]");
-    EQ_VALUE(value[1].GetNumber(), 30, "value[1]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 20U, "value[0]", __LINE__);
+    helper.Equal(value[1].GetNumber(), 30U, "value[1]", __LINE__);
 
     value[0] = 50;
     value[1] = 100;
@@ -3649,30 +3611,28 @@ static int TestAddition1() {
     value += vu_long_long{400};
     value += double{500};
 
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 6, "Size()");
-    EQ_VALUE(value[0].GetNumber(), 50, "value[0]");
-    EQ_VALUE(value[1].GetNumber(), 100, "value[1]");
-    EQ_VALUE(value[2].GetNumber(), 200, "value[2]");
-    EQ_VALUE(value[3].GetNumber(), 300, "value[3]");
-    EQ_VALUE(value[4].GetNumber(), 400, "value[4]");
-    EQ_VALUE(value[5].GetNumber(), 500, "value[5]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 6U, "Size()", __LINE__);
+    helper.Equal(value[0].GetNumber(), 50U, "value[0]", __LINE__);
+    helper.Equal(value[1].GetNumber(), 100U, "value[1]", __LINE__);
+    helper.Equal(value[2].GetNumber(), 200U, "value[2]", __LINE__);
+    helper.Equal(value[3].GetNumber(), 300U, "value[3]", __LINE__);
+    helper.Equal(value[4].GetNumber(), 400U, "value[4]", __LINE__);
+    helper.Equal(value[5].GetNumber(), 500U, "value[5]", __LINE__);
 
     value.Reset();
 
     value[10] = 100;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 11, "Size()");
-    EQ_TRUE(value[3].IsUndefined(), "value[3]");
-    EQ_TRUE(value[4].IsUndefined(), "value[4]");
-    EQ_TRUE(value[5].IsUndefined(), "value[5]");
-    EQ_VALUE(value[10].GetNumber(), 100, "value[10]");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 11U, "Size()", __LINE__);
+    helper.EqualsTrue(value[3].IsUndefined(), "value[3]", __LINE__);
+    helper.EqualsTrue(value[4].IsUndefined(), "value[4]", __LINE__);
+    helper.EqualsTrue(value[5].IsUndefined(), "value[5]", __LINE__);
+    helper.Equal(value[10].GetNumber(), 100U, "value[10]", __LINE__);
     //////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestAddition2() {
+void TestAddition2(TestHelper &helper) {
     ValueC  value;
     VArray  arr_var;
     VString str;
@@ -3680,135 +3640,133 @@ static int TestAddition2() {
     /////////////////
 
     value += true;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsTrue(), "value[0].IsTrue()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsTrue(), "value[0].IsTrue()", __LINE__);
 
     value += true;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsTrue(), "value[0].IsTrue()");
-    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsTrue(), "value[0].IsTrue()", __LINE__);
+    helper.EqualsTrue(value[1].IsTrue(), "value[1].IsTrue()", __LINE__);
 
     value.Reset();
     /////////////////
 
     value += false;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsFalse(), "value[0].IsFalse()", __LINE__);
 
     value += false;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    EQ_TRUE(value[1].IsFalse(), "value[1].IsFalse()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsFalse(), "value[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value[1].IsFalse(), "value[1].IsFalse()", __LINE__);
 
     value.Reset();
     /////////////////
 
     value += nullptr;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsNull(), "value[0].IsNull()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsNull(), "value[0].IsNull()", __LINE__);
 
     value += nullptr;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsNull(), "value[0].IsNull()");
-    EQ_TRUE(value[1].IsNull(), "value[1].IsNull()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsNull(), "value[0].IsNull()", __LINE__);
+    helper.EqualsTrue(value[1].IsNull(), "value[1].IsNull()", __LINE__);
 
     value.Reset();
     /////////////////
 
     value += "-ABCDEF0123456789ABCDEF0123456789-";
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     value += "^ABCDEF0123456789ABCDEF0123456789^";
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    EQ_TRUE(value[1].IsString(), "value[1].IsString()");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
+    helper.EqualsTrue(value[1].IsString(), "value[1].IsString()", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[1].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
+                      "StringUtils::IsEqual", __LINE__);
     value.Reset();
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
     value += static_cast<VString &&>(str);
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
+    helper.Equal(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value += static_cast<VString &&>(str);
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    EQ_TRUE(value[1].IsString(), "value[1].IsString()");
-    EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
+    helper.EqualsTrue(value[1].IsString(), "value[1].IsString()", __LINE__);
+    helper.Equal(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str", __LINE__);
+    helper.Equal(value[1].StringStorage(), c_str2, "value[1].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
     value.Reset();
     /////////////////
 
     str   = VString("-ABCDEF0123456789ABCDEF0123456789-");
     c_str = str.First();
     value += str;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
+    helper.NotEqual(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     str    = VString("#0123456789ABCDEF0123456789ABCDEF#");
     c_str2 = str.First();
     value += str;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsString(), "value[0].IsString()");
-    EQ_TRUE(value[1].IsString(), "value[1].IsString()");
-    NOT_EQ_TO(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str");
-    NOT_EQ_TO(value[1].StringStorage(), c_str2, "value[1].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
+    helper.EqualsTrue(value[1].IsString(), "value[1].IsString()", __LINE__);
+    helper.NotEqual(value[0].StringStorage(), c_str, "value[0].StringStorage()", "c_str", __LINE__);
+    helper.NotEqual(value[1].StringStorage(), c_str2, "value[1].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
     value.Reset();
 
     //////////////
 
     value += VHArray();
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    EQ_TRUE(value[0].IsObject(), "value[0].IsObject()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsObject(), "value[0].IsObject()", __LINE__);
 
     value += VHArray();
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 2, "Size()");
-    EQ_TRUE(value[0].IsObject(), "value[0].IsObject()");
-    EQ_TRUE(value[1].IsObject(), "value[1].IsObject()");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value[0].IsObject(), "value[0].IsObject()", __LINE__);
+    helper.EqualsTrue(value[1].IsObject(), "value[1].IsObject()", __LINE__);
 
     //////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestAddition3() {
+void TestAddition3(TestHelper &helper) {
     ValueC        value;
     VArray        arr_var;
     const ValueC *arr_storage;
@@ -3818,19 +3776,19 @@ static int TestAddition3() {
     /////////////////
     arr_var = VArray(1);
     value += arr_var;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
 
     value.Reset();
 
     arr_var = VArray(3);
     value += arr_var;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
 
     value.Reset();
     ///
@@ -3842,17 +3800,17 @@ static int TestAddition3() {
     c_str       = arr_storage[2].StringStorage();
 
     value += arr_var;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 3, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
-    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 3U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value[0].IsFalse(), "value[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value[1].IsTrue(), "value[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value[2].IsString(), "value[2].IsString()", __LINE__);
+    helper.NotEqual(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     arr_var.Reset();
     arr_var += ValueC{nullptr};
@@ -3862,40 +3820,40 @@ static int TestAddition3() {
     c_str2      = arr_storage[2].StringStorage();
 
     value += arr_var;
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 6, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
-    NOT_EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
-    EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
-    EQ_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
-    EQ_TRUE(value[5].IsString(), "value[5].IsString()");
-    NOT_EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 6U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value[0].IsFalse(), "value[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value[1].IsTrue(), "value[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value[2].IsString(), "value[2].IsString()", __LINE__);
+    helper.NotEqual(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(value[3].IsNull(), "value[3].IsNull()", __LINE__);
+    helper.EqualsTrue(value[4].IsNumber(), "value1[4].IsNumber()", __LINE__);
+    helper.Equal(value[4].GetNumber(), 14U, "value[4].GetNumber()", __LINE__);
+    helper.EqualsTrue(value[5].IsString(), "value[5].IsString()", __LINE__);
+    helper.NotEqual(value[5].StringStorage(), c_str2, "value[5].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     value.Reset();
     /////////////////
     value += VArray(1);
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
 
     value.Reset();
 
     value += VArray(3);
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 1, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 1U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
 
     value.Reset();
     arr_var.Reset();
@@ -3907,17 +3865,17 @@ static int TestAddition3() {
     c_str       = arr_storage[2].StringStorage();
 
     value += static_cast<VArray &&>(arr_var);
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 3, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
-    EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 3U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.Equal(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value[0].IsFalse(), "value[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value[1].IsTrue(), "value[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value[2].IsString(), "value[2].IsString()", __LINE__);
+    helper.Equal(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     arr_var += ValueC{nullptr};
     arr_var += ValueC{14};
@@ -3926,32 +3884,30 @@ static int TestAddition3() {
     c_str2      = arr_storage[2].StringStorage();
 
     value += static_cast<VArray &&>(arr_var);
-    EQ_TO(arr_var.First(), nullptr, "arr_var.First()", "null");
+    helper.Equal(arr_var.First(), nullptr, "arr_var.First()", "null", __LINE__);
 
-    EQ_TRUE(value.IsArray(), "IsArray()");
-    EQ_VALUE(value.Size(), 6, "Size()");
-    NOT_EQ_TO(value.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value[0].IsFalse(), "value[0].IsFalse()");
-    EQ_TRUE(value[1].IsTrue(), "value[1].IsTrue()");
-    EQ_TRUE(value[2].IsString(), "value[2].IsString()");
-    EQ_TO(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(value[3].IsNull(), "value[3].IsNull()");
-    EQ_TRUE(value[4].IsNumber(), "value1[4].IsNumber()");
-    EQ_VALUE(value[4].GetNumber(), 14, "value[4].GetNumber()");
-    EQ_TRUE(value[5].IsString(), "value[5].IsString()");
-    EQ_TO(value[5].StringStorage(), c_str2, "value[5].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value[5].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value.Size(), 6U, "Size()", __LINE__);
+    helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value[0].IsFalse(), "value[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value[1].IsTrue(), "value[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value[2].IsString(), "value[2].IsString()", __LINE__);
+    helper.Equal(value[2].StringStorage(), c_str, "value[2].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(value[3].IsNull(), "value[3].IsNull()", __LINE__);
+    helper.EqualsTrue(value[4].IsNumber(), "value1[4].IsNumber()", __LINE__);
+    helper.Equal(value[4].GetNumber(), 14U, "value[4].GetNumber()", __LINE__);
+    helper.EqualsTrue(value[5].IsString(), "value[5].IsString()", __LINE__);
+    helper.Equal(value[5].StringStorage(), c_str2, "value[5].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value[5].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
     //////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestAddition4() {
+void TestAddition4(TestHelper &helper) {
     ValueC        value1;
     ValueC        value2;
     VArray        arr_var;
@@ -3962,48 +3918,48 @@ static int TestAddition4() {
 
     value2 = true;
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsTrue(), "value1[0].IsTrue()", __LINE__);
 
     value2 = true;
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
-    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsTrue(), "value1[0].IsTrue()", __LINE__);
+    helper.EqualsTrue(value1[1].IsTrue(), "value1[1].IsTrue()", __LINE__);
 
     value1.Reset();
     /////////////////
 
     value2 = false;
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
 
     value2 = false;
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    EQ_TRUE(value1[1].IsFalse(), "value1[1].IsFalse()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value1[1].IsFalse(), "value1[1].IsFalse()", __LINE__);
 
     value1.Reset();
     /////////////////
 
     value2 = nullptr;
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsNull(), "value1[0].IsNull()", __LINE__);
 
     value2 = nullptr;
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
-    EQ_TRUE(value1[1].IsNull(), "value1[1].IsNull()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsNull(), "value1[0].IsNull()", __LINE__);
+    helper.EqualsTrue(value1[1].IsNull(), "value1[1].IsNull()", __LINE__);
 
     value1.Reset();
     /////////////////
@@ -4012,58 +3968,58 @@ static int TestAddition4() {
     value2            = static_cast<VString &&>(str);
 
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsString(), "value1[0].IsString()", __LINE__);
+    helper.NotEqual(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = static_cast<VString &&>(str);
 
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    EQ_TRUE(value1[1].IsString(), "value1[1].IsString()");
-    NOT_EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    NOT_EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsString(), "value1[0].IsString()", __LINE__);
+    helper.EqualsTrue(value1[1].IsString(), "value1[1].IsString()", __LINE__);
+    helper.NotEqual(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.NotEqual(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
     value1.Reset();
     /////////////////
 
     value2 = VArray(1);
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value1.Reset();
 
     value2 = VArray(10);
     value1 += value2;
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value1.Reset();
 
     value2 = VArray(1);
     value1.Merge(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value2 = VArray(10);
     value1.Merge(static_cast<ValueC &&>(value2));
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value1.Reset();
     ///
@@ -4076,17 +4032,17 @@ static int TestAddition4() {
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(static_cast<ValueC &&>(value2));
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 3, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[2].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 3U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value1[1].IsTrue(), "value1[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value1[2].IsString(), "value1[2].IsString()", __LINE__);
+    helper.Equal(value1[2].StringStorage(), c_str, "value1[2].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     arr_var.Reset();
     arr_var += ValueC{ValueType::Null};
@@ -4097,33 +4053,31 @@ static int TestAddition4() {
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 6, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
-    EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
-    EQ_VALUE(value1[4].GetNumber(), 14, "value1[4].GetNumber()");
-    EQ_TRUE(value1[5].IsString(), "value1[5].IsString()");
-    NOT_EQ_TO(value1[5].StringStorage(), c_str2, "value1[5].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 6U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value1[1].IsTrue(), "value1[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value1[2].IsString(), "value1[2].IsString()", __LINE__);
+    helper.Equal(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(value1[3].IsNull(), "value1[3].IsNull()", __LINE__);
+    helper.EqualsTrue(value1[4].IsNumber(), "value1[4].IsNumber()", __LINE__);
+    helper.Equal(value1[4].GetNumber(), 14U, "value1[4].GetNumber()", __LINE__);
+    helper.EqualsTrue(value1[5].IsString(), "value1[5].IsString()", __LINE__);
+    helper.NotEqual(value1[5].StringStorage(), c_str2, "value1[5].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     value1.Reset();
 
     //////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestAddition5() {
+void TestAddition5(TestHelper &helper) {
     ValueC        value1;
     ValueC        value2;
     VArray        arr_var;
@@ -4133,13 +4087,13 @@ static int TestAddition5() {
     /////////////////
 
     value2 = true;
-    EQ_TRUE(value2.IsTrue(), "value2.IsTrue()");
+    helper.EqualsTrue(value2.IsTrue(), "value2.IsTrue()", __LINE__);
 
     value1 += static_cast<ValueC &&>(value2);
 
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsTrue(), "value1[0].IsTrue()", __LINE__);
 
     value2 += true;
     value2 += false;
@@ -4151,10 +4105,10 @@ static int TestAddition5() {
 
     value2 = true;
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsTrue(), "value1[0].IsTrue()");
-    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsTrue(), "value1[0].IsTrue()", __LINE__);
+    helper.EqualsTrue(value1[1].IsTrue(), "value1[1].IsTrue()", __LINE__);
 
     value1.Reset();
     /////////////////
@@ -4162,32 +4116,32 @@ static int TestAddition5() {
     value2 = false;
 
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
 
     value2 = false;
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    EQ_TRUE(value1[1].IsFalse(), "value1[1].IsFalse()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value1[1].IsFalse(), "value1[1].IsFalse()", __LINE__);
 
     value1.Reset();
     /////////////////
 
     value2 = nullptr;
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsNull(), "value1[0].IsNull()", __LINE__);
 
     value2 = nullptr;
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsNull(), "value1[0].IsNull()");
-    EQ_TRUE(value1[1].IsNull(), "value1[1].IsNull()");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsNull(), "value1[0].IsNull()", __LINE__);
+    helper.EqualsTrue(value1[1].IsNull(), "value1[1].IsNull()", __LINE__);
 
     value1.Reset();
     /////////////////
@@ -4196,44 +4150,44 @@ static int TestAddition5() {
     value2            = static_cast<VString &&>(str);
 
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 1, "Size()");
-    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsString(), "value1[0].IsString()", __LINE__);
+    helper.Equal(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = static_cast<VString &&>(str);
 
     value1 += static_cast<ValueC &&>(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 2, "Size()");
-    EQ_TRUE(value1[0].IsString(), "value1[0].IsString()");
-    EQ_TRUE(value1[1].IsString(), "value1[1].IsString()");
-    EQ_TO(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    EQ_TO(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
+    helper.EqualsTrue(value1[0].IsString(), "value1[0].IsString()", __LINE__);
+    helper.EqualsTrue(value1[1].IsString(), "value1[1].IsString()", __LINE__);
+    helper.Equal(value1[0].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.Equal(value1[1].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
     value1.Reset();
     /////////////////
 
     value2 = VArray(1);
     value1.Merge(value2);
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value2 = VArray(1);
     value1.Merge(static_cast<ValueC &&>(value2));
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 0, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    EQ_TO(value2.GetArray(), nullptr, "GetArray()", "null");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value1.Reset();
     ///
@@ -4246,17 +4200,17 @@ static int TestAddition5() {
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(static_cast<ValueC &&>(value2));
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 3, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 3U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value1[1].IsTrue(), "value1[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value1[2].IsString(), "value1[2].IsString()", __LINE__);
+    helper.Equal(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
 
     arr_var.Reset();
     arr_var += ValueC{ValueType::Null};
@@ -4267,32 +4221,30 @@ static int TestAddition5() {
     value2      = static_cast<VArray &&>(arr_var);
 
     value1.Merge(static_cast<ValueC &&>(value2));
-    EQ_TRUE(value2.IsUndefined(), "value2.IsUndefined()");
-    EQ_TRUE(value1.IsArray(), "IsArray()");
-    EQ_VALUE(value1.Size(), 6, "Size()");
-    NOT_EQ_TO(value1.GetArray(), nullptr, "GetArray()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null");
-    NOT_EQ_TO(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage");
-    EQ_TRUE(value1[0].IsFalse(), "value1[0].IsFalse()");
-    EQ_TRUE(value1[1].IsTrue(), "value1[1].IsTrue()");
-    EQ_TRUE(value1[2].IsString(), "value1[2].IsString()");
-    EQ_TO(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str");
-    EQ_TRUE(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-            "StringUtils::IsEqual");
-    EQ_TRUE(value1[3].IsNull(), "value1[3].IsNull()");
-    EQ_TRUE(value1[4].IsNumber(), "value1[4].IsNumber()");
-    EQ_VALUE(value1[4].GetNumber(), 14, "value1[3].GetNumber()");
-    EQ_TRUE(value1[5].IsString(), "value1[0].IsString()");
-    EQ_TO(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2");
-    EQ_TRUE(StringUtils::IsEqual(value1[5].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-            "StringUtils::IsEqual");
+    helper.EqualsTrue(value2.IsUndefined(), "value2.IsUndefined()", __LINE__);
+    helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
+    helper.Equal(value1.Size(), 6U, "Size()", __LINE__);
+    helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
+    helper.NotEqual(value1.GetArray()->First(), arr_storage, "GetArray()->First()", "storage", __LINE__);
+    helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
+    helper.EqualsTrue(value1[1].IsTrue(), "value1[1].IsTrue()", __LINE__);
+    helper.EqualsTrue(value1[2].IsString(), "value1[2].IsString()", __LINE__);
+    helper.Equal(value1[2].StringStorage(), c_str, "value1[0].StringStorage()", "c_str", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                      "StringUtils::IsEqual", __LINE__);
+    helper.EqualsTrue(value1[3].IsNull(), "value1[3].IsNull()", __LINE__);
+    helper.EqualsTrue(value1[4].IsNumber(), "value1[4].IsNumber()", __LINE__);
+    helper.Equal(value1[4].GetNumber(), 14U, "value1[3].GetNumber()", __LINE__);
+    helper.EqualsTrue(value1[5].IsString(), "value1[0].IsString()", __LINE__);
+    helper.Equal(value1[5].StringStorage(), c_str2, "value1[1].StringStorage()", "c_str2", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(value1[5].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
+                      "StringUtils::IsEqual", __LINE__);
     value1.Reset();
     //////////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestAddition6() {
+void TestAddition6(TestHelper &helper) {
     ValueC                      value1;
     ValueC                      value2;
     VString                     str_var;
@@ -4322,58 +4274,58 @@ static int TestAddition6() {
 
     value2 = VHArray();   // Setting to object type.
     value2.Merge(value1); // Copy
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage1, "GetArray()->First()", "storage");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
-          "value2[\"k3\"].StringStorage()", "IsEqual");
+    helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
+    helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.NotEqual(value2.GetObject()->First(), h_arr_storage1, "GetArray()->First()", "storage", __LINE__);
+    helper.Equal(value2["k1"].GetNumber(), 11U, "value2[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k2"].GetNumber(), 22U, "value2[\"k2\"].GetNumber()", __LINE__);
+    helper.NotEqual(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+                 "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
     value2 = VHArray();  // Clearing and  Setting to object type.
     value2 += h_arr_var; // Copy
-    EQ_VALUE(value2.Size(), 4, "value2.Size()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage");
-    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value2[\"w4\"].StringStorage()", "IsEqual");
-    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
+    helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.NotEqual(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage", __LINE__);
+    helper.Equal(value2["w1"].GetNumber(), 10U, "[\"w1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w2"].GetNumber(), 20U, "[\"w2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w3"].GetNumber(), 30U, "[\"w3\"].GetNumber()", __LINE__);
+    helper.NotEqual(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value2[\"w4\"].StringStorage()", "IsEqual", __LINE__);
+    helper.Equal(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null", __LINE__);
 
     ////
 
     value2 = VHArray();                           // Clearing and  Setting to object type.
     value2.Merge(static_cast<ValueC &&>(value1)); // Move
-    EQ_TRUE(value1.IsUndefined(), "value1.IsUndefined()");
-    EQ_VALUE(value2.Size(), 3, "value2.Size()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
-          "value2[\"k3\"].StringStorage()", "IsEqual");
+    helper.EqualsTrue(value1.IsUndefined(), "value1.IsUndefined()", __LINE__);
+    helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
+    helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.NotEqual(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage", __LINE__);
+    helper.Equal(value2["k1"].GetNumber(), 11U, "value2[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k2"].GetNumber(), 22U, "value2[\"k2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+                 "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
 
     value2 = VHArray();                           // Clearing and  Setting to object type.
     value2 += static_cast<VHArray &&>(h_arr_var); // Move
-    EQ_TO(h_arr_var.First(), nullptr, "h_arr_var.First()", "null");
-    EQ_VALUE(value2.Size(), 4, "value2.Size()");
-    NOT_EQ_TO(value2.GetObject(), nullptr, "GetObject()", "null");
-    NOT_EQ_TO(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage");
-    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value2[\"w4\"].StringStorage()", "IsEqual");
-    EQ_TO(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null");
+    helper.Equal(h_arr_var.First(), nullptr, "h_arr_var.First()", "null", __LINE__);
+    helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
+    helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
+    helper.NotEqual(value2.GetObject()->First(), h_arr_storage2, "GetArray()->First()", "storage", __LINE__);
+    helper.Equal(value2["w1"].GetNumber(), 10U, "[\"w1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w2"].GetNumber(), 20U, "[\"w2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w3"].GetNumber(), 30U, "[\"w3\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value2[\"w4\"].StringStorage()", "IsEqual", __LINE__);
+    helper.Equal(value2.GetValue(4), nullptr, "value2.GetValue(4)", "null", __LINE__);
 
     if (value2.GetObject() != nullptr) {
         h_arr_var = *(value2.GetObject()); // Copying back the values.
@@ -4384,18 +4336,18 @@ static int TestAddition6() {
     value2 = VHArray();   // Clearing and  Setting to object type.
     value2.Merge(value1); // Copy
     value2 += h_arr_var;  // Copy
-    EQ_VALUE(value2.Size(), 7, "value2.Size()");
-    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value2[\"w4\"].StringStorage()", "IsEqual");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
-          "value2[\"k3\"].StringStorage()", "IsEqual");
+    helper.Equal(value2.Size(), 7U, "value2.Size()", __LINE__);
+    helper.Equal(value2["w1"].GetNumber(), 10U, "[\"w1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w2"].GetNumber(), 20U, "[\"w2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w3"].GetNumber(), 30U, "[\"w3\"].GetNumber()", __LINE__);
+    helper.NotEqual(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value2[\"w4\"].StringStorage()", "IsEqual", __LINE__);
+    helper.Equal(value2["k1"].GetNumber(), 11U, "value2[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k2"].GetNumber(), 22U, "value2[\"k2\"].GetNumber()", __LINE__);
+    helper.NotEqual(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+                 "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
     ////
     value2       = VHArray(); // Clearing and  Setting to object type.
@@ -4408,20 +4360,20 @@ static int TestAddition6() {
     value2 += h_arr_var;  // Copy
     value2.Merge(value1); // Copy
 
-    EQ_VALUE(value2["w0"].GetNumber(), 5, "[\"w0\"].GetNumber()");
-    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    NOT_EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value2[\"w4\"].StringStorage()", "IsEqual");
-    EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
-    EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    NOT_EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
-          "value2[\"k3\"].StringStorage()", "IsEqual");
+    helper.Equal(value2["w0"].GetNumber(), 5U, "[\"w0\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w1"].GetNumber(), 10U, "[\"w1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w2"].GetNumber(), 20U, "[\"w2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w3"].GetNumber(), 30U, "[\"w3\"].GetNumber()", __LINE__);
+    helper.NotEqual(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value2[\"w4\"].StringStorage()", "IsEqual", __LINE__);
+    helper.Equal(value2["w5"].GetNumber(), 500U, "[\"w5\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w6"].GetNumber(), 600U, "[\"w6\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k1"].GetNumber(), 11U, "value2[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k2"].GetNumber(), 22U, "value2[\"k2\"].GetNumber()", __LINE__);
+    helper.NotEqual(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+                 "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
     value2       = VHArray(); // Clearing and  Setting to object type.
     value2["w0"] = 5;
@@ -4432,343 +4384,341 @@ static int TestAddition6() {
     value2["w6"] = 600;
     value2.Merge(static_cast<ValueC &&>(value1)); // Move
     value2 += static_cast<VHArray &&>(h_arr_var); // Move
-    EQ_VALUE(value2["w0"].GetNumber(), 5, "[\"w0\"].GetNumber()");
-    EQ_VALUE(value2["w1"].GetNumber(), 10, "[\"w1\"].GetNumber()");
-    EQ_VALUE(value2["w2"].GetNumber(), 20, "[\"w2\"].GetNumber()");
-    EQ_VALUE(value2["w3"].GetNumber(), 30, "[\"w3\"].GetNumber()");
-    EQ_TO(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2");
-    EQ_TO(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
-          "value2[\"w4\"].StringStorage()", "IsEqual");
-    EQ_VALUE(value2["w5"].GetNumber(), 500, "[\"w5\"].GetNumber()");
-    EQ_VALUE(value2["w6"].GetNumber(), 600, "[\"w6\"].GetNumber()");
-    EQ_VALUE(value2["k1"].GetNumber(), 11, "value2[\"k1\"].GetNumber()");
-    EQ_VALUE(value2["k2"].GetNumber(), 22, "value2[\"k2\"].GetNumber()");
-    EQ_TO(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1");
-    EQ_TO(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
-          "value2[\"k3\"].StringStorage()", "IsEqual");
+    helper.Equal(value2["w0"].GetNumber(), 5U, "[\"w0\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w1"].GetNumber(), 10U, "[\"w1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w2"].GetNumber(), 20U, "[\"w2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w3"].GetNumber(), 30U, "[\"w3\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w4"].StringStorage(), str_c2, "value2[\"w4\"].StringStorage()", "str_c2", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
+                 "value2[\"w4\"].StringStorage()", "IsEqual", __LINE__);
+    helper.Equal(value2["w5"].GetNumber(), 500U, "[\"w5\"].GetNumber()", __LINE__);
+    helper.Equal(value2["w6"].GetNumber(), 600U, "[\"w6\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k1"].GetNumber(), 11U, "value2[\"k1\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k2"].GetNumber(), 22U, "value2[\"k2\"].GetNumber()", __LINE__);
+    helper.Equal(value2["k3"].StringStorage(), str_c1, "value2[\"k3\"].StringStorage()", "str_c1", __LINE__);
+    helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
+                 "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
     /////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestStringify1() {
+void TestStringify1(TestHelper &helper) {
     ValueC value;
 
     ///////////
     value = VArray();
-    EQ_VALUE(value.Stringify(), "[]", "Stringify()");
+    helper.Equal(value.Stringify(), "[]", "Stringify()", __LINE__);
 
     value.Reset();
     value += true;
-    EQ_VALUE(value.Stringify(), "[true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
-    EQ_VALUE(value.Stringify(), "[false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += 0;
-    EQ_VALUE(value.Stringify(), "[0]", "Stringify()");
+    helper.Equal(value.Stringify(), "[0]", "Stringify()", __LINE__);
 
     value.Reset();
     value += "a";
-    EQ_VALUE(value.Stringify(), R"(["a"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["a"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
-    EQ_VALUE(value.Stringify(), R"(["ABC"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{}]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += true;
-    EQ_VALUE(value.Stringify(), "[true,true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += true;
-    EQ_VALUE(value.Stringify(), "[false,true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += true;
-    EQ_VALUE(value.Stringify(), "[null,true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[null,true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += -3;
     value += true;
-    EQ_VALUE(value.Stringify(), "[-3,true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[-3,true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += "a";
     value += true;
-    EQ_VALUE(value.Stringify(), R"(["a",true])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["a",true])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += true;
-    EQ_VALUE(value.Stringify(), R"(["ABC",true])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",true])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += true;
-    EQ_VALUE(value.Stringify(), "[[],true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += true;
-    EQ_VALUE(value.Stringify(), "[{},true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},true]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += false;
-    EQ_VALUE(value.Stringify(), "[true,false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += false;
-    EQ_VALUE(value.Stringify(), "[false,false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += false;
-    EQ_VALUE(value.Stringify(), "[null,false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[null,false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += 500;
     value += false;
-    EQ_VALUE(value.Stringify(), "[500,false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[500,false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VString("a");
     value += false;
-    EQ_VALUE(value.Stringify(), R"(["a",false])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["a",false])", "Stringify()", __LINE__);
 
     value.Reset();
     VString str("ABC");
     value += str;
     value += false;
-    EQ_VALUE(value.Stringify(), R"(["ABC",false])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",false])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += false;
-    EQ_VALUE(value.Stringify(), "[[],false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += false;
-    EQ_VALUE(value.Stringify(), "[{},false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},false]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[true,null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[false,null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[null,null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[null,null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += 456.5;
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[456.5,null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[456.5,null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += "a";
     value += nullptr;
-    EQ_VALUE(value.Stringify(), R"(["a",null])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["a",null])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += nullptr;
-    EQ_VALUE(value.Stringify(), R"(["ABC",null])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",null])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[[],null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[{},null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},null]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += "A";
-    EQ_VALUE(value.Stringify(), R"([true,"A"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([true,"A"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += "AB";
-    EQ_VALUE(value.Stringify(), R"([false,"AB"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([false,"AB"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += "ABC";
-    EQ_VALUE(value.Stringify(), R"([null,"ABC"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([null,"ABC"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += -8.9;
     value += "ABC";
-    EQ_VALUE(value.Stringify(), R"([-8.9,"ABC"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([-8.9,"ABC"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "a";
     value += "ABCD";
-    EQ_VALUE(value.Stringify(), R"(["a","ABCD"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["a","ABCD"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += "ABCDE";
-    EQ_VALUE(value.Stringify(), R"(["ABC","ABCDE"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC","ABCDE"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += "ABCDEF";
-    EQ_VALUE(value.Stringify(), R"([[],"ABCDEF"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([[],"ABCDEF"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += "ABCDEFG";
-    EQ_VALUE(value.Stringify(), R"([{},"ABCDEFG"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([{},"ABCDEFG"])", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[true,[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[false,[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[null,[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[null,[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += 10000;
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[10000,[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[10000,[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += VArray();
-    EQ_VALUE(value.Stringify(), R"(["ABC",[]])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",[]])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[[],[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[{},[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},[]]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[true,{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,{}]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[false,{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,{}]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[null,{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[null,{}]", "Stringify()", __LINE__);
 
     value.Reset();
     value += -1000;
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[-1000,{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[-1000,{}]", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += VHArray();
-    EQ_VALUE(value.Stringify(), R"(["ABC",{}])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",{}])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[[],{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],{}]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[{},{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},{}]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value += true;
     value += VHArray();
     value += false;
-    EQ_VALUE(value.Stringify(), "[true,{},false]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,{},false]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += VArray();
     value += nullptr;
-    EQ_VALUE(value.Stringify(), "[false,[],null]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,[],null]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += VHArray();
     value += "ABC";
-    EQ_VALUE(value.Stringify(), R"([null,{},"ABC"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([null,{},"ABC"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += 789;
     value += "ABC";
-    EQ_VALUE(value.Stringify(), R"([null,789,"ABC"])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([null,789,"ABC"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += VArray();
     value += VHArray();
-    EQ_VALUE(value.Stringify(), R"(["ABC",[],{}])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",[],{}])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += VHArray();
     value[2] = 498;
-    EQ_VALUE(value.Stringify(), "[[],{},498]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],{},498]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += VArray();
     value += true;
-    EQ_VALUE(value.Stringify(), "[{},[],true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},[],true]", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
@@ -4776,42 +4726,42 @@ static int TestStringify1() {
     value += VHArray();
     value += 0;
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[true,{},0,[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[true,{},0,[]]", "Stringify()", __LINE__);
 
     value.Reset();
     value += false;
     value += VArray();
     value += nullptr;
     value += VHArray();
-    EQ_VALUE(value.Stringify(), "[false,[],null,{}]", "Stringify()");
+    helper.Equal(value.Stringify(), "[false,[],null,{}]", "Stringify()", __LINE__);
 
     value.Reset();
     value += nullptr;
     value += VHArray();
     value += "ABC";
     value += VArray();
-    EQ_VALUE(value.Stringify(), R"([null,{},"ABC",[]])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([null,{},"ABC",[]])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "ABC";
     value += VArray();
     value += VHArray();
     value += nullptr;
-    EQ_VALUE(value.Stringify(), R"(["ABC",[],{},null])", "Stringify()");
+    helper.Equal(value.Stringify(), R"(["ABC",[],{},null])", "Stringify()", __LINE__);
 
     value.Reset();
     value += VArray();
     value += false;
     value += VHArray();
     value += true;
-    EQ_VALUE(value.Stringify(), "[[],false,{},true]", "Stringify()");
+    helper.Equal(value.Stringify(), "[[],false,{},true]", "Stringify()", __LINE__);
 
     value.Reset();
     value += VHArray();
     value += nullptr;
     value += VArray();
     value += VArray();
-    EQ_VALUE(value.Stringify(), "[{},null,[],[]]", "Stringify()");
+    helper.Equal(value.Stringify(), "[{},null,[],[]]", "Stringify()", __LINE__);
 
     ///////////
     value.Reset();
@@ -4822,7 +4772,7 @@ static int TestStringify1() {
     value += "ABC";
     value += VArray();
     value += VHArray();
-    EQ_VALUE(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])", "Stringify()", __LINE__);
 
     ///////////
     value.Reset();
@@ -4833,329 +4783,328 @@ static int TestStringify1() {
     value += nullptr;
     value += false;
     value += true;
-    EQ_VALUE(value.Stringify(), R"([{},[],"a",1.5,null,false,true])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([{},[],"a",1.5,null,false,true])", "Stringify()", __LINE__);
     ///////////////////////////////////////
-    END_SUB_TEST;
 }
 
-static int TestStringify2() {
+void TestStringify2(TestHelper &helper) {
     ValueC value;
 
     ///////////
     value = VHArray();
-    EQ_VALUE(value.Stringify(), R"({})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["B"] = false;
-    EQ_VALUE(value.Stringify(), R"({"B":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"B":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["AA"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"AA":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"AA":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["a"] = 0;
-    EQ_VALUE(value.Stringify(), R"({"a":0})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"a":0})", "Stringify()", __LINE__);
 
     value.Reset();
     value["abc"] = "a";
-    EQ_VALUE(value.Stringify(), R"({"abc":"a"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"abc":"a"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["ab"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"ab":"ABC"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"ab":"ABC"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["ABC"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"ABC":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"ABC":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["5vn7b83y98t3wrupwmwa4ataw"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["A"] = true;
     value["B"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":true,"B":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":true,"B":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = false;
     value["b"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":false,"b":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":false,"b":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"]  = nullptr;
     value["BC"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":null,"BC":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":null,"BC":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"]  = -3;
     value["AB"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":-3,"AB":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":-3,"AB":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"]   = "a";
     value["ABC"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":"a","ABC":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"a","ABC":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = "ABC";
     value["1"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","1":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"ABC","1":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"]   = VArray();
     value["123"] = true;
-    EQ_VALUE(value.Stringify(), R"({"X":[],"123":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":[],"123":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["x"] = VHArray();
     value["A"] = true;
-    EQ_VALUE(value.Stringify(), R"({"x":{},"A":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"x":{},"A":true})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["A2"] = true;
     value["A1"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A2":true,"A1":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A2":true,"A1":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A-"]   = false;
     value["A123"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A-":false,"A123":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A-":false,"A123":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = nullptr;
     value["B"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A":null,"B":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":null,"B":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = 500;
     value["B"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A":500,"B":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":500,"B":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = VString("a");
     value["B"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A":"a","B":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"a","B":false})", "Stringify()", __LINE__);
 
     value.Reset();
     VString str("ABC");
     value["A"] = str;
     value["B"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","B":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"ABC","B":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"] = VArray();
     value["A"] = false;
-    EQ_VALUE(value.Stringify(), R"({"X":[],"A":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":[],"A":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"] = VHArray();
     value["A"] = false;
-    EQ_VALUE(value.Stringify(), R"({"X":{},"A":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":{},"A":false})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["A"] = true;
     value["W"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":true,"W":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":true,"W":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = false;
     value["@"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":false,"@":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":false,"@":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = nullptr;
     value["#"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":null,"#":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":null,"#":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = 456.5;
     value["H"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":456.5,"H":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":456.5,"H":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = "a";
     value["Q"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":"a","Q":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"a","Q":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = "ABC";
     value["e"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","e":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"ABC","e":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"] = VArray();
     value["n"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"X":[],"n":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":[],"n":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["t"] = VHArray();
     value["A"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"t":{},"A":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"t":{},"A":null})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["e"] = true;
     value["A"] = "A";
-    EQ_VALUE(value.Stringify(), R"({"e":true,"A":"A"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"e":true,"A":"A"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["m"] = false;
     value["A"] = "AB";
-    EQ_VALUE(value.Stringify(), R"({"m":false,"A":"AB"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"m":false,"A":"AB"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["i"] = nullptr;
     value["A"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"i":null,"A":"ABC"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"i":null,"A":"ABC"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["s"] = -8.9;
     value["A"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"s":-8.9,"A":"ABC"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"s":-8.9,"A":"ABC"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["-"] = "a";
     value["A"] = "ABCD";
-    EQ_VALUE(value.Stringify(), R"({"-":"a","A":"ABCD"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"-":"a","A":"ABCD"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["g"] = "ABC";
     value["A"] = "ABCDE";
-    EQ_VALUE(value.Stringify(), R"({"g":"ABC","A":"ABCDE"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"g":"ABC","A":"ABCDE"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["o"] = VArray();
     value["A"] = "ABCDEF";
-    EQ_VALUE(value.Stringify(), R"({"o":[],"A":"ABCDEF"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"o":[],"A":"ABCDEF"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = VHArray();
     value["o"] = "ABCDEFG";
-    EQ_VALUE(value.Stringify(), R"({"A":{},"o":"ABCDEFG"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":{},"o":"ABCDEFG"})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["d"] = true;
     value["y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"d":true,"y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"d":true,"y":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = false;
     value["y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":false,"y":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = nullptr;
     value["y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"A":null,"y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":null,"y":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = 10000;
     value["y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"A":10000,"y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":10000,"y":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = "ABC";
     value["y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"ABC","y":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"] = VArray();
     value["y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"X":[],"y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":[],"y":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"] = VHArray();
     value["Y"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"X":{},"Y":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":{},"Y":[]})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["A"] = true;
     value["y"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":true,"y":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = false;
     value["y"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":false,"y":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":false,"y":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = nullptr;
     value["y"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":null,"y":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = -1000;
     value["y"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":-1000,"y":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":-1000,"y":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = "ABC";
     value["y"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"ABC","y":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["C"] = VArray();
     value["R"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"C":[],"R":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"C":[],"R":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["cc"] = VHArray();
     value["rr"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"cc":{},"rr":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"cc":{},"rr":{}})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
     value["A"]  = true;
     value["y"]  = VHArray();
     value["AA"] = false;
-    EQ_VALUE(value.Stringify(), R"({"A":true,"y":{},"AA":false})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":true,"y":{},"AA":false})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"] = false;
     value["y"] = VArray();
     value["B"] = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"A":false,"y":[],"B":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":false,"y":[],"B":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"]   = nullptr;
     value["y"]   = VHArray();
     value["ABC"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["t"] = nullptr;
     value["Y"] = 789;
     value["A"] = "ABC";
-    EQ_VALUE(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["A"]     = "ABC";
     value["y"]     = VArray();
     value["key-u"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"]     = VArray();
     value["Y"]     = VHArray();
     value["key-u"] = 498;
-    EQ_VALUE(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"] = VHArray();
     value["y"] = VArray();
     value["A"] = true;
-    EQ_VALUE(value.Stringify(), R"({"X":{},"y":[],"A":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":{},"y":[],"A":true})", "Stringify()", __LINE__);
     ///////////
 
     value.Reset();
@@ -5163,42 +5112,42 @@ static int TestStringify2() {
     value["y"]     = VHArray();
     value["AA"]    = 0;
     value["k-300"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["B1"]    = false;
     value["y"]     = VArray();
     value["[A]"]   = nullptr;
     value["k-300"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()", __LINE__);
 
     value.Reset();
     value["{A}"]   = nullptr;
     value["y"]     = VHArray();
     value["AA"]    = "ABC";
     value["k-300"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["x"]     = "ABC";
     value["[]]"]   = VArray();
     value["key-u"] = VHArray();
     value["A"]     = nullptr;
-    EQ_VALUE(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"]       = VArray();
     value["CCCCccc"] = false;
     value["key-u"]   = VHArray();
     value["A"]       = true;
-    EQ_VALUE(value.Stringify(), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()", __LINE__);
 
     value.Reset();
     value["X"]     = VHArray();
     value["A"]     = nullptr;
     value["key-u"] = VArray();
     value["k-300"] = VArray();
-    EQ_VALUE(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()", __LINE__);
 
     ///////////
     value.Reset();
@@ -5209,7 +5158,8 @@ static int TestStringify2() {
     value["E"] = "ABC";
     value["F"] = VArray();
     value["G"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()",
+                 __LINE__);
 
     ///////////
     value.Reset();
@@ -5220,14 +5170,13 @@ static int TestStringify2() {
     value["EEEEE"]   = nullptr;
     value["FFFFFF"]  = false;
     value["GGGGGGG"] = true;
-    EQ_VALUE(value.Stringify(), R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})",
-             "Stringify()");
+    helper.Equal(value.Stringify(),
+                 R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})", "Stringify()",
+                 __LINE__);
     ///////////////////////////////////////
-
-    END_SUB_TEST;
 }
 
-static int TestStringify3() {
+void TestStringify3(TestHelper &helper) {
     ValueC value;
 
     value[0] += true;
@@ -5237,7 +5186,7 @@ static int TestStringify3() {
     value[0] += "ABC";
     value[0] += VArray();
     value[0] += VHArray();
-    EQ_VALUE(value.Stringify(), R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()", __LINE__);
 
     value         = VArray();
     value[0]["a"] = true;
@@ -5247,7 +5196,8 @@ static int TestStringify3() {
     value[0]["B"] = "a";
     value[0]["2"] = VArray();
     value[0]["6"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", "Stringify()");
+    helper.Equal(value.Stringify(), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", "Stringify()",
+                 __LINE__);
 
     value.Reset();
     value["o"] += true;
@@ -5257,7 +5207,7 @@ static int TestStringify3() {
     value["o"] += "ABC";
     value["o"] += VArray();
     value["o"] += VHArray();
-    EQ_VALUE(value.Stringify(), R"({"o":[true,false,null,0,"ABC",[],{}]})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"o":[true,false,null,0,"ABC",[],{}]})", "Stringify()", __LINE__);
 
     value.Reset();
     value["i"]["a"] = true;
@@ -5267,26 +5217,24 @@ static int TestStringify3() {
     value["i"]["B"] = "a";
     value["i"]["2"] = VArray();
     value["i"]["6"] = VHArray();
-    EQ_VALUE(value.Stringify(), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", "Stringify()");
+    helper.Equal(value.Stringify(), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", "Stringify()",
+                 __LINE__);
 
     ////
-    END_SUB_TEST;
 }
 
-static int TestStringify4() {
+void TestStringify4(TestHelper &helper) {
     ValueC value;
 
     value["\"\\/\b\f\n\r\t"] = "\t\r\n\f\b/\\\"";
-    EQ_VALUE(value.Stringify(), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})", "value.Stringify()", __LINE__);
 
     value.Reset();
     value += "\"\\/\b\f\n\r\t";
-    EQ_VALUE(value.Stringify(), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()");
-
-    END_SUB_TEST;
+    helper.Equal(value.Stringify(), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()", __LINE__);
 }
 
-static int TestDeleteValue() {
+void TestDeleteValue(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -5294,136 +5242,134 @@ static int TestDeleteValue() {
 
     value[0] = 1;
     value.RemoveIndex(int{0});
-    EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = "c";
     value.RemoveIndex(vu_int{0});
-    EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = VArray();
     value.RemoveIndex(vu_long_long{0});
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = false;
     value[1] = true;
     value.RemoveIndex(0);
-    EQ_VALUE(value.Stringify(), R"([true])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([true])", "value.Stringify()", __LINE__);
     value.RemoveIndex(1);
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = "abc";
     value[1] = nullptr;
     value.RemoveIndex(1);
-    EQ_VALUE(value.Stringify(), R"(["abc"])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"(["abc"])", "value.Stringify()", __LINE__);
     value.RemoveIndex(0);
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
     value.RemoveIndex(1);
-    EQ_VALUE(value.Stringify(), R"([false,null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([false,null])", "value.Stringify()", __LINE__);
     value.RemoveIndex(0);
-    EQ_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([null])", "value.Stringify()", __LINE__);
 
     value.RemoveIndex(2);
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
     value[1].Reset();
-    EQ_VALUE(value.Stringify(), R"([false,null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([false,null])", "value.Stringify()", __LINE__);
     value[0].Reset();
-    EQ_VALUE(value.Stringify(), R"([null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([null])", "value.Stringify()", __LINE__);
 
     value[2].Reset();
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value[0] = "a";
     value[1] = VArray();
     value[2] = VHArray();
     value.RemoveIndex(2);
-    EQ_VALUE(value.Stringify(), R"(["a",[]])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"(["a",[]])", "value.Stringify()", __LINE__);
     value.RemoveIndex(1);
-    EQ_VALUE(value.Stringify(), R"(["a"])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"(["a"])", "value.Stringify()", __LINE__);
 
     value.RemoveIndex(0);
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     /////////
     value.Reset();
 
     value["A"] = 1;
     value.RemoveIndex(0);
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value["A"] = "c";
     value.Remove("A");
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value["A"] = VArray();
     value.Remove("A");
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value.Reset();
     value["A"]  = false;
     value["bb"] = true;
     value.Remove("A");
-    EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_VALUE(value.Stringify(), R"({"bb":true})", "value.Stringify()");
+    helper.Equal(value.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(value.Stringify(), R"({"bb":true})", "value.Stringify()", __LINE__);
     value.RemoveIndex(1);
-    EQ_TO(value.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(value.GetValue(1), nullptr, "GetValue(1)", "null");
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(value.GetValue(1), nullptr, "GetValue(1)", "null", __LINE__);
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value["A"]  = "abc";
     value["bb"] = nullptr;
     value.Remove("bb");
-    EQ_VALUE(value.Stringify(), R"({"A":"abc"})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"abc"})", "value.Stringify()", __LINE__);
     value.Remove("A");
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value["A"]   = false;
     value["bb"]  = true;
     value["AAA"] = nullptr;
     value.Remove("bb");
-    EQ_VALUE(value.Stringify(), R"({"A":false,"AAA":null})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":false,"AAA":null})", "value.Stringify()", __LINE__);
     value.Remove("A");
-    EQ_VALUE(value.Stringify(), R"({"AAA":null})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"AAA":null})", "value.Stringify()", __LINE__);
 
     value.Remove("AAA");
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value["A"]   = "a";
     value["bb"]  = VHArray();
     value["AAA"] = VArray();
     value.Remove("AAA");
-    EQ_VALUE(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
     value.Remove("bb");
-    EQ_VALUE(value.Stringify(), R"({"A":"a"})", value.Stringify().First());
+    helper.Equal(value.Stringify(), R"({"A":"a"})", value.Stringify().First(), __LINE__);
 
     value.Remove("A");
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 
     value["A"]   = "a";
     value["bb"]  = VHArray();
     value["AAA"] = VArray();
     value["AAA"].Reset();
-    EQ_VALUE(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
     value["bb"].Reset();
-    EQ_VALUE(value.Stringify(), R"({"A":"a"})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"A":"a"})", "value.Stringify()", __LINE__);
 
     value["A"].Reset();
-    EQ_VALUE(value.Stringify(), R"({})", "value.Stringify()");
-
-    END_SUB_TEST;
+    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 }
 
-static int TestSortValue() {
+void TestSortValue(TestHelper &helper) {
     ValueC value;
 
     value["2019"] = 0;
@@ -5436,8 +5382,8 @@ static int TestSortValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
-             "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
+                 "value.Stringify()", __LINE__);
 
     value.Reset();
 
@@ -5451,8 +5397,8 @@ static int TestSortValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
-             "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
+                 "value.Stringify()", __LINE__);
 
     value.Reset();
 
@@ -5465,7 +5411,8 @@ static int TestSortValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})", "value.Stringify()",
+                 __LINE__);
 
     value.Reset();
 
@@ -5478,12 +5425,11 @@ static int TestSortValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})", "value.Stringify()");
-
-    END_SUB_TEST;
+    helper.Equal(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})", "value.Stringify()",
+                 __LINE__);
 }
 
-static int TestGroupValue() {
+void TestGroupValue(TestHelper &helper) {
     ValueC value;
 
     value += VHArray();
@@ -5514,22 +5460,22 @@ static int TestGroupValue() {
     value.GroupBy(value2, "year");
     value2.Sort();
 
-    EQ_VALUE(
+    helper.Equal(
         value2.Stringify(),
         R"({"2017":[{"month":1}],"2018":[{"month":2},{"month":3}],"2019":[{"month":4}],"2020":[{"month":5},{"month":6},{"month":7}]})",
-        "value2.Stringify()");
+        "value2.Stringify()", __LINE__);
 
     value2.Sort(false);
 
-    EQ_VALUE(
+    helper.Equal(
         value2.Stringify(),
         R"({"2020":[{"month":5},{"month":6},{"month":7}],"2019":[{"month":4}],"2018":[{"month":2},{"month":3}],"2017":[{"month":1}]})",
-        "value2.Stringify()");
+        "value2.Stringify()", __LINE__);
 
     value.Reset();
     value2.Reset();
     value.GroupBy(value2, "year");
-    EQ_VALUE(value2.Stringify(), R"()", "value2.Stringify()");
+    helper.Equal(value2.Stringify(), R"()", "value2.Stringify()", __LINE__);
 
     value[0]["year1"] = 2019;
     value[1]["year1"] = 2020;
@@ -5548,7 +5494,7 @@ static int TestGroupValue() {
     value[6]["month"] = 3;
 
     value.GroupBy(value2, "year");
-    EQ_VALUE(value2.Stringify(), R"({})", "value2.Stringify()");
+    helper.Equal(value2.Stringify(), R"({})", "value2.Stringify()", __LINE__);
 
     ////
     value.Reset();
@@ -5561,14 +5507,14 @@ static int TestGroupValue() {
     value[1]["month"] = 5;
     value[2]["month"] = 1;
 
-    EQ_FALSE(value.GroupBy(value2, "year"), "value2.Stringify()");
+    helper.EqualsFalse(value.GroupBy(value2, "year"), "value2.Stringify()", __LINE__);
 
     value[2].Reset();
     value.GroupBy(value2, "year");
-    EQ_FALSE(value.GroupBy(value2, "year"), "value2.Stringify()");
+    helper.EqualsFalse(value.GroupBy(value2, "year"), "value2.Stringify()", __LINE__);
 
     value[2]["year"] = VHArray();
-    EQ_FALSE(value.GroupBy(value2, "year"), "value2.Stringify()");
+    helper.EqualsFalse(value.GroupBy(value2, "year"), "value2.Stringify()", __LINE__);
 
     ///////////////////
 
@@ -5586,13 +5532,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([1,2,3,4,5,6,7])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([1,2,3,4,5,6,7])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([7,6,5,4,3,2,1])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([7,6,5,4,3,2,1])", "value.Stringify()", __LINE__);
 
     //////////////////////
 
@@ -5610,12 +5556,12 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()", __LINE__);
 
     value = value2;
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()", __LINE__);
 
     ///////////////////
 
@@ -5633,13 +5579,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([-7,-6,-5,-4,-3,-2,-1])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([-7,-6,-5,-4,-3,-2,-1])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])", "value.Stringify()", __LINE__);
 
     ///////////////////
 
@@ -5657,13 +5603,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])", "value.Stringify()", __LINE__);
 
     ///////////////////
 
@@ -5681,13 +5627,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"(["a","b","c","d","e","f","g"])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"(["a","b","c","d","e","f","g"])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"(["g","f","e","d","c","b","a"])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"(["g","f","e","d","c","b","a"])", "value.Stringify()", __LINE__);
 
     ///////////////////
 
@@ -5705,7 +5651,7 @@ static int TestGroupValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([[0,0,0],[0,0,0,0,0]])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([[0,0,0],[0,0,0,0,0]])", "value.Stringify()", __LINE__);
 
     value.Reset();
     value2.Reset();
@@ -5721,7 +5667,7 @@ static int TestGroupValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([[0,0,0,0,0],[0,0,0]])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([[0,0,0,0,0],[0,0,0]])", "value.Stringify()", __LINE__);
 
     ///////////////////
 
@@ -5739,7 +5685,8 @@ static int TestGroupValue() {
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])", "value.Stringify()",
+                 __LINE__);
 
     value.Reset();
     value2.Reset();
@@ -5755,7 +5702,8 @@ static int TestGroupValue() {
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])", "value.Stringify()",
+                 __LINE__);
 
     //////////////////////
 
@@ -5770,13 +5718,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([true,true])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([true,true])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([true,true])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([true,true])", "value.Stringify()", __LINE__);
 
     //////////
     value.Reset();
@@ -5788,13 +5736,13 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([false,false])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([false,false])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([false,false])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([false,false])", "value.Stringify()", __LINE__);
     ///////////
     value.Reset();
     value2.Reset();
@@ -5805,81 +5753,80 @@ static int TestGroupValue() {
     value = value2;
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([null,null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([null,null])", "value.Stringify()", __LINE__);
 
     value = value2;
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([null,null])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([null,null])", "value.Stringify()", __LINE__);
     ///////////
     value.RemoveIndex(0);
     value.RemoveIndex(1);
 
     value.Sort();
 
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
 
     value.Sort(false);
 
-    EQ_VALUE(value.Stringify(), R"([])", "value.Stringify()");
-
+    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
     ///////////////////
-
-    END_SUB_TEST;
 }
 
 static int RunValueTests() {
-    STARTING_TEST("Value.hpp");
+    TestHelper helper{"Value.hpp", __FILE__};
 
-    START_TEST("GetType Sting Test", TestGetStingOfType);
+    helper.PrintGroupName();
 
-    START_TEST("Empty Value Test", TestEmptyValue);
-    START_TEST("True Value Test", TestTrueValue);
-    START_TEST("False Value Test", TestFalseValue);
-    START_TEST("Null Value Test", TestNullValue);
-    START_TEST("Number Value Test 1", TestNumberValue1);
-    START_TEST("Number Value Test 2", TestNumberValue2);
-    START_TEST("Number Value Test 3", TestNumberValue3);
-    START_TEST("Number Value Test 4", TestNumberValue4);
-    START_TEST("Number Value Test 5", TestNumberValue5);
-    START_TEST("String Value Test", TestStringValue);
-    START_TEST("Array Value Test", TestArrayValue);
+    helper.Test("GetType Sting Test", TestGetTypeString);
 
-    START_TEST("Object Value Test 1", TestObjectValue1);
-    START_TEST("Object Value Test 2", TestObjectValue2);
+    helper.Test("Empty Value Test", TestEmptyValue);
+    helper.Test("True Value Test", TestTrueValue);
+    helper.Test("False Value Test", TestFalseValue);
+    helper.Test("Null Value Test", TestNullValue);
+    helper.Test("Number Value Test 1", TestNumberValue1);
+    helper.Test("Number Value Test 2", TestNumberValue2);
+    helper.Test("Number Value Test 3", TestNumberValue3);
+    helper.Test("Number Value Test 4", TestNumberValue4);
+    helper.Test("Number Value Test 5", TestNumberValue5);
+    helper.Test("String Value Test", TestStringValue);
+    helper.Test("Array Value Test", TestArrayValue);
 
-    START_TEST("Move Value Test 1", TestMoveValue1);
-    START_TEST("Move Value Test 2", TestMoveValue2);
-    START_TEST("Move Value Test 3", TestMoveValue3);
-    START_TEST("Move Value Test 4", TestMoveValue4);
+    helper.Test("Object Value Test 1", TestObjectValue1);
+    helper.Test("Object Value Test 2", TestObjectValue2);
 
-    START_TEST("Copy Value Test 1", TestCopyValue1);
-    START_TEST("Copy Value Test 2", TestCopyValue2);
-    START_TEST("Copy Value Test 3", TestCopyValue3);
-    START_TEST("Copy Value Test 4", TestCopyValue4);
+    helper.Test("Move Value Test 1", TestMoveValue1);
+    helper.Test("Move Value Test 2", TestMoveValue2);
+    helper.Test("Move Value Test 3", TestMoveValue3);
+    helper.Test("Move Value Test 4", TestMoveValue4);
 
-    START_TEST("Index Operator Test 1", TestIndexOperator1);
-    START_TEST("Index Operator Test 2", TestIndexOperator2);
+    helper.Test("Copy Value Test 1", TestCopyValue1);
+    helper.Test("Copy Value Test 2", TestCopyValue2);
+    helper.Test("Copy Value Test 3", TestCopyValue3);
+    helper.Test("Copy Value Test 4", TestCopyValue4);
 
-    START_TEST("Addition Test 1", TestAddition1);
-    START_TEST("Addition Test 2", TestAddition2);
-    START_TEST("Addition Test 3", TestAddition3);
-    START_TEST("Addition Test 4", TestAddition4);
-    START_TEST("Addition Test 5", TestAddition5);
-    START_TEST("Addition Test 6", TestAddition6);
+    helper.Test("Index Operator Test 1", TestIndexOperator1);
+    helper.Test("Index Operator Test 2", TestIndexOperator2);
 
-    START_TEST("Stringify Test 1", TestStringify1);
-    START_TEST("Stringify Test 2", TestStringify2);
-    START_TEST("Stringify Test 3", TestStringify3);
-    START_TEST("Stringify Test 4", TestStringify4);
+    helper.Test("Addition Test 1", TestAddition1);
+    helper.Test("Addition Test 2", TestAddition2);
+    helper.Test("Addition Test 3", TestAddition3);
+    helper.Test("Addition Test 4", TestAddition4);
+    helper.Test("Addition Test 5", TestAddition5);
+    helper.Test("Addition Test 6", TestAddition6);
 
-    START_TEST("Delete Value Test", TestDeleteValue);
+    helper.Test("Stringify Test 1", TestStringify1);
+    helper.Test("Stringify Test 2", TestStringify2);
+    helper.Test("Stringify Test 3", TestStringify3);
+    helper.Test("Stringify Test 4", TestStringify4);
 
-    START_TEST("Sort Value Test", TestSortValue);
-    START_TEST("Group Value Test", TestGroupValue);
+    helper.Test("Delete Value Test", TestDeleteValue);
 
-    END_TEST("Value.hpp");
+    helper.Test("Sort Value Test", TestSortValue);
+    helper.Test("Group Value Test", TestGroupValue);
+
+    return helper.EndTests();
 }
 
 } // namespace Test

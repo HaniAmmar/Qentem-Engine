@@ -32,265 +32,261 @@ namespace Test {
 
 using String8 = String<char>;
 
-static int TestString1() {
+void TestString1(TestHelper &helper) {
     SizeT length;
     char *strptr;
 
     String8 str1;
-    EQ_VALUE(str1.Length(), 0, "Length");
-    EQ_TO(str1.First(), nullptr, "First()", "null");
+    helper.Equal(str1.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
 
     String8 str2{"0123456789"};
-    EQ_VALUE(str2.Length(), 10, "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
+    helper.Equal(str2.Length(), 10U, "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
 
     str2.Reset();
-    EQ_VALUE(str2.Length(), 0, "Length");
-    EQ_TO(str2.First(), nullptr, "First()", "null");
+    helper.Equal(str2.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
 
     str1 = String8("abcd");
-    EQ_VALUE(str1.Length(), 4, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]"); // Dose it have /0 at the end?
-    EQ_VALUE(str1, "abcd", "str1");
-    NOT_EQ_TO(str1, "abcdef", "str1", "abcdef");
+    helper.Equal(str1.Length(), 4U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__); // Dose it have /0 at the end?
+    helper.Equal(str1, "abcd", "str1", __LINE__);
+    helper.NotEqual(str1, "abcdef", "str1", "abcdef", __LINE__);
 
-    str1 = String8("abcd", 2);
-    EQ_VALUE(str1.Length(), 2, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "ab", "str1");
-    NOT_EQ_TO(str1, "abcd", "str1", "abcd");
+    str1 = String8("abcd", 2U);
+    helper.Equal(str1.Length(), 2U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "ab", "str1", __LINE__);
+    helper.NotEqual(str1, "abcd", "str1", "abcd", __LINE__);
 
     str1 = "ABCDEF0123456789ABCDEF0123456789";
-    EQ_VALUE(str1.Length(), 32, "Length");
+    helper.Equal(str1.Length(), 32U, "Length", __LINE__);
 
     length = str1.Length();
     strptr = str1.Eject();
-    NOT_EQ_TO(strptr, nullptr, "Eject", "null");
+    helper.NotEqual(strptr, nullptr, "Eject", "null", __LINE__);
 
     str2 = String8(strptr, length); // Manage
-    EQ_TO(str2.First(), strptr, "First()", "strptr");
-    EQ_VALUE(str2.Length(), length, "Length");
+    helper.Equal(str2.First(), strptr, "First()", "strptr", __LINE__);
+    helper.Equal(str2.Length(), length, "Length", __LINE__);
 
     str1 = static_cast<String8 &&>(str2); // Move
-    EQ_VALUE(str1.First(), strptr, "First()");
-    EQ_VALUE(str1.Length(), length, "Length");
-    EQ_VALUE(str2.Length(), 0, "Length");
-    EQ_TO(str2.First(), nullptr, "First()", "null");
+    helper.Equal(str1.First(), strptr, "First()", __LINE__);
+    helper.Equal(str1.Length(), length, "Length", __LINE__);
+    helper.Equal(str2.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
 
     str2 = "abcdef"; // Copy
-    EQ_VALUE(str2.Length(), 6, "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), "abcdef", 5), "IsEqual");
+    helper.Equal(str2.Length(), 6U, "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), "abcdef", 5U), "IsEqual", __LINE__);
 
     str2 = str1; // Copy
-    EQ_VALUE(str2.Length(), str1.Length(), "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(str2.First(), str1.First(), "First()", str1.First());
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual");
+    helper.Equal(str2.Length(), str1.Length(), "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(str2.First(), str1.First(), "First()", str1.First(), __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual", __LINE__);
 
     str2.Reset();
     str1 = "efg";         // Copy
     str2 = String8(str1); // Copy
-    EQ_VALUE(str2.Length(), str1.Length(), "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(str2.First(), str1.First(), "First()", str1.First());
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual");
+    helper.Equal(str2.Length(), str1.Length(), "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(str2.First(), str1.First(), "First()", str1.First(), __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual", __LINE__);
 
     str1 = "hig";         // Copy
     str2 = String8(str1); // Copy over a value
-    EQ_VALUE(str2.Length(), str1.Length(), "Length");
-    NOT_EQ_TO(str2.First(), str1.First(), "First()", str1.First());
-    EQ_TRUE(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual");
+    helper.Equal(str2.Length(), str1.Length(), "Length", __LINE__);
+    helper.NotEqual(str2.First(), str1.First(), "First()", str1.First(), __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual", __LINE__);
 
     length = str1.Length();
     str2   = String8(static_cast<String8 &&>(str1));
-    EQ_VALUE(str1.Length(), 0, "Length");
-    EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str2.Length(), length, "Length");
+    helper.Equal(str1.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.Length(), length, "Length", __LINE__);
 
     str1 = "A";
-    EQ_VALUE(str1.Length(), 1, "Length");
+    helper.Equal(str1.Length(), 1U, "Length", __LINE__);
     strptr = str1.Eject();
-    EQ_TO(strptr[0], 'A', "strptr[0]", "A");
+    helper.Equal(strptr[0], 'A', "strptr[0]", "A", __LINE__);
     Memory::Deallocate(strptr);
 
     char   *tmp_size_2 = Memory::Allocate<char>(2);
-    String8 str_size_2 = String8(tmp_size_2, 2);
+    String8 str_size_2 = String8(tmp_size_2, 2U);
 
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    NOT_EQ_TO(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2");
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1U)
+    helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
 #else
-    EQ_TO(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2");
+    helper.Equal(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
 #endif
-
-    END_SUB_TEST;
 }
 
-static int TestStringCompare() {
+void TestStringCompare(TestHelper &helper) {
     String8     str1("a");
     String8     str2("a");
     const char *str3 = "a";
 
-    EQ_TO(str1, str2, "str1", "str2");
-    EQ_TO(str2, str1, "str2", "str1");
-    EQ_TO(str1, str3, "str1", "str3");
-    EQ_TO(str2, str3, "str2", "str3");
+    helper.Equal(str1, str2, "str1", "str2", __LINE__);
+    helper.Equal(str2, str1, "str2", "str1", __LINE__);
+    helper.Equal(str1, str3, "str1", "str3", __LINE__);
+    helper.Equal(str2, str3, "str2", "str3", __LINE__);
 
     str1 = "abc";
     str2 = "abc";
     str3 = "abc";
-    EQ_TO(str1, str2, "str1", "str2");
-    EQ_TO(str2, str1, "str2", "str1");
-    EQ_TO(str1, str3, "str1", "str3");
-    EQ_TO(str2, str3, "str2", "str3");
+    helper.Equal(str1, str2, "str1", "str2", __LINE__);
+    helper.Equal(str2, str1, "str2", "str1", __LINE__);
+    helper.Equal(str1, str3, "str1", "str3", __LINE__);
+    helper.Equal(str2, str3, "str2", "str3", __LINE__);
 
     str1 = "a";
     str2 = "b";
     str3 = "c";
-    NOT_EQ_TO(str1, str2, "str1", "str2");
-    NOT_EQ_TO(str2, str1, "str2", "str1");
-    NOT_EQ_TO(str1, str3, "str1", "str3");
-    NOT_EQ_TO(str2, str3, "str2", "str3");
+    helper.NotEqual(str1, str2, "str1", "str2", __LINE__);
+    helper.NotEqual(str2, str1, "str2", "str1", __LINE__);
+    helper.NotEqual(str1, str3, "str1", "str3", __LINE__);
+    helper.NotEqual(str2, str3, "str2", "str3", __LINE__);
 
     str1 = "abc";
     str2 = "efg";
     str3 = "hij";
-    NOT_EQ_TO(str1, str2, "str1", "str2");
-    NOT_EQ_TO(str2, str1, "str2", "str1");
-    NOT_EQ_TO(str1, str3, "str1", "str3");
-    NOT_EQ_TO(str2, str3, "str2", "str3");
+    helper.NotEqual(str1, str2, "str1", "str2", __LINE__);
+    helper.NotEqual(str2, str1, "str2", "str1", __LINE__);
+    helper.NotEqual(str1, str3, "str1", "str3", __LINE__);
+    helper.NotEqual(str2, str3, "str2", "str3", __LINE__);
 
     str1 = "a";
     str2 = "ef";
     str3 = "abc";
-    NOT_EQ_TO(str1, str2, "str1", "str2");
-    NOT_EQ_TO(str2, str1, "str2", "str1");
-    NOT_EQ_TO(str1, str3, "str1", "str3");
-    NOT_EQ_TO(str2, str3, "str2", "str3");
+    helper.NotEqual(str1, str2, "str1", "str2", __LINE__);
+    helper.NotEqual(str2, str1, "str2", "str1", __LINE__);
+    helper.NotEqual(str1, str3, "str1", "str3", __LINE__);
+    helper.NotEqual(str2, str3, "str2", "str3", __LINE__);
 
     str1 = "";
-    EQ_FALSE(str1.IsEqual(" ", 1), "IsEqual");
+    helper.EqualsFalse(str1.IsEqual(" ", 1U), "IsEqual", __LINE__);
 
     str1 = "";
     str2 = "";
-    EQ_TRUE((str1 >= str2), "IsBigger");
-    EQ_TRUE((str1 <= str2), "IsLess");
-    EQ_FALSE((str1 > str2), "IsBigger");
-    EQ_FALSE((str1 < str2), "IsLess");
+    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 <= str2), "IsLess", __LINE__);
+    helper.EqualsFalse((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
 
     str1 = "a";
     str2 = "a";
-    EQ_TRUE((str1 >= str2), "IsBigger");
-    EQ_TRUE((str1 <= str2), "IsLess");
-    EQ_FALSE((str1 > str2), "IsBigger");
-    EQ_FALSE((str1 < str2), "IsLess");
+    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 <= str2), "IsLess", __LINE__);
+    helper.EqualsFalse((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
 
     str1 = "a";
     str2 = "A";
-    EQ_TRUE((str1 >= str2), "IsBigger");
-    EQ_TRUE((str1 > str2), "IsBigger");
-    EQ_FALSE((str1 <= str2), "IsLess");
-    EQ_FALSE((str1 < str2), "IsLess");
+    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
+    helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    EQ_FALSE((str2 >= str1), "IsBigger");
-    EQ_FALSE((str2 > str1), "IsBigger");
-    EQ_TRUE((str2 <= str1), "IsLess");
-    EQ_TRUE((str2 < str1), "IsLess");
+    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
+    helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 
     str1 = "a";
     str2 = "B";
-    EQ_TRUE((str1 >= str2), "IsBigger");
-    EQ_TRUE((str1 > str2), "IsBigger");
-    EQ_FALSE((str1 <= str2), "IsLess");
-    EQ_FALSE((str1 < str2), "IsLess");
+    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
+    helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    EQ_FALSE((str2 >= str1), "IsBigger");
-    EQ_FALSE((str2 > str1), "IsBigger");
-    EQ_TRUE((str2 <= str1), "IsLess");
-    EQ_TRUE((str2 < str1), "IsLess");
+    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
+    helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 
     str1 = "aa";
     str2 = "aA";
-    EQ_TRUE((str1 >= str2), "IsBigger");
-    EQ_TRUE((str1 > str2), "IsBigger");
-    EQ_FALSE((str1 <= str2), "IsLess");
-    EQ_FALSE((str1 < str2), "IsLess");
+    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
+    helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    EQ_FALSE((str2 >= str1), "IsBigger");
-    EQ_FALSE((str2 > str1), "IsBigger");
-    EQ_TRUE((str2 <= str1), "IsLess");
-    EQ_TRUE((str2 < str1), "IsLess");
+    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
+    helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 
     str1 = "2021";
     str2 = "2018";
-    EQ_TRUE((str1 >= str2), "IsBigger");
-    EQ_TRUE((str1 > str2), "IsBigger");
-    EQ_FALSE((str1 <= str2), "IsLess");
-    EQ_FALSE((str1 < str2), "IsLess");
+    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
+    helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    EQ_FALSE((str2 >= str1), "IsBigger");
-    EQ_FALSE((str2 > str1), "IsBigger");
-    EQ_TRUE((str2 <= str1), "IsLess");
-    EQ_TRUE((str2 < str1), "IsLess");
-
-    END_SUB_TEST;
+    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
+    helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 }
 
-static int TestString2() {
+void TestString2(TestHelper &helper) {
     String8 str1;
     String8 str2;
 
-    str1.Insert("a", 1);
-    EQ_VALUE(str1.Length(), 1, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "a", "str1");
+    str1.Insert("a", 1U);
+    helper.Equal(str1.Length(), 1U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "a", "str1", __LINE__);
 
-    str1.Insert("bc", 2);
-    EQ_VALUE(str1.Length(), 3, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abc", "str1");
+    str1.Insert("bc", 2U);
+    helper.Equal(str1.Length(), 3U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abc", "str1", __LINE__);
 
-    str1.Insert("", 0);
-    EQ_VALUE(str1.Length(), 3, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abc", "str1");
+    str1.Insert("", 0U);
+    helper.Equal(str1.Length(), 3U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abc", "str1", __LINE__);
 
     str2 = String8::Merge(str1, String8("def"));
-    EQ_VALUE(str2.Length(), 6, "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
-    EQ_VALUE(str2, "abcdef", "str2");
+    helper.Equal(str2.Length(), 6U, "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2, "abcdef", "str2", __LINE__);
 
     str2 = String8::Merge(str2, String8(""));
-    EQ_VALUE(str2.Length(), 6, "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
-    EQ_VALUE(str2, "abcdef", "str2");
+    helper.Equal(str2.Length(), 6U, "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2, "abcdef", "str2", __LINE__);
 
     str2 = String8::Merge(String8(""), str2);
-    EQ_VALUE(str2.Length(), 6, "Length");
-    NOT_EQ_TO(str2.First(), nullptr, "First()", "null");
-    EQ_VALUE(str2.First()[str2.Length()], 0, "First()[Length]");
-    EQ_VALUE(str2, "abcdef", "str2");
+    helper.Equal(str2.Length(), 6U, "Length", __LINE__);
+    helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2, "abcdef", "str2", __LINE__);
 
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1U)
     str1.Reset();
     for (SizeT i = 0; i < String8::ShortStringMax; i++) {
         str1 += "A";
     }
 
     str1 += "_";
-    EQ_VALUE(str1.Length(), (String8::ShortStringMax + 1), "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "AAAAAAAAAAAAAA_", "str1");
+    helper.Equal(str1.Length(), (String8::ShortStringMax + 1U), "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "AAAAAAAAAAAAAA_", "str1", __LINE__);
 
     str1.Reset();
     for (SizeT i = 3; i < String8::ShortStringMax; i++) {
@@ -298,89 +294,89 @@ static int TestString2() {
     }
 
     str1 += "_";
-    EQ_VALUE(str1.Length(), (String8::ShortStringMax - 2), "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "AAAAAAAAAAA_", "str1");
+    helper.Equal(str1.Length(), (String8::ShortStringMax - 2U), "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "AAAAAAAAAAA_", "str1", __LINE__);
 
     str1 += "B";
-    EQ_VALUE(str1.Length(), 13, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "AAAAAAAAAAA_B", "str1");
+    helper.Equal(str1.Length(), 13U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "AAAAAAAAAAA_B", "str1", __LINE__);
 
     str1 += "_C";
-    EQ_VALUE(str1.Length(), 15, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "AAAAAAAAAAA_B_C", "str1");
+    helper.Equal(str1.Length(), 15U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "AAAAAAAAAAA_B_C", "str1", __LINE__);
 #endif
 
     str1.Reset();
     str1 += "a";
-    EQ_VALUE(str1.Length(), 1, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "a", "str1");
+    helper.Equal(str1.Length(), 1U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "a", "str1", __LINE__);
 
     str1 += "bc";
-    EQ_VALUE(str1.Length(), 3, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abc", "str1");
+    helper.Equal(str1.Length(), 3U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abc", "str1", __LINE__);
 
     str2 = "def";
     str1 += str2;
-    EQ_VALUE(str1.Length(), 6, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abcdef", "str1");
+    helper.Equal(str1.Length(), 6U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abcdef", "str1", __LINE__);
 
     str2 = "ghi";
     str1 += static_cast<String8 &&>(str2);
-    EQ_VALUE(str1.Length(), 9, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abcdefghi", "str1");
-    EQ_VALUE(str2.Length(), 0, "Length");
-    EQ_TO(str2.First(), nullptr, "First()", "null");
+    helper.Equal(str1.Length(), 9U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abcdefghi", "str1", __LINE__);
+    helper.Equal(str2.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
 
     str1 = str1 + "";
-    EQ_VALUE(str1.Length(), 9, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abcdefghi", "str1");
+    helper.Equal(str1.Length(), 9U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abcdefghi", "str1", __LINE__);
 
     str1 = str1 + "gkl";
-    EQ_VALUE(str1.Length(), 12, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abcdefghigkl", "str1");
+    helper.Equal(str1.Length(), 12U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abcdefghigkl", "str1", __LINE__);
 
     str2 = "123";
     str1 = str1 + str2;
-    EQ_VALUE(str1.Length(), 15, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "abcdefghigkl123", "str1");
+    helper.Equal(str1.Length(), 15U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abcdefghigkl123", "str1", __LINE__);
 
     str1 = "aaaaaaaaaaaaaaaaaaaaaaaa";
     str1 += "aaaaaaaaaaaaaaaaaaaaaaaa";
-    EQ_VALUE(str1.Length(), 48, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "str1");
+    helper.Equal(str1.Length(), 48U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "str1", __LINE__);
 
     str1.Reset();
     str1 = "1234";
     str2 = "5678";
     str1 = str1 + static_cast<String8 &&>(str2);
-    EQ_VALUE(str1.Length(), 8, "Length");
-    NOT_EQ_TO(str1.First(), nullptr, "First()", "null");
-    EQ_VALUE(str1.First()[str1.Length()], 0, "First()[Length]");
-    EQ_VALUE(str1, "12345678", "str1");
-    EQ_VALUE(str2.Length(), 0, "Length");
-    EQ_TO(str2.First(), nullptr, "First()", "null");
+    helper.Equal(str1.Length(), 8U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "12345678", "str1", __LINE__);
+    helper.Equal(str2.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
 
     struct SimpleStream {
         char               str[8]{0};
@@ -399,113 +395,111 @@ static int TestString2() {
     SimpleStream sis;
     sis << str1;
 
-    EQ_TRUE(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8), "SimpleStream");
-
-    END_SUB_TEST;
+    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8U), "SimpleStream", __LINE__);
 }
 
-static int TestTrim() {
+void TestTrim(TestHelper &helper) {
     String8 str1("");
 
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 0, "length");
+    helper.Equal(str1.Length(), 0U, "length", __LINE__);
 
     str1 = " ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 0, "length");
+    helper.Equal(str1.Length(), 0U, "length", __LINE__);
 
     str1 = "  ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 0, "length");
+    helper.Equal(str1.Length(), 0U, "length", __LINE__);
 
     str1 = "                    ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 0, "length");
+    helper.Equal(str1.Length(), 0U, "length", __LINE__);
 
     str1 = " a";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "a ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = " a ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "  a";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "a  ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "  a  ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "                      a";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "a                      ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = "                      a                      ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 1, "length");
+    helper.Equal(str1.Length(), 1U, "length", __LINE__);
 
     str1 = " abcd";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "abcd ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = " abcd ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "  abcd";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "abcd  ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "  abcd  ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "                      abcd";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "abcd                      ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 
     str1 = "                      abcd                      ";
     str1 = String8::Trim(str1);
-    EQ_VALUE(str1.Length(), 4, "length");
-
-    END_SUB_TEST;
+    helper.Equal(str1.Length(), 4U, "length", __LINE__);
 }
 
 static int RunStringTests() {
-    STARTING_TEST("String.hpp");
+    TestHelper helper{"String.hpp", __FILE__};
 
-    START_TEST("String Test 1", TestString1);
-    START_TEST("String::Compare", TestStringCompare);
-    START_TEST("String Test 2", TestString2);
-    START_TEST("String::Trim", TestTrim);
+    helper.PrintGroupName();
 
-    END_TEST("String.hpp");
+    helper.Test("String Test 1", TestString1);
+    helper.Test("String::Compare", TestStringCompare);
+    helper.Test("String Test 2", TestString2);
+    helper.Test("String::Trim", TestTrim);
+
+    return helper.EndTests();
 }
 
 } // namespace Test

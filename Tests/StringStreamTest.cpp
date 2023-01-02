@@ -2,7 +2,7 @@
 
 int main() {
     int ret = Qentem::Test::RunStringStreamTests();
-    Qentem::Test::TestHelper::PrintMemoryStatus();
+    Qentem::TestHelper::PrintMemoryStatus();
 
     return ret;
 }

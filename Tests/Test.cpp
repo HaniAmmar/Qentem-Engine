@@ -51,7 +51,7 @@ int main() {
     // }
 
     int ret = Qentem::Test::RunTests();
-    Qentem::Test::TestHelper::PrintMemoryStatus();
+    Qentem::TestHelper::PrintMemoryStatus();
 
     return ret;
 }

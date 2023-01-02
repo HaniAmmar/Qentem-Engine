@@ -36,62 +36,60 @@ static SizeT HexStringToNumber(const char *str) noexcept {
     return Digit<char>::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
-static int TestHexConv() {
+void TestHexConv(TestHelper &helper) {
     SizeT       number;
     const char *hex = nullptr;
 
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 0, "number");
+    helper.Equal(number, 0U, "number", __LINE__);
 
     hex    = "0000";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 0, "number");
+    helper.Equal(number, 0U, "number", __LINE__);
 
     hex    = "AAAA";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 43690, "number");
+    helper.Equal(number, 43690U, "number", __LINE__);
 
     hex    = "000A";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 10, "number");
+    helper.Equal(number, 10U, "number", __LINE__);
 
     hex    = "A000";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 40960, "number");
+    helper.Equal(number, 40960U, "number", __LINE__);
 
     hex    = "ABCDEF";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 11259375, "number");
+    helper.Equal(number, 11259375U, "number", __LINE__);
 
     hex    = "FEDCBA";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 16702650, "number");
+    helper.Equal(number, 16702650U, "number", __LINE__);
 
     hex    = "abcdef";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 11259375, "number");
+    helper.Equal(number, 11259375U, "number", __LINE__);
 
     hex    = "fedcba";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 16702650, "number");
+    helper.Equal(number, 16702650U, "number", __LINE__);
 
     hex    = "12345";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 74565, "number");
+    helper.Equal(number, 74565U, "number", __LINE__);
 
     hex    = "6789";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 26505, "number");
+    helper.Equal(number, 26505U, "number", __LINE__);
 
     hex    = "FFFF";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 65535, "number");
+    helper.Equal(number, 65535U, "number", __LINE__);
 
     hex    = "9999";
     number = HexStringToNumber(hex);
-    EQ_VALUE(number, 39321, "number");
-
-    END_SUB_TEST;
+    helper.Equal(number, 39321U, "number", __LINE__);
 }
 
 template <typename Number_T_>
@@ -99,50 +97,48 @@ bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
     return DigitC::StringToNumber(num, str, StringUtils::Count(str));
 }
 
-static int TestStringToNumber1() {
+void TestStringToNumber1(TestHelper &helper) {
     SizeT       number = 0;
     const char *str    = "";
     bool        valid;
 
     str   = "";
     valid = StringToNumberCount(number, str);
-    EQ_FALSE(valid, "valid");
-    EQ_VALUE(number, 0, "number");
+    helper.EqualsFalse(valid, "valid", __LINE__);
+    helper.Equal(number, 0U, "number", __LINE__);
 
     str   = "0";
     valid = StringToNumberCount(number, str);
-    EQ_TRUE(valid, "valid");
-    EQ_VALUE(number, 0, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(number, 0U, str, __LINE__);
 
     str   = "1";
     valid = StringToNumberCount(number, str);
-    EQ_TRUE(valid, "valid");
-    EQ_VALUE(number, 1, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(number, 1U, str, __LINE__);
 
     str   = "1000000";
     valid = StringToNumberCount(number, str);
-    EQ_TRUE(valid, "valid");
-    EQ_VALUE(number, 1000000, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(number, 1000000U, str, __LINE__);
 
     str   = "1010101";
     valid = StringToNumberCount(number, str);
-    EQ_TRUE(valid, "valid");
-    EQ_VALUE(number, 1010101, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(number, 1010101U, str, __LINE__);
 
     str   = "9999999";
     valid = StringToNumberCount(number, str);
-    EQ_TRUE(valid, "valid");
-    EQ_VALUE(number, 9999999, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(number, 9999999U, str, __LINE__);
 
     str   = "123456789";
     valid = StringToNumberCount(number, str);
-    EQ_TRUE(valid, "valid");
-    EQ_VALUE(number, 123456789, str);
-
-    END_SUB_TEST;
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(number, 123456789U, str, __LINE__);
 }
 
-static int TestStringToNumber2() {
+void TestStringToNumber2(TestHelper &helper) {
     int           number_int    = 0;
     unsigned int  number_uint   = 0;
     long          number_long   = 0;
@@ -154,236 +150,234 @@ static int TestStringToNumber2() {
     bool        valid;
 
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     valid = StringToNumberCount(number_uint, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     valid = StringToNumberCount(number_ulong, str);
-    EQ_VALUE(number_ulong, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_ulong, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-e";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+e";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-e1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+e1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1--e1";
     valid = StringToNumberCount(number_ulong, str);
-    EQ_VALUE(number_ulong, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_ulong, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1++e1";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e-";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e+";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e--1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e++1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1ee1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_double, 0.0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E";
     valid = StringToNumberCount(number_uint, str);
-    EQ_VALUE(number_uint, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_uint, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "E1";
     valid = StringToNumberCount(number_uint, str);
-    EQ_VALUE(number_uint, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_uint, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-E";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+E";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-E1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+E1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1--E1";
     valid = StringToNumberCount(number_ulong, str);
-    EQ_VALUE(number_ulong, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_ulong, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1++E1";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E-";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E+";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E--1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E++1";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1EE1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_double, 0.0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     // .0 is valid
 
     str   = "0.";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".0.0";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0.0.";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0..0";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123.";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".123.123";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123.123.";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123..123";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "12y3";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1x23";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "w123";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-";
     valid = StringToNumberCount(number_float, str);
-    EQ_VALUE(number_float, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-";
     valid = StringToNumberCount(number_long, str);
-    EQ_VALUE(number_long, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_long, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "500000000000000000X000.000000000000";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0, "number");
-    EQ_FALSE(valid, "valid");
-
-    END_SUB_TEST;
+    helper.Equal(number_double, 0.0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 }
 
-static int TestStringToNumber3() {
+void TestStringToNumber3(TestHelper &helper) {
     int          number_int    = 0;
     unsigned int number_uint   = 0;
     double       number_double = 0;
@@ -392,276 +386,272 @@ static int TestStringToNumber3() {
     bool        valid;
 
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_double, 0.0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-w1";
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+w1";
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+01";
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-01";
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "01";
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_int, 0, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e";
     valid = StringToNumberCount(number_uint, str);
-    EQ_VALUE(number_uint, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_uint, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "e1";
     valid = StringToNumberCount(number_uint, str);
-    EQ_VALUE(number_uint, 0, "number");
-    EQ_FALSE(valid, "valid");
+    helper.Equal(number_uint, 0U, "number", __LINE__);
+    helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 0.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, -1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, -1.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "+1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "+1";
     valid = StringToNumberCount(number_uint, str);
-    EQ_VALUE(number_uint, 1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_uint, 1U, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1";
     valid = StringToNumberCount(number_int, str);
-    EQ_VALUE(number_int, -1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_int, -1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1.0";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1.1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1.1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1.1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "123456789";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 123456789, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 123456789.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1.123456789";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1.123456789, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1.123456789, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "123456789.123456789";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 123456789.123456789, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 123456789.123456789, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1e10";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1E10";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1e+10";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1E+10";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "5000000000000000000000000000000000";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 5e33, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 5e33, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "5000000000000000000000.000000000000";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 5e21, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 5e21, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1E5";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e5, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e5, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1e-10";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e-10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e-10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "1E-10";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 1e-10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 1e-10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "0.3";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0.3, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 0.3, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "0.2";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0.2, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 0.2, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "0.1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 0.1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 0.1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "2.3";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 2.3, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 2.3, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "3.2";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 3.2, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 3.2, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "5.1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, 5.1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number_double, 5.1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1";
     valid = StringToNumberCount(number_double, str);
-    EQ_VALUE(number_double, -1, "number");
-    EQ_TRUE(valid, "valid");
-
-    END_SUB_TEST;
+    helper.Equal(number_double, -1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 }
 
-static int TestStringToNumber4() {
+void TestStringToNumber4(TestHelper &helper) {
     const char *str    = nullptr;
     double      number = 0;
     bool        valid;
 
     str   = "-1.0";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1.1";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1.1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1.1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-123456789";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -123456789, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -123456789.0, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1.123456789";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1.123456789, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1.123456789, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-123456789.123456789";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -123456789.123456789, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -123456789.123456789, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1e10";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1E10";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1e+10";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1E+10";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1e10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1e10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1e-10";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1e-10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1e-10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-1E-10";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -1e-10, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -1e-10, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-0.3";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -0.3, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -0.3, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-0.2";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -0.2, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -0.2, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-0.1";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -0.1, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -0.1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-2.3";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -2.3, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -2.3, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-3.2";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -3.2, "number");
-    EQ_TRUE(valid, "valid");
+    helper.Equal(number, -3.2, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 
     str   = "-5.1";
     valid = StringToNumberCount(number, str);
-    EQ_VALUE(number, -5.1, "number");
-    EQ_TRUE(valid, "valid");
-
-    END_SUB_TEST;
+    helper.Equal(number, -5.1, "number", __LINE__);
+    helper.EqualsTrue(valid, "valid", __LINE__);
 }
 
-static int TestNumberToString1() {
+void TestNumberToString1(TestHelper &helper) {
     int           number_int;
     unsigned int  number_uint;
     long          number_long;
@@ -670,492 +660,484 @@ static int TestNumberToString1() {
     double        number_double;
 
     number_int = -1;
-    EQ_VALUE(DigitC::NumberToString(number_int), "-1", "return");
+    helper.Equal(DigitC::NumberToString(number_int), "-1", "return", __LINE__);
 
     number_int = 1;
-    EQ_VALUE(DigitC::NumberToString(number_int), "1", "return");
+    helper.Equal(DigitC::NumberToString(number_int), "1", "return", __LINE__);
 
     number_long = -100000;
-    EQ_VALUE(DigitC::NumberToString(number_long), "-100000", "return");
+    helper.Equal(DigitC::NumberToString(number_long), "-100000", "return", __LINE__);
 
     number_long = 100000;
-    EQ_VALUE(DigitC::NumberToString(number_long), "100000", "return");
+    helper.Equal(DigitC::NumberToString(number_long), "100000", "return", __LINE__);
 
     number_uint = 0;
-    EQ_VALUE(DigitC::NumberToString(number_uint), "0", "return");
+    helper.Equal(DigitC::NumberToString(number_uint), "0", "return", __LINE__);
 
     number_ulong = 1;
-    EQ_VALUE(DigitC::NumberToString(number_ulong), "1", "return");
+    helper.Equal(DigitC::NumberToString(number_ulong), "1", "return", __LINE__);
 
     number_ulong = 4;
-    EQ_VALUE(DigitC::NumberToString(number_ulong), "4", "return");
+    helper.Equal(DigitC::NumberToString(number_ulong), "4", "return", __LINE__);
 
     number_int = -7;
-    EQ_VALUE(DigitC::NumberToString(number_int), "-7", "return");
+    helper.Equal(DigitC::NumberToString(number_int), "-7", "return", __LINE__);
 
     number_uint = 10;
-    EQ_VALUE(DigitC::NumberToString(number_uint), "10", "return");
+    helper.Equal(DigitC::NumberToString(number_uint), "10", "return", __LINE__);
 
     number_ulong = 3;
-    EQ_VALUE(DigitC::NumberToString(number_ulong), "3", "return");
+    helper.Equal(DigitC::NumberToString(number_ulong), "3", "return", __LINE__);
 
     number_float = 1;
-    EQ_VALUE(DigitC::NumberToString(number_float), "1", "return");
+    helper.Equal(DigitC::NumberToString(number_float), "1", "return", __LINE__);
 
     number_double = 0;
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), ".0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "0.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), ".00000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "00.00", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), ".0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "0.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), ".00000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "00.00", "return", __LINE__);
 
     number_double = 1;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "1.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "1.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "001", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "1.00000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "01.00", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "1.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "1.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "001", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "1.00000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "01.00", "return", __LINE__);
 
     number_double = 15;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "15", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "15", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "15.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "15.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "015", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "15.00000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "15.00", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "15", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "15", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "15.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "15.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "015", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "15.00000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "15.00", "return", __LINE__);
 
     number_double = 12345;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "12345", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "12345", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "12345.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "12345.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "12345", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "12345.00000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "12345.00", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "12345", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "12345", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "12345.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "12345.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "12345", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "12345.00000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "12345.00", "return", __LINE__);
 
     number_double = 1.1;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "001.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "1.10000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "01.10", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "001.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "1.10000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "01.10", "return", __LINE__);
 
     number_double = 100.5;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 0), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 0), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 0), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 0), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 0), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 0), "100.50000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 0), "100.50", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "100.50000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "100.50", "return", __LINE__);
 
     number_double = 1.123456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "001.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "1.10000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "01.10", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "001.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "1.10000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "01.10", "return", __LINE__);
 
     number_double = 80.123456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "80.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "80.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "80.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "80.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "080.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "80.10000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "80.10", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "80.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "80.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "80.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "80.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "080.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "80.10000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "80.10", "return", __LINE__);
 
     number_double = 12345.123456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "12345.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "12345.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "12345.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "12345.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "12345.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "12345.10000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "12345.10", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "12345.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "12345.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "12345.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "12345.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "12345.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "12345.10000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "12345.10", "return", __LINE__);
 
     number_double = 1.123456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "1.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "001.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "1.10000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "01.10", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "1.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "001.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "1.10000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "01.10", "return", __LINE__);
 
     number_double = 100.123456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "100.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "100.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "100.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "100.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "100.1", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "100.10000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "100.10", "return");
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "100.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "100.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "100.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "100.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "100.1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "100.10000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "100.10", "return", __LINE__);
 
     number_double = 100.523456;
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 0, 1), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 0, 1), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 1, 1), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 1, 1, 1), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 3, 0, 1), "100.5", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 0, 5, 1), "100.50000", "return");
-    EQ_VALUE(DigitC::NumberToString(number_double, 2, 2, 1), "100.50", "return");
-
-    END_SUB_TEST;
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "100.5", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "100.50000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "100.50", "return", __LINE__);
 }
 
-static int TestNumberToString2() {
+void TestNumberToString2(TestHelper &helper) {
     double number = 1.123456;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 2), "001.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 2), "1.12000", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 2), "01.12", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "001.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "1.12000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "01.12", "return", __LINE__);
 
     number = 80.123456;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "80.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 2), "80.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), "80.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 2), "80.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 2), "080.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 2), "80.12000", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 2), "80.12", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "80.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "80.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "80.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "80.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "080.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "80.12000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "80.12", "return", __LINE__);
 
     number = 12345.123456;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "12345.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 2), "12345.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), "12345.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 2), "12345.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 2), "12345.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 2), "12345.12000", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 2), "12345.12", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "12345.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "12345.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "12345.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "12345.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "12345.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "12345.12000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "12345.12", "return", __LINE__);
 
     number = 1.123456;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 2), "1.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 2), "001.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 2), "1.12000", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 2), "01.12", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "1.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "001.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "1.12000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "01.12", "return", __LINE__);
 
     number = 100.123456;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "100.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 2), "100.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), "100.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 2), "100.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 2), "100.12", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 2), "100.12000", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 2), "100.12", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "100.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "100.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "100.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "100.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "100.12", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "100.12000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "100.12", "return", __LINE__);
 
     number = 100.523456;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "100.52", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 2), "100.52", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), "100.52", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 2), "100.52", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 2), "100.52", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 2), "100.52000", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 2), "100.52", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "100.52", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "100.52", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "100.52", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "100.52", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "100.52", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "100.52000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "100.52", "return", __LINE__);
 
     number = 100.1234;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 5), "100.1234", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 5), "100.1234", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 5), "100.1234", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 1, 5), "100.1234", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 0, 5), "100.1234", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 5, 5), "100.12340", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 2, 2, 5), "100.1234", "return");
-    END_SUB_TEST;
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 5U), "100.1234", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 5U), "100.1234", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 5U), "100.1234", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 5U), "100.1234", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 5U), "100.1234", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 5U), "100.12340", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 5U), "100.1234", "return", __LINE__);
 }
 
-static int TestNumberToString3() {
+void TestNumberToString3(TestHelper &helper) {
     double number;
 
     number = 5.15;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 3), "5.15", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "5.15", "return", __LINE__);
 
     number = 5.55;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "5.55", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "5.55", "return", __LINE__);
 
     // number = 5.55; // NOTE: Fix
-    // EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "5.6",
+    // EQ_VALUE(DigitC::NumberToString(number, 0U, 0U, 1U), "5.6",
     // "return");
 
     number = 5.57;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "5.6", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 1), "5.6", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 1), "5.60", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 1), "005.600", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "5.6", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "5.6", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "5.60", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "005.600", "return", __LINE__);
 
     number = 0.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "1", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 1), "1.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 1), "1.00", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 1), "001.000", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "1.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "1.00", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "001.000", "return", __LINE__);
 
     number = 0.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), ".99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 2), ".99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 2), ".99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 2), "000.990", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), ".99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), ".99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 2U), ".99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 2U), "000.990", "return", __LINE__);
 
     number = 0.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 5), ".99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 5), ".99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 5), ".99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 5), "000.990", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 5U), ".99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 5U), ".99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 5U), ".99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 5U), "000.990", "return", __LINE__);
 
     number = 5.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "6", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 1), "6.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 1), "6.00", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 1), "006.000", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "6", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "6.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "6.00", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "006.000", "return", __LINE__);
 
     number = 9.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "10", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 1), "10.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 1), "10.00", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 1), "010.000", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "10", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "10.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "10.00", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "010.000", "return", __LINE__);
 
     number = 90.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "91", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 1), "91.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 1), "91.00", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 1), "091.000", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "91", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "91.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "91.00", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "091.000", "return", __LINE__);
 
     number = 99.99;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "100", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 1, 1), "100.0", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 2, 1), "100.00", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 3, 3, 1), "100.000", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "100", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "100.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "100.00", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "100.000", "return", __LINE__);
 
     number = 99.0099;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 1), "99", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "99.01", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 3), "99.01", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "99", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "99.01", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "99.01", "return", __LINE__);
 
     number = 99.0009;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 3), "99.001", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "99.001", "return", __LINE__);
 
     number = 456789.0029;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 3), "456789.003", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "456789.003", "return", __LINE__);
 
     number = -456789.0024;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 3), "-456789.002", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "-456789.002", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(18446744073709551615ULL), "18446744073709551615", "return");
+    helper.Equal(DigitC::NumberToString(18446744073709551615ULL), "18446744073709551615", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-9223372036854775807LL), "-9223372036854775807", "return");
+    helper.Equal(DigitC::NumberToString(-9223372036854775807LL), "-9223372036854775807", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(9223372036854775807LL), "9223372036854775807", "return");
-    END_SUB_TEST;
+    helper.Equal(DigitC::NumberToString(9223372036854775807LL), "9223372036854775807", "return", __LINE__);
 }
 
-static int TestNumberToString4() {
+void TestNumberToString4(TestHelper &helper) {
     double number = -123456;
-    EQ_VALUE(DigitC::NumberToString(number, 30, 0, 0), "-000000000000000123456", "return");
+    helper.Equal(DigitC::NumberToString(number, 30U, 0U, 0U), "-000000000000000123456", "return", __LINE__);
 
     number = -2;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 0), "-2", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 0U), "-2", "return", __LINE__);
 
     number = -3.1;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 0), "-3.1", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 0U), "-3.1", "return", __LINE__);
 
     number = -3.1;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 0), "-3.1", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 0U), "-3.1", "return", __LINE__);
 
     number = -22.87;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 2), "-22.87", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "-22.87", "return", __LINE__);
 
     number = -55.0055;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 10), "-55.0055", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 10U), "-55.0055", "return", __LINE__);
 
     number = -0.123455678987455;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "-0.123455678987455", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "-0.123455678987455", "return", __LINE__);
 
     number = -0.123455678987452;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "-0.123455678987452", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "-0.123455678987452", "return", __LINE__);
     number = 0.999999;
-    EQ_VALUE(DigitC::NumberToString(number, 0, 0, 5), "1", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 6), "0.999999", "return");
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 10), "0.999999", "return");
+    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 5U), "1", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 6U), "0.999999", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 10U), "0.999999", "return", __LINE__);
 
     number = 0.123e-11;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "1.23e-12", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "1.23e-12", "return", __LINE__);
 
     number = -2.00000000000099;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "-2.00000000000099", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "-2.00000000000099", "return", __LINE__);
 
     number = 3.9999999999999;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "3.9999999999999", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "3.9999999999999", "return", __LINE__);
 
     number = 99.1005099;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 10), "99.1005099", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 10U), "99.1005099", "return", __LINE__);
 
     number = 99.1005099;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 7), "99.1005099", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 7U), "99.1005099", "return", __LINE__);
 
     number = 871.080055555;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 9), "871.080055555", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 9U), "871.080055555", "return", __LINE__);
 
     number = 0.00056599999999999999;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 3), "1e-3", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 3U), "1e-3", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(number), "5.66e-4", "return");
+    helper.Equal(DigitC::NumberToString(number), "5.66e-4", "return", __LINE__);
 
     number = 3.99999999999909;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 0), "3.99999999999909", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "3.99999999999909", "return", __LINE__);
 
     number = 2.00000000000015;
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "2.00000000000015", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "2.00000000000015", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(number, 1, 0, 14), "2.00000000000015", "return");
+    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "2.00000000000015", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(7.0, 1, 3, 3), "7.000", "return");
+    helper.Equal(DigitC::NumberToString(7.0, 1U, 3U, 3U), "7.000", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-7.0, 1, 3, 3), "-7.000", "return");
+    helper.Equal(DigitC::NumberToString(-7.0, 1U, 3U, 3U), "-7.000", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(8.0, 3, 3, 3), "008.000", "return");
+    helper.Equal(DigitC::NumberToString(8.0, 3U, 3U, 3U), "008.000", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-8.0, 3, 3, 3), "-008.000", "return");
+    helper.Equal(DigitC::NumberToString(-8.0, 3U, 3U, 3U), "-008.000", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(7.1, 1, 3, 3), "7.100", "return");
+    helper.Equal(DigitC::NumberToString(7.1, 1U, 3U, 3U), "7.100", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-7.1, 1, 3, 3), "-7.100", "return");
+    helper.Equal(DigitC::NumberToString(-7.1, 1U, 3U, 3U), "-7.100", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(8.1, 3, 3, 3), "008.100", "return");
+    helper.Equal(DigitC::NumberToString(8.1, 3U, 3U, 3U), "008.100", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-8.1, 3, 3, 3), "-008.100", "return");
+    helper.Equal(DigitC::NumberToString(-8.1, 3U, 3U, 3U), "-008.100", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.93002099999999999, 1, 3, 3), "0.930", "return");
+    helper.Equal(DigitC::NumberToString(0.93002099999999999, 1U, 3U, 3U), "0.930", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-9223372036854775807.0, 1), "-9223372036854775808", "return");
+    helper.Equal(DigitC::NumberToString(-9223372036854775807.0, 1U), "-9223372036854775808", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-0.9223372036854775, 1, 1), "-0.9223372036854775", "return");
-    EQ_VALUE(DigitC::NumberToString(-92233.0, 10), "-0000092233", "return");
+    helper.Equal(DigitC::NumberToString(-0.9223372036854775, 1U, 1U), "-0.9223372036854775", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(-92233.0, 10U), "-0000092233", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-92233.0, 1), "-92233", "return");
+    helper.Equal(DigitC::NumberToString(-92233.0, 1U), "-92233", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775, 1), "0.9223372036854775", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775, 1U), "0.9223372036854775", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9999, 1, 1, 3), "1.0", "return");
-    EQ_VALUE(DigitC::NumberToString(-0.9999, 1, 1, 3), "-1.0", "return");
+    helper.Equal(DigitC::NumberToString(0.9999, 1U, 1U, 3U), "1.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(-0.9999, 1U, 1U, 3U), "-1.0", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9999, 3, 1, 3), "001.0", "return");
-    EQ_VALUE(DigitC::NumberToString(-0.9999, 3, 1, 3), "-001.0", "return");
+    helper.Equal(DigitC::NumberToString(0.9999, 3U, 1U, 3U), "001.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(-0.9999, 3U, 1U, 3U), "-001.0", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9999, 3, 3, 3), "001.000", "return");
-    EQ_VALUE(DigitC::NumberToString(-0.9999, 3, 3, 3), "-001.000", "return");
-    EQ_VALUE(DigitC::NumberToString(0.9, 1, 1), "0.9", "return");
-    EQ_VALUE(DigitC::NumberToString(-0.9, 1, 1), "-0.9", "return");
+    helper.Equal(DigitC::NumberToString(0.9999, 3U, 3U, 3U), "001.000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(-0.9999, 3U, 3U, 3U), "-001.000", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(0.9, 1U, 1U), "0.9", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(-0.9, 1U, 1U), "-0.9", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9999, 1, 1), "0.9999", "return");
-    EQ_VALUE(DigitC::NumberToString(-0.9999, 1, 1), "-0.9999", "return");
+    helper.Equal(DigitC::NumberToString(0.9999, 1U, 1U), "0.9999", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(-0.9999, 1U, 1U), "-0.9999", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(12345678912345.345, 1, 1, 2), "12345678912345.35", "return");
+    helper.Equal(DigitC::NumberToString(12345678912345.345, 1U, 1U, 2U), "12345678912345.35", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(45.12345678912345, 1, 1, 14), "45.12345678912345", "return");
+    helper.Equal(DigitC::NumberToString(45.12345678912345, 1U, 1U, 14U), "45.12345678912345", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(45.12345678912345, 1, 1, 3), "45.123", "return");
+    helper.Equal(DigitC::NumberToString(45.12345678912345, 1U, 1U, 3U), "45.123", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-10.9999, 1, 1, 0), "-10.9999", "return");
-    EQ_VALUE(DigitC::NumberToString(10.9999, 1, 1, 0), "10.9999", "return");
+    helper.Equal(DigitC::NumberToString(-10.9999, 1U, 1U, 0U), "-10.9999", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(10.9999, 1U, 1U, 0U), "10.9999", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-10.9999, 1, 1, 2), "-11.0", "return");
-    EQ_VALUE(DigitC::NumberToString(10.9999, 1, 1, 2), "11.0", "return");
-
-    END_SUB_TEST;
+    helper.Equal(DigitC::NumberToString(-10.9999, 1U, 1U, 2U), "-11.0", "return", __LINE__);
+    helper.Equal(DigitC::NumberToString(10.9999, 1U, 1U, 2U), "11.0", "return", __LINE__);
 }
 
-static int TestNumberToString5() {
-    EQ_VALUE(DigitC::NumberToString(1e308), "1e308", "return");
+void TestNumberToString5(TestHelper &helper) {
+    helper.Equal(DigitC::NumberToString(1e308), "1e308", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(1e-308), "1e-308", "return");
+    helper.Equal(DigitC::NumberToString(1e-308), "1e-308", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(15e100), "1.5e101", "return");
+    helper.Equal(DigitC::NumberToString(15e100), "1.5e101", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(1.6866831148613157e308), "1.686683114861316e308", "return");
+    helper.Equal(DigitC::NumberToString(1.6866831148613157e308), "1.686683114861316e308", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(99999999999999999999.0), "1e20", "return");
+    helper.Equal(DigitC::NumberToString(99999999999999999999.0), "1e20", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.000000000000000009), "9e-18", "return");
+    helper.Equal(DigitC::NumberToString(0.000000000000000009), "9e-18", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.000000000009), "9e-12", "return");
+    helper.Equal(DigitC::NumberToString(0.000000000009), "9e-12", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(-0.000000000009), "-9e-12", "return");
+    helper.Equal(DigitC::NumberToString(-0.000000000009), "-9e-12", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.100009), "0.100009", "return");
+    helper.Equal(DigitC::NumberToString(0.100009), "0.100009", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.100009, 0), ".100009", "return");
+    helper.Equal(DigitC::NumberToString(0.100009, 0U), ".100009", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.000009), "9e-6", "return");
+    helper.Equal(DigitC::NumberToString(0.000009), "9e-6", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(1.000009), "1.000009", "return");
+    helper.Equal(DigitC::NumberToString(1.000009), "1.000009", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 1), "0.9", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 1U), "0.9", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 2), "0.92", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 2U), "0.92", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 3), "0.922", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 3U), "0.922", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 4), "0.9223", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 4U), "0.9223", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 5), "0.92234", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 5U), "0.92234", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 6), "0.922337", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 6U), "0.922337", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 7), "0.9223372", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 7U), "0.9223372", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 8), "0.9223372", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 8U), "0.9223372", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 9), "0.922337204", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 9U), "0.922337204", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 10), "0.9223372037", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 10U), "0.9223372037", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 11), "0.92233720369", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 11U), "0.92233720369", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 12), "0.922337203685", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 12U), "0.922337203685", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 13), "0.9223372036855", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 13U), "0.9223372036855", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 14), "0.92233720368548", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 14U), "0.92233720368548", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 15), "0.922337203685478", "return");
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 15U), "0.922337203685478", "return", __LINE__);
 
-    EQ_VALUE(DigitC::NumberToString(0.9223372036854775807, 1, 1, 16), "0.9223372036854776", "return");
-
-    END_SUB_TEST;
+    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 16U), "0.9223372036854776", "return", __LINE__);
 }
 
 static int RunDigitTests() {
-    STARTING_TEST("Digit.hpp");
+    TestHelper helper{"Digit.hpp", __FILE__};
 
-    START_TEST("Hex Conversion Test", TestHexConv);
+    helper.PrintGroupName();
 
-    START_TEST("StringToNumber Test 1", TestStringToNumber1);
-    START_TEST("StringToNumber Test 2", TestStringToNumber2);
-    START_TEST("StringToNumber Test 3", TestStringToNumber3);
-    START_TEST("StringToNumber Test 4", TestStringToNumber4);
+    helper.Test("Hex Conversion Test", TestHexConv);
 
-    START_TEST("NumberToString Test 1", TestNumberToString1);
-    START_TEST("NumberToString Test 2", TestNumberToString2);
-    START_TEST("NumberToString Test 3", TestNumberToString3);
-    START_TEST("NumberToString Test 4", TestNumberToString4);
-    START_TEST("NumberToString Test 5", TestNumberToString5);
+    helper.Test("StringToNumber Test 1", TestStringToNumber1);
+    helper.Test("StringToNumber Test 2", TestStringToNumber2);
+    helper.Test("StringToNumber Test 3", TestStringToNumber3);
+    helper.Test("StringToNumber Test 4", TestStringToNumber4);
 
-    // TODO: Add NumberToStringStream test
+    helper.Test("NumberToString Test 1", TestNumberToString1);
+    helper.Test("NumberToString Test 2", TestNumberToString2);
+    helper.Test("NumberToString Test 3", TestNumberToString3);
+    helper.Test("NumberToString Test 4", TestNumberToString4);
+    helper.Test("NumberToString Test 5", TestNumberToString5);
 
-    END_TEST("Digit.hpp");
+    return helper.EndTests();
 }
 
 } // namespace Test

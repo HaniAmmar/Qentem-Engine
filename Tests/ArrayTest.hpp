@@ -31,184 +31,182 @@
 namespace Qentem {
 namespace Test {
 
-static int TestArray1() {
+void TestArray1(TestHelper &helper) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2(8);
 
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_TRUE(numbers1.IsEmpty(), "IsEmpty");
-    EQ_FALSE(numbers1.IsNotEmpty(), "IsNotEmpty");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_TO(numbers1.Last(), nullptr, "Last()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.EqualsTrue(numbers1.IsEmpty(), "IsEmpty", __LINE__);
+    helper.EqualsFalse(numbers1.IsNotEmpty(), "IsNotEmpty", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1.Last(), nullptr, "Last()", "null", __LINE__);
 
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 8, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 8U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Reset();
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(5);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 5, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 5U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(10);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 10, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 10U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Resize(18);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 18, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 18U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     storage = numbers1.First();
     numbers1.Resize(4);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 4, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers1.First(), storage, "First()", "storage");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 4U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
 
     numbers2.Resize(5);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 5, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 5U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Resize(2);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 2, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 2U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Resize(0);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(0);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reset();
     numbers2.Reset();
 
     numbers1.ResizeAndInitialize(8);
     storage = numbers1.First();
-    EQ_VALUE(numbers1.Size(), 8, "Size");
-    EQ_FALSE(numbers1.IsEmpty(), "IsEmpty");
-    EQ_TRUE(numbers1.IsNotEmpty(), "IsNotEmpty");
-    EQ_VALUE(numbers1.Capacity(), 8, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 8U, "Size", __LINE__);
+    helper.EqualsFalse(numbers1.IsEmpty(), "IsEmpty", __LINE__);
+    helper.EqualsTrue(numbers1.IsNotEmpty(), "IsNotEmpty", __LINE__);
+    helper.Equal(numbers1.Capacity(), 8U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.ResizeAndInitialize(4);
-    NOT_EQ_TO(numbers1.First(), storage, "First()", "storage");
+    helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
 
     storage  = numbers1.First();
     numbers2 = numbers1;
-    EQ_VALUE(numbers1.Size(), 4, "Size");
-    EQ_VALUE(numbers1.Capacity(), 4, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.Size(), 4, "Size");
-    EQ_VALUE(numbers2.Capacity(), 4, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
+    helper.Equal(numbers1.Size(), 4U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 4U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.Size(), 4U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 4U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
 
     numbers1.ResizeAndInitialize(16);
-    EQ_VALUE(numbers1.Size(), 16, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 16U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     storage  = numbers1.First();
     numbers2 = numbers1;
-    EQ_VALUE(numbers2.Size(), 16, "Size");
-    EQ_VALUE(numbers2.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
+    helper.Equal(numbers2.Size(), 16U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 16U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
 
     numbers2 = static_cast<Array<SizeT> &&>(numbers1);
-    EQ_VALUE(numbers2.Size(), 16, "Size");
-    EQ_VALUE(numbers2.Capacity(), 16, "Capacity");
-    EQ_VALUE(numbers2.First(), storage, "First()");
+    helper.Equal(numbers2.Size(), 16U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 16U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), storage, "First()", __LINE__);
 
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     storage  = numbers1.First();
     numbers1 = Array<SizeT>(numbers2);
-    EQ_VALUE(numbers1.Size(), 16, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers1.First(), storage, "First()", "storage");
+    helper.Equal(numbers1.Size(), 16U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
 
     storage  = numbers2.First();
     numbers1 = Array<SizeT>(static_cast<Array<SizeT> &&>(numbers2));
-    EQ_VALUE(numbers1.Size(), 16, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1.First(), storage, "First()");
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 16U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1.First(), storage, "First()", __LINE__);
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Clear();
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.ResizeAndInitialize(3);
     numbers2.ResizeAndInitialize(5);
     storage = numbers2.First();
 
     numbers1 += numbers2;
-    EQ_VALUE(numbers1.Size(), 8, "Size");
-    EQ_VALUE(numbers1.Capacity(), 8, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers1.First(), storage, "First()", "storage");
+    helper.Equal(numbers1.Size(), 8U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 8U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
 
     storage = numbers1.First();
     numbers1 += static_cast<Array<SizeT> &&>(numbers2);
-    EQ_VALUE(numbers1.Size(), 13, "Size");
-    EQ_VALUE(numbers1.Capacity(), 13, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers1.First(), storage, "First()", "storage");
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 13U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 13U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.ResizeAndInitialize(5);
     numbers1.Resize(18);
     storage = numbers1.First();
     numbers1 += static_cast<Array<SizeT> &&>(numbers2);
-    EQ_VALUE(numbers1.Size(), 18, "Size");
-    EQ_VALUE(numbers1.Capacity(), 18, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1.First(), storage, "First()");
+    helper.Equal(numbers1.Size(), 18U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 18U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1.First(), storage, "First()", __LINE__);
 
     storage = numbers1.First();
     numbers2 += static_cast<Array<SizeT> &&>(numbers1);
-    EQ_VALUE(numbers2.Size(), 18, "Size");
-    EQ_VALUE(numbers2.Capacity(), 18, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.First(), storage, "First()");
+    helper.Equal(numbers2.Size(), 18U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 18U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.First(), storage, "First()", __LINE__);
 
     SizeT *tmp = numbers2.Eject();
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    EQ_VALUE(tmp, storage, "First()");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(tmp, storage, "First()", __LINE__);
 
     Memory::Deallocate(tmp);
-
-    END_SUB_TEST;
 }
 
-static int TestArray2() {
+void TestArray2(TestHelper &helper) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2;
@@ -217,37 +215,35 @@ static int TestArray2() {
     numbers1.ResizeAndInitialize(4);
     storage = numbers2.First();
     numbers2.Insert(numbers1);
-    EQ_VALUE(numbers2.Size(), 4, "Size");
-    EQ_VALUE(numbers2.Capacity(), 4, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    EQ_TO(numbers2.First(), storage, "First()", "storage");
-    EQ_TO(numbers2.Last(), (storage + 3), "Last()", "(storage + 3)");
-    NOT_EQ_TO(numbers1.Last(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 4U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 4U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.First(), storage, "First()", "storage", __LINE__);
+    helper.Equal(numbers2.Last(), (storage + 3), "Last()", "(storage + 3)", __LINE__);
+    helper.NotEqual(numbers1.Last(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(10);
     numbers2.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
-    EQ_VALUE(numbers2.Size(), 4, "Size");
-    EQ_VALUE(numbers2.Capacity(), 4, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 4U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 4U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
-    EQ_VALUE(numbers2.Size(), 8, "Size");
-    EQ_VALUE(numbers2.Capacity(), 8, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 8U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 8U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     storage = numbers1.First();
     numbers2.Insert(static_cast<Array<SizeT> &&>(numbers1));
-    EQ_VALUE(numbers2.Size(), 12, "Size");
-    EQ_VALUE(numbers2.Capacity(), 12, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
-
-    END_SUB_TEST;
+    helper.Equal(numbers2.Size(), 12U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 12U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
 }
 
-static int TestArray3() {
+void TestArray3(TestHelper &helper) {
     Array<SizeT>        numbers1;
     Array<SizeT>        numbers2(8);
     Array<String<char>> strings;
@@ -259,34 +255,34 @@ static int TestArray3() {
     const SizeT *storage1 = numbers1.Storage();
     const SizeT *storage2 = numbers1.Storage();
 
-    EQ_VALUE(numbers1.Size(), 8, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 8), "(numbers1.Capacity() >= 8)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 8U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 8), "(numbers1.Capacity() >= 8)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     SizeT sum = 0;
     for (const SizeT &num : numbers1) {
         sum += num;
     }
 
-    EQ_VALUE(sum, 28U, "sum");
+    helper.Equal(sum, 28U, "sum", __LINE__);
 
     numbers2.Insert(storage1[0]).Insert(storage1[1]);
 
     for (SizeT i = 2; i < 8; i++) {
         numbers2.Insert(storage1[i]);
-        EQ_VALUE(storage2[i], storage1[i], "storage2[i]");
+        helper.Equal(storage2[i], storage1[i], "storage2[i]", __LINE__);
     }
 
-    EQ_VALUE(numbers2.Size(), 8, "Size");
-    EQ_VALUE(numbers2.Capacity(), 8, "Capacity");
+    helper.Equal(numbers2.Size(), 8U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 8U, "Capacity", __LINE__);
 
     numbers2.Resize(16);
-    EQ_VALUE(numbers2.Size(), 8, "Size");
-    EQ_VALUE(numbers2.Capacity(), 16, "Capacity");
+    helper.Equal(numbers2.Size(), 8U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 16U, "Capacity", __LINE__);
 
     numbers2.Compress();
-    EQ_VALUE(numbers2.Size(), 8, "Size");
-    EQ_VALUE(numbers2.Capacity(), 8, "Capacity");
+    helper.Equal(numbers2.Size(), 8U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 8U, "Capacity", __LINE__);
 
     // Checking move
     String<char> str1("val--------------------------------1");
@@ -297,29 +293,27 @@ static int TestArray3() {
 
     strings += static_cast<String<char> &&>(str1);
 
-    EQ_TO(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
+    helper.Equal(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr", __LINE__);
 
     strings.Insert(static_cast<String<char> &&>(str2));
-    EQ_TO(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
+    helper.Equal(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr", __LINE__);
 
     strings += str1;
-    NOT_EQ_TO(strings.Storage()[2].First(), str1_cstr, "storage_str[2].First()", "str1_cstr");
+    helper.NotEqual(strings.Storage()[2].First(), str1_cstr, "storage_str[2].First()", "str1_cstr", __LINE__);
 
     strings.Insert(str2);
-    NOT_EQ_TO(strings.Storage()[3].First(), str2_cstr, "storage_str[3].First()", "str2_cstr");
+    helper.NotEqual(strings.Storage()[3].First(), str2_cstr, "storage_str[3].First()", "str2_cstr", __LINE__);
 
     // Checking move after expanding.
     for (SizeT i = 0; i < 16; i++) {
         strings += String<char>("");
     }
 
-    EQ_TO(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr");
-    EQ_TO(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr");
-
-    END_SUB_TEST;
+    helper.Equal(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr", __LINE__);
+    helper.Equal(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr", __LINE__);
 }
 
-static int TestArray4() {
+void TestArray4(TestHelper &helper) {
     Array<String<char>> strings1;
     Array<String<char>> strings2;
 
@@ -335,25 +329,23 @@ static int TestArray4() {
     strings2 += strings1;
     String<char> *storage2 = strings2.Storage();
 
-    EQ_VALUE(strings2.Size(), 2, "Size");
-    NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr");
-    NOT_EQ_TO(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr");
+    helper.Equal(strings2.Size(), 2U, "Size", __LINE__);
+    helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr", __LINE__);
+    helper.NotEqual(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr", __LINE__);
 
     strings2.Reserve(2);
     strings2 += static_cast<Array<String<char>> &&>(strings1);
     storage2 = strings2.Storage();
 
-    EQ_VALUE(strings2.Size(), 2, "Size");
-    NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    EQ_TO(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr");
-    EQ_TO(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr");
-
-    END_SUB_TEST;
+    helper.Equal(strings2.Size(), 2U, "Size", __LINE__);
+    helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr", __LINE__);
+    helper.Equal(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr", __LINE__);
 }
 
-static int TestArraySort() {
-    Array<int> numbers;
+void TestArraySort(TestHelper &helper) {
+    Array<unsigned int> numbers;
 
     numbers += 3;
     numbers += 0;
@@ -364,24 +356,24 @@ static int TestArraySort() {
 
     numbers.Sort();
 
-    int *storage = numbers.Storage();
+    unsigned int *storage = numbers.Storage();
 
-    EQ_VALUE(storage[0], 0, "storage[0]");
-    EQ_VALUE(storage[1], 1, "storage[1]");
-    EQ_VALUE(storage[2], 2, "storage[2]");
-    EQ_VALUE(storage[3], 3, "storage[3]");
-    EQ_VALUE(storage[4], 4, "storage[4]");
-    EQ_VALUE(storage[5], 5, "storage[5]");
+    helper.Equal(storage[0], 0U, "storage[0]", __LINE__);
+    helper.Equal(storage[1], 1U, "storage[1]", __LINE__);
+    helper.Equal(storage[2], 2U, "storage[2]", __LINE__);
+    helper.Equal(storage[3], 3U, "storage[3]", __LINE__);
+    helper.Equal(storage[4], 4U, "storage[4]", __LINE__);
+    helper.Equal(storage[5], 5U, "storage[5]", __LINE__);
 
     numbers.Sort(false);
     storage = numbers.Storage();
 
-    EQ_VALUE(storage[0], 5, "storage[0]");
-    EQ_VALUE(storage[1], 4, "storage[1]");
-    EQ_VALUE(storage[2], 3, "storage[2]");
-    EQ_VALUE(storage[3], 2, "storage[3]");
-    EQ_VALUE(storage[4], 1, "storage[4]");
-    EQ_VALUE(storage[5], 0, "storage[5]");
+    helper.Equal(storage[0], 5U, "storage[0]", __LINE__);
+    helper.Equal(storage[1], 4U, "storage[1]", __LINE__);
+    helper.Equal(storage[2], 3U, "storage[2]", __LINE__);
+    helper.Equal(storage[3], 2U, "storage[3]", __LINE__);
+    helper.Equal(storage[4], 1U, "storage[4]", __LINE__);
+    helper.Equal(storage[5], 0U, "storage[5]", __LINE__);
 
     numbers.Reset();
 
@@ -395,12 +387,12 @@ static int TestArraySort() {
     numbers.Sort(false);
     storage = numbers.Storage();
 
-    EQ_VALUE(storage[0], 5, "storage[0]");
-    EQ_VALUE(storage[1], 4, "storage[1]");
-    EQ_VALUE(storage[2], 3, "storage[2]");
-    EQ_VALUE(storage[3], 2, "storage[3]");
-    EQ_VALUE(storage[4], 1, "storage[4]");
-    EQ_VALUE(storage[5], 0, "storage[5]");
+    helper.Equal(storage[0], 5U, "storage[0]", __LINE__);
+    helper.Equal(storage[1], 4U, "storage[1]", __LINE__);
+    helper.Equal(storage[2], 3U, "storage[2]", __LINE__);
+    helper.Equal(storage[3], 2U, "storage[3]", __LINE__);
+    helper.Equal(storage[4], 1U, "storage[4]", __LINE__);
+    helper.Equal(storage[5], 0U, "storage[5]", __LINE__);
 
     numbers.Reset();
 
@@ -414,22 +406,22 @@ static int TestArraySort() {
     numbers.Sort();
     storage = numbers.Storage();
 
-    EQ_VALUE(storage[0], 0, "storage[0]");
-    EQ_VALUE(storage[1], 1, "storage[1]");
-    EQ_VALUE(storage[2], 2, "storage[2]");
-    EQ_VALUE(storage[3], 3, "storage[3]");
-    EQ_VALUE(storage[4], 4, "storage[4]");
-    EQ_VALUE(storage[5], 5, "storage[5]");
+    helper.Equal(storage[0], 0U, "storage[0]", __LINE__);
+    helper.Equal(storage[1], 1U, "storage[1]", __LINE__);
+    helper.Equal(storage[2], 2U, "storage[2]", __LINE__);
+    helper.Equal(storage[3], 3U, "storage[3]", __LINE__);
+    helper.Equal(storage[4], 4U, "storage[4]", __LINE__);
+    helper.Equal(storage[5], 5U, "storage[5]", __LINE__);
 
     numbers.Sort(false);
     storage = numbers.Storage();
 
-    EQ_VALUE(storage[0], 5, "storage[0]");
-    EQ_VALUE(storage[1], 4, "storage[1]");
-    EQ_VALUE(storage[2], 3, "storage[2]");
-    EQ_VALUE(storage[3], 2, "storage[3]");
-    EQ_VALUE(storage[4], 1, "storage[4]");
-    EQ_VALUE(storage[5], 0, "storage[5]");
+    helper.Equal(storage[0], 5U, "storage[0]", __LINE__);
+    helper.Equal(storage[1], 4U, "storage[1]", __LINE__);
+    helper.Equal(storage[2], 3U, "storage[2]", __LINE__);
+    helper.Equal(storage[3], 2U, "storage[3]", __LINE__);
+    helper.Equal(storage[4], 1U, "storage[4]", __LINE__);
+    helper.Equal(storage[5], 0U, "storage[5]", __LINE__);
 
     Array<String<char>> strings;
 
@@ -444,24 +436,24 @@ static int TestArraySort() {
     strings.Sort();
     String<char> *storage_str = strings.Storage();
 
-    EQ_VALUE(storage_str[0], "2017", "storage_str[0]");
-    EQ_VALUE(storage_str[1], "2018", "storage_str[1]");
-    EQ_VALUE(storage_str[2], "2018", "storage_str[2]");
-    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
-    EQ_VALUE(storage_str[4], "2020", "storage_str[4]");
-    EQ_VALUE(storage_str[5], "2021", "storage_str[5]");
-    EQ_VALUE(storage_str[6], "2021", "storage_str[6]");
+    helper.Equal(storage_str[0], "2017", "storage_str[0]", __LINE__);
+    helper.Equal(storage_str[1], "2018", "storage_str[1]", __LINE__);
+    helper.Equal(storage_str[2], "2018", "storage_str[2]", __LINE__);
+    helper.Equal(storage_str[3], "2019", "storage_str[3]", __LINE__);
+    helper.Equal(storage_str[4], "2020", "storage_str[4]", __LINE__);
+    helper.Equal(storage_str[5], "2021", "storage_str[5]", __LINE__);
+    helper.Equal(storage_str[6], "2021", "storage_str[6]", __LINE__);
 
     strings.Sort(false);
     storage_str = strings.Storage();
 
-    EQ_VALUE(storage_str[0], "2021", "storage_str[0]");
-    EQ_VALUE(storage_str[1], "2021", "storage_str[1]");
-    EQ_VALUE(storage_str[2], "2020", "storage_str[2]");
-    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
-    EQ_VALUE(storage_str[4], "2018", "storage_str[4]");
-    EQ_VALUE(storage_str[5], "2018", "storage_str[5]");
-    EQ_VALUE(storage_str[6], "2017", "storage_str[6]");
+    helper.Equal(storage_str[0], "2021", "storage_str[0]", __LINE__);
+    helper.Equal(storage_str[1], "2021", "storage_str[1]", __LINE__);
+    helper.Equal(storage_str[2], "2020", "storage_str[2]", __LINE__);
+    helper.Equal(storage_str[3], "2019", "storage_str[3]", __LINE__);
+    helper.Equal(storage_str[4], "2018", "storage_str[4]", __LINE__);
+    helper.Equal(storage_str[5], "2018", "storage_str[5]", __LINE__);
+    helper.Equal(storage_str[6], "2017", "storage_str[6]", __LINE__);
 
     strings.Reset();
 
@@ -476,24 +468,24 @@ static int TestArraySort() {
     strings.Sort();
     storage_str = strings.Storage();
 
-    EQ_VALUE(storage_str[0], "2017", "storage_str[0]");
-    EQ_VALUE(storage_str[1], "2018", "storage_str[1]");
-    EQ_VALUE(storage_str[2], "2018", "storage_str[2]");
-    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
-    EQ_VALUE(storage_str[4], "2020", "storage_str[4]");
-    EQ_VALUE(storage_str[5], "2021", "storage_str[5]");
-    EQ_VALUE(storage_str[6], "2021", "storage_str[6]");
+    helper.Equal(storage_str[0], "2017", "storage_str[0]", __LINE__);
+    helper.Equal(storage_str[1], "2018", "storage_str[1]", __LINE__);
+    helper.Equal(storage_str[2], "2018", "storage_str[2]", __LINE__);
+    helper.Equal(storage_str[3], "2019", "storage_str[3]", __LINE__);
+    helper.Equal(storage_str[4], "2020", "storage_str[4]", __LINE__);
+    helper.Equal(storage_str[5], "2021", "storage_str[5]", __LINE__);
+    helper.Equal(storage_str[6], "2021", "storage_str[6]", __LINE__);
 
     strings.Sort(false);
     storage_str = strings.Storage();
 
-    EQ_VALUE(storage_str[0], "2021", "storage_str[0]");
-    EQ_VALUE(storage_str[1], "2021", "storage_str[1]");
-    EQ_VALUE(storage_str[2], "2020", "storage_str[2]");
-    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
-    EQ_VALUE(storage_str[4], "2018", "storage_str[4]");
-    EQ_VALUE(storage_str[5], "2018", "storage_str[5]");
-    EQ_VALUE(storage_str[6], "2017", "storage_str[6]");
+    helper.Equal(storage_str[0], "2021", "storage_str[0]", __LINE__);
+    helper.Equal(storage_str[1], "2021", "storage_str[1]", __LINE__);
+    helper.Equal(storage_str[2], "2020", "storage_str[2]", __LINE__);
+    helper.Equal(storage_str[3], "2019", "storage_str[3]", __LINE__);
+    helper.Equal(storage_str[4], "2018", "storage_str[4]", __LINE__);
+    helper.Equal(storage_str[5], "2018", "storage_str[5]", __LINE__);
+    helper.Equal(storage_str[6], "2017", "storage_str[6]", __LINE__);
 
     strings.Reset();
 
@@ -508,27 +500,27 @@ static int TestArraySort() {
     strings.Sort(false);
     storage_str = strings.Storage();
 
-    EQ_VALUE(storage_str[0], "2021", "storage_str[0]");
-    EQ_VALUE(storage_str[1], "2021", "storage_str[1]");
-    EQ_VALUE(storage_str[2], "2020", "storage_str[2]");
-    EQ_VALUE(storage_str[3], "2019", "storage_str[3]");
-    EQ_VALUE(storage_str[4], "2018", "storage_str[4]");
-    EQ_VALUE(storage_str[5], "2018", "storage_str[5]");
-    EQ_VALUE(storage_str[6], "2017", "storage_str[6]");
-
-    END_SUB_TEST;
+    helper.Equal(storage_str[0], "2021", "storage_str[0]", __LINE__);
+    helper.Equal(storage_str[1], "2021", "storage_str[1]", __LINE__);
+    helper.Equal(storage_str[2], "2020", "storage_str[2]", __LINE__);
+    helper.Equal(storage_str[3], "2019", "storage_str[3]", __LINE__);
+    helper.Equal(storage_str[4], "2018", "storage_str[4]", __LINE__);
+    helper.Equal(storage_str[5], "2018", "storage_str[5]", __LINE__);
+    helper.Equal(storage_str[6], "2017", "storage_str[6]", __LINE__);
 }
 
 static int RunArrayTests() {
-    STARTING_TEST("Array.hpp");
+    TestHelper helper{"Array.hpp", __FILE__};
 
-    START_TEST("Array Test 1", TestArray1);
-    START_TEST("Array Test 2", TestArray2);
-    START_TEST("Array Test 3", TestArray3);
-    START_TEST("Array Test 4", TestArray4);
-    START_TEST("Array Sort Test", TestArraySort);
+    helper.PrintGroupName();
 
-    END_TEST("Array.hpp");
+    helper.Test("Array Test 1", TestArray1);
+    helper.Test("Array Test 2", TestArray2);
+    helper.Test("Array Test 3", TestArray3);
+    helper.Test("Array Test 4", TestArray4);
+    helper.Test("Array Sort Test", TestArraySort);
+
+    return helper.EndTests();
 }
 
 } // namespace Test

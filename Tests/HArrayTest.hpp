@@ -33,67 +33,65 @@ namespace Test {
 
 using HashArray = HArray<SizeT, char>;
 
-static int TestHArray1() {
+void TestHArray1(TestHelper &helper) {
     HashArray numbers1;
     HashArray numbers2(8);
 
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_TO(numbers1.End(), nullptr, "End()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1.End(), nullptr, "End()", "null", __LINE__);
 
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_TRUE(numbers2.Capacity() >= 8, "Capacity>= 8");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.EqualsTrue(numbers2.Capacity() >= 8U, "Capacity>= 8", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Reset();
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(5);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 8, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 8U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(10);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 16, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Resize(18);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 32, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 32U, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Resize(4);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_TRUE(numbers2.Capacity() >= 4, "Capacity>= 4");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.EqualsTrue(numbers2.Capacity() >= 4U, "Capacity>= 4", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Resize(5);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 8, "Capacity");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 8U, "Capacity", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Resize(2);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_TRUE(numbers2.Capacity() >= 2, "Capacity>= 2");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.EqualsTrue(numbers2.Capacity() >= 2U, "Capacity>= 2", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     numbers1.Reserve(0);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     numbers2.Resize(0);
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-
-    END_SUB_TEST;
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
 }
 
-static int TestHArray2() {
+void TestHArray2(TestHelper &helper) {
     HashArray                  numbers1(8);
     HashArray                  numbers2;
     const String<char>        *key;
@@ -101,36 +99,36 @@ static int TestHArray2() {
     const HAItem<SizeT, char> *storage;
 
     numbers1["key1"] = 1;
-    EQ_VALUE(numbers1.Size(), 1, "Size");
-    EQ_TRUE(numbers1.Capacity() >= 8, "Capacity>= 8");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_TO(numbers1.End(), (numbers1.First() + 1), "End()", "null");
-    EQ_VALUE(numbers1["key1"], 1, "key1");
+    helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
+    helper.EqualsTrue(numbers1.Capacity() >= 8U, "Capacity>= 8", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1.End(), (numbers1.First() + 1), "End()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 1U, "key1", __LINE__);
 
     const SizeT cap  = numbers1.Capacity();
     numbers1["key1"] = 20;
-    EQ_VALUE(numbers1.Size(), 1, "Size");
-    EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1["key1"], 20, "key1");
+    helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), cap, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 20U, "key1", __LINE__);
 
     numbers1["key1"] = 300;
-    EQ_VALUE(numbers1.Size(), 1, "Size");
-    EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1["key1"], 300, "key1");
+    helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), cap, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 300U, "key1", __LINE__);
 
     numbers1["key1"] = 4000;
-    EQ_VALUE(numbers1.Size(), 1, "Size");
-    EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1["key1"], 4000, "key1");
+    helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), cap, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 4000U, "key1", __LINE__);
 
     numbers1["key1"] = 10000;
-    EQ_VALUE(numbers1.Size(), 1, "Size");
-    EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1["key1"], 10000, "key1");
+    helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), cap, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 10000U, "key1", __LINE__);
 
     numbers1["key1"] = 19990;
     numbers1["key2"] = 20000;
@@ -148,115 +146,113 @@ static int TestHArray2() {
 
     numbers1["ABCDEF0123456789ABCDEF0123456789"] = 70;
 
-    EQ_VALUE(numbers1.Size(), 7, "Size");
-    EQ_VALUE(numbers1.Capacity(), cap, "Capacity");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1["key1"], 10, "key1");
-    EQ_VALUE(numbers1["key2"], 20, "key2");
-    EQ_VALUE(numbers1["key3"], 30, "key3");
-    EQ_VALUE(numbers1["key4"], 40, "key4");
-    EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
+    helper.Equal(numbers1.Size(), 7U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), cap, "Capacity", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers1["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers1["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers1["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers1["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers1["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, "ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     key = numbers1.GetKey(0);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key1", 4), "(GetKey(0) == key1)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("key1", 4), "(GetKey(0) == key1)", __LINE__);
     key = numbers1.GetKey(1);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key2", 4), "(GetKey(1) == key2)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("key2", 4), "(GetKey(1) == key2)", __LINE__);
     key = numbers1.GetKey(2);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key3", 4), "(GetKey(2) == key3)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("key3", 4), "(GetKey(2) == key3)", __LINE__);
     key = numbers1.GetKey(3);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key4", 4), "(GetKey(3) == key4)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("key4", 4), "(GetKey(3) == key4)", __LINE__);
     key = numbers1.GetKey(4);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key5", 4), "(GetKey(4) == key5)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("key5", 4), "(GetKey(4) == key5)", __LINE__);
     key = numbers1.GetKey(5);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("key6", 4), "(GetKey(5) == key6)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("key6", 4), "(GetKey(5) == key6)", __LINE__);
     key = numbers1.GetKey(6);
-    NOT_EQ_TO(key, nullptr, "key", "null");
-    EQ_TRUE(key->IsEqual("ABCDEF0123456789ABCDEF0123456789", 32), "(GetKey(6) == key7)");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
+    helper.EqualsTrue(key->IsEqual("ABCDEF0123456789ABCDEF0123456789", 32), "(GetKey(6) == key7)", __LINE__);
 
     key   = numbers1.GetKey(6);
     str_c = key->First();
     // Test expanding
     numbers1["key8"] = 80;
     numbers1["key9"] = 90;
-    EQ_VALUE(numbers1.Size(), 9, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1["key1"], 10, "key1");
-    EQ_VALUE(numbers1["key2"], 20, "key2");
-    EQ_VALUE(numbers1["key3"], 30, "key3");
-    EQ_VALUE(numbers1["key4"], 40, "key4");
-    EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
-    EQ_VALUE(numbers1["key8"], 80, "key8");
-    EQ_VALUE(numbers1["key9"], 90, "key9");
+    helper.Equal(numbers1.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers1["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers1["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers1["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers1["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers1["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, "ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.Equal(numbers1["key8"], 80U, "key8", __LINE__);
+    helper.Equal(numbers1["key9"], 90U, "key9", __LINE__);
 
     const String<char> *key2 = numbers1.GetKey(6);
-    NOT_EQ_TO(key2, key, "str", "GetKey(6)");
-    NOT_EQ_TO(key2, nullptr, "key", "null");
-    EQ_VALUE(key2->First(), str_c, "GetKey(6)->First()");
+    helper.NotEqual(key2, key, "str", "GetKey(6)", __LINE__);
+    helper.NotEqual(key2, nullptr, "key", "null", __LINE__);
+    helper.Equal(key2->First(), str_c, "GetKey(6)->First()", __LINE__);
 
     storage  = numbers1.First();
     numbers2 = numbers1;
-    EQ_VALUE(numbers1.Size(), 9, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.Size(), 9, "Size");
-    EQ_TRUE((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
-    NOT_EQ_TO(numbers1.GetKey(6), numbers2.GetKey(6), "numbers1.GetKey(6)", "numbers2.GetKey(6)");
-    NOT_EQ_TO(numbers2.GetKey(6)->First(), str_c, "str_c", "GetKey(6)->First()");
+    helper.Equal(numbers1.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
+    helper.NotEqual(numbers1.GetKey(6), numbers2.GetKey(6), "numbers1.GetKey(6)", "numbers2.GetKey(6)", __LINE__);
+    helper.NotEqual(numbers2.GetKey(6)->First(), str_c, "str_c", "GetKey(6)->First()", __LINE__);
 
     numbers2 = static_cast<HashArray &&>(numbers1);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.Size(), 9, "Size");
-    EQ_TRUE((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.First(), storage, "First()");
-    EQ_VALUE(numbers2["key1"], 10, "key1");
-    EQ_VALUE(numbers2["key2"], 20, "key2");
-    EQ_VALUE(numbers2["key3"], 30, "key3");
-    EQ_VALUE(numbers2["key4"], 40, "key4");
-    EQ_VALUE(numbers2["key5"], 50, "key5");
-    EQ_VALUE(numbers2["key6"], 60, "key6");
-    EQ_VALUE(numbers2["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
-    EQ_VALUE(numbers2["key8"], 80, "key8");
-    EQ_VALUE(numbers2["key9"], 90, "key9");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.First(), storage, "First()", __LINE__);
+    helper.Equal(numbers2["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers2["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers2["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers2["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers2["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers2["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers2["ABCDEF0123456789ABCDEF0123456789"], 70U, "ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.Equal(numbers2["key8"], 80U, "key8", __LINE__);
+    helper.Equal(numbers2["key9"], 90U, "key9", __LINE__);
 
     numbers1 = HashArray(numbers2);
-    EQ_VALUE(numbers1.Size(), 9, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.Size(), 9, "Size");
-    EQ_TRUE((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers1.First(), storage, "First()", "storage");
-    EQ_VALUE(numbers2.First(), storage, "First()");
-    EQ_VALUE(numbers1["key1"], 10, "key1");
-    EQ_VALUE(numbers1["key2"], 20, "key2");
-    EQ_VALUE(numbers1["key3"], 30, "key3");
-    EQ_VALUE(numbers1["key4"], 40, "key4");
-    EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70, "ABCDEF0123456789ABCDEF0123456789");
-    EQ_VALUE(numbers1["key8"], 80, "key8");
-    EQ_VALUE(numbers1["key9"], 90, "key9");
-
-    END_SUB_TEST;
+    helper.Equal(numbers1.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers2.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
+    helper.Equal(numbers2.First(), storage, "First()", __LINE__);
+    helper.Equal(numbers1["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers1["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers1["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers1["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers1["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers1["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, "ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.Equal(numbers1["key8"], 80U, "key8", __LINE__);
+    helper.Equal(numbers1["key9"], 90U, "key9", __LINE__);
 }
 
-static int TestHArray3() {
+void TestHArray3(TestHelper &helper) {
     HashArray                  numbers1(8);
     HashArray                  numbers2;
     const String<char>        *key;
@@ -274,36 +270,34 @@ static int TestHArray3() {
     numbers2["key9"] = 90;
 
     key = numbers2.GetKey(5);
-    NOT_EQ_TO(key, nullptr, "key", "null");
+    helper.NotEqual(key, nullptr, "key", "null", __LINE__);
     str_c = key->First();
 
     storage  = numbers2.First();
     numbers1 = static_cast<HashArray &&>(numbers2);
 
-    EQ_VALUE(numbers1.Size(), 9, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers1.First(), storage, "First()");
-    EQ_VALUE(numbers1["key1"], 10, "key1");
-    EQ_VALUE(numbers1["key2"], 20, "key2");
-    EQ_VALUE(numbers1["key3"], 30, "key3");
-    EQ_VALUE(numbers1["key4"], 40, "key4");
-    EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 60, "key6");
-    EQ_VALUE(numbers1["key7"], 70, "key7");
-    EQ_VALUE(numbers1["key8"], 80, "key8");
-    EQ_VALUE(numbers1["key9"], 90, "key9");
-    EQ_TO(numbers1.GetKey(5), key, "key", "GetKey(5)");
-    EQ_VALUE(numbers1.GetKey(5)->First(), str_c, "GetKey(5)->First()");
+    helper.Equal(numbers1.Size(), 9U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers1.First(), storage, "First()", __LINE__);
+    helper.Equal(numbers1["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers1["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers1["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers1["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers1["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers1["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers1["key7"], 70U, "key7", __LINE__);
+    helper.Equal(numbers1["key8"], 80U, "key8", __LINE__);
+    helper.Equal(numbers1["key9"], 90U, "key9", __LINE__);
+    helper.Equal(numbers1.GetKey(5), key, "key", "GetKey(5)", __LINE__);
+    helper.Equal(numbers1.GetKey(5)->First(), str_c, "GetKey(5)->First()", __LINE__);
 
-    EQ_VALUE(numbers2.Size(), 0, "Size");
-    EQ_VALUE(numbers2.Capacity(), 0, "Capacity");
-    EQ_TO(numbers2.First(), nullptr, "First()", "null");
-
-    END_SUB_TEST;
+    helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 }
 
-static int TestHArray4() {
+void TestHArray4(TestHelper &helper) {
     HashArray                  numbers1;
     HashArray                  numbers2;
     HashArray                  numbers3(3);
@@ -322,21 +316,21 @@ static int TestHArray4() {
     SizeT keyindex = 100;
 
     numbers1.GetKeyIndex(keyindex, "key1", 4);
-    EQ_VALUE(keyindex, 0, "key1 Index");
+    helper.Equal(keyindex, 0U, "key1 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key2", 4);
-    EQ_VALUE(keyindex, 1, "key2 Index");
+    helper.Equal(keyindex, 1U, "key2 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key3", 4);
-    EQ_VALUE(keyindex, 2, "key3 Index");
+    helper.Equal(keyindex, 2U, "key3 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key4", 4);
-    EQ_VALUE(keyindex, 3, "key4 Index");
+    helper.Equal(keyindex, 3U, "key4 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key5", 4);
-    EQ_VALUE(keyindex, 4, "key5 Index");
+    helper.Equal(keyindex, 4U, "key5 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key6", 4);
-    EQ_VALUE(keyindex, 5, "key6 Index");
+    helper.Equal(keyindex, 5U, "key6 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key7", 4);
-    EQ_VALUE(keyindex, 6, "key7 Index");
+    helper.Equal(keyindex, 6U, "key7 Index", __LINE__);
     numbers1.GetKeyIndex(keyindex, "key8", 4);
-    EQ_VALUE(keyindex, 7, "key8 Index");
+    helper.Equal(keyindex, 7U, "key8 Index", __LINE__);
 
     numbers2["key1"]  = 100;
     numbers2["key3"]  = 300;
@@ -348,117 +342,117 @@ static int TestHArray4() {
     numbers3 = numbers1; // Backup
 
     numbers1 += numbers2;
-    EQ_VALUE(numbers1.Size(), 10, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 10), "(numbers1.Capacity() >= 10)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.Size(), 6, "Size");
-    EQ_TRUE((numbers2.Capacity() >= 6), "(numbers2.Capacity() >= 6)");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers2.First(), numbers1.First(), "First()", "null");
-    EQ_VALUE(numbers1["key1"], 100, "key1");
-    EQ_VALUE(numbers1["key2"], 20, "key2");
-    EQ_VALUE(numbers1["key3"], 300, "key3");
-    EQ_VALUE(numbers1["key4"], 40, "key4");
-    EQ_VALUE(numbers1["key5"], 50, "key5");
-    EQ_VALUE(numbers1["key6"], 600, "key6");
-    EQ_VALUE(numbers1["key7"], 70, "key7");
-    EQ_VALUE(numbers1["key8"], 800, "key8");
-    EQ_VALUE(numbers1["key9"], 900, "key9");
-    EQ_VALUE(numbers1["key10"], 1000, "key10");
+    helper.Equal(numbers1.Size(), 10U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 10), "(numbers1.Capacity() >= 10)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.Size(), 6U, "Size", __LINE__);
+    helper.EqualsTrue((numbers2.Capacity() >= 6), "(numbers2.Capacity() >= 6)", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers2.First(), numbers1.First(), "First()", "null", __LINE__);
+    helper.Equal(numbers1["key1"], 100U, "key1", __LINE__);
+    helper.Equal(numbers1["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers1["key3"], 300U, "key3", __LINE__);
+    helper.Equal(numbers1["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers1["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers1["key6"], 600U, "key6", __LINE__);
+    helper.Equal(numbers1["key7"], 70U, "key7", __LINE__);
+    helper.Equal(numbers1["key8"], 800U, "key8", __LINE__);
+    helper.Equal(numbers1["key9"], 900U, "key9", __LINE__);
+    helper.Equal(numbers1["key10"], 1000U, "key10", __LINE__);
 
     SizeT        index = 0;
     const SizeT *val   = numbers1.GetValue(index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 100, "0");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 100U, "0", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 20, "1");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 20U, "1", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 300, "2");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 300U, "2", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 40, "3");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 40U, "3", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 50, "4");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 50U, "4", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 600, "5");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 600U, "5", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 70, "6");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 70U, "6", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 800, "7");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 800U, "7", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 900, "8");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 900U, "8", __LINE__);
 
     val = numbers1.GetValue(++index);
-    NOT_EQ_TO(val, nullptr, "GetValue(index)", "null");
-    EQ_VALUE(*val, 1000, "9");
+    helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
+    helper.Equal(*val, 1000U, "9", __LINE__);
 
     val = numbers1.GetValue(99999);
-    EQ_TO(val, nullptr, "GetValue(index)", "null");
+    helper.Equal(val, nullptr, "GetValue(index)", "null", __LINE__);
 
     numbers1 = numbers3; // Restore
     numbers3 = numbers2; // Backup
     numbers2 += numbers1;
-    EQ_VALUE(numbers2["key1"], 10, "key1");
-    EQ_VALUE(numbers2["key2"], 20, "key2");
-    EQ_VALUE(numbers2["key3"], 30, "key3");
-    EQ_VALUE(numbers2["key4"], 40, "key4");
-    EQ_VALUE(numbers2["key5"], 50, "key5");
-    EQ_VALUE(numbers2["key6"], 60, "key6");
-    EQ_VALUE(numbers2["key7"], 70, "key7");
-    EQ_VALUE(numbers2["key8"], 80, "key8");
-    EQ_VALUE(numbers2["key9"], 900, "key9");
-    EQ_VALUE(numbers2["key10"], 1000, "key10");
+    helper.Equal(numbers2["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers2["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers2["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers2["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers2["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers2["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers2["key7"], 70U, "key7", __LINE__);
+    helper.Equal(numbers2["key8"], 80U, "key8", __LINE__);
+    helper.Equal(numbers2["key9"], 900U, "key9", __LINE__);
+    helper.Equal(numbers2["key10"], 1000U, "key10", __LINE__);
 
     numbers2 = numbers3; // Restore
     numbers3 = numbers1; // Backup
 
     storage = numbers1.First();
     numbers2 += static_cast<HashArray &&>(numbers1);
-    EQ_VALUE(numbers1.Size(), 0, "Size");
-    EQ_VALUE(numbers1.Capacity(), 0, "Capacity");
-    EQ_TO(numbers1.First(), nullptr, "First()", "null");
-    EQ_VALUE(numbers2.Size(), 10, "Size");
-    EQ_TRUE((numbers2.Capacity() >= 10), "(numbers2.Capacity() >= 10)");
-    NOT_EQ_TO(numbers2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(numbers2.First(), storage, "First()", "storage");
-    EQ_VALUE(numbers2["key1"], 10, "key1");
-    EQ_VALUE(numbers2["key2"], 20, "key2");
-    EQ_VALUE(numbers2["key3"], 30, "key3");
-    EQ_VALUE(numbers2["key4"], 40, "key4");
-    EQ_VALUE(numbers2["key5"], 50, "key5");
-    EQ_VALUE(numbers2["key6"], 60, "key6");
-    EQ_VALUE(numbers2["key7"], 70, "key7");
-    EQ_VALUE(numbers2["key8"], 80, "key8");
-    EQ_VALUE(numbers2["key9"], 900, "key9");
-    EQ_VALUE(numbers2["key10"], 1000, "key10");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
+    helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
+    helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(numbers2.Size(), 10U, "Size", __LINE__);
+    helper.EqualsTrue((numbers2.Capacity() >= 10), "(numbers2.Capacity() >= 10)", __LINE__);
+    helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
+    helper.Equal(numbers2["key1"], 10U, "key1", __LINE__);
+    helper.Equal(numbers2["key2"], 20U, "key2", __LINE__);
+    helper.Equal(numbers2["key3"], 30U, "key3", __LINE__);
+    helper.Equal(numbers2["key4"], 40U, "key4", __LINE__);
+    helper.Equal(numbers2["key5"], 50U, "key5", __LINE__);
+    helper.Equal(numbers2["key6"], 60U, "key6", __LINE__);
+    helper.Equal(numbers2["key7"], 70U, "key7", __LINE__);
+    helper.Equal(numbers2["key8"], 80U, "key8", __LINE__);
+    helper.Equal(numbers2["key9"], 900U, "key9", __LINE__);
+    helper.Equal(numbers2["key10"], 1000U, "key10", __LINE__);
 
     // Addition of an empty array does nothing.
     numbers2 += HashArray(10);
-    EQ_VALUE(numbers2.Size(), 10, "Size");
+    helper.Equal(numbers2.Size(), 10U, "Size", __LINE__);
 
     numbers2.Resize(1);
-    EQ_VALUE(numbers2["key1"], 10, "key1");
+    helper.Equal(numbers2["key1"], 10U, "key1", __LINE__);
 
-    EQ_TO(numbers2.GetKey(1), nullptr, "GetKey(1)", "null");
+    helper.Equal(numbers2.GetKey(1), nullptr, "GetKey(1)", "null", __LINE__);
 
     numbers1.Reset();
     numbers1[""] = 555;
-    EQ_VALUE(numbers1[""], 555, "empty key");
+    helper.Equal(numbers1[""], 555U, "empty key", __LINE__);
 
     numbers1.Reset();
 
@@ -467,14 +461,12 @@ static int TestHArray4() {
 
         numbers1.Insert(Digit<char>::NumberToString(i), static_cast<SizeT &&>(SizeT{i}));
         value = numbers1.GetValue(key);
-        NOT_EQ_TO(value, nullptr, "value", "null");
-        EQ_VALUE(*value, i, key.First());
+        helper.NotEqual(value, nullptr, "value", "null", __LINE__);
+        helper.Equal(*value, i, key.First(), __LINE__);
     }
-
-    END_SUB_TEST;
 }
 
-static int TestHArray5() {
+void TestHArray5(TestHelper &helper) {
     HArray<SizeT, char> numbers1;
     String<char>        key;
     SizeT              *value;
@@ -486,8 +478,8 @@ static int TestHArray5() {
         numbers1[key] = i;
 
         value = numbers1.GetValue(key.First(), key.Length());
-        NOT_EQ_TO(value, nullptr, "value", "null");
-        EQ_VALUE(*value, i, key.First());
+        helper.NotEqual(value, nullptr, "value", "null", __LINE__);
+        helper.Equal(*value, i, key.First(), __LINE__);
     }
 
     numbers1.Reset();
@@ -496,54 +488,54 @@ static int TestHArray5() {
         numbers1[Digit<char>::NumberToString(i)] = i;
 
         value = numbers1.GetValue(Digit<char>::NumberToString(i));
-        NOT_EQ_TO(value, nullptr, "value", "null");
-        EQ_VALUE(*value, i, key.First());
+        helper.NotEqual(value, nullptr, "value", "null", __LINE__);
+        helper.Equal(*value, i, key.First(), __LINE__);
     }
 
     for (SizeT i = 1; i < 10; i++) {
-        EQ_VALUE(numbers1[Digit<char>::NumberToString(i)], i, "key.First()");
+        helper.Equal(numbers1[Digit<char>::NumberToString(i)], i, "key.First()", __LINE__);
     }
 
     value = numbers1.GetValue("10", 2);
-    NOT_EQ_TO(value, nullptr, "value", "null");
-    EQ_VALUE(*value, 10, "10");
+    helper.NotEqual(value, nullptr, "value", "null", __LINE__);
+    helper.Equal(*value, 10U, "10", __LINE__);
 
     for (SizeT i = 1; i < 11; i++) {
         numbers1.Remove(Digit<char>::NumberToString(i));
     }
 
     for (SizeT i = 1; i < 11; i++) {
-        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        helper.Equal(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null", __LINE__);
     }
 
     numbers1.Compress();
-    EQ_VALUE(numbers1.Size(), 990, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 990), "(numbers1.Capacity() >= 990)");
-    NOT_EQ_TO(numbers1.First(), nullptr, "First()", "null");
+    helper.Equal(numbers1.Size(), 990U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 990), "(numbers1.Capacity() >= 990)", __LINE__);
+    helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
     for (SizeT i = 1; i < 101; i++) {
         numbers1.Remove(Digit<char>::NumberToString(i));
     }
 
     for (SizeT i = 1; i < 101; i++) {
-        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        helper.Equal(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null", __LINE__);
     }
 
     numbers1.Compress();
-    EQ_VALUE(numbers1.Size(), 900, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 900), "(numbers1.Capacity() >= 900)");
+    helper.Equal(numbers1.Size(), 900U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 900), "(numbers1.Capacity() >= 900)", __LINE__);
 
     for (SizeT i = 101; i < 201; i++) {
         numbers1.Remove(Digit<char>::NumberToString(i));
     }
 
     for (SizeT i = 101; i < 201; i++) {
-        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        helper.Equal(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null", __LINE__);
     }
 
     numbers1.Compress();
-    EQ_VALUE(numbers1.Size(), 800, "Size");
-    EQ_TRUE((numbers1.Capacity() >= 800), "(numbers1.Capacity() >= 800)");
+    helper.Equal(numbers1.Size(), 800U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 800), "(numbers1.Capacity() >= 800)", __LINE__);
 
     for (SizeT i = 0; i < 1001; i++) {
         key = Digit<char>::NumberToString(i);
@@ -551,22 +543,20 @@ static int TestHArray5() {
     }
 
     for (SizeT i = 0; i < 1001; i++) {
-        EQ_TO(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null");
+        helper.Equal(numbers1.GetValue(Digit<char>::NumberToString(i)), nullptr, "value", "null", __LINE__);
     }
 
     numbers1.Compress();
-    EQ_VALUE(numbers1.Size(), 0, "Size");
+    helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
 
     numbers1.Reserve(16);
     numbers1["a"] = 1;
     numbers1.Compress();
-    EQ_VALUE(numbers1.Size(), 1, "Size");
-    EQ_TRUE(numbers1.Capacity() >= 1, "Capacity() >= 1");
-
-    END_SUB_TEST;
+    helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
+    helper.EqualsTrue(numbers1.Capacity() >= 1U, "Capacity() >= 1", __LINE__);
 }
 
-static int TestHArray6() {
+void TestHArray6(TestHelper &helper) {
     SizeT                             id;
     HArray<String<char>, char>        strings1;
     HArray<String<char>, char>        strings2;
@@ -586,75 +576,73 @@ static int TestHArray6() {
     strings1[static_cast<String<char> &&>(key1)] = static_cast<String<char> &&>(str1);
     strings1[static_cast<String<char> &&>(key2)] = static_cast<String<char> &&>(str2);
 
-    EQ_VALUE(strings1.Size(), 2, "Size");
-    NOT_EQ_TO(strings1.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(strings1.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(strings1.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
-    NOT_EQ_TO(strings1.GetKey(1), nullptr, "GetKey(1)", "null");
-    EQ_TO(strings1.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
+    helper.Equal(strings1.Size(), 2U, "Size", __LINE__);
+    helper.NotEqual(strings1.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(strings1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(strings1.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1", __LINE__);
+    helper.Equal(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1", __LINE__);
+    helper.NotEqual(strings1.GetKey(1), nullptr, "GetKey(1)", "null", __LINE__);
+    helper.Equal(strings1.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2", __LINE__);
+    helper.Equal(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2", __LINE__);
 
     id = 0;
-    EQ_TO(strings1.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
-    EQ_TO(strings1.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
+    helper.Equal(strings1.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1", __LINE__);
+    helper.Equal(strings1.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 
     strings2 += strings1;
-    EQ_VALUE(strings2.Size(), 2, "Size");
-    NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
-    NOT_EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
-    NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
-    NOT_EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
+    helper.Equal(strings2.Size(), 2U, "Size", __LINE__);
+    helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(strings2.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.NotEqual(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1", __LINE__);
+    helper.Equal(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1", __LINE__);
+    helper.NotEqual(strings2.GetKey(1), nullptr, "GetKey(1)", "null", __LINE__);
+    helper.NotEqual(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2", __LINE__);
+    helper.Equal(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2", __LINE__);
 
     id = 0;
-    NOT_EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
-    NOT_EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
+    helper.NotEqual(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1", __LINE__);
+    helper.NotEqual(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 
     strings2.Reserve(2);
     storage = strings1.First();
     strings2 += static_cast<HArray<String<char>, char> &&>(strings1);
-    EQ_VALUE(strings2.Size(), 2, "Size()");
-    EQ_VALUE(strings2.Capacity(), 2, "Capacity()");
-    NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(strings2.First(), storage, "First()", "storage");
-    NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
-    NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
-    EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
+    helper.Equal(strings2.Size(), 2U, "Size()", __LINE__);
+    helper.Equal(strings2.Capacity(), 2U, "Capacity()", __LINE__);
+    helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(strings2.First(), storage, "First()", "storage", __LINE__);
+    helper.NotEqual(strings2.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1", __LINE__);
+    helper.Equal(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1", __LINE__);
+    helper.NotEqual(strings2.GetKey(1), nullptr, "GetKey(1)", "null", __LINE__);
+    helper.Equal(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2", __LINE__);
+    helper.Equal(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2", __LINE__);
 
     id = 0;
-    EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
-    EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
+    helper.Equal(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1", __LINE__);
+    helper.Equal(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 
     strings1 += static_cast<HArray<String<char>, char> &&>(strings2);
     strings1.Resize(10);
     storage = strings1.First();
     strings2.Reset();
     strings2 += static_cast<HArray<String<char>, char> &&>(strings1);
-    EQ_VALUE(strings2.Size(), 2, "Size");
-    EQ_VALUE(strings2.Capacity(), 2, "Capacity()");
-    NOT_EQ_TO(strings2.First(), nullptr, "First()", "null");
-    NOT_EQ_TO(strings2.First(), storage, "First()", "storage");
-    NOT_EQ_TO(strings2.GetKey(0), nullptr, "GetKey(0)", "null");
-    EQ_TO(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1");
-    EQ_TO(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1");
-    NOT_EQ_TO(strings2.GetKey(1), nullptr, "GetKey(1)", "null");
-    EQ_TO(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2");
-    EQ_TO(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2");
+    helper.Equal(strings2.Size(), 2U, "Size", __LINE__);
+    helper.Equal(strings2.Capacity(), 2U, "Capacity()", __LINE__);
+    helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(strings2.First(), storage, "First()", "storage", __LINE__);
+    helper.NotEqual(strings2.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
+    helper.Equal(strings2.GetKey(0)->First(), k_str1, "GetKey(0)->First()", "k_str1", __LINE__);
+    helper.Equal(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", "GetKey(0)", "k-1", __LINE__);
+    helper.NotEqual(strings2.GetKey(1), nullptr, "GetKey(1)", "null", __LINE__);
+    helper.Equal(strings2.GetKey(1)->First(), k_str2, "GetKey(1)->First()", "k_str2", __LINE__);
+    helper.Equal(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", "GetKey(1)", "k-2", __LINE__);
 
     id = 0;
-    EQ_TO(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1");
-    EQ_TO(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2");
-
-    END_SUB_TEST;
+    helper.Equal(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1", __LINE__);
+    helper.Equal(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 }
 
-static int TestHArray7() {
+void TestHArray7(TestHelper &helper) {
     SizeT id = 1000;
 
     HArray<SizeT, char> numbers1(id);
@@ -665,11 +653,11 @@ static int TestHArray7() {
 
     for (SizeT z = 0; z < id; z++) {
         numbers1.Remove(Digit<char>::NumberToString(z));
-        EQ_TO(numbers1.GetKey(z), nullptr, "GetKey(id)->First()", "null");
+        helper.Equal(numbers1.GetKey(z), nullptr, "GetKey(id)->First()", "null", __LINE__);
     }
 
     numbers1.Resize((id + 1));
-    EQ_VALUE(numbers1.Size(), 0, "Size()");
+    helper.Equal(numbers1.Size(), 0U, "Size()", __LINE__);
 
     numbers1.Reserve(id);
     for (SizeT y = 0; y < id; y++) {
@@ -679,16 +667,14 @@ static int TestHArray7() {
     do {
         --id;
         numbers1.Remove(Digit<char>::NumberToString(id));
-        EQ_TO(numbers1.GetKey(id), nullptr, "GetKey(id)->First()", id);
+        helper.Equal(numbers1.GetKey(id), nullptr, "GetKey(id)->First()", id, __LINE__);
     } while (id > 0);
 
     numbers1.Resize((id + 1));
-    EQ_VALUE(numbers1.Size(), 0, "Size()");
-
-    END_SUB_TEST;
+    helper.Equal(numbers1.Size(), 0U, "Size()", __LINE__);
 }
 
-static int TestHArray8() {
+void TestHArray8(TestHelper &helper) {
     constexpr SizeT id = 100;
 
     HArray<SizeT, char> list(id);
@@ -707,9 +693,9 @@ static int TestHArray8() {
         String<char> key2 = Digit<char>::NumberToString(i);
         key2 += "-k";
 
-        EQ_TRUE(list.Rename(key1, key2), "Rename()");
-        EQ_TO(list.GetValue(key1), nullptr, "value", "null");
-        EQ_FALSE(list.Rename(key1, key2), "Rename()");
+        helper.EqualsTrue(list.Rename(key1, key2), "Rename()", __LINE__);
+        helper.Equal(list.GetValue(key1), nullptr, "value", "null", __LINE__);
+        helper.EqualsFalse(list.Rename(key1, key2), "Rename()", __LINE__);
 
         const SizeT *y = list.GetValue(key2);
         SizeT        w = id + 1;
@@ -718,7 +704,7 @@ static int TestHArray8() {
             w = *y;
         }
 
-        EQ_TO(w, i, "value", i);
+        helper.Equal(w, i, "value", i, __LINE__);
     }
 
     SizeT j = id;
@@ -730,7 +716,7 @@ static int TestHArray8() {
         String<char> key2 = Digit<char>::NumberToString(j);
         key2 += "-k";
 
-        EQ_TRUE(list.Rename(key2, key1), "Rename()");
+        helper.EqualsTrue(list.Rename(key2, key1), "Rename()", __LINE__);
     } while (j > 0);
 
     for (SizeT i = 0; i < id; i++) {
@@ -744,20 +730,18 @@ static int TestHArray8() {
             w = *y;
         }
 
-        EQ_TO(w, i, "value", i);
+        helper.Equal(w, i, "value", i, __LINE__);
     }
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key2 = Digit<char>::NumberToString(i);
         key2 += "-k";
 
-        EQ_TO(list.GetValue(key2), nullptr, "value", "null");
+        helper.Equal(list.GetValue(key2), nullptr, "value", "null", __LINE__);
     }
-
-    END_SUB_TEST;
 }
 
-static int TestHArray9() {
+void TestHArray9(TestHelper &helper) {
     constexpr SizeT id = 10;
 
     HArray<SizeT, char>                list(id);
@@ -774,22 +758,22 @@ static int TestHArray9() {
         item2     = list.GetItem(item->Key.First(), item->Key.Length(), item->Hash);
         value     = list.GetValue(item->Key.First(), item->Key.Length(), item->Hash);
 
-        NOT_EQ_TO(item, nullptr, "item", "null");
-        EQ_TO(item->Key, key, "value", key.First());
-        EQ_TO(item->Value, i, "value", i);
-        NOT_EQ_TO(item2, nullptr, "value", "null");
-        EQ_TO(item, item2, "item", item);
-        NOT_EQ_TO(value, nullptr, "value", "null");
-        EQ_TO(item2->Value, *value, "value", item2->Value);
+        helper.NotEqual(item, nullptr, "item", "null", __LINE__);
+        helper.Equal(item->Key, key, "value", key.First(), __LINE__);
+        helper.Equal(item->Value, i, "value", i, __LINE__);
+        helper.NotEqual(item2, nullptr, "value", "null", __LINE__);
+        helper.Equal(item, item2, "item", item, __LINE__);
+        helper.NotEqual(value, nullptr, "value", "null", __LINE__);
+        helper.Equal(item2->Value, *value, "value", item2->Value, __LINE__);
 
         item2 = list.GetItem(item->Key.First(), item->Key.Length(), i);
         value = list.GetValue(item->Key.First(), item->Key.Length(), i);
-        EQ_TO(item2, nullptr, "value", "null");
-        EQ_TO(value, nullptr, "value", "null");
+        helper.Equal(item2, nullptr, "value", "null", __LINE__);
+        helper.Equal(value, nullptr, "value", "null", __LINE__);
     }
 
     item = list.GetItem(id);
-    EQ_TO(item, nullptr, "item", "null");
+    helper.Equal(item, nullptr, "item", "null", __LINE__);
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
@@ -797,7 +781,7 @@ static int TestHArray9() {
 
         list.RemoveIndex(i);
 
-        EQ_TO(list.GetValue(key), nullptr, "value", "null");
+        helper.Equal(list.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
     list.Reset();
@@ -816,7 +800,7 @@ static int TestHArray9() {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
         key += Digit<char>::NumberToString(i);
-        EQ_TO(list.GetValue(key), nullptr, "value", "null");
+        helper.Equal(list.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
     // No clear
@@ -834,13 +818,11 @@ static int TestHArray9() {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
         key += Digit<char>::NumberToString(i);
-        EQ_TO(list.GetValue(key), nullptr, "value", "null");
+        helper.Equal(list.GetValue(key), nullptr, "value", "null", __LINE__);
     }
-
-    END_SUB_TEST;
 }
 
-static int TestHArray10() {
+void TestHArray10(TestHelper &helper) {
     constexpr SizeT id = 10;
 
     HArray<SizeT, char> list(id);
@@ -853,18 +835,16 @@ static int TestHArray10() {
 
         const Qentem::HAItem<SizeT, char> *item = list.GetItem(key);
 
-        NOT_EQ_TO(item, nullptr, "item", "null");
-        EQ_VALUE(item->Value, i, "index");
+        helper.NotEqual(item, nullptr, "item", "null", __LINE__);
+        helper.Equal(item->Value, i, "index", __LINE__);
     }
 
     String<char> key1("k-");
     key1 += Digit<char>::NumberToString(100);
-    EQ_TO(list.GetItem(key1), nullptr, "GetItem(k-100)", "null");
-
-    END_SUB_TEST;
+    helper.Equal(list.GetItem(key1), nullptr, "GetItem(k-100)", "null", __LINE__);
 }
 
-static int TestHArraySort() {
+void TestHArraySort(TestHelper &helper) {
     HashArray strings;
 
     strings["2017"] += 2017;
@@ -877,38 +857,38 @@ static int TestHArraySort() {
 
     strings.Sort();
 
-    NOT_EQ_TO(strings.GetValue(0), nullptr, "GetValue(0)", "null");
-    EQ_VALUE(*(strings.GetValue(0)), 2016, "strings[2016]");
-    NOT_EQ_TO(strings.GetValue(1), nullptr, "GetValue(1)", "null");
-    EQ_VALUE(*(strings.GetValue(1)), 2017, "strings[2017]");
-    NOT_EQ_TO(strings.GetValue(2), nullptr, "GetValue(2)", "null");
-    EQ_VALUE(*(strings.GetValue(2)), 2018, "strings[2018]");
-    NOT_EQ_TO(strings.GetValue(3), nullptr, "GetValue(3)", "null");
-    EQ_VALUE(*(strings.GetValue(3)), 2019, "strings[2019]");
-    NOT_EQ_TO(strings.GetValue(4), nullptr, "GetValue(4)", "null");
-    EQ_VALUE(*(strings.GetValue(4)), 2020, "strings[2020]");
-    NOT_EQ_TO(strings.GetValue(5), nullptr, "GetValue(5)", "null");
-    EQ_VALUE(*(strings.GetValue(5)), 2021, "strings[2021]");
-    NOT_EQ_TO(strings.GetValue(6), nullptr, "GetValue(6)", "null");
-    EQ_VALUE(*(strings.GetValue(6)), 2022, "strings[2022]");
+    helper.NotEqual(strings.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(0)), 2016U, "strings[2016]", __LINE__);
+    helper.NotEqual(strings.GetValue(1), nullptr, "GetValue(1)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(1)), 2017U, "strings[2017]", __LINE__);
+    helper.NotEqual(strings.GetValue(2), nullptr, "GetValue(2)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(2)), 2018U, "strings[2018]", __LINE__);
+    helper.NotEqual(strings.GetValue(3), nullptr, "GetValue(3)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(3)), 2019U, "strings[2019]", __LINE__);
+    helper.NotEqual(strings.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(4)), 2020U, "strings[2020]", __LINE__);
+    helper.NotEqual(strings.GetValue(5), nullptr, "GetValue(5)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(5)), 2021U, "strings[2021]", __LINE__);
+    helper.NotEqual(strings.GetValue(6), nullptr, "GetValue(6)", "null", __LINE__);
+    helper.Equal(*(strings.GetValue(6)), 2022U, "strings[2022]", __LINE__);
 
-    EQ_VALUE(strings["2016"], 2016, "strings[2016]");
-    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
-    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
-    EQ_VALUE(strings["2022"], 2022, "strings[2022]");
+    helper.Equal(strings["2016"], 2016U, "strings[2016]", __LINE__);
+    helper.Equal(strings["2017"], 2017U, "strings[2017]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2019"], 2019U, "strings[2019]", __LINE__);
+    helper.Equal(strings["2020"], 2020U, "strings[2020]", __LINE__);
+    helper.Equal(strings["2021"], 2021U, "strings[2021]", __LINE__);
+    helper.Equal(strings["2022"], 2022U, "strings[2022]", __LINE__);
 
     strings.Sort(false);
 
-    EQ_VALUE(strings["2022"], 2022, "strings[2022]");
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
-    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
-    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
-    EQ_VALUE(strings["2016"], 2016, "strings[2016]");
+    helper.Equal(strings["2022"], 2022U, "strings[2022]", __LINE__);
+    helper.Equal(strings["2021"], 2021U, "strings[2021]", __LINE__);
+    helper.Equal(strings["2020"], 2020U, "strings[2020]", __LINE__);
+    helper.Equal(strings["2019"], 2019U, "strings[2019]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2017"], 2017U, "strings[2017]", __LINE__);
+    helper.Equal(strings["2016"], 2016U, "strings[2016]", __LINE__);
 
     strings.Reset();
 
@@ -921,21 +901,21 @@ static int TestHArraySort() {
 
     strings.Sort();
 
-    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
-    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
+    helper.Equal(strings["2017"], 2017U, "strings[2017]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2019"], 2019U, "strings[2019]", __LINE__);
+    helper.Equal(strings["2020"], 2020U, "strings[2020]", __LINE__);
+    helper.Equal(strings["2021"], 2021U, "strings[2021]", __LINE__);
 
     strings.Sort(false);
 
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
-    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
-    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+    helper.Equal(strings["2021"], 2021U, "strings[2021]", __LINE__);
+    helper.Equal(strings["2020"], 2020U, "strings[2020]", __LINE__);
+    helper.Equal(strings["2019"], 2019U, "strings[2019]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2017"], 2017U, "strings[2017]", __LINE__);
 
     strings.Reset();
 
@@ -948,12 +928,12 @@ static int TestHArraySort() {
 
     strings.Sort(false);
 
-    EQ_VALUE(strings["2021"], 2021, "strings[2021]");
-    EQ_VALUE(strings["2020"], 2020, "strings[2020]");
-    EQ_VALUE(strings["2019"], 2019, "strings[2019]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2018"], 2018, "strings[2018]");
-    EQ_VALUE(strings["2017"], 2017, "strings[2017]");
+    helper.Equal(strings["2021"], 2021U, "strings[2021]", __LINE__);
+    helper.Equal(strings["2020"], 2020U, "strings[2020]", __LINE__);
+    helper.Equal(strings["2019"], 2019U, "strings[2019]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2018"], 2018U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2017"], 2017U, "strings[2017]", __LINE__);
 
     SizeT total = 0;
 
@@ -961,27 +941,27 @@ static int TestHArraySort() {
         total += item.Value;
     }
 
-    EQ_VALUE(total, 10095, "total");
-
-    END_SUB_TEST;
+    helper.Equal(total, 10095U, "total", __LINE__);
 }
 
 static int RunHArrayTests() {
-    STARTING_TEST("HArray.hpp");
+    TestHelper helper{"HArray.hpp", __FILE__};
 
-    START_TEST("HArray Test 1", TestHArray1);
-    START_TEST("HArray Test 2", TestHArray2);
-    START_TEST("HArray Test 3", TestHArray3);
-    START_TEST("HArray Test 4", TestHArray4);
-    START_TEST("HArray Test 5", TestHArray5);
-    START_TEST("HArray Test 6", TestHArray6);
-    START_TEST("HArray Test 7", TestHArray7);
-    START_TEST("HArray Test 8", TestHArray8);
-    START_TEST("HArray Test 9", TestHArray9);
-    START_TEST("HArray Test 10", TestHArray10);
-    START_TEST("HArray Sort Test", TestHArraySort);
+    helper.PrintGroupName();
 
-    END_TEST("HArray.hpp");
+    helper.Test("HArray Test 1", TestHArray1);
+    helper.Test("HArray Test 2", TestHArray2);
+    helper.Test("HArray Test 3", TestHArray3);
+    helper.Test("HArray Test 4", TestHArray4);
+    helper.Test("HArray Test 5", TestHArray5);
+    helper.Test("HArray Test 6", TestHArray6);
+    helper.Test("HArray Test 7", TestHArray7);
+    helper.Test("HArray Test 8", TestHArray8);
+    helper.Test("HArray Test 9", TestHArray9);
+    helper.Test("HArray Test 10", TestHArray10);
+    helper.Test("HArray Sort Test", TestHArraySort);
+
+    return helper.EndTests();
 }
 
 } // namespace Test

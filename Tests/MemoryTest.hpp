@@ -33,9 +33,11 @@ namespace Test {
 // No tests needed for now; if Memory.hpp has a bug, every thing else will break.
 
 static int RunMemoryTests() {
-    STARTING_TEST("Memory.hpp");
+    TestHelper helper{"Memory.hpp", __FILE__};
 
-    END_TEST("Memory.hpp");
+    helper.PrintGroupName();
+
+    return helper.EndTests();
 }
 
 } // namespace Test
