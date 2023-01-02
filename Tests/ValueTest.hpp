@@ -69,16 +69,6 @@ static const char *GetTypeString(ValueType type) noexcept {
     }
 }
 
-template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-QENTEM_NOINLINE void ValueTypeEqual(Value1_T_ left, Value2_T_ right, const Char_T_ *name, unsigned long line,
-                                    TestHelper &helper) {
-    if (left != right) {
-        helper.SetError(true);
-        TestHelper::PrintErrorMessage2(false, name, GetTypeString(left), GetTypeString(right), helper.GetFileFullname(),
-                                       line);
-    }
-}
-
 void TestGetTypeString(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Undefined), "Undefined", 9), "Undefined", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Object), "Object", 6), "Object", __LINE__);
@@ -110,7 +100,7 @@ void TestEmptyValue(TestHelper &helper) {
     helper.EqualsFalse(value1.IsTrue(), "IsTrue()", __LINE__);
     helper.EqualsFalse(value1.IsFalse(), "IsFalse()", __LINE__);
     helper.EqualsFalse(value1.IsNull(), "IsNull()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::Undefined, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Undefined), "Type()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetValue(10), nullptr, "GetValue(10)", "null", __LINE__);
@@ -168,7 +158,7 @@ void TestTrueValue(TestHelper &helper) {
 
     value1 = true;
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::True, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::True), "Type()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -236,7 +226,7 @@ void TestFalseValue(TestHelper &helper) {
 
     value1 = false;
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::False, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::False), "Type()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -304,7 +294,7 @@ void TestNullValue(TestHelper &helper) {
 
     value1 = nullptr;
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::Null, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Null), "Type()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -461,7 +451,7 @@ void TestNumberValue2(TestHelper &helper) {
     /////////////////// unsigned
 
     value1 = ValueC{vu_short{10}};
-    ValueTypeEqual(value1.Type(), ValueType::UInt64, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::UInt64), "Type()", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
@@ -538,7 +528,7 @@ void TestNumberValue3(TestHelper &helper) {
     /////////////////// signed
 
     value1 = ValueC{short{-10}};
-    ValueTypeEqual(value1.Type(), ValueType::Int64, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Int64), "Type()", __LINE__);
     helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
@@ -663,7 +653,7 @@ void TestNumberValue4(TestHelper &helper) {
     /////////////////// float
 
     value1 = ValueC{float{10.5}};
-    ValueTypeEqual(value1.Type(), ValueType::Double, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Double), "Type()", __LINE__);
     helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
@@ -850,7 +840,7 @@ void TestStringValue(TestHelper &helper) {
 
     value1 = "-ABCDEF0123456789ABCDEF0123456789-";
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::String, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::String), "Type()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -970,7 +960,7 @@ void TestArrayValue(TestHelper &helper) {
 
     value1 = arr_var; // Copy.
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::Array, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Array), "Type()", __LINE__);
     helper.Equal(value1.Size(), 5U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
@@ -1201,7 +1191,7 @@ void TestObjectValue1(TestHelper &helper) {
 
     value1 = h_arr_var; // Copy.
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
-    ValueTypeEqual(value1.Type(), ValueType::Object, "Type()", __LINE__, helper);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Object), "Type()", __LINE__);
     helper.Equal(value1.Size(), 5U, "Size()", __LINE__);
     helper.NotEqual(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.NotEqual(value1.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
