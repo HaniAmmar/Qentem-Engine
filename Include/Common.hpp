@@ -69,9 +69,11 @@
 
 #ifdef _MSC_VER
 #define QENTEM_NOINLINE __declspec(noinline)
+#define QENTEM_INLINE __forceinline
 #define QENTEM_MAYBE_UNUSED
 #else
 #define QENTEM_NOINLINE __attribute__((noinline))
+#define QENTEM_INLINE __attribute__((always_inline))
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
 
