@@ -1542,6 +1542,7 @@ struct TemplatePatterns {
     static constexpr Char_T_ TildeChar = '~'; // Tilde
 };
 
+// char
 template <typename Char_T_>
 struct TPStrings<Char_T_, 1> {
     static constexpr const Char_T_ *VariablePrefix    = "{var:";
@@ -1561,6 +1562,7 @@ struct TPStrings<Char_T_, 1> {
     static constexpr const Char_T_ *HTMLSingleQuote   = "&apos;";
 };
 
+// char16_t
 template <typename Char_T_>
 struct TPStrings<Char_T_, 2> {
     static constexpr const Char_T_ *VariablePrefix    = u"{var:";
@@ -1580,6 +1582,7 @@ struct TPStrings<Char_T_, 2> {
     static constexpr const Char_T_ *HTMLSingleQuote   = u"&apos;";
 };
 
+// char32_t
 template <typename Char_T_>
 struct TPStrings<Char_T_, 4> {
     static constexpr const Char_T_ *VariablePrefix    = U"{var:";
@@ -1597,6 +1600,46 @@ struct TPStrings<Char_T_, 4> {
     static constexpr const Char_T_ *HTMLBigger        = U"&gt;";
     static constexpr const Char_T_ *HTMLQuote         = U"&quot;";
     static constexpr const Char_T_ *HTMLSingleQuote   = U"&apos;";
+};
+
+// wchar_t size = 4
+template <>
+struct TPStrings<wchar_t, 4> {
+    static constexpr const wchar_t *VariablePrefix    = L"{var:";
+    static constexpr const wchar_t *RawVariablePrefix = L"{raw:";
+    static constexpr const wchar_t *MathPrefix        = L"{math:";
+    static constexpr const wchar_t *InLineIfPrefix    = L"{if:";
+    static constexpr const wchar_t *LoopPrefix        = L"<loop";
+    static constexpr const wchar_t *LoopSuffix        = L"</loop>";
+    static constexpr const wchar_t *IfPrefix          = L"<if";
+    static constexpr const wchar_t *IfSuffix          = L"</if>";
+    static constexpr const wchar_t *ElsePrefix        = L"<else";
+    static constexpr const wchar_t *ElseSuffix        = L"/>";
+    static constexpr const wchar_t *HTMLAnd           = L"&amp;";
+    static constexpr const wchar_t *HTMLLess          = L"&lt;";
+    static constexpr const wchar_t *HTMLBigger        = L"&gt;";
+    static constexpr const wchar_t *HTMLQuote         = L"&quot;";
+    static constexpr const wchar_t *HTMLSingleQuote   = L"&apos;";
+};
+
+// wchar_t size = 2
+template <>
+struct TPStrings<wchar_t, 2> {
+    static constexpr const wchar_t *VariablePrefix    = L"{var:";
+    static constexpr const wchar_t *RawVariablePrefix = L"{raw:";
+    static constexpr const wchar_t *MathPrefix        = L"{math:";
+    static constexpr const wchar_t *InLineIfPrefix    = L"{if:";
+    static constexpr const wchar_t *LoopPrefix        = L"<loop";
+    static constexpr const wchar_t *LoopSuffix        = L"</loop>";
+    static constexpr const wchar_t *IfPrefix          = L"<if";
+    static constexpr const wchar_t *IfSuffix          = L"</if>";
+    static constexpr const wchar_t *ElsePrefix        = L"<else";
+    static constexpr const wchar_t *ElseSuffix        = L"/>";
+    static constexpr const wchar_t *HTMLAnd           = L"&amp;";
+    static constexpr const wchar_t *HTMLLess          = L"&lt;";
+    static constexpr const wchar_t *HTMLBigger        = L"&gt;";
+    static constexpr const wchar_t *HTMLQuote         = L"&quot;";
+    static constexpr const wchar_t *HTMLSingleQuote   = L"&apos;";
 };
 
 } // namespace Qentem

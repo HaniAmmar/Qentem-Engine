@@ -282,6 +282,7 @@ struct JSONotation {
     static constexpr const Char_T_ *NullString       = &(JSONotationStrings<Char_T_, size_>::NullString[0]);
 };
 
+// char
 template <typename Char_T_>
 struct JSONotationStrings<Char_T_, 1> {
     static constexpr const Char_T_ *FalseString = "false";
@@ -289,6 +290,7 @@ struct JSONotationStrings<Char_T_, 1> {
     static constexpr const Char_T_ *NullString  = "null";
 };
 
+// char16_t
 template <typename Char_T_>
 struct JSONotationStrings<Char_T_, 2> {
     static constexpr const Char_T_ *FalseString = u"false";
@@ -296,11 +298,28 @@ struct JSONotationStrings<Char_T_, 2> {
     static constexpr const Char_T_ *NullString  = u"null";
 };
 
+// char32_t
 template <typename Char_T_>
 struct JSONotationStrings<Char_T_, 4> {
     static constexpr const Char_T_ *FalseString = U"false";
     static constexpr const Char_T_ *TrueString  = U"true";
     static constexpr const Char_T_ *NullString  = U"null";
+};
+
+// wchar_t size = 4
+template <>
+struct JSONotationStrings<wchar_t, 4> {
+    static constexpr const wchar_t *FalseString = L"false";
+    static constexpr const wchar_t *TrueString  = L"true";
+    static constexpr const wchar_t *NullString  = L"null";
+};
+
+// wchar_t size = 2
+template <>
+struct JSONotationStrings<wchar_t, 2> {
+    static constexpr const wchar_t *FalseString = L"false";
+    static constexpr const wchar_t *TrueString  = L"true";
+    static constexpr const wchar_t *NullString  = L"null";
 };
 
 } // namespace JSON
