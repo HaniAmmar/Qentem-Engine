@@ -113,7 +113,7 @@ class StringStream {
                 n_size = initial_size;
             }
 
-            expand(n_size * SizeT(4));
+            expand(n_size * SizeT{4});
         }
 
         Storage()[Length()] = one_char;

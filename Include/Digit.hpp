@@ -213,7 +213,7 @@ class Digit {
                 return false;
             }
 
-            number *= Number_T_(10);
+            number *= Number_T_{10};
             number += (static_cast<Number_T_>(chr - DigitChars::ZeroChar));
         }
 
@@ -428,22 +428,22 @@ class Digit {
                                                 "606162636465666768697071727374757677787980818283848586878889"
                                                 "90919293949596979899"};
 
-        while (number >= Number2_T_(100)) {
-            offset -= Number_T_(2);
-            const SizeT index              = (static_cast<SizeT>(number % Number2_T_(100)) * SizeT(2));
+        while (number >= Number2_T_{100}) {
+            offset -= Number_T_{2};
+            const SizeT index              = (static_cast<SizeT>(number % Number2_T_{100}) * SizeT{2});
             storage[offset]                = static_cast<Char_T_>(lookup_table[index]);
-            storage[offset + Number_T_(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
-            number /= Number2_T_(100);
+            storage[offset + Number_T_{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
+            number /= Number2_T_{100};
         }
 
-        if (number < Number2_T_(10)) {
+        if (number < Number2_T_{10}) {
             --offset;
             storage[offset] = static_cast<Char_T_>(number) + DigitChars::ZeroChar;
         } else {
-            offset -= Number_T_(2);
-            const SizeT index          = (static_cast<SizeT>(number) * SizeT(2));
+            offset -= Number_T_{2};
+            const SizeT index          = (static_cast<SizeT>(number) * SizeT{2});
             storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
-            storage[offset + SizeT(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
         }
     }
 

@@ -106,7 +106,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
 
                                 Unicode::ToUTF(code, buffer);
 
-                                offset += SizeT(4);
+                                offset += SizeT{4};
                                 offset2 = offset;
                                 continue;
                             }
