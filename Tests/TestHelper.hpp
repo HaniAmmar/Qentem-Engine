@@ -157,9 +157,6 @@ struct TestHelper {
                              << value2 << "`\nReturned Value: `" << value1 << "`\n\n";
     }
 
-    void        SetError(bool value) noexcept { error_ = value; }
-    const char *GetFileFullname() noexcept { return file_fullname_; }
-
     static SizeT &AllocateHit() noexcept {
         static SizeT count = 0;
         return count;
