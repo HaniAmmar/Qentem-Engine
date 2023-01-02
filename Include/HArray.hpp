@@ -497,7 +497,7 @@ class HArray {
     void clearHashTable() noexcept { hashTable_.Reset(); }
     void setSize(const SizeT new_size) noexcept { index_ = new_size; }
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
-    void expand() { resize(((Capacity() != 0) ? (Capacity() << 1U) : 2U)); }
+    void expand() { resize(((Capacity() != 0) ? (Capacity() * SizeT(2)) : SizeT(2))); }
 
     HAItem_T_ *find(SizeT *&index, const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT     *ht      = getHashTable();
@@ -505,7 +505,7 @@ class HArray {
         index              = (ht + (hash & getBase()));
 
         while (*index != 0) {
-            HAItem_T_ *item = (storage + (*index) - 1);
+            HAItem_T_ *item = (storage + ((*index) - 1));
 
             if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
                 return item;

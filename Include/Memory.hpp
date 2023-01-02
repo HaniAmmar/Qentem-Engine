@@ -157,10 +157,10 @@ struct QuickSort {
 
 /////////////////////////////////////////////////////////////////////
 inline static SizeT AligneSize(SizeT n_size, SizeT mini = 1) noexcept {
-    const SizeT size = (SizeT{1} << (Platform::CLZ((n_size >> SizeT{1}) | SizeT{mini})));
+    const SizeT size = (SizeT{1} << (Platform::CLZ((n_size / SizeT{2}) | SizeT{mini})));
 
     if (size < n_size) {
-        return (size << SizeT{1});
+        return (size * SizeT{2});
     }
 
     return size;

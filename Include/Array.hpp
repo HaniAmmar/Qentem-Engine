@@ -128,7 +128,7 @@ class Array {
                 setCapacity(1U);
             }
 
-            resize(Capacity() << 1U);
+            resize(Capacity() * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), static_cast<Type_ &&>(item));

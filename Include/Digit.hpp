@@ -213,7 +213,7 @@ class Digit {
                 return false;
             }
 
-            number = (number << 3U) + (number << 1U);
+            number *= Number_T_(10);
             number += (static_cast<Number_T_>(chr - DigitChars::ZeroChar));
         }
 
@@ -430,7 +430,7 @@ class Digit {
 
         while (number >= Number2_T_(100)) {
             offset -= Number_T_(2);
-            const SizeT index              = (static_cast<SizeT>(number % Number2_T_(100)) << 1U);
+            const SizeT index              = (static_cast<SizeT>(number % Number2_T_(100)) * SizeT(2));
             storage[offset]                = static_cast<Char_T_>(lookup_table[index]);
             storage[offset + Number_T_(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
             number /= Number2_T_(100);
@@ -441,7 +441,7 @@ class Digit {
             storage[offset] = static_cast<Char_T_>(number) + DigitChars::ZeroChar;
         } else {
             offset -= Number_T_(2);
-            const SizeT index          = (static_cast<SizeT>(number) << 1U);
+            const SizeT index          = (static_cast<SizeT>(number) * SizeT(2));
             storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
             storage[offset + SizeT(1)] = static_cast<Char_T_>(lookup_table[index + SizeT(1)]);
         }
@@ -813,7 +813,7 @@ class Digit {
             }
 
             while (++offset2 < length) {
-                exponent *= (exponent << 3U) + (exponent << 1U);
+                exponent *= int(10);
                 exponent += static_cast<int>(str[offset2] - DigitChars::ZeroChar);
             }
 

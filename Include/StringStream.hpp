@@ -32,7 +32,7 @@ namespace Qentem {
  */
 template <typename Char_T_>
 class StringStream {
-    static constexpr SizeT initial_size = 4; // <<2 = 16
+    static constexpr SizeT initial_size = 4; // * 4 = 16
 
   public:
     StringStream() = default;
@@ -113,7 +113,7 @@ class StringStream {
                 n_size = initial_size;
             }
 
-            expand(n_size << 2U);
+            expand(n_size * SizeT(4));
         }
 
         Storage()[Length()] = one_char;
@@ -280,7 +280,7 @@ class StringStream {
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
 
     void allocate(SizeT size) {
-        size = (Memory::AligneSize(size, 4U) << 1U);
+        size = (Memory::AligneSize(size, 4U) * SizeT{2});
         setCapacity(size);
         setStorage(Memory::Allocate<Char_T_>(size));
     }

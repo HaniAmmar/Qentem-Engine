@@ -99,14 +99,14 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
                             // Surrogate
                             if ((length - offset) > 5) {
                                 code = (code ^ 0xD800U) << 10U;
-                                offset += 2;
+                                offset += SizeT{2};
 
                                 code += Digit<Char_T_>::HexStringToNumber((content + offset), 4) & 0x3FFU;
                                 code += 0x10000U;
 
                                 Unicode::ToUTF(code, buffer);
 
-                                offset += 4;
+                                offset += SizeT(4);
                                 offset2 = offset;
                                 continue;
                             }
