@@ -1024,28 +1024,18 @@ class Template_CV {
         const SizeT    loop_length  = loop_info->InnerTemplate.Length();
 
         if (loop_set->IsObject()) {
-            while (true) {
+            do {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
                 loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length_);
                 loop_template.render(loop_content, loop_length, loop_info->SubTags);
-
-                if ((--loop_size) == 0) {
-                    break;
-                }
-
                 ++loop_index;
-            }
+            } while ((--loop_size) != 0);
         } else {
-            while (true) {
+            do {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
                 loop_template.render(loop_content, loop_length, loop_info->SubTags);
-
-                if ((--loop_size) == 0) {
-                    break;
-                }
-
                 ++loop_index;
-            }
+            } while ((--loop_size) != 0);
         }
     }
 
