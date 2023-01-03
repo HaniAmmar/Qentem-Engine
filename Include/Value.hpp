@@ -574,6 +574,129 @@ class Value {
         return (type > val.Type());
     }
 
+    inline bool operator<=(const Value &val) const noexcept {
+        const ValueType type = Type();
+
+        if (type == val.Type()) {
+            switch (type) {
+                case ValueType::Object: {
+                    return (object_.Size() <= val.object_.Size());
+                }
+
+                case ValueType::Array: {
+                    return (array_.Size() <= val.array_.Size());
+                }
+
+                case ValueType::String: {
+                    return (string_ <= val.string_);
+                }
+
+                case ValueType::UInt64: {
+                    return (number_.GetUInt64() <= val.number_.GetUInt64());
+                }
+
+                case ValueType::Int64: {
+                    return (number_.GetInt64() <= val.number_.GetInt64());
+                }
+
+                case ValueType::Double: {
+                    return (number_.GetDouble() <= val.number_.GetDouble());
+                }
+
+                case ValueType::True:
+                case ValueType::False:
+                case ValueType::Null:
+                case ValueType::Undefined: {
+                    return true;
+                }
+            }
+        }
+
+        return (type < val.Type());
+    }
+
+    inline bool operator>=(const Value &val) const noexcept {
+        const ValueType type = Type();
+
+        if (type == val.Type()) {
+            switch (type) {
+                case ValueType::Object: {
+                    return (object_.Size() >= val.object_.Size());
+                }
+
+                case ValueType::Array: {
+                    return (array_.Size() >= val.array_.Size());
+                }
+
+                case ValueType::String: {
+                    return (string_ >= val.string_);
+                }
+
+                case ValueType::UInt64: {
+                    return (number_.GetUInt64() >= val.number_.GetUInt64());
+                }
+
+                case ValueType::Int64: {
+                    return (number_.GetInt64() >= val.number_.GetInt64());
+                }
+
+                case ValueType::Double: {
+                    return (number_.GetDouble() >= val.number_.GetDouble());
+                }
+
+                case ValueType::True:
+                case ValueType::False:
+                case ValueType::Null:
+                case ValueType::Undefined: {
+                    return true;
+                }
+            }
+        }
+
+        return (type > val.Type());
+    }
+
+    inline bool operator==(const Value &val) const noexcept {
+        const ValueType type = Type();
+
+        if (type == val.Type()) {
+            switch (type) {
+                case ValueType::Object: {
+                    return (object_.Size() == val.object_.Size());
+                }
+
+                case ValueType::Array: {
+                    return (array_.Size() == val.array_.Size());
+                }
+
+                case ValueType::String: {
+                    return (string_ == val.string_);
+                }
+
+                case ValueType::UInt64: {
+                    return (number_.GetUInt64() == val.number_.GetUInt64());
+                }
+
+                case ValueType::Int64: {
+                    return (number_.GetInt64() == val.number_.GetInt64());
+                }
+
+                case ValueType::Double: {
+                    return (number_.GetDouble() == val.number_.GetDouble());
+                }
+
+                case ValueType::True:
+                case ValueType::False:
+                case ValueType::Null:
+                case ValueType::Undefined: {
+                    return true;
+                }
+            }
+        }
+
+        return (type > val.Type());
+    }
+
     inline bool IsNumber() const noexcept {
         switch (Type()) {
             case ValueType::UInt64:
@@ -641,11 +764,15 @@ class Value {
         }
 
         if (IsArray() && val.IsArray()) {
-            for (const Value *src_val = val.array_.Storage(), *end = (src_val + val.array_.Size()); src_val < end;
-                 src_val++) {
+            Value       *src_val = val.array_.Storage();
+            const Value *end     = (src_val + val.array_.Size());
+
+            while (src_val < end) {
                 if (!(src_val->IsUndefined())) {
                     array_ += *src_val;
                 }
+
+                ++src_val;
             }
         } else if (IsObject() && val.IsObject()) {
             object_ += val.object_;
@@ -765,7 +892,7 @@ class Value {
         return false;
     }
 
-    // To get a pointer to the string and its length.
+    // To get a pointer to a string value and its length.
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key, Number_T_ &length) const noexcept {
         switch (Type()) {
@@ -943,17 +1070,6 @@ class Value {
                 return true;
             }
 
-            case ValueType::String: {
-                double num;
-
-                if (Digit<Char_T_>::StringToNumber(num, string_.First(), string_.Length())) {
-                    value = static_cast<Number_T_>(num);
-                    return true;
-                }
-
-                return false;
-            }
-
             case ValueType::True: {
                 value = 1;
                 return true;
@@ -965,10 +1081,20 @@ class Value {
                 return true;
             }
 
+            case ValueType::String: {
+                double num;
+
+                if (Digit<Char_T_>::StringToNumber(num, string_.First(), string_.Length())) {
+                    value = static_cast<Number_T_>(num);
+                    return true;
+                }
+            }
+
             default: {
-                return false;
             }
         }
+
+        return false;
     }
 
     bool GetBool(bool &value) const noexcept {
@@ -1009,14 +1135,13 @@ class Value {
                     value = false;
                     return true;
                 }
-
-                return false;
             }
 
             default: {
-                return false;
             }
         }
+
+        return false;
     }
 
     inline void Remove(const Char_T_ *key) const noexcept {
@@ -1197,7 +1322,7 @@ class Value {
         }
 
         if (*(stream.Last()) == JSONotation_T_::CommaChar) {
-            stream.StepBack(1);
+            stream.StepBack(1U);
         }
 
         stream += JSONotation_T_::ECurlyChar;
@@ -1214,7 +1339,7 @@ class Value {
         }
 
         if (*(stream.Last()) == JSONotation_T_::CommaChar) {
-            stream.StepBack(1);
+            stream.StepBack(1U);
         }
 
         stream += JSONotation_T_::ESquareChar;
