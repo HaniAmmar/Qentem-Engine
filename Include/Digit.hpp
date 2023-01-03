@@ -91,44 +91,44 @@ class Digit {
         return str;
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned short number) {
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, unsigned short number) {
         unsignedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned int number) {
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, unsigned int number) {
         unsignedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned long number) {
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, unsigned long number) {
         unsignedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, unsigned long long number) {
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, unsigned long long number) {
         unsignedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, short number) {
-        intToString(stream, number);
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, short number) {
+        signedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, int number) {
-        intToString(stream, number);
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, int number) {
+        signedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, long number) {
-        intToString(stream, number);
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, long number) {
+        signedIntToString(stream, number);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, long long number) {
-        intToString(stream, number);
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, long long number) {
+        signedIntToString(stream, number);
     }
 
     /*
@@ -151,14 +151,14 @@ class Digit {
         return str;
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, double number, unsigned int min = 1,
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, double number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
         doubleToString(stream, number, min, r_min, precision);
     }
 
-    template <typename StringStream_T_>
-    inline static void NumberToStringStream(StringStream_T_ &stream, float f_number, unsigned int min = 1,
+    template <typename Stream_T_>
+    inline static void NumberToStringStream(Stream_T_ &stream, float f_number, unsigned int min = 1,
                                             unsigned int r_min = 0, unsigned int precision = 0) {
         doubleToString(stream, static_cast<double>(f_number), min, r_min, precision);
     }
@@ -469,7 +469,7 @@ class Digit {
     }
 
     template <typename Stream_T_, typename Number_T_>
-    inline static void intToString(Stream_T_ &stream, Number_T_ number) {
+    inline static void signedIntToString(Stream_T_ &stream, Number_T_ number) {
         Char_T_ storage[QENTEM_INT_NUMBER_MAX_SIZE_];
         SizeT   offset = QENTEM_INT_NUMBER_MAX_SIZE_;
 
@@ -713,8 +713,8 @@ class Digit {
         return dstring.Storage();
     }
 
-    template <typename StringStream_T_>
-    inline static Char_T_ *getCharForNumber(StringStream_T_ &string, SizeT length) {
+    template <typename Stream_T_>
+    inline static Char_T_ *getCharForNumber(Stream_T_ &string, SizeT length) {
         return string.Buffer(length);
     }
 
