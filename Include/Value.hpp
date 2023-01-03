@@ -1110,7 +1110,7 @@ class Value {
 
     inline ValueType Type() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return static_cast<ValueType>(type_.Value.GetHighTag());
+        return static_cast<ValueType>(type_.Value.GetHighByte());
 #else
         return type_;
 #endif
@@ -1276,7 +1276,7 @@ class Value {
 
     inline void setType(ValueType new_type) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        type_.Value.SetHighTag(static_cast<unsigned char>(new_type));
+        type_.Value.SetHighByte(static_cast<unsigned char>(new_type));
 #else
         type_ = new_type;
 #endif

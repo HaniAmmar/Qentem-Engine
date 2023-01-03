@@ -81,7 +81,7 @@ class String {
             padding_ = src.padding_;
             length_  = src.length_;
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-            storage_.SetLowTag(src.storage_.GetLowTag());
+            storage_.SetLowByte(src.storage_.GetLowByte());
 #endif
             storage_ = static_cast<QPointer<Char_T_> &&>(src.storage_);
 
@@ -236,7 +236,7 @@ class String {
 
     inline SizeT Length() const noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        const unsigned char len = storage_.GetLowTag();
+        const unsigned char len = storage_.GetLowByte();
 
         return ((len != 0) ? len : length_);
 #else
@@ -322,7 +322,7 @@ class String {
   private:
     void clearLength() noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        storage_.SetLowTag(0);
+        storage_.SetLowByte(0);
 #endif
         length_ = 0;
     }
@@ -330,9 +330,9 @@ class String {
     void setLength(SizeT new_length) noexcept {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
         if (new_length < ShortStringMax) {
-            storage_.SetLowTag(static_cast<unsigned char>(new_length));
+            storage_.SetLowByte(static_cast<unsigned char>(new_length));
         } else {
-            storage_.SetLowTag(0);
+            storage_.SetLowByte(0);
             length_ = new_length;
         }
 #else

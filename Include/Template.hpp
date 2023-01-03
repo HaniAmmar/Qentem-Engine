@@ -320,7 +320,7 @@ class Template {
 
         inline TagType GetType() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-            return static_cast<TagType>(info_.GetHighTag());
+            return static_cast<TagType>(info_.GetHighByte());
 #else
             return type_;
 #endif
@@ -332,7 +332,7 @@ class Template {
       private:
         void setType(TagType type) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-            info_.SetHighTag(static_cast<unsigned char>(type));
+            info_.SetHighByte(static_cast<unsigned char>(type));
 #else
             type_ = type;
 #endif

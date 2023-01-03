@@ -27,7 +27,7 @@
 
 namespace Qentem {
 
-template <typename Type_>
+template <typename Type_T_>
 class QPointer {
   public:
     QPointer()                               = default;
@@ -35,7 +35,7 @@ class QPointer {
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
-    explicit QPointer(Type_ *pointer) noexcept : pointer_{pointer} {}
+    explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {}
     QPointer(QPointer &&src) noexcept : p_number_{src.p_number_} { src.p_number_ = 0; }
 
     QPointer &operator=(QPointer &&src) noexcept {
@@ -48,7 +48,7 @@ class QPointer {
         return *this;
     }
 
-    void SetPointer(Type_ *pointer) noexcept {
+    void SetPointer(Type_T_ *pointer) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         p_number_ &= 0xFFFF000000000000ULL;
         p_number_ |= (reinterpret_cast<unsigned long long>(pointer) & 0x0000FFFFFFFFFFFFULL);
@@ -57,11 +57,11 @@ class QPointer {
 #endif
     }
 
-    Type_ *GetPointer() const noexcept {
+    Type_T_ *GetPointer() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         char *tmp_pointer = nullptr;
         tmp_pointer += (p_number_ & 0x0000FFFFFFFFFFFFULL);
-        return reinterpret_cast<Type_ *>(tmp_pointer);
+        return reinterpret_cast<Type_T_ *>(tmp_pointer);
 #else
         return pointer_;
 #endif
@@ -73,28 +73,28 @@ class QPointer {
     }
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    void SetHighTag(unsigned char byte) noexcept {
+    void SetHighByte(unsigned char byte) noexcept {
         unsigned long long tmp = byte;
         p_number_ &= 0x00FFFFFFFFFFFFFFULL;
         p_number_ |= (tmp << 56U);
     }
 
-    unsigned char GetHighTag() const noexcept { return static_cast<unsigned char>(p_number_ >> 56U); }
+    unsigned char GetHighByte() const noexcept { return static_cast<unsigned char>(p_number_ >> 56U); }
 
-    void SetLowTag(unsigned char byte) noexcept {
+    void SetLowByte(unsigned char byte) noexcept {
         unsigned long long tmp = byte;
         p_number_ &= 0xFF00FFFFFFFFFFFFULL;
         p_number_ |= (tmp << 48U);
     }
 
-    unsigned char GetLowTag() const noexcept { return ((p_number_ >> 48U) & 0x00FFU); }
+    unsigned char GetLowByte() const noexcept { return ((p_number_ >> 48U) & 0x00FFU); }
 #endif
 
     void Reset() noexcept { pointer_ = nullptr; }
 
   private:
     union {
-        Type_             *pointer_;
+        Type_T_           *pointer_;
         unsigned long long p_number_{0};
     };
 };
