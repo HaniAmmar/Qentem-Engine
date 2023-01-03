@@ -42,8 +42,8 @@ class Array {
         }
     }
 
-    Array(Array &&src) noexcept : index_{src.Size()}, capacity_{src.Capacity()} {
-        storage_.Move(static_cast<QPointer<Type_> &&>(src.storage_));
+    Array(Array &&src) noexcept
+        : index_{src.Size()}, capacity_{src.Capacity()}, storage_{static_cast<QPointer<Type_> &&>(src.storage_)} {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -66,7 +66,7 @@ class Array {
             setCapacity(src.Capacity());
             src.setSize(0);
             src.setCapacity(0);
-            storage_ = static_cast<QPointer<Type_> &&>(src.storage_);
+            storage_.MovePointerOnly(src.storage_);
         }
 
         return *this;

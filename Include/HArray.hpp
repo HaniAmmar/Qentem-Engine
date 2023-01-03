@@ -73,8 +73,8 @@ class HArray {
         Memory::Deallocate(getHashTable());
     }
 
-    HArray(HArray &&src) noexcept : index_{src.Size()}, capacity_{src.Capacity()} {
-        hashTable_.Move(static_cast<QPointer<SizeT> &&>(src.hashTable_));
+    HArray(HArray &&src) noexcept
+        : index_{src.Size()}, capacity_{src.Capacity()}, hashTable_{static_cast<QPointer<SizeT> &&>(src.hashTable_)} {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -91,7 +91,7 @@ class HArray {
             setCapacity(src.Capacity());
             src.setSize(0);
             src.setCapacity(0);
-            hashTable_ = static_cast<QPointer<SizeT> &&>(src.hashTable_);
+            hashTable_.MovePointerOnly(src.hashTable_);
         }
 
         return *this;

@@ -42,8 +42,8 @@ class String {
 
     String() = default;
 
-    String(String &&src) noexcept : padding_(src.padding_), length_(src.length_) {
-        storage_.Move(static_cast<QPointer<Char_T_> &&>(src.storage_));
+    String(String &&src) noexcept
+        : padding_(src.padding_), length_(src.length_), storage_{static_cast<QPointer<Char_T_> &&>(src.storage_)} {
         src.clearLength();
     }
 
@@ -83,10 +83,8 @@ class String {
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
             storage_.SetLowByte(src.storage_.GetLowByte());
 #endif
-            storage_ = static_cast<QPointer<Char_T_> &&>(src.storage_);
-
             src.clearLength();
-            src.clearStorage();
+            storage_.MovePointerOnly(src.storage_);
         }
 
         return *this;

@@ -40,11 +40,7 @@ class QPointer {
 
     QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-            bits_.number_ = src.bits_.number_;
-#else
-            pointer_ = src.pointer_;
-#endif
+            pointer_     = src.pointer_;
             src.pointer_ = nullptr;
         }
 
@@ -68,8 +64,12 @@ class QPointer {
 #endif
     }
 
-    void Move(QPointer &&src) noexcept {
-        pointer_     = src.pointer_;
+    void MovePointerOnly(QPointer &src) noexcept {
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        bits_.number_ = src.bits_.number_;
+#else
+        pointer_ = src.pointer_;
+#endif
         src.pointer_ = nullptr;
     }
 
@@ -98,8 +98,8 @@ class QPointer {
 #endif
 
     union {
-        Type_T_           *pointer_;
-        unsigned long long p_number_{0};
+        Type_T_           *pointer_{nullptr};
+        unsigned long long p_number_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         Bits bits_;
 #endif
