@@ -38,7 +38,7 @@ static SizeT HexStringToNumber(const char *str) noexcept {
 
 static void TestHexConv(TestHelper &helper) {
     SizeT       number;
-    const char *hex = nullptr;
+    const char *hex = "";
 
     number = HexStringToNumber(hex);
     helper.Equal(number, 0U, "number", __LINE__);
@@ -146,7 +146,7 @@ static void TestStringToNumber2(TestHelper &helper) {
     float         number_float  = 0;
     double        number_double = 0;
 
-    const char *str = nullptr;
+    const char *str = "";
     bool        valid;
 
     valid = StringToNumberCount(number_int, str);
@@ -382,7 +382,7 @@ static void TestStringToNumber3(TestHelper &helper) {
     unsigned int number_uint   = 0;
     double       number_double = 0;
 
-    const char *str = nullptr;
+    const char *str = "";
     bool        valid;
 
     valid = StringToNumberCount(number_double, str);

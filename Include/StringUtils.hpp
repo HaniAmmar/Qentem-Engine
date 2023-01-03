@@ -40,15 +40,15 @@ class StringUtils {
 
     template <typename Char_T_, typename Number_T_ = SizeT>
     static Number_T_ Count(const Char_T_ *str) noexcept {
-        Number_T_ len = 0;
+        const Char_T_ *str_2 = str;
 
-        if (str != nullptr) {
-            while (*(str++) != 0) {
-                ++len;
-            };
+        // if (str_2 != nullptr) {
+        while (*str_2 != '\0') {
+            ++str_2;
         }
+        // }
 
-        return len;
+        return static_cast<Number_T_>(str_2 - str);
     }
 
     template <typename Char_T_, typename Number_T_>
