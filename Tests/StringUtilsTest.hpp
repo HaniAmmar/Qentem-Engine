@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestHash(TestHelper &helper) {
+static void TestHash(TestHelper &helper) {
     SizeT hash;
     SizeT hash2;
     SizeT hash3;
@@ -71,7 +71,7 @@ void TestHash(TestHelper &helper) {
     helper.NotEqual(hash2, 0U, "hash2", "0", __LINE__);
 }
 
-void TestCount(TestHelper &helper) {
+static void TestCount(TestHelper &helper) {
     SizeT length = StringUtils::Count("");
     helper.Equal(length, 0U, "length", __LINE__);
 
@@ -97,7 +97,7 @@ void TestCount(TestHelper &helper) {
     helper.Equal(length, 63U, "length", __LINE__);
 }
 
-void TestLeftTrim(TestHelper &helper) {
+static void TestLeftTrim(TestHelper &helper) {
     unsigned int offset = 0;
 
     StringUtils::TrimLeft("", offset, 0U);
@@ -234,7 +234,7 @@ void TestLeftTrim(TestHelper &helper) {
     helper.Equal(offset, 2U, "offset", __LINE__);
 }
 
-void TestSoftTrim(TestHelper &helper) {
+static void TestSoftTrim(TestHelper &helper) {
     SizeT offset = 0;
     SizeT length = 0;
 
@@ -453,7 +453,7 @@ void TestSoftTrim(TestHelper &helper) {
     helper.Equal(length, 3U, "length", __LINE__);
 }
 
-void TestIsEqual(TestHelper &helper) {
+static void TestIsEqual(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual("", "", 0U), "IsEqual", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual("a", "a", 1U), "IsEqual", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual("ab", "ab", 2U), "IsEqual", __LINE__);
@@ -502,7 +502,7 @@ void TestIsEqual(TestHelper &helper) {
                        "IsEqual", __LINE__);
 }
 
-void TestIsBigger(TestHelper &helper) {
+static void TestIsBigger(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsBigger("", "", 0U, 0U, true), "IsBigger", __LINE__);
     helper.EqualsTrue(StringUtils::IsBigger("b", "a", 1U, 1U, false), "IsBigger", __LINE__);
     helper.EqualsTrue(StringUtils::IsBigger("a", "a", 1U, 1U, true), "IsBigger", __LINE__);
@@ -545,7 +545,7 @@ void TestIsBigger(TestHelper &helper) {
     helper.EqualsFalse(StringUtils::IsBigger("2018", "2021", 4U, 4U, false), "IsBigger", __LINE__);
 }
 
-void TestIsLess(TestHelper &helper) {
+static void TestIsLess(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsLess("", "", 0U, 0U, true), "IsLess", __LINE__);
     helper.EqualsTrue(StringUtils::IsLess("a", "b", 1U, 1U, false), "IsLess", __LINE__);
     helper.EqualsTrue(StringUtils::IsLess("a", "a", 1U, 1U, true), "IsLess", __LINE__);

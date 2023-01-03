@@ -33,7 +33,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestEngine1(TestHelper &helper) {
+static void TestEngine1(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 0;
     SizeT       find_len    = 3;
@@ -253,7 +253,7 @@ void TestEngine1(TestHelper &helper) {
     helper.Equal(ret, 0U, "return", __LINE__);
 }
 
-void TestEngine2(TestHelper &helper) {
+static void TestEngine2(TestHelper &helper) {
     SizeT           ret;
     SizeT           content_len = 16;
     constexpr SizeT find_len    = 3;
@@ -293,20 +293,20 @@ void TestEngine2(TestHelper &helper) {
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "00000001", 0u, 8u);
-    helper.Equal(ret, 8u, "return", __LINE__);
+    ret = Engine::FindOne('1', "00000001", 0U, 8U);
+    helper.Equal(ret, 8U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "0000000000000001", 0u, 16u);
-    helper.Equal(ret, 16u, "return", __LINE__);
+    ret = Engine::FindOne('1', "0000000000000001", 0U, 16U);
+    helper.Equal(ret, 16U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "00000000000000000000000000000001", 0u, 32u);
-    helper.Equal(ret, 32u, "return", __LINE__);
+    ret = Engine::FindOne('1', "00000000000000000000000000000001", 0U, 32U);
+    helper.Equal(ret, 32U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "0000000000000000000000000000000000000000000000000000000000000001", 0u, 64u);
-    helper.Equal(ret, 64u, "return", __LINE__);
+    ret = Engine::FindOne('1', "0000000000000000000000000000000000000000000000000000000000000001", 0U, 64U);
+    helper.Equal(ret, 64U, "return", __LINE__);
 }
 
-void TestEngine3(TestHelper &helper) {
+static void TestEngine3(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 0;
     const char *content     = "";
@@ -375,7 +375,7 @@ void TestEngine3(TestHelper &helper) {
     helper.Equal(ret, 0U, "return", __LINE__);
 }
 
-void TestEngine4(TestHelper &helper) {
+static void TestEngine4(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 12;
     const char *content     = "{{{{{{}}}}}}";
@@ -556,7 +556,7 @@ void TestEngine4(TestHelper &helper) {
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-void TestEngine5(TestHelper &helper) {
+static void TestEngine5(TestHelper &helper) {
     SizeT       ret;
     SizeT       content_len = 18;
     const char *content     = "       )          ";
@@ -772,7 +772,7 @@ void TestEngine5(TestHelper &helper) {
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-void TestEngine6(TestHelper &helper) {
+static void TestEngine6(TestHelper &helper) {
     SizeT           ret;
     constexpr SizeT content_len = 50;
     const char     *content     = "{-{-{-     -}{-{-  -}{-   -}{- -}{- -}-}-}-}{- -}";
@@ -928,14 +928,14 @@ void TestEngine6(TestHelper &helper) {
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-struct Item2__ {
-    Array<Item2__> SubItems;
-    SizeT          Offset{0};
-    SizeT          Length{0};
-    SizeT          padding_[2]{0};
+struct Item2Engine {
+    Array<Item2Engine> SubItems;
+    SizeT              Offset{0};
+    SizeT              Length{0};
+    SizeT              padding_[2]{0};
 };
 
-static void to_JSON(StringStream<char> &stream, const Array<Item2__> &items, const char *content) {
+static void to_JSON(StringStream<char> &stream, const Array<Item2Engine> &items, const char *content) {
     if (items.IsEmpty()) {
         return;
     }
@@ -966,8 +966,8 @@ static void to_JSON(StringStream<char> &stream, const Array<Item2__> &items, con
     stream += '}';
 }
 
-void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT r_tag_len, Array<Item2__> &items,
-                    const char *content, SizeT offset, SizeT end_offset) {
+static void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT r_tag_len,
+                           Array<Item2Engine> &items, const char *content, SizeT offset, SizeT end_offset) {
     const SizeT l_r_len      = (l_tag_len + r_tag_len);
     SizeT       e_tag_offset = offset;
     SizeT       s_tag_offset;
@@ -994,7 +994,7 @@ void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT
             return;
         }
 
-        Item2__ item;
+        Item2Engine item;
         item.Offset = (s_tag_offset - l_tag_len);
         item.Length = (e_tag_offset - item.Offset);
 
@@ -1003,14 +1003,14 @@ void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag, SizeT
                            (e_tag_offset - r_tag_len));
         }
 
-        items += static_cast<Item2__ &&>(item);
+        items += static_cast<Item2Engine &&>(item);
 
         offset = e_tag_offset;
     }
 }
 
-void TestEngine7(TestHelper &helper) {
-    Array<Item2__>     items;
+static void TestEngine7(TestHelper &helper) {
+    Array<Item2Engine> items;
     StringStream<char> stream;
     const char        *content;
     const char        *result;

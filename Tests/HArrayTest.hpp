@@ -33,7 +33,7 @@ namespace Test {
 
 using HashArray = HArray<SizeT, char>;
 
-void TestHArray1(TestHelper &helper) {
+static void TestHArray1(TestHelper &helper) {
     HashArray numbers1;
     HashArray numbers2(8);
 
@@ -91,7 +91,7 @@ void TestHArray1(TestHelper &helper) {
     helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
 }
 
-void TestHArray2(TestHelper &helper) {
+static void TestHArray2(TestHelper &helper) {
     HashArray                  numbers1(8);
     HashArray                  numbers2;
     const String<char>        *key;
@@ -252,7 +252,7 @@ void TestHArray2(TestHelper &helper) {
     helper.Equal(numbers1["key9"], 90U, "key9", __LINE__);
 }
 
-void TestHArray3(TestHelper &helper) {
+static void TestHArray3(TestHelper &helper) {
     HashArray                  numbers1(8);
     HashArray                  numbers2;
     const String<char>        *key;
@@ -297,7 +297,7 @@ void TestHArray3(TestHelper &helper) {
     helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 }
 
-void TestHArray4(TestHelper &helper) {
+static void TestHArray4(TestHelper &helper) {
     HashArray                  numbers1;
     HashArray                  numbers2;
     HashArray                  numbers3(3);
@@ -466,7 +466,7 @@ void TestHArray4(TestHelper &helper) {
     }
 }
 
-void TestHArray5(TestHelper &helper) {
+static void TestHArray5(TestHelper &helper) {
     HArray<SizeT, char> numbers1;
     String<char>        key;
     SizeT              *value;
@@ -556,7 +556,7 @@ void TestHArray5(TestHelper &helper) {
     helper.EqualsTrue(numbers1.Capacity() >= 1U, "Capacity() >= 1", __LINE__);
 }
 
-void TestHArray6(TestHelper &helper) {
+static void TestHArray6(TestHelper &helper) {
     SizeT                             id;
     HArray<String<char>, char>        strings1;
     HArray<String<char>, char>        strings2;
@@ -642,7 +642,7 @@ void TestHArray6(TestHelper &helper) {
     helper.Equal(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 }
 
-void TestHArray7(TestHelper &helper) {
+static void TestHArray7(TestHelper &helper) {
     SizeT id = 1000;
 
     HArray<SizeT, char> numbers1(id);
@@ -674,7 +674,7 @@ void TestHArray7(TestHelper &helper) {
     helper.Equal(numbers1.Size(), 0U, "Size()", __LINE__);
 }
 
-void TestHArray8(TestHelper &helper) {
+static void TestHArray8(TestHelper &helper) {
     constexpr SizeT id = 100;
 
     HArray<SizeT, char> list(id);
@@ -741,7 +741,7 @@ void TestHArray8(TestHelper &helper) {
     }
 }
 
-void TestHArray9(TestHelper &helper) {
+static void TestHArray9(TestHelper &helper) {
     constexpr SizeT id = 10;
 
     HArray<SizeT, char>                list(id);
@@ -822,7 +822,7 @@ void TestHArray9(TestHelper &helper) {
     }
 }
 
-void TestHArray10(TestHelper &helper) {
+static void TestHArray10(TestHelper &helper) {
     constexpr SizeT id = 10;
 
     HArray<SizeT, char> list(id);
@@ -844,7 +844,7 @@ void TestHArray10(TestHelper &helper) {
     helper.Equal(list.GetItem(key1), nullptr, "GetItem(k-100)", "null", __LINE__);
 }
 
-void TestHArraySort(TestHelper &helper) {
+static void TestHArraySort(TestHelper &helper) {
     HashArray strings;
 
     strings["2017"] += 2017;
@@ -937,7 +937,7 @@ void TestHArraySort(TestHelper &helper) {
 
     SizeT total = 0;
 
-    for (auto &item : strings) {
+    for (const auto &item : strings) {
         total += item.Value;
     }
 

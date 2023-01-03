@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestVariableTag1(TestHelper &helper) {
+static void TestVariableTag1(TestHelper &helper) {
     const char *content;
 
     Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5,
@@ -241,7 +241,7 @@ void TestVariableTag1(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"()", R"(Render())", __LINE__);
 }
 
-void TestVariableTag2(TestHelper &helper) {
+static void TestVariableTag2(TestHelper &helper) {
     Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
     const char *content;
 
@@ -283,7 +283,7 @@ void TestVariableTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"(1.5---1.5---1.5)", R"(Render())", __LINE__);
 }
 
-void TestVariableTag3(TestHelper &helper) {
+static void TestVariableTag3(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -475,7 +475,7 @@ void TestVariableTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"( {var:0)", R"(Render())", __LINE__);
 }
 
-void TestVariableTag4(TestHelper &helper) {
+static void TestVariableTag4(TestHelper &helper) {
     Value<char> value;
 
     value += R"(<)";
@@ -655,7 +655,7 @@ void TestVariableTag4(TestHelper &helper) {
 #endif
 }
 
-void TestRawVariableTag1(TestHelper &helper) {
+static void TestRawVariableTag1(TestHelper &helper) {
     const char *content;
 
     Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5,
@@ -847,7 +847,7 @@ void TestRawVariableTag1(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"({raw:6key3]})", R"(Render())", __LINE__);
 }
 
-void TestRawVariableTag2(TestHelper &helper) {
+static void TestRawVariableTag2(TestHelper &helper) {
     Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
     const char *content;
 
@@ -889,7 +889,7 @@ void TestRawVariableTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"(1.5---1.5---1.5)", R"(Render())", __LINE__);
 }
 
-void TestRawVariableTag3(TestHelper &helper) {
+static void TestRawVariableTag3(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -1081,7 +1081,7 @@ void TestRawVariableTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"({ raw:0)", R"(Render())", __LINE__);
 }
 
-void TestRawVariableTag4(TestHelper &helper) {
+static void TestRawVariableTag4(TestHelper &helper) {
     Value<char> value;
 
     value += R"(<)";
@@ -1200,7 +1200,7 @@ void TestRawVariableTag4(TestHelper &helper) {
     helper.Equal(Template::Render(R"({raw:53})", &value), R"(A""BC<<DE>>FG''HI&&GK)", R"(Render())", __LINE__);
 }
 
-void TestMathTag1(TestHelper &helper) {
+static void TestMathTag1(TestHelper &helper) {
     Value<char> value;
 
     value[R"(a1)"] = 5;
@@ -1418,7 +1418,7 @@ void TestMathTag1(TestHelper &helper) {
     helper.Equal(Template::Render(R"({math: {var:1} == true})", &value), R"(1)", R"(Render())", __LINE__);
 }
 
-void TestMathTag2(TestHelper &helper) {
+static void TestMathTag2(TestHelper &helper) {
     Value<char> value;
 
     value += Array<Value<char>>();
@@ -1545,7 +1545,7 @@ void TestMathTag2(TestHelper &helper) {
     helper.Equal(Template::Render(R"({math:1+1!=(A)})", &value), R"({math:1+1!=(A)})", R"(Render())", __LINE__);
 }
 
-void TestInlineIfTag(TestHelper &helper) {
+static void TestInlineIfTag(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -1801,7 +1801,7 @@ void TestInlineIfTag(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value2), R"( 25 )", R"(Render())", __LINE__);
 }
 
-void TestLoopTag1(TestHelper &helper) {
+static void TestLoopTag1(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -1917,7 +1917,7 @@ void TestLoopTag1(TestHelper &helper) {
                  __LINE__);
 }
 
-void TestLoopTag2(TestHelper &helper) {
+static void TestLoopTag2(TestHelper &helper) {
     Value<char> value3;
     const char *content;
 
@@ -2011,7 +2011,7 @@ void TestLoopTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value3), R"()", R"(Render())", __LINE__);
 }
 
-void TestLoopTag3(TestHelper &helper) {
+static void TestLoopTag3(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -2166,7 +2166,7 @@ void TestLoopTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"(some_valsome_valsome_val)", R"(Render())", __LINE__);
 }
 
-void TestLoopTag4(TestHelper &helper) {
+static void TestLoopTag4(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char> content;
@@ -2206,7 +2206,7 @@ void TestLoopTag4(TestHelper &helper) {
     helper.EqualsTrue((Template::Render(content.First(), content.Length(), &value) == output), R"(Render())", __LINE__);
 }
 
-void TestLoopTag5(TestHelper &helper) {
+static void TestLoopTag5(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -2329,7 +2329,7 @@ void TestLoopTag5(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"(7654321)", R"(Render())", __LINE__);
 }
 
-void TestIfTag1(TestHelper &helper) {
+static void TestIfTag1(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -2517,7 +2517,7 @@ void TestIfTag1(TestHelper &helper) {
     helper.Equal(String<char>::Trim(Template::Render(content, &value).GetString()), R"(d)", R"(Render())", __LINE__);
 }
 
-void TestIfTag2(TestHelper &helper) {
+static void TestIfTag2(TestHelper &helper) {
     Value<char> value;
     const char *content;
 
@@ -2554,7 +2554,7 @@ void TestIfTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), R"()", R"(Render())", __LINE__);
 }
 
-void TestRender1(TestHelper &helper) {
+static void TestRender1(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char> content;
@@ -2693,7 +2693,7 @@ void TestRender1(TestHelper &helper) {
     helper.EqualsTrue((Template::Render(content.First(), content.Length(), &value) == output), R"(Render())", __LINE__);
 }
 
-void TestRender2(TestHelper &helper) {
+static void TestRender2(TestHelper &helper) {
     Value<char> value;
     const char *content;
 

@@ -36,7 +36,6 @@
 
 #ifndef QENTEM_OUTPUT_STREAM
 #include <iostream>
-#define QENTEM_OUTPUT_STREAM_TYPE std::wostream
 #define QENTEM_OUTPUT_STREAM std::wcout
 #endif
 
@@ -54,19 +53,19 @@ struct TestOutPut {
     TestOutPut &operator=(const TestOutPut &) = delete;
 
     template <typename... Values_T_>
-    static void Print(const Values_T_ &...values) {
-        // (out) will copy the value but at that point it will not matter.
+    QENTEM_NOINLINE static void Print(const Values_T_ &...values) {
+        // (out) may copy the value but at that point it will not matter.
         int dummy[sizeof...(Values_T_)] = {(QENTEM_OUTPUT_STREAM << static_cast<const Values_T_ &>(values), 0)...};
         (void)dummy;
-        // (std::cout << ... << values); c++17
+        // (QENTEM_OUTPUT_STREAM << ... << static_cast<const Values_T_ &>(values)); // c++17
     }
 
-    enum Colors { MAIN, ERROR, PASS, END };
+    enum Colors { TITLE, ERROR, PASS, END };
 
-    static const char *GetColor(Colors color) noexcept {
+    QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
         if (coloredOutput_) {
             switch (color) {
-                case MAIN:
+                case TITLE:
                     return "\x1B[36m";
                 case ERROR:
                     return "\x1B[31m";
@@ -105,14 +104,16 @@ struct MemoryRecord {
         size_t peakSize{0};
     };
 
-    static void ResetSubMemory() noexcept {
+    QENTEM_NOINLINE static void ResetSubMemory() noexcept {
         records_.subAllocations  = 0;
         records_.subDellocations = 0;
     }
 
-    static SizeT CheckSubMemory() noexcept { return (records_.subAllocations - records_.subDellocations); }
+    QENTEM_NOINLINE static SizeT CheckSubMemory() noexcept {
+        return (records_.subAllocations - records_.subDellocations);
+    }
 
-    static void AddAllocation(void *pointer) noexcept {
+    QENTEM_NOINLINE static void AddAllocation(void *pointer) noexcept {
         ++(records_.allocations);
         ++(records_.subAllocations);
 
@@ -129,7 +130,7 @@ struct MemoryRecord {
         }
     }
 
-    static void Removeallocation(void *pointer) noexcept {
+    QENTEM_NOINLINE static void Removeallocation(void *pointer) noexcept {
         ++(records_.dellocations);
         ++(records_.subDellocations);
 
@@ -142,7 +143,7 @@ struct MemoryRecord {
 #endif
     }
 
-    static void PrintMemoryStatus() noexcept {
+    QENTEM_NOINLINE static void PrintMemoryStatus() noexcept {
         TestOutPut::Print("\nMemory: ", (static_cast<double>(records_.remainingSize) / 1024),
                           " KB, Peak: ", (static_cast<double>(records_.peakSize) / 1024), " KB\n");
 
@@ -172,13 +173,13 @@ struct TestHelper {
         : test_name_{name}, file_fullname_{file_fullname} {}
 
     QENTEM_NOINLINE void PrintGroupName() const noexcept {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::MAIN), test_name_,
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() noexcept {
         if (!error_) {
-            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::MAIN), test_name_,
+            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
                               TestOutPut::GetColor(TestOutPut::Colors::PASS), " Passed all tests",
                               TestOutPut::GetColor(TestOutPut::Colors::END), "\n\n");
             return 0;
@@ -187,8 +188,8 @@ struct TestHelper {
         return 1;
     }
 
-    template <typename FUNC_>
-    QENTEM_NOINLINE void Test(const char *name, FUNC_ func) {
+    template <typename Char_T_, typename FUNC_T_>
+    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func) {
         if (!error_) {
             func(*this);
 
@@ -274,8 +275,9 @@ struct TestHelper {
                           "` should", (equal ? " not " : " "), "equal: `", value2, "`\n Returned Value: `", value1,
                           "`\n\n");
     }
-    static void PrintInfo() {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::MAIN), "Configurations",
+
+    QENTEM_NOINLINE static void PrintInfo() {
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
 
 #ifdef QENTEM_64BIT_ARCH
@@ -329,7 +331,7 @@ class EmptyStream {
 
 namespace Test {
 QENTEM_MAYBE_UNUSED
-void TestError(TestHelper &helper) {
+static void TestHelperTestError(TestHelper &helper) {
     (void)helper;
     //////////////////////////////
 }
@@ -341,7 +343,7 @@ static int RunTestHelperTests() {
 
     helper.PrintGroupName();
 
-    helper.Test("Test Error", TestError);
+    helper.Test("Test Error", TestHelperTestError);
 
     helper.EndTests();
 

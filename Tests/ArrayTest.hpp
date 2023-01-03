@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestArray1(TestHelper &helper) {
+static void TestArray1(TestHelper &helper) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2(8);
@@ -206,7 +206,7 @@ void TestArray1(TestHelper &helper) {
     Memory::Deallocate(tmp);
 }
 
-void TestArray2(TestHelper &helper) {
+static void TestArray2(TestHelper &helper) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2;
@@ -243,7 +243,7 @@ void TestArray2(TestHelper &helper) {
     helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
 }
 
-void TestArray3(TestHelper &helper) {
+static void TestArray3(TestHelper &helper) {
     Array<SizeT>        numbers1;
     Array<SizeT>        numbers2(8);
     Array<String<char>> strings;
@@ -313,7 +313,7 @@ void TestArray3(TestHelper &helper) {
     helper.Equal(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr", __LINE__);
 }
 
-void TestArray4(TestHelper &helper) {
+static void TestArray4(TestHelper &helper) {
     Array<String<char>> strings1;
     Array<String<char>> strings2;
 
@@ -344,7 +344,7 @@ void TestArray4(TestHelper &helper) {
     helper.Equal(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr", __LINE__);
 }
 
-void TestArraySort(TestHelper &helper) {
+static void TestArraySort(TestHelper &helper) {
     Array<unsigned int> numbers;
 
     numbers += 3;

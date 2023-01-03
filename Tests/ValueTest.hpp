@@ -69,7 +69,7 @@ static const char *GetTypeString(ValueType type) noexcept {
     }
 }
 
-void TestGetTypeString(TestHelper &helper) {
+static void TestGetTypeString(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Undefined), "Undefined", 9), "Undefined", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Object), "Object", 6), "Object", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Array), "Array", 5), "Array", __LINE__);
@@ -82,7 +82,7 @@ void TestGetTypeString(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Null), "Null", 4), "Null", __LINE__);
 }
 
-void TestEmptyValue(TestHelper &helper) {
+static void TestEmptyValue(TestHelper &helper) {
     ValueC value1;
 
     VStringStream ss_var;
@@ -145,7 +145,7 @@ void TestEmptyValue(TestHelper &helper) {
     helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
 }
 
-void TestTrueValue(TestHelper &helper) {
+static void TestTrueValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -213,7 +213,7 @@ void TestTrueValue(TestHelper &helper) {
     helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
 }
 
-void TestFalseValue(TestHelper &helper) {
+static void TestFalseValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -281,7 +281,7 @@ void TestFalseValue(TestHelper &helper) {
     helper.EqualsTrue(value3.IsFalse(), "IsFalse()", __LINE__);
 }
 
-void TestNullValue(TestHelper &helper) {
+static void TestNullValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -349,7 +349,7 @@ void TestNullValue(TestHelper &helper) {
     helper.EqualsTrue(value3.IsNull(), "IsNull()", __LINE__);
 }
 
-void TestNumberValue1(TestHelper &helper) {
+static void TestNumberValue1(TestHelper &helper) {
     using vu_int = unsigned int;
 
     ValueC value1;
@@ -434,7 +434,7 @@ void TestNumberValue1(TestHelper &helper) {
     helper.Equal(value2.GetNumber(), 3.75, "GetNumber()", __LINE__);
 }
 
-void TestNumberValue2(TestHelper &helper) {
+static void TestNumberValue2(TestHelper &helper) {
     using vu_short     = unsigned short;
     using vu_int       = unsigned int;
     using vu_long      = unsigned long;
@@ -514,7 +514,7 @@ void TestNumberValue2(TestHelper &helper) {
     value1.Reset();
 }
 
-void TestNumberValue3(TestHelper &helper) {
+static void TestNumberValue3(TestHelper &helper) {
     using v_long_long = long long;
 
     ValueC  value1;
@@ -641,7 +641,7 @@ void TestNumberValue3(TestHelper &helper) {
     value1.Reset();
 }
 
-void TestNumberValue4(TestHelper &helper) {
+static void TestNumberValue4(TestHelper &helper) {
     ValueC  value1;
     VString str_var;
     bool    bool_var;
@@ -772,7 +772,7 @@ void TestNumberValue4(TestHelper &helper) {
     value1.Reset();
 }
 
-void TestNumberValue5(TestHelper &helper) {
+static void TestNumberValue5(TestHelper &helper) {
     using vu_short     = unsigned short;
     using vu_int       = unsigned int;
     using vu_long      = unsigned long;
@@ -827,7 +827,7 @@ void TestNumberValue5(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), 10U, "GetNumber()", __LINE__);
 }
 
-void TestStringValue(TestHelper &helper) {
+static void TestStringValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -942,7 +942,7 @@ void TestStringValue(TestHelper &helper) {
     helper.Equal(str_var, "321", "str_var", __LINE__);
 }
 
-void TestArrayValue(TestHelper &helper) {
+static void TestArrayValue(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1166,7 +1166,7 @@ void TestArrayValue(TestHelper &helper) {
     helper.Equal(value2.GetArray()->Size(), 0U, "Size()", __LINE__);
 }
 
-void TestObjectValue1(TestHelper &helper) {
+static void TestObjectValue1(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1299,7 +1299,7 @@ void TestObjectValue1(TestHelper &helper) {
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 }
 
-void TestObjectValue2(TestHelper &helper) {
+static void TestObjectValue2(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1456,7 +1456,7 @@ void TestObjectValue2(TestHelper &helper) {
     helper.EqualsTrue(value3.GetObject()->Capacity() >= 3U, "GetObject()->Capacity() >= 3", __LINE__);
 }
 
-void TestMoveValue1(TestHelper &helper) {
+static void TestMoveValue1(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -1808,7 +1808,7 @@ void TestMoveValue1(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestMoveValue2(TestHelper &helper) {
+static void TestMoveValue2(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -1878,7 +1878,7 @@ void TestMoveValue2(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestMoveValue3(TestHelper &helper) {
+static void TestMoveValue3(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -2267,7 +2267,7 @@ void TestMoveValue3(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestMoveValue4(TestHelper &helper) {
+static void TestMoveValue4(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -2344,7 +2344,7 @@ void TestMoveValue4(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestCopyValue1(TestHelper &helper) {
+static void TestCopyValue1(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -2607,7 +2607,7 @@ void TestCopyValue1(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestCopyValue2(TestHelper &helper) {
+static void TestCopyValue2(TestHelper &helper) {
     ValueC value1;
 
     // true
@@ -2747,7 +2747,7 @@ void TestCopyValue2(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestCopyValue3(TestHelper &helper) {
+static void TestCopyValue3(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -3138,7 +3138,7 @@ void TestCopyValue3(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestCopyValue4(TestHelper &helper) {
+static void TestCopyValue4(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -3394,7 +3394,7 @@ void TestCopyValue4(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-void TestIndexOperator1(TestHelper &helper) {
+static void TestIndexOperator1(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -3542,7 +3542,7 @@ void TestIndexOperator1(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-void TestIndexOperator2(TestHelper &helper) {
+static void TestIndexOperator2(TestHelper &helper) {
     ValueC  value;
     ValueC *value_ptr;
 
@@ -3575,7 +3575,7 @@ void TestIndexOperator2(TestHelper &helper) {
     ////////////////////
 }
 
-void TestAddition1(TestHelper &helper) {
+static void TestAddition1(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -3622,7 +3622,7 @@ void TestAddition1(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-void TestAddition2(TestHelper &helper) {
+static void TestAddition2(TestHelper &helper) {
     ValueC  value;
     VArray  arr_var;
     VString str;
@@ -3756,7 +3756,7 @@ void TestAddition2(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-void TestAddition3(TestHelper &helper) {
+static void TestAddition3(TestHelper &helper) {
     ValueC        value;
     VArray        arr_var;
     const ValueC *arr_storage;
@@ -3897,7 +3897,7 @@ void TestAddition3(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-void TestAddition4(TestHelper &helper) {
+static void TestAddition4(TestHelper &helper) {
     ValueC        value1;
     ValueC        value2;
     VArray        arr_var;
@@ -4067,7 +4067,7 @@ void TestAddition4(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-void TestAddition5(TestHelper &helper) {
+static void TestAddition5(TestHelper &helper) {
     ValueC        value1;
     ValueC        value2;
     VArray        arr_var;
@@ -4234,7 +4234,7 @@ void TestAddition5(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-void TestAddition6(TestHelper &helper) {
+static void TestAddition6(TestHelper &helper) {
     ValueC                      value1;
     ValueC                      value2;
     VString                     str_var;
@@ -4391,7 +4391,7 @@ void TestAddition6(TestHelper &helper) {
     /////////////////////////////
 }
 
-void TestStringify1(TestHelper &helper) {
+static void TestStringify1(TestHelper &helper) {
     ValueC value;
 
     ///////////
@@ -4777,7 +4777,7 @@ void TestStringify1(TestHelper &helper) {
     ///////////////////////////////////////
 }
 
-void TestStringify2(TestHelper &helper) {
+static void TestStringify2(TestHelper &helper) {
     ValueC value;
 
     ///////////
@@ -5166,7 +5166,7 @@ void TestStringify2(TestHelper &helper) {
     ///////////////////////////////////////
 }
 
-void TestStringify3(TestHelper &helper) {
+static void TestStringify3(TestHelper &helper) {
     ValueC value;
 
     value[0] += true;
@@ -5213,7 +5213,7 @@ void TestStringify3(TestHelper &helper) {
     ////
 }
 
-void TestStringify4(TestHelper &helper) {
+static void TestStringify4(TestHelper &helper) {
     ValueC value;
 
     value["\"\\/\b\f\n\r\t"] = "\t\r\n\f\b/\\\"";
@@ -5224,7 +5224,7 @@ void TestStringify4(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()", __LINE__);
 }
 
-void TestDeleteValue(TestHelper &helper) {
+static void TestDeleteValue(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -5359,7 +5359,7 @@ void TestDeleteValue(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
 }
 
-void TestSortValue(TestHelper &helper) {
+static void TestSortValue(TestHelper &helper) {
     ValueC value;
 
     value["2019"] = 0;
@@ -5419,7 +5419,7 @@ void TestSortValue(TestHelper &helper) {
                  __LINE__);
 }
 
-void TestGroupValue(TestHelper &helper) {
+static void TestGroupValue(TestHelper &helper) {
     ValueC value;
 
     value += VHArray();

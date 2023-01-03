@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestVariableUTag1(TestHelper &helper) {
+static void TestVariableUTag1(TestHelper &helper) {
     const char16_t *content;
 
     Value<char16_t> value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5,
@@ -241,7 +241,7 @@ void TestVariableUTag1(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"()", uR"(Render())", __LINE__);
 }
 
-void TestVariableUTag2(TestHelper &helper) {
+static void TestVariableUTag2(TestHelper &helper) {
     Value<char16_t> value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5])");
     const char16_t *content;
 
@@ -283,7 +283,7 @@ void TestVariableUTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"(1.5---1.5---1.5)", uR"(Render())", __LINE__);
 }
 
-void TestVariableUTag3(TestHelper &helper) {
+static void TestVariableUTag3(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -476,7 +476,7 @@ void TestVariableUTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"( {var:0)", uR"(Render())", __LINE__);
 }
 
-void TestVariableUTag4(TestHelper &helper) {
+static void TestVariableUTag4(TestHelper &helper) {
     Value<char16_t> value;
 
     value += uR"(<)";
@@ -660,7 +660,7 @@ void TestVariableUTag4(TestHelper &helper) {
 #endif
 }
 
-void TestRawVariableUTag1(TestHelper &helper) {
+static void TestRawVariableUTag1(TestHelper &helper) {
     const char16_t *content;
 
     Value<char16_t> value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5,
@@ -852,7 +852,7 @@ void TestRawVariableUTag1(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"({raw:6key3]})", uR"(Render())", __LINE__);
 }
 
-void TestRawVariableUTag2(TestHelper &helper) {
+static void TestRawVariableUTag2(TestHelper &helper) {
     Value<char16_t> value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5])");
     const char16_t *content;
 
@@ -894,7 +894,7 @@ void TestRawVariableUTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"(1.5---1.5---1.5)", uR"(Render())", __LINE__);
 }
 
-void TestRawVariableUTag3(TestHelper &helper) {
+static void TestRawVariableUTag3(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -1087,7 +1087,7 @@ void TestRawVariableUTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"({ raw:0)", uR"(Render())", __LINE__);
 }
 
-void TestRawVariableUTag4(TestHelper &helper) {
+static void TestRawVariableUTag4(TestHelper &helper) {
     Value<char16_t> value;
 
     value += uR"(<)";
@@ -1206,7 +1206,7 @@ void TestRawVariableUTag4(TestHelper &helper) {
     helper.Equal(Template::Render(uR"({raw:53})", &value), uR"(A""BC<<DE>>FG''HI&&GK)", uR"(Render())", __LINE__);
 }
 
-void TestMathUTag1(TestHelper &helper) {
+static void TestMathUTag1(TestHelper &helper) {
     Value<char16_t> value;
 
     value[uR"(a1)"] = 5;
@@ -1424,7 +1424,7 @@ void TestMathUTag1(TestHelper &helper) {
     helper.Equal(Template::Render(uR"({math: {var:1} == true})", &value), uR"(1)", uR"(Render())", __LINE__);
 }
 
-void TestMathUTag2(TestHelper &helper) {
+static void TestMathUTag2(TestHelper &helper) {
     Value<char16_t> value;
 
     value += Array<Value<char16_t>>();
@@ -1553,7 +1553,7 @@ void TestMathUTag2(TestHelper &helper) {
     helper.Equal(Template::Render(uR"({math:1+1!=(A)})", &value), uR"({math:1+1!=(A)})", uR"(Render())", __LINE__);
 }
 
-void TestInlineIfUTag(TestHelper &helper) {
+static void TestInlineIfUTag(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -1810,7 +1810,7 @@ void TestInlineIfUTag(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value2), uR"( 25 )", uR"(Render())", __LINE__);
 }
 
-void TestLoopUTag1(TestHelper &helper) {
+static void TestLoopUTag1(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -1926,7 +1926,7 @@ void TestLoopUTag1(TestHelper &helper) {
                  __LINE__);
 }
 
-void TestLoopUTag2(TestHelper &helper) {
+static void TestLoopUTag2(TestHelper &helper) {
     Value<char16_t> value3;
     const char16_t *content;
 
@@ -2020,7 +2020,7 @@ void TestLoopUTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value3), uR"()", uR"(Render())", __LINE__);
 }
 
-void TestLoopUTag3(TestHelper &helper) {
+static void TestLoopUTag3(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -2175,7 +2175,7 @@ void TestLoopUTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"(some_valsome_valsome_val)", uR"(Render())", __LINE__);
 }
 
-void TestLoopUTag4(TestHelper &helper) {
+static void TestLoopUTag4(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char16_t> content;
@@ -2217,7 +2217,7 @@ void TestLoopUTag4(TestHelper &helper) {
                       __LINE__);
 }
 
-void TestLoopUTag5(TestHelper &helper) {
+static void TestLoopUTag5(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -2340,7 +2340,7 @@ void TestLoopUTag5(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"(7654321)", uR"(Render())", __LINE__);
 }
 
-void TestIfUTag1(TestHelper &helper) {
+static void TestIfUTag1(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -2532,7 +2532,7 @@ void TestIfUTag1(TestHelper &helper) {
                  __LINE__);
 }
 
-void TestIfUTag2(TestHelper &helper) {
+static void TestIfUTag2(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 
@@ -2569,7 +2569,7 @@ void TestIfUTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), uR"()", uR"(Render())", __LINE__);
 }
 
-void TestRenderU1(TestHelper &helper) {
+static void TestRenderU1(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char16_t> content;
@@ -2714,7 +2714,7 @@ void TestRenderU1(TestHelper &helper) {
                       __LINE__);
 }
 
-void TestRenderU2(TestHelper &helper) {
+static void TestRenderU2(TestHelper &helper) {
     Value<char16_t> value;
     const char16_t *content;
 

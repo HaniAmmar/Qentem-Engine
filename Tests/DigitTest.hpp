@@ -36,7 +36,7 @@ static SizeT HexStringToNumber(const char *str) noexcept {
     return Digit<char>::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
-void TestHexConv(TestHelper &helper) {
+static void TestHexConv(TestHelper &helper) {
     SizeT       number;
     const char *hex = nullptr;
 
@@ -97,7 +97,7 @@ bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
     return DigitC::StringToNumber(num, str, StringUtils::Count(str));
 }
 
-void TestStringToNumber1(TestHelper &helper) {
+static void TestStringToNumber1(TestHelper &helper) {
     SizeT       number = 0;
     const char *str    = "";
     bool        valid;
@@ -138,7 +138,7 @@ void TestStringToNumber1(TestHelper &helper) {
     helper.Equal(number, 123456789U, str, __LINE__);
 }
 
-void TestStringToNumber2(TestHelper &helper) {
+static void TestStringToNumber2(TestHelper &helper) {
     int           number_int    = 0;
     unsigned int  number_uint   = 0;
     long          number_long   = 0;
@@ -166,7 +166,7 @@ void TestStringToNumber2(TestHelper &helper) {
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-e";
@@ -196,7 +196,7 @@ void TestStringToNumber2(TestHelper &helper) {
 
     str   = "1++e1";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e-";
@@ -261,7 +261,7 @@ void TestStringToNumber2(TestHelper &helper) {
 
     str   = "1++E1";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E-";
@@ -291,74 +291,74 @@ void TestStringToNumber2(TestHelper &helper) {
 
     str   = ".";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     // .0 is valid
 
     str   = "0.";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".0.0";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0.0.";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0..0";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123.";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".123.123";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123.123.";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123..123";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "12y3";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1x23";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "w123";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-";
     valid = StringToNumberCount(number_float, str);
-    helper.Equal(number_float, 0.0f, "number", __LINE__);
+    helper.Equal(number_float, 0.0F, "number", __LINE__);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+";
@@ -377,7 +377,7 @@ void TestStringToNumber2(TestHelper &helper) {
     helper.EqualsFalse(valid, "valid", __LINE__);
 }
 
-void TestStringToNumber3(TestHelper &helper) {
+static void TestStringToNumber3(TestHelper &helper) {
     int          number_int    = 0;
     unsigned int number_uint   = 0;
     double       number_double = 0;
@@ -560,7 +560,7 @@ void TestStringToNumber3(TestHelper &helper) {
     helper.EqualsTrue(valid, "valid", __LINE__);
 }
 
-void TestStringToNumber4(TestHelper &helper) {
+static void TestStringToNumber4(TestHelper &helper) {
     const char *str    = nullptr;
     double      number = 0;
     bool        valid;
@@ -651,7 +651,7 @@ void TestStringToNumber4(TestHelper &helper) {
     helper.EqualsTrue(valid, "valid", __LINE__);
 }
 
-void TestNumberToString1(TestHelper &helper) {
+static void TestNumberToString1(TestHelper &helper) {
     int           number_int;
     unsigned int  number_uint;
     long          number_long;
@@ -800,7 +800,7 @@ void TestNumberToString1(TestHelper &helper) {
     helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "100.50", "return", __LINE__);
 }
 
-void TestNumberToString2(TestHelper &helper) {
+static void TestNumberToString2(TestHelper &helper) {
     double number = 1.123456;
     helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "1.12", "return", __LINE__);
     helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "1.12", "return", __LINE__);
@@ -865,7 +865,7 @@ void TestNumberToString2(TestHelper &helper) {
     helper.Equal(DigitC::NumberToString(number, 2U, 2U, 5U), "100.1234", "return", __LINE__);
 }
 
-void TestNumberToString3(TestHelper &helper) {
+static void TestNumberToString3(TestHelper &helper) {
     double number;
 
     number = 5.15;
@@ -947,7 +947,7 @@ void TestNumberToString3(TestHelper &helper) {
     helper.Equal(DigitC::NumberToString(9223372036854775807LL), "9223372036854775807", "return", __LINE__);
 }
 
-void TestNumberToString4(TestHelper &helper) {
+static void TestNumberToString4(TestHelper &helper) {
     double number = -123456;
     helper.Equal(DigitC::NumberToString(number, 30U, 0U, 0U), "-000000000000000123456", "return", __LINE__);
 
@@ -1061,7 +1061,7 @@ void TestNumberToString4(TestHelper &helper) {
     helper.Equal(DigitC::NumberToString(10.9999, 1U, 1U, 2U), "11.0", "return", __LINE__);
 }
 
-void TestNumberToString5(TestHelper &helper) {
+static void TestNumberToString5(TestHelper &helper) {
     helper.Equal(DigitC::NumberToString(1e308), "1e308", "return", __LINE__);
 
     helper.Equal(DigitC::NumberToString(1e-308), "1e-308", "return", __LINE__);

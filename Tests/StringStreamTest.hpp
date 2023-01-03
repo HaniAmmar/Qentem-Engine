@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestStringStream(TestHelper &helper) {
+static void TestStringStream(TestHelper &helper) {
     StringStream<char> ss1;
     StringStream<char> ss2{10}; // Preset size
     String<char>       str;

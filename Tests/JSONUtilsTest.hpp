@@ -34,7 +34,7 @@ static void escapeJSON(const char *str, StringStream<char> &buffer) {
     JSON::EscapeJSON(str, StringUtils::Count(str), buffer);
 }
 
-void TestEscapeJSON(TestHelper &helper) {
+static void TestEscapeJSON(TestHelper &helper) {
     const char        *str;
     StringStream<char> buffer;
     /*
@@ -339,7 +339,7 @@ void TestEscapeJSON(TestHelper &helper) {
     buffer.Clear();
 }
 
-void TestUnEscapeJSON1(TestHelper &helper) {
+static void TestUnEscapeJSON1(TestHelper &helper) {
     StringStream<char> buffer;
     const char        *str1;
     const char        *str2;
@@ -643,7 +643,7 @@ void TestUnEscapeJSON1(TestHelper &helper) {
     buffer.Clear();
 }
 
-void TestUnEscapeJSON2(TestHelper &helper) {
+static void TestUnEscapeJSON2(TestHelper &helper) {
     StringStream<char> buffer;
     const char        *str1;
     const char        *str2;

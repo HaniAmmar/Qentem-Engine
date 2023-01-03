@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestToUTF8(TestHelper &helper) {
+static void TestToUTF8(TestHelper &helper) {
     /*
      * HEX         UNICODE      BINARY
      * 0x0000      0            00000000
@@ -139,7 +139,7 @@ void TestToUTF8(TestHelper &helper) {
     stream.Clear();
 }
 
-void TestToUTF16(TestHelper &helper) {
+static void TestToUTF16(TestHelper &helper) {
     using QChar = char16_t;
 
     StringStream<QChar> stream;
@@ -208,7 +208,7 @@ void TestToUTF16(TestHelper &helper) {
     stream.Clear();
 }
 
-void TestToUTF32(TestHelper &helper) {
+static void TestToUTF32(TestHelper &helper) {
     StringStream<char32_t> stream;
 
     Unicode::ToUTF(0x0000, stream);

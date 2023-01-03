@@ -166,7 +166,7 @@ class ALEHelper {
     Array<Value_T_> items_;
 };
 
-void TestALE1(TestHelper &helper) {
+static void TestALE1(TestHelper &helper) {
     double      number;
     const char *content;
     bool        is_valid;
@@ -352,7 +352,7 @@ void TestALE1(TestHelper &helper) {
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE2(TestHelper &helper) {
+static void TestALE2(TestHelper &helper) {
     double      number = -99;
     const char *content;
     bool        is_valid;
@@ -520,7 +520,7 @@ void TestALE2(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE3(TestHelper &helper) {
+static void TestALE3(TestHelper &helper) {
     double      number;
     const char *content;
     bool        is_valid;
@@ -787,7 +787,7 @@ void TestALE3(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE4(TestHelper &helper) {
+static void TestALE4(TestHelper &helper) {
     double      number;
     const char *content;
     bool        is_valid;
@@ -1040,7 +1040,7 @@ void TestALE4(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE5(TestHelper &helper) {
+static void TestALE5(TestHelper &helper) {
     double      number;
     const char *content;
     bool        is_valid;
@@ -1285,7 +1285,7 @@ void TestALE5(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE6(TestHelper &helper) {
+static void TestALE6(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -1490,7 +1490,7 @@ void TestALE6(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE7(TestHelper &helper) {
+static void TestALE7(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -1764,7 +1764,7 @@ void TestALE7(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE8(TestHelper &helper) {
+static void TestALE8(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -2040,7 +2040,7 @@ void TestALE8(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-void TestALE9(TestHelper &helper) {
+static void TestALE9(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -2312,7 +2312,7 @@ void TestALE9(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-void TestALE10(TestHelper &helper) {
+static void TestALE10(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -2584,7 +2584,7 @@ void TestALE10(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-void TestALE11(TestHelper &helper) {
+static void TestALE11(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -2932,7 +2932,7 @@ void TestALE11(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-void TestALE12(TestHelper &helper) {
+static void TestALE12(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -3115,7 +3115,7 @@ void TestALE12(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE13(TestHelper &helper) {
+static void TestALE13(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -3320,7 +3320,7 @@ void TestALE13(TestHelper &helper) {
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE14(TestHelper &helper) {
+static void TestALE14(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -3613,7 +3613,7 @@ void TestALE14(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-void TestALE15(TestHelper &helper) {
+static void TestALE15(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;
@@ -3783,7 +3783,7 @@ void TestALE15(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-void TestALE16(TestHelper &helper) {
+static void TestALE16(TestHelper &helper) {
     double      number = -1;
     const char *content;
     bool        is_valid;

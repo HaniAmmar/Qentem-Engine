@@ -32,7 +32,7 @@ namespace Test {
 
 namespace JSON = Qentem::JSON;
 
-void TestParse1(TestHelper &helper) {
+static void TestParse1(TestHelper &helper) {
     Value<char> value;
 
     ///////////
@@ -298,7 +298,7 @@ void TestParse1(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"([["[]"],["[]"]])", "Stringify()", __LINE__);
 }
 
-void TestParse2(TestHelper &helper) {
+static void TestParse2(TestHelper &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"({})");
@@ -542,7 +542,7 @@ void TestParse2(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"({"a":{"c":"{}"},"b":{"d":"{}"}})", "Stringify()", __LINE__);
 }
 
-void TestParse3(TestHelper &helper) {
+static void TestParse3(TestHelper &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"([{"one":1}])");
@@ -754,7 +754,7 @@ void TestParse3(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"([1,2])", "Stringify()", __LINE__);
 }
 
-void TestParse4(TestHelper &helper) {
+static void TestParse4(TestHelper &helper) {
     Value<char>         value;
     const String<char> *key_ptr;
     const char         *str1;
@@ -870,7 +870,7 @@ void TestParse4(TestHelper &helper) {
                       "IsEqual()", __LINE__);
 }
 
-void TestParse5(TestHelper &helper) {
+static void TestParse5(TestHelper &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"([1   ]    ])");
@@ -1051,7 +1051,7 @@ void TestParse5(TestHelper &helper) {
     helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
 }
 
-void TestParse6(TestHelper &helper) {
+static void TestParse6(TestHelper &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"(["\"])");

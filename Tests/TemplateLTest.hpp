@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Test {
 
-void TestVariableLTag1(TestHelper &helper) {
+static void TestVariableLTag1(TestHelper &helper) {
     const wchar_t *content;
 
     Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5,
@@ -241,7 +241,7 @@ void TestVariableLTag1(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"()", LR"(Render())", __LINE__);
 }
 
-void TestVariableLTag2(TestHelper &helper) {
+static void TestVariableLTag2(TestHelper &helper) {
     Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
     const wchar_t *content;
 
@@ -283,7 +283,7 @@ void TestVariableLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"(1.5---1.5---1.5)", LR"(Render())", __LINE__);
 }
 
-void TestVariableLTag3(TestHelper &helper) {
+static void TestVariableLTag3(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -476,7 +476,7 @@ void TestVariableLTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"( {var:0)", LR"(Render())", __LINE__);
 }
 
-void TestVariableLTag4(TestHelper &helper) {
+static void TestVariableLTag4(TestHelper &helper) {
     Value<wchar_t> value;
 
     value += LR"(<)";
@@ -660,7 +660,7 @@ void TestVariableLTag4(TestHelper &helper) {
 #endif
 }
 
-void TestRawVariableLTag1(TestHelper &helper) {
+static void TestRawVariableLTag1(TestHelper &helper) {
     const wchar_t *content;
 
     Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5,
@@ -852,7 +852,7 @@ void TestRawVariableLTag1(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"({raw:6key3]})", LR"(Render())", __LINE__);
 }
 
-void TestRawVariableLTag2(TestHelper &helper) {
+static void TestRawVariableLTag2(TestHelper &helper) {
     Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
     const wchar_t *content;
 
@@ -894,7 +894,7 @@ void TestRawVariableLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"(1.5---1.5---1.5)", LR"(Render())", __LINE__);
 }
 
-void TestRawVariableLTag3(TestHelper &helper) {
+static void TestRawVariableLTag3(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -1087,7 +1087,7 @@ void TestRawVariableLTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"({ raw:0)", LR"(Render())", __LINE__);
 }
 
-void TestRawVariableLTag4(TestHelper &helper) {
+static void TestRawVariableLTag4(TestHelper &helper) {
     Value<wchar_t> value;
 
     value += LR"(<)";
@@ -1206,7 +1206,7 @@ void TestRawVariableLTag4(TestHelper &helper) {
     helper.Equal(Template::Render(LR"({raw:53})", &value), LR"(A""BC<<DE>>FG''HI&&GK)", LR"(Render())", __LINE__);
 }
 
-void TestMathLTag1(TestHelper &helper) {
+static void TestMathLTag1(TestHelper &helper) {
     Value<wchar_t> value;
 
     value[LR"(a1)"] = 5;
@@ -1424,7 +1424,7 @@ void TestMathLTag1(TestHelper &helper) {
     helper.Equal(Template::Render(LR"({math: {var:1} == true})", &value), LR"(1)", LR"(Render())", __LINE__);
 }
 
-void TestMathLTag2(TestHelper &helper) {
+static void TestMathLTag2(TestHelper &helper) {
     Value<wchar_t> value;
 
     value += Array<Value<wchar_t>>();
@@ -1553,7 +1553,7 @@ void TestMathLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(LR"({math:1+1!=(A)})", &value), LR"({math:1+1!=(A)})", LR"(Render())", __LINE__);
 }
 
-void TestInlineIfLTag(TestHelper &helper) {
+static void TestInlineIfLTag(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -1810,7 +1810,7 @@ void TestInlineIfLTag(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value2), LR"( 25 )", LR"(Render())", __LINE__);
 }
 
-void TestLoopLTag1(TestHelper &helper) {
+static void TestLoopLTag1(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -1926,7 +1926,7 @@ void TestLoopLTag1(TestHelper &helper) {
                  __LINE__);
 }
 
-void TestLoopLTag2(TestHelper &helper) {
+static void TestLoopLTag2(TestHelper &helper) {
     Value<wchar_t> value3;
     const wchar_t *content;
 
@@ -2020,7 +2020,7 @@ void TestLoopLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value3), LR"()", LR"(Render())", __LINE__);
 }
 
-void TestLoopLTag3(TestHelper &helper) {
+static void TestLoopLTag3(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -2175,7 +2175,7 @@ void TestLoopLTag3(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"(some_valsome_valsome_val)", LR"(Render())", __LINE__);
 }
 
-void TestLoopLTag4(TestHelper &helper) {
+static void TestLoopLTag4(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<wchar_t> content;
@@ -2217,7 +2217,7 @@ void TestLoopLTag4(TestHelper &helper) {
                       __LINE__);
 }
 
-void TestLoopLTag5(TestHelper &helper) {
+static void TestLoopLTag5(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -2340,7 +2340,7 @@ void TestLoopLTag5(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"(7654321)", LR"(Render())", __LINE__);
 }
 
-void TestIfLTag1(TestHelper &helper) {
+static void TestIfLTag1(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -2532,7 +2532,7 @@ void TestIfLTag1(TestHelper &helper) {
                  __LINE__);
 }
 
-void TestIfLTag2(TestHelper &helper) {
+static void TestIfLTag2(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -2569,7 +2569,7 @@ void TestIfLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, &value), LR"()", LR"(Render())", __LINE__);
 }
 
-void TestRenderL1(TestHelper &helper) {
+static void TestRenderL1(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<wchar_t> content;
@@ -2714,7 +2714,7 @@ void TestRenderL1(TestHelper &helper) {
                       __LINE__);
 }
 
-void TestRenderL2(TestHelper &helper) {
+static void TestRenderL2(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 

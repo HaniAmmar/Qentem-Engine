@@ -32,7 +32,7 @@ namespace Test {
 
 using String8 = String<char>;
 
-void TestString1(TestHelper &helper) {
+static void TestString1(TestHelper &helper) {
     SizeT length;
     char *strptr;
 
@@ -128,7 +128,7 @@ void TestString1(TestHelper &helper) {
 #endif
 }
 
-void TestStringCompare(TestHelper &helper) {
+static void TestStringCompare(TestHelper &helper) {
     String8     str1("a");
     String8     str2("a");
     const char *str3 = "a";
@@ -236,7 +236,7 @@ void TestStringCompare(TestHelper &helper) {
     helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 }
 
-void TestString2(TestHelper &helper) {
+static void TestString2(TestHelper &helper) {
     String8 str1;
     String8 str2;
 
@@ -398,7 +398,7 @@ void TestString2(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8U), "SimpleStream", __LINE__);
 }
 
-void TestTrim(TestHelper &helper) {
+static void TestTrim(TestHelper &helper) {
     String8 str1("");
 
     str1 = String8::Trim(str1);
