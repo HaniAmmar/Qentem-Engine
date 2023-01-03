@@ -59,9 +59,7 @@ class QPointer {
 
     Type_T_ *GetPointer() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        char *tmp_pointer = nullptr;
-        tmp_pointer += (p_number_ & 0x0000FFFFFFFFFFFFULL);
-        return reinterpret_cast<Type_T_ *>(tmp_pointer);
+        return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
 #else
         return pointer_;
 #endif
@@ -92,10 +90,28 @@ class QPointer {
 
     void Reset() noexcept { pointer_ = nullptr; }
 
+    // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
   private:
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+    struct Bits {
+#ifndef QENTEM_BIG_ENDIAN
+        unsigned long long number_ : 48;
+        unsigned long long low_byte_ : 8;
+        unsigned long long high_byte_ : 8;
+#else
+        unsigned long long high_byte_ : 8;
+        unsigned long long low_byte_ : 8;
+        unsigned long long number_ : 48;
+#endif
+    };
+#endif
+
     union {
         Type_T_           *pointer_;
         unsigned long long p_number_{0};
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        Bits bits_;
+#endif
     };
 };
 
