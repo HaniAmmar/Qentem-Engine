@@ -430,10 +430,11 @@ class Digit {
 
         while (number >= Number2_T_{100}) {
             offset -= Number_T_{2};
-            const SizeT index              = (static_cast<SizeT>(number % Number2_T_{100}) * SizeT{2});
+            const SizeT index = (static_cast<SizeT>(number % Number2_T_{100}) * SizeT{2});
+            number /= Number2_T_{100};
+
             storage[offset]                = static_cast<Char_T_>(lookup_table[index]);
             storage[offset + Number_T_{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
-            number /= Number2_T_{100};
         }
 
         if (number < Number2_T_{10}) {
