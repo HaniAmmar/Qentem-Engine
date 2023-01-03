@@ -940,21 +940,23 @@ static void to_JSON(StringStream<char> &stream, const Array<Item2Engine> &items,
         return;
     }
 
+    const Item2Engine *storage = items.First();
+
     stream += '{';
 
     for (SizeT i = 0; i < items.Size(); i++) {
         stream += '"';
-        stream.Insert((content + items.Storage()[i].Offset), items.Storage()[i].Length);
+        stream.Insert((content + storage[i].Offset), storage[i].Length);
         stream += "\":{";
 
         stream += "\"O\":";
-        stream += Digit<char>::NumberToString(items.Storage()[i].Offset);
+        stream += Digit<char>::NumberToString(storage[i].Offset);
         stream += ",\"L\":";
-        stream += Digit<char>::NumberToString(items.Storage()[i].Length);
+        stream += Digit<char>::NumberToString(storage[i].Length);
 
-        if (items.Storage()[i].SubItems.IsNotEmpty()) {
+        if (storage[i].SubItems.IsNotEmpty()) {
             stream += ",\"S\":";
-            to_JSON(stream, items.Storage()[i].SubItems, content);
+            to_JSON(stream, storage[i].SubItems, content);
         }
 
         stream += '}';
