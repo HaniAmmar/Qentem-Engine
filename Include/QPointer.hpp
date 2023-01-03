@@ -36,13 +36,16 @@ class QPointer {
     QPointer &operator=(const QPointer &src) = delete;
 
     explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {}
-    QPointer(QPointer &&src) noexcept : p_number_{src.p_number_} { src.p_number_ = 0; }
+    QPointer(QPointer &&src) noexcept : pointer_{src.pointer_} { src.pointer_ = nullptr; }
 
     QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
-            p_number_ &= 0xFFFF000000000000ULL;
-            p_number_ |= (src.p_number_ & 0x0000FFFFFFFFFFFFULL);
-            src.p_number_ = 0;
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+            bits_.number_ = src.bits_.number_;
+#else
+            pointer_ = src.pointer_;
+#endif
+            src.pointer_ = nullptr;
         }
 
         return *this;
@@ -71,26 +74,14 @@ class QPointer {
     }
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    void SetHighByte(unsigned char byte) noexcept {
-        unsigned long long tmp = byte;
-        p_number_ &= 0x00FFFFFFFFFFFFFFULL;
-        p_number_ |= (tmp << 56U);
-    }
-
-    unsigned char GetHighByte() const noexcept { return static_cast<unsigned char>(p_number_ >> 56U); }
-
-    void SetLowByte(unsigned char byte) noexcept {
-        unsigned long long tmp = byte;
-        p_number_ &= 0xFF00FFFFFFFFFFFFULL;
-        p_number_ |= (tmp << 48U);
-    }
-
-    unsigned char GetLowByte() const noexcept { return ((p_number_ >> 48U) & 0x00FFU); }
+    void          SetHighByte(unsigned char byte) noexcept { bits_.high_byte_ = byte; }
+    unsigned char GetHighByte() const noexcept { return bits_.high_byte_; }
+    void          SetLowByte(unsigned char byte) noexcept { bits_.low_byte_ = byte; }
+    unsigned char GetLowByte() const noexcept { return bits_.low_byte_; }
 #endif
 
     void Reset() noexcept { pointer_ = nullptr; }
 
-    // Only 64-bit uses pointer tagging, so there is no need to adjust its size.
   private:
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     struct Bits {
