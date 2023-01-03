@@ -2751,7 +2751,7 @@ void TestRenderU2(TestHelper &helper) {
 }
 
 static int RunTemplateUTests() {
-    TestHelper helper{"Template.hpp (32-bit character)", __FILE__};
+    TestHelper helper{"Template.hpp (16-bit char)", __FILE__};
 
     helper.PrintGroupName();
 

@@ -1,8 +1,9 @@
 #include "JSONUtilsTest.hpp"
 
 int main() {
+    Qentem::TestHelper::PrintInfo();
     int ret = Qentem::Test::RunJSONUtilsTests();
-    Qentem::TestHelper::PrintMemoryStatus();
+    Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;
 }

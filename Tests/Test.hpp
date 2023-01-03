@@ -23,24 +23,25 @@
 #ifndef QENTEM_TEST_H_
 #define QENTEM_TEST_H_
 
+// clang-format off
 #include "TestHelper.hpp"
-
-#include "ALETest.hpp"
+#include "MemoryTest.hpp"
+#include "StringUtilsTest.hpp"
+#include "StringTest.hpp"
+#include "StringStreamTest.hpp"
 #include "ArrayTest.hpp"
 #include "DigitTest.hpp"
-#include "EngineTest.hpp"
 #include "HArrayTest.hpp"
-#include "JSONTest.hpp"
+#include "EngineTest.hpp"
+#include "ALETest.hpp"
+#include "UnicodeTest.hpp"
 #include "JSONUtilsTest.hpp"
-#include "MemoryTest.hpp"
-#include "StringStreamTest.hpp"
-#include "StringTest.hpp"
-#include "StringUtilsTest.hpp"
+#include "ValueTest.hpp"
+#include "JSONTest.hpp"
 #include "TemplateLTest.hpp"
 #include "TemplateTest.hpp"
 #include "TemplateUTest.hpp"
-#include "UnicodeTest.hpp"
-#include "ValueTest.hpp"
+// clang-format on
 
 namespace Qentem {
 namespace Test {
@@ -48,7 +49,6 @@ namespace Test {
 static int RunTests() {
     int passed = 0;
     int failed = 0;
-    int total  = 0;
 
     ((Qentem::Test::RunTestHelperTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunMemoryTests() == 0) ? ++passed : ++failed);
@@ -69,56 +69,18 @@ static int RunTests() {
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
     if (failed == 0) {
-        QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_PASS << "All good." << QENTEM_OUTPUT_END_COLOR << '\n';
+        QENTEM_OUTPUT_STREAM << TestOutPut::GetColor(TestOutPut::Colors::PASS) << "All good."
+                             << TestOutPut::GetColor(TestOutPut::Colors::END) << '\n';
         return 0;
     }
 
-    total = (passed + failed);
-
-    QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_ERROR << "Not good!" << QENTEM_OUTPUT_END_COLOR << " " << failed
-                         << " out of " << total << " failed.\n";
+    QENTEM_OUTPUT_STREAM << TestOutPut::GetColor(TestOutPut::Colors::ERROR) << "Not good!"
+                         << TestOutPut::GetColor(TestOutPut::Colors::END) << " " << failed << " out of "
+                         << (passed + failed) << " failed.\n";
 
     return 1;
 }
 
-static void PrintInfo() {
-    QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_MAIN << "Configurations" << QENTEM_OUTPUT_END_COLOR << ":\n";
-
-#ifdef QENTEM_64BIT_ARCH
-    QENTEM_OUTPUT_STREAM << "Arch: 64BIT\n";
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    QENTEM_OUTPUT_STREAM << "Tagged Pointers: On\n";
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    QENTEM_OUTPUT_STREAM << "Short String Optimization: On\n";
-#endif
-#endif
-#else
-    QENTEM_OUTPUT_STREAM << "Arch: 32BIT\n";
-#endif
-
-    QENTEM_OUTPUT_STREAM << "Endianness: ";
-
-#ifndef QENTEM_BIG_ENDIAN
-    QENTEM_OUTPUT_STREAM << "Little-Endian\n";
-#else
-    QENTEM_OUTPUT_STREAM << "Big-Endian\n";
-#endif
-
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    QENTEM_OUTPUT_STREAM << "Autoescape HTML: On\n";
-#else
-    QENTEM_OUTPUT_STREAM << "Autoescape HTML: Off\n";
-#endif
-
-#if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-    QENTEM_OUTPUT_STREAM << "AVX2: On\n";
-#endif
-#if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-    QENTEM_OUTPUT_STREAM << "SSE2: On\n";
-#endif
-
-    QENTEM_OUTPUT_STREAM << "SizeT size: " << sizeof(SizeT) << "\n\n";
-}
 } // namespace Test
 } // namespace Qentem
 

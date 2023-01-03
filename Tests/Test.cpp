@@ -28,7 +28,7 @@
 #include "Test.hpp"
 
 int main() {
-    Qentem::Test::PrintInfo();
+    Qentem::TestHelper::PrintInfo();
 
     // for (int i = 0; i < 100000; i++) {
     //     Qentem::Test::RunTestHelperTests();
@@ -51,7 +51,7 @@ int main() {
     // }
 
     int ret = Qentem::Test::RunTests();
-    Qentem::TestHelper::PrintMemoryStatus();
+    Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;
 }

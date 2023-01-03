@@ -20,6 +20,10 @@
  * SOFTWARE.
  */
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4505)
+#endif
+
 #include "Common.hpp"
 
 #if defined(__APPLE__)
@@ -30,26 +34,10 @@
 #include <malloc.h>
 #endif
 
-#ifndef QENTEM_ENABLE_COLORED_OUTPUT
-#define QENTEM_ENABLE_COLORED_OUTPUT 1
-#endif
-
 #ifndef QENTEM_OUTPUT_STREAM
 #include <iostream>
 #define QENTEM_OUTPUT_STREAM_TYPE std::wostream
 #define QENTEM_OUTPUT_STREAM std::wcout
-#endif
-
-#if defined(QENTEM_ENABLE_COLORED_OUTPUT) && (QENTEM_ENABLE_COLORED_OUTPUT == 1)
-#define QENTEM_OUTPUT_START_COLOR_MAIN "\x1B[36m"
-#define QENTEM_OUTPUT_START_COLOR_ERROR "\x1B[31m"
-#define QENTEM_OUTPUT_START_COLOR_PASS "\x1B[32m"
-#define QENTEM_OUTPUT_END_COLOR "\x1B[0m"
-#else
-#define QENTEM_OUTPUT_START_COLOR_MAIN ""
-#define QENTEM_OUTPUT_START_COLOR_ERROR ""
-#define QENTEM_OUTPUT_START_COLOR_PASS ""
-#define QENTEM_OUTPUT_END_COLOR ""
 #endif
 
 #ifndef QENTEM_TESTHELPER_H_
@@ -57,21 +45,142 @@
 
 namespace Qentem {
 
+struct TestOutPut {
+    TestOutPut()                              = delete;
+    ~TestOutPut()                             = delete;
+    TestOutPut(TestOutPut &&)                 = delete;
+    TestOutPut(const TestOutPut &)            = delete;
+    TestOutPut &operator=(TestOutPut &&)      = delete;
+    TestOutPut &operator=(const TestOutPut &) = delete;
+
+    template <typename... Values_T_>
+    static void Print(const Values_T_ &...values) {
+        // (out) will copy the value but at that point it will not matter.
+        int dummy[sizeof...(Values_T_)] = {(QENTEM_OUTPUT_STREAM << static_cast<const Values_T_ &>(values), 0)...};
+        (void)dummy;
+        // (std::cout << ... << values); c++17
+    }
+
+    enum Colors { MAIN, ERROR, PASS, END };
+
+    static const char *GetColor(Colors color) noexcept {
+        if (coloredOutput_) {
+            switch (color) {
+                case MAIN:
+                    return "\x1B[36m";
+                case ERROR:
+                    return "\x1B[31m";
+                case PASS:
+                    return "\x1B[32m";
+                case END:
+                    return "\x1B[0m";
+                default:
+                    return "";
+            }
+        }
+
+        return "";
+    }
+
+  private:
+    static bool coloredOutput_;
+};
+
+bool TestOutPut::coloredOutput_{true};
+
+struct MemoryRecord {
+    MemoryRecord()                                = delete;
+    ~MemoryRecord()                               = delete;
+    MemoryRecord(MemoryRecord &&)                 = delete;
+    MemoryRecord(const MemoryRecord &)            = delete;
+    MemoryRecord &operator=(MemoryRecord &&)      = delete;
+    MemoryRecord &operator=(const MemoryRecord &) = delete;
+
+    struct Records {
+        SizeT  allocations{0};
+        SizeT  dellocations{0};
+        SizeT  subAllocations{0};
+        SizeT  subDellocations{0};
+        size_t remainingSize{0};
+        size_t peakSize{0};
+    };
+
+    static void ResetSubMemory() noexcept {
+        records_.subAllocations  = 0;
+        records_.subDellocations = 0;
+    }
+
+    static SizeT CheckSubMemory() noexcept { return (records_.subAllocations - records_.subDellocations); }
+
+    static void AddAllocation(void *pointer) noexcept {
+        ++(records_.allocations);
+        ++(records_.subAllocations);
+
+#if defined(_WIN32) || defined(_WIN64)
+        records_.remainingSize += _msize(pointer);
+#elif defined(__APPLE__)
+        records_.remainingSize += malloc_size(pointer);
+#else
+        records_.remainingSize += malloc_usable_size(pointer);
+#endif
+
+        if (records_.remainingSize > records_.peakSize) {
+            records_.peakSize = records_.remainingSize;
+        }
+    }
+
+    static void Removeallocation(void *pointer) noexcept {
+        ++(records_.dellocations);
+        ++(records_.subDellocations);
+
+#if defined(_WIN32) || defined(_WIN64)
+        records_.remainingSize -= _msize(pointer);
+#elif defined(__APPLE__)
+        records_.remainingSize -= malloc_size(pointer);
+#else
+        records_.remainingSize -= malloc_usable_size(pointer);
+#endif
+    }
+
+    static void PrintMemoryStatus() noexcept {
+        TestOutPut::Print("\nMemory: ", (static_cast<double>(records_.remainingSize) / 1024),
+                          " KB, Peak: ", (static_cast<double>(records_.peakSize) / 1024), " KB\n");
+
+        TestOutPut::Print("Allocations: ", records_.allocations, ", Deallocations: ", records_.dellocations, ".\n");
+
+        SizeT remaining_dellocations = (records_.allocations - records_.dellocations);
+
+        if (remaining_dellocations != 0) {
+            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
+                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_dellocations,
+                              " Remaining Dellocations.\n\n");
+        }
+    }
+
+  private:
+    static Records records_;
+};
+
+MemoryRecord::Records MemoryRecord::records_{};
+
 struct TestHelper {
     TestHelper()  = delete;
     ~TestHelper() = default;
 
-    QENTEM_NOINLINE TestHelper(const char *name, const char *file_fullname) noexcept
+    QENTEM_NOINLINE
+    TestHelper(const char *name, const char *file_fullname) noexcept
         : test_name_{name}, file_fullname_{file_fullname} {}
 
     QENTEM_NOINLINE void PrintGroupName() const noexcept {
-        QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_MAIN << test_name_ << QENTEM_OUTPUT_END_COLOR << ":\n";
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::MAIN), test_name_,
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() noexcept {
         if (!error_) {
-            QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_MAIN << test_name_ << QENTEM_OUTPUT_START_COLOR_PASS
-                                 << " Passed all tests" << QENTEM_OUTPUT_END_COLOR << "\n\n";
+            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::MAIN), test_name_,
+                              TestOutPut::GetColor(TestOutPut::Colors::PASS), " Passed all tests",
+                              TestOutPut::GetColor(TestOutPut::Colors::END), "\n\n");
             return 0;
         }
 
@@ -84,137 +193,125 @@ struct TestHelper {
             func(*this);
 
             if (!error_) {
-                QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_PASS << "Pass" << QENTEM_OUTPUT_END_COLOR << ": "
-                                     << name << '\n';
+                TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "Pass",
+                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", name, '\n');
+            }
+
+            SizeT remaining_dellocations = MemoryRecord::CheckSubMemory();
+            MemoryRecord::ResetSubMemory();
+
+            if (remaining_dellocations != 0) {
+                TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
+                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_dellocations,
+                                  " Remaining Dellocations.\n");
             }
         }
     }
 
     template <typename Char_T_>
     QENTEM_NOINLINE void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
-        if (!value) {
+        if (!error_ && !value) {
             error_ = true;
-            TestHelper::PrintErrorMessage1(false, name, file_fullname_, line);
+            TestHelper::PrintErrorMessage1(false, name, line);
         }
     }
 
     template <typename Char_T_>
     QENTEM_NOINLINE void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
-        if (value) {
+        if (!error_ && value) {
             error_ = true;
-            TestHelper::PrintErrorMessage1(true, name, file_fullname_, line);
+            TestHelper::PrintErrorMessage1(true, name, line);
         }
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    QENTEM_NOINLINE void Equal(Value1_T_ left, Value2_T_ right, const Char_T_ *name, Value3_T_ value,
-                               unsigned long line) {
-        if (left != right) {
+    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
+                               const Value3_T_ &value, unsigned long line) {
+        if (!error_ && (left != right)) {
             error_ = true;
-            TestHelper::PrintErrorMessage2(false, name, left, value, file_fullname_, line);
+            TestHelper::PrintErrorMessage2(false, name, left, value, line);
         }
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    QENTEM_NOINLINE void NotEqual(Value1_T_ left, Value2_T_ right, const Char_T_ *name, Value3_T_ value,
+    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
+                                  const Value3_T_ &value, unsigned long line) {
+        if (!error_ && (left == right)) {
+            error_ = true;
+            TestHelper::PrintErrorMessage2(true, name, left, value, line);
+        }
+    }
+
+    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
+    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
+        if (!error_ && (left != right)) {
+            error_ = true;
+            TestHelper::PrintErrorMessage2(false, name, left, right, line);
+        }
+    }
+
+    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
+    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
                                   unsigned long line) {
-        if (left == right) {
+        if (!error_ && (left == right)) {
             error_ = true;
-            TestHelper::PrintErrorMessage2(true, name, left, value, file_fullname_, line);
-        }
-    }
-
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void Equal(Value1_T_ left, Value2_T_ right, const Char_T_ *name, unsigned long line) {
-        if (left != right) {
-            error_ = true;
-            TestHelper::PrintErrorMessage2(false, name, left, right, file_fullname_, line);
-        }
-    }
-
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void NotEqual(Value1_T_ left, Value2_T_ right, const Char_T_ *name, unsigned long line) {
-        if (left == right) {
-            error_ = true;
-            TestHelper::PrintErrorMessage2(true, name, left, right, file_fullname_, line);
+            TestHelper::PrintErrorMessage2(true, name, left, right, line);
         }
     }
 
     template <typename Char_T_>
-    QENTEM_NOINLINE static void PrintErrorMessage1(bool equal, const Char_T_ *name, const char *file,
-                                                   unsigned long line) {
-        QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed" << QENTEM_OUTPUT_END_COLOR << ": " << file
-                             << ":" << line << ":\n`" << name << "` should" << (equal ? " not " : " ")
-                             << "equal `true`\n\n";
+    QENTEM_NOINLINE void PrintErrorMessage1(bool equal, const Char_T_ *name, unsigned long line) {
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", file_fullname_, ":", line, ":\n`", name,
+                          "` should", (equal ? " not " : " "), "equal: `true`\n\n");
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE static void PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
-                                                   const Value2_T_ &value2, const char *file, unsigned long line) {
-        // (out <<) will copy the value1 and value2, but at that point, it will not matter.
-        QENTEM_OUTPUT_STREAM << QENTEM_OUTPUT_START_COLOR_ERROR << "Failed" << QENTEM_OUTPUT_END_COLOR << ": " << file
-                             << ":" << line << ":\n`" << name << "` should" << (equal ? " not " : " ") << "equal `"
-                             << value2 << "`\nReturned Value: `" << value1 << "`\n\n";
+    QENTEM_NOINLINE void PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
+                                            const Value2_T_ &value2, unsigned long line) {
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", file_fullname_, ":", line, ":\n`", name,
+                          "` should", (equal ? " not " : " "), "equal: `", value2, "`\n Returned Value: `", value1,
+                          "`\n\n");
     }
+    static void PrintInfo() {
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::MAIN), "Configurations",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
 
-    static SizeT &AllocateHit() noexcept {
-        static SizeT count = 0;
-        return count;
-    }
-
-    static SizeT &DeallocateHit() noexcept {
-        static SizeT count = 0;
-        return count;
-    }
-
-    static void AddMemorySize(void *pointer) noexcept {
-        size_t &m_size = GetMemorySize();
-        size_t &m_peak = GetMemoryPeak();
-
-        ++(AllocateHit());
-
-#if defined(_WIN32) || defined(_WIN64)
-        m_size += _msize(pointer);
-#elif defined(__APPLE__)
-        m_size += malloc_size(pointer);
+#ifdef QENTEM_64BIT_ARCH
+        TestOutPut::Print("Arch: 64BIT\n");
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        TestOutPut::Print("Tagged Pointers: On\n");
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+        TestOutPut::Print("Short String Optimization: On\n");
+#endif
+#endif
 #else
-        m_size += malloc_usable_size(pointer);
+        TestOutPut::Print("Arch: 32BIT\n");
 #endif
 
-        if (m_size > m_peak) {
-            m_peak = m_size;
-        }
-    }
+        TestOutPut::Print("Endianness: ");
 
-    static void RemoveMemorySize(void *pointer) noexcept {
-        size_t &m_size = GetMemorySize();
-
-        ++(DeallocateHit());
-
-#if defined(_WIN32) || defined(_WIN64)
-        m_size -= _msize(pointer);
-#elif defined(__APPLE__)
-        m_size -= malloc_size(pointer);
+#ifndef QENTEM_BIG_ENDIAN
+        TestOutPut::Print("Little-Endian\n");
 #else
-        m_size -= malloc_usable_size(pointer);
+        TestOutPut::Print("Big-Endian\n");
 #endif
-    }
 
-    static size_t &GetMemorySize() noexcept {
-        static size_t size = 0;
-        return size;
-    }
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
+        TestOutPut::Print("Autoescape HTML: On\n");
+#else
+        TestOutPut::Print("Autoescape HTML: Off\n");
+#endif
 
-    static size_t &GetMemoryPeak() noexcept {
-        static size_t peak = 0;
-        return peak;
-    }
+#if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
+        TestOutPut::Print("AVX2: On\n");
+#endif
+#if defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
+        TestOutPut::Print("SSE2: On\n");
+#endif
 
-    static void PrintMemoryStatus() {
-        QENTEM_OUTPUT_STREAM << "\nMemory: " << (static_cast<double>(GetMemorySize()) / 1024)
-                             << " KB, Peak: " << (static_cast<double>(GetMemoryPeak()) / 1024) << " KB\n";
-        QENTEM_OUTPUT_STREAM << "Allocations: " << AllocateHit() << ", Deallocations: " << DeallocateHit() << ".";
-        QENTEM_OUTPUT_STREAM << " " << (AllocateHit() - DeallocateHit()) << " remaining.\n";
+        TestOutPut::Print("SizeT size: ", sizeof(SizeT), "\n\n");
     }
 
   private:
@@ -223,19 +320,12 @@ struct TestHelper {
     bool        error_{false};
 };
 
-// class EmptyStream {
-//     template <typename Value_T_>
-//     friend Stream_T_ &operator<<(Stream_T_ &out, const Value_T_ &val) noexcept {
-//         (void)val;
-//         return out;
-//     }
-
-//     template <typename Stream_T_>
-//     friend Stream_T_ &operator<<(Stream_T_ &out, const void *val) noexcept {
-//         (void)val;
-//         return out;
-//     }
-// };
+class EmptyStream {
+    template <typename Value_T_>
+    void operator,(const Value_T_ &val) noexcept {
+        (void)val;
+    }
+};
 
 namespace Test {
 QENTEM_MAYBE_UNUSED
@@ -261,8 +351,4 @@ static int RunTestHelperTests() {
 } // namespace Test
 } // namespace Qentem
 
-#endif
-
-#ifdef _MSC_VER
-#pragma warning(disable : 4505)
 #endif

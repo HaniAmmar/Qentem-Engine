@@ -2751,7 +2751,7 @@ void TestRenderL2(TestHelper &helper) {
 }
 
 static int RunTemplateLTests() {
-    TestHelper helper{"Template.hpp (32-bit character)", __FILE__};
+    TestHelper helper{"Template.hpp (Wide char)", __FILE__};
 
     helper.PrintGroupName();
 

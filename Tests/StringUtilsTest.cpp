@@ -1,8 +1,9 @@
 #include "StringUtilsTest.hpp"
 
 int main() {
+    Qentem::TestHelper::PrintInfo();
     int ret = Qentem::Test::RunStringUtilsTests();
-    Qentem::TestHelper::PrintMemoryStatus();
+    Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;
 }

@@ -2730,7 +2730,7 @@ void TestRender2(TestHelper &helper) {
 }
 
 static int RunTemplateTests() {
-    TestHelper helper{"Template.hpp (32-bit character)", __FILE__};
+    TestHelper helper{"Template.hpp", __FILE__};
 
     helper.PrintGroupName();
 

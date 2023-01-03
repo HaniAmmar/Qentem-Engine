@@ -1,8 +1,9 @@
 #include "ValueTest.hpp"
 
 int main() {
+    Qentem::TestHelper::PrintInfo();
     int ret = Qentem::Test::RunValueTests();
-    Qentem::TestHelper::PrintMemoryStatus();
+    Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;
 }

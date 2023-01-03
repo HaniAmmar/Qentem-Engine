@@ -1,8 +1,9 @@
 #include "EngineTest.hpp"
 
 int main() {
+    Qentem::TestHelper::PrintInfo();
     int ret = Qentem::Test::RunEngineTests();
-    Qentem::TestHelper::PrintMemoryStatus();
+    Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;
 }
