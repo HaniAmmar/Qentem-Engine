@@ -32,7 +32,7 @@ int main() {
         (8 / 4 + 1) - 1 - -1 + 2 == ((5/5+1)*2+1)+3*3)"; // 1
     ///////////////////////////////////////////////////
 
-    for (auto &eq : equations) {
+    for (const auto &eq : equations) {
         std::cout << Qentem::ALE::Evaluate(eq) << '\n';
     }
 }
