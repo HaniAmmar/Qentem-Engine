@@ -231,11 +231,12 @@ class Template {
         StringStream<Char_T_>  InnerTemplate;
         Array<TagBit<Char_T_>> SubTags;
         void                  *padding_1;
-        int                    padding_2;
         unsigned short         SetOffset;
         unsigned short         SetLength;
+        unsigned short         FixedIndex;
         unsigned short         IndexOffset;
         unsigned short         IndexLength;
+        unsigned short         FixedSize;
         unsigned short         RepeatOffset;
         unsigned short         RepeatLength;
         unsigned short         GroupOffset;
@@ -442,7 +443,7 @@ class Template_CV {
             ++tag;
         }
 
-        // Add the remaining string.
+        // Add any remaining string.
         ss_->Insert((content + offset), (length - offset));
     }
 
@@ -707,7 +708,7 @@ class Template_CV {
                 return;
             }
 
-            if ((loop_key_ != nullptr) && (*content == TemplatePatterns_C_::TildeChar)) {
+            if ((*content == TemplatePatterns_C_::TildeChar) && (loop_key_ != nullptr)) {
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
                 escapeHTMLSpecialChars(*ss_, loop_key_, loop_key_length_);
 #else
@@ -772,27 +773,33 @@ class Template_CV {
         return 0;
     }
 
-    QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content, const SizeT length) const noexcept {
+    QENTEM_NOINLINE bool static IsStaticNumber(const Char_T_ *content, const SizeT length) noexcept {
         if (length > TemplatePatterns_C_::VariableFulllength) {
-            const Value_T_ *value  = nullptr;
-            SizeT           offset = 0;
-            offset                 = Engine::Find<Char_T_>(TemplatePatterns_C_::VariablePrefix,
-                                           TemplatePatterns_C_::VariablePrefixLength, content, offset, length);
-
-            if (offset != 0) {
-                const SizeT end_offset =
-                    Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content, offset, length);
-
-                if (end_offset != 0) {
-                    value = findValue((content + offset),
-                                      ((end_offset - TemplatePatterns_C_::InLineSuffixLength) - offset));
-                }
-
-                return ((value != nullptr) && (value->SetNumber(number)));
+            if (Engine::Find<Char_T_>(TemplatePatterns_C_::VariablePrefix, TemplatePatterns_C_::VariablePrefixLength,
+                                      content, SizeT{0}, length) != 0) {
+                return false;
             }
         }
 
-        return Digit<Char_T_>::StringToNumber(number, content, length);
+        return true;
+    }
+
+    QENTEM_NOINLINE void static findKey(const Char_T_ *content, SizeT offset, SizeT end_offset,
+                                        unsigned short &i_offset, unsigned short &i_length) noexcept {
+        offset = Engine::Find<Char_T_>(TemplatePatterns_C_::VariablePrefix, TemplatePatterns_C_::VariablePrefixLength,
+                                       content, offset, end_offset);
+
+        i_length = 1;
+
+        if (offset != 0) {
+            end_offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content, offset, end_offset);
+
+            if (end_offset != 0) {
+                i_offset = static_cast<unsigned short>(offset);
+                i_length =
+                    static_cast<unsigned short>(((end_offset - TemplatePatterns_C_::InLineSuffixLength) - offset));
+            }
+        }
     }
 
     QENTEM_NOINLINE static void generateLoopContent(const Char_T_ *content, TagBit *tag, SizeT level) {
@@ -802,7 +809,8 @@ class Template_CV {
         SizeT          tmp_length        = 0;
         SizeT          loop_value_length = 0;
         SizeT          previous_offset   = 0;
-        bool           break_loop        = false;
+        SizeT          tmp_offset;
+        bool           break_loop = false;
 
         content += offset;
 
@@ -826,7 +834,7 @@ class Template_CV {
 
             // XY="..."
             // 4: Goes back to X
-            SizeT tmp_offset = (offset - 4);
+            tmp_offset = (offset - 4);
 
             do {
                 switch (content[tmp_offset]) {
@@ -852,16 +860,26 @@ class Template_CV {
                     }
 
                     case TemplatePatterns_C_::IndexChar: {
-                        info->IndexOffset = static_cast<unsigned short>(offset);
-                        info->IndexLength = static_cast<unsigned short>(tmp_length);
-                        break_loop        = true;
+                        const Char_T_ *tmp_content = (content + offset);
+
+                        if (!IsStaticNumber(tmp_content, tmp_length) ||
+                            !(Digit<Char_T_>::StringToNumber(info->FixedIndex, tmp_content, tmp_length))) {
+                            findKey(content, offset, (tmp_length + offset), info->IndexOffset, info->IndexLength);
+                        }
+
+                        break_loop = true;
                         break;
                     }
 
                     case TemplatePatterns_C_::RepeatChar: {
-                        info->RepeatOffset = static_cast<unsigned short>(offset);
-                        info->RepeatLength = static_cast<unsigned short>(tmp_length);
-                        break_loop         = true;
+                        const Char_T_ *tmp_content = (content + offset);
+
+                        if (!IsStaticNumber(tmp_content, tmp_length) ||
+                            !(Digit<Char_T_>::StringToNumber(info->FixedSize, tmp_content, tmp_length))) {
+                            findKey(content, offset, (tmp_length + offset), info->RepeatOffset, info->RepeatLength);
+                        }
+
+                        break_loop = true;
                         break;
                     }
 
@@ -962,12 +980,12 @@ class Template_CV {
         Value_T_        grouped_set;
         const Value_T_ *loop_set   = root_value_;
         LoopTag        *loop_info  = static_cast<LoopTag *>(tag->GetInfo());
-        SizeT           loop_index = 0;
-        SizeT           loop_size  = 0;
+        SizeT           loop_index = loop_info->FixedIndex;
+        SizeT           loop_size  = loop_info->FixedSize;
 
         content += (tag->GetOffset() + TemplatePatterns_C_::LoopPrefixLength);
 
-        // Set (Array)
+        // Set (Array|Object)
         if (loop_info->SetLength != 0) {
             loop_set = findValue((content + loop_info->SetOffset), loop_info->SetLength);
 
@@ -976,16 +994,22 @@ class Template_CV {
             }
         }
 
-        // Size
-        if ((loop_info->RepeatLength != 0) &&
-            (!parseNumber(loop_size, (content + loop_info->RepeatOffset), loop_info->RepeatLength))) {
-            return; // Not a number
+        // Index
+        if (loop_info->IndexLength != 0) {
+            const Value_T_ *tmp_value = findValue((content + loop_info->IndexOffset), loop_info->IndexLength);
+
+            if ((tmp_value == nullptr) || !(tmp_value->SetNumber(loop_index))) {
+                return; // Not a number
+            }
         }
 
-        // Index
-        if ((loop_info->IndexLength != 0) &&
-            (!parseNumber(loop_index, (content + loop_info->IndexOffset), loop_info->IndexLength))) {
-            return; // Not a number
+        // Size
+        if (loop_info->RepeatLength != 0) {
+            const Value_T_ *tmp_value = findValue((content + loop_info->RepeatOffset), loop_info->RepeatLength);
+
+            if ((tmp_value == nullptr) || !(tmp_value->SetNumber(loop_size))) {
+                return; // Not a number
+            }
         }
 
         // Group
