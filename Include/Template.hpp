@@ -774,20 +774,19 @@ class Template_CV {
 
     QENTEM_NOINLINE bool parseNumber(SizeT &number, const Char_T_ *content, const SizeT length) const noexcept {
         if (length > TemplatePatterns_C_::VariableFulllength) {
-            SizeT offset = 0;
-            offset       = Engine::Find<Char_T_>(TemplatePatterns_C_::VariablePrefix,
+            const Value_T_ *value  = nullptr;
+            SizeT           offset = 0;
+            offset                 = Engine::Find<Char_T_>(TemplatePatterns_C_::VariablePrefix,
                                            TemplatePatterns_C_::VariablePrefixLength, content, offset, length);
 
             if (offset != 0) {
                 const SizeT end_offset =
                     Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content, offset, length);
 
-                if (end_offset == 0) {
-                    return false;
+                if (end_offset != 0) {
+                    value = findValue((content + offset),
+                                      ((end_offset - TemplatePatterns_C_::InLineSuffixLength) - offset));
                 }
-
-                const Value_T_ *value =
-                    findValue((content + offset), ((end_offset - TemplatePatterns_C_::InLineSuffixLength) - offset));
 
                 return ((value != nullptr) && (value->SetNumber(number)));
             }
@@ -1112,19 +1111,16 @@ class Template_CV {
         if (inline_if_info->CaseLength != 0) {
             double result;
 
-            if (!(ALE::Evaluate(result, (content + inline_if_info->CaseOffset), inline_if_info->CaseLength, this))) {
-                // A messed-up case.
-                return;
-            }
-
-            if (result > 0.0) {
-                if (inline_if_info->TrueLength != 0) {
-                    render((content + inline_if_info->TrueOffset), inline_if_info->TrueLength,
-                           inline_if_info->TrueSubTags);
+            if (ALE::Evaluate(result, (content + inline_if_info->CaseOffset), inline_if_info->CaseLength, this)) {
+                if (result > 0.0) {
+                    if (inline_if_info->TrueLength != 0) {
+                        render((content + inline_if_info->TrueOffset), inline_if_info->TrueLength,
+                               inline_if_info->TrueSubTags);
+                    }
+                } else if (inline_if_info->FalseLength != 0) {
+                    render((content + inline_if_info->FalseOffset), inline_if_info->FalseLength,
+                           inline_if_info->FalseSubTags);
                 }
-            } else if (inline_if_info->FalseLength != 0) {
-                render((content + inline_if_info->FalseOffset), inline_if_info->FalseLength,
-                       inline_if_info->FalseSubTags);
             }
         }
     }
@@ -1202,7 +1198,7 @@ class Template_CV {
                                                         TemplatePatterns_C_::IfPrefixLength, content, offset, length);
 
             if ((next_if == 0) || (else_offset < next_if)) {
-                // No nesting <ifs or <else is before the child <if.
+                // No nesting <ifs or <else before a sub-if.
                 break;
             }
 
@@ -1210,7 +1206,7 @@ class Template_CV {
                                            next_if, length);
 
             if (else_offset > offset) {
-                // <else came after the child if.
+                // <else is after a sub-if.
                 break;
             }
         }
