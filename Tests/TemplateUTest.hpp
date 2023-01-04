@@ -2089,6 +2089,12 @@ static void TestLoopUTag3(TestHelper &helper) {
     content = uR"(<loop repeat="{var:in}">A</loop>)";
     helper.Equal(Template::Render(content, &value), uR"(AA)", uR"(Render())", __LINE__);
 
+    value[uR"(C)"] = 3;
+    value[uR"(D)"] = 4;
+
+    content = uR"(<loop index="{var:in}"value="v">v</loop>)";
+    helper.Equal(Template::Render(content, &value), uR"(4)", uR"(Render())", __LINE__);
+
     /////
     value.Reset();
     value[uR"(k1)"] = 10;

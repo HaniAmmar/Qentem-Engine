@@ -2089,6 +2089,12 @@ static void TestLoopLTag3(TestHelper &helper) {
     content = LR"(<loop repeat="{var:in}">A</loop>)";
     helper.Equal(Template::Render(content, &value), LR"(AA)", LR"(Render())", __LINE__);
 
+    value[LR"(C)"] = 3;
+    value[LR"(D)"] = 4;
+
+    content = LR"(<loop index="{var:in}"value="v">v</loop>)";
+    helper.Equal(Template::Render(content, &value), LR"(4)", LR"(Render())", __LINE__);
+
     /////
     value.Reset();
     value[LR"(k1)"] = 10;

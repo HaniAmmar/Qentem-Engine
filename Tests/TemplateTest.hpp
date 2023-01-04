@@ -2080,6 +2080,12 @@ static void TestLoopTag3(TestHelper &helper) {
     content = R"(<loop repeat="{var:in}">A</loop>)";
     helper.Equal(Template::Render(content, &value), R"(AA)", R"(Render())", __LINE__);
 
+    value[R"(C)"] = 3;
+    value[R"(D)"] = 4;
+
+    content = R"(<loop index="{var:in}"value="v">v</loop>)";
+    helper.Equal(Template::Render(content, &value), R"(4)", R"(Render())", __LINE__);
+
     /////
     value.Reset();
     value[R"(k1)"] = 10;
