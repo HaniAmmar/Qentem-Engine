@@ -226,7 +226,7 @@ class Template {
     };
 
     template <typename Char_T_>
-    struct LoopInfo_T {
+    struct LoopTag_T_ {
         // TODO: Remove StringStream;
         StringStream<Char_T_>  InnerTemplate;
         Array<TagBit<Char_T_>> SubTags;
@@ -245,7 +245,7 @@ class Template {
     };
 
     template <typename Char_T_>
-    struct InlineIfInfo_T {
+    struct InlineIfTag_T_ {
         Array<TagBit<Char_T_>> TrueSubTags;
         Array<TagBit<Char_T_>> FalseSubTags;
         void                  *padding_1;
@@ -258,7 +258,7 @@ class Template {
     };
 
     template <typename Char_T_>
-    struct IfCase_T {
+    struct IfTagCase_T_ {
         Array<TagBit<Char_T_>> SubTags;
         const SizeT            CaseOffset;
         const SizeT            CaseLength;
@@ -290,22 +290,23 @@ class Template {
         ~TagBit() {
             switch (GetType()) {
                 case TagType::Loop: {
-                    LoopInfo_T<Char_T_> *loop_info = static_cast<LoopInfo_T<Char_T_> *>(pointer_.GetPointer());
+                    LoopTag_T_<Char_T_> *loop_info = static_cast<LoopTag_T_<Char_T_> *>(pointer_.GetPointer());
                     Memory::Dispose(loop_info);
                     Memory::Deallocate(loop_info);
                     break;
                 }
 
                 case TagType::If: {
-                    Array<IfCase_T<Char_T_>> *if_info = static_cast<Array<IfCase_T<Char_T_>> *>(pointer_.GetPointer());
+                    Array<IfTagCase_T_<Char_T_>> *if_info =
+                        static_cast<Array<IfTagCase_T_<Char_T_>> *>(pointer_.GetPointer());
                     Memory::Dispose(if_info);
                     Memory::Deallocate(if_info);
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    InlineIfInfo_T<Char_T_> *inline_if_info =
-                        static_cast<InlineIfInfo_T<Char_T_> *>(pointer_.GetPointer());
+                    InlineIfTag_T_<Char_T_> *inline_if_info =
+                        static_cast<InlineIfTag_T_<Char_T_> *>(pointer_.GetPointer());
                     Memory::Dispose(inline_if_info);
                     Memory::Deallocate(inline_if_info);
                     break;
@@ -315,21 +316,20 @@ class Template {
                 }
             }
         }
-
-        LoopInfo_T<Char_T_> *MakeLoopInfo() {
-            LoopInfo_T<Char_T_> *pointer = Memory::AllocateInit<LoopInfo_T<Char_T_>>();
+        LoopTag_T_<Char_T_> *MakeLoopInfo() {
+            LoopTag_T_<Char_T_> *pointer = Memory::AllocateInit<LoopTag_T_<Char_T_>>();
             pointer_.SetPointer(pointer);
             return pointer;
         }
 
-        Array<IfCase_T<Char_T_>> *MakeIfInfo() {
-            Array<IfCase_T<Char_T_>> *pointer = Memory::AllocateInit<Array<IfCase_T<Char_T_>>>();
+        Array<IfTagCase_T_<Char_T_>> *MakeIfInfo() {
+            Array<IfTagCase_T_<Char_T_>> *pointer = Memory::AllocateInit<Array<IfTagCase_T_<Char_T_>>>();
             pointer_.SetPointer(pointer);
             return pointer;
         }
 
-        InlineIfInfo_T<Char_T_> *MakeInlineIf() {
-            InlineIfInfo_T<Char_T_> *pointer = Memory::AllocateInit<InlineIfInfo_T<Char_T_>>();
+        InlineIfTag_T_<Char_T_> *MakeInlineIf() {
+            InlineIfTag_T_<Char_T_> *pointer = Memory::AllocateInit<InlineIfTag_T_<Char_T_>>();
             pointer_.SetPointer(pointer);
             return pointer;
         }
@@ -371,12 +371,12 @@ class Template_CV {
     friend class Qentem::ALE;
     friend class Qentem::Template;
 
-    using TagBit        = Template::TagBit<Char_T_>;
-    using TagType       = Template::TagType;
-    using LoopInfo_     = Template::LoopInfo_T<Char_T_>;
-    using IfCase_       = Template::IfCase_T<Char_T_>;
-    using IfInfo_       = Array<IfCase_>;
-    using InlineIfInfo_ = Template::InlineIfInfo_T<Char_T_>;
+    using TagBit      = Template::TagBit<Char_T_>;
+    using TagType     = Template::TagType;
+    using LoopTag     = Template::LoopTag_T_<Char_T_>;
+    using IfTagCase   = Template::IfTagCase_T_<Char_T_>;
+    using IfTag       = Array<IfTagCase>;
+    using InlineIfTag = Template::InlineIfTag_T_<Char_T_>;
 
     using TemplatePatterns_C_ = TemplatePatterns<Char_T_>;
 
@@ -810,7 +810,7 @@ class Template_CV {
         const SizeT start_offset =
             Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content, SizeT{0}, length);
 
-        LoopInfo_ *info = tag->MakeLoopInfo();
+        LoopTag *info = tag->MakeLoopInfo();
 
         offset = 0;
         // Stage 1: Info extraction
@@ -962,7 +962,7 @@ class Template_CV {
         // Stage 3: Data
         Value_T_        grouped_set;
         const Value_T_ *loop_set   = root_value_;
-        LoopInfo_      *loop_info  = static_cast<LoopInfo_ *>(tag->GetInfo());
+        LoopTag        *loop_info  = static_cast<LoopTag *>(tag->GetInfo());
         SizeT           loop_index = 0;
         SizeT           loop_size  = 0;
 
@@ -1046,7 +1046,7 @@ class Template_CV {
         const SizeT length          = ((tag->GetEndOffset() - TemplatePatterns_C_::InLineSuffixLength) - offset);
         bool        break_loop;
 
-        InlineIfInfo_ *info = tag->MakeInlineIf();
+        InlineIfTag *info = tag->MakeInlineIf();
 
         content += offset;
         offset = 0;
@@ -1106,7 +1106,7 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE void renderInLineIf(const Char_T_ *content, const TagBit *tag) const {
-        InlineIfInfo_ *inline_if_info = static_cast<InlineIfInfo_ *>(tag->GetInfo());
+        InlineIfTag *inline_if_info = static_cast<InlineIfTag *>(tag->GetInfo());
         content += (tag->GetOffset() + TemplatePatterns_C_::InLineIfPrefixLength);
 
         if (inline_if_info->CaseLength != 0) {
@@ -1139,7 +1139,7 @@ class Template_CV {
         content += case_offset;
         case_offset = 0;
 
-        IfInfo_ *if_info = tag->MakeIfInfo();
+        IfTag *if_info = tag->MakeIfInfo();
 
         // The content without </if>
         const SizeT length2 = (length - TemplatePatterns_C_::IfSuffixLength);
@@ -1157,12 +1157,13 @@ class Template_CV {
                     if (else_offset == 0) {
                         content_length = (length2 - content_offset);
                         if_info->Insert(
-                            IfCase_{Array<TagBit>{}, case_offset, case_length, content_offset, content_length});
+                            IfTagCase{Array<TagBit>{}, case_offset, case_length, content_offset, content_length});
                         break;
                     }
 
                     content_length = ((else_offset - TemplatePatterns_C_::ElsePrefixLength) - content_offset);
-                    if_info->Insert(IfCase_{Array<TagBit>{}, case_offset, case_length, content_offset, content_length});
+                    if_info->Insert(
+                        IfTagCase{Array<TagBit>{}, case_offset, case_length, content_offset, content_length});
 
                     if ((content[else_offset] != TemplatePatterns_C_::ElseIfChar)) {
                         else_offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::MultiLineSuffix, content,
@@ -1170,7 +1171,7 @@ class Template_CV {
 
                         if (else_offset != 0) {
                             if_info->Insert(
-                                IfCase_{Array<TagBit>{}, case_offset, 0, else_offset, (length2 - else_offset)});
+                                IfTagCase{Array<TagBit>{}, case_offset, 0, else_offset, (length2 - else_offset)});
                         }
 
                         break;
@@ -1218,9 +1219,9 @@ class Template_CV {
     }
 
     void renderIf(const Char_T_ *content, const TagBit *tag) const {
-        IfInfo_       *if_info = static_cast<IfInfo_ *>(tag->GetInfo());
-        IfCase_       *item    = if_info->Storage();
-        const IfCase_ *end     = (item + if_info->Size());
+        IfTag           *if_info = static_cast<IfTag *>(tag->GetInfo());
+        IfTagCase       *item    = if_info->Storage();
+        const IfTagCase *end     = (item + if_info->Size());
 
         content += (tag->GetOffset() + TemplatePatterns_C_::IfPrefixLength);
 
