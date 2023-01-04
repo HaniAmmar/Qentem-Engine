@@ -1355,13 +1355,13 @@ class Template_CV {
                 left_value = findValue((left_content + TemplatePatterns_C_::VariablePrefixLength),
                                        (left_length - TemplatePatterns_C_::VariableFulllength)); // {var:x}
 
-                if (left_value == nullptr) {
+                if (left_value != nullptr) {
+                    if (left_value->IsNumber()) {
+                        left_value->SetNumber(left.Number);
+                        left_evaluated = true;
+                    }
+                } else {
                     return false;
-                }
-
-                if (left_value->IsNumber()) {
-                    left_value->SetNumber(left.Number);
-                    left_evaluated = true;
                 }
             } else {
                 if (*left_content != ALEExpressions_T_::ParenthesStart) {
@@ -1378,13 +1378,13 @@ class Template_CV {
                 right_value = findValue((right_content + TemplatePatterns_C_::VariablePrefixLength),
                                         (right_length - TemplatePatterns_C_::VariableFulllength)); // {var:x}
 
-                if (right_value == nullptr) {
+                if (right_value != nullptr) {
+                    if (right_value->IsNumber()) {
+                        right_value->SetNumber(right.Number);
+                        right_evaluated = true;
+                    }
+                } else {
                     return false;
-                }
-
-                if (right_value->IsNumber()) {
-                    right_value->SetNumber(right.Number);
-                    right_evaluated = true;
                 }
             } else if (left_evaluated) {
                 if (*right_content != ALEExpressions_T_::ParenthesStart) {
@@ -1396,28 +1396,21 @@ class Template_CV {
         }
 
         if (left_evaluated || right_evaluated) {
-            if (!left_evaluated && ((left_value == nullptr) || !(ALESetNumber(left.Number, left_value)))) {
-                return false;
+            if (left_evaluated || ((left_value != nullptr) && ALESetNumber(left.Number, left_value))) {
+                if (right_evaluated || ((right_value != nullptr) && ALESetNumber(right.Number, right_value))) {
+                    result = (left.Number == right.Number);
+                    return true;
+                }
             }
-
-            if (!right_evaluated && ((right_value == nullptr) || !(ALESetNumber(right.Number, right_value)))) {
-                return false;
+        } else if ((left_value == nullptr) || left_value->SetCharAndLength(left_content, left_length)) {
+            if ((right_value == nullptr) || right_value->SetCharAndLength(right_content, right_length)) {
+                result =
+                    ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
+                return true;
             }
-
-            result = (left.Number == right.Number);
-        } else {
-            if ((left_value != nullptr) && !(left_value->SetCharAndLength(left_content, left_length))) {
-                return false;
-            }
-
-            if ((right_value != nullptr) && !(right_value->SetCharAndLength(right_content, right_length))) {
-                return false;
-            }
-
-            result = ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
         }
 
-        return true;
+        return false;
     }
 
     Template_CV(StringStream_T_ *stream, const Value_T_ *root_value, const Template_CV *parent = nullptr,
