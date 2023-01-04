@@ -1258,19 +1258,20 @@ class Template_CV {
                 value = root_value_;
             } else {
                 const Template_CV *obj = this;
-                SizeT              lvl = 0;
 
                 do {
-                    ++lvl;
-                } while (key[lvl] == TemplatePatterns_C_::TildeChar);
+                    ++offset;
+                } while (key[offset] == TemplatePatterns_C_::TildeChar);
+
+                if (offset > level_) {
+                    return nullptr;
+                }
+
+                SizeT lvl = offset;
 
                 while (lvl < level_) {
                     ++lvl;
                     obj = obj->parent_;
-                }
-
-                if (lvl > level_) {
-                    return nullptr;
                 }
 
                 if ((key[(length - 1)] != TemplatePatterns_C_::VariableIndexSuffix)) {
@@ -1282,8 +1283,8 @@ class Template_CV {
                     ++tmp;
                 }
 
-                value  = obj->loop_value_;
-                offset = (lvl + 1);
+                value = obj->loop_value_;
+                ++offset;
             }
 
             while (value != nullptr) {
