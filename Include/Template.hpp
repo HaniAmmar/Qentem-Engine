@@ -575,64 +575,64 @@ class Template_CV {
     }
 
     // Part of parse()
-    QENTEM_NOINLINE static void light_parse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT length) {
+    QENTEM_NOINLINE static void lightParse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT length) {
         SizeT offset = 0;
 
         while (true) {
             offset = Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLinePrefix, content, offset, length);
 
-            if (offset == 0) {
-                break;
+            if (offset != 0) {
+                switch (content[offset]) {
+                    case TemplatePatterns_C_::Var_2ND_Char: {
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::VariablePrefix + 2), (content + offset + 1),
+                                                 (TemplatePatterns_C_::VariablePrefixLength - 2))) {
+                            const SizeT end_offset =
+                                Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
+                                                         (offset + TemplatePatterns_C_::VariablePrefixLength), length);
+                            // end_offset cannot be zero
+
+                            tags_cache += TagBit{TagType::Variable, (offset - TemplatePatterns_C_::InLinePrefixLength),
+                                                 end_offset};
+                            offset = end_offset;
+                        }
+
+                        continue;
+                    }
+
+                    case TemplatePatterns_C_::Raw_2ND_Char: {
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::RawVariablePrefix + 2), (content + offset + 1),
+                                                 (TemplatePatterns_C_::RawVariablePrefixLength - 2))) {
+                            const SizeT end_offset = Engine::FindOne<Char_T_>(
+                                TemplatePatterns_C_::InLineSuffix, content,
+                                (offset + TemplatePatterns_C_::RawVariablePrefixLength), length);
+                            tags_cache += TagBit{TagType::RawVariable,
+                                                 (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
+                            offset = end_offset;
+                        }
+
+                        continue;
+                    }
+
+                    case TemplatePatterns_C_::Math_2ND_Char: {
+                        if (StringUtils::IsEqual((TemplatePatterns_C_::MathPrefix + 2), (content + offset + 1),
+                                                 (TemplatePatterns_C_::MathPrefixLength - 2))) {
+                            const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
+                                TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
+                                (offset + TemplatePatterns_C_::MathPrefixLength - 1), length);
+                            tags_cache +=
+                                TagBit{TagType::Math, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
+                            offset = end_offset;
+                        }
+
+                        continue;
+                    }
+
+                    default: {
+                    }
+                }
             }
 
-            switch (content[offset]) {
-                case TemplatePatterns_C_::Var_2ND_Char: {
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::VariablePrefix + 2), (content + offset + 1),
-                                             (TemplatePatterns_C_::VariablePrefixLength - 2))) {
-                        const SizeT end_offset =
-                            Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
-                                                     (offset + TemplatePatterns_C_::VariablePrefixLength), length);
-                        // end_offset cannot be zero
-
-                        tags_cache +=
-                            TagBit{TagType::Variable, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
-                        offset = end_offset;
-                    }
-
-                    break;
-                }
-
-                case TemplatePatterns_C_::Raw_2ND_Char: {
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::RawVariablePrefix + 2), (content + offset + 1),
-                                             (TemplatePatterns_C_::RawVariablePrefixLength - 2))) {
-                        const SizeT end_offset =
-                            Engine::FindOne<Char_T_>(TemplatePatterns_C_::InLineSuffix, content,
-                                                     (offset + TemplatePatterns_C_::RawVariablePrefixLength), length);
-                        tags_cache += TagBit{TagType::RawVariable, (offset - TemplatePatterns_C_::InLinePrefixLength),
-                                             end_offset};
-                        offset = end_offset;
-                    }
-
-                    break;
-                }
-
-                case TemplatePatterns_C_::Math_2ND_Char: {
-                    if (StringUtils::IsEqual((TemplatePatterns_C_::MathPrefix + 2), (content + offset + 1),
-                                             (TemplatePatterns_C_::MathPrefixLength - 2))) {
-                        const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
-                            TemplatePatterns_C_::InLinePrefix, TemplatePatterns_C_::InLineSuffix, content,
-                            (offset + TemplatePatterns_C_::MathPrefixLength - 1), length);
-                        tags_cache +=
-                            TagBit{TagType::Math, (offset - TemplatePatterns_C_::InLinePrefixLength), end_offset};
-                        offset = end_offset;
-                    }
-
-                    break;
-                }
-
-                default: {
-                }
-            }
+            break;
         }
     }
 
@@ -1120,11 +1120,11 @@ class Template_CV {
         }
 
         if (info->TrueLength != 0) {
-            light_parse(info->TrueSubTags, (content + info->TrueOffset), info->TrueLength);
+            lightParse(info->TrueSubTags, (content + info->TrueOffset), info->TrueLength);
         }
 
         if (info->FalseLength != 0) {
-            light_parse(info->FalseSubTags, (content + info->FalseOffset), info->FalseLength);
+            lightParse(info->FalseSubTags, (content + info->FalseOffset), info->FalseLength);
         }
     }
 
@@ -1311,7 +1311,7 @@ class Template_CV {
                 ++offset;
             }
 
-            while (value != nullptr) {
+            do {
                 value = value->GetValue((key + offset), (tmp - offset));
 
                 ++tmp;
@@ -1329,7 +1329,7 @@ class Template_CV {
                 while (key[tmp] != TemplatePatterns_C_::VariableIndexSuffix) {
                     ++tmp;
                 }
-            }
+            } while (value != nullptr);
         }
 
         return value;
