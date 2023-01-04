@@ -73,8 +73,6 @@ struct TestOutPut {
                     return "\x1B[32m";
                 case END:
                     return "\x1B[0m";
-                default:
-                    return "";
             }
         }
 

@@ -20,16 +20,20 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_COMMON_H_
+#define QENTEM_COMMON_H_
+
+namespace Qentem {
+
 #ifndef QENTEM_AUTOESCAPE_HTML
 #define QENTEM_AUTOESCAPE_HTML 1
 #endif
 
-#ifndef QENTEM_COMMON_H_
-#define QENTEM_COMMON_H_
-
 #ifndef QENTEM_DOUBLE_PRECISION
 #define QENTEM_DOUBLE_PRECISION 15
 #endif
+
+// static constexpr bool QentemIs64bit = (sizeof(void *) == 8);
 
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__powerpc64__) ||  \
     defined(__s390__)
@@ -39,6 +43,9 @@
 // the upper 16 bits can be used for taging.
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
+// static constexpr bool QentemPointerTagging = QentemIs64bit && 1;
+#else
+// static constexpr bool QentemPointerTagging          = false;
 #endif
 #endif
 
@@ -46,9 +53,13 @@
 #ifndef QENTEM_SSO
 // Short string optimization
 #define QENTEM_SSO 1
+// static constexpr bool QentemShortStringOptimization = true;
+#else
+// static constexpr bool QentemShortStringOptimization = false;
 #endif
 #else
 #undef QENTEM_SSO
+// static constexpr bool QentemShortStringOptimization = false;
 #endif
 
 #ifndef QENTEM_AVX2
@@ -82,8 +93,6 @@
 #define QENTEM_BIG_ENDIAN
 #endif
 #endif
-
-namespace Qentem {
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T

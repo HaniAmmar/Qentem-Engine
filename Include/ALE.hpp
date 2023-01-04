@@ -223,7 +223,7 @@ class ALE {
                 case ALEExpressions_T_::ParenthesStart: {
                     // getExpression check for closed parenthes, so "length" will never go over the actual length.
                     length += offset;
-                    ++offset; // passing (
+                    ++offset; // after (
                     --length; // before )
 
                     return Parse(val, offset, length);
@@ -484,38 +484,37 @@ class ALE {
             return Expression::None;
         }
 
+        static bool isExpression(const Char_T_ *content, SizeT offset) noexcept {
+            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+
+            while (offset != 0) {
+                --offset;
+
+                switch (content[offset]) {
+                    case ALEExpressions_T_::SpaceChar: {
+                        break;
+                    }
+
+                    case ALEExpressions_T_::ParenthesEnd:
+                    case ALEExpressions_T_::BracketEnd: {
+                        // (...) and {} are numbers.
+                        return true;
+                    }
+
+                    default: {
+                        // A number
+                        return ((content[offset] < ALEExpressions_T_::ColonChar) &&
+                                (content[offset] > ALEExpressions_T_::SlashChar));
+                    }
+                }
+            }
+
+            return false;
+        }
+
         const Helper_T_ *helper_;
         const Char_T_   *content_;
     };
-
-    template <typename Char_T_>
-    static bool isExpression(const Char_T_ *content, SizeT offset) noexcept {
-        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
-
-        while (offset != 0) {
-            --offset;
-
-            switch (content[offset]) {
-                case ALEExpressions_T_::SpaceChar: {
-                    break;
-                }
-
-                case ALEExpressions_T_::ParenthesEnd:
-                case ALEExpressions_T_::BracketEnd: {
-                    // (...) and {} are numbers.
-                    return true;
-                }
-
-                default: {
-                    // A number
-                    return ((content[offset] < ALEExpressions_T_::ColonChar) &&
-                            (content[offset] > ALEExpressions_T_::SlashChar));
-                }
-            }
-        }
-
-        return false;
-    }
 };
 
 template <typename Char_T_>
