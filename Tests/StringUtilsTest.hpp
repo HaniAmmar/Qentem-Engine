@@ -503,46 +503,46 @@ static void TestIsEqual(TestHelper &helper) {
 }
 
 static void TestIsBigger(TestHelper &helper) {
-    helper.EqualsTrue(StringUtils::IsBigger("", "", 0U, 0U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("b", "a", 1U, 1U, false), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("a", "a", 1U, 1U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("a", "A", 1U, 1U, false), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("a", "A", 1U, 1U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("aa", "aA", 2U, 2U, false), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("aa", "aA", 2U, 2U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8U, 8U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("abcdefgh", "aBcdefgh", 8U, 8U, false), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8U, 8U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("201811111", "20189999", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("2018", "2018", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("201911111", "20189999", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("2019", "2018", 4U, 4U, false), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("201911111", "20189999", 4U, 4U, false), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("2019", "2018", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("2019", "2018", 3U, 3U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("2021", "2018", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsTrue(StringUtils::IsBigger("2021", "2018", 4U, 4U, false), "IsBigger", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("", "", 0U, 0U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("b", "a", 1U, 1U, false), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("a", "a", 1U, 1U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("a", "A", 1U, 1U, false), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("a", "A", 1U, 1U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("aa", "aA", 2U, 2U, false), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("aa", "aA", 2U, 2U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("abcdefgh", "aBcdefgh", 8U, 8U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("abcdefgh", "aBcdefgh", 8U, 8U, false), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("abcdefgh", "abcdefgh", 8U, 8U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("201811111", "20189999", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("2018", "2018", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("201911111", "20189999", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("2019", "2018", 4U, 4U, false), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("201911111", "20189999", 4U, 4U, false), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("2019", "2018", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("2019", "2018", 3U, 3U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("2021", "2018", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsTrue(StringUtils::IsGreater("2021", "2018", 4U, 4U, false), "IsGreater", __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsBigger("", "", 0U, 0U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("a", "a", 1U, 1U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("a", "b", 1U, 1U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("A", "a", 1U, 1U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("A", "a", 1U, 1U, true), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("aA", "aa", 2U, 2U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("aA", "aa", 2U, 2U, true), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8U, 8U, true), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("aBcdefgh", "abcdefgh", 8U, 8U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("abcdefgh", "abcdefgh", 8U, 8U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("201811111", "20189999", 4U, 4U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2018", "2018", 4U, 4U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("20189999", "201911111", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2018", "2019", 4U, 4U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("20189999", "201911111", 4U, 4U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2018", "2019", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2018", "2019", 3U, 3U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2019", "2018", 3U, 3U, false), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2018", "2021", 4U, 4U, true), "IsBigger", __LINE__);
-    helper.EqualsFalse(StringUtils::IsBigger("2018", "2021", 4U, 4U, false), "IsBigger", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("", "", 0U, 0U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("a", "a", 1U, 1U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("a", "b", 1U, 1U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("A", "a", 1U, 1U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("A", "a", 1U, 1U, true), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("aA", "aa", 2U, 2U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("aA", "aa", 2U, 2U, true), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("aBcdefgh", "abcdefgh", 8U, 8U, true), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("aBcdefgh", "abcdefgh", 8U, 8U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("abcdefgh", "abcdefgh", 8U, 8U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("201811111", "20189999", 4U, 4U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2018", "2018", 4U, 4U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("20189999", "201911111", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2018", "2019", 4U, 4U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("20189999", "201911111", 4U, 4U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2018", "2019", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2018", "2019", 3U, 3U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2019", "2018", 3U, 3U, false), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, true), "IsGreater", __LINE__);
+    helper.EqualsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, false), "IsGreater", __LINE__);
 }
 
 static void TestIsLess(TestHelper &helper) {
@@ -598,7 +598,7 @@ static int RunStringUtilsTests() {
     helper.Test("TrimLeft Test", TestLeftTrim);
     helper.Test("Trim Test", TestSoftTrim);
     helper.Test("IsEqual Test", TestIsEqual);
-    helper.Test("IsBigger Test", TestIsBigger);
+    helper.Test("IsGreater Test", TestIsBigger);
     helper.Test("IsLess Test", TestIsLess);
 
     return helper.EndTests();

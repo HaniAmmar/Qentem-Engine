@@ -112,8 +112,8 @@ class StringUtils {
     }
 
     template <typename Char_T_>
-    static bool IsBigger(const Char_T_ *left, const Char_T_ *right, SizeT left_length, SizeT right_length,
-                         bool orEqual) noexcept {
+    static bool IsGreater(const Char_T_ *left, const Char_T_ *right, SizeT left_length, SizeT right_length,
+                          bool orEqual) noexcept {
         SizeT offset = 0;
 
         while ((left_length != offset) && (right_length != offset)) {

@@ -175,63 +175,63 @@ static void TestStringCompare(TestHelper &helper) {
 
     str1 = "";
     str2 = "";
-    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 >= str2), "IsGreater", __LINE__);
     helper.EqualsTrue((str1 <= str2), "IsLess", __LINE__);
-    helper.EqualsFalse((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 > str2), "IsGreater", __LINE__);
     helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
 
     str1 = "a";
     str2 = "a";
-    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 >= str2), "IsGreater", __LINE__);
     helper.EqualsTrue((str1 <= str2), "IsLess", __LINE__);
-    helper.EqualsFalse((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsFalse((str1 > str2), "IsGreater", __LINE__);
     helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
 
     str1 = "a";
     str2 = "A";
-    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
-    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 >= str2), "IsGreater", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsGreater", __LINE__);
     helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
     helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
-    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 >= str1), "IsGreater", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsGreater", __LINE__);
     helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
     helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 
     str1 = "a";
     str2 = "B";
-    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
-    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 >= str2), "IsGreater", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsGreater", __LINE__);
     helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
     helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
-    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 >= str1), "IsGreater", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsGreater", __LINE__);
     helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
     helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 
     str1 = "aa";
     str2 = "aA";
-    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
-    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 >= str2), "IsGreater", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsGreater", __LINE__);
     helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
     helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
-    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 >= str1), "IsGreater", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsGreater", __LINE__);
     helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
     helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 
     str1 = "2021";
     str2 = "2018";
-    helper.EqualsTrue((str1 >= str2), "IsBigger", __LINE__);
-    helper.EqualsTrue((str1 > str2), "IsBigger", __LINE__);
+    helper.EqualsTrue((str1 >= str2), "IsGreater", __LINE__);
+    helper.EqualsTrue((str1 > str2), "IsGreater", __LINE__);
     helper.EqualsFalse((str1 <= str2), "IsLess", __LINE__);
     helper.EqualsFalse((str1 < str2), "IsLess", __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), "IsBigger", __LINE__);
-    helper.EqualsFalse((str2 > str1), "IsBigger", __LINE__);
+    helper.EqualsFalse((str2 >= str1), "IsGreater", __LINE__);
+    helper.EqualsFalse((str2 > str1), "IsGreater", __LINE__);
     helper.EqualsTrue((str2 <= str1), "IsLess", __LINE__);
     helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 }
