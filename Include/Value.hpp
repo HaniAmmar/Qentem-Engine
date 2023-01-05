@@ -1145,17 +1145,14 @@ class Value {
         return false;
     }
 
-    inline void Remove(const Char_T_ *key) const noexcept {
+    inline void Remove(const Char_T_ *key, SizeT length) const noexcept {
         if (IsObject()) {
-            object_.Remove(key);
+            object_.Remove(key, length);
         }
     }
 
-    inline void Remove(const VString &key) const noexcept {
-        if (IsObject()) {
-            object_.Remove(key);
-        }
-    }
+    inline void Remove(const VString &key) const noexcept { Remove(key.First(), key.Length()); }
+    inline void Remove(const Char_T_ *key) const noexcept { Remove(key, StringUtils::Count(key)); }
 
     void RemoveIndex(SizeT index) const noexcept {
         if (IsObject()) {
