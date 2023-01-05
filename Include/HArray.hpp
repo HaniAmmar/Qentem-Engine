@@ -169,22 +169,7 @@ class HArray {
         }
     }
 
-    Value_ &operator[](const Char_T_ *key) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT len  = StringUtils::Count(key);
-        const SizeT hash = StringUtils::Hash(key, len);
-        SizeT      *index;
-        HAItem_    *item = find(index, key, len, hash);
-
-        if (item != nullptr) {
-            return item->Value;
-        }
-
-        return insert(index, Key_(key, len), hash)->Value;
-    }
+    Value_ &operator[](const Char_T_ *key) { return GetOrAdd(key, StringUtils::Count(key)); }
 
     Value_ &operator[](Key_ &&key) {
         if (Size() == Capacity()) {
@@ -222,6 +207,22 @@ class HArray {
         }
 
         return insert(index, Key_(key), hash)->Value;
+    }
+
+    Value_ &GetOrAdd(const Char_T_ *key, const SizeT len) {
+        if (Size() == Capacity()) {
+            expand();
+        }
+
+        const SizeT hash = StringUtils::Hash(key, len);
+        SizeT      *index;
+        HAItem_    *item = find(index, key, len, hash);
+
+        if (item != nullptr) {
+            return item->Value;
+        }
+
+        return insert(index, Key_(key, len), hash)->Value;
     }
 
     void Insert(Key_ &&key, Value_ &&val) {
