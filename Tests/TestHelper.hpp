@@ -79,6 +79,8 @@ struct TestOutPut {
         return "";
     }
 
+    void static SetColoredOutput(bool value) { coloredOutput_ = value; }
+
   private:
     static bool coloredOutput_;
 };
