@@ -23,6 +23,7 @@
 #include "TestHelper.hpp"
 
 #include "JSONUtils.hpp"
+#include "StringStream.hpp"
 
 #ifndef QENTEM_JSONUTILS_TESTS_H_
 #define QENTEM_JSONUTILS_TESTS_H_

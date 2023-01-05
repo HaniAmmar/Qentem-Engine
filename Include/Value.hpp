@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "StringStream.hpp"
 
 #include "Array.hpp"
 #include "HArray.hpp"
@@ -1219,20 +1220,6 @@ class Value {
         }
     }
 
-    inline VString Stringify() const {
-        StringStream<Char_T_> stream;
-
-        const ValueType type = Type();
-
-        if (type == ValueType::Object) {
-            stringifyObject(this->object_, stream);
-        } else if (type == ValueType::Array) {
-            stringifyArray(this->array_, stream);
-        }
-
-        return stream.GetString();
-    }
-
     inline ValueType Type() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         return static_cast<ValueType>(type_.Value.GetHighByte());
@@ -1303,8 +1290,28 @@ class Value {
         }
     }
 
+    template <typename Stream_T_>
+    inline void Stringify(Stream_T_ &stream) const {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
+            stringifyObject(this->object_, stream);
+        } else if (type == ValueType::Array) {
+            stringifyArray(this->array_, stream);
+        }
+    }
+
+    VString Stringify() const {
+        StringStream<Char_T_> stream;
+
+        Stringify(stream);
+
+        return stream.GetString();
+    }
+
   private:
-    static void stringifyObject(const VObject &obj, StringStream<Char_T_> &stream) {
+    template <typename Stream_T_>
+    static void stringifyObject(const VObject &obj, Stream_T_ &stream) {
         using V_item_ = HAItem_T_<Value, Char_T_>;
 
         stream += JSONotation::SCurlyChar;
@@ -1328,7 +1335,8 @@ class Value {
         stream += JSONotation::ECurlyChar;
     }
 
-    static void stringifyArray(const VArray &arr, StringStream<Char_T_> &stream) {
+    template <typename Stream_T_>
+    static void stringifyArray(const VArray &arr, Stream_T_ &stream) {
         stream += JSONotation::SSquareChar;
 
         for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
@@ -1345,7 +1353,8 @@ class Value {
         stream += JSONotation::ESquareChar;
     }
 
-    static void stringifyValue(const Value &val, StringStream<Char_T_> &stream) {
+    template <typename Stream_T_>
+    static void stringifyValue(const Value &val, Stream_T_ &stream) {
         switch (val.Type()) {
             case ValueType::Object: {
                 stringifyObject(val.object_, stream);

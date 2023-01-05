@@ -20,26 +20,24 @@
  * SOFTWARE.
  */
 
-#include "StringStream.hpp"
-
 #ifndef QENTEM_UNICODE_H_
 #define QENTEM_UNICODE_H_
 
 namespace Qentem {
 namespace Unicode {
 
-template <typename Char_T_, int S>
+template <typename, typename, int>
 struct UnicodeToUTF {};
 
-template <typename Char_T_>
-static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
-    UnicodeToUTF<Char_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode, stream);
+template <typename Char_T_, typename Stream_T_>
+static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
+    UnicodeToUTF<Char_T_, Stream_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode, stream);
 }
 
 // UTF8
-template <typename Char_T_>
-struct UnicodeToUTF<Char_T_, 1> {
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
+template <typename Char_T_, typename Stream_T_>
+struct UnicodeToUTF<Char_T_, Stream_T_, 1> {
+    static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
         /*
          * ToUTF(0xC3D, stream);
          * ToUTF(0x00A1, stream);
@@ -67,9 +65,9 @@ struct UnicodeToUTF<Char_T_, 1> {
 };
 
 // UTF16
-template <typename Char_T_>
-struct UnicodeToUTF<Char_T_, 2> {
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) {
+template <typename Char_T_, typename Stream_T_>
+struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
+    static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
         if (unicode < 0x10000U) {
             stream += static_cast<Char_T_>(unicode);
         } else {
@@ -81,9 +79,9 @@ struct UnicodeToUTF<Char_T_, 2> {
 };
 
 // UTF32
-template <typename Char_T_>
-struct UnicodeToUTF<Char_T_, 4> {
-    static void ToUTF(unsigned int unicode, StringStream<Char_T_> &stream) { stream += static_cast<Char_T_>(unicode); }
+template <typename Char_T_, typename Stream_T_>
+struct UnicodeToUTF<Char_T_, Stream_T_, 4> {
+    static void ToUTF(unsigned int unicode, Stream_T_ &stream) { stream += static_cast<Char_T_>(unicode); }
 };
 
 } // namespace Unicode
