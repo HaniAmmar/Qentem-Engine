@@ -213,8 +213,8 @@ struct Template {
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ *root_value,
-                              StringStream_T_ *stream) {
+    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value,
+                              StringStream_T_ &stream) {
         Array<TagBit<Char_T_>> tags_cache;
         Render(content, length, *root_value, *stream, tags_cache);
     }
@@ -404,7 +404,7 @@ struct TemplateSub {
         SizeT         offset = 0;
 
         while (tag != end) {
-            ss_->Insert((content + offset), (tag->GetOffset() - offset));
+            stream_->Insert((content + offset), (tag->GetOffset() - offset));
 
             switch (tag->GetType()) {
                 case TagType::Variable: {
@@ -446,7 +446,7 @@ struct TemplateSub {
         }
 
         // Add any remaining string.
-        ss_->Insert((content + offset), (length - offset));
+        stream_->Insert((content + offset), (length - offset));
     }
 
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT length, SizeT level) {
@@ -694,27 +694,27 @@ struct TemplateSub {
                 const Char_T_ *str;
                 SizeT          len;
                 value->SetCharAndLength(str, len);
-                escapeHTMLSpecialChars(*ss_, str, len);
+                escapeHTMLSpecialChars(*stream_, str, len);
                 return;
             }
 #endif
 
-            if (value->CopyStringValueTo(*ss_)) {
+            if (value->CopyStringValueTo(*stream_)) {
                 return;
             }
 
             if ((*content == TemplatePatterns::TildeChar) && (loop_key_ != nullptr)) {
 #if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-                escapeHTMLSpecialChars(*ss_, loop_key_, loop_key_length_);
+                escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
 #else
-                ss_->Insert(loop_key_, loop_key_length_);
+                stream_->Insert(loop_key_, loop_key_length_);
 #endif
             }
         }
 
         if (*content != TemplatePatterns::TildeChar) {
-            ss_->Insert((content - TemplatePatterns::VariablePrefixLength),
-                        (length + TemplatePatterns::VariableFulllength));
+            stream_->Insert((content - TemplatePatterns::VariablePrefixLength),
+                            (length + TemplatePatterns::VariableFulllength));
         }
     }
 
@@ -725,13 +725,13 @@ struct TemplateSub {
 
         const Value_T_ *value = findValue(content, length);
 
-        if ((value != nullptr) && value->CopyStringValueTo(*ss_)) {
+        if ((value != nullptr) && value->CopyStringValueTo(*stream_)) {
             return;
         }
 
         if (*content != TemplatePatterns::TildeChar) {
-            ss_->Insert((content - TemplatePatterns::RawVariablePrefixLength),
-                        (length + TemplatePatterns::RawVariableFulllength));
+            stream_->Insert((content - TemplatePatterns::RawVariablePrefixLength),
+                            (length + TemplatePatterns::RawVariableFulllength));
         }
     }
 
@@ -742,9 +742,10 @@ struct TemplateSub {
         SizeT length = ((tag->GetEndOffset() - TemplatePatterns::InLineSuffixLength) - content_offset);
 
         if (ALE::Evaluate(number, content, length, this)) {
-            Digit<Char_T_>::NumberToString(*ss_, number, 1, 0, 3);
+            Digit<Char_T_>::NumberToString(*stream_, number, 1, 0, 3);
         } else {
-            ss_->Insert((content - TemplatePatterns::MathPrefixLength), (length + TemplatePatterns::MathFulllength));
+            stream_->Insert((content - TemplatePatterns::MathPrefixLength),
+                            (length + TemplatePatterns::MathFulllength));
         }
     }
 
@@ -1033,7 +1034,7 @@ struct TemplateSub {
         }
 
         // Stage 4: Render
-        TemplateSub    loop_template{ss_, root_value_, this, (level_ + 1)};
+        TemplateSub    loop_template{stream_, root_value_, this, (level_ + 1)};
         const Char_T_ *loop_content = loop_info->InnerTemplate.First();
         const SizeT    loop_length  = loop_info->InnerTemplate.Length();
 
@@ -1427,9 +1428,9 @@ struct TemplateSub {
 
     TemplateSub(StringStream_T_ *stream, const Value_T_ *root_value, const TemplateSub *parent = nullptr,
                 SizeT level = 0) noexcept
-        : ss_{stream}, root_value_{root_value}, parent_{parent}, level_{level} {}
+        : stream_{stream}, root_value_{root_value}, parent_{parent}, level_{level} {}
 
-    StringStream_T_   *ss_;
+    StringStream_T_   *stream_;
     const Value_T_    *root_value_;
     const TemplateSub *parent_;
     const Value_T_    *loop_value_{nullptr};
