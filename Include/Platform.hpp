@@ -161,7 +161,7 @@ inline static unsigned int CLZ(Number_T_ value) noexcept {
 #else
 
 template <typename Number_T_>
-inline static unsigned int CLZ(Number_T_ value) noexcept {
+inline static unsigned int CTZ(Number_T_ value) noexcept {
     if (value > 0) {
         unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
         return ++index;
