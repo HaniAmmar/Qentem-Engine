@@ -44,10 +44,10 @@ enum class ValueType : unsigned char {
 
 template <typename Char_T_>
 class Value {
-    using JSONotation_T_ = JSON::JSONotation<Char_T_>;
-    using VObject        = HArray<Value, Char_T_>;
-    using VArray         = Array<Value>;
-    using VString        = String<Char_T_>;
+    using JSONotation = JSON::JSONotation_T_<Char_T_>;
+    using VObject     = HArray<Value, Char_T_>;
+    using VArray      = Array<Value>;
+    using VString     = String<Char_T_>;
 
   public:
     Value() noexcept : number_{} {}
@@ -903,20 +903,20 @@ class Value {
             }
 
             case ValueType::True: {
-                key    = JSONotation_T_::TrueString;
-                length = JSONotation_T_::TrueStringLength;
+                key    = JSONotation::TrueString;
+                length = JSONotation::TrueStringLength;
                 return true;
             }
 
             case ValueType::False: {
-                key    = JSONotation_T_::FalseString;
-                length = JSONotation_T_::FalseStringLength;
+                key    = JSONotation::FalseString;
+                length = JSONotation::FalseStringLength;
                 return true;
             }
 
             case ValueType::Null: {
-                key    = JSONotation_T_::NullString;
-                length = JSONotation_T_::NullStringLength;
+                key    = JSONotation::NullString;
+                length = JSONotation::NullStringLength;
                 return true;
             }
 
@@ -949,17 +949,17 @@ class Value {
             }
 
             case ValueType::True: {
-                value = VString(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength);
+                value = VString(JSONotation::TrueString, JSONotation::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                value = VString(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength);
+                value = VString(JSONotation::FalseString, JSONotation::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                value = VString(JSONotation_T_::NullString, JSONotation_T_::NullStringLength);
+                value = VString(JSONotation::NullString, JSONotation::NullStringLength);
                 break;
             }
 
@@ -995,17 +995,17 @@ class Value {
             }
 
             case ValueType::True: {
-                stream.Insert(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength);
+                stream.Insert(JSONotation::TrueString, JSONotation::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                stream.Insert(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength);
+                stream.Insert(JSONotation::FalseString, JSONotation::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Insert(JSONotation_T_::NullString, JSONotation_T_::NullStringLength);
+                stream.Insert(JSONotation::NullString, JSONotation::NullStringLength);
                 break;
             }
 
@@ -1126,12 +1126,12 @@ class Value {
             }
 
             case ValueType::String: {
-                if (string_.IsEqual(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength)) {
+                if (string_.IsEqual(JSONotation::TrueString, JSONotation::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (string_.IsEqual(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength)) {
+                if (string_.IsEqual(JSONotation::FalseString, JSONotation::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1307,42 +1307,42 @@ class Value {
     static void stringifyObject(const VObject &obj, StringStream<Char_T_> &stream) {
         using V_item_ = HAItem_T_<Value, Char_T_>;
 
-        stream += JSONotation_T_::SCurlyChar;
+        stream += JSONotation::SCurlyChar;
 
         for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size()); h_item != end; h_item++) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
-                stream += JSONotation_T_::QuoteChar;
+                stream += JSONotation::QuoteChar;
                 JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
-                stream += JSONotation_T_::QuoteChar;
-                stream += JSONotation_T_::ColonChar;
+                stream += JSONotation::QuoteChar;
+                stream += JSONotation::ColonChar;
 
                 stringifyValue(h_item->Value, stream);
-                stream += JSONotation_T_::CommaChar;
+                stream += JSONotation::CommaChar;
             }
         }
 
-        if (*(stream.Last()) == JSONotation_T_::CommaChar) {
+        if (*(stream.Last()) == JSONotation::CommaChar) {
             stream.StepBack(1U);
         }
 
-        stream += JSONotation_T_::ECurlyChar;
+        stream += JSONotation::ECurlyChar;
     }
 
     static void stringifyArray(const VArray &arr, StringStream<Char_T_> &stream) {
-        stream += JSONotation_T_::SSquareChar;
+        stream += JSONotation::SSquareChar;
 
         for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
             if (!(item->IsUndefined())) {
                 stringifyValue(*item, stream);
-                stream += JSONotation_T_::CommaChar;
+                stream += JSONotation::CommaChar;
             }
         }
 
-        if (*(stream.Last()) == JSONotation_T_::CommaChar) {
+        if (*(stream.Last()) == JSONotation::CommaChar) {
             stream.StepBack(1U);
         }
 
-        stream += JSONotation_T_::ESquareChar;
+        stream += JSONotation::ESquareChar;
     }
 
     static void stringifyValue(const Value &val, StringStream<Char_T_> &stream) {
@@ -1358,9 +1358,9 @@ class Value {
             }
 
             case ValueType::String: {
-                stream += JSONotation_T_::QuoteChar;
+                stream += JSONotation::QuoteChar;
                 JSON::EscapeJSON(val.string_.First(), val.string_.Length(), stream);
-                stream += JSONotation_T_::QuoteChar;
+                stream += JSONotation::QuoteChar;
                 break;
             }
 
@@ -1380,17 +1380,17 @@ class Value {
             }
 
             case ValueType::False: {
-                stream.Insert(JSONotation_T_::FalseString, JSONotation_T_::FalseStringLength);
+                stream.Insert(JSONotation::FalseString, JSONotation::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                stream.Insert(JSONotation_T_::TrueString, JSONotation_T_::TrueStringLength);
+                stream.Insert(JSONotation::TrueString, JSONotation::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Insert(JSONotation_T_::NullString, JSONotation_T_::NullStringLength);
+                stream.Insert(JSONotation::NullString, JSONotation::NullStringLength);
                 break;
             }
 

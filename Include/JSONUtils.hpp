@@ -31,18 +31,18 @@ namespace Qentem {
 namespace JSON {
 
 template <typename>
-struct JSONotation;
+struct JSONotation_T_;
 
 template <typename Char_T_>
 QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T_> &buffer) {
-    using JSONotation_T_ = JSONotation<Char_T_>;
+    using JSONotation = JSONotation_T_<Char_T_>;
 
     SizeT offset  = 0;
     SizeT offset2 = 0;
 
     while (offset < length) {
         switch (content[offset]) {
-            case JSONotation_T_::BSlashChar: {
+            case JSONotation::BSlashChar: {
                 if (offset > offset2) {
                     buffer.Insert((content + offset2), (offset - offset2));
                 }
@@ -51,39 +51,39 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
                 offset2 = (offset + 1);
 
                 switch (content[offset]) {
-                    case JSONotation_T_::QuoteChar:
-                    case JSONotation_T_::BSlashChar:
-                    case JSONotation_T_::SlashChar: {
+                    case JSONotation::QuoteChar:
+                    case JSONotation::BSlashChar:
+                    case JSONotation::SlashChar: {
                         buffer += content[offset];
                         break;
                     }
 
-                    case JSONotation_T_::B_Char: {
-                        buffer += JSONotation_T_::BackSpaceControlChar;
+                    case JSONotation::B_Char: {
+                        buffer += JSONotation::BackSpaceControlChar;
                         break;
                     }
 
-                    case JSONotation_T_::F_Char: {
-                        buffer += JSONotation_T_::FormfeedControlChar;
+                    case JSONotation::F_Char: {
+                        buffer += JSONotation::FormfeedControlChar;
                         break;
                     }
 
-                    case JSONotation_T_::N_Char: {
-                        buffer += JSONotation_T_::LineControlChar;
+                    case JSONotation::N_Char: {
+                        buffer += JSONotation::LineControlChar;
                         break;
                     }
-                    case JSONotation_T_::R_Char: {
-                        buffer += JSONotation_T_::CarriageControlChar;
-                        break;
-                    }
-
-                    case JSONotation_T_::T_Char: {
-                        buffer += JSONotation_T_::TabControlChar;
+                    case JSONotation::R_Char: {
+                        buffer += JSONotation::CarriageControlChar;
                         break;
                     }
 
-                    case JSONotation_T_::CU_Char:
-                    case JSONotation_T_::U_Char: {
+                    case JSONotation::T_Char: {
+                        buffer += JSONotation::TabControlChar;
+                        break;
+                    }
+
+                    case JSONotation::CU_Char:
+                    case JSONotation::U_Char: {
                         ++offset;
 
                         if ((length - offset) > 3) {
@@ -123,7 +123,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
                 break;
             }
 
-            case JSONotation_T_::QuoteChar: {
+            case JSONotation::QuoteChar: {
                 if (buffer.IsNotEmpty()) {
                     buffer.Insert((content + offset2), (offset - offset2));
                 }
@@ -132,9 +132,9 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
                 return offset;
             }
 
-            case JSONotation_T_::LineControlChar:
-            case JSONotation_T_::TabControlChar:
-            case JSONotation_T_::CarriageControlChar: {
+            case JSONotation::LineControlChar:
+            case JSONotation::TabControlChar:
+            case JSONotation::CarriageControlChar: {
                 return 0;
             }
 
@@ -154,66 +154,66 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
 
 template <typename Char_T_>
 static void EscapeJSON(const Char_T_ *content, SizeT length, StringStream<Char_T_> &buffer) {
-    using JSONotation_T_ = JSONotation<Char_T_>;
+    using JSONotation = JSONotation_T_<Char_T_>;
 
     SizeT offset  = 0;
     SizeT offset2 = 0;
 
     while (offset < length) {
         switch (content[offset]) {
-            case JSONotation_T_::QuoteChar:
-            case JSONotation_T_::BSlashChar:
-            case JSONotation_T_::SlashChar:
-            case JSONotation_T_::BackSpaceControlChar:
-            case JSONotation_T_::FormfeedControlChar:
-            case JSONotation_T_::LineControlChar:
-            case JSONotation_T_::CarriageControlChar:
-            case JSONotation_T_::TabControlChar: {
+            case JSONotation::QuoteChar:
+            case JSONotation::BSlashChar:
+            case JSONotation::SlashChar:
+            case JSONotation::BackSpaceControlChar:
+            case JSONotation::FormfeedControlChar:
+            case JSONotation::LineControlChar:
+            case JSONotation::CarriageControlChar:
+            case JSONotation::TabControlChar: {
                 if (offset > offset2) {
                     buffer.Insert((content + offset2), (offset - offset2));
                 }
 
-                buffer += JSONotation_T_::BSlashChar;
+                buffer += JSONotation::BSlashChar;
                 offset2 = offset + 1;
 
                 switch (content[offset]) {
-                    case JSONotation_T_::QuoteChar: {
-                        buffer += JSONotation_T_::QuoteChar;
+                    case JSONotation::QuoteChar: {
+                        buffer += JSONotation::QuoteChar;
                         break;
                     }
 
-                    case JSONotation_T_::BSlashChar: {
-                        buffer += JSONotation_T_::BSlashChar;
+                    case JSONotation::BSlashChar: {
+                        buffer += JSONotation::BSlashChar;
                         break;
                     }
 
-                    case JSONotation_T_::SlashChar: {
-                        buffer += JSONotation_T_::SlashChar;
+                    case JSONotation::SlashChar: {
+                        buffer += JSONotation::SlashChar;
                         break;
                     }
 
-                    case JSONotation_T_::BackSpaceControlChar: {
-                        buffer += JSONotation_T_::B_Char;
+                    case JSONotation::BackSpaceControlChar: {
+                        buffer += JSONotation::B_Char;
                         break;
                     }
 
-                    case JSONotation_T_::FormfeedControlChar: {
-                        buffer += JSONotation_T_::F_Char;
+                    case JSONotation::FormfeedControlChar: {
+                        buffer += JSONotation::F_Char;
                         break;
                     }
 
-                    case JSONotation_T_::LineControlChar: {
-                        buffer += JSONotation_T_::N_Char;
+                    case JSONotation::LineControlChar: {
+                        buffer += JSONotation::N_Char;
                         break;
                     }
 
-                    case JSONotation_T_::CarriageControlChar: {
-                        buffer += JSONotation_T_::R_Char;
+                    case JSONotation::CarriageControlChar: {
+                        buffer += JSONotation::R_Char;
                         break;
                     }
 
-                    case JSONotation_T_::TabControlChar: {
-                        buffer += JSONotation_T_::T_Char;
+                    case JSONotation::TabControlChar: {
+                        buffer += JSONotation::T_Char;
                         break;
                     }
 
@@ -238,7 +238,7 @@ template <typename Char_T_, int S>
 struct JSONotationStrings {};
 
 template <typename Char_T_>
-struct JSONotation {
+struct JSONotation_T_ {
   private:
     static constexpr int size_ = static_cast<int>(sizeof(Char_T_));
 

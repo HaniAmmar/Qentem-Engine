@@ -28,160 +28,76 @@
 namespace Qentem {
 namespace JSON {
 
-template <typename>
+template <typename, typename>
 class JSONParser;
+
+template <typename Char_T_, typename Number_T, typename Stream_T_>
+inline static Value<Char_T_> Parse(Stream_T_ &stream, const Char_T_ *content, Number_T length) {
+    return JSONParser<Char_T_, Stream_T_>::Parse(stream, content, static_cast<SizeT>(length));
+}
 
 template <typename Char_T_, typename Number_T>
 inline static Value<Char_T_> Parse(const Char_T_ *content, Number_T length) {
-    return JSONParser<Char_T_>::Parse(content, static_cast<SizeT>(length));
+    StringStream<Char_T_> stream{};
+    return Parse(stream, content, static_cast<SizeT>(length));
 }
 
 template <typename Char_T_>
 inline static Value<Char_T_> Parse(const Char_T_ *content) {
-    return JSONParser<Char_T_>::Parse(content, StringUtils::Count(content));
+    return Parse(content, StringUtils::Count(content));
 }
 
-template <typename Char_T_>
+template <typename Char_T_, typename Stream_T_>
 class JSONParser {
     using VValue = Value<Char_T_>;
 
   public:
-    JSONParser() = default;
+    JSONParser()                              = delete;
+    JSONParser(JSONParser &&)                 = delete;
+    JSONParser(const JSONParser &)            = delete;
+    JSONParser &operator=(JSONParser &&)      = delete;
+    JSONParser &operator=(const JSONParser &) = delete;
+    ~JSONParser()                             = delete;
 
-    static VValue Parse(const Char_T_ *content, SizeT length) {
+    static VValue Parse(Stream_T_ &stream, const Char_T_ *content, SizeT length) {
+        VValue value;
+
         if (length != 0) {
             SizeT offset = 0;
             StringUtils::TrimLeft(content, offset, length);
-            VValue value = JSONParser{}.parseValue(content, offset, length);
+            parseValue(value, stream, content, offset, length);
             StringUtils::TrimLeft(content, offset, length);
 
-            if (offset == length) {
-                return value;
+            if (offset != length) {
+                value.Reset();
             }
         }
 
-        return VValue{};
+        return value;
     }
 
   private:
-    using JSONotation_T_ = JSONotation<Char_T_>;
-    using VObject        = HArray<VValue, Char_T_>;
-    using VArray         = Array<VValue>;
-    using VString        = String<Char_T_>;
+    using JSONotation = JSONotation_T_<Char_T_>;
+    using VObject     = HArray<VValue, Char_T_>;
+    using VArray      = Array<VValue>;
+    using VString     = String<Char_T_>;
 
-    VValue parseObject(const Char_T_ *content, SizeT &offset, const SizeT length) {
-        VObject obj;
+    static void parseObject(VValue &value, Stream_T_ &stream, const Char_T_ *content, SizeT &offset,
+                            const SizeT length) {
+        StringUtils::TrimLeft(content, offset, length);
 
-        while (offset < length) {
-            if (content[offset] != JSONotation_T_::QuoteChar) {
-                offset = length;
-                break;
-            }
+        if (content[offset] != JSONotation::ECurlyChar) {
+            VObject obj;
 
-            ++offset;
-            const Char_T_ *str = (content + offset);
-            SizeT          len = UnEscapeJSON(str, length, buffer_);
-
-            if (len == 0) {
-                break;
-            }
-
-            offset += len;
-            --len;
-
-            if (buffer_.IsNotEmpty()) {
-                str = buffer_.First();
-                len = buffer_.Length();
-                buffer_.Clear();
-            }
-
-            VValue &obj_value = obj[VString{str, len}];
-            StringUtils::TrimLeft(content, offset, length);
-
-            if (content[offset] != JSONotation_T_::ColonChar) {
-                break;
-            }
-
-            ++offset;
-            StringUtils::TrimLeft(content, offset, length);
-            obj_value = parseValue(content, offset, length);
-            StringUtils::TrimLeft(content, offset, length);
-
-            const Char_T_ c = content[offset];
-
-            if (c == JSONotation_T_::ECurlyChar) {
-                ++offset;
-                return VValue{static_cast<VObject &&>(obj)};
-            }
-
-            if (c != JSONotation_T_::CommaChar) {
-                break;
-            }
-
-            ++offset;
-            StringUtils::TrimLeft(content, offset, length);
-        }
-
-        return VValue{};
-    }
-
-    VValue parseArray(const Char_T_ *content, SizeT &offset, const SizeT length) {
-        VArray arr;
-
-        while (offset < length) {
-            arr += parseValue(content, offset, length);
-            StringUtils::TrimLeft(content, offset, length);
-
-            const Char_T_ c = content[offset];
-
-            if (c == JSONotation_T_::ESquareChar) {
-                ++offset;
-                // arr.Compress();
-                return VValue{static_cast<VArray &&>(arr)};
-            }
-
-            if (c != JSONotation_T_::CommaChar) {
-                break;
-            }
-
-            ++offset;
-            StringUtils::TrimLeft(content, offset, length);
-        }
-
-        return VValue{};
-    }
-
-    VValue parseValue(const Char_T_ *content, SizeT &offset, const SizeT length) {
-        switch (content[offset]) {
-            case JSONotation_T_::SCurlyChar: {
-                ++offset;
-                StringUtils::TrimLeft(content, offset, length);
-
-                if (content[offset] == JSONotation_T_::ECurlyChar) {
-                    ++offset;
-                    return VValue{ValueType::Object};
+            while (offset < length) {
+                if (content[offset] != JSONotation::QuoteChar) {
+                    offset = length;
+                    break;
                 }
 
-                return parseObject(content, offset, length);
-            }
-
-            case JSONotation_T_::SSquareChar: {
                 ++offset;
-                StringUtils::TrimLeft(content, offset, length);
-
-                if (content[offset] == JSONotation_T_::ESquareChar) {
-                    ++offset;
-                    return VValue{ValueType::Array};
-                }
-
-                return parseArray(content, offset, length);
-            }
-
-            case JSONotation_T_::QuoteChar: {
-                ++offset;
-
                 const Char_T_ *str = (content + offset);
-                SizeT          len = UnEscapeJSON(str, (length - offset), buffer_);
+                SizeT          len = UnEscapeJSON(str, length, stream);
 
                 if (len == 0) {
                     break;
@@ -190,49 +106,154 @@ class JSONParser {
                 offset += len;
                 --len;
 
-                if (buffer_.IsNotEmpty()) {
-                    str = buffer_.First();
-                    len = buffer_.Length();
-                    buffer_.Clear();
+                if (stream.IsNotEmpty()) {
+                    str = stream.First();
+                    len = stream.Length();
+                    stream.Clear();
                 }
 
-                return VValue{str, len};
+                VValue &obj_value = obj[VString{str, len}];
+                StringUtils::TrimLeft(content, offset, length);
+
+                if (content[offset] != JSONotation::ColonChar) {
+                    break;
+                }
+
+                ++offset;
+                StringUtils::TrimLeft(content, offset, length);
+                parseValue(obj_value, stream, content, offset, length);
+                StringUtils::TrimLeft(content, offset, length);
+
+                const Char_T_ c = content[offset];
+
+                if (c == JSONotation::ECurlyChar) {
+                    ++offset;
+                    value = static_cast<VObject &&>(obj);
+                    break;
+                }
+
+                if (c != JSONotation::CommaChar) {
+                    break;
+                }
+
+                ++offset;
+                StringUtils::TrimLeft(content, offset, length);
+            }
+        } else {
+            ++offset;
+            value = VValue{ValueType::Object};
+        }
+    }
+
+    static void parseArray(VValue &value, Stream_T_ &stream, const Char_T_ *content, SizeT &offset,
+                           const SizeT length) {
+        StringUtils::TrimLeft(content, offset, length);
+
+        if (content[offset] != JSONotation::ESquareChar) {
+            VArray arr;
+
+            while (offset < length) {
+                parseValue(value, stream, content, offset, length);
+                arr += static_cast<VValue &&>(value);
+                StringUtils::TrimLeft(content, offset, length);
+
+                const Char_T_ c = content[offset];
+
+                if (c == JSONotation::ESquareChar) {
+                    ++offset;
+                    // arr.Compress();
+                    value = static_cast<VArray &&>(arr);
+                    break;
+                }
+
+                if (c != JSONotation::CommaChar) {
+                    break;
+                }
+
+                ++offset;
+                StringUtils::TrimLeft(content, offset, length);
+            }
+        } else {
+            ++offset;
+            value = VValue{ValueType::Array};
+        }
+    }
+
+    static void parseValue(VValue &value, Stream_T_ &stream, const Char_T_ *content, SizeT &offset,
+                           const SizeT length) {
+        switch (content[offset]) {
+            case JSONotation::SCurlyChar: {
+                ++offset;
+                parseObject(value, stream, content, offset, length);
+                return;
             }
 
-            case JSONotation_T_::T_Char: {
-                const Char_T_ *true_string = JSONotation_T_::TrueString;
+            case JSONotation::SSquareChar: {
+                ++offset;
+                parseArray(value, stream, content, offset, length);
+                return;
+            }
+
+            case JSONotation::QuoteChar: {
+                ++offset;
+
+                const Char_T_ *str = (content + offset);
+                SizeT          len = UnEscapeJSON(str, (length - offset), stream);
+
+                if (len == 0) {
+                    break;
+                }
+
+                offset += len;
+                --len;
+
+                if (stream.IsNotEmpty()) {
+                    str = stream.First();
+                    len = stream.Length();
+                    stream.Clear();
+                }
+
+                value = VString{str, len};
+                return;
+            }
+
+            case JSONotation::T_Char: {
+                const Char_T_ *true_string = JSONotation::TrueString;
 
                 do {
                 } while ((content[++offset] == *(++true_string)));
 
                 if (*(true_string) == 0) {
-                    return VValue{true};
+                    value = true;
+                    return;
                 }
 
                 break;
             }
 
-            case JSONotation_T_::F_Char: {
-                const Char_T_ *false_string = JSONotation_T_::FalseString;
+            case JSONotation::F_Char: {
+                const Char_T_ *false_string = JSONotation::FalseString;
 
                 do {
                 } while ((content[++offset] == *(++false_string)));
 
                 if (*(false_string) == 0) {
-                    return VValue{false};
+                    value = false;
+                    return;
                 }
 
                 break;
             }
 
-            case JSONotation_T_::N_Char: {
-                const Char_T_ *null_string = JSONotation_T_::NullString;
+            case JSONotation::N_Char: {
+                const Char_T_ *null_string = JSONotation::NullString;
 
                 do {
                 } while ((content[++offset] == *(++null_string)));
 
                 if (*(null_string) == 0) {
-                    return VValue{nullptr};
+                    value = nullptr;
+                    return;
                 }
 
                 break;
@@ -241,44 +262,47 @@ class JSONParser {
             default: {
                 const SizeT    num_offset      = offset;
                 const Char_T_ *num_content     = (content + num_offset);
-                const bool     is_not_negative = (content[offset] != JSONotation_T_::NegativeChar);
+                const bool     is_not_negative = (content[offset] != JSONotation::NegativeChar);
                 bool           is_float        = false;
 
                 while (offset < length) {
                     switch (content[offset]) {
-                        case JSONotation_T_::DotChar:
-                        case JSONotation_T_::E_Char:
-                        case JSONotation_T_::CE_Char: {
+                        case JSONotation::DotChar:
+                        case JSONotation::E_Char:
+                        case JSONotation::CE_Char: {
                             is_float = true;
                             break;
                         }
 
-                        case JSONotation_T_::SpaceChar:
-                        case JSONotation_T_::LineControlChar:
-                        case JSONotation_T_::TabControlChar:
-                        case JSONotation_T_::CarriageControlChar:
-                        case JSONotation_T_::CommaChar:
-                        case JSONotation_T_::ECurlyChar:
-                        case JSONotation_T_::ESquareChar: {
+                        case JSONotation::SpaceChar:
+                        case JSONotation::LineControlChar:
+                        case JSONotation::TabControlChar:
+                        case JSONotation::CarriageControlChar:
+                        case JSONotation::CommaChar:
+                        case JSONotation::ECurlyChar:
+                        case JSONotation::ESquareChar: {
                             const SizeT len = (offset - num_offset);
 
                             if (is_float || (len > 19)) {
                                 double num;
 
                                 if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
-                                    return VValue{num};
+                                    value = num;
+                                    return;
                                 }
                             } else if (is_not_negative) {
                                 unsigned long long num;
 
                                 if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
-                                    return VValue{num};
+                                    value = num;
+                                    return;
                                 }
                             } else {
                                 long long num;
 
                                 if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
-                                    return VValue{num};
+                                    value = num;
+                                    return;
                                 }
                             }
 
@@ -295,10 +319,7 @@ class JSONParser {
         }
 
         offset = length;
-        return VValue{};
     }
-
-    StringStream<Char_T_> buffer_{};
 };
 
 } // namespace JSON
