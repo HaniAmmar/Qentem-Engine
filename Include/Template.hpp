@@ -21,7 +21,6 @@
  */
 
 #include "ALE.hpp"
-#include "Array.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_TEMPLATE_H_
