@@ -188,27 +188,27 @@ struct Template {
     struct TagBit;
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ *root_value, StringStream_T_ *stream,
-                              Array<TagBit<Char_T_>> *tags_cache) {
+    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value, StringStream_T_ &stream,
+                              Array<TagBit<Char_T_>> &tags_cache) {
         GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags_cache);
         RenderOnly(content, length, root_value, stream, tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void RenderOnly(const Char_T_ *content, SizeT length, const Value_T_ *root_value,
-                                  StringStream_T_ *stream, Array<TagBit<Char_T_>> *tags_cache) {
+    inline static void RenderOnly(const Char_T_ *content, SizeT length, const Value_T_ &root_value,
+                                  StringStream_T_ &stream, Array<TagBit<Char_T_>> &tags_cache) {
         using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
         // tags_cache should not be empty. Use GenerateTags() once befor calling this function in a loop.
-        const TemplateSubCV temp{stream, root_value};
-        temp.render(content, length, *tags_cache);
+        const TemplateSubCV temp{&stream, &root_value};
+        temp.render(content, length, tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void GenerateTags(const Char_T_ *content, SizeT length, Array<TagBit<Char_T_>> *tags_cache) {
+    inline static void GenerateTags(const Char_T_ *content, SizeT length, Array<TagBit<Char_T_>> &tags_cache) {
         using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
 
-        if (tags_cache->IsEmpty()) {
-            TemplateSubCV::parse(*tags_cache, content, length, 0);
+        if (tags_cache.IsEmpty()) {
+            TemplateSubCV::parse(tags_cache, content, length, 0);
         }
     }
 
@@ -216,18 +216,18 @@ struct Template {
     inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ *root_value,
                               StringStream_T_ *stream) {
         Array<TagBit<Char_T_>> tags_cache;
-        Render(content, length, root_value, stream, &tags_cache);
+        Render(content, length, *root_value, *stream, tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
-    inline static StringStream_T_ Render(const Char_T_ *content, SizeT length, const Value_T_ *root_value) {
+    inline static StringStream_T_ Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value) {
         StringStream_T_ stream;
-        Render(content, length, root_value, &stream);
+        Render(content, length, &root_value, &stream);
         return stream;
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
-    inline static StringStream_T_ Render(const Char_T_ *content, const Value_T_ *root_value) {
+    inline static StringStream_T_ Render(const Char_T_ *content, const Value_T_ &root_value) {
         return Render(content, StringUtils::Count(content), root_value);
     }
 
