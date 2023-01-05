@@ -36,15 +36,12 @@ namespace Qentem {
  */
 
 template <typename>
-class ALEBasicHelper;
+struct ALEBasicHelper;
 
 template <typename>
-class ALEExpressions;
+struct ALEExpressions_T_;
 
-template <typename, typename>
-class ALESub;
-
-class ALE {
+struct ALE {
   public:
     ALE()                       = delete;
     ALE(ALE &&)                 = delete;
@@ -63,7 +60,7 @@ class ALE {
         } Content{};
     };
 
-    enum class Expression {
+    enum struct Expression {
         None = 0U,
         Or,             // ||
         And,            // &&
@@ -217,10 +214,10 @@ class ALE {
         }
 
         bool getNumber(Number &val, SizeT offset, SizeT length) const noexcept {
-            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+            using ALEExpressions = ALEExpressions_T_<Char_T_>;
 
             switch (content_[offset]) {
-                case ALEExpressions_T_::ParenthesStart: {
+                case ALEExpressions::ParenthesStart: {
                     // getExpression check for closed parenthes, so "length" will never go over the actual length.
                     length += offset;
                     ++offset; // after (
@@ -229,7 +226,7 @@ class ALE {
                     return Parse(val, offset, length);
                 }
 
-                case ALEExpressions_T_::BracketStart: {
+                case ALEExpressions::BracketStart: {
                     return (helper_->ALESetNumber(val.Number, (content_ + offset), length));
                 }
 
@@ -360,59 +357,59 @@ class ALE {
         }
 
         Expression getExpression(SizeT &offset, const SizeT length) const noexcept {
-            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+            using ALEExpressions = ALEExpressions_T_<Char_T_>;
 
             while (offset < length) {
                 switch (content_[offset]) {
-                    case ALEExpressions_T_::OrExp: { // ||
-                        if (content_[(offset + 1)] == ALEExpressions_T_::OrExp) {
+                    case ALEExpressions::OrExp: { // ||
+                        if (content_[(offset + 1)] == ALEExpressions::OrExp) {
                             return Expression::Or;
                         }
 
                         return Expression::Error;
                     }
 
-                    case ALEExpressions_T_::AndExp: { // &&
-                        if (content_[(offset + 1)] == ALEExpressions_T_::AndExp) {
+                    case ALEExpressions::AndExp: { // &&
+                        if (content_[(offset + 1)] == ALEExpressions::AndExp) {
                             return Expression::And;
                         }
 
                         return Expression::Error;
                     }
 
-                    case ALEExpressions_T_::BiggerExp: { // > or >=
-                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                    case ALEExpressions::BiggerExp: { // > or >=
+                        if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
                             return Expression::BiggerOrEqual;
                         }
 
                         return Expression::Bigger;
                     }
 
-                    case ALEExpressions_T_::LessExp: { // < or <=
-                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                    case ALEExpressions::LessExp: { // < or <=
+                        if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
                             return Expression::LessOrEqual;
                         }
 
                         return Expression::Less;
                     }
 
-                    case ALEExpressions_T_::NotExp: { // !=
-                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                    case ALEExpressions::NotExp: { // !=
+                        if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
                             return Expression::NotEqual;
                         }
 
                         return Expression::Error;
                     }
 
-                    case ALEExpressions_T_::EqualExp: { // ==
-                        if (content_[(offset + 1)] == ALEExpressions_T_::EqualExp) {
+                    case ALEExpressions::EqualExp: { // ==
+                        if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
                             return Expression::Equal;
                         }
 
                         return Expression::Error;
                     }
 
-                    case ALEExpressions_T_::SubtractExp: {
+                    case ALEExpressions::SubtractExp: {
                         if (isExpression(content_, offset)) {
                             return Expression::Subtraction;
                         }
@@ -420,7 +417,7 @@ class ALE {
                         break;
                     }
 
-                    case ALEExpressions_T_::AddExp: {
+                    case ALEExpressions::AddExp: {
                         if (isExpression(content_, offset)) {
                             return Expression::Addition;
                         }
@@ -428,29 +425,28 @@ class ALE {
                         break;
                     }
 
-                    case ALEExpressions_T_::DivideExp: {
+                    case ALEExpressions::DivideExp: {
                         return Expression::Division;
                     }
 
-                    case ALEExpressions_T_::MultipleExp: {
+                    case ALEExpressions::MultipleExp: {
                         return Expression::Multiplication;
                     }
 
-                    case ALEExpressions_T_::RemainderExp: {
+                    case ALEExpressions::RemainderExp: {
                         return Expression::Remainder;
                     }
 
-                    case ALEExpressions_T_::ExponentExp: {
+                    case ALEExpressions::ExponentExp: {
                         return Expression::Exponent;
                     }
 
-                    case ALEExpressions_T_::ParenthesStart: {
+                    case ALEExpressions::ParenthesStart: {
                         // (...) are evaluated to numbers.
 
                         ++offset;
-                        offset = Engine::SkipInnerPatterns<Char_T_>(ALEExpressions_T_::ParenthesStart,
-                                                                    ALEExpressions_T_::ParenthesEnd, content_, offset,
-                                                                    length);
+                        offset = Engine::SkipInnerPatterns<Char_T_>(
+                            ALEExpressions::ParenthesStart, ALEExpressions::ParenthesEnd, content_, offset, length);
 
                         if (offset != 0) {
                             continue;
@@ -459,12 +455,12 @@ class ALE {
                         return Expression::Error;
                     }
 
-                    case ALEExpressions_T_::BracketStart: {
+                    case ALEExpressions::BracketStart: {
                         // {...} are evaluated by callback to a number or
                         // string.
 
                         ++offset;
-                        offset = Engine::FindOne<Char_T_>(ALEExpressions_T_::BracketEnd, content_, offset, length);
+                        offset = Engine::FindOne<Char_T_>(ALEExpressions::BracketEnd, content_, offset, length);
 
                         if (offset != 0) {
                             continue;
@@ -485,26 +481,26 @@ class ALE {
         }
 
         static bool isExpression(const Char_T_ *content, SizeT offset) noexcept {
-            using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+            using ALEExpressions = ALEExpressions_T_<Char_T_>;
 
             while (offset != 0) {
                 --offset;
 
                 switch (content[offset]) {
-                    case ALEExpressions_T_::SpaceChar: {
+                    case ALEExpressions::SpaceChar: {
                         break;
                     }
 
-                    case ALEExpressions_T_::ParenthesEnd:
-                    case ALEExpressions_T_::BracketEnd: {
+                    case ALEExpressions::ParenthesEnd:
+                    case ALEExpressions::BracketEnd: {
                         // (...) and {} are numbers.
                         return true;
                     }
 
                     default: {
                         // A number
-                        return ((content[offset] < ALEExpressions_T_::ColonChar) &&
-                                (content[offset] > ALEExpressions_T_::SlashChar));
+                        return ((content[offset] < ALEExpressions::ColonChar) &&
+                                (content[offset] > ALEExpressions::SlashChar));
                     }
                 }
             }
@@ -518,7 +514,7 @@ class ALE {
 };
 
 template <typename Char_T_>
-class ALEBasicHelper {
+struct ALEBasicHelper {
   public:
     static bool ALESetNumber(double &number, const Char_T_ *content, SizeT length) noexcept {
         return false;
@@ -530,12 +526,12 @@ class ALEBasicHelper {
 
     static bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left, ALE::Number right,
                            bool left_evaluated, bool right_evaluated) noexcept {
-        using ALEExpressions_T_ = ALEExpressions<Char_T_>;
+        using ALEExpressions = ALEExpressions_T_<Char_T_>;
 
         if (!left_evaluated) {
             const Char_T_ *left_content = (content + left.Content.Offset);
 
-            if (*left_content != ALEExpressions_T_::ParenthesStart) {
+            if (*left_content != ALEExpressions::ParenthesStart) {
                 if (!(Digit<Char_T_>::StringToNumber(left.Number, left_content,
                                                      static_cast<SizeT>(left.Content.Length)))) {
                     return false;
@@ -548,7 +544,7 @@ class ALEBasicHelper {
         if (!right_evaluated) {
             const Char_T_ *right_content = (content + right.Content.Offset);
 
-            if (*right_content != ALEExpressions_T_::ParenthesStart) {
+            if (*right_content != ALEExpressions::ParenthesStart) {
                 if (!(Digit<Char_T_>::StringToNumber(right.Number, right_content,
                                                      static_cast<SizeT>(right.Content.Length)))) {
                     return false;
@@ -565,7 +561,7 @@ class ALEBasicHelper {
 };
 
 template <typename Char_T_>
-class ALEExpressions {
+struct ALEExpressions_T_ {
   public:
     static constexpr Char_T_ RemainderExp = '%';
     static constexpr Char_T_ MultipleExp  = '*';
