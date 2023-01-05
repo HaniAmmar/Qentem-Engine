@@ -216,13 +216,13 @@ struct Template {
     inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value,
                               StringStream_T_ &stream) {
         Array<TagBit<Char_T_>> tags_cache;
-        Render(content, length, *root_value, *stream, tags_cache);
+        Render(content, length, root_value, stream, tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
     inline static StringStream_T_ Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value) {
         StringStream_T_ stream;
-        Render(content, length, &root_value, &stream);
+        Render(content, length, root_value, stream);
         return stream;
     }
 
