@@ -1170,7 +1170,7 @@ static void TestObjectValue1(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
-    using ObjectItem_ = HAItem<ValueC, char>;
+    using ObjectItem_ = HAItem_T_<ValueC, char>;
 
     VHArray            h_arr_var;
     const ObjectItem_ *storage;
@@ -1303,7 +1303,7 @@ static void TestObjectValue2(TestHelper &helper) {
     ValueC value1;
     ValueC value2;
 
-    using ObjectItem_ = HAItem<ValueC, char>;
+    using ObjectItem_ = HAItem_T_<ValueC, char>;
 
     VHArray            h_arr_var;
     const ObjectItem_ *storage;
@@ -1469,8 +1469,8 @@ static void TestMoveValue1(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -1892,8 +1892,8 @@ static void TestMoveValue3(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2357,8 +2357,8 @@ static void TestCopyValue1(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2620,8 +2620,8 @@ static void TestCopyValue2(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
@@ -2761,8 +2761,8 @@ static void TestCopyValue3(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -3152,8 +3152,8 @@ static void TestCopyValue4(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -4235,14 +4235,14 @@ static void TestAddition5(TestHelper &helper) {
 }
 
 static void TestAddition6(TestHelper &helper) {
-    ValueC                      value1;
-    ValueC                      value2;
-    VString                     str_var;
-    const char                 *str_c1;
-    const char                 *str_c2;
-    VHArray                     h_arr_var;
-    const HAItem<ValueC, char> *h_arr_storage1 = nullptr;
-    const HAItem<ValueC, char> *h_arr_storage2 = nullptr;
+    ValueC                         value1;
+    ValueC                         value2;
+    VString                        str_var;
+    const char                    *str_c1;
+    const char                    *str_c2;
+    VHArray                        h_arr_var;
+    const HAItem_T_<ValueC, char> *h_arr_storage1 = nullptr;
+    const HAItem_T_<ValueC, char> *h_arr_storage2 = nullptr;
 
     value1["k1"] = 11;
     value1["k2"] = 22;

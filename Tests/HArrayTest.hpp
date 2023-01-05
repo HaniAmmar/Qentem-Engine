@@ -92,11 +92,11 @@ static void TestHArray1(TestHelper &helper) {
 }
 
 static void TestHArray2(TestHelper &helper) {
-    HashArray                  numbers1(8);
-    HashArray                  numbers2;
-    const String<char>        *key;
-    const char                *str_c;
-    const HAItem<SizeT, char> *storage;
+    HashArray                     numbers1(8);
+    HashArray                     numbers2;
+    const String<char>           *key;
+    const char                   *str_c;
+    const HAItem_T_<SizeT, char> *storage;
 
     numbers1["key1"] = 1;
     helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
@@ -253,11 +253,11 @@ static void TestHArray2(TestHelper &helper) {
 }
 
 static void TestHArray3(TestHelper &helper) {
-    HashArray                  numbers1(8);
-    HashArray                  numbers2;
-    const String<char>        *key;
-    const char                *str_c;
-    const HAItem<SizeT, char> *storage;
+    HashArray                     numbers1(8);
+    HashArray                     numbers2;
+    const String<char>           *key;
+    const char                   *str_c;
+    const HAItem_T_<SizeT, char> *storage;
 
     numbers2["key4"] = 40;
     numbers2["key1"] = 10;
@@ -298,11 +298,11 @@ static void TestHArray3(TestHelper &helper) {
 }
 
 static void TestHArray4(TestHelper &helper) {
-    HashArray                  numbers1;
-    HashArray                  numbers2;
-    HashArray                  numbers3(3);
-    const HAItem<SizeT, char> *storage;
-    SizeT                     *value;
+    HashArray                     numbers1;
+    HashArray                     numbers2;
+    HashArray                     numbers3(3);
+    const HAItem_T_<SizeT, char> *storage;
+    SizeT                        *value;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -557,10 +557,10 @@ static void TestHArray5(TestHelper &helper) {
 }
 
 static void TestHArray6(TestHelper &helper) {
-    SizeT                             id;
-    HArray<String<char>, char>        strings1;
-    HArray<String<char>, char>        strings2;
-    const HAItem<String<char>, char> *storage;
+    SizeT                                id;
+    HArray<String<char>, char>           strings1;
+    HArray<String<char>, char>           strings2;
+    const HAItem_T_<String<char>, char> *storage;
 
     String<char> key1("k-1-ABCDEF0123456789ABCDEF0123456789");
     String<char> key2("k-2-ABCDEF0123456789ABCDEF0123456789");
@@ -744,10 +744,10 @@ static void TestHArray8(TestHelper &helper) {
 static void TestHArray9(TestHelper &helper) {
     constexpr SizeT id = 10;
 
-    HArray<SizeT, char>                list(id);
-    const Qentem::HAItem<SizeT, char> *item;
-    const Qentem::HAItem<SizeT, char> *item2;
-    const SizeT                       *value;
+    HArray<SizeT, char>                   list(id);
+    const Qentem::HAItem_T_<SizeT, char> *item;
+    const Qentem::HAItem_T_<SizeT, char> *item2;
+    const SizeT                          *value;
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
@@ -833,7 +833,7 @@ static void TestHArray10(TestHelper &helper) {
 
         list[key] = i;
 
-        const Qentem::HAItem<SizeT, char> *item = list.GetItem(key);
+        const Qentem::HAItem_T_<SizeT, char> *item = list.GetItem(key);
 
         helper.NotEqual(item, nullptr, "item", "null", __LINE__);
         helper.Equal(item->Value, i, "index", __LINE__);

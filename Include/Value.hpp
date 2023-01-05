@@ -1242,7 +1242,7 @@ class Value {
     }
 
     bool GroupBy(Value &groupedValue, const Char_T_ *key, const SizeT length) const {
-        using V_item_ = HAItem<Value, Char_T_>;
+        using V_item_ = HAItem_T_<Value, Char_T_>;
         VObject new_sub_obj;
         VString grouped_key;
         SizeT   grouped_key_index;
@@ -1305,7 +1305,7 @@ class Value {
 
   private:
     static void stringifyObject(const VObject &obj, StringStream<Char_T_> &stream) {
-        using V_item_ = HAItem<Value, Char_T_>;
+        using V_item_ = HAItem_T_<Value, Char_T_>;
 
         stream += JSONotation_T_::SCurlyChar;
 
