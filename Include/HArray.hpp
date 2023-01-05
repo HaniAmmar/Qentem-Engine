@@ -470,7 +470,7 @@ class HArray {
     inline const HAItem_ *begin() const noexcept { return First(); }
     inline const HAItem_ *end() const noexcept { return End(); }
 
-    inline const HAItem_ *Last() const noexcept {
+    inline HAItem_ *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - 1));
         }

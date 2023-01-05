@@ -263,9 +263,9 @@ class StringStream {
     inline bool           IsEmpty() const noexcept { return (Length() == 0); }
     inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
-    inline const Char_T_ *Last() const noexcept {
+    inline Char_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
-            return (First() + (Length() - 1));
+            return (Storage() + (Length() - 1));
         }
 
         return nullptr;

@@ -249,7 +249,7 @@ class Array {
     inline const Type_ *begin() const noexcept { return First(); }
     inline const Type_ *end() const noexcept { return End(); }
 
-    inline const Type_ *Last() const noexcept {
+    inline Type_ *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - 1));
         }

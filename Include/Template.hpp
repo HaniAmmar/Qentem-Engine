@@ -448,8 +448,7 @@ class Template_CV {
     }
 
     QENTEM_NOINLINE static void parse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT length, SizeT level) {
-        SizeT   offset = 0;
-        TagBit *tag;
+        SizeT offset = 0;
 
         while (offset < length) {
             if (content[offset] == TemplatePatterns_C_::InLinePrefix) {
@@ -519,9 +518,8 @@ class Template_CV {
 
                             if (end_offset != 0) {
                                 tags_cache += TagBit{TagType::InLineIf, offset, end_offset};
-                                tag    = tags_cache.Storage() + (tags_cache.Size() - 1);
                                 offset = end_offset;
-                                generateInLineIfInfo(content, tag);
+                                generateInLineIfInfo(content, tags_cache.Last());
                                 continue;
                             }
                         }
@@ -545,9 +543,8 @@ class Template_CV {
 
                         if (end_offset != 0) {
                             tags_cache += TagBit{TagType::Loop, offset, end_offset};
-                            tag    = tags_cache.Storage() + (tags_cache.Size() - 1);
                             offset = end_offset;
-                            generateLoopContent(content, tag, level);
+                            generateLoopContent(content, tags_cache.Last(), level);
                             continue;
                         }
                     }
@@ -561,9 +558,8 @@ class Template_CV {
 
                         if (end_offset != 0) {
                             tags_cache += TagBit{TagType::If, offset, end_offset};
-                            tag    = tags_cache.Storage() + (tags_cache.Size() - 1);
                             offset = end_offset;
-                            generateIfCases(content, tag);
+                            generateIfCases(content, tags_cache.Last());
                             continue;
                         }
                     }
@@ -1149,7 +1145,7 @@ class Template_CV {
         }
     }
 
-    QENTEM_NOINLINE static void generateIfCases(const Char_T_ *content, TagBit *&tag) {
+    QENTEM_NOINLINE static void generateIfCases(const Char_T_ *content, TagBit *tag) {
         SizeT       case_offset = (tag->GetOffset() + TemplatePatterns_C_::IfPrefixLength);
         const SizeT length      = (tag->GetEndOffset() - case_offset);
         SizeT       case_length;

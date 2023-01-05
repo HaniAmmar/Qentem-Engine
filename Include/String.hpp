@@ -261,14 +261,12 @@ class String {
     inline bool           IsEmpty() const noexcept { return (Length() == 0); }
     inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
 
-    inline const Char_T_ *Last() const noexcept {
-        const Char_T_ *src = First();
-
-        if (src != nullptr) {
-            return (src + (Length() - 1));
+    inline Char_T_ *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (Storage() + (Length() - 1));
         }
 
-        return src;
+        return nullptr;
     }
 
     static String Merge(const String &src1, const String &src2) {

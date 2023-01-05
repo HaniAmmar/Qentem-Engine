@@ -1328,11 +1328,13 @@ class Value {
             }
         }
 
-        if (*(stream.Last()) == JSONotation::CommaChar) {
-            stream.StepBack(1U);
-        }
+        Char_T_ *last = stream.Last();
 
-        stream += JSONotation::ECurlyChar;
+        if ((last != nullptr) && (*last == JSONotation::CommaChar)) {
+            *last = JSONotation::ECurlyChar;
+        } else {
+            stream += JSONotation::ECurlyChar;
+        }
     }
 
     template <typename Stream_T_>
@@ -1346,11 +1348,13 @@ class Value {
             }
         }
 
-        if (*(stream.Last()) == JSONotation::CommaChar) {
-            stream.StepBack(1U);
-        }
+        Char_T_ *last = stream.Last();
 
-        stream += JSONotation::ESquareChar;
+        if ((last != nullptr) && (*last == JSONotation::CommaChar)) {
+            *last = JSONotation::ESquareChar;
+        } else {
+            stream += JSONotation::ESquareChar;
+        }
     }
 
     template <typename Stream_T_>
