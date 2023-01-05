@@ -2215,7 +2215,7 @@ static void TestLoopLTag4(TestHelper &helper) {
     content += LR"(<loop value="loop1-value">A loop1-value B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += LR"(A )";
-        Digit<wchar_t>::NumberToStringStream(output, i);
+        Digit<wchar_t>::NumberToString(output, i);
         output += LR"( B)";
     }
 
@@ -2618,7 +2618,7 @@ static void TestRenderL1(TestHelper &helper) {
             content += str;
             content += LR"(})";
 
-            Digit<wchar_t>::NumberToStringStream(output, 1U + i);
+            Digit<wchar_t>::NumberToString(output, 1U + i);
         }
     }
 
@@ -2641,9 +2641,9 @@ static void TestRenderL1(TestHelper &helper) {
             size += 8;
 
             content += LR"({if case="{var:)";
-            Digit<wchar_t>::NumberToStringStream(content, i);
+            Digit<wchar_t>::NumberToString(content, i);
             content += LR"(}<)";
-            Digit<wchar_t>::NumberToStringStream(content, 1U + i);
+            Digit<wchar_t>::NumberToString(content, 1U + i);
             content += LR"(" true="yes"})";
 
             output += LR"(yes)";

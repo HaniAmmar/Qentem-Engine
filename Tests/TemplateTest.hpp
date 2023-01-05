@@ -2205,7 +2205,7 @@ static void TestLoopTag4(TestHelper &helper) {
     content += R"(<loop value="loop1-value">A loop1-value B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += R"(A )";
-        Digit<char>::NumberToStringStream(output, i);
+        Digit<char>::NumberToString(output, i);
         output += R"( B)";
     }
 
@@ -2602,7 +2602,7 @@ static void TestRender1(TestHelper &helper) {
             content += str;
             content += R"(})";
 
-            Digit<char>::NumberToStringStream(output, 1U + i);
+            Digit<char>::NumberToString(output, 1U + i);
         }
     }
 
@@ -2624,9 +2624,9 @@ static void TestRender1(TestHelper &helper) {
             size += 8;
 
             content += R"({if case="{var:)";
-            Digit<char>::NumberToStringStream(content, i);
+            Digit<char>::NumberToString(content, i);
             content += R"(}<)";
-            Digit<char>::NumberToStringStream(content, 1U + i);
+            Digit<char>::NumberToString(content, 1U + i);
             content += R"(" true="yes"})";
 
             output += R"(yes)";

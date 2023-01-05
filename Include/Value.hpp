@@ -980,17 +980,17 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(stream, number_.GetUInt64());
+                Digit<Char_T_>::NumberToString(stream, number_.GetUInt64());
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(stream, number_.GetInt64());
+                Digit<Char_T_>::NumberToString(stream, number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(stream, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
+                Digit<Char_T_>::NumberToString(stream, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
                 break;
             }
 
@@ -1365,17 +1365,17 @@ class Value {
             }
 
             case ValueType::UInt64: {
-                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetUInt64());
+                Digit<Char_T_>::NumberToString(stream, val.number_.GetUInt64());
                 break;
             }
 
             case ValueType::Int64: {
-                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetInt64());
+                Digit<Char_T_>::NumberToString(stream, val.number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToStringStream(stream, val.number_.GetDouble());
+                Digit<Char_T_>::NumberToString(stream, val.number_.GetDouble());
                 break;
             }
 

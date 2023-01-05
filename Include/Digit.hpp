@@ -87,47 +87,47 @@ class Digit {
     template <typename Number_T_>
     inline static String<Char_T_> NumberToString(Number_T_ number) {
         String<Char_T_> str;
-        NumberToStringStream(str, number);
+        NumberToString(str, number);
         return str;
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, unsigned short number) {
+    inline static void NumberToString(Stream_T_ &stream, unsigned short number) {
         unsignedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, unsigned int number) {
+    inline static void NumberToString(Stream_T_ &stream, unsigned int number) {
         unsignedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, unsigned long number) {
+    inline static void NumberToString(Stream_T_ &stream, unsigned long number) {
         unsignedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, unsigned long long number) {
+    inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
         unsignedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, short number) {
+    inline static void NumberToString(Stream_T_ &stream, short number) {
         signedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, int number) {
+    inline static void NumberToString(Stream_T_ &stream, int number) {
         signedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, long number) {
+    inline static void NumberToString(Stream_T_ &stream, long number) {
         signedIntToString(stream, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, long long number) {
+    inline static void NumberToString(Stream_T_ &stream, long long number) {
         signedIntToString(stream, number);
     }
 
@@ -152,14 +152,14 @@ class Digit {
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, double number, unsigned int min = 1,
-                                            unsigned int r_min = 0, unsigned int precision = 0) {
+    inline static void NumberToString(Stream_T_ &stream, double number, unsigned int min = 1, unsigned int r_min = 0,
+                                      unsigned int precision = 0) {
         doubleToString(stream, number, min, r_min, precision);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToStringStream(Stream_T_ &stream, float f_number, unsigned int min = 1,
-                                            unsigned int r_min = 0, unsigned int precision = 0) {
+    inline static void NumberToString(Stream_T_ &stream, float f_number, unsigned int min = 1, unsigned int r_min = 0,
+                                      unsigned int precision = 0) {
         doubleToString(stream, static_cast<double>(f_number), min, r_min, precision);
     }
 

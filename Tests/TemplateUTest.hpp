@@ -2215,7 +2215,7 @@ static void TestLoopUTag4(TestHelper &helper) {
     content += uR"(<loop value="loop1-value">A loop1-value B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += uR"(A )";
-        Digit<char16_t>::NumberToStringStream(output, i);
+        Digit<char16_t>::NumberToString(output, i);
         output += uR"( B)";
     }
 
@@ -2618,7 +2618,7 @@ static void TestRenderU1(TestHelper &helper) {
             content += str;
             content += uR"(})";
 
-            Digit<char16_t>::NumberToStringStream(output, 1U + i);
+            Digit<char16_t>::NumberToString(output, 1U + i);
         }
     }
 
@@ -2641,9 +2641,9 @@ static void TestRenderU1(TestHelper &helper) {
             size += 8;
 
             content += uR"({if case="{var:)";
-            Digit<char16_t>::NumberToStringStream(content, i);
+            Digit<char16_t>::NumberToString(content, i);
             content += uR"(}<)";
-            Digit<char16_t>::NumberToStringStream(content, 1U + i);
+            Digit<char16_t>::NumberToString(content, 1U + i);
             content += uR"(" true="yes"})";
 
             output += uR"(yes)";

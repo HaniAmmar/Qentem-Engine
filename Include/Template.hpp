@@ -747,7 +747,7 @@ class Template_CV {
         SizeT length = ((tag->GetEndOffset() - TemplatePatterns_C_::InLineSuffixLength) - content_offset);
 
         if (ALE::Evaluate(number, content, length, this)) {
-            Digit<Char_T_>::NumberToStringStream(*ss_, number, 1, 0, 3);
+            Digit<Char_T_>::NumberToString(*ss_, number, 1, 0, 3);
         } else {
             ss_->Insert((content - TemplatePatterns_C_::MathPrefixLength),
                         (length + TemplatePatterns_C_::MathFulllength));
