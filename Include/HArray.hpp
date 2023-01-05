@@ -348,28 +348,33 @@ class HArray {
      */
     bool Rename(const Key_T_ &from, Key_T_ &&to) const noexcept {
         if (Size() != 0) {
+            HAItem_T_     *item;
             const Char_T_ *from_str = from.First();
+            const Char_T_ *to_str;
+            SizeT         *left_index;
+            SizeT         *right_index;
             const SizeT    from_len = from.Length();
+            SizeT          to_len;
+            SizeT          to_hash;
+            SizeT          offset;
 
-            SizeT *left_index;
             find(left_index, from_str, from_len, StringUtils::Hash(from_str, from_len));
 
             if (*left_index != 0) {
-                const Char_T_ *to_str = to.First();
-                const SizeT    to_len = to.Length();
+                to_str = to.First();
+                to_len = to.Length();
 
-                const SizeT to_hash = StringUtils::Hash(to_str, to_len);
+                to_hash = StringUtils::Hash(to_str, to_len);
 
-                SizeT *right_index;
                 find(right_index, to_str, to_len, to_hash);
 
                 if (*right_index == 0) {
-                    const SizeT offset = ((*left_index) - 1);
-                    HAItem_T_  *item   = (Storage() + offset);
-                    *right_index       = *left_index;
-                    *left_index        = item->Next;
-                    item->Next         = 0;
-                    item->Hash         = to_hash;
+                    offset       = ((*left_index) - 1);
+                    item         = (Storage() + offset);
+                    *right_index = *left_index;
+                    *left_index  = item->Next;
+                    item->Next   = 0;
+                    item->Hash   = to_hash;
 
                     item->Key = static_cast<Key_T_ &&>(to);
                     return true;
@@ -441,10 +446,9 @@ class HArray {
 
     // Returns the actual number of items.
     SizeT ActualSize() const noexcept {
-        SizeT size = 0;
-
         const HAItem_T_ *item = Storage();
         const HAItem_T_ *end  = (item + Size());
+        SizeT            size = 0;
 
         while (item != end) {
             size += (item->Hash != 0);
@@ -502,16 +506,19 @@ class HArray {
     HAItem_T_ *find(SizeT *&index, const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT     *ht      = getHashTable();
         HAItem_T_ *storage = reinterpret_cast<HAItem_T_ *>(ht + Capacity());
-        index              = (ht + (hash & getBase()));
+        HAItem_T_ *item;
+        index     = (ht + (hash & getBase()));
+        SizeT tmp = *index;
 
-        while (*index != 0) {
-            HAItem_T_ *item = (storage + ((*index) - 1));
+        while (tmp != 0) {
+            item = (storage + (tmp - 1));
 
-            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
+            if (item->Key.IsEqual(key, length)) {
                 return item;
             }
 
             index = &(item->Next);
+            tmp   = *index;
         }
 
         return nullptr;
@@ -590,25 +597,27 @@ class HArray {
     }
 
     void generateHash() const noexcept {
-        SizeT       i    = 1;
-        const SizeT base = getBase();
-        SizeT      *ht   = getHashTable();
-        HAItem_T_  *src  = Storage();
-        HAItem_T_  *item = src;
-
-        const HAItem_T_ *end = (item + Size());
+        SizeT           *ht   = getHashTable();
+        HAItem_T_       *src  = Storage();
+        HAItem_T_       *item = src;
+        const HAItem_T_ *end  = (item + Size());
+        SizeT           *index;
+        SizeT            i    = 1;
+        const SizeT      base = getBase();
+        SizeT            tmp;
 
         while (item != end) {
-            item->Next   = 0;
-            SizeT *index = (ht + (item->Hash & base));
+            item->Next = 0;
+            index      = (ht + (item->Hash & base));
+            tmp        = *index;
 
-            while (*index != 0) {
-                index = &((src + ((*index) - 1))->Next);
+            while (tmp != 0) {
+                index = &((src + (tmp - 1))->Next);
+                tmp   = *index;
             }
 
             *index = i;
             ++i;
-            item->Next = 0;
             ++item;
         }
     }
