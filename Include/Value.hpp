@@ -54,12 +54,12 @@ class Value {
     Value() noexcept : number_{} {}
 
     Value(Value &&val) noexcept : number_{val.number_} {
-#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
-        setType(val.Type());
-        val.setTypeToUndefined();
-#else
-        val.number_.ClearAll();
-#endif
+        if (Config::PointerTagging) {
+            val.number_.ClearAll();
+        } else {
+            setType(val.Type());
+            val.setTypeToUndefined();
+        }
     }
 
     Value(const Value &val) { copyValue(val); }
@@ -138,12 +138,12 @@ class Value {
 
             number_ = val.number_;
 
-#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
-            setType(val.Type());
-            val.setTypeToUndefined();
-#else
-            val.number_.ClearAll();
-#endif
+            if (Config::PointerTagging) {
+                val.number_.ClearAll();
+            } else {
+                setType(val.Type());
+                val.setTypeToUndefined();
+            }
         }
 
         return *this;
@@ -180,11 +180,13 @@ class Value {
                 }
             } else {
                 reset();
-#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
-                setTypeToUndefined();
-#else
-                number_.ClearAll();
-#endif
+
+                if (Config::PointerTagging) {
+                    number_.ClearAll();
+                } else {
+                    setTypeToUndefined();
+                }
+
                 if (!(val.IsUndefined())) {
                     copyValue(val);
                 }
@@ -945,7 +947,7 @@ class Value {
             }
 
             case ValueType::Double: {
-                value = Digit<Char_T_>::NumberToString(number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
+                value = Digit<Char_T_>::NumberToString(number_.GetDouble(), 1, 0, Config::FloatDoublePrecision);
                 break;
             }
 
@@ -991,7 +993,7 @@ class Value {
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToString(stream, number_.GetDouble(), 1, 0, QENTEM_DOUBLE_PRECISION);
+                Digit<Char_T_>::NumberToString(stream, number_.GetDouble(), 1, 0, Config::FloatDoublePrecision);
                 break;
             }
 
@@ -1169,11 +1171,12 @@ class Value {
 
     void Reset() noexcept {
         reset();
-#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
-        setTypeToUndefined();
-#else
-        number_.ClearAll();
-#endif
+
+        if (Config::PointerTagging) {
+            number_.ClearAll();
+        } else {
+            setTypeToUndefined();
+        }
     }
 
     void Compress() {
@@ -1193,9 +1196,11 @@ class Value {
             if (size != array_.Capacity()) {
                 if (size == 0) {
                     array_.Reset();
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-                    setTypeToArray();
-#endif
+
+                    if (Config::PointerTagging) {
+                        setTypeToArray();
+                    }
+
                     return;
                 }
 
@@ -1542,12 +1547,12 @@ class Value {
         inline long long          GetInt64() const noexcept { return number_.sll; }
         inline double             GetDouble() const noexcept { return number_.ddl; }
 
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         inline void ClearAll() noexcept {
-            number_.ull = 0;
-            padding_    = nullptr;
+            if (Config::PointerTagging) {
+                number_.ull = 0;
+                padding_    = nullptr;
+            }
         }
-#endif
 
       private:
         union Number_T_ {

@@ -539,123 +539,130 @@ static void TestVariableUTag4(TestHelper &helper) {
     value += uR"("ABC'DEF<GHI>GK<)";
     value += uR"(A""BC<<DE>>FG''HI&&GK)";
 
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    helper.Equal(Template::Render(uR"({var:0})", value), uR"(&lt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:1})", value), uR"(&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:2})", value), uR"(&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:3})", value), uR"(&quot;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:4})", value), uR"(&apos;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:5})", value), uR"(&lt;&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:6})", value), uR"(&lt;&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:7})", value), uR"(&lt;&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:8})", value), uR"(&gt;&quot;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:9})", value), uR"(&quot;&apos;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:10})", value), uR"(&lt;&quot;&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:11})", value), uR"(&lt;&apos;&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:12})", value), uR"(&lt;&amp;&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:13})", value), uR"(&amp;&quot;&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:14})", value), uR"(&quot;&apos;&quot;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:15})", value), uR"(&apos;&lt;&apos;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:16})", value), uR"(&apos;&amp;&apos;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:17})", value), uR"(&lt;&gt;&amp;&apos;&quot;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:18})", value), uR"(&apos;&quot;&lt;&gt;&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:19})", value), uR"(&lt;&quot;&amp;&apos;&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:20})", value), uR"(&lt;&lt;&lt;&lt;&lt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:21})", value), uR"(&gt;&gt;&gt;&gt;&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:22})", value), uR"(&amp;&amp;&amp;&amp;&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:23})", value), uR"(&quot;&quot;&quot;&quot;&quot;)", uR"(Render())",
-                 __LINE__);
-    helper.Equal(Template::Render(uR"({var:24})", value), uR"(&apos;&apos;&apos;&apos;&apos;)", uR"(Render())",
-                 __LINE__);
-    helper.Equal(Template::Render(uR"({var:25})", value), uR"(A&lt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:26})", value), uR"(A&gt;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:27})", value), uR"(A&amp;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:28})", value), uR"(A&quot;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:29})", value), uR"(A&apos;)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:30})", value), uR"(&lt;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:31})", value), uR"(&gt;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:32})", value), uR"(&amp;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:33})", value), uR"(&quot;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:34})", value), uR"(&apos;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:35})", value), uR"(A&lt;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:36})", value), uR"(A&gt;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:37})", value), uR"(A&amp;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:38})", value), uR"(A&quot;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:39})", value), uR"(A&apos;A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:40})", value), uR"(AA&lt;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:41})", value), uR"(AA&gt;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:42})", value), uR"(AA&amp;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:43})", value), uR"(AA&quot;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:44})", value), uR"(AA&apos;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:45})", value), uR"(AA&lt;&lt;&lt;&lt;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:46})", value), uR"(AA&gt;&gt;&gt;&gt;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:47})", value), uR"(AA&amp;&amp;&amp;&amp;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:48})", value), uR"(AA&quot;&quot;&quot;&quot;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:49})", value), uR"(AA&apos;&apos;&apos;&apos;AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:50})", value),
-                 uR"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:51})", value), uR"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)", uR"(Render())",
-                 __LINE__);
-    helper.Equal(Template::Render(uR"({var:52})", value), uR"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", uR"(Render())",
-                 __LINE__);
-    helper.Equal(Template::Render(uR"({var:53})", value),
-                 uR"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", uR"(Render())", __LINE__);
-#else
-    helper.Equal(Template::Render(uR"({var:0})", value), uR"(<)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:1})", value), uR"(>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:2})", value), uR"(&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:3})", value), uR"(")", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:4})", value), uR"(')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:5})", value), uR"(<>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:6})", value), uR"(<&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:7})", value), uR"(<&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:8})", value), uR"(>")", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:9})", value), uR"("')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:10})", value), uR"(<">)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:11})", value), uR"(<'>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:12})", value), uR"(<&>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:13})", value), uR"(&"&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:14})", value), uR"("'")", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:15})", value), uR"('<')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:16})", value), uR"('&')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:17})", value), uR"(<>&'")", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:18})", value), uR"('"<>&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:19})", value), uR"(<"&'>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:20})", value), uR"(<<<<<)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:21})", value), uR"(>>>>>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:22})", value), uR"(&&&&&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:23})", value), uR"(""""")", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:24})", value), uR"(''''')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:25})", value), uR"(A<)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:26})", value), uR"(A>)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:27})", value), uR"(A&)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:28})", value), uR"(A")", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:29})", value), uR"(A')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:30})", value), uR"(<A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:31})", value), uR"(>A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:32})", value), uR"(&A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:33})", value), uR"("A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:34})", value), uR"('A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:35})", value), uR"(A<A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:36})", value), uR"(A>A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:37})", value), uR"(A&A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:38})", value), uR"(A"A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:39})", value), uR"(A'A)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:40})", value), uR"(AA<AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:41})", value), uR"(AA>AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:42})", value), uR"(AA&AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:43})", value), uR"(AA"AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:44})", value), uR"(AA'AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:45})", value), uR"(AA<<<<AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:46})", value), uR"(AA>>>>AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:47})", value), uR"(AA&&&&AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:48})", value), uR"(AA""""AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:49})", value), uR"(AA''''AA)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:50})", value), uR"(<A>B'C"D&E'F"G<H>I&G"K)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:51})", value), uR"(AB"CD'EF<GH>IGK')", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:52})", value), uR"("ABC'DEF<GHI>GK<)", uR"(Render())", __LINE__);
-    helper.Equal(Template::Render(uR"({var:53})", value), uR"(A""BC<<DE>>FG''HI&&GK)", uR"(Render())", __LINE__);
-#endif
+    if (Config::AutoEscapeHTML) {
+        helper.Equal(Template::Render(uR"({var:0})", value), uR"(&lt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:1})", value), uR"(&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:2})", value), uR"(&amp;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:3})", value), uR"(&quot;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:4})", value), uR"(&apos;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:5})", value), uR"(&lt;&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:6})", value), uR"(&lt;&amp;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:7})", value), uR"(&lt;&amp;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:8})", value), uR"(&gt;&quot;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:9})", value), uR"(&quot;&apos;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:10})", value), uR"(&lt;&quot;&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:11})", value), uR"(&lt;&apos;&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:12})", value), uR"(&lt;&amp;&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:13})", value), uR"(&amp;&quot;&amp;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:14})", value), uR"(&quot;&apos;&quot;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:15})", value), uR"(&apos;&lt;&apos;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:16})", value), uR"(&apos;&amp;&apos;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:17})", value), uR"(&lt;&gt;&amp;&apos;&quot;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:18})", value), uR"(&apos;&quot;&lt;&gt;&amp;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:19})", value), uR"(&lt;&quot;&amp;&apos;&gt;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:20})", value), uR"(&lt;&lt;&lt;&lt;&lt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:21})", value), uR"(&gt;&gt;&gt;&gt;&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:22})", value), uR"(&amp;&amp;&amp;&amp;&amp;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:23})", value), uR"(&quot;&quot;&quot;&quot;&quot;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:24})", value), uR"(&apos;&apos;&apos;&apos;&apos;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:25})", value), uR"(A&lt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:26})", value), uR"(A&gt;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:27})", value), uR"(A&amp;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:28})", value), uR"(A&quot;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:29})", value), uR"(A&apos;)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:30})", value), uR"(&lt;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:31})", value), uR"(&gt;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:32})", value), uR"(&amp;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:33})", value), uR"(&quot;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:34})", value), uR"(&apos;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:35})", value), uR"(A&lt;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:36})", value), uR"(A&gt;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:37})", value), uR"(A&amp;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:38})", value), uR"(A&quot;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:39})", value), uR"(A&apos;A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:40})", value), uR"(AA&lt;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:41})", value), uR"(AA&gt;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:42})", value), uR"(AA&amp;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:43})", value), uR"(AA&quot;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:44})", value), uR"(AA&apos;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:45})", value), uR"(AA&lt;&lt;&lt;&lt;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:46})", value), uR"(AA&gt;&gt;&gt;&gt;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:47})", value), uR"(AA&amp;&amp;&amp;&amp;AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:48})", value), uR"(AA&quot;&quot;&quot;&quot;AA)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:49})", value), uR"(AA&apos;&apos;&apos;&apos;AA)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:50})", value),
+                     uR"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:51})", value), uR"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)",
+                     uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:52})", value), uR"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", uR"(Render())",
+                     __LINE__);
+        helper.Equal(Template::Render(uR"({var:53})", value),
+                     uR"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", uR"(Render())", __LINE__);
+    } else {
+        helper.Equal(Template::Render(uR"({var:0})", value), uR"(<)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:1})", value), uR"(>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:2})", value), uR"(&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:3})", value), uR"(")", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:4})", value), uR"(')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:5})", value), uR"(<>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:6})", value), uR"(<&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:7})", value), uR"(<&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:8})", value), uR"(>")", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:9})", value), uR"("')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:10})", value), uR"(<">)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:11})", value), uR"(<'>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:12})", value), uR"(<&>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:13})", value), uR"(&"&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:14})", value), uR"("'")", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:15})", value), uR"('<')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:16})", value), uR"('&')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:17})", value), uR"(<>&'")", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:18})", value), uR"('"<>&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:19})", value), uR"(<"&'>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:20})", value), uR"(<<<<<)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:21})", value), uR"(>>>>>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:22})", value), uR"(&&&&&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:23})", value), uR"(""""")", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:24})", value), uR"(''''')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:25})", value), uR"(A<)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:26})", value), uR"(A>)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:27})", value), uR"(A&)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:28})", value), uR"(A")", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:29})", value), uR"(A')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:30})", value), uR"(<A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:31})", value), uR"(>A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:32})", value), uR"(&A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:33})", value), uR"("A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:34})", value), uR"('A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:35})", value), uR"(A<A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:36})", value), uR"(A>A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:37})", value), uR"(A&A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:38})", value), uR"(A"A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:39})", value), uR"(A'A)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:40})", value), uR"(AA<AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:41})", value), uR"(AA>AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:42})", value), uR"(AA&AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:43})", value), uR"(AA"AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:44})", value), uR"(AA'AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:45})", value), uR"(AA<<<<AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:46})", value), uR"(AA>>>>AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:47})", value), uR"(AA&&&&AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:48})", value), uR"(AA""""AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:49})", value), uR"(AA''''AA)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:50})", value), uR"(<A>B'C"D&E'F"G<H>I&G"K)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:51})", value), uR"(AB"CD'EF<GH>IGK')", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:52})", value), uR"("ABC'DEF<GHI>GK<)", uR"(Render())", __LINE__);
+        helper.Equal(Template::Render(uR"({var:53})", value), uR"(A""BC<<DE>>FG''HI&&GK)", uR"(Render())", __LINE__);
+    }
 }
 
 static void TestRawVariableUTag1(TestHelper &helper) {
@@ -1779,21 +1786,23 @@ static void TestInlineIfUTag(TestHelper &helper) {
     value2 += 15;
 
     content = uR"({if case="1" true="{var:0}" false="{var:1}"})";
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    helper.Equal(Template::Render(content, value2), uR"(&amp;)", uR"(Render())", __LINE__);
-#else
-    helper.Equal(Template::Render(content, value2), uR"(&)", uR"(Render())", __LINE__);
-#endif
+
+    if (Config::AutoEscapeHTML) {
+        helper.Equal(Template::Render(content, value2), uR"(&amp;)", uR"(Render())", __LINE__);
+    } else {
+        helper.Equal(Template::Render(content, value2), uR"(&)", uR"(Render())", __LINE__);
+    }
 
     content = uR"({if case="1" true="{raw:0}" false="{raw:1}"})";
     helper.Equal(Template::Render(content, value2), uR"(&)", uR"(Render())", __LINE__);
 
     content = uR"({if case="0" true="{var:0}" false="{var:1}"})";
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-    helper.Equal(Template::Render(content, value2), uR"(&quot;)", uR"(Render())", __LINE__);
-#else
-    helper.Equal(Template::Render(content, value2), uR"(")", uR"(Render())", __LINE__);
-#endif
+
+    if (Config::AutoEscapeHTML) {
+        helper.Equal(Template::Render(content, value2), uR"(&quot;)", uR"(Render())", __LINE__);
+    } else {
+        helper.Equal(Template::Render(content, value2), uR"(")", uR"(Render())", __LINE__);
+    }
 
     content = uR"({if case="0" true="{raw:0}" false="{raw:1}"})";
     helper.Equal(Template::Render(content, value2), uR"(")", uR"(Render())", __LINE__);

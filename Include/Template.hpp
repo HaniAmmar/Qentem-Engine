@@ -689,26 +689,26 @@ struct TemplateSub {
         const Value_T_ *value = findValue(content, length);
 
         if (value != nullptr) {
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-            if (value->IsString()) {
-                const Char_T_ *str;
-                SizeT          len;
-                value->SetCharAndLength(str, len);
-                escapeHTMLSpecialChars(*stream_, str, len);
-                return;
+            if (Config::AutoEscapeHTML) {
+                if (value->IsString()) {
+                    const Char_T_ *str;
+                    SizeT          len;
+                    value->SetCharAndLength(str, len);
+                    escapeHTMLSpecialChars(*stream_, str, len);
+                    return;
+                }
             }
-#endif
 
             if (value->CopyStringValueTo(*stream_)) {
                 return;
             }
 
             if ((*content == TemplatePatterns::TildeChar) && (loop_key_ != nullptr)) {
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-                escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
-#else
-                stream_->Insert(loop_key_, loop_key_length_);
-#endif
+                if (Config::AutoEscapeHTML) {
+                    escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
+                } else {
+                    stream_->Insert(loop_key_, loop_key_length_);
+                }
             }
         }
 

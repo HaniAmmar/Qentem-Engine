@@ -25,42 +25,74 @@
 
 namespace Qentem {
 
-#ifndef QENTEM_AUTOESCAPE_HTML
-#define QENTEM_AUTOESCAPE_HTML 1
-#endif
-
-#ifndef QENTEM_DOUBLE_PRECISION
-#define QENTEM_DOUBLE_PRECISION 15
-#endif
-
-// static constexpr bool QentemIs64bit = (sizeof(void *) == 8);
-
+struct Config {
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__powerpc64__) ||  \
     defined(__s390__)
-
 #define QENTEM_64BIT_ARCH
+    // static constexpr bool Is64bit = (sizeof(void *) == 8);
+    static constexpr bool Is64bit = true;
+#else
+    static constexpr bool Is64bit                 = false;
+#endif
+    ///////////////////////////////////////////////
+#ifndef QENTEM_BIG_ENDIAN
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define QENTEM_BIG_ENDIAN 1
+#endif
+#endif
+/////////////////
+#if defined(QENTEM_BIG_ENDIAN) && (QENTEM_BIG_ENDIAN == 1)
+    static constexpr bool BigEndian = true;
+#else
+    static constexpr bool BigEndian               = false;
+#endif
+///////////////////////////////////////////////
+#ifdef QENTEM_64BIT_ARCH
 // 64bit arch only uses the lower 48 bits for pointers,
 // the upper 16 bits can be used for taging.
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
-// static constexpr bool QentemPointerTagging = QentemIs64bit && 1;
+#endif
+#endif
+/////////////////
+#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+    static constexpr bool PointerTagging = true;
 #else
-// static constexpr bool QentemPointerTagging          = false;
+    static constexpr bool PointerTagging          = false;
 #endif
-#endif
-
+///////////////////////////////////////////////
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
 #ifndef QENTEM_SSO
 // Short string optimization
 #define QENTEM_SSO 1
-// static constexpr bool QentemShortStringOptimization = true;
-#else
-// static constexpr bool QentemShortStringOptimization = false;
 #endif
 #else
 #undef QENTEM_SSO
-// static constexpr bool QentemShortStringOptimization = false;
 #endif
+/////////////////
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+    static constexpr bool ShortStringOptimization = true;
+#else
+    static constexpr bool ShortStringOptimization = false;
+#endif
+
+    ///////////////////////////////////////////////
+#ifndef QENTEM_AUTOESCAPE_HTML
+#define QENTEM_AUTOESCAPE_HTML 1
+#endif
+/////////////////
+#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
+    static constexpr bool AutoEscapeHTML = true;
+#else
+    static constexpr bool AutoEscapeHTML          = false;
+#endif
+
+    static constexpr unsigned int FloatMaxLength       = 22;
+    static constexpr unsigned int ExponentMaxLength    = 5;
+    static constexpr unsigned int IntMaxLength         = 20;
+    static constexpr unsigned int FloatDoublePrecision = 15;
+};
+///////////////////////////////////////////////
 
 #ifndef QENTEM_AVX2
 #define QENTEM_AVX2 0
@@ -86,12 +118,6 @@ namespace Qentem {
 #define QENTEM_NOINLINE __attribute__((noinline))
 #define QENTEM_INLINE __attribute__((always_inline))
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
-#endif
-
-#ifndef QENTEM_BIG_ENDIAN
-#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define QENTEM_BIG_ENDIAN
-#endif
 #endif
 
 #ifndef QENTEM_SIZE_T

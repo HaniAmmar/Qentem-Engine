@@ -48,42 +48,40 @@ class QPointer {
     }
 
     void SetPointer(Type_T_ *pointer) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        p_number_ &= 0xFFFF000000000000ULL;
-        p_number_ |= (reinterpret_cast<unsigned long long>(pointer) & 0x0000FFFFFFFFFFFFULL);
-#else
-        pointer_ = pointer;
-#endif
+        if (Config::PointerTagging) {
+            p_number_ &= 0xFFFF000000000000ULL;
+            p_number_ |= (reinterpret_cast<unsigned long long>(pointer) & 0x0000FFFFFFFFFFFFULL);
+        } else {
+            pointer_ = pointer;
+        }
     }
 
     Type_T_ *GetPointer() const noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
-#else
-        return pointer_;
-#endif
+        if (Config::PointerTagging) {
+            return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
+        } else {
+            return pointer_;
+        }
     }
 
     void MovePointerOnly(QPointer &src) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        bits_.number_ = src.bits_.number_;
-#else
-        pointer_ = src.pointer_;
-#endif
+        if (Config::PointerTagging) {
+            bits_.number_ = src.bits_.number_;
+        } else {
+            pointer_ = src.pointer_;
+        }
+
         src.pointer_ = nullptr;
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     void          SetHighByte(unsigned char byte) noexcept { bits_.high_byte_ = byte; }
     unsigned char GetHighByte() const noexcept { return bits_.high_byte_; }
     void          SetLowByte(unsigned char byte) noexcept { bits_.low_byte_ = byte; }
     unsigned char GetLowByte() const noexcept { return bits_.low_byte_; }
-#endif
 
     void Reset() noexcept { pointer_ = nullptr; }
 
   private:
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     struct Bits {
 #ifndef QENTEM_BIG_ENDIAN
         unsigned long long number_ : 48;
@@ -95,14 +93,11 @@ class QPointer {
         unsigned long long number_ : 48;
 #endif
     };
-#endif
 
     union {
         Type_T_           *pointer_{nullptr};
         unsigned long long p_number_;
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        Bits bits_;
-#endif
+        Bits               bits_;
     };
 };
 

@@ -21,7 +21,7 @@
  */
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4505)
+#pragma warning(disable : 4505) // Warning about functions not being used.
 #endif
 
 #include "Common.hpp"
@@ -279,32 +279,38 @@ struct TestHelper {
     QENTEM_NOINLINE static void PrintInfo() {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
+        if (Config::Is64bit) {
+            TestOutPut::Print("Arch: 64BIT\n");
 
-#ifdef QENTEM_64BIT_ARCH
-        TestOutPut::Print("Arch: 64BIT\n");
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        TestOutPut::Print("Tagged Pointers: On\n");
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-        TestOutPut::Print("Short String Optimization: On\n");
-#endif
-#endif
-#else
-        TestOutPut::Print("Arch: 32BIT\n");
-#endif
+            if (Config::PointerTagging) {
+                TestOutPut::Print("Tagged Pointers: On\n");
 
-        TestOutPut::Print("Endianness: ");
+                if (Config::ShortStringOptimization) {
+                    TestOutPut::Print("Short String Optimization: On\n");
+                } else {
+                    TestOutPut::Print("Short String Optimization: Off\n");
+                }
+            } else {
+                TestOutPut::Print("Tagged Pointers: Off\n");
+                TestOutPut::Print("Short String Optimization: Off\n");
+            }
+        } else {
+            TestOutPut::Print("Arch: 32BIT\n");
+            TestOutPut::Print("Tagged Pointers: Off\n");
+            TestOutPut::Print("Short String Optimization: Off\n");
+        }
 
-#ifndef QENTEM_BIG_ENDIAN
-        TestOutPut::Print("Little-Endian\n");
-#else
-        TestOutPut::Print("Big-Endian\n");
-#endif
+        if (Config::BigEndian) {
+            TestOutPut::Print("Endianness: Big-Endian\n");
+        } else {
+            TestOutPut::Print("Endianness: Little-Endian\n");
+        }
 
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
-        TestOutPut::Print("Autoescape HTML: On\n");
-#else
-        TestOutPut::Print("Autoescape HTML: Off\n");
-#endif
+        if (Config::AutoEscapeHTML) {
+            TestOutPut::Print("Autoescape HTML: On\n");
+        } else {
+            TestOutPut::Print("Autoescape HTML: Off\n");
+        }
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
         TestOutPut::Print("AVX2: On\n");

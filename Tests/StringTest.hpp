@@ -121,11 +121,11 @@ static void TestString1(TestHelper &helper) {
     char   *tmp_size_2 = Memory::Allocate<char>(2);
     String8 str_size_2 = String8(tmp_size_2, 2U);
 
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1U)
-    helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
-#else
-    helper.Equal(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
-#endif
+    if (Config::ShortStringOptimization) {
+        helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
+    } else {
+        helper.Equal(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
+    }
 }
 
 static void TestStringCompare(TestHelper &helper) {

@@ -25,11 +25,6 @@
 #ifndef QENTEM_DIGIT_H_
 #define QENTEM_DIGIT_H_
 
-#define QENTEM_DECIMAL_BASE_ 10
-#define QENTEM_EXPONENT_MAX_LENGTH_ 5
-#define QENTEM_NUMBER_MAX_SIZE_ 20
-#define QENTEM_FLOAT_NUMBER_MAX_SIZE_ 22
-
 namespace Qentem {
 
 /*
@@ -343,7 +338,7 @@ class Digit {
             ++offset;
 
             if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
-                w_number *= QENTEM_DECIMAL_BASE_;
+                w_number *= 10;
                 w_number += (static_cast<unsigned long long>(c) - DigitChars::ZeroChar);
             } else if (c == DigitChars::DotChar) {
                 if (has_dot || (offset == length)) {
@@ -365,7 +360,7 @@ class Digit {
                 c = str[offset];
 
                 if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
-                    base *= QENTEM_DECIMAL_BASE_;
+                    base *= 10;
                     number += (static_cast<Number_T_>(c) - DigitChars::ZeroChar) / base;
                 } else {
                     return false;
@@ -404,7 +399,7 @@ class Digit {
 
                 if (exponent > 9) {
                     number2 = 1E10;
-                    exponent -= QENTEM_DECIMAL_BASE_;
+                    exponent -= 10;
                 } else {
                     number2 = 1E1;
                     --exponent;
@@ -451,8 +446,8 @@ class Digit {
 
     template <typename Stream_T_>
     inline static void unsignedIntToString(Stream_T_ &stream, unsigned long long number) {
-        Char_T_ storage[QENTEM_NUMBER_MAX_SIZE_];
-        SizeT   offset = QENTEM_NUMBER_MAX_SIZE_;
+        Char_T_ storage[Config::IntMaxLength];
+        SizeT   offset = Config::IntMaxLength;
 
         /*
          *   18446744073709551615 MAX unsigned long long   20
@@ -466,13 +461,13 @@ class Digit {
          */
 
         intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-        stream.Insert(&(storage[offset]), (QENTEM_NUMBER_MAX_SIZE_ - offset));
+        stream.Insert(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
     template <typename Stream_T_>
     inline static void signedIntToString(Stream_T_ &stream, long long number) {
-        Char_T_ storage[QENTEM_NUMBER_MAX_SIZE_];
-        SizeT   offset = QENTEM_NUMBER_MAX_SIZE_;
+        Char_T_ storage[Config::IntMaxLength];
+        SizeT   offset = Config::IntMaxLength;
 
         /*
          *   18446744073709551615 MAX unsigned long long   20
@@ -499,16 +494,16 @@ class Digit {
             storage[offset] = DigitChars::NegativeChar;
         }
 
-        stream.Insert(&(storage[offset]), (QENTEM_NUMBER_MAX_SIZE_ - offset));
+        stream.Insert(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
     template <typename String_T_>
     QENTEM_NOINLINE static void doubleToString(String_T_ &dstring, double number, unsigned int min, unsigned int r_min,
                                                unsigned int precision) {
-        constexpr unsigned int max_length = QENTEM_FLOAT_NUMBER_MAX_SIZE_ - 1;
+        constexpr unsigned int max_length = Config::FloatMaxLength - 1;
 
         Char_T_            tmp[max_length];
-        Char_T_            tmp2[QENTEM_FLOAT_NUMBER_MAX_SIZE_];
+        Char_T_            tmp2[Config::FloatMaxLength];
         unsigned long long fraction        = 0;
         unsigned int       fraction_length = 0;
         unsigned int       end_offset      = max_length;
@@ -554,16 +549,16 @@ class Digit {
 
                 fraction = extractFraction(number, precision);
 
-                if ((precision < 17) && ((fraction % QENTEM_DECIMAL_BASE_) > 4)) {
-                    fraction /= QENTEM_DECIMAL_BASE_;
+                if ((precision < 17) && ((fraction % 10) > 4)) {
+                    fraction /= 10;
                     ++fraction;
                 } else {
-                    fraction /= QENTEM_DECIMAL_BASE_;
+                    fraction /= 10;
                 }
 
                 // Removing all zeros from the fraction.
-                while ((precision != 0) && ((fraction % QENTEM_DECIMAL_BASE_) == 0)) {
-                    fraction /= QENTEM_DECIMAL_BASE_;
+                while ((precision != 0) && ((fraction % 10) == 0)) {
+                    fraction /= 10;
                     --precision;
                 }
 
@@ -678,10 +673,10 @@ class Digit {
             min -= left_length;
             end_offset += min;
 
-            if (end_offset > QENTEM_FLOAT_NUMBER_MAX_SIZE_) {
-                min += QENTEM_FLOAT_NUMBER_MAX_SIZE_;
+            if (end_offset > Config::FloatMaxLength) {
+                min += Config::FloatMaxLength;
                 min        = (min - end_offset);
-                end_offset = QENTEM_FLOAT_NUMBER_MAX_SIZE_;
+                end_offset = Config::FloatMaxLength;
             }
         } else {
             min = 0;
@@ -726,11 +721,11 @@ class Digit {
                     exponent += 100;
                     number /= 1E100;
                 } else if (number > 1E9) {
-                    exponent += QENTEM_DECIMAL_BASE_;
+                    exponent += 10;
                     number /= 1E10;
                 } else {
                     ++exponent;
-                    number /= QENTEM_DECIMAL_BASE_;
+                    number /= 10;
                 }
             } while (number > 9);
         } else {
@@ -739,11 +734,11 @@ class Digit {
                     exponent -= 100;
                     number *= 1E100;
                 } else if (number < 1E-9) {
-                    exponent -= QENTEM_DECIMAL_BASE_;
+                    exponent -= 10;
                     number *= 1E10;
                 } else {
                     --exponent;
-                    number *= QENTEM_DECIMAL_BASE_;
+                    number *= 10;
                 }
             } while (number < 0.9);
         }
@@ -763,7 +758,7 @@ class Digit {
     QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str, SizeT &length) noexcept {
         SizeT        offset     = (length - 1);
         SizeT        offset2    = 0;
-        SizeT        MAX_LENGTH = QENTEM_EXPONENT_MAX_LENGTH_; // e(-|+)xxx
+        SizeT        MAX_LENGTH = Config::ExponentMaxLength; // e(-|+)xxx
         unsigned int sign       = 0;
 
         while ((offset != 0) && (MAX_LENGTH != 0)) {
@@ -777,7 +772,7 @@ class Digit {
 
                     case DigitChars::E_Char:
                     case DigitChars::UE_Char: {
-                        if (MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) {
+                        if (MAX_LENGTH == Config::ExponentMaxLength) {
                             // No number.
                             return false;
                         }
@@ -789,7 +784,7 @@ class Digit {
 
                     case DigitChars::NegativeChar:
                     case DigitChars::PositiveChar: {
-                        if ((MAX_LENGTH == QENTEM_EXPONENT_MAX_LENGTH_) || (sign != 0)) {
+                        if ((MAX_LENGTH == Config::ExponentMaxLength) || (sign != 0)) {
                             // No number, or double sign.
                             return false;
                         }
