@@ -212,7 +212,7 @@ struct Template {
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void RenderOnly(const Char_T_ *content, SizeT length, const Value_T_ &root_value,
-                                  StringStream_T_ &stream, Array<TagBit<Char_T_>> &tags_cache) {
+                                  StringStream_T_ &stream, const Array<TagBit<Char_T_>> &tags_cache) {
         using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
         // tags_cache should not be empty. Use GenerateTags() once befor calling this function in a loop.
         const TemplateSubCV temp{&stream, &root_value};
@@ -574,7 +574,7 @@ struct TemplateSub {
                         if (end_offset != 0) {
                             tags_cache += TagBit{TagType::If, offset, end_offset};
                             offset = end_offset;
-                            generateIfCases(content, tags_cache.Last());
+                            generateIfCases(content, tags_cache.Last(), level);
                             continue;
                         }
                     }
@@ -1157,7 +1157,9 @@ struct TemplateSub {
         }
     }
 
-    QENTEM_NOINLINE static void generateIfCases(const Char_T_ *content, TagBit *tag) {
+    QENTEM_NOINLINE static void generateIfCases(const Char_T_ *content, TagBit *tag, const SizeT level) {
+        Array<TagBit> sub_tags;
+
         SizeT       case_offset = (tag->GetOffset() + TemplatePatterns::IfPrefixLength);
         const SizeT length      = (tag->GetEndOffset() - case_offset);
         SizeT       case_length;
@@ -1184,22 +1186,31 @@ struct TemplateSub {
 
                     if (else_offset == 0) {
                         content_length = (length2 - content_offset);
-                        if_info->Insert(
-                            IfTagCase{Array<TagBit>{}, case_offset, case_length, content_offset, content_length});
+                        parse(sub_tags, (content + content_offset), content_length, level);
+
+                        if_info->Insert(IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), case_offset, case_length,
+                                                  content_offset, content_length});
+
                         break;
                     }
 
                     content_length = ((else_offset - TemplatePatterns::ElsePrefixLength) - content_offset);
-                    if_info->Insert(
-                        IfTagCase{Array<TagBit>{}, case_offset, case_length, content_offset, content_length});
+                    parse(sub_tags, (content + content_offset), content_length, level);
+
+                    if_info->Insert(IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), case_offset, case_length,
+                                              content_offset, content_length});
 
                     if ((content[else_offset] != TemplatePatterns::ElseIfChar)) {
                         else_offset =
                             Engine::FindOne<Char_T_>(TemplatePatterns::MultiLineSuffix, content, else_offset, length2);
 
                         if (else_offset != 0) {
-                            if_info->Insert(
-                                IfTagCase{Array<TagBit>{}, case_offset, 0, else_offset, (length2 - else_offset)});
+                            const SizeT else_length = (length2 - else_offset);
+
+                            parse(sub_tags, (content + else_offset), else_length, level);
+
+                            if_info->Insert(IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), case_offset, 0,
+                                                      else_offset, else_length});
                         }
 
                         break;
@@ -1258,10 +1269,6 @@ struct TemplateSub {
 
             if ((item->CaseLength == 0) ||
                 (ALE::Evaluate(result, (content + item->CaseOffset), item->CaseLength, this) && (result > 0))) {
-                if (item->SubTags.IsEmpty()) {
-                    parse(item->SubTags, (content + item->ContentOffset), item->ContentLength, level_);
-                }
-
                 render((content + item->ContentOffset), item->ContentLength, item->SubTags);
                 break;
             }
