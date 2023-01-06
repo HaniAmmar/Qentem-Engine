@@ -199,11 +199,7 @@ struct Template {
         static HArray<Array<TagBit<Char_T_>>, Char_T_> cache;
 
         Array<TagBit<Char_T_>> &tags = cache.GetOrAdd(name, name_length);
-
-        if (tags.IsEmpty()) {
-            GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags);
-        }
-
+        GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags);
         RenderOnly(content, length, root_value, stream, tags);
     }
 
