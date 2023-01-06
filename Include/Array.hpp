@@ -295,7 +295,7 @@ class Array {
         const Type_ *src_item = src.First();
         const Type_ *src_end  = (src_item + src.Size());
 
-        while (src_item != src_end) {
+        while (src_item < src_end) {
             Memory::Initialize(storage, *src_item);
             ++storage;
             ++src_item;
@@ -309,7 +309,7 @@ class Array {
             const Type_ *src_item = src.First();
             const Type_ *src_end  = (src_item + src.Size());
 
-            while (src_item != src_end) {
+            while (src_item < src_end) {
                 Memory::Initialize(storage, *src_item);
                 ++storage;
                 ++src_item;

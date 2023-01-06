@@ -45,7 +45,7 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
         do {
             QENTEM_SIMD_STOREU(m_pointer, m_zero);
             ++m_pointer;
-        } while (m_pointer != end);
+        } while (m_pointer < end);
     }
 #endif
 
@@ -75,7 +75,7 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
             QENTEM_SIMD_STOREU(m_to, QENTEM_SIMD_LOAD(m_form));
             ++m_form;
             ++m_to;
-        } while (m_form != end);
+        } while (m_form < end);
     }
 #endif
 

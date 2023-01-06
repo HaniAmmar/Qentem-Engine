@@ -96,7 +96,7 @@ class StringUtils {
                        bool orEqual) noexcept {
         SizeT offset = 0;
 
-        while ((left_length != offset) && (right_length != offset)) {
+        while ((left_length > offset) && (right_length > offset)) {
             if (left[offset] > right[offset]) {
                 return false;
             }
@@ -116,7 +116,7 @@ class StringUtils {
                           bool orEqual) noexcept {
         SizeT offset = 0;
 
-        while ((left_length != offset) && (right_length != offset)) {
+        while ((left_length > offset) && (right_length > offset)) {
             if (left[offset] < right[offset]) {
                 return false;
             }
@@ -136,7 +136,7 @@ class StringUtils {
         SizeT offset = 0;
 
         // if ((left != nullptr) && (right != nullptr)) {
-        while ((length != offset) && (left[offset] == right[offset])) {
+        while ((length > offset) && (left[offset] == right[offset])) {
             ++offset;
         }
         // }
@@ -152,7 +152,7 @@ class StringUtils {
         SizeT base   = 33;
         SizeT offset = 0;
 
-        while (offset != length) {
+        while (offset < length) {
             const SizeT num = static_cast<SizeT>(key[offset]);
             ++offset;
             hash += (base * offset * num);

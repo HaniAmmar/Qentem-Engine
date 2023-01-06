@@ -702,7 +702,7 @@ class Digit {
             --min;
         }
 
-        while (offset != end_offset) {
+        while (offset < end_offset) {
             str[offset] = tmp2[offset2];
             ++offset;
             ++offset2;

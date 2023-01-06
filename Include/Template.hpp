@@ -403,7 +403,7 @@ struct TemplateSub {
         const TagBit *end    = (tag + tags_cache.Size());
         SizeT         offset = 0;
 
-        while (tag != end) {
+        while (tag < end) {
             stream_->Insert((content + offset), (tag->GetOffset() - offset));
 
             switch (tag->GetType()) {

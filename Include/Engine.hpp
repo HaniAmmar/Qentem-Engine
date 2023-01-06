@@ -129,7 +129,7 @@ class Engine {
                 if ((*pattern == content[offset]) && (pattern[len_one_less] == content[offset + len_one_less])) {
                     Number_T_ tmp_offset = 1;
 
-                    while ((tmp_offset != len_one_less) && (pattern[tmp_offset] == content[tmp_offset + offset])) {
+                    while ((tmp_offset < len_one_less) && (pattern[tmp_offset] == content[tmp_offset + offset])) {
                         ++tmp_offset;
                     }
 

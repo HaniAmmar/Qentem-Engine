@@ -1182,7 +1182,7 @@ class Value {
             const Value *src_end = array_.End();
             SizeT        size    = 0;
 
-            while (src_val != src_end) {
+            while (src_val < src_end) {
                 if (!(src_val->IsUndefined())) {
                     ++size;
                 }
@@ -1208,7 +1208,7 @@ class Value {
                     }
 
                     ++src_val;
-                } while (src_val != src_end);
+                } while (src_val < src_end);
 
                 array_ = static_cast<VArray &&>(new_array);
             }

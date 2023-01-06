@@ -121,7 +121,7 @@ class HArray {
             resize(n_size);
         }
 
-        while (src_item != src_end) {
+        while (src_item < src_end) {
             if (src_item->Hash != 0) {
                 SizeT   *index;
                 HAItem_ *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
@@ -153,7 +153,7 @@ class HArray {
             resize(n_size);
         }
 
-        while (src_item != src_end) {
+        while (src_item < src_end) {
             if (src_item->Hash != 0) {
                 SizeT   *index;
                 HAItem_ *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
@@ -451,7 +451,7 @@ class HArray {
         const HAItem_ *end  = (item + Size());
         SizeT          size = 0;
 
-        while (item != end) {
+        while (item < end) {
             size += (item->Hash != 0);
             ++item;
         }
@@ -568,7 +568,7 @@ class HArray {
                 }
 
                 ++src_item;
-            } while (src_item != src_end);
+            } while (src_item < src_end);
 
             setSize(static_cast<SizeT>(storage_item - storage_src));
             generateHash();
@@ -583,7 +583,7 @@ class HArray {
         HAItem_       *item         = src;
         const HAItem_ *end          = (item + Size());
 
-        while (item != end) {
+        while (item < end) {
             if (item->Hash != 0) {
                 Memory::Initialize(storage_item, static_cast<HAItem_ &&>(*item));
                 ++storage_item;
@@ -607,7 +607,7 @@ class HArray {
         const SizeT    base = getBase();
         SizeT          tmp;
 
-        while (item != end) {
+        while (item < end) {
             item->Next = 0;
             index      = (ht + (item->Hash & base));
             tmp        = *index;
