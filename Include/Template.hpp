@@ -600,10 +600,8 @@ struct TemplateSub {
                             const SizeT end_offset =
                                 Engine::FindOne<Char_T_>(TemplatePatterns::InLineSuffix, content,
                                                          (offset + TemplatePatterns::VariablePrefixLength), length);
-                            // end_offset cannot be zero
-
-                            tags_cache +=
-                                TagBit{TagType::Variable, (offset - TemplatePatterns::InLinePrefixLength), end_offset};
+                            offset -= TemplatePatterns::InLinePrefixLength;
+                            tags_cache += TagBit{TagType::Variable, offset, end_offset};
                             offset = end_offset;
                         }
 
@@ -616,8 +614,8 @@ struct TemplateSub {
                             const SizeT end_offset =
                                 Engine::FindOne<Char_T_>(TemplatePatterns::InLineSuffix, content,
                                                          (offset + TemplatePatterns::RawVariablePrefixLength), length);
-                            tags_cache += TagBit{TagType::RawVariable, (offset - TemplatePatterns::InLinePrefixLength),
-                                                 end_offset};
+                            offset -= TemplatePatterns::InLinePrefixLength;
+                            tags_cache += TagBit{TagType::RawVariable, offset, end_offset};
                             offset = end_offset;
                         }
 
@@ -630,8 +628,8 @@ struct TemplateSub {
                             const SizeT end_offset = Engine::SkipInnerPatterns<Char_T_>(
                                 TemplatePatterns::InLinePrefix, TemplatePatterns::InLineSuffix, content,
                                 (offset + TemplatePatterns::MathPrefixLength - 1), length);
-                            tags_cache +=
-                                TagBit{TagType::Math, (offset - TemplatePatterns::InLinePrefixLength), end_offset};
+                            offset -= TemplatePatterns::InLinePrefixLength;
+                            tags_cache += TagBit{TagType::Math, offset, end_offset};
                             offset = end_offset;
                         }
 
