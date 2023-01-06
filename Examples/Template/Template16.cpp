@@ -20,7 +20,7 @@ int main() {
 {if case="{var:0} + {var:1} != 10" false="{var:3}"}
     )";
 
-    std::cout << Template::Render(content, &value) << '\n';
+    std::cout << Template::Render(content, value) << '\n';
     /*
         Output:
             16

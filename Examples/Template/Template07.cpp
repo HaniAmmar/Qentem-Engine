@@ -16,7 +16,7 @@ int main() {
         R"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
         repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
 
-    std::cout << Template::Render(content, &value) << '\n';
+    std::cout << Template::Render(content, value) << '\n';
 
     /*
         Output:
