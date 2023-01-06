@@ -188,6 +188,26 @@ struct Template {
     struct TagBit;
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
+    inline static void CachedRender(const Char_T_ *content, SizeT length, const Value_T_ &root_value,
+                                    StringStream_T_ &stream, const Char_T_ *name, SizeT name_length) {
+        // This is not a thread safe function, and its here to show how to cache geterated tags.
+        // Use this in a single threaded prosess, or change it.
+
+        // Usage:
+        // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
+
+        static HArray<Array<TagBit<Char_T_>>, Char_T_> cache;
+
+        Array<TagBit<Char_T_>> &tags = cache.GetOrAdd(name, name_length);
+
+        if (tags.IsEmpty()) {
+            GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags);
+        }
+
+        RenderOnly(content, length, root_value, stream, tags);
+    }
+
+    template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value, StringStream_T_ &stream,
                               Array<TagBit<Char_T_>> &tags_cache) {
         GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags_cache);
