@@ -27,7 +27,7 @@
 
 #define QENTEM_DECIMAL_BASE_ 10
 #define QENTEM_EXPONENT_MAX_LENGTH_ 5
-#define QENTEM_INT_NUMBER_MAX_SIZE_ 20
+#define QENTEM_NUMBER_MAX_SIZE_ 20
 #define QENTEM_FLOAT_NUMBER_MAX_SIZE_ 22
 
 namespace Qentem {
@@ -84,6 +84,16 @@ class Digit {
         return value;
     }
 
+    template <typename Stream_T_>
+    inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
+        unsignedIntToString(stream, number);
+    }
+
+    template <typename Stream_T_>
+    inline static void NumberToString(Stream_T_ &stream, long long number) {
+        signedIntToString(stream, number);
+    }
+
     template <typename Number_T_>
     inline static String<Char_T_> NumberToString(Number_T_ number) {
         String<Char_T_> str;
@@ -93,42 +103,32 @@ class Digit {
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned short number) {
-        unsignedIntToString(stream, number);
+        NumberToString(stream, static_cast<unsigned long long>(number));
     }
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned int number) {
-        unsignedIntToString(stream, number);
+        NumberToString(stream, static_cast<unsigned long long>(number));
     }
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned long number) {
-        unsignedIntToString(stream, number);
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
-        unsignedIntToString(stream, number);
+        NumberToString(stream, static_cast<unsigned long long>(number));
     }
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, short number) {
-        signedIntToString(stream, number);
+        NumberToString(stream, static_cast<long long>(number));
     }
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, int number) {
-        signedIntToString(stream, number);
+        NumberToString(stream, static_cast<long long>(number));
     }
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, long number) {
-        signedIntToString(stream, number);
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, long long number) {
-        signedIntToString(stream, number);
+        NumberToString(stream, static_cast<long long>(number));
     }
 
     /*
@@ -421,37 +421,38 @@ class Digit {
         return true;
     }
 
-    template <typename Number_T_, typename Number2_T_>
-    QENTEM_NOINLINE static void intToString(Char_T_ *storage, Number_T_ &offset, Number2_T_ number) {
-        static constexpr char lookup_table[] = {"000102030405060708091011121314151617181920212223242526272829"
-                                                "303132333435363738394041424344454647484950515253545556575859"
-                                                "606162636465666768697071727374757677787980818283848586878889"
-                                                "90919293949596979899"};
+    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
+        using NumberT_ = unsigned long long;
 
-        while (number >= Number2_T_{100}) {
-            offset -= Number_T_{2};
-            const SizeT index = (static_cast<SizeT>(number % Number2_T_{100}) * SizeT{2});
-            number /= Number2_T_{100};
+        static const char lookup_table[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                            "303132333435363738394041424344454647484950515253545556575859"
+                                            "606162636465666768697071727374757677787980818283848586878889"
+                                            "90919293949596979899"};
 
-            storage[offset]                = static_cast<Char_T_>(lookup_table[index]);
-            storage[offset + Number_T_{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
+        while (number >= NumberT_{100}) {
+            offset -= SizeT{2};
+            const SizeT index = (static_cast<SizeT>(number % NumberT_{100}) * SizeT{2});
+            number /= NumberT_{100};
+
+            storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
         }
 
-        if (number < Number2_T_{10}) {
+        if (number < NumberT_{10}) {
             --offset;
             storage[offset] = static_cast<Char_T_>(number) + DigitChars::ZeroChar;
         } else {
-            offset -= Number_T_{2};
+            offset -= SizeT{2};
             const SizeT index          = (static_cast<SizeT>(number) * SizeT{2});
             storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
             storage[offset + SizeT{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
         }
     }
 
-    template <typename Stream_T_, typename Number_T_>
-    inline static void unsignedIntToString(Stream_T_ &stream, Number_T_ number) {
-        Char_T_ storage[QENTEM_INT_NUMBER_MAX_SIZE_];
-        SizeT   offset = QENTEM_INT_NUMBER_MAX_SIZE_;
+    template <typename Stream_T_>
+    inline static void unsignedIntToString(Stream_T_ &stream, unsigned long long number) {
+        Char_T_ storage[QENTEM_NUMBER_MAX_SIZE_];
+        SizeT   offset = QENTEM_NUMBER_MAX_SIZE_;
 
         /*
          *   18446744073709551615 MAX unsigned long long   20
@@ -464,15 +465,14 @@ class Digit {
          *  -32767                MAX short                5 + (-|+) = 6
          */
 
-        intToString(&(storage[0]), offset, number);
-
-        stream.Insert(&(storage[offset]), (QENTEM_INT_NUMBER_MAX_SIZE_ - offset));
+        intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
+        stream.Insert(&(storage[offset]), (QENTEM_NUMBER_MAX_SIZE_ - offset));
     }
 
-    template <typename Stream_T_, typename Number_T_>
-    inline static void signedIntToString(Stream_T_ &stream, Number_T_ number) {
-        Char_T_ storage[QENTEM_INT_NUMBER_MAX_SIZE_];
-        SizeT   offset = QENTEM_INT_NUMBER_MAX_SIZE_;
+    template <typename Stream_T_>
+    inline static void signedIntToString(Stream_T_ &stream, long long number) {
+        Char_T_ storage[QENTEM_NUMBER_MAX_SIZE_];
+        SizeT   offset = QENTEM_NUMBER_MAX_SIZE_;
 
         /*
          *   18446744073709551615 MAX unsigned long long   20
@@ -492,14 +492,14 @@ class Digit {
             negative = true;
         }
 
-        intToString(&(storage[0]), offset, number);
+        intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
 
         if (negative) {
             --offset;
             storage[offset] = DigitChars::NegativeChar;
         }
 
-        stream.Insert(&(storage[offset]), (QENTEM_INT_NUMBER_MAX_SIZE_ - offset));
+        stream.Insert(&(storage[offset]), (QENTEM_NUMBER_MAX_SIZE_ - offset));
     }
 
     template <typename String_T_>
@@ -662,7 +662,7 @@ class Digit {
 
             end_offset = 4;
 
-            intToString(&(tmp[0]), end_offset, exponent);
+            intToString(&(tmp[0]), end_offset, static_cast<unsigned long long>(exponent));
 
             while (end_offset < 4) {
                 tmp2[offset] = tmp[end_offset];
