@@ -500,13 +500,13 @@ class Digit {
     template <typename String_T_>
     QENTEM_NOINLINE static void doubleToString(String_T_ &dstring, double number, unsigned int min, unsigned int r_min,
                                                unsigned int precision) {
-        constexpr unsigned int max_length = Config::FloatMaxLength - 1;
+        constexpr SizeT max_length = (Config::FloatMaxLength - 1U);
 
         Char_T_            tmp[max_length];
         Char_T_            tmp2[Config::FloatMaxLength];
         unsigned long long fraction        = 0;
+        SizeT              end_offset      = max_length;
         unsigned int       fraction_length = 0;
-        unsigned int       end_offset      = max_length;
         unsigned int       offset          = 0;
         int                exponent        = 0;
         const bool         negative        = (number < 0);
@@ -530,7 +530,7 @@ class Digit {
             intToString(&(tmp[0]), end_offset, tmp_number);
         }
 
-        unsigned int left_length = (max_length - end_offset);
+        SizeT left_length = (max_length - end_offset);
 
         if (end_offset != 0) { // Full
             number -= static_cast<double>(left_number);
@@ -600,7 +600,7 @@ class Digit {
             }
 
             if (((end_offset == 0) && (exponent == 0)) || (left_length != 0) || no_exponent) {
-                unsigned int offset2 = end_offset;
+                SizeT offset2 = end_offset;
 
                 tmp2[offset] = DigitChars::DotChar;
                 ++offset;
@@ -675,7 +675,7 @@ class Digit {
 
             if (end_offset > Config::FloatMaxLength) {
                 min += Config::FloatMaxLength;
-                min        = (min - end_offset);
+                min        = static_cast<unsigned int>(min - end_offset);
                 end_offset = Config::FloatMaxLength;
             }
         } else {
