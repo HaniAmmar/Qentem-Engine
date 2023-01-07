@@ -95,14 +95,6 @@ if (ENABLE_COVERAGE)
     target_link_libraries(EngineTest --coverage)
 endif()
 
-# ALE
-add_executable(ALETest Tests/ALETest.cpp)
-add_test(NAME ALETest COMMAND ALETest)
-
-if (ENABLE_COVERAGE)
-    target_link_libraries(ALETest --coverage)
-endif()
-
 # Unicode
 add_executable(UnicodeTest Tests/UnicodeTest.cpp)
 add_test(NAME UnicodeTest COMMAND UnicodeTest)
@@ -133,6 +125,14 @@ add_test(NAME JSONTest COMMAND JSONTest)
 
 if (ENABLE_COVERAGE)
     target_link_libraries(JSONTest --coverage)
+endif()
+
+# ALE
+add_executable(ALETest Tests/RunEvaluateTest.cpp)
+add_test(NAME ALETest COMMAND ALETest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(ALETest --coverage)
 endif()
 
 # Template

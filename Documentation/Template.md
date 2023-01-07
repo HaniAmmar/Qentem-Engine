@@ -4,8 +4,8 @@
 -   [Raw Variable](#raw-variable)
 -   [Math](#math)
 -   [Inline If](#inline-if)
--   [Loop](#loop)
 -   [If Condition](#if-condition)
+-   [Loop](#loop)
 
 ## Variable
 
@@ -129,7 +129,25 @@ Raw variable tag is the same as Variable tag, except it does not escape HTML spe
 {math:...}
 ```
 
-This tag passes its value to [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/main/Documentation/ALE.md) for arithmetic and logic evaluation.
+-   Logic operations:
+
+    -   && `And`
+    -   || `Or`
+    -   == `Equal`
+    -   != `Not equal`
+    -   \> `Bigger than`
+    -   \>= `Bigger than or equal`
+    -   < `Less than`
+    -   <= `Less than or equal`
+
+-   Arithmetic operations:
+
+    -   ^ `Exponent`
+    -   % `Remainder`
+    -   \* `Multiplication`
+    -   / `Division`
+    -   \+ `Addition`
+    -   \- `Subtraction`
 
 ```cpp
 #include "Template.hpp"
@@ -170,6 +188,26 @@ int main() {
 ```
 
 ## Inline If
+
+-   Logic operations:
+
+    -   && `And`
+    -   || `Or`
+    -   == `Equal`
+    -   != `Not equal`
+    -   \> `Bigger than`
+    -   \>= `Bigger than or equal`
+    -   < `Less than`
+    -   <= `Less than or equal`
+
+-   Arithmetic operations:
+
+    -   ^ `Exponent`
+    -   % `Remainder`
+    -   \* `Multiplication`
+    -   / `Division`
+    -   \+ `Addition`
+    -   \- `Subtraction`
 
 ```txt
 {if case="..." true="..." false="..."}
@@ -214,14 +252,155 @@ With variables:
 
 `true` and `false` only accept Variable tag, Raw variable tag and Math tag.
 
-### ALE Note
+## If Condition
 
-ALE uses `1` for `true`, 0 for `false` and `null`. if the operation is equal, Template will try the following:
+-   Logic operations:
+
+    -   && `And`
+    -   || `Or`
+    -   == `Equal`
+    -   != `Not equal`
+    -   \> `Bigger than`
+    -   \>= `Bigger than or equal`
+    -   < `Less than`
+    -   <= `Less than or equal`
+
+-   Arithmetic operations:
+
+    -   ^ `Exponent`
+    -   % `Remainder`
+    -   \* `Multiplication`
+    -   / `Division`
+    -   \+ `Addition`
+    -   \- `Subtraction`
+
+```txt
+<if case="...">...</if>
+<if case="...">...<else />...</if>
+<if case="...">...<elseif case="..." />...</if>
+<if case="...">...<elseif case="..." />...<else />...</if>
+```
+
+Similar to `{if case="..." ...}`, but capable of branching, and nesting.
+
+### If Example 1
+
+```cpp
+#include "Template.hpp"
+#include "Value.hpp"
+
+#include <iostream>
+
+using Qentem::Template;
+using Qentem::Value;
+
+int main() {
+    Value<char> value;
+
+    value += 0;
+    value += 1;
+    value += 2;
+    value += 3;
+
+    const char *content = R"(
+<if case="{var:0} == 0">
+Zero!
+</if>
+
+<if case="{var:1} == 0">
+Zero!
+<else />
+Not {var:0} but {var:1}.
+</if>
+
+<if case="{var:2} == 0">
+Zero!
+<elseif case="{var:2} == 2" />
+Two!
+<else />
+Not zero or one.
+</if>
+
+<if case="{var:2} == 0">
+Zero!
+<elseif case="{var:2} == 5" />
+Two!
+<elseif case="{var:3} == 3" />
+{var:3}
+<else />
+Not zero or one or two.
+</if>
+    )";
+
+    std::cout << Template::Render(content, value) << '\n';
+
+    /*
+        Output:
+            Zero!
+
+            Not 0 but 1.
+
+            Two!
+
+            3
+    */
+}
+```
+
+### If Example 2
+
+```cpp
+#include "JSON.hpp"
+#include "Template.hpp"
+
+#include <iostream>
+
+using Qentem::Template;
+using Qentem::Value;
+
+int main() {
+    auto value = Qentem::JSON::Parse(R"([0,1,2,3])");
+
+    const char *content = R"(
+<if case="{var:0} == 0">
+Zero!<if case="{var:1} == 1"> and one<if case="{var:2} == 2"> and two!</if></if>
+</if>
+
+<if case="({var:3} + 5) == 0">
+Zero!
+<else />
+<if case="{var:3} == 3">{var:3}+5 is 8 not {var:3}</if>
+</if>
+)";
+
+    std::cout << Template::Render(content, value) << '\n';
+
+    /*
+        Output:
+        Zero! and one and two!
+
+        3+5 is 8 not 3
+    */
+}
+```
+
+### Evaluation Note
+
+Evaluate uses 1 for `true`, 0 for `false` and `null`. if the operation is equal, Template will try the following:
 
 -   If one of the variables is a number, it will convert the other part to a number: ({var:one} == 1)
--   If none of the variables is a number, it will convert the other part to a string: ({var:bool} == true)
+-   If none of the variables are numbers, it will convert them to strings: ({var:bool} == true)
 
-To force ALE to treat the variables as numbers, use parentheses: (({var:bool}) == 1)
+To force converting the variables to numbers, use parentheses: {math:({var:bool}) == 1}
+
+### Evaluation Order
+
+-   Parentheses.
+-   Exponent. Remainder.
+-   Multiplication. Division.
+-   Addition. Subtraction.
+-   Equal. Not Equal. Less than. Bigger than.
+-   And. Or.
 
 ## Loop
 
@@ -636,118 +815,6 @@ int main() {
                 Month(1)
                 Month(5)
                 Month(7)
-    */
-}
-```
-
-## If Condition
-
-```txt
-<if case="...">...</if>
-<if case="...">...<else />...</if>
-<if case="...">...<elseif case="..." />...</if>
-<if case="...">...<elseif case="..." />...<else />...</if>
-```
-
-Similar to `{if case="..." ...}`, but capable of branching, and nesting.
-
-### If Example 1
-
-```cpp
-#include "Template.hpp"
-#include "Value.hpp"
-
-#include <iostream>
-
-using Qentem::Template;
-using Qentem::Value;
-
-int main() {
-    Value<char> value;
-
-    value += 0;
-    value += 1;
-    value += 2;
-    value += 3;
-
-    const char *content = R"(
-<if case="{var:0} == 0">
-Zero!
-</if>
-
-<if case="{var:1} == 0">
-Zero!
-<else />
-Not {var:0} but {var:1}.
-</if>
-
-<if case="{var:2} == 0">
-Zero!
-<elseif case="{var:2} == 2" />
-Two!
-<else />
-Not zero or one.
-</if>
-
-<if case="{var:2} == 0">
-Zero!
-<elseif case="{var:2} == 5" />
-Two!
-<elseif case="{var:3} == 3" />
-{var:3}
-<else />
-Not zero or one or two.
-</if>
-    )";
-
-    std::cout << Template::Render(content, value) << '\n';
-
-    /*
-        Output:
-            Zero!
-
-            Not 0 but 1.
-
-            Two!
-
-            3
-    */
-}
-```
-
-### If Example 2
-
-```cpp
-#include "JSON.hpp"
-#include "Template.hpp"
-
-#include <iostream>
-
-using Qentem::Template;
-using Qentem::Value;
-
-int main() {
-    auto value = Qentem::JSON::Parse(R"([0,1,2,3])");
-
-    const char *content = R"(
-<if case="{var:0} == 0">
-Zero!<if case="{var:1} == 1"> and one<if case="{var:2} == 2"> and two!</if></if>
-</if>
-
-<if case="({var:3} + 5) == 0">
-Zero!
-<else />
-<if case="{var:3} == 3">{var:3}+5 is 8 not {var:3}</if>
-</if>
-)";
-
-    std::cout << Template::Render(content, value) << '\n';
-
-    /*
-        Output:
-        Zero! and one and two!
-
-        3+5 is 8 not 3
     */
 }
 ```

@@ -22,7 +22,6 @@
 
 // #include "StringStream.hpp"
 // static Qentem::StringStream<char> test_ss;
-// #define QENTEM_OUTPUT_STREAM_TYPE Qentem::StringStream<char>
 // #define QENTEM_OUTPUT_STREAM test_ss
 
 #include "Test.hpp"
@@ -40,11 +39,11 @@ int main() {
     //     Qentem::Test::RunDigitTests();
     //     Qentem::Test::RunHArrayTests();
     //     Qentem::Test::RunEngineTests();
-    //     Qentem::Test::RunALETests();
     //     Qentem::Test::RunUnicodeTests();
     //     Qentem::Test::RunJSONUtilsTests();
     //     Qentem::Test::RunValueTests();
     //     Qentem::Test::RunJSONTests();
+    //     Qentem::Test::RunEvaluateTests();
     //     Qentem::Test::RunTemplateTests();
     //     Qentem::Test::RunTemplateUTests();
     //     Qentem::Test::RunTemplateLTests();

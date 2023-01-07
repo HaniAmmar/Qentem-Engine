@@ -20,7 +20,10 @@
  * SOFTWARE.
  */
 
-#include "ALE.hpp"
+#include "Array.hpp"
+#include "Digit.hpp"
+#include "Engine.hpp"
+#include "HArray.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_TEMPLATE_H_
@@ -111,7 +114,6 @@ namespace Qentem {
  * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
  * {math: 0.2 + 0.3}
  *
- * See ALE::Evaluate
  */
 
 /*
@@ -174,6 +176,9 @@ template <typename, typename, typename>
 struct TemplateSub;
 
 template <typename>
+struct ALEExpressions_T_;
+
+template <typename>
 struct TemplatePatterns_T_;
 
 struct Template {
@@ -188,7 +193,7 @@ struct Template {
     struct TagBit;
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &root_value,
+    inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &value,
                                     StringStream_T_ &stream, const Char_T_ *name, const SizeT name_length) {
         // This is not a thread safe function, and its here to show how to cache geterated tags.
         // Use this in a single threaded prosess, or change it.
@@ -196,25 +201,29 @@ struct Template {
         // Usage:
         // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
 
+        using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
+
+        const TemplateSubCV temp{&stream, &value};
+
         static HArray<Array<TagBit<Char_T_>>, Char_T_> cache;
 
         Array<TagBit<Char_T_>> &tags = cache.GetOrAdd(name, name_length);
 
         if (tags.IsEmpty()) {
-            GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags);
+            TemplateSubCV::parse(tags, content, length, 0);
         }
 
-        RenderOnly(content, root_value, stream, tags);
+        temp.render(content, tags);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &root_value, StringStream_T_ &stream,
+    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &value, StringStream_T_ &stream,
                               Array<TagBit<Char_T_>> &tags_cache) {
         if (tags_cache.IsEmpty()) {
             GenerateTags<Char_T_, Value_T_, StringStream_T_>(content, length, tags_cache);
         }
 
-        RenderOnly(content, root_value, stream, tags_cache);
+        RenderOnly(content, value, stream, tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
@@ -234,25 +243,45 @@ struct Template {
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, const SizeT length, const Value_T_ &root_value,
+    inline static void Render(const Char_T_ *content, const SizeT length, const Value_T_ &value,
                               StringStream_T_ &stream) {
         Array<TagBit<Char_T_>> tags_cache;
-        Render(content, length, root_value, stream, tags_cache);
+        Render(content, length, value, stream, tags_cache);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
-    inline static StringStream_T_ Render(const Char_T_ *content, const SizeT length, const Value_T_ &root_value) {
+    inline static StringStream_T_ Render(const Char_T_ *content, const SizeT length, const Value_T_ &value) {
         StringStream_T_ stream;
-        Render(content, length, root_value, stream);
+        Render(content, length, value, stream);
         return stream;
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
-    inline static StringStream_T_ Render(const Char_T_ *content, const Value_T_ &root_value) {
-        return Render(content, StringUtils::Count(content), root_value);
+    inline static StringStream_T_ Render(const Char_T_ *content, const Value_T_ &value) {
+        return Render(content, StringUtils::Count(content), value);
     }
 
-    enum struct TagType : unsigned char {
+    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
+    inline static bool Evaluate(double &number, const Char_T_ *content, const Value_T_ &value) {
+        using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
+        StringStream_T_ stream;
+
+        const TemplateSubCV temp{&stream, &value};
+        return temp.evaluate(number, content, StringUtils::Count(content));
+    }
+
+    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
+    inline static double Evaluate(const Char_T_ *content, const Value_T_ &value) {
+        double number;
+
+        if (Evaluate(number, content, value)) {
+            return number;
+        }
+
+        return 0;
+    }
+
+    enum TagType : unsigned char {
         None = 0,
         Variable,    // {var:x}
         RawVariable, // {raw:x}
@@ -417,7 +446,6 @@ struct TemplateSub {
     TemplateSub() = delete;
 
   private:
-    friend struct Qentem::ALE;
     friend struct Qentem::Template;
 
     using TagBit           = Template::TagBit<Char_T_>;
@@ -735,6 +763,18 @@ struct TemplateSub {
         }
     }
 
+    bool evaluate(double &number, const Char_T_ *content, SizeT length) const noexcept {
+        ALENumber num;
+
+        if (parseExpression(num, content, 0, length)) {
+            number = num.Number;
+            return true;
+        }
+
+        number = 0;
+        return false;
+    }
+
     static void escapeHTMLSpecialChars(StringStream_T_ &stream, const Char_T_ *str, SizeT length) {
         SizeT offset = 0;
         SizeT index  = 0;
@@ -834,7 +874,7 @@ struct TemplateSub {
     void renderMath(const Char_T_ *content, const TagBit *tag) const {
         double number;
 
-        if (ALE::Evaluate(number, content, tag->GetLength(), this)) {
+        if (evaluate(number, content, tag->GetLength())) {
             Digit<Char_T_>::NumberToString(*stream_, number, 1, 0, 3);
         } else {
             stream_->Insert((content - TemplatePatterns::MathPrefixLength),
@@ -929,7 +969,7 @@ struct TemplateSub {
         if (tag->CaseLength != 0) {
             double result;
 
-            if (ALE::Evaluate(result, (content + tag->CaseOffset), tag->CaseLength, this)) {
+            if (evaluate(result, (content + tag->CaseOffset), tag->CaseLength)) {
                 if (result > 0.0) {
                     if (tag->TrueLength != 0) {
                         render((content + tag->TrueOffset), tag->TrueSubTags);
@@ -949,7 +989,7 @@ struct TemplateSub {
         while (item < end) {
             // <else> without if = (item->CaseLength == 0)
             if ((item->CaseLength == 0) ||
-                (ALE::Evaluate(result, (content + item->CaseOffset), item->CaseLength, this) && (result > 0))) {
+                (evaluate(result, (content + item->CaseOffset), item->CaseLength) && (result > 0))) {
                 render((content + item->ContentOffset), item->SubTags);
                 break;
             }
@@ -1398,18 +1438,412 @@ struct TemplateSub {
         return value;
     }
 
-    bool ALESetNumber(double &number, const Value_T_ *value) const noexcept {
-        if (!(value->SetNumber(number))) {
-            const Char_T_ *str;
-            SizeT          len;
+    union ALENumber {
+        double Number;
 
-            return (value->SetCharAndLength(str, len) && ALE::Evaluate(number, str, len, this));
+        struct {
+            // int is half the size of double. DONT change the type, or it will break.
+            unsigned int Offset;
+            unsigned int Length;
+        } Content{0, 0};
+    };
+
+    enum ALEExpression {
+        None,
+        Or,             // ||
+        And,            // &&
+        Equal,          // ==
+        NotEqual,       // !=
+        BiggerOrEqual,  // >=
+        LessOrEqual,    // <=
+        Bigger,         // >
+        Less,           // <
+        Addition,       // +
+        Subtraction,    // -
+        Multiplication, // *
+        Division,       // /
+        Remainder,      // %
+        Exponent,       // ^
+        Error           // X
+    };
+
+    bool parseExpression(ALENumber &number, const Char_T_ *content, SizeT offset, const SizeT length) const noexcept {
+        const SizeT   num_offset = offset;
+        ALEExpression expr       = getExpression(content, offset, length);
+        return subParseExpression(number, content, offset, num_offset, length, expr, ALEExpression::None);
+    }
+
+    bool subParseExpression(ALENumber &left, const Char_T_ *content, SizeT &offset, SizeT num_offset,
+                            const SizeT length, ALEExpression &expr, const ALEExpression previous_expr) const noexcept {
+        ALENumber     right;
+        ALEExpression next_expr;
+
+        if (expr != ALEExpression::Error) {
+            const bool no_equal = ((expr != ALEExpression::Equal) && (expr != ALEExpression::NotEqual));
+
+            if (!getExpressionValue(left, content, num_offset, (offset - num_offset), no_equal)) {
+                return false;
+            }
+
+            while (offset < length) {
+                ++offset;
+
+                if (expr < ALEExpression::Bigger) {
+                    ++offset;
+                }
+
+                num_offset = offset;
+                next_expr  = getExpression(content, offset, length);
+
+                if (expr >= next_expr) {
+                    if (!getExpressionValue(right, content, num_offset, (offset - num_offset),
+                                            ((expr != ALEExpression::Equal) && (expr != ALEExpression::NotEqual))) ||
+                        !processExpression(content, left, right, no_equal, false, expr)) {
+                        return false;
+                    }
+
+                    expr = next_expr;
+
+                    if (previous_expr >= next_expr) {
+                        return true;
+                    }
+                } else {
+                    if (!subParseExpression(right, content, offset, num_offset, length, next_expr, expr) ||
+                        !processExpression(content, left, right, no_equal, true, expr)) {
+                        return false;
+                    }
+
+                    expr = next_expr;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    bool getExpressionValue(ALENumber &val, const Char_T_ *content, SizeT offset, SizeT length,
+                            bool no_equal) const noexcept {
+        StringUtils::Trim(content, offset, length);
+
+        if (no_equal) {
+            return getExpressionNumber(val, content, offset, length);
+        }
+
+        val.Content.Offset = static_cast<unsigned int>(offset);
+        val.Content.Length = static_cast<unsigned int>(length);
+
+        return true;
+    }
+
+    bool getExpressionNumber(ALENumber &val, const Char_T_ *content, SizeT offset, SizeT length) const noexcept {
+        using ALEExpressions = ALEExpressions_T_<Char_T_>;
+
+        switch (content[offset]) {
+            case ALEExpressions::ParenthesStart: {
+                // getExpression check for closed parenthes, so "length" will never go over the actual length.
+                length += offset;
+                ++offset; // after (
+                --length; // before )
+
+                return parseExpression(val, content, offset, length);
+            }
+
+            case ALEExpressions::BracketStart: {
+                return (setNumber(val.Number, (content + offset), length));
+            }
+
+            default: {
+                return (Digit<Char_T_>::StringToNumber(val.Number, (content + offset), length));
+            }
+        }
+    }
+
+    bool processExpression(const Char_T_ *content, ALENumber &left, ALENumber right, bool left_evaluated,
+                           bool right_evaluated, ALEExpression expr) const noexcept {
+        switch (expr) {
+            case ALEExpression::Exponent: { // ^
+                if (right.Number != 0.0) {
+                    // TODO: Needs more work to evaluate fractions
+                    if (left.Number != 0.0) {
+                        const bool neg = (right.Number < 0);
+
+                        if (neg) {
+                            right.Number = -right.Number; // neg ASM
+                        }
+
+                        if (right.Number < 1) {
+                            return false;
+                        }
+
+                        unsigned int times = static_cast<unsigned int>(right.Number);
+                        const double num   = left.Number;
+
+                        while (--times != 0) {
+                            left.Number *= num;
+                        }
+
+                        if (neg) {
+                            left.Number = (1 / left.Number);
+                        }
+                    }
+
+                    break;
+                }
+
+                left.Number = 1;
+                break;
+            }
+
+            case ALEExpression::Remainder: { // %
+                left.Number = static_cast<double>(static_cast<unsigned long long>(left.Number) %
+                                                  static_cast<unsigned long long>(right.Number));
+                break;
+            }
+
+            case ALEExpression::Multiplication: { // *
+                left.Number *= right.Number;
+                break;
+            }
+
+            case ALEExpression::Division: { // /
+                if (right.Number != 0.0) {
+                    left.Number /= right.Number;
+                    break;
+                }
+
+                return false;
+            }
+
+            case ALEExpression::Addition: { // +
+                left.Number += right.Number;
+                break;
+            }
+
+            case ALEExpression::Subtraction: { // -
+                left.Number -= right.Number;
+                break;
+            }
+
+            case ALEExpression::Less: { // <
+                left.Number = (left.Number < right.Number) ? 1 : 0;
+                break;
+            }
+
+            case ALEExpression::LessOrEqual: { // <=
+                left.Number = (left.Number <= right.Number) ? 1 : 0;
+                break;
+            }
+
+            case ALEExpression::Bigger: { // >
+                left.Number = (left.Number > right.Number) ? 1 : 0;
+                break;
+            }
+
+            case ALEExpression::BiggerOrEqual: { // >=
+                left.Number = (left.Number >= right.Number) ? 1 : 0;
+                break;
+            }
+
+            case ALEExpression::And: { // &&
+                left.Number = ((left.Number > 0) && (right.Number > 0)) ? 1 : 0;
+                break;
+            }
+
+            case ALEExpression::Or: { // ||
+                left.Number = ((left.Number > 0) || (right.Number > 0)) ? 1 : 0;
+                break;
+            }
+
+            case ALEExpression::Equal:      // ==
+            case ALEExpression::NotEqual: { // !=
+                bool is_equal;
+
+                if (isEqual(is_equal, content, left, right, left_evaluated, right_evaluated)) {
+                    if (expr == ALEExpression::Equal) {
+                        left.Number = (is_equal ? 1 : 0);
+                    } else {
+                        left.Number = (is_equal ? 0 : 1);
+                    }
+
+                    break;
+                }
+
+                return false;
+            }
+
+            default: {
+            }
         }
 
         return true;
     }
 
-    bool ALESetNumber(double &number, const Char_T_ *content, SizeT length) const noexcept {
+    ALEExpression getExpression(const Char_T_ *content, SizeT &offset, const SizeT length) const noexcept {
+        using ALEExpressions = ALEExpressions_T_<Char_T_>;
+
+        while (offset < length) {
+            switch (content[offset]) {
+                case ALEExpressions::OrExp: { // ||
+                    if (content[(offset + 1)] == ALEExpressions::OrExp) {
+                        return ALEExpression::Or;
+                    }
+
+                    return ALEExpression::Error;
+                }
+
+                case ALEExpressions::AndExp: { // &&
+                    if (content[(offset + 1)] == ALEExpressions::AndExp) {
+                        return ALEExpression::And;
+                    }
+
+                    return ALEExpression::Error;
+                }
+
+                case ALEExpressions::BiggerExp: { // > or >=
+                    if (content[(offset + 1)] == ALEExpressions::EqualExp) {
+                        return ALEExpression::BiggerOrEqual;
+                    }
+
+                    return ALEExpression::Bigger;
+                }
+
+                case ALEExpressions::LessExp: { // < or <=
+                    if (content[(offset + 1)] == ALEExpressions::EqualExp) {
+                        return ALEExpression::LessOrEqual;
+                    }
+
+                    return ALEExpression::Less;
+                }
+
+                case ALEExpressions::NotExp: { // !=
+                    if (content[(offset + 1)] == ALEExpressions::EqualExp) {
+                        return ALEExpression::NotEqual;
+                    }
+
+                    return ALEExpression::Error;
+                }
+
+                case ALEExpressions::EqualExp: { // ==
+                    if (content[(offset + 1)] == ALEExpressions::EqualExp) {
+                        return ALEExpression::Equal;
+                    }
+
+                    return ALEExpression::Error;
+                }
+
+                case ALEExpressions::SubtractExp: {
+                    if (isExpression(content, offset)) {
+                        return ALEExpression::Subtraction;
+                    }
+
+                    break;
+                }
+
+                case ALEExpressions::AddExp: {
+                    if (isExpression(content, offset)) {
+                        return ALEExpression::Addition;
+                    }
+
+                    break;
+                }
+
+                case ALEExpressions::DivideExp: {
+                    return ALEExpression::Division;
+                }
+
+                case ALEExpressions::MultipleExp: {
+                    return ALEExpression::Multiplication;
+                }
+
+                case ALEExpressions::RemainderExp: {
+                    return ALEExpression::Remainder;
+                }
+
+                case ALEExpressions::ExponentExp: {
+                    return ALEExpression::Exponent;
+                }
+
+                case ALEExpressions::ParenthesStart: {
+                    // (...) are evaluated to numbers.
+
+                    ++offset;
+                    offset = Engine::SkipInnerPatterns<Char_T_>(ALEExpressions::ParenthesStart,
+                                                                ALEExpressions::ParenthesEnd, content, offset, length);
+
+                    if (offset != 0) {
+                        continue;
+                    }
+
+                    return ALEExpression::Error;
+                }
+
+                case ALEExpressions::BracketStart: {
+                    // {...} are evaluated by callback to a number or
+                    // string.
+
+                    ++offset;
+                    offset = Engine::FindOne<Char_T_>(ALEExpressions::BracketEnd, content, offset, length);
+
+                    if (offset != 0) {
+                        continue;
+                    }
+
+                    offset = length;
+                    return ALEExpression::Error;
+                }
+
+                default: {
+                }
+            }
+
+            ++offset;
+        }
+
+        return ALEExpression::None;
+    }
+
+    bool isExpression(const Char_T_ *content, SizeT offset) const noexcept {
+        using ALEExpressions = ALEExpressions_T_<Char_T_>;
+
+        while (offset != 0) {
+            --offset;
+
+            switch (content[offset]) {
+                case ALEExpressions::SpaceChar: {
+                    break;
+                }
+
+                case ALEExpressions::ParenthesEnd:
+                case ALEExpressions::BracketEnd: {
+                    // (...) and {} are numbers.
+                    return true;
+                }
+
+                default: {
+                    // A number
+                    return ((content[offset] < ALEExpressions::ColonChar) &&
+                            (content[offset] > ALEExpressions::SlashChar));
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool setNumber(double &number, const Value_T_ *value) const noexcept {
+        if (!(value->SetNumber(number))) {
+            const Char_T_ *str;
+            SizeT          len;
+
+            return (value->SetCharAndLength(str, len) && evaluate(number, str, len));
+        }
+
+        return true;
+    }
+
+    bool setNumber(double &number, const Char_T_ *content, SizeT length) const noexcept {
         const Value_T_ *value = nullptr;
 
         if (length > TemplatePatterns::VariableFulllength) {
@@ -1418,11 +1852,11 @@ struct TemplateSub {
             value = findValue(content, length);
         }
 
-        return ((value != nullptr) && ALESetNumber(number, value));
+        return ((value != nullptr) && setNumber(number, value));
     }
 
-    bool ALEIsEqual(bool &result, const Char_T_ *content, ALE::Number left, ALE::Number right, bool left_evaluated,
-                    bool right_evaluated) const noexcept {
+    bool isEqual(bool &result, const Char_T_ *content, ALENumber left, ALENumber right, bool left_evaluated,
+                 bool right_evaluated) const noexcept {
         using ALEExpressions = ALEExpressions_T_<Char_T_>;
 
         const Value_T_ *left_value  = nullptr;
@@ -1451,7 +1885,7 @@ struct TemplateSub {
                 if (*left_content != ALEExpressions::ParenthesStart) {
                     left_evaluated = Digit<Char_T_>::StringToNumber(left.Number, left_content, left_length);
                 } else {
-                    left_evaluated = ALE::Evaluate(left.Number, (left_content + 1), (left_length -= 2), this);
+                    left_evaluated = evaluate(left.Number, (left_content + 1), (left_length -= 2));
                 }
             }
         }
@@ -1470,27 +1904,29 @@ struct TemplateSub {
                 } else {
                     return false;
                 }
-            } else if (left_evaluated) {
+            } else {
                 if (*right_content != ALEExpressions::ParenthesStart) {
                     right_evaluated = Digit<Char_T_>::StringToNumber(right.Number, right_content, right_length);
                 } else {
-                    right_evaluated = ALE::Evaluate(right.Number, (right_content + 1), (right_length -= 2), this);
+                    right_evaluated = evaluate(right.Number, (right_content + 1), (right_length -= 2));
                 }
             }
         }
 
         if (left_evaluated || right_evaluated) {
-            if (left_evaluated || ((left_value != nullptr) && ALESetNumber(left.Number, left_value))) {
-                if (right_evaluated || ((right_value != nullptr) && ALESetNumber(right.Number, right_value))) {
+            if (left_evaluated || ((left_value != nullptr) && setNumber(left.Number, left_value))) {
+                if (right_evaluated || ((right_value != nullptr) && setNumber(right.Number, right_value))) {
                     result = (left.Number == right.Number);
                     return true;
                 }
             }
         } else if ((left_value == nullptr) || left_value->SetCharAndLength(left_content, left_length)) {
             if ((right_value == nullptr) || right_value->SetCharAndLength(right_content, right_length)) {
-                result =
-                    ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
-                return true;
+                if ((left_length != 0) && (right_length != 0)) {
+                    result = ((left_length == right_length) &&
+                              StringUtils::IsEqual(left_content, right_content, right_length));
+                    return true;
+                }
             }
         }
 
@@ -1508,6 +1944,31 @@ struct TemplateSub {
     const Char_T_     *loop_key_{nullptr};
     SizeT              loop_key_length_{0};
     const SizeT        level_;
+};
+
+template <typename Char_T_>
+struct ALEExpressions_T_ {
+  public:
+    static constexpr Char_T_ RemainderExp = '%';
+    static constexpr Char_T_ MultipleExp  = '*';
+    static constexpr Char_T_ DivideExp    = '/';
+    static constexpr Char_T_ AddExp       = '+';
+    static constexpr Char_T_ SubtractExp  = '-';
+    static constexpr Char_T_ EqualExp     = '=';
+    static constexpr Char_T_ NotExp       = '!';
+    static constexpr Char_T_ LessExp      = '<';
+    static constexpr Char_T_ BiggerExp    = '>';
+    static constexpr Char_T_ AndExp       = '&';
+    static constexpr Char_T_ OrExp        = '|';
+
+    static constexpr Char_T_ ParenthesStart = '(';
+    static constexpr Char_T_ ParenthesEnd   = ')';
+    static constexpr Char_T_ BracketStart   = '{';
+    static constexpr Char_T_ BracketEnd     = '}';
+    static constexpr Char_T_ ExponentExp    = '^';
+    static constexpr Char_T_ SpaceChar      = ' ';
+    static constexpr Char_T_ ColonChar      = ':';
+    static constexpr Char_T_ SlashChar      = '/';
 };
 
 template <typename Char_T_, int S>
