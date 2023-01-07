@@ -433,13 +433,16 @@ struct Template {
             }
         }
 
+#ifndef _MSC_VER
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
         inline LoopTag_T_<Char_T_>     *GetLoopInfo() const noexcept { return loop_info_; }
         inline InlineIfTag_T_<Char_T_> *GetInlineIfInfo() const noexcept { return i_if_info_; }
         inline IfTag_T_<Char_T_>       *GetIfInfo() const noexcept { return if_info_; }
+#ifndef _MSC_VER
 #pragma GCC diagnostic pop
-
+#endif
         inline TagType GetType() const noexcept { return type_; }
         inline SizeT   GetOffset() const noexcept { return content_.offset; }
         inline SizeT   GetLength() const noexcept { return content_.length_; }
