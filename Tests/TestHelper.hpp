@@ -331,35 +331,6 @@ struct TestHelper {
     bool        error_{false};
 };
 
-class EmptyStream {
-    template <typename Value_T_>
-    void operator,(const Value_T_ &val) noexcept {
-        (void)val;
-    }
-};
-
-namespace Test {
-QENTEM_MAYBE_UNUSED
-static void TestHelperTestError(TestHelper &helper) {
-    (void)helper;
-    //////////////////////////////
-}
-
-QENTEM_MAYBE_UNUSED
-static int RunTestHelperTests() {
-    // EmptyStream stream;
-    TestHelper helper{"TestHelper.hpp", __FILE__};
-
-    helper.PrintGroupName();
-
-    helper.Test("Test Error", TestHelperTestError);
-
-    helper.EndTests();
-
-    return 0;
-}
-
-} // namespace Test
 } // namespace Qentem
 
 #endif

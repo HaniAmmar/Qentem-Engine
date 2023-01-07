@@ -30,7 +30,6 @@ int main() {
     Qentem::TestHelper::PrintInfo();
 
     // for (int i = 0; i < 100000; i++) {
-    //     Qentem::Test::RunTestHelperTests();
     //     Qentem::Test::RunMemoryTests();
     //     Qentem::Test::RunStringUtilsTests();
     //     Qentem::Test::RunStringTests();

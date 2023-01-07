@@ -50,7 +50,6 @@ static int RunTests() {
     int passed = 0;
     int failed = 0;
 
-    ((Qentem::Test::RunTestHelperTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunMemoryTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);

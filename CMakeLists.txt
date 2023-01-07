@@ -23,14 +23,6 @@ else()
     endif()
 endif()
 
-# TestHelper
-add_executable(TestHelperTest Tests/TestHelper.cpp)
-add_test(NAME TestHelperTest COMMAND TestHelperTest)
-
-if (ENABLE_COVERAGE)
-    target_link_libraries(TestHelperTest --coverage)
-endif()
-
 # Memory
 add_executable(MemoryTest Tests/MemoryTest.cpp)
 add_test(NAME MemoryTest COMMAND MemoryTest)
@@ -127,12 +119,12 @@ if (ENABLE_COVERAGE)
     target_link_libraries(JSONTest --coverage)
 endif()
 
-# ALE
-add_executable(ALETest Tests/RunEvaluateTest.cpp)
-add_test(NAME ALETest COMMAND ALETest)
+# Evaluate
+add_executable(EvaluateTest Tests/EvaluateTest.cpp)
+add_test(NAME EvaluateTest COMMAND EvaluateTest)
 
 if (ENABLE_COVERAGE)
-    target_link_libraries(ALETest --coverage)
+    target_link_libraries(EvaluateTest --coverage)
 endif()
 
 # Template
