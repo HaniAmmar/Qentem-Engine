@@ -55,9 +55,9 @@ struct ALE {
 
         struct {
             // int is half the size of double. DONT change the type, or it will break.
-            unsigned int Offset{0};
-            unsigned int Length{0};
-        } Content{};
+            unsigned int Offset;
+            unsigned int Length;
+        } Content{0, 0};
     };
 
     enum struct Expression {
