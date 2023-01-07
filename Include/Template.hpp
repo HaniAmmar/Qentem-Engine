@@ -229,7 +229,7 @@ struct Template {
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void GenerateTags(const Char_T_ *content, const SizeT length, Array<TagBit<Char_T_>> &tags_cache) {
         using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
-        // tags_cache should not be empty.
+        // tags_cache should be empty.
         TemplateSubCV::parse(tags_cache, content, length, 0);
     }
 
