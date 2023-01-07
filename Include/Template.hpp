@@ -775,43 +775,43 @@ struct TemplateSub {
         return false;
     }
 
-    static void escapeHTMLSpecialChars(StringStream_T_ &stream, const Char_T_ *str, SizeT length) {
+    void escapeHTMLSpecialChars(const Char_T_ *str, SizeT length) const {
         SizeT offset = 0;
         SizeT index  = 0;
 
         while (index < length) {
             switch (str[index]) {
                 case '&': {
-                    stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns::HTMLAnd, TemplatePatterns::HTMLAndLength);
+                    stream_->Insert((str + offset), (index - offset));
+                    stream_->Insert(TemplatePatterns::HTMLAnd, TemplatePatterns::HTMLAndLength);
                     offset = (++index);
                     break;
                 }
 
                 case '<': {
-                    stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns::HTMLLess, TemplatePatterns::HTMLLessLength);
+                    stream_->Insert((str + offset), (index - offset));
+                    stream_->Insert(TemplatePatterns::HTMLLess, TemplatePatterns::HTMLLessLength);
                     offset = (++index);
                     break;
                 }
 
                 case '>': {
-                    stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns::HTMLBigger, TemplatePatterns::HTMLBiggerLength);
+                    stream_->Insert((str + offset), (index - offset));
+                    stream_->Insert(TemplatePatterns::HTMLBigger, TemplatePatterns::HTMLBiggerLength);
                     offset = (++index);
                     break;
                 }
 
                 case '"': {
-                    stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns::HTMLQuote, TemplatePatterns::HTMLQuoteLength);
+                    stream_->Insert((str + offset), (index - offset));
+                    stream_->Insert(TemplatePatterns::HTMLQuote, TemplatePatterns::HTMLQuoteLength);
                     offset = (++index);
                     break;
                 }
 
                 case '\'': {
-                    stream.Insert((str + offset), (index - offset));
-                    stream.Insert(TemplatePatterns::HTMLSingleQuote, TemplatePatterns::HTMLSingleQuoteLength);
+                    stream_->Insert((str + offset), (index - offset));
+                    stream_->Insert(TemplatePatterns::HTMLSingleQuote, TemplatePatterns::HTMLSingleQuoteLength);
                     offset = (++index);
                     break;
                 }
@@ -822,7 +822,7 @@ struct TemplateSub {
             }
         }
 
-        stream.Insert((str + offset), (length - offset));
+        stream_->Insert((str + offset), (length - offset));
     }
 
     void renderVariable(const Char_T_ *content, const TagBit *tag) const {
@@ -834,7 +834,7 @@ struct TemplateSub {
                     const Char_T_ *str;
                     SizeT          len;
                     value->SetCharAndLength(str, len);
-                    escapeHTMLSpecialChars(*stream_, str, len);
+                    escapeHTMLSpecialChars(str, len);
                     return;
                 }
             }
@@ -845,7 +845,7 @@ struct TemplateSub {
 
             if ((*content == TemplatePatterns::TildeChar) && (loop_key_ != nullptr)) {
                 if (Config::AutoEscapeHTML) {
-                    escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
+                    escapeHTMLSpecialChars(loop_key_, loop_key_length_);
                 } else {
                     stream_->Insert(loop_key_, loop_key_length_);
                 }

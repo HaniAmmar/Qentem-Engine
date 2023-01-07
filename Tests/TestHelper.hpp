@@ -145,7 +145,7 @@ struct MemoryRecord {
 
     QENTEM_NOINLINE static void PrintMemoryStatus() noexcept {
         TestOutPut::Print("\nMemory: ", (static_cast<double>(records_.remainingSize) / 1024),
-                          " KB, Peak: ", (static_cast<double>(records_.peakSize) / 1024), " KB\n");
+                          " KB, Peak: ", (static_cast<double>(records_.peakSize) / 1024), " KB.\n");
 
         TestOutPut::Print("Allocations: ", records_.allocations, ", Deallocations: ", records_.dellocations, ".\n");
 
