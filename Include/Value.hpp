@@ -1297,9 +1297,9 @@ class Value {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            stringifyObject(this->object_, stream);
+            stringifyObject(object_, stream);
         } else if (type == ValueType::Array) {
-            stringifyArray(this->array_, stream);
+            stringifyArray(array_, stream);
         }
     }
 
