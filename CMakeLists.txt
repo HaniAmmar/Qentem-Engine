@@ -135,6 +135,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(TemplateTest --coverage)
 endif()
 
+# Template (16bit character)
+add_executable(TemplateUTest Tests/TemplateUTest.cpp)
+add_test(NAME TemplateUTest COMMAND TemplateUTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(TemplateUTest --coverage)
+ endif()
+
 # Template (Wide character)
 add_executable(TemplateLTest Tests/TemplateLTest.cpp)
 add_test(NAME TemplateLTest COMMAND TemplateLTest)
