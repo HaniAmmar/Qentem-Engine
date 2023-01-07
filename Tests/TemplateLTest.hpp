@@ -1804,6 +1804,9 @@ static void TestInlineIfLTag(TestHelper &helper) {
         helper.Equal(Template::Render(content, value2), LR"(")", LR"(Render())", __LINE__);
     }
 
+    content = LR"({if case="0" true="*{raw:0}*" false="-{raw:1}-"})";
+    helper.Equal(Template::Render(content, value2), LR"(-"-)", R"(Render())", __LINE__);
+
     content = LR"({if case="0" true="{raw:0}" false="{raw:1}"})";
     helper.Equal(Template::Render(content, value2), LR"(")", LR"(Render())", __LINE__);
 

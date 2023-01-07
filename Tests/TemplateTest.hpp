@@ -1796,6 +1796,9 @@ static void TestInlineIfTag(TestHelper &helper) {
         helper.Equal(Template::Render(content, value2), R"(")", R"(Render())", __LINE__);
     }
 
+    content = R"({if case="0" true="*{raw:0}*" false="-{raw:1}-"})";
+    helper.Equal(Template::Render(content, value2), R"(-"-)", R"(Render())", __LINE__);
+
     content = R"({if case="0" true="{raw:0}" false="{raw:1}"})";
     helper.Equal(Template::Render(content, value2), R"(")", R"(Render())", __LINE__);
 

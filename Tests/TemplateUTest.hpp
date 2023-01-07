@@ -1804,6 +1804,9 @@ static void TestInlineIfUTag(TestHelper &helper) {
         helper.Equal(Template::Render(content, value2), uR"(")", uR"(Render())", __LINE__);
     }
 
+    content = uR"({if case="0" true="*{raw:0}*" false="-{raw:1}-"})";
+    helper.Equal(Template::Render(content, value2), uR"(-"-)", uR"(Render())", __LINE__);
+
     content = uR"({if case="0" true="{raw:0}" false="{raw:1}"})";
     helper.Equal(Template::Render(content, value2), uR"(")", uR"(Render())", __LINE__);
 
