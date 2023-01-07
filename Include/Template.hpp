@@ -379,23 +379,30 @@ struct Template {
         TagBit(TagType type, SizeT offset, SizeT length_) : type_{type} {
             switch (type) {
                 case TagType::Loop: {
-                    loop_info_         = Memory::AllocateInit<LoopTag_T_<Char_T_>>();
-                    loop_info_->Offset = offset;
-                    loop_info_->Length = length_;
+                    LoopTag_T_<Char_T_> *loop_info = Memory::AllocateInit<LoopTag_T_<Char_T_>>();
+
+                    loop_info->Offset = offset;
+                    loop_info->Length = length_;
+                    info_             = loop_info;
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    i_if_info_         = Memory::AllocateInit<InlineIfTag_T_<Char_T_>>();
-                    i_if_info_->Offset = offset;
-                    i_if_info_->Length = length_;
+                    InlineIfTag_T_<Char_T_> *i_if_info = Memory::AllocateInit<InlineIfTag_T_<Char_T_>>();
+
+                    i_if_info->Offset = offset;
+                    i_if_info->Length = length_;
+                    info_             = i_if_info;
+
                     break;
                 }
 
                 case TagType::If: {
-                    if_info_         = Memory::AllocateInit<IfTag_T_<Char_T_>>();
-                    if_info_->Offset = offset;
-                    if_info_->Length = length_;
+                    IfTag_T_<Char_T_> *if_info = Memory::AllocateInit<IfTag_T_<Char_T_>>();
+
+                    if_info->Offset = offset;
+                    if_info->Length = length_;
+                    info_           = if_info;
                     break;
                 }
 
@@ -407,40 +414,36 @@ struct Template {
         }
 
         ~TagBit() {
-            if (loop_info_ != nullptr) {
-                switch (type_) {
-                    case TagType::Loop: {
-                        Memory::Dispose(loop_info_);
-                        Memory::Deallocate(loop_info_);
-                        break;
-                    }
+            switch (type_) {
+                case TagType::Loop: {
+                    Memory::Dispose(static_cast<LoopTag_T_<Char_T_> *>(info_));
+                    Memory::Deallocate(info_);
+                    break;
+                }
 
-                    case TagType::InLineIf: {
-                        Memory::Dispose(i_if_info_);
-                        Memory::Deallocate(i_if_info_);
-                        break;
-                    }
+                case TagType::InLineIf: {
+                    Memory::Dispose(static_cast<InlineIfTag_T_<Char_T_> *>(info_));
+                    Memory::Deallocate(info_);
+                    break;
+                }
 
-                    case TagType::If: {
-                        Memory::Dispose(if_info_);
-                        Memory::Deallocate(if_info_);
-                        break;
-                    }
+                case TagType::If: {
+                    Memory::Dispose(static_cast<IfTag_T_<Char_T_> *>(info_));
+                    Memory::Deallocate(info_);
+                    break;
+                }
 
-                    default: {
-                    }
+                default: {
                 }
             }
         }
 
-#ifndef _MSC_VER
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #endif
-        inline LoopTag_T_<Char_T_>     *GetLoopInfo() const noexcept { return loop_info_; }
-        inline InlineIfTag_T_<Char_T_> *GetInlineIfInfo() const noexcept { return i_if_info_; }
-        inline IfTag_T_<Char_T_>       *GetIfInfo() const noexcept { return if_info_; }
-#ifndef _MSC_VER
+        inline void *GetInfo() const noexcept { return info_; }
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
         inline TagType GetType() const noexcept { return type_; }
@@ -454,10 +457,8 @@ struct Template {
         };
 
         union {
-            LoopTag_T_<Char_T_>     *loop_info_;
-            InlineIfTag_T_<Char_T_> *i_if_info_;
-            IfTag_T_<Char_T_>       *if_info_;
-            Content_                 content_{0, 0};
+            void    *info_;
+            Content_ content_{0, 0};
         };
 
         TagType type_{TagType::None};
@@ -502,19 +503,19 @@ struct TemplateSub {
                 }
 
                 case TagType::Loop: {
-                    const LoopTag *loop_tag = tag->GetLoopInfo();
+                    const LoopTag *loop_tag = static_cast<LoopTag *>(tag->GetInfo());
                     renderLoop((content + loop_tag->Offset), loop_tag);
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    const InlineIfTag *i_if_tag = tag->GetInlineIfInfo();
+                    const InlineIfTag *i_if_tag = static_cast<InlineIfTag *>(tag->GetInfo());
                     renderInLineIf((content + i_if_tag->Offset), i_if_tag);
                     break;
                 }
 
                 case TagType::If: {
-                    const IfTag *if_tag = tag->GetIfInfo();
+                    const IfTag *if_tag = static_cast<IfTag *>(tag->GetInfo());
                     renderIf((content + if_tag->Offset), if_tag);
                     break;
                 }
@@ -629,7 +630,8 @@ struct TemplateSub {
                                 offset += TemplatePatterns::InLineIfPrefixLength;
                                 tags_cache += TagBit{TagType::InLineIf, offset,
                                                      ((end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
-                                generateInLineIfInfo((content + offset), tags_cache.Last()->GetInlineIfInfo());
+                                generateInLineIfInfo((content + offset),
+                                                     static_cast<InlineIfTag *>(tags_cache.Last()->GetInfo()));
                                 last_offset = end_offset;
                                 offset      = end_offset;
                                 continue;
@@ -661,7 +663,8 @@ struct TemplateSub {
                             offset += TemplatePatterns::InLineIfPrefixLength;
                             tags_cache += TagBit{TagType::Loop, offset,
                                                  ((end_offset - TemplatePatterns::LoopSuffixLength) - offset)};
-                            generateLoopContent((content + offset), tags_cache.Last()->GetLoopInfo(), level);
+                            generateLoopContent((content + offset),
+                                                static_cast<LoopTag *>(tags_cache.Last()->GetInfo()), level);
                             last_offset = end_offset;
                             offset      = end_offset;
                             continue;
@@ -681,7 +684,8 @@ struct TemplateSub {
 
                             offset += TemplatePatterns::IfPrefixLength;
                             tags_cache += TagBit{TagType::If, offset, (end_offset - offset)};
-                            generateIfCases((content + offset), tags_cache.Last()->GetIfInfo(), level);
+                            generateIfCases((content + offset), static_cast<IfTag *>(tags_cache.Last()->GetInfo()),
+                                            level);
                             last_offset = end_offset;
                             offset      = end_offset;
                             continue;
