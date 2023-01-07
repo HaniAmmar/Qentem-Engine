@@ -410,7 +410,7 @@ struct ALE {
                     }
 
                     case ALEExpressions::SubtractExp: {
-                        if (isExpression(content_, offset)) {
+                        if (isExpression(offset)) {
                             return Expression::Subtraction;
                         }
 
@@ -418,7 +418,7 @@ struct ALE {
                     }
 
                     case ALEExpressions::AddExp: {
-                        if (isExpression(content_, offset)) {
+                        if (isExpression(offset)) {
                             return Expression::Addition;
                         }
 
@@ -480,13 +480,13 @@ struct ALE {
             return Expression::None;
         }
 
-        static bool isExpression(const Char_T_ *content, SizeT offset) noexcept {
+        bool isExpression(SizeT offset) const noexcept {
             using ALEExpressions = ALEExpressions_T_<Char_T_>;
 
             while (offset != 0) {
                 --offset;
 
-                switch (content[offset]) {
+                switch (content_[offset]) {
                     case ALEExpressions::SpaceChar: {
                         break;
                     }
@@ -499,8 +499,8 @@ struct ALE {
 
                     default: {
                         // A number
-                        return ((content[offset] < ALEExpressions::ColonChar) &&
-                                (content[offset] > ALEExpressions::SlashChar));
+                        return ((content_[offset] < ALEExpressions::ColonChar) &&
+                                (content_[offset] > ALEExpressions::SlashChar));
                     }
                 }
             }
