@@ -192,11 +192,13 @@ struct Template {
     template <typename>
     struct TagBit;
 
+    union ALENumber;
+
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &value,
                                     StringStream_T_ &stream, const Char_T_ *name, const SizeT name_length) {
         // This is not a thread safe function, and its here to show how to cache geterated tags.
-        // Use this in a single threaded prosess, or change it.
+        // cab be used in single threaded prosesses, but it is better to change it.
 
         // Usage:
         // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
@@ -263,23 +265,41 @@ struct Template {
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
     inline static bool Evaluate(double &number, const Char_T_ *content, const Value_T_ &value) {
-        using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
-        StringStream_T_ stream;
+        // For testing only.
 
+        using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
+        StringStream_T_     stream;
         const TemplateSubCV temp{&stream, &value};
-        return temp.evaluate(number, content, StringUtils::Count(content));
+        ALENumber           num;
+
+        bool ret = temp.evaluate(num, content, 0, StringUtils::Count(content));
+
+        if (ret) {
+            number = num.Number;
+            return true;
+        }
+
+        number = 0;
+        return false;
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
     inline static double Evaluate(const Char_T_ *content, const Value_T_ &value) {
+        // For testing only.
         double number;
-
-        if (Evaluate(number, content, value)) {
-            return number;
-        }
-
-        return 0;
+        Evaluate(number, content, value);
+        return number;
     }
+
+    union ALENumber {
+        double Number;
+
+        struct {
+            // int is half the size of double. DONT change the type, or it will break.
+            unsigned int Offset;
+            unsigned int Length;
+        } Content{0, 0};
+    };
 
     enum TagType : unsigned char {
         None = 0,
@@ -448,6 +468,7 @@ struct TemplateSub {
   private:
     friend struct Qentem::Template;
 
+    using ALENumber        = Template::ALENumber;
     using TagBit           = Template::TagBit<Char_T_>;
     using TagType          = Template::TagType;
     using LoopTag          = Template::LoopTag_T_<Char_T_>;
@@ -763,18 +784,6 @@ struct TemplateSub {
         }
     }
 
-    bool evaluate(double &number, const Char_T_ *content, SizeT length) const noexcept {
-        ALENumber num;
-
-        if (parseExpression(num, content, 0, length)) {
-            number = num.Number;
-            return true;
-        }
-
-        number = 0;
-        return false;
-    }
-
     void escapeHTMLSpecialChars(const Char_T_ *str, SizeT length) const {
         SizeT offset = 0;
         SizeT index  = 0;
@@ -872,10 +881,10 @@ struct TemplateSub {
     }
 
     void renderMath(const Char_T_ *content, const TagBit *tag) const {
-        double number;
+        ALENumber number;
 
-        if (evaluate(number, content, tag->GetLength())) {
-            Digit<Char_T_>::NumberToString(*stream_, number, 1, 0, 3);
+        if (evaluate(number, content, 0, tag->GetLength())) {
+            Digit<Char_T_>::NumberToString(*stream_, number.Number, 1, 0, 3);
         } else {
             stream_->Insert((content - TemplatePatterns::MathPrefixLength),
                             (tag->GetLength() + TemplatePatterns::MathFulllength));
@@ -967,10 +976,10 @@ struct TemplateSub {
 
     void renderInLineIf(const Char_T_ *content, const InlineIfTag *tag) const {
         if (tag->CaseLength != 0) {
-            double result;
+            ALENumber result;
 
-            if (evaluate(result, (content + tag->CaseOffset), tag->CaseLength)) {
-                if (result > 0.0) {
+            if (evaluate(result, (content + tag->CaseOffset), 0, tag->CaseLength)) {
+                if (result.Number > 0.0) {
                     if (tag->TrueLength != 0) {
                         render((content + tag->TrueOffset), tag->TrueSubTags);
                     }
@@ -984,12 +993,12 @@ struct TemplateSub {
     void renderIf(const Char_T_ *content, const IfTag *tag) const {
         const IfTagCase *item = tag->Cases.First();
         const IfTagCase *end  = (item + tag->Cases.Size());
-        double           result;
+        ALENumber        result;
 
         while (item < end) {
             // <else> without if = (item->CaseLength == 0)
             if ((item->CaseLength == 0) ||
-                (evaluate(result, (content + item->CaseOffset), item->CaseLength) && (result > 0))) {
+                (evaluate(result, (content + item->CaseOffset), 0, item->CaseLength) && (result.Number > 0))) {
                 render((content + item->ContentOffset), item->SubTags);
                 break;
             }
@@ -1438,16 +1447,6 @@ struct TemplateSub {
         return value;
     }
 
-    union ALENumber {
-        double Number;
-
-        struct {
-            // int is half the size of double. DONT change the type, or it will break.
-            unsigned int Offset;
-            unsigned int Length;
-        } Content{0, 0};
-    };
-
     enum ALEExpression {
         None,
         Or,             // ||
@@ -1467,14 +1466,14 @@ struct TemplateSub {
         Error           // X
     };
 
-    bool parseExpression(ALENumber &number, const Char_T_ *content, SizeT offset, const SizeT length) const noexcept {
+    bool evaluate(ALENumber &number, const Char_T_ *content, SizeT offset, const SizeT length) const noexcept {
         const SizeT   num_offset = offset;
         ALEExpression expr       = getExpression(content, offset, length);
-        return subParseExpression(number, content, offset, num_offset, length, expr, ALEExpression::None);
+        return subEvaluate(number, content, offset, num_offset, length, expr, ALEExpression::None);
     }
 
-    bool subParseExpression(ALENumber &left, const Char_T_ *content, SizeT &offset, SizeT num_offset,
-                            const SizeT length, ALEExpression &expr, const ALEExpression previous_expr) const noexcept {
+    bool subEvaluate(ALENumber &left, const Char_T_ *content, SizeT &offset, SizeT num_offset, const SizeT length,
+                     ALEExpression &expr, const ALEExpression previous_expr) const noexcept {
         ALENumber     right;
         ALEExpression next_expr;
 
@@ -1508,7 +1507,7 @@ struct TemplateSub {
                         return true;
                     }
                 } else {
-                    if (!subParseExpression(right, content, offset, num_offset, length, next_expr, expr) ||
+                    if (!subEvaluate(right, content, offset, num_offset, length, next_expr, expr) ||
                         !processExpression(content, left, right, no_equal, true, expr)) {
                         return false;
                     }
@@ -1547,11 +1546,11 @@ struct TemplateSub {
                 ++offset; // after (
                 --length; // before )
 
-                return parseExpression(val, content, offset, length);
+                return evaluate(val, content, offset, length);
             }
 
             case ALEExpressions::BracketStart: {
-                return (setNumber(val.Number, (content + offset), length));
+                return (setNumber(val, (content + offset), length));
             }
 
             default: {
@@ -1832,18 +1831,18 @@ struct TemplateSub {
         return false;
     }
 
-    bool setNumber(double &number, const Value_T_ *value) const noexcept {
-        if (!(value->SetNumber(number))) {
+    bool setNumber(ALENumber &number, const Value_T_ *value) const noexcept {
+        if (!(value->SetNumber(number.Number))) {
             const Char_T_ *str;
             SizeT          len;
 
-            return (value->SetCharAndLength(str, len) && evaluate(number, str, len));
+            return (value->SetCharAndLength(str, len) && evaluate(number, str, 0, len));
         }
 
         return true;
     }
 
-    bool setNumber(double &number, const Char_T_ *content, SizeT length) const noexcept {
+    bool setNumber(ALENumber &number, const Char_T_ *content, SizeT length) const noexcept {
         const Value_T_ *value = nullptr;
 
         if (length > TemplatePatterns::VariableFulllength) {
@@ -1885,7 +1884,7 @@ struct TemplateSub {
                 if (*left_content != ALEExpressions::ParenthesStart) {
                     left_evaluated = Digit<Char_T_>::StringToNumber(left.Number, left_content, left_length);
                 } else {
-                    left_evaluated = evaluate(left.Number, (left_content + 1), (left_length -= 2));
+                    left_evaluated = evaluate(left, (left_content + 1), 0, (left_length -= 2));
                 }
             }
         }
@@ -1908,14 +1907,14 @@ struct TemplateSub {
                 if (*right_content != ALEExpressions::ParenthesStart) {
                     right_evaluated = Digit<Char_T_>::StringToNumber(right.Number, right_content, right_length);
                 } else {
-                    right_evaluated = evaluate(right.Number, (right_content + 1), (right_length -= 2));
+                    right_evaluated = evaluate(right, (right_content + 1), 0, (right_length -= 2));
                 }
             }
         }
 
         if (left_evaluated || right_evaluated) {
-            if (left_evaluated || ((left_value != nullptr) && setNumber(left.Number, left_value))) {
-                if (right_evaluated || ((right_value != nullptr) && setNumber(right.Number, right_value))) {
+            if (left_evaluated || ((left_value != nullptr) && setNumber(left, left_value))) {
+                if (right_evaluated || ((right_value != nullptr) && setNumber(right, right_value))) {
                     result = (left.Number == right.Number);
                     return true;
                 }
