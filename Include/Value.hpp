@@ -911,6 +911,21 @@ class Value {
         return false;
     }
 
+    template <typename Number_T_>
+    void SetValueKeyLength(SizeT index, const Value *&value, const Char_T_ *&key, Number_T_ &length) const noexcept {
+        if (IsObject()) {
+            const HAItem_T_<Value, Char_T_> *item = object_.GetItem(index);
+
+            value = nullptr;
+
+            if ((item != nullptr) && !(item->Value.IsUndefined())) {
+                value  = &(item->Value);
+                key    = item->Key.First();
+                length = static_cast<Number_T_>(item->Key.Length());
+            }
+        }
+    }
+
     // To get a pointer to a string value and its length.
     template <typename Number_T_>
     bool SetCharAndLength(const Char_T_ *&key, Number_T_ &length) const noexcept {
