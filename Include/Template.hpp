@@ -308,8 +308,7 @@ struct Template {
         unsigned short         SetLength;
         unsigned short         GroupOffset;
         unsigned short         GroupLength;
-        unsigned short         SortOffset;
-        unsigned short         SortLength;
+        unsigned short         Sort;
     };
 
     template <typename Char_T_>
@@ -884,13 +883,13 @@ struct TemplateSub {
         }
 
         // Sort
-        if (tag->SortLength != 0) {
+        if (tag->Sort != 0) {
             if (tag->GroupLength == 0) {
                 grouped_set = *loop_set;
                 loop_set    = &grouped_set;
             }
 
-            grouped_set.Sort(content_[tag->SortOffset] == TemplatePatterns::SortAscend);
+            grouped_set.Sort(tag->Sort == 1);
         }
 
         // Stage 4: Render
@@ -1060,9 +1059,8 @@ struct TemplateSub {
                     }
 
                     case TemplatePatterns::SortChar: {
-                        tag->SortOffset = static_cast<unsigned short>(offset);
-                        tag->SortLength = static_cast<unsigned short>(tmp_length);
-                        break_loop      = true;
+                        tag->Sort  = ((content[offset] == 'a') ? 1 : 2);
+                        break_loop = true;
                         break;
                     }
 
@@ -1975,7 +1973,6 @@ struct TemplatePatterns_T_ {
     static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
     static constexpr Char_T_ GroupChar  = 'o'; // gr[o]up
     static constexpr Char_T_ SortChar   = 'r'; // so[r]t
-    static constexpr Char_T_ SortAscend = 'a'; // [a]scend
 
     // Var
     static constexpr Char_T_ TildeChar = '~'; // Tilde
