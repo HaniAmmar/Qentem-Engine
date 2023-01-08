@@ -1223,7 +1223,6 @@ static void TestMathUTag1(TestHelper &helper) {
     value[uR"(a7)"] = 6;
     value[uR"(a8)"] = 1;
     value[uR"(a9)"] = uR"(1)";
-    value[uR"(eq)"] = uR"((8+1+{var:a8}))";
 
     helper.Equal(Template::Render(uR"({math:1+1})", value), uR"(2)", uR"(Render())", __LINE__);
 
@@ -1338,13 +1337,13 @@ static void TestMathUTag1(TestHelper &helper) {
     helper.Equal(Template::Render(uR"({math:{var:a3}       ==       null     })", value), uR"(1)", uR"(Render())",
                  __LINE__);
 
-    helper.Equal(Template::Render(uR"({math:{var:eq}})", value), uR"(10)", uR"(Render())", __LINE__);
+    helper.Equal(Template::Render(uR"({math:((8+1+{var:a8}))})", value), uR"(10)", uR"(Render())", __LINE__);
 
     helper.Equal(Template::Render(uR"({math:10==(8+1+{var:a8})})", value), uR"(1)", uR"(Render())", __LINE__);
 
-    helper.Equal(Template::Render(uR"({math:{var:eq}==9+1})", value), uR"(1)", uR"(Render())", __LINE__);
+    helper.Equal(Template::Render(uR"({math:((8+1+{var:a8}))==9+1})", value), uR"(1)", uR"(Render())", __LINE__);
 
-    helper.Equal(Template::Render(uR"({math:(5*2)=={var:eq}})", value), uR"(1)", uR"(Render())", __LINE__);
+    helper.Equal(Template::Render(uR"({math:(5*2)==((8+1+{var:a8}))})", value), uR"(1)", uR"(Render())", __LINE__);
 
     //////////////
     value.Reset();
