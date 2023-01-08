@@ -117,6 +117,8 @@ namespace Qentem {
 /*
  * Inline If Tag:
  *
+ * NOTE: No spaces before '='
+ *
  * {if case="3 == 3" true="Yes" false="No"}
  * {if case="{var:var_five} == 5" true="5" false="no"}
  * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
@@ -127,6 +129,9 @@ namespace Qentem {
 
 /*
  * Loop Tag:
+ *
+ * NOTE: No spaces before '='
+ *
  * <loop set="..." value="..." group="..." sort="...">...</loop>
  * <loop value="...">...</loop>
  * <loop set="..." value="...">...</loop>
@@ -302,7 +307,7 @@ struct Template {
     template <typename Char_T_>
     struct LoopTag_T_ {
         // TODO: Remove StringStream;
-        StringStream<Char_T_>  InnerTemplate;
+        StringStream<Char_T_>  SubTemplate;
         Array<TagBit<Char_T_>> SubTags;
         unsigned short         SetOffset;
         unsigned short         SetLength;
@@ -869,60 +874,56 @@ struct TemplateSub {
             loop_set = root_value_;
         }
 
-        if (loop_set == nullptr) {
-            return;
-        }
-
-        // Group
-        if (tag->GroupLength != 0) {
-            if (!(loop_set->GroupBy(grouped_set, (content_ + tag->GroupOffset), tag->GroupLength))) {
-                return;
-            }
-
-            loop_set = &grouped_set;
-        }
-
-        // Sort
-        if (tag->Sort != 0) {
-            if (tag->GroupLength == 0) {
-                grouped_set = *loop_set;
-                loop_set    = &grouped_set;
-            }
-
-            grouped_set.Sort(tag->Sort == 1);
-        }
-
-        // Stage 4: Render
-        const Char_T_ *loop_content = tag->InnerTemplate.First();
-        TemplateSub    loop_template{loop_content, stream_, root_value_, this, (level_ + 1)};
-
-        const SizeT loop_size  = loop_set->Size();
-        SizeT       loop_index = 0;
-
-        if (loop_set->IsObject()) {
-            while (loop_index < loop_size) {
-                loop_template.loop_value_ = loop_set->GetValue(loop_index);
-
-                if (loop_template.loop_value_ != nullptr) {
-                    loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length_);
-                    const TagBit *s_tag = tag->SubTags.First();
-                    const TagBit *s_end = (s_tag + tag->SubTags.Size());
-                    loop_template.Render(s_tag, s_end);
+        if (loop_set != nullptr) {
+            // Group
+            if (tag->GroupLength != 0) {
+                if (!(loop_set->GroupBy(grouped_set, (content_ + tag->GroupOffset), tag->GroupLength))) {
+                    return;
                 }
 
-                ++loop_index;
+                loop_set = &grouped_set;
             }
-        } else {
-            while (loop_index < loop_size) {
-                loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
-                if (loop_template.loop_value_ != nullptr) {
-                    const TagBit *s_tag = tag->SubTags.First();
-                    const TagBit *s_end = (s_tag + tag->SubTags.Size());
-                    loop_template.Render(s_tag, s_end);
+            // Sort
+            if (tag->Sort != 0) {
+                if (tag->GroupLength == 0) {
+                    grouped_set = *loop_set;
+                    loop_set    = &grouped_set;
                 }
 
-                ++loop_index;
+                grouped_set.Sort(tag->Sort == 1);
+            }
+
+            // Stage 4: Render
+            const Char_T_ *loop_content = tag->SubTemplate.First();
+            TemplateSub    loop_template{loop_content, stream_, root_value_, this, (level_ + 1)};
+            const TagBit  *s_tag = tag->SubTags.First();
+            const TagBit  *s_end = (s_tag + tag->SubTags.Size());
+
+            const SizeT loop_size  = loop_set->Size();
+            SizeT       loop_index = 0;
+
+            if (loop_set->IsObject()) {
+                while (loop_index < loop_size) {
+                    loop_set->SetValueKeyLength(loop_index, loop_template.loop_value_, loop_template.loop_key_,
+                                                loop_template.loop_key_length_);
+
+                    if (loop_template.loop_value_ != nullptr) {
+                        loop_template.Render(s_tag, s_end);
+                    }
+
+                    ++loop_index;
+                }
+            } else {
+                while (loop_index < loop_size) {
+                    loop_template.loop_value_ = loop_set->GetValue(loop_index);
+
+                    if (loop_template.loop_value_ != nullptr) {
+                        loop_template.Render(s_tag, s_end);
+                    }
+
+                    ++loop_index;
+                }
             }
         }
     }
@@ -974,21 +975,6 @@ struct TemplateSub {
     /*
      * Gets everything between "..."
      */
-
-    static SizeT getQuotedRemove(const Char_T_ *content, SizeT &offset, SizeT end_offset) noexcept {
-        offset = Engine::FindOne<Char_T_>(TemplatePatterns::QuoteChar, content, offset, end_offset);
-
-        if (offset != 0) {
-            end_offset = Engine::FindOne<Char_T_>(TemplatePatterns::QuoteChar, content, offset, end_offset);
-
-            if (end_offset != 0) {
-                return ((end_offset - 1) - offset);
-            }
-        }
-
-        return 0;
-    }
-
     static SizeT getQuotedValue(const Char_T_ *content, SizeT &offset, SizeT end_offset) noexcept {
         offset = Engine::FindOne<Char_T_>(TemplatePatterns::QuoteChar, content, offset, end_offset);
 
@@ -999,8 +985,8 @@ struct TemplateSub {
         return end_offset;
     }
 
-    static void generateLoopContent(const Char_T_ *content, SizeT offset, SizeT end_offset, LoopTag *tag,
-                                    const SizeT level) {
+    static void generateLoopContent2(const Char_T_ *content, SizeT offset, SizeT end_offset, LoopTag *tag,
+                                     const SizeT level) {
         const Char_T_ *loop_value        = nullptr;
         SizeT          tmp_length        = 0;
         SizeT          loop_value_length = 0;
@@ -1093,12 +1079,10 @@ struct TemplateSub {
                     break;
                 }
 
-                tag->InnerTemplate.Insert((content + previous_offset),
-                                          ((offset - loop_value_length) - previous_offset));
+                tag->SubTemplate.Insert((content + previous_offset), ((offset - loop_value_length) - previous_offset));
+                tag->SubTemplate.Insert(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength);
 
-                tag->InnerTemplate.Insert(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength);
-
-                Char_T_ *buffer = tag->InnerTemplate.Buffer(level + 1);
+                Char_T_ *buffer = tag->SubTemplate.Buffer(level + 1);
                 SizeT    lvl    = level;
 
                 while (true) {
@@ -1128,30 +1112,160 @@ struct TemplateSub {
                 }
 
                 if ((content[(sub_offset - 1)] == TemplatePatterns::VariableIndexSuffix)) {
-                    tag->InnerTemplate.Insert((content + offset), (sub_offset - offset));
+                    tag->SubTemplate.Insert((content + offset), (sub_offset - offset));
                 }
 
                 previous_offset = sub_offset;
-                tag->InnerTemplate += TemplatePatterns::InLineSuffix;
+                tag->SubTemplate += TemplatePatterns::InLineSuffix;
             }
         }
 
-        tag->InnerTemplate.Insert((content + previous_offset), (end_offset - previous_offset));
+        tag->SubTemplate.Insert((content + previous_offset), (end_offset - previous_offset));
 
-        Parse(tag->SubTags, tag->InnerTemplate.First(), 0, tag->InnerTemplate.Length(), (level + 1));
+        Parse(tag->SubTags, tag->SubTemplate.First(), 0, tag->SubTemplate.Length(), (level + 1));
+    }
+
+    static void generateLoopContent(const Char_T_ *content, SizeT offset, SizeT end_offset, LoopTag *tag,
+                                    const SizeT level) {
+        const Char_T_ *loop_value        = nullptr;
+        SizeT          loop_value_length = 0;
+        SizeT          previous_offset;
+
+        const SizeT sub_content_offset =
+            Engine::FindOne<Char_T_>(TemplatePatterns::MultiLineSuffix, content, offset, end_offset);
+
+        SizeT offset2     = getQuotedValue(content, offset, sub_content_offset);
+        SizeT last_offset = offset;
+        offset -= 6U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
+
+        while ((offset2 != 0) && (offset < sub_content_offset)) {
+            switch (content[offset]) {
+                case TemplatePatterns::SetChar: {
+                    SizeT set_offset = last_offset;
+                    SizeT set_length = ((offset2 - 1) - last_offset);
+
+                    if ((content[last_offset] == TemplatePatterns::InLinePrefix) &&
+                        (set_length > TemplatePatterns::VariableFulllength)) {
+                        set_offset += TemplatePatterns::VariablePrefixLength;
+                        set_length -= static_cast<unsigned short>(TemplatePatterns::VariableFulllength);
+                    }
+
+                    tag->SetOffset = static_cast<unsigned short>(set_offset);
+                    tag->SetLength = static_cast<unsigned short>(set_length);
+
+                    offset      = offset2;
+                    offset2     = getQuotedValue(content, offset, sub_content_offset);
+                    last_offset = offset;
+                    offset -= 6U;
+                    break;
+                }
+
+                case TemplatePatterns::ValueChar: {
+                    loop_value        = (content + last_offset);
+                    loop_value_length = ((offset2 - 1) - last_offset);
+                    offset            = offset2;
+                    offset2           = getQuotedValue(content, offset, sub_content_offset);
+                    last_offset       = offset;
+                    offset -= 6U;
+                    break;
+                }
+
+                case TemplatePatterns::SortChar: {
+                    tag->Sort   = ((content[last_offset] == 'a') ? 1 : 2);
+                    offset      = offset2;
+                    offset2     = getQuotedValue(content, offset, sub_content_offset);
+                    last_offset = offset;
+                    offset -= 6U;
+                    break;
+                }
+
+                case TemplatePatterns::GroupChar: {
+                    tag->GroupOffset = static_cast<unsigned short>(last_offset);
+                    tag->GroupLength = static_cast<unsigned short>((offset2 - 1) - last_offset);
+                    offset           = offset2;
+                    offset2          = getQuotedValue(content, offset, sub_content_offset);
+                    last_offset      = offset;
+                    offset -= 6U;
+                    break;
+                }
+
+                default: {
+                    ++offset;
+                }
+            }
+        }
+
+        offset          = sub_content_offset;
+        previous_offset = sub_content_offset;
+
+        if (loop_value != nullptr) {
+            while (true) {
+                if (loop_value_length > 1U) {
+                    offset = Engine::Find<Char_T_>(loop_value, loop_value_length, content, previous_offset, end_offset);
+                } else {
+                    offset = Engine::FindOne<Char_T_>(*loop_value, content, previous_offset, end_offset);
+                }
+
+                if (offset == 0) {
+                    break;
+                }
+
+                tag->SubTemplate.Insert((content + previous_offset), ((offset - loop_value_length) - previous_offset));
+                tag->SubTemplate.Insert(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength);
+
+                Char_T_ *buffer = tag->SubTemplate.Buffer(level + 1);
+                SizeT    lvl    = level;
+
+                while (true) {
+                    buffer[lvl] = TemplatePatterns::TildeChar;
+
+                    if (lvl == 0) {
+                        break;
+                    }
+
+                    --lvl;
+                }
+
+                SizeT sub_offset = offset;
+
+                while (content[sub_offset] == TemplatePatterns::VariableIndexPrefix) {
+                    while ((content[sub_offset] != TemplatePatterns::VariableIndexSuffix) &&
+                           (sub_offset < end_offset)) {
+                        ++sub_offset;
+                    }
+
+                    ++sub_offset;
+                }
+
+                if (sub_offset > end_offset) {
+                    // Unclosed bracket
+                    break;
+                }
+
+                if ((content[(sub_offset - 1)] == TemplatePatterns::VariableIndexSuffix)) {
+                    tag->SubTemplate.Insert((content + offset), (sub_offset - offset));
+                }
+
+                previous_offset = sub_offset;
+                tag->SubTemplate += TemplatePatterns::InLineSuffix;
+            }
+        }
+
+        tag->SubTemplate.Insert((content + previous_offset), (end_offset - previous_offset));
+
+        Parse(tag->SubTags, tag->SubTemplate.First(), 0, tag->SubTemplate.Length(), (level + 1));
     }
 
     void static generateInLineIfInfo(const Char_T_ *content, SizeT offset, SizeT end_offset, InlineIfTag *tag) {
-        SizeT offset2 = getQuotedValue(content, offset, end_offset);
-        // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
-
         SizeT true_offset      = 0;
         SizeT true_end_offset  = 0;
         SizeT false_offset     = 0;
         SizeT false_end_offset = 0;
 
+        SizeT offset2     = getQuotedValue(content, offset, end_offset);
         SizeT last_offset = offset;
-        offset -= 5U;
+
+        offset -= 5U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
         while ((offset2 != 0) && (offset < end_offset)) {
             switch (content[offset]) {
@@ -1967,12 +2081,10 @@ struct TemplatePatterns_T_ {
     static constexpr Char_T_ FalseChar = 'l'; // fa[l]se
 
     // Loop
-    static constexpr Char_T_ SetChar    = 's'; // [s]et
-    static constexpr Char_T_ ValueChar  = 'l'; // va[l]ue
-    static constexpr Char_T_ RepeatChar = 'p'; // re[p]eat
-    static constexpr Char_T_ IndexChar  = 'd'; // in[d]ex
-    static constexpr Char_T_ GroupChar  = 'o'; // gr[o]up
-    static constexpr Char_T_ SortChar   = 'r'; // so[r]t
+    static constexpr Char_T_ SetChar   = 'e'; //  s[e]t
+    static constexpr Char_T_ ValueChar = 'a'; // v[a]lue
+    static constexpr Char_T_ SortChar  = 'o'; // s[o]rt
+    static constexpr Char_T_ GroupChar = 'r'; // g[r]oup
 
     // Var
     static constexpr Char_T_ TildeChar = '~'; // Tilde
