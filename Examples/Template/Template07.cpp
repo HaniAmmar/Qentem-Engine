@@ -13,13 +13,12 @@ int main() {
     value += 1;
 
     const char *content =
-        R"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
-        repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
+        R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
 
     std::cout << Template::Render(content, value) << '\n';
 
     /*
         Output:
-(0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1)
+                (0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1)
     */
 }

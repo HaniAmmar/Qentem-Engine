@@ -55,14 +55,12 @@ namespace Qentem {
  *
  *
  *  <...>
- *  - <loop set="s"? value="s"? repeat="var|n"? index="var|n"? group="s"? sort="ascend|descend"?>...</loop>
+ *  - <loop set="s"? value="s"? group="s"? sort="ascend|descend"?>...</loop>
  *
  *      - s: String, n: Number, var: Raw ariable,
  *      - set: child name in the passed colloction: Optional.
  *      - value: the current value in the colloction: Optional.
  *          Note: Choose a unique name.
- *      - repeat: if set, it will be used instead of the "set" size.
- *      - index: starting index.
  *      - group: group an array using sub value of an object.
  *      - sort: sort an array or object (ascend or descend).
  *      - ?: means optional.
@@ -129,6 +127,12 @@ namespace Qentem {
 
 /*
  * Loop Tag:
+ * <loop set="..." value="..." group="..." sort="...">...</loop>
+ * <loop value="...">...</loop>
+ * <loop set="..." value="...">...</loop>
+ * <loop set="..." value="..." group="...">...</loop>
+ * <loop set="..." value="..." sort="...">...</loop>
+ * <loop set="..." value="..." group="..." sort="...">...</loop>
  *
  * <loop set="tree_name" value="loop1-value">
  *     loop1-value
@@ -146,19 +150,11 @@ namespace Qentem {
  *      </loop>
  * </loop>
  *
- * <loop value="loop1-value" repeat="number|var">
- *     loop1-value
- * </loop>
- *
- * <loop value="loop1-value" index="number|var">
- *     loop1-value
- * </loop>
- *
  * <loop value="loop1-value" sort="ascend|descend">
  *     loop1-value
  * </loop>
  *
- * <loop value="loop1-value" group="s">
+ * <loop value="loop1-value" group="xyz">
  *     loop1-value
  * </loop>
  */
@@ -310,12 +306,6 @@ struct Template {
         Array<TagBit<Char_T_>> SubTags;
         unsigned short         SetOffset;
         unsigned short         SetLength;
-        unsigned short         FixedIndex;
-        unsigned short         FixedSize;
-        unsigned short         IndexOffset;
-        unsigned short         IndexLength;
-        unsigned short         RepeatOffset;
-        unsigned short         RepeatLength;
         unsigned short         GroupOffset;
         unsigned short         GroupLength;
         unsigned short         SortOffset;
@@ -871,35 +861,17 @@ struct TemplateSub {
     void renderLoop(const LoopTag *tag) const {
         // Stage 3: Data
         Value_T_        grouped_set;
-        const Value_T_ *loop_set   = root_value_;
-        SizeT           loop_index = tag->FixedIndex;
-        SizeT           loop_size  = tag->FixedSize;
+        const Value_T_ *loop_set;
 
         // Set (Array|Object)
         if (tag->SetLength != 0) {
             loop_set = findValue((content_ + tag->SetOffset), tag->SetLength);
-
-            if (loop_set == nullptr) {
-                return; // set="..." has invalid value.
-            }
+        } else {
+            loop_set = root_value_;
         }
 
-        // Index
-        if (tag->IndexLength != 0) {
-            const Value_T_ *tmp_value = findValue((content_ + tag->IndexOffset), tag->IndexLength);
-
-            if ((tmp_value == nullptr) || !(tmp_value->SetNumber(loop_index))) {
-                return; // Not a number
-            }
-        }
-
-        // Size
-        if (tag->RepeatLength != 0) {
-            const Value_T_ *tmp_value = findValue((content_ + tag->RepeatOffset), tag->RepeatLength);
-
-            if ((tmp_value == nullptr) || !(tmp_value->SetNumber(loop_size))) {
-                return; // Not a number
-            }
+        if (loop_set == nullptr) {
+            return;
         }
 
         // Group
@@ -921,37 +893,38 @@ struct TemplateSub {
             grouped_set.Sort(content_[tag->SortOffset] == TemplatePatterns::SortAscend);
         }
 
-        if (loop_size == 0) {
-            loop_size = loop_set->Size();
-
-            if (loop_size <= loop_index) {
-                return;
-            }
-
-            loop_size -= loop_index;
-        }
-
         // Stage 4: Render
         const Char_T_ *loop_content = tag->InnerTemplate.First();
         TemplateSub    loop_template{loop_content, stream_, root_value_, this, (level_ + 1)};
 
+        const SizeT loop_size  = loop_set->Size();
+        SizeT       loop_index = 0;
+
         if (loop_set->IsObject()) {
-            do {
+            while (loop_index < loop_size) {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
-                loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length_);
-                const TagBit *s_tag = tag->SubTags.First();
-                const TagBit *s_end = (s_tag + tag->SubTags.Size());
-                loop_template.Render(s_tag, s_end);
+
+                if (loop_template.loop_value_ != nullptr) {
+                    loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length_);
+                    const TagBit *s_tag = tag->SubTags.First();
+                    const TagBit *s_end = (s_tag + tag->SubTags.Size());
+                    loop_template.Render(s_tag, s_end);
+                }
+
                 ++loop_index;
-            } while ((--loop_size) != 0);
+            }
         } else {
-            do {
+            while (loop_index < loop_size) {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
-                const TagBit *s_tag       = tag->SubTags.First();
-                const TagBit *s_end       = (s_tag + tag->SubTags.Size());
-                loop_template.Render(s_tag, s_end);
+
+                if (loop_template.loop_value_ != nullptr) {
+                    const TagBit *s_tag = tag->SubTags.First();
+                    const TagBit *s_end = (s_tag + tag->SubTags.Size());
+                    loop_template.Render(s_tag, s_end);
+                }
+
                 ++loop_index;
-            } while ((--loop_size) != 0);
+            }
         }
     }
 
@@ -1027,34 +1000,6 @@ struct TemplateSub {
         return end_offset;
     }
 
-    bool static isStaticNumber(const Char_T_ *content, const SizeT length) noexcept {
-        if (length > TemplatePatterns::VariableFulllength) {
-            if (Engine::Find<Char_T_>(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength, content,
-                                      SizeT{0}, length) != 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    void static findKey(const Char_T_ *content, SizeT offset, SizeT end_offset, unsigned short &i_offset,
-                        unsigned short &i_length) noexcept {
-        offset = Engine::Find<Char_T_>(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength,
-                                       content, offset, end_offset);
-
-        i_length = 1;
-
-        if (offset != 0) {
-            end_offset = Engine::FindOne<Char_T_>(TemplatePatterns::InLineSuffix, content, offset, end_offset);
-
-            if (end_offset != 0) {
-                i_offset = static_cast<unsigned short>(offset);
-                i_length = static_cast<unsigned short>(((end_offset - TemplatePatterns::InLineSuffixLength) - offset));
-            }
-        }
-    }
-
     static void generateLoopContent(const Char_T_ *content, SizeT offset, SizeT end_offset, LoopTag *tag,
                                     const SizeT level) {
         const Char_T_ *loop_value        = nullptr;
@@ -1101,30 +1046,6 @@ struct TemplateSub {
                             (tmp_length > TemplatePatterns::VariableFulllength)) {
                             tag->SetOffset += TemplatePatterns::VariablePrefixLength;
                             tag->SetLength -= static_cast<unsigned short>(TemplatePatterns::VariableFulllength);
-                        }
-
-                        break_loop = true;
-                        break;
-                    }
-
-                    case TemplatePatterns::IndexChar: {
-                        const Char_T_ *tmp_content = (content + offset);
-
-                        if (!isStaticNumber(tmp_content, tmp_length) ||
-                            !(Digit<Char_T_>::StringToNumber(tag->FixedIndex, tmp_content, tmp_length))) {
-                            findKey(content, offset, (tmp_length + offset), tag->IndexOffset, tag->IndexLength);
-                        }
-
-                        break_loop = true;
-                        break;
-                    }
-
-                    case TemplatePatterns::RepeatChar: {
-                        const Char_T_ *tmp_content = (content + offset);
-
-                        if (!isStaticNumber(tmp_content, tmp_length) ||
-                            !(Digit<Char_T_>::StringToNumber(tag->FixedSize, tmp_content, tmp_length))) {
-                            findKey(content, offset, (tmp_length + offset), tag->RepeatOffset, tag->RepeatLength);
                         }
 
                         break_loop = true;

@@ -1819,126 +1819,43 @@ static void TestInlineIfLTag(TestHelper &helper) {
 }
 
 static void TestLoopLTag1(TestHelper &helper) {
-    Value<wchar_t> value;
-    const wchar_t *content;
-
-    value += 100;
-    value += -50;
-    value += LR"(Qentem)";
-    value += true;
-    value += false;
-    value += nullptr;
-    value += 3;
-
-    content = LR"(<loop repeat="10">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AAAAAAAAAA)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop             repeat="1">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(A)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop<loop repeat="1">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(<loopA)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="3"         >ABC</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(ABCABCABC)", LR"(Render())", __LINE__);
-
-    content = LR"(-<loop repeat="3">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(-AAA)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="3">A</loop>-)";
-    helper.Equal(Template::Render(content, value), LR"(AAA-)", LR"(Render())", __LINE__);
-
-    content = LR"(-<loop repeat="3">A</loop>-)";
-    helper.Equal(Template::Render(content, value), LR"(-AAA-)", LR"(Render())", __LINE__);
-
-    content = LR"(--<loop repeat="3">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(--AAA)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="3">A</loop>--)";
-    helper.Equal(Template::Render(content, value), LR"(AAA--)", LR"(Render())", __LINE__);
-
-    content = LR"(--<loop repeat="3">A</loop>--)";
-    helper.Equal(Template::Render(content, value), LR"(--AAA--)", LR"(Render())", __LINE__);
-
-    content = LR"(---<loop repeat="3">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(---AAA)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="3">A</loop>---)";
-    helper.Equal(Template::Render(content, value), LR"(AAA---)", LR"(Render())", __LINE__);
-
-    content = LR"(---<loop repeat="3">A</loop>---)";
-    helper.Equal(Template::Render(content, value), LR"(---AAA---)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="2">A</loop><loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AABBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="2">A</loop>-<loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AA-BBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="2">A</loop>--<loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AA--BBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="2">A</loop>---<loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AA---BBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="2">A</loop>            <loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AA            BBB)", LR"(Render())", __LINE__);
-
-    ////
-
-    content = LR"(<loop repeat="4">CC</loop><loop repeat="2">A</loop><loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(CCCCCCCCAABBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="4">CC</loop>-<loop repeat="2">A</loop>-<loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(CCCCCCCC-AA-BBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="4">CC</loop>--<loop repeat="2">A</loop>--<loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(CCCCCCCC--AA--BBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="4">CC</loop>---<loop repeat="2">A</loop>---<loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(CCCCCCCC---AA---BBB)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="4">CC</loop>     <loop repeat="2">A</loop>            <loop repeat="3">B</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(CCCCCCCC     AA            BBB)", LR"(Render())", __LINE__);
-
-    ////////////////
-
-    content = LR"(<loop repeat="6"value="loop1-value">loop1-value, </loop>)";
-    helper.Equal(Template::Render(content, value), LR"(100, -50, Qentem, true, false, null, )", LR"(Render())",
-                 __LINE__);
-
-    content = LR"(<loop repeat="6" value="loop1-value">loop1-value, loop1-value </loop>)";
-    helper.Equal(Template::Render(content, value),
-                 LR"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null )", LR"(Render())", __LINE__);
-
-    content = LR"(<loop index="2" repeat="4" value="loop1-value">loop1-value{if
-        case="loop1-value != null" true=", "}</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(Qentem, true, false, null)", LR"(Render())", __LINE__);
-
-    ////////////////
-
-    value.Reset();
-    value += 0;
-    value += 1;
-    value += 2;
-
-    content = LR"(<loop repeat="3" value="loop1-value"><loop
-        repeat="2" value="loop2-value">(loop1-value: loop2-value) </loop></loop>)";
-    helper.Equal(Template::Render(content, value), LR"((0: 0) (0: 1) (1: 0) (1: 1) (2: 0) (2: 1) )", LR"(Render())",
-                 __LINE__);
-
-    content = LR"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
-        repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
-    helper.Equal(Template::Render(content, value),
-                 LR"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", LR"(Render())",
-                 __LINE__);
-}
-
-static void TestLoopLTag2(TestHelper &helper) {
     Value<wchar_t> value3;
     const wchar_t *content;
+    Value<wchar_t> value1;
 
-    Value<wchar_t> value1 = JSON::Parse(LR"([100, -50, "A", true, false, null])");
+    value1 += 100;
+    value1 += -50;
+    value1 += LR"(Qentem)";
+    value1 += true;
+    value1 += false;
+    value1 += nullptr;
+    value1 += 3;
+
+    content = LR"(<loop value="loop1-value">loop1-value, </loop>)";
+    helper.Equal(Template::Render(content, value1), LR"(100, -50, Qentem, true, false, null, 3, )", LR"(Render())",
+                 __LINE__);
+
+    content = LR"(<loop value="loop1-value">loop1-value, loop1-value </loop>)";
+    helper.Equal(Template::Render(content, value1),
+                 LR"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", LR"(Render())",
+                 __LINE__);
+
+    ////////////////
+
+    value1.Reset();
+    value1 += 0;
+    value1 += 1;
+
+    content = LR"(<loop value="loop1-value"><loop value="loop2-value">(loop1-value: loop2-value) </loop></loop>)";
+    helper.Equal(Template::Render(content, value1), LR"((0: 0) (0: 1) (1: 0) (1: 1) )", LR"(Render())", __LINE__);
+
+    content = LR"(<loop value="loop1-value"><loop value="loop2-value"><loop
+                 value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
+    helper.Equal(Template::Render(content, value1),
+                 LR"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", LR"(Render())",
+                 __LINE__);
+
+    value1                = JSON::Parse(LR"([100, -50, "A", true, false, null])");
     Value<wchar_t> value2 = JSON::Parse(LR"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 
     //////////////////////
@@ -1946,9 +1863,6 @@ static void TestLoopLTag2(TestHelper &helper) {
 
     content = LR"(<loop value="loop1-value">loop1-value, </loop>)";
     helper.Equal(Template::Render(content, value1), LR"(100, -50, A, true, false, null, )", LR"(Render())", __LINE__);
-
-    content = LR"(<loop value="loop1-value" index="3">loop1-value, </loop>)";
-    helper.Equal(Template::Render(content, value2), LR"(true, false, null, )", LR"(Render())", __LINE__);
 
     content = LR"(<loop value="loop1-value">loop1-value, </loop>)";
     helper.Equal(Template::Render(content, value2), LR"(4, 1.5, ABC, true, false, null, )", LR"(Render())", __LINE__);
@@ -2000,7 +1914,7 @@ static void TestLoopLTag2(TestHelper &helper) {
     value3.Reset();
     value3[0][LR"(k2)"] += value2;
 
-    content = LR"(<loop set="0[k2][0]"key="loop1-key"value="loop1-value">loop1-value, loop1-value, </loop>)";
+    content = LR"(<loop set="0[k2][0]"value="loop1-value">loop1-value, loop1-value, </loop>)";
     helper.Equal(Template::Render(content, value3),
                  LR"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )", LR"(Render())", __LINE__);
 
@@ -2011,14 +1925,8 @@ static void TestLoopLTag2(TestHelper &helper) {
 
     value3 = JSON::Parse(LR"({"group":[1,2,3,4]})");
 
-    content = LR"(<loop set="group" value="_Val" repeat="1">_Val</loop>)";
-    helper.Equal(Template::Render(content, value3), LR"(1)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop set="group" value="_Val" index="3">_Val</loop>)";
-    helper.Equal(Template::Render(content, value3), LR"(4)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop index="2" repeat="1" set="group" value="_Val">_Val</loop>)";
-    helper.Equal(Template::Render(content, value3), LR"(3)", LR"(Render())", __LINE__);
+    content = LR"(<loop set="group" value="_Val">_Val</loop>)";
+    helper.Equal(Template::Render(content, value3), LR"(1234)", LR"(Render())", __LINE__);
 
     value3  = JSON::Parse(LR"({"numbers":[1,2,3,4,5,6,7,8]})");
     content = LR"(A<loop set="numbers" value="t">t</loop>B)";
@@ -2028,7 +1936,7 @@ static void TestLoopLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, value3), LR"()", LR"(Render())", __LINE__);
 }
 
-static void TestLoopLTag3(TestHelper &helper) {
+static void TestLoopLTag2(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -2047,10 +1955,7 @@ static void TestLoopLTag3(TestHelper &helper) {
     content = LR"(<loo</loop>)";
     helper.Equal(Template::Render(content, value), LR"(<loo</loop>)", LR"(Render())", __LINE__);
 
-    content = LR"(<loop></loop><loop repeat="2">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AA)", LR"(Render())", __LINE__);
-
-    content = LR"(<loop key="a">a</loop>)";
+    content = LR"(<loop></loop><loop>A</loop>)";
     helper.Equal(Template::Render(content, value), LR"()", LR"(Render())", __LINE__);
 
     content = LR"(<loop value="a">a</loop>)";
@@ -2073,35 +1978,10 @@ static void TestLoopLTag3(TestHelper &helper) {
 
     value[LR"(in)"] = Array<Value<wchar_t>>();
 
-    content = LR"(<loop repeat="{var:in}">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"()", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="10" index="{var:in}">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"()", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="10" index="{var:in">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"()", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="10" index="{var:100}">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"()", LR"(Render())", __LINE__);
-
-    content = LR"(<loop repeat="10" index="O">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"()", LR"(Render())", __LINE__);
-
     content = LR"(<loop value="v">v</loop>)";
     helper.Equal(Template::Render(content, value), LR"(in)", LR"(Render())", __LINE__);
 
     value.Reset();
-    value[LR"(in)"] = 2;
-
-    content = LR"(<loop repeat="{var:in}">A</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(AA)", LR"(Render())", __LINE__);
-
-    value[LR"(C)"] = 3;
-    value[LR"(D)"] = 4;
-
-    content = LR"(<loop index="{var:in}"value="v">v</loop>)";
-    helper.Equal(Template::Render(content, value), LR"(4)", LR"(Render())", __LINE__);
 
     /////
     value.Reset();
@@ -2165,7 +2045,8 @@ static void TestLoopLTag3(TestHelper &helper) {
     content = LR"(<loop set="array" value="item">item[var11]item[var22]item[var33] item[var44]</loop>)";
     helper.Equal(Template::Render(content, value), LR"( )", LR"(Render())", __LINE__);
 
-    content = LR"(<loop repeat="1"><l</loop>)";
+    value.RemoveIndex(0);
+    content = LR"(<loop><l</loop>)";
     helper.Equal(Template::Render(content, value), LR"(<l)", LR"(Render())", __LINE__);
 
     value = JSON::Parse(LR"(
@@ -2187,49 +2068,29 @@ static void TestLoopLTag3(TestHelper &helper) {
 
     content = LR"(<loop set="2020">{var:name}</loop>)";
     helper.Equal(Template::Render(content, value), LR"(some_valsome_valsome_val)", LR"(Render())", __LINE__);
-}
 
-static void TestLoopLTag4(TestHelper &helper) {
     constexpr unsigned int size_4 = (8 * 4);
 
-    StringStream<wchar_t> content;
+    StringStream<wchar_t> content2;
     StringStream<wchar_t> output;
     String<wchar_t>       str;
-    Value<wchar_t>        value;
+    Value<wchar_t>        value2;
 
     for (unsigned int i = 0; i < size_4; i++) {
-        value += i;
+        value2 += i;
     }
 
-    content += LR"(<loop repeat="1">)";
-    for (unsigned int i = 0; i < size_4; i++) {
-        content += LR"({var:)";
-        str = Digit<wchar_t>::NumberToString(i);
-        content += str;
-        content += LR"(})";
-
-        output += str;
-    }
-    content += LR"(</loop>)";
-
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
-
-    //////////////////////
-
-    content.Clear();
-    output.Clear();
-
-    content += LR"(<loop value="loop1-value">A loop1-value B</loop>)";
+    content2 += LR"(<loop value="loop1-value">A loop1-value B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += LR"(A )";
         Digit<wchar_t>::NumberToString(output, i);
         output += LR"( B)";
     }
 
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
+    helper.Equal(Template::Render(content2.First(), content2.Length(), value2), output, LR"(Render())", __LINE__);
 }
 
-static void TestLoopLTag5(TestHelper &helper) {
+static void TestLoopLTag3(TestHelper &helper) {
     Value<wchar_t> value;
     const wchar_t *content;
 
@@ -2601,7 +2462,7 @@ static void TestRenderL1(TestHelper &helper) {
         content += LR"(})";
     }
 
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
+    helper.Equal(Template::Render(content.First(), content.Length(), value), output, LR"(Render())", __LINE__);
 
     content.Clear();
     output.Clear();
@@ -2627,7 +2488,7 @@ static void TestRenderL1(TestHelper &helper) {
         }
     }
 
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
+    helper.Equal(Template::Render(content.First(), content.Length(), value), output, LR"(Render())", __LINE__);
 
     content.Clear();
     output.Clear();
@@ -2654,28 +2515,7 @@ static void TestRenderL1(TestHelper &helper) {
         }
     }
 
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
-
-    content.Clear();
-    output.Clear();
-
-    size = 8;
-    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
-        if (x != size) {
-            content += LR"({var:)";
-            str = Digit<wchar_t>::NumberToString(i);
-            content += str;
-            content += LR"(})";
-
-            output += str;
-        } else {
-            size += 8;
-            content += LR"(<loop repeat="1">A</loop>)";
-            output += LR"(A)";
-        }
-    }
-
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
+    helper.Equal(Template::Render(content.First(), content.Length(), value), output, LR"(Render())", __LINE__);
 
     content.Clear();
     output.Clear();
@@ -2696,28 +2536,7 @@ static void TestRenderL1(TestHelper &helper) {
         }
     }
 
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
-
-    content.Clear();
-    output.Clear();
-
-    constexpr unsigned int size_2_1 = (8 * 2) - 1;
-
-    for (unsigned int i = 0; i < size_2_1; i++) {
-        value += i;
-    }
-
-    content += LR"(<loop repeat="1">)";
-    for (unsigned int i = 0; i < size_2_1; i++) {
-        content += LR"({var:)";
-        str = Digit<wchar_t>::NumberToString(i);
-        content += str;
-        output += str;
-        content += LR"(})";
-    }
-    content += LR"(</loop>)";
-
-    helper.EqualsTrue((Template::Render(content.First(), content.Length(), value) == output), LR"(Render())", __LINE__);
+    helper.Equal(Template::Render(content.First(), content.Length(), value), output, LR"(Render())", __LINE__);
 }
 
 static void TestRenderL2(TestHelper &helper) {
@@ -2779,8 +2598,6 @@ static int RunTemplateLTests() {
     helper.Test("Loop Tag Test 1", TestLoopLTag1);
     helper.Test("Loop Tag Test 2", TestLoopLTag2);
     helper.Test("Loop Tag Test 3", TestLoopLTag3);
-    helper.Test("Loop Tag Test 4", TestLoopLTag4);
-    helper.Test("Loop Tag Test 5", TestLoopLTag5);
 
     helper.Test("If Tag Test 1", TestIfLTag1);
     helper.Test("If Tag Test 2", TestIfLTag2);

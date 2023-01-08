@@ -405,17 +405,12 @@ To force converting the variables to numbers, use parentheses: {math:({var:bool}
 ## Loop
 
 ```txt
-<loop set="..." value="..." repeat="..." index="..." group="..." sort="...">...</loop>
+<loop set="..." value="..." group="..." sort="...">...</loop>
 <loop value="...">...</loop>
 <loop set="..." value="...">...</loop>
-<loop set="..." value="..." repeat="...">...</loop>
-<loop set="..." value="..." repeat="..." index="...">...</loop>
-<loop set="..." value="..." repeat="..." index="..." group="...">...</loop>
-
-<loop repeat="...">...</loop>
-<loop set="..." repeat="..." index="...">...</loop>
-<loop set="..." repeat="...">...</loop>
-<loop set="..." index="...">...</loop>
+<loop set="..." value="..." group="...">...</loop>
+<loop set="..." value="..." sort="...">...</loop>
+<loop set="..." value="..." group="..." sort="...">...</loop>
 ```
 
 Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop. `group` groups the giving array by sub-value of an object. `sort` will sort the set in ascendind or descending order.
