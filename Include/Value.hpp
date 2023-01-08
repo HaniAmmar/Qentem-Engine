@@ -65,8 +65,24 @@ class Value {
     Value(const Value &val) { copyValue(val); }
 
     ~Value() {
-        if (!IsUndefined()) {
-            reset();
+        switch (Type()) {
+            case ValueType::Object: {
+                Memory::Dispose(&object_);
+                break;
+            }
+
+            case ValueType::Array: {
+                Memory::Dispose(&array_);
+                break;
+            }
+
+            case ValueType::String: {
+                Memory::Dispose(&string_);
+                break;
+            }
+
+            default: {
+            }
         }
     }
 
