@@ -212,12 +212,12 @@ struct Template {
         Array<TagBit<Char_T_>> &tags = cache.GetOrAdd(name, name_length);
 
         if (tags.IsEmpty()) {
-            TemplateSubCV::parse(tags, content, 0, length, 0);
+            TemplateSubCV::Parse(tags, content, 0, length);
         }
 
         const TagBit<Char_T_> *tag = tags.First();
         const TagBit<Char_T_> *end = (tag + tags.Size());
-        temp.render(tag, end);
+        temp.Render(tag, end);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
@@ -227,12 +227,12 @@ struct Template {
         const TemplateSubCV temp{content, &stream, &value};
 
         if (tags_cache.IsEmpty()) {
-            TemplateSubCV::parse(tags_cache, content, 0, length, 0);
+            TemplateSubCV::Parse(tags_cache, content, 0, length);
         }
 
         const TagBit<Char_T_> *tag = tags_cache.First();
         const TagBit<Char_T_> *end = (tag + tags_cache.Size());
-        temp.render(tag, end);
+        temp.Render(tag, end);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
@@ -439,6 +439,10 @@ template <typename Char_T_, typename Value_T_, typename StringStream_T_>
 struct TemplateSub {
     TemplateSub() = delete;
 
+    TemplateSub(const Char_T_ *content, StringStream_T_ *stream, const Value_T_ *root_value,
+                const TemplateSub *parent = nullptr, const SizeT level = 0) noexcept
+        : content_{content}, stream_{stream}, root_value_{root_value}, parent_{parent}, level_{level} {}
+
   private:
     friend struct Qentem::Template;
 
@@ -451,7 +455,8 @@ struct TemplateSub {
     using IfTag            = Array<Template::IfTagCase_T_<Char_T_>>;
     using TemplatePatterns = TemplatePatterns_T_<Char_T_>;
 
-    void render(const TagBit *tag, const TagBit *end) const {
+  public:
+    void Render(const TagBit *tag, const TagBit *end) const {
         while (tag < end) {
             switch (tag->GetType()) {
                 case TagType::Variable: {
@@ -497,8 +502,8 @@ struct TemplateSub {
         }
     }
 
-    static void parse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT offset, const SizeT end_offset,
-                      SizeT const level) {
+    static void Parse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT offset, const SizeT end_offset,
+                      SizeT const level = 0) {
         SizeT last_offset = offset;
 
         while (offset < end_offset) {
@@ -665,6 +670,7 @@ struct TemplateSub {
         }
     }
 
+  private:
     // Part of parse()
     static void lightParse(Array<TagBit> &tags_cache, const Char_T_ *content, SizeT offset, const SizeT end_offset) {
         SizeT last_offset = offset;
@@ -935,7 +941,7 @@ struct TemplateSub {
                 loop_set->SetKeyCharAndLength(loop_index, loop_template.loop_key_, loop_template.loop_key_length_);
                 const TagBit *s_tag = tag->SubTags.First();
                 const TagBit *s_end = (s_tag + tag->SubTags.Size());
-                loop_template.render(s_tag, s_end);
+                loop_template.Render(s_tag, s_end);
                 ++loop_index;
             } while ((--loop_size) != 0);
         } else {
@@ -943,7 +949,7 @@ struct TemplateSub {
                 loop_template.loop_value_ = loop_set->GetValue(loop_index);
                 const TagBit *s_tag       = tag->SubTags.First();
                 const TagBit *s_end       = (s_tag + tag->SubTags.Size());
-                loop_template.render(s_tag, s_end);
+                loop_template.Render(s_tag, s_end);
                 ++loop_index;
             } while ((--loop_size) != 0);
         }
@@ -962,14 +968,14 @@ struct TemplateSub {
                         s_end -= tag->TrueTagsSize;
                     }
 
-                    render(s_tag, s_end);
+                    Render(s_tag, s_end);
                 }
             } else if (tag->SubTags.IsNotEmpty()) {
                 const TagBit *s_tag = tag->SubTags.First();
                 const TagBit *s_end = (s_tag + tag->SubTags.Size());
                 s_tag += tag->TrueTagsSize;
 
-                render(s_tag, s_end);
+                Render(s_tag, s_end);
             }
         }
     }
@@ -985,7 +991,7 @@ struct TemplateSub {
                 (evaluate(result, item->CaseOffset, item->CaseEndOffset) && (result.Number > 0))) {
                 const TagBit *s_tag = item->SubTags.First();
                 const TagBit *s_end = (s_tag + item->SubTags.Size());
-                render(s_tag, s_end);
+                Render(s_tag, s_end);
                 break;
             }
 
@@ -1213,7 +1219,7 @@ struct TemplateSub {
 
         tag->InnerTemplate.Insert((content + previous_offset), (end_offset - previous_offset));
 
-        parse(tag->SubTags, tag->InnerTemplate.First(), 0, tag->InnerTemplate.Length(), (level + 1));
+        Parse(tag->SubTags, tag->InnerTemplate.First(), 0, tag->InnerTemplate.Length(), (level + 1));
     }
 
     void static generateInLineIfInfo(const Char_T_ *content, SizeT offset, SizeT end_offset, InlineIfTag *tag) {
@@ -1294,13 +1300,13 @@ struct TemplateSub {
                 else_offset = nextElse(content, content_offset, end_offset);
 
                 if (else_offset == 0) {
-                    parse(sub_tags, content, content_offset, end_offset, level);
+                    Parse(sub_tags, content, content_offset, end_offset, level);
                     *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), offset, case_end_offset};
 
                     break;
                 }
 
-                parse(sub_tags, content, content_offset, (else_offset - TemplatePatterns::ElsePrefixLength), level);
+                Parse(sub_tags, content, content_offset, (else_offset - TemplatePatterns::ElsePrefixLength), level);
                 *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), offset, case_end_offset};
 
                 if ((content[else_offset] != TemplatePatterns::ElseIfChar)) {
@@ -1308,7 +1314,7 @@ struct TemplateSub {
                         Engine::FindOne<Char_T_>(TemplatePatterns::MultiLineSuffix, content, else_offset, end_offset);
 
                     if (else_offset != 0) {
-                        parse(sub_tags, content, else_offset, end_offset, level);
+                        Parse(sub_tags, content, else_offset, end_offset, level);
                         *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), 0, 0}; // else without if
                     }
 
@@ -1903,10 +1909,6 @@ struct TemplateSub {
 
         return false;
     }
-
-    TemplateSub(const Char_T_ *content, StringStream_T_ *stream, const Value_T_ *root_value,
-                const TemplateSub *parent = nullptr, const SizeT level = 0) noexcept
-        : content_{content}, stream_{stream}, root_value_{root_value}, parent_{parent}, level_{level} {}
 
     const Char_T_     *content_;
     StringStream_T_   *stream_;
