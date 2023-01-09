@@ -157,21 +157,19 @@ class Engine {
     }
 
     /*
-     * If a search is about { ... }, and nest itself like:
-     * {.{..{...}..}.}; then this function can skip inner brackets:
      *
-     * return SkipInnerPatterns("{{", 2, "}}", 2, content, offset, end_offset, max_end_before, full_length);
+     * SkipInnerPatterns("{{", 2, "}}", 2, content, offset, end_offset, full_length);
      *
      * 'prefix_length' and 'suffix_length' should be bigger than 1;
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ SkipInnerPatterns(const Char_T_ *prefix, SizeT prefix_length, const Char_T_ *suffix,
                                        SizeT suffix_length, const Char_T_ *content, Number_T_ offset,
-                                       const Number_T_ max_end_before, Number_T_ full_length = 0) noexcept {
+                                       const Number_T_ end_offset, Number_T_ full_length = 0) noexcept {
         Number_T_ offset2 = offset;
 
         while (true) {
-            offset2 = Find(suffix, suffix_length, content, offset2, max_end_before, full_length);
+            offset2 = Find(suffix, suffix_length, content, offset2, end_offset, full_length);
             offset  = Find(prefix, prefix_length, content, offset, offset2, full_length);
 
             if (offset == 0) {
@@ -186,18 +184,18 @@ class Engine {
      * If a search is about { ... }, and nest itself like:
      * {.{..{...}..}.}; then this function can skip inner brackets:
      *
-     * SkipInnerPatterns("{", "}", content, offset, end_offset, max_end_before, full_length);
+     * SkipInnerPatterns("{", "}", content, offset, end_offset, full_length);
      *
      */
 
     template <typename Char_T_, typename Number_T_>
     static Number_T_ SkipInnerPatterns(const Char_T_ prefix, const Char_T_ suffix, const Char_T_ *content,
-                                       Number_T_ offset, const Number_T_ max_end_before,
+                                       Number_T_ offset, const Number_T_ end_offset,
                                        Number_T_ full_length = 0) noexcept {
         Number_T_ offset2 = offset;
 
         while (true) {
-            offset2 = FindOne(suffix, content, offset2, max_end_before, full_length);
+            offset2 = FindOne(suffix, content, offset2, end_offset, full_length);
             offset  = FindOne(prefix, content, offset, offset2, full_length);
 
             if (offset == 0) {

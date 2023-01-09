@@ -435,8 +435,7 @@ struct TemplateSub {
 
     TemplateSub(const Char_T_ *content, SizeT length, StringStream_T_ *stream, const Value_T_ *root_value,
                 const TemplateSub *parent = nullptr, const SizeT level = 0) noexcept
-        : content_{content}, stream_{stream}, root_value_{root_value}, parent_{parent}, level_{level}, length_{length} {
-    }
+        : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, level_{level}, length_{length} {}
 
   private:
     friend struct Qentem::Template;
@@ -874,7 +873,7 @@ struct TemplateSub {
         if (tag->SetLength != 0) {
             loop_set = findValue((content_ + tag->SetOffset), tag->SetLength);
         } else {
-            loop_set = root_value_;
+            loop_set = value_;
         }
 
         if (loop_set != nullptr) {
@@ -899,7 +898,7 @@ struct TemplateSub {
 
             // Stage 4: Render
             TemplateSub loop_template{
-                tag->SubTemplate.First(), tag->SubTemplate.Length(), stream_, root_value_, this, (level_ + 1)};
+                tag->SubTemplate.First(), tag->SubTemplate.Length(), stream_, value_, this, (level_ + 1)};
             const TagBit *s_tag = tag->SubTags.First();
             const TagBit *s_end = (s_tag + tag->SubTags.Size());
 
@@ -1269,7 +1268,7 @@ struct TemplateSub {
 
             if (*key != TemplatePatterns::TildeChar) {
                 if ((key[(length - 1)] != TemplatePatterns::VariableIndexSuffix)) {
-                    return root_value_->GetValue(key, length);
+                    return value_->GetValue(key, length);
                 }
 
                 // [...]
@@ -1277,7 +1276,7 @@ struct TemplateSub {
                     ++tmp;
                 }
 
-                value = root_value_;
+                value = value_;
             } else {
                 const TemplateSub *obj = this;
 
@@ -1812,7 +1811,7 @@ struct TemplateSub {
 
     const Char_T_     *content_;
     StringStream_T_   *stream_;
-    const Value_T_    *root_value_;
+    const Value_T_    *value_;
     const TemplateSub *parent_;
     const Value_T_    *loop_value_{nullptr};
     const Char_T_     *loop_key_{nullptr};
