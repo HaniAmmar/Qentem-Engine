@@ -469,22 +469,22 @@ struct TemplateSub {
                 }
 
                 case TagType::Loop: {
-                    renderLoop(static_cast<LoopTag *>(tag->GetInfo()));
+                    renderLoop(tag);
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    renderInLineIf(static_cast<InlineIfTag *>(tag->GetInfo()));
+                    renderInLineIf(tag);
                     break;
                 }
 
                 case TagType::If: {
-                    renderIf(static_cast<IfTag *>(tag->GetInfo()));
+                    renderIf(tag);
                     break;
                 }
 
                 case TagType::RawText: {
-                    stream_->Insert((content_ + tag->GetOffset()), tag->GetLength());
+                    renderRawText(tag);
                     break;
                 }
 
@@ -864,22 +864,23 @@ struct TemplateSub {
         }
     }
 
-    void renderLoop(const LoopTag *tag) const {
+    void renderLoop(const TagBit *tag) const {
+        const LoopTag *i_tag = static_cast<const LoopTag *>(tag->GetInfo());
         // Stage 3: Data
         Value_T_        grouped_set;
         const Value_T_ *loop_set;
 
         // Set (Array|Object)
-        if (tag->SetLength != 0) {
-            loop_set = findValue((content_ + tag->SetOffset), tag->SetLength);
+        if (i_tag->SetLength != 0) {
+            loop_set = findValue((content_ + i_tag->SetOffset), i_tag->SetLength);
         } else {
             loop_set = value_;
         }
 
         if (loop_set != nullptr) {
             // Group
-            if (tag->GroupLength != 0) {
-                if (!(loop_set->GroupBy(grouped_set, (content_ + tag->GroupOffset), tag->GroupLength))) {
+            if (i_tag->GroupLength != 0) {
+                if (!(loop_set->GroupBy(grouped_set, (content_ + i_tag->GroupOffset), i_tag->GroupLength))) {
                     return;
                 }
 
@@ -887,20 +888,20 @@ struct TemplateSub {
             }
 
             // Sort
-            if (tag->Sort != 0) {
-                if (tag->GroupLength == 0) {
+            if (i_tag->Sort != 0) {
+                if (i_tag->GroupLength == 0) {
                     grouped_set = *loop_set;
                     loop_set    = &grouped_set;
                 }
 
-                grouped_set.Sort(tag->Sort == 1);
+                grouped_set.Sort(i_tag->Sort == 1);
             }
 
             // Stage 4: Render
             TemplateSub loop_template{
-                tag->SubTemplate.First(), tag->SubTemplate.Length(), stream_, value_, this, (level_ + 1)};
-            const TagBit *s_tag = tag->SubTags.First();
-            const TagBit *s_end = (s_tag + tag->SubTags.Size());
+                i_tag->SubTemplate.First(), i_tag->SubTemplate.Length(), stream_, value_, this, (level_ + 1)};
+            const TagBit *s_tag = i_tag->SubTags.First();
+            const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
 
             const SizeT loop_size  = loop_set->Size();
             SizeT       loop_index = 0;
@@ -930,34 +931,37 @@ struct TemplateSub {
         }
     }
 
-    void renderInLineIf(const InlineIfTag *tag) const {
+    void renderInLineIf(const TagBit *tag) const {
+        const InlineIfTag *i_tag = static_cast<const InlineIfTag *>(tag->GetInfo());
+
         ALENumber result;
 
-        if (evaluate(result, tag->CaseOffset, tag->CaseEndOffset)) {
+        if (evaluate(result, i_tag->CaseOffset, i_tag->CaseEndOffset)) {
             if (result.Number > 0.0) {
-                if (tag->TrueTagsSize != 0) {
-                    const TagBit *s_tag = tag->SubTags.First();
-                    const TagBit *s_end = (s_tag + tag->SubTags.Size());
+                if (i_tag->TrueTagsSize != 0) {
+                    const TagBit *s_tag = i_tag->SubTags.First();
+                    const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
 
-                    if (tag->SubTags.Size() != tag->TrueTagsSize) {
-                        s_end -= tag->TrueTagsSize;
+                    if (i_tag->SubTags.Size() != i_tag->TrueTagsSize) {
+                        s_end -= i_tag->TrueTagsSize;
                     }
 
                     Render(s_tag, s_end);
                 }
-            } else if (tag->SubTags.IsNotEmpty()) {
-                const TagBit *s_tag = tag->SubTags.First();
-                const TagBit *s_end = (s_tag + tag->SubTags.Size());
-                s_tag += tag->TrueTagsSize;
+            } else if (i_tag->SubTags.IsNotEmpty()) {
+                const TagBit *s_tag = i_tag->SubTags.First();
+                const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
+                s_tag += i_tag->TrueTagsSize;
 
                 Render(s_tag, s_end);
             }
         }
     }
 
-    void renderIf(const IfTag *tag) const {
-        const IfTagCase *item = tag->First();
-        const IfTagCase *end  = (item + tag->Size());
+    void renderIf(const TagBit *tag) const {
+        const IfTag     *i_tag = static_cast<const IfTag *>(tag->GetInfo());
+        const IfTagCase *item  = i_tag->First();
+        const IfTagCase *end   = (item + i_tag->Size());
         ALENumber        result;
 
         while (item < end) {
@@ -973,6 +977,8 @@ struct TemplateSub {
             ++item;
         }
     }
+
+    void renderRawText(const TagBit *tag) const { stream_->Insert((content_ + tag->GetOffset()), tag->GetLength()); }
 
     /*
      * Gets everything between "..."
