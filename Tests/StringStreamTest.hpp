@@ -164,7 +164,7 @@ static void TestStringStream(TestHelper &helper) {
     ss2.Insert("bcdef", 1);
     ss2.Insert("cdef", 1);
 
-    char      *e_str    = ss2.Eject();
+    char      *e_str    = ss2.Detach();
     const bool is_equal = StringUtils::IsEqual(e_str, "abc", 3);
     Memory::Deallocate(e_str);
 

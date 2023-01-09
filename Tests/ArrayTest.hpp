@@ -197,7 +197,7 @@ static void TestArray1(TestHelper &helper) {
     helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(numbers2.First(), storage, "First()", __LINE__);
 
-    SizeT *tmp = numbers2.Eject();
+    SizeT *tmp = numbers2.Detach();
     helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
     helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);

@@ -212,7 +212,7 @@ class String {
         clearStorage();
     }
 
-    Char_T_ *Eject() {
+    Char_T_ *Detach() {
         Char_T_ *str;
 
         if (Config::ShortStringOptimization) {

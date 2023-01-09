@@ -233,7 +233,7 @@ class StringStream {
         }
     }
 
-    Char_T_ *Eject() noexcept {
+    Char_T_ *Detach() noexcept {
         setLength(0);
         setCapacity(0);
         Char_T_ *str = Storage();
@@ -247,7 +247,7 @@ class StringStream {
 
         if (Capacity() > len) {
             Storage()[len] = 0;
-            return String<Char_T_>(Eject(), len);
+            return String<Char_T_>(Detach(), len);
         }
 
         String<Char_T_> str{First(), len};

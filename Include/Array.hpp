@@ -172,7 +172,7 @@ class Array {
         setCapacity(0);
     }
 
-    Type_ *Eject() noexcept {
+    Type_ *Detach() noexcept {
         setSize(0);
         setCapacity(0);
         Type_ *tmp = Storage();

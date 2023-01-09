@@ -67,8 +67,8 @@ static void TestString1(TestHelper &helper) {
     helper.Equal(str1.Length(), 32U, "Length", __LINE__);
 
     length = str1.Length();
-    strptr = str1.Eject();
-    helper.NotEqual(strptr, nullptr, "Eject", "null", __LINE__);
+    strptr = str1.Detach();
+    helper.NotEqual(strptr, nullptr, "Detach", "null", __LINE__);
 
     str2 = String8(strptr, length); // Manage
     helper.Equal(str2.First(), strptr, "First()", "strptr", __LINE__);
@@ -114,7 +114,7 @@ static void TestString1(TestHelper &helper) {
 
     str1 = "A";
     helper.Equal(str1.Length(), 1U, "Length", __LINE__);
-    strptr = str1.Eject();
+    strptr = str1.Detach();
     helper.Equal(strptr[0], 'A', "strptr[0]", "A", __LINE__);
     Memory::Deallocate(strptr);
 
