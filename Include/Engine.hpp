@@ -44,11 +44,12 @@ class Engine {
      * Returns the (index+1) of a given character.
      */
     template <typename Char_T_, typename Number_T_>
-    static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content, Number_T_ offset,
-                             const Number_T_ end_offset) noexcept {
+    static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content, Number_T_ offset, const Number_T_ end_offset,
+                             Number_T_ full_length = 0) noexcept {
 #ifdef QENTEM_SIMD_ENABLED
         if (offset < end_offset) {
-            SizeT m_size = ((end_offset - offset) >> QENTEM_SIMD_SHIFT_SIZE);
+            Number_T_ m_size =
+                ((((full_length > end_offset) ? full_length : end_offset) - offset) >> QENTEM_SIMD_SHIFT_SIZE);
 
             if (m_size != 0) {
                 const QENTEM_SIMD_VAR m_char_1 = Platform::SMIDSetToOne(char_1);
@@ -59,14 +60,17 @@ class Engine {
                     const QENTEM_SIMD_NUMBER_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
 
                     if (bits != 0) {
-                        return (Platform::CTZ(bits) + offset);
+                        const Number_T_ simd_offset = (Platform::CTZ(bits) + offset);
+                        return ((simd_offset <= end_offset) ? simd_offset : 0);
                     }
 
                     offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
                     --m_size;
-                } while (m_size != 0);
+                } while ((m_size != 0) && (offset < end_offset));
             }
         }
+#else
+        (void)full_length;
 #endif
 
         while (offset < end_offset) {
@@ -82,17 +86,18 @@ class Engine {
 
     /*
      * Returns the (index+length) of a given pattern.
-     * pattern_length should be bigger than 1;
+     * 'pattern_length' should be bigger than 1;
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ Find(const Char_T_ *pattern, const SizeT pattern_length, const Char_T_ *content, Number_T_ offset,
-                          Number_T_ end_offset) noexcept {
+                          Number_T_ end_offset, Number_T_ full_length = 0) noexcept {
         if ((offset < end_offset) && ((offset + pattern_length) <= end_offset)) {
             const SizeT len_one_less = (pattern_length - 1);
             end_offset -= len_one_less;
 
 #ifdef QENTEM_SIMD_ENABLED
-            SizeT m_size = ((end_offset - offset) >> QENTEM_SIMD_SHIFT_SIZE);
+            Number_T_ m_size = ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
+                                QENTEM_SIMD_SHIFT_SIZE);
 
             if (m_size != 0) {
                 const Char_T_        *content_ofs     = (content + offset);
@@ -109,10 +114,14 @@ class Engine {
 
                     while (bits != 0) {
                         const Number_T_ index         = Platform::CTZ(bits) - 1;
-                        const Number_T_ pattern_index = (index + offset + pattern_length);
+                        const Number_T_ pattern_index = (index + offset);
 
-                        if ((len_one_less == 1) || StringUtils::IsEqual(pattern, (content_ofs + index), len_one_less)) {
-                            return pattern_index;
+                        if ((index + offset) > end_offset) {
+                            return 0;
+                        }
+
+                        if (StringUtils::IsEqual(pattern, (content_ofs + index), len_one_less)) {
+                            return (pattern_index + pattern_length);
                         }
 
                         bits ^= (QENTEM_SIMD_NUMBER_T{1} << index);
@@ -121,8 +130,10 @@ class Engine {
                     offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
                     content_ofs += Platform::SMIDNextOffset<Char_T_, Number_T_>();
                     --m_size;
-                } while (m_size != 0);
+                } while ((m_size != 0) && (offset < end_offset));
             }
+#else
+            (void)full_length;
 #endif
 
             while (offset < end_offset) {
@@ -149,19 +160,19 @@ class Engine {
      * If a search is about { ... }, and nest itself like:
      * {.{..{...}..}.}; then this function can skip inner brackets:
      *
-     * return SkipInnerPatterns("{", 1, "}", 1,
-     *                          content, offset, end_offset, max_end_before);
+     * return SkipInnerPatterns("{{", 2, "}}", 2, content, offset, end_offset, max_end_before, full_length);
      *
+     * 'prefix_length' and 'suffix_length' should be bigger than 1;
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ SkipInnerPatterns(const Char_T_ *prefix, SizeT prefix_length, const Char_T_ *suffix,
                                        SizeT suffix_length, const Char_T_ *content, Number_T_ offset,
-                                       const Number_T_ max_end_before) noexcept {
+                                       const Number_T_ max_end_before, Number_T_ full_length = 0) noexcept {
         Number_T_ offset2 = offset;
 
         while (true) {
-            offset2 = Find(suffix, suffix_length, content, offset2, max_end_before);
-            offset  = Find(prefix, prefix_length, content, offset, offset2);
+            offset2 = Find(suffix, suffix_length, content, offset2, max_end_before, full_length);
+            offset  = Find(prefix, prefix_length, content, offset, offset2, full_length);
 
             if (offset == 0) {
                 return offset2;
@@ -171,14 +182,23 @@ class Engine {
         return 0;
     }
 
+    /*
+     * If a search is about { ... }, and nest itself like:
+     * {.{..{...}..}.}; then this function can skip inner brackets:
+     *
+     * SkipInnerPatterns("{", "}", content, offset, end_offset, max_end_before, full_length);
+     *
+     */
+
     template <typename Char_T_, typename Number_T_>
     static Number_T_ SkipInnerPatterns(const Char_T_ prefix, const Char_T_ suffix, const Char_T_ *content,
-                                       Number_T_ offset, const Number_T_ max_end_before) noexcept {
+                                       Number_T_ offset, const Number_T_ max_end_before,
+                                       Number_T_ full_length = 0) noexcept {
         Number_T_ offset2 = offset;
 
         while (true) {
-            offset2 = FindOne(suffix, content, offset2, max_end_before);
-            offset  = FindOne(prefix, content, offset, offset2);
+            offset2 = FindOne(suffix, content, offset2, max_end_before, full_length);
+            offset  = FindOne(prefix, content, offset, offset2, full_length);
 
             if (offset == 0) {
                 return offset2;
