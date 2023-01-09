@@ -302,8 +302,16 @@ static void TestEngine2(TestHelper &helper) {
     ret = Engine::FindOne('1', "00000000000000000000000000000001", 0U, 32U);
     helper.Equal(ret, 32U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "0000000000000000000000000000000000000000000000000000000000000001", 0U, 64U);
-    helper.Equal(ret, 64U, "return", __LINE__);
+    content     = "ABC   ";
+    content_len = 6;
+
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    helper.Equal(ret, 3U, "return", __LINE__);
+
+    content = R"(<loop value="loop1-value">loop1-value, </loop>)";
+
+    ret = Engine::Find("loop1-value", SizeT{11}, content, SizeT{26}, SizeT{39}, SizeT{46});
+    helper.Equal(ret, 37U, "return", __LINE__);
 }
 
 static void TestEngine3(TestHelper &helper) {
