@@ -86,7 +86,7 @@ class Engine {
 
     /*
      * Returns the (index+length) of a given pattern.
-     * 'pattern_length' should be bigger than 1;
+     * 'pattern_length' should be greater than 1;
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ Find(const Char_T_ *pattern, const SizeT pattern_length, const Char_T_ *content, Number_T_ offset,
@@ -160,7 +160,7 @@ class Engine {
      *
      * SkipInnerPatterns("{{", 2, "}}", 2, content, offset, end_offset, full_length);
      *
-     * 'prefix_length' and 'suffix_length' should be bigger than 1;
+     * 'prefix_length' and 'suffix_length' should be greater than 1;
      */
     template <typename Char_T_, typename Number_T_>
     static Number_T_ SkipInnerPatterns(const Char_T_ *prefix, SizeT prefix_length, const Char_T_ *suffix,

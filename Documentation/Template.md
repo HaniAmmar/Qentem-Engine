@@ -135,8 +135,8 @@ Raw variable tag is the same as Variable tag, except it does not escape HTML spe
     -   || `Or`
     -   == `Equal`
     -   != `Not equal`
-    -   \> `Bigger than`
-    -   \>= `Bigger than or equal`
+    -   \> `Greater than`
+    -   \>= `Greater than or equal`
     -   < `Less than`
     -   <= `Less than or equal`
 
@@ -195,8 +195,8 @@ int main() {
     -   || `Or`
     -   == `Equal`
     -   != `Not equal`
-    -   \> `Bigger than`
-    -   \>= `Bigger than or equal`
+    -   \> `Greater than`
+    -   \>= `Greater than or equal`
     -   < `Less than`
     -   <= `Less than or equal`
 
@@ -260,8 +260,8 @@ With variables:
     -   || `Or`
     -   == `Equal`
     -   != `Not equal`
-    -   \> `Bigger than`
-    -   \>= `Bigger than or equal`
+    -   \> `Greater than`
+    -   \>= `Greater than or equal`
     -   < `Less than`
     -   <= `Less than or equal`
 
@@ -399,7 +399,7 @@ To force converting the variables to numbers, use parentheses: {math:({var:bool}
 -   Exponent. Remainder.
 -   Multiplication. Division.
 -   Addition. Subtraction.
--   Equal. Not Equal. Less than. Bigger than.
+-   Equal. Not Equal. Less than. Greater than.
 -   And. Or.
 
 ## Loop

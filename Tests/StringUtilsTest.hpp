@@ -502,7 +502,7 @@ static void TestIsEqual(TestHelper &helper) {
                        "IsEqual", __LINE__);
 }
 
-static void TestIsBigger(TestHelper &helper) {
+static void TestIsGreater(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsGreater("", "", 0U, 0U, true), "IsGreater", __LINE__);
     helper.EqualsTrue(StringUtils::IsGreater("b", "a", 1U, 1U, false), "IsGreater", __LINE__);
     helper.EqualsTrue(StringUtils::IsGreater("a", "a", 1U, 1U, true), "IsGreater", __LINE__);
@@ -598,7 +598,7 @@ static int RunStringUtilsTests() {
     helper.Test("TrimLeft Test", TestLeftTrim);
     helper.Test("Trim Test", TestSoftTrim);
     helper.Test("IsEqual Test", TestIsEqual);
-    helper.Test("IsGreater Test", TestIsBigger);
+    helper.Test("IsGreater Test", TestIsGreater);
     helper.Test("IsLess Test", TestIsLess);
 
     return helper.EndTests();
