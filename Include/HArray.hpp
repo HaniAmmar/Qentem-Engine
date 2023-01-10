@@ -83,15 +83,18 @@ class HArray {
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
-            HAItem_ *storage = Storage();
-            Memory::Dispose(storage, (storage + Size()));
-            Memory::Deallocate(getHashTable());
+            HAItem_    *storage = Storage();
+            SizeT      *ht      = getHashTable();
+            const SizeT size    = Size();
 
             setSize(src.Size());
             setCapacity(src.Capacity());
             src.setSize(0);
             src.setCapacity(0);
             hashTable_.MovePointerOnly(src.hashTable_);
+
+            Memory::Dispose(storage, (storage + size));
+            Memory::Deallocate(ht);
         }
 
         return *this;
@@ -99,14 +102,17 @@ class HArray {
 
     HArray &operator=(const HArray &src) {
         if (this != &src) {
-            HAItem_ *storage = Storage();
-            Memory::Dispose(storage, (storage + Size()));
-            Memory::Deallocate(getHashTable());
+            HAItem_    *storage = Storage();
+            SizeT      *ht      = getHashTable();
+            const SizeT size    = Size();
+
             setHashTable(nullptr);
             setCapacity(0);
             setSize(0);
-
             copyTable(src);
+
+            Memory::Dispose(storage, (storage + size));
+            Memory::Deallocate(ht);
         }
 
         return *this;

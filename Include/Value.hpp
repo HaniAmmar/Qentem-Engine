@@ -148,18 +148,23 @@ class Value {
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            if (!IsUndefined()) {
-                reset();
-            }
-
-            number_ = val.number_;
+            VNumber tmp = val.number_;
 
             if (Config::PointerTagging) {
                 val.number_.ClearAll();
             } else {
-                setType(val.Type());
                 val.setTypeToUndefined();
             }
+
+            if (!IsUndefined()) {
+                reset();
+            }
+
+            if (!Config::PointerTagging) {
+                val.setTypeToUndefined();
+            }
+
+            number_ = tmp;
         }
 
         return *this;
@@ -167,8 +172,10 @@ class Value {
 
     Value &operator=(const Value &val) {
         if (this != &val) {
-            if (Type() == val.Type()) {
-                switch (Type()) {
+            ValueType type = Type();
+
+            if (type == val.Type()) {
+                switch (type) {
                     case ValueType::Object: {
                         object_ = val.object_;
                         break;
@@ -1559,7 +1566,7 @@ class Value {
       public:
         VNumber() = default;
 
-        explicit VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, padding_{v_num.padding_} {}
+        VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, padding_{v_num.padding_} {}
         VNumber &operator=(const VNumber &v_num) {
             if (this != &v_num) {
                 number_  = v_num.number_;

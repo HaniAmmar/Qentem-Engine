@@ -58,15 +58,18 @@ class Array {
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
-            Type_ *storage = Storage();
-            Memory::Dispose(storage, (storage + Size()));
-            Memory::Deallocate(storage);
+            Type_      *storage = Storage();
+            const SizeT size    = Size();
 
             setSize(src.Size());
             setCapacity(src.Capacity());
             src.setSize(0);
             src.setCapacity(0);
             storage_.MovePointerOnly(src.storage_);
+
+            // Just in case the copied array is not a child array.
+            Memory::Dispose(storage, (storage + size));
+            Memory::Deallocate(storage);
         }
 
         return *this;
@@ -74,26 +77,21 @@ class Array {
 
     Array &operator=(const Array &src) {
         if (this != &src) {
-            Type_ *storage = Storage();
-            Memory::Dispose(storage, (storage + Size()));
-            Memory::Deallocate(storage);
+            Type_      *storage = Storage();
+            const SizeT size    = Size();
+
             setStorage(nullptr);
             setSize(0);
             setCapacity(src.Size());
-
             copyArray(src);
+
+            // Just in case the copied array is not a child array.
+            Memory::Dispose(storage, (storage + size));
+            Memory::Deallocate(storage);
         }
 
         return *this;
     }
-
-    // Type_ &operator[](SizeT index) const {
-    //     if (index < Size()) {
-    //         return Storage()[index];
-    //     }
-
-    //     throw 1; // Index out of range
-    // }
 
     void operator+=(Array &&src) {
         if (Capacity() == 0) {
