@@ -264,18 +264,18 @@ struct TestHelper {
 
     template <typename Char_T_>
     QENTEM_NOINLINE void PrintErrorMessage1(bool equal, const Char_T_ *name, unsigned long line) {
-        TestOutPut::Print(part_name_, TestOutPut::GetColor(TestOutPut::Colors::ERROR), " Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", file_fullname_, ":", line, ":\n`", name,
-                          "` should", (equal ? " not " : " "), "equal: `true`\n\n");
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n', file_fullname_, ":",
+                          line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `true`\n\n");
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE void PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
                                             const Value2_T_ &value2, unsigned long line) {
-        TestOutPut::Print(part_name_, TestOutPut::GetColor(TestOutPut::Colors::ERROR), " Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", file_fullname_, ":", line, ":\n`", name,
-                          "` should", (equal ? " not " : " "), "equal: `", value2, "`\n Returned Value: `", value1,
-                          "`\n\n");
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n', file_fullname_, ":",
+                          line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `", value2,
+                          "`\n Returned Value: `", value1, "`\n\n");
     }
 
     QENTEM_NOINLINE static void PrintInfo() {
