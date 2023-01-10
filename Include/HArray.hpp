@@ -514,7 +514,7 @@ class HArray {
         while (tmp != 0) {
             item = (storage + (tmp - 1));
 
-            if (item->Key.IsEqual(key, length)) {
+            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
                 return item;
             }
 
