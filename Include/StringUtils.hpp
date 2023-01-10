@@ -52,7 +52,7 @@ class StringUtils {
     }
 
     template <typename Char_T_, typename Number_T_>
-    static void TrimLeft(const Char_T_ *str, Number_T_ &offset, Number_T_ end_offset) noexcept {
+    static void TrimLeft(const Char_T_ *str, Number_T_ &offset, const Number_T_ end_offset) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         while (offset < end_offset) {
@@ -64,6 +64,24 @@ class StringUtils {
             }
 
             ++offset;
+        }
+    }
+
+    template <typename Char_T_, typename Number_T_>
+    static void TrimRight(const Char_T_ *str, const Number_T_ offset, Number_T_ &end_offset) noexcept {
+        using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
+
+        if (end_offset != offset) {
+            while (--end_offset > offset) {
+                const Char_T_ c = str[end_offset];
+
+                if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
+                    (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
+                    break;
+                }
+            }
+
+            ++end_offset;
         }
     }
 
