@@ -71,17 +71,18 @@ class StringUtils {
     static void TrimRight(const Char_T_ *str, const Number_T_ offset, Number_T_ &end_offset) noexcept {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
-        if (end_offset != offset) {
-            while (--end_offset > offset) {
+        if (end_offset > offset) {
+            do {
+                --end_offset;
                 const Char_T_ c = str[end_offset];
 
                 if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
                     (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
+                    ++end_offset;
                     break;
                 }
-            }
 
-            ++end_offset;
+            } while (end_offset > offset);
         }
     }
 
