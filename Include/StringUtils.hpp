@@ -56,11 +56,16 @@ class StringUtils {
         using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
 
         while (offset < end_offset) {
-            const Char_T_ c = str[offset];
+            switch (str[offset]) {
+                case WhiteSpaceChars_T_::SpaceChar:
+                case WhiteSpaceChars_T_::LineControlChar:
+                case WhiteSpaceChars_T_::TabControlChar:
+                case WhiteSpaceChars_T_::CarriageControlChar:
+                    break;
 
-            if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
-                (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
-                return;
+                default: {
+                    return;
+                }
             }
 
             ++offset;
@@ -74,12 +79,18 @@ class StringUtils {
         if (end_offset > offset) {
             do {
                 --end_offset;
-                const Char_T_ c = str[end_offset];
 
-                if ((c != WhiteSpaceChars_T_::SpaceChar) && (c != WhiteSpaceChars_T_::LineControlChar) &&
-                    (c != WhiteSpaceChars_T_::TabControlChar) && (c != WhiteSpaceChars_T_::CarriageControlChar)) {
-                    ++end_offset;
-                    break;
+                switch (str[end_offset]) {
+                    case WhiteSpaceChars_T_::SpaceChar:
+                    case WhiteSpaceChars_T_::LineControlChar:
+                    case WhiteSpaceChars_T_::TabControlChar:
+                    case WhiteSpaceChars_T_::CarriageControlChar:
+                        break;
+
+                    default: {
+                        ++end_offset;
+                        return;
+                    }
                 }
 
             } while (end_offset > offset);
