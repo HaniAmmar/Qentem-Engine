@@ -97,7 +97,7 @@ static void TestCount(TestHelper &helper) {
     helper.Equal(length, 63U, "length", __LINE__);
 }
 
-static void TestLeftTrim(TestHelper &helper) {
+static void TestTrimLeft(TestHelper &helper) {
     unsigned int offset = 0;
 
     StringUtils::TrimLeft("", offset, 0U);
@@ -234,7 +234,216 @@ static void TestLeftTrim(TestHelper &helper) {
     helper.Equal(offset, 2U, "offset", __LINE__);
 }
 
-static void TestSoftTrim(TestHelper &helper) {
+static void TestTrimRight(TestHelper &helper) {
+    unsigned int end_offset = 0;
+
+    StringUtils::TrimRight("", 0U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("", 1U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("", 10U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("a", 0U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("abc", 0U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("a ", 1U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("abc ", 4U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("a  ", 3U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("abc  ", 5U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("a   ", 4U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    StringUtils::TrimRight("abc   ", 6U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    end_offset = 2;
+    StringUtils::TrimRight("a ", 0U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight("abc ", 0U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("a  ", 0U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 5;
+    StringUtils::TrimRight("abc  ", 0U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight("a   ", 4U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight("a   ", 0U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight("abc   ", 6U, end_offset);
+    helper.Equal(end_offset, 6U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight("abc   ", 3U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight("abc   ", 2U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight("abc   ", 0U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 2;
+    StringUtils::TrimRight(" a", 0U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 2;
+    StringUtils::TrimRight(" a", 1U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 2;
+    StringUtils::TrimRight(" a", 2U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 1;
+    StringUtils::TrimRight(" a", 0U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    end_offset = 1;
+    StringUtils::TrimRight(" a", 1U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight(" abc", 0U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("  a", 0U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 5;
+    StringUtils::TrimRight("  abc", 0U, end_offset);
+    helper.Equal(end_offset, 5U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight("   a", 0U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   a", 0U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   a", 2U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   a", 1U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight("   abc", 0U, end_offset);
+    helper.Equal(end_offset, 6U, "end_offset", __LINE__);
+
+    end_offset = 5;
+    StringUtils::TrimRight("   abc", 0U, end_offset);
+    helper.Equal(end_offset, 5U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight("   abc", 0U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   abc", 0U, end_offset);
+    helper.Equal(end_offset, 0U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   abc", 1U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   abc", 2U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight(" a ", 0U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 5;
+    StringUtils::TrimRight(" abc ", 0U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight(" a  ", 4U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight(" abc  ", 0U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight("  a   ", 0U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 8;
+    StringUtils::TrimRight("  abc   ", 0U, end_offset);
+    helper.Equal(end_offset, 5U, "end_offset", __LINE__);
+
+    end_offset = 1;
+    StringUtils::TrimRight(" ", 1U, end_offset);
+    helper.Equal(end_offset, 1U, "end_offset", __LINE__);
+
+    end_offset = 2;
+    StringUtils::TrimRight("  ", 2U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight("   ", 3U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 3;
+    StringUtils::TrimRight(" a ", 3U, end_offset);
+    helper.Equal(end_offset, 3U, "end_offset", __LINE__);
+
+    end_offset = 5;
+    StringUtils::TrimRight(" abc ", 5U, end_offset);
+    helper.Equal(end_offset, 5U, "end_offset", __LINE__);
+
+    end_offset = 4;
+    StringUtils::TrimRight(" a  ", 4U, end_offset);
+    helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 6;
+    StringUtils::TrimRight(" abc  ", 6U, end_offset);
+    helper.Equal(end_offset, 6U, "end_offset", __LINE__);
+
+    end_offset = 7;
+    StringUtils::TrimRight("  a    ", 6U, end_offset);
+    helper.Equal(end_offset, 6U, "end_offset", __LINE__);
+
+    end_offset = 8;
+    StringUtils::TrimRight("  abc   ", 4U, end_offset);
+    helper.Equal(end_offset, 5U, "end_offset", __LINE__);
+}
+
+static void TestTrim(TestHelper &helper) {
     SizeT offset = 0;
     SizeT length = 0;
 
@@ -595,8 +804,9 @@ static int RunStringUtilsTests() {
 
     helper.Test("Hash Test", TestHash);
     helper.Test("Count Test", TestCount);
-    helper.Test("TrimLeft Test", TestLeftTrim);
-    helper.Test("Trim Test", TestSoftTrim);
+    helper.Test("TrimLeft Test", TestTrimLeft);
+    helper.Test("TrimLeft Test", TestTrimRight);
+    helper.Test("Trim Test", TestTrim);
     helper.Test("IsEqual Test", TestIsEqual);
     helper.Test("IsGreater Test", TestIsGreater);
     helper.Test("IsLess Test", TestIsLess);
