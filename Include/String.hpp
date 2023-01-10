@@ -38,7 +38,8 @@ namespace Qentem {
 template <typename Char_T_>
 class String {
   public:
-    static constexpr SizeT ShortStringMax = ((6 + (sizeof(void *))) / sizeof(Char_T_));
+    // Two numbers, and one pointer -2 for tagging bytes (see QPointer).
+    static constexpr SizeT ShortStringMax = (((sizeof(void *) - 2) + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
 
     String() = default;
 
@@ -220,8 +221,10 @@ class String {
             const SizeT len = Length();
 
             if (len < ShortStringMax) {
-                str = Memory::Allocate<Char_T_>(len + 1);
-                Memory::Copy(str, src, ((len + 1) * sizeof(Char_T_)));
+                const SizeT len2 = (len + 1);
+                str              = Memory::Allocate<Char_T_>(len2);
+                Memory::Copy(str, src, (len2 * sizeof(Char_T_)));
+                str[len] = '\0';
             } else {
                 str = src;
             }
@@ -279,31 +282,26 @@ class String {
     void Insert(const Char_T_ *str, const SizeT len) {
         if ((str != nullptr) && (len != 0)) {
             const SizeT src_len = Length();
-            const SizeT new_len = (src_len + len);
+            SizeT       new_len = (src_len + len) + 1;
             Char_T_    *src     = Storage();
             Char_T_    *ns;
 
             if (Config::ShortStringOptimization) {
-                Char_T_ n_src[ShortStringMax];
+                if (new_len > ShortStringMax) {
+                    ns = Memory::Allocate<Char_T_>(new_len);
 
-                if (src_len < ShortStringMax) {
-                    for (SizeT i = 0; i < src_len; i++) {
-                        n_src[i] = src[i];
+                    if (src != nullptr) {
+                        Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
+                        deallocate(src);
                     }
 
-                    src = &(n_src[0]);
-                }
+                    setStorage(ns);
 
-                ns = allocate(new_len + 1);
-
-                if (src != nullptr) {
-                    Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
-                    deallocate(src);
+                } else {
+                    ns = reinterpret_cast<Char_T_ *>(&padding_);
                 }
             } else {
-                // The else is not needeed, but its here to make gcc happy.
-                // and because this is a constexpr if, it wil not matter.
-                ns = allocate(new_len + 1);
+                ns = allocate(new_len);
 
                 if (src != nullptr) {
                     Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
@@ -312,6 +310,7 @@ class String {
             }
 
             Memory::Copy((ns + src_len), str, (len * sizeof(Char_T_)));
+            --new_len;
             ns[new_len] = 0;
             setLength(new_len);
         }
