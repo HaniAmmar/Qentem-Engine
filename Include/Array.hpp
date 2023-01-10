@@ -120,7 +120,24 @@ class Array {
         src.clearStorage();
     }
 
-    void operator+=(const Array &src) { addArray(src); }
+    void operator+=(const Array &src) {
+        const SizeT n_size = (Size() + src.Size());
+
+        if (n_size > Capacity()) {
+            resize(n_size);
+        }
+
+        index_ += src.Size();
+        Type_       *storage  = Storage();
+        const Type_ *src_item = src.First();
+        const Type_ *src_end  = (src_item + src.Size());
+
+        while (src_item < src_end) {
+            Memory::Initialize(storage, *src_item);
+            ++storage;
+            ++src_item;
+        }
+    }
 
     void operator+=(Type_ &&item) {
         if (Size() == Capacity()) {
@@ -143,7 +160,7 @@ class Array {
     }
 
     inline Array &Insert(const Array &src) {
-        addArray(src);
+        *this += static_cast<const Array &>(src);
         return *this;
     }
 
@@ -281,25 +298,6 @@ class Array {
         }
 
         Memory::Deallocate(src);
-    }
-
-    void addArray(const Array &src) {
-        const SizeT n_size = (Size() + src.Size());
-
-        if (n_size > Capacity()) {
-            resize(n_size);
-        }
-
-        index_ += src.Size();
-        Type_       *storage  = Storage();
-        const Type_ *src_item = src.First();
-        const Type_ *src_end  = (src_item + src.Size());
-
-        while (src_item < src_end) {
-            Memory::Initialize(storage, *src_item);
-            ++storage;
-            ++src_item;
-        }
     }
 
     void copyArray(const Array &src) {
