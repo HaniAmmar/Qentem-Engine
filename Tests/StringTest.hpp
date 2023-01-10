@@ -398,7 +398,7 @@ static void TestString2(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8U), "SimpleStream", __LINE__);
 }
 
-static void TestTrim(TestHelper &helper) {
+static void TestStringTrim(TestHelper &helper) {
     String8 str1("");
 
     str1 = String8::Trim(str1);
@@ -497,7 +497,7 @@ static int RunStringTests() {
     helper.Test("String Test 1", TestString1);
     helper.Test("String::Compare", TestStringCompare);
     helper.Test("String Test 2", TestString2);
-    helper.Test("String::Trim", TestTrim);
+    helper.Test("String::Trim", TestStringTrim);
 
     return helper.EndTests();
 }
