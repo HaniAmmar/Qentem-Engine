@@ -1263,7 +1263,7 @@ class Value {
 
     inline ValueType Type() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return static_cast<ValueType>(type_.Value.GetHighByte());
+        return static_cast<ValueType>(type_.Storage_.GetHighByte());
 #else
         return type_;
 #endif
@@ -1455,7 +1455,7 @@ class Value {
 
     inline void setType(ValueType new_type) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        type_.Value.SetHighByte(static_cast<unsigned char>(new_type));
+        type_.Storage_.SetHighByte(static_cast<unsigned char>(new_type));
 #else
         type_ = new_type;
 #endif
@@ -1567,11 +1567,11 @@ class Value {
       public:
         VNumber() = default;
 
-        VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, padding_{v_num.padding_} {}
+        VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {}
         VNumber &operator=(const VNumber &v_num) {
             if (this != &v_num) {
-                number_  = v_num.number_;
-                padding_ = v_num.padding_;
+                number_   = v_num.number_;
+                p_number_ = v_num.p_number_;
             }
 
             return *this;
@@ -1589,7 +1589,7 @@ class Value {
         inline void ClearAll() noexcept {
             if (Config::PointerTagging) {
                 number_.ull = 0;
-                padding_    = nullptr;
+                p_number_   = 0;
             }
         }
 
@@ -1603,31 +1603,31 @@ class Value {
             unsigned long long ull;
             long long          sll;
             double             ddl;
-            SizeT              padding_[2]{0, 0}; // Just in case SizeT is set to long
+            SizeT              padding_[2]{0}; // Just in case SizeT is set to long
         };
 
 #ifndef QENTEM_BIG_ENDIAN
-        Number_T_   number_;
-        const void *padding_{nullptr};
+        Number_T_          number_{};
+        unsigned long long p_number_{0};
 #else
-        const void *padding_{nullptr};
-        Number_T_   number_;
+        unsigned long long p_number_{0};
+        Number_T_          number_{};
 #endif
     };
 
-    struct VType_ {
+    struct TagType {
 #ifndef QENTEM_BIG_ENDIAN
       private:
-        SizeT padding_[2]{0, 0};
+        SizeT index_capacity_[2]{0};
 
       public:
-        QPointer<void> Value{};
+        QPointer<void> Storage_{};
 #else
       public:
-        QPointer<void> Value{};
+        QPointer<void> Storage_{};
 
       private:
-        SizeT padding_[2]{0, 0};
+        SizeT index_capacity_[2]{0};
 #endif
     };
 
@@ -1637,12 +1637,11 @@ class Value {
         VString string_;
         VNumber number_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        VType_ type_;
+        TagType type_;
+#endif
     };
 
-#else
-    };
-
+#if !defined(QENTEM_POINTER_TAGGING) || (QENTEM_POINTER_TAGGING != 1)
     ValueType type_{ValueType::Undefined};
 #endif
 };
