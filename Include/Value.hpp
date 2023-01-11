@@ -148,7 +148,8 @@ class Value {
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            VNumber tmp = val.number_;
+            VNumber         tmp    = val.number_;
+            const ValueType t_type = val.Type();
 
             if (Config::PointerTagging) {
                 val.number_.ClearAll();
@@ -161,7 +162,7 @@ class Value {
             }
 
             if (!Config::PointerTagging) {
-                val.setTypeToUndefined();
+                setType(t_type);
             }
 
             number_ = tmp;
