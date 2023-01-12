@@ -216,6 +216,18 @@ static void TestEvaluate1(TestHelper &helper) {
     content  = "(()) (()()) ((()())())";
     is_valid = Template::Evaluate(number, content, value);
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    content  = "3()";
+    is_valid = Template::Evaluate(number, content, value);
+    helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    content  = "3(1)";
+    is_valid = Template::Evaluate(number, content, value);
+    helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    content  = "3(1+1)";
+    is_valid = Template::Evaluate(number, content, value);
+    helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 }
 
 static void TestEvaluate2(TestHelper &helper) {
@@ -2806,6 +2818,18 @@ static void TestEvaluate11(TestHelper &helper) {
         1 - -1 + 2 == ((5/5+1)*2+1)+3*3)";
     number  = Template::Evaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
+
+    content = R"(2*3^2+5)";
+    number  = Template::Evaluate(content, value);
+    helper.Equal(number, 23, "number", __LINE__);
+
+    content = R"(5+3^2*2)";
+    number  = Template::Evaluate(content, value);
+    helper.Equal(number, 23, "number", __LINE__);
+
+    content = R"(((((((((2+2*2^3)))))))))";
+    number  = Template::Evaluate(content, value);
+    helper.Equal(number, 18, "number", __LINE__);
 }
 
 static void TestEvaluate12(TestHelper &helper) {
