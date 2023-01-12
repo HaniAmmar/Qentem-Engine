@@ -1726,9 +1726,8 @@ struct TemplateSub {
                 return false;
             }
 
-            case QOperation::NoOp:
-            case QOperation::Error: {
-                return false;
+            default: {
+                // It will not reach this.
             }
         }
 
