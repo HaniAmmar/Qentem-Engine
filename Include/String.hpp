@@ -110,19 +110,19 @@ class String {
     }
 
     String &operator+=(String &&src) {
-        Insert(src.First(), src.Length());
+        Write(src.First(), src.Length());
         src.Reset();
 
         return *this;
     }
 
     String &operator+=(const String &src) {
-        Insert(src.First(), src.Length());
+        Write(src.First(), src.Length());
         return *this;
     }
 
     String &operator+=(const Char_T_ *str) {
-        Insert(str, StringUtils::Count(str));
+        Write(str, StringUtils::Count(str));
         return *this;
     }
 
@@ -279,7 +279,7 @@ class String {
         return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
 
-    void Insert(const Char_T_ *str, const SizeT len) {
+    void Write(const Char_T_ *str, const SizeT len) {
         if ((str != nullptr) && (len != 0)) {
             const SizeT src_len = Length();
             SizeT       new_len = (src_len + len) + 1;

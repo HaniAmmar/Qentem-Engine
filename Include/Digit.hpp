@@ -461,7 +461,7 @@ class Digit {
          */
 
         intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-        stream.Insert(&(storage[offset]), (Config::IntMaxLength - offset));
+        stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
     template <typename Stream_T_>
@@ -494,7 +494,7 @@ class Digit {
             storage[offset] = DigitChars::NegativeChar;
         }
 
-        stream.Insert(&(storage[offset]), (Config::IntMaxLength - offset));
+        stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
     template <typename String_T_>

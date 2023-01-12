@@ -900,36 +900,36 @@ struct TemplateSub {
         while (index < length) {
             switch (str[index]) {
                 case '&': {
-                    stream->Insert((str + offset), (index - offset));
-                    stream->Insert(TemplatePatterns::HTMLAnd, TemplatePatterns::HTMLAndLength);
+                    stream->Write((str + offset), (index - offset));
+                    stream->Write(TemplatePatterns::HTMLAnd, TemplatePatterns::HTMLAndLength);
                     offset = (++index);
                     break;
                 }
 
                 case '<': {
-                    stream->Insert((str + offset), (index - offset));
-                    stream->Insert(TemplatePatterns::HTMLLess, TemplatePatterns::HTMLLessLength);
+                    stream->Write((str + offset), (index - offset));
+                    stream->Write(TemplatePatterns::HTMLLess, TemplatePatterns::HTMLLessLength);
                     offset = (++index);
                     break;
                 }
 
                 case '>': {
-                    stream->Insert((str + offset), (index - offset));
-                    stream->Insert(TemplatePatterns::HTMLGreater, TemplatePatterns::HTMLGreaterLength);
+                    stream->Write((str + offset), (index - offset));
+                    stream->Write(TemplatePatterns::HTMLGreater, TemplatePatterns::HTMLGreaterLength);
                     offset = (++index);
                     break;
                 }
 
                 case '"': {
-                    stream->Insert((str + offset), (index - offset));
-                    stream->Insert(TemplatePatterns::HTMLQuote, TemplatePatterns::HTMLQuoteLength);
+                    stream->Write((str + offset), (index - offset));
+                    stream->Write(TemplatePatterns::HTMLQuote, TemplatePatterns::HTMLQuoteLength);
                     offset = (++index);
                     break;
                 }
 
                 case '\'': {
-                    stream->Insert((str + offset), (index - offset));
-                    stream->Insert(TemplatePatterns::HTMLSingleQuote, TemplatePatterns::HTMLSingleQuoteLength);
+                    stream->Write((str + offset), (index - offset));
+                    stream->Write(TemplatePatterns::HTMLSingleQuote, TemplatePatterns::HTMLSingleQuoteLength);
                     offset = (++index);
                     break;
                 }
@@ -940,7 +940,7 @@ struct TemplateSub {
             }
         }
 
-        stream->Insert((str + offset), (length - offset));
+        stream->Write((str + offset), (length - offset));
     }
 
     void renderVariable(const TagBit *tag) const {
@@ -967,13 +967,13 @@ struct TemplateSub {
                 if (Config::AutoEscapeHTML) {
                     escapeHTMLSpecialChars(stream_, loop_key_, loop_key_length_);
                 } else {
-                    stream_->Insert(loop_key_, loop_key_length_);
+                    stream_->Write(loop_key_, loop_key_length_);
                 }
             }
         }
 
         if (*content != TemplatePatterns::TildeChar) {
-            stream_->Insert(
+            stream_->Write(
                 (content - TemplatePatterns::VariablePrefixLength),
                 (i_tag->Length + TemplatePatterns::VariablePrefixLength + TemplatePatterns::InLineSuffixLength));
         }
@@ -989,8 +989,8 @@ struct TemplateSub {
         }
 
         if (*content != TemplatePatterns::TildeChar) {
-            stream_->Insert((content - TemplatePatterns::RawVariablePrefixLength),
-                            (i_tag->Length + TemplatePatterns::RawVariableFulllength));
+            stream_->Write((content - TemplatePatterns::RawVariablePrefixLength),
+                           (i_tag->Length + TemplatePatterns::RawVariableFulllength));
         }
     }
 
@@ -1001,9 +1001,9 @@ struct TemplateSub {
         if (i_tag->Expresions.IsNotEmpty() && evaluateExpressions(number, i_tag->Expresions)) {
             Digit<Char_T_>::NumberToString(*stream_, number.Number.Real, 1, 0, 3);
         } else {
-            stream_->Insert(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
-                            ((i_tag->EndOffset - i_tag->Offset) + TemplatePatterns::MathPrefixLength +
-                             TemplatePatterns::InLineSuffixLength));
+            stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
+                           ((i_tag->EndOffset - i_tag->Offset) + TemplatePatterns::MathPrefixLength +
+                            TemplatePatterns::InLineSuffixLength));
         }
     }
 
@@ -1122,7 +1122,7 @@ struct TemplateSub {
         }
     }
 
-    void renderRawText(const TagBit *tag) const { stream_->Insert((content_ + tag->GetOffset()), tag->GetLength()); }
+    void renderRawText(const TagBit *tag) const { stream_->Write((content_ + tag->GetOffset()), tag->GetLength()); }
 
     void parseVariableTag(SizeT offset, SizeT end_offset, VariableTag *tag) const {
         tag->Offset = offset;
@@ -1240,8 +1240,8 @@ struct TemplateSub {
                     break;
                 }
 
-                tag->SubTemplate.Insert((content_ + previous_offset), ((offset - loop_value_length) - previous_offset));
-                tag->SubTemplate.Insert(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength);
+                tag->SubTemplate.Write((content_ + previous_offset), ((offset - loop_value_length) - previous_offset));
+                tag->SubTemplate.Write(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength);
 
                 Char_T_ *buffer = tag->SubTemplate.Buffer(level_ + 1);
                 SizeT    lvl    = level_;
@@ -1273,7 +1273,7 @@ struct TemplateSub {
                 }
 
                 if ((content_[(sub_offset - 1)] == TemplatePatterns::VariableIndexSuffix)) {
-                    tag->SubTemplate.Insert((content_ + offset), (sub_offset - offset));
+                    tag->SubTemplate.Write((content_ + offset), (sub_offset - offset));
                 }
 
                 previous_offset = sub_offset;
@@ -1281,7 +1281,7 @@ struct TemplateSub {
             }
         }
 
-        tag->SubTemplate.Insert((content_ + previous_offset), (end_offset - previous_offset));
+        tag->SubTemplate.Write((content_ + previous_offset), (end_offset - previous_offset));
 
         TemplateSub loop_template{
             tag->SubTemplate.First(), tag->SubTemplate.Length(), nullptr, nullptr, nullptr, (level_ + 1)};

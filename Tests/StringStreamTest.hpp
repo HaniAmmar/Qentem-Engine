@@ -147,22 +147,22 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss2.First()[2], 'g', "First()[0]", __LINE__);
 
     ss2.Reset();
-    ss2.Insert("a", 1);
+    ss2.Write("a", 1);
     helper.Equal(ss2.Length(), 1U, "Length", __LINE__);
     helper.EqualsTrue((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)", __LINE__);
     helper.EqualsTrue((ss2.Capacity() >= 1), "(ss2.Capacity() >= 1)", __LINE__);
     helper.NotEqual(ss2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(ss2.First()[0], 'a', "First()[0]", __LINE__);
 
-    ss2.Insert("bc", 2);
+    ss2.Write("bc", 2);
     helper.Equal(ss2.Length(), 3U, "Length", __LINE__);
     helper.EqualsTrue((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)", __LINE__);
     helper.Equal(ss2, "abc", "StringStream", __LINE__);
     ss2.Reset();
 
-    ss2.Insert("abcdef", 1);
-    ss2.Insert("bcdef", 1);
-    ss2.Insert("cdef", 1);
+    ss2.Write("abcdef", 1);
+    ss2.Write("bcdef", 1);
+    ss2.Write("cdef", 1);
 
     char      *e_str    = ss2.Detach();
     const bool is_equal = StringUtils::IsEqual(e_str, "abc", 3);

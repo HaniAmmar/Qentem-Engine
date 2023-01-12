@@ -240,19 +240,19 @@ static void TestString2(TestHelper &helper) {
     String8 str1;
     String8 str2;
 
-    str1.Insert("a", 1U);
+    str1.Write("a", 1U);
     helper.Equal(str1.Length(), 1U, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
     helper.Equal(str1, "a", "str1", __LINE__);
 
-    str1.Insert("bc", 2U);
+    str1.Write("bc", 2U);
     helper.Equal(str1.Length(), 3U, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
     helper.Equal(str1, "abc", "str1", __LINE__);
 
-    str1.Insert("", 0U);
+    str1.Write("", 0U);
     helper.Equal(str1.Length(), 3U, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);

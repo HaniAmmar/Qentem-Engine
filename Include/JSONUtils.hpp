@@ -43,7 +43,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
         switch (content[offset]) {
             case JSONotation::BSlashChar: {
                 if (offset > offset2) {
-                    stream.Insert((content + offset2), (offset - offset2));
+                    stream.Write((content + offset2), (offset - offset2));
                 }
 
                 ++offset;
@@ -124,7 +124,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
 
             case JSONotation::QuoteChar: {
                 if (stream.IsNotEmpty()) {
-                    stream.Insert((content + offset2), (offset - offset2));
+                    stream.Write((content + offset2), (offset - offset2));
                 }
 
                 ++offset;
@@ -145,7 +145,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
     }
 
     if (stream.IsNotEmpty()) {
-        stream.Insert((content + offset2), (offset - offset2));
+        stream.Write((content + offset2), (offset - offset2));
     }
 
     return offset;
@@ -169,7 +169,7 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) 
             case JSONotation::CarriageControlChar:
             case JSONotation::TabControlChar: {
                 if (offset > offset2) {
-                    stream.Insert((content + offset2), (offset - offset2));
+                    stream.Write((content + offset2), (offset - offset2));
                 }
 
                 stream += JSONotation::BSlashChar;
@@ -230,7 +230,7 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) 
         ++offset;
     }
 
-    stream.Insert((content + offset2), (offset - offset2));
+    stream.Write((content + offset2), (offset - offset2));
 }
 
 template <typename Char_T_, int S>

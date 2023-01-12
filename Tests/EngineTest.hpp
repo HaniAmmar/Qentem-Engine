@@ -954,7 +954,7 @@ static void to_JSON(StringStream<char> &stream, const Array<Item2Engine> &items,
 
     for (SizeT i = 0; i < items.Size(); i++) {
         stream += '"';
-        stream.Insert((content + storage[i].Offset), storage[i].Length);
+        stream.Write((content + storage[i].Offset), storage[i].Length);
         stream += "\":{";
 
         stream += "\"O\":";

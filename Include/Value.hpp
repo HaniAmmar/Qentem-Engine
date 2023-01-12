@@ -1016,7 +1016,7 @@ class Value {
     bool CopyStringValueTo(StringStream_T_ &stream) const {
         switch (Type()) {
             case ValueType::String: {
-                stream.Insert(string_.First(), string_.Length());
+                stream.Write(string_.First(), string_.Length());
                 break;
             }
 
@@ -1036,17 +1036,17 @@ class Value {
             }
 
             case ValueType::True: {
-                stream.Insert(JSONotation::TrueString, JSONotation::TrueStringLength);
+                stream.Write(JSONotation::TrueString, JSONotation::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                stream.Insert(JSONotation::FalseString, JSONotation::FalseStringLength);
+                stream.Write(JSONotation::FalseString, JSONotation::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Insert(JSONotation::NullString, JSONotation::NullStringLength);
+                stream.Write(JSONotation::NullString, JSONotation::NullStringLength);
                 break;
             }
 
@@ -1433,17 +1433,17 @@ class Value {
             }
 
             case ValueType::False: {
-                stream.Insert(JSONotation::FalseString, JSONotation::FalseStringLength);
+                stream.Write(JSONotation::FalseString, JSONotation::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                stream.Insert(JSONotation::TrueString, JSONotation::TrueStringLength);
+                stream.Write(JSONotation::TrueString, JSONotation::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Insert(JSONotation::NullString, JSONotation::NullStringLength);
+                stream.Write(JSONotation::NullString, JSONotation::NullStringLength);
                 break;
             }
 

@@ -54,7 +54,7 @@ class StringStream {
     StringStream(const StringStream &src) {
         if (src.Length() != 0) {
             allocate(src.Length());
-            insert(src.First(), src.Length());
+            write(src.First(), src.Length());
         }
     }
 
@@ -79,7 +79,7 @@ class StringStream {
             setCapacity(0);
             Memory::Deallocate(Storage());
             clearStorage();
-            Insert(src.First(), src.Length());
+            write(src.First(), src.Length());
         }
 
         return *this;
@@ -90,7 +90,7 @@ class StringStream {
         setCapacity(0);
         Memory::Deallocate(Storage());
         clearStorage();
-        insert(str, StringUtils::Count(str));
+        write(str, StringUtils::Count(str));
 
         return *this;
     }
@@ -100,7 +100,7 @@ class StringStream {
         setCapacity(0);
         Memory::Deallocate(Storage());
         clearStorage();
-        insert(src.First(), src.Length());
+        write(src.First(), src.Length());
 
         return *this;
     }
@@ -120,9 +120,9 @@ class StringStream {
         ++length_;
     }
 
-    inline void operator+=(const StringStream<Char_T_> &src) { insert(src.First(), src.Length()); }
-    inline void operator+=(const String<Char_T_> &src) { insert(src.First(), src.Length()); }
-    inline void operator+=(const Char_T_ *str) { insert(str, StringUtils::Count(str)); }
+    inline void operator+=(const StringStream<Char_T_> &src) { write(src.First(), src.Length()); }
+    inline void operator+=(const String<Char_T_> &src) { write(src.First(), src.Length()); }
+    inline void operator+=(const Char_T_ *str) { write(str, StringUtils::Count(str)); }
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const StringStream &src) {
@@ -141,12 +141,12 @@ class StringStream {
     }
 
     friend StringStream &operator<<(StringStream &out, const StringStream &src) {
-        out.insert(src.First(), src.Length());
+        out.write(src.First(), src.Length());
         return out;
     }
 
     friend StringStream &operator<<(StringStream &out, const String<Char_T_> &src) {
-        out.insert(src.First(), src.Length());
+        out.write(src.First(), src.Length());
         return out;
     }
 
@@ -156,7 +156,7 @@ class StringStream {
     }
 
     friend StringStream &operator<<(StringStream &out, const Char_T_ *str) {
-        out.insert(str, StringUtils::Count(str));
+        out.write(str, StringUtils::Count(str));
         return out;
     }
 
@@ -197,7 +197,7 @@ class StringStream {
     inline bool operator!=(const StringStream &stream) const noexcept { return (!(*this == stream)); }
     inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
     inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
-    inline void Insert(const Char_T_ *str, const SizeT length) { insert(str, length); }
+    inline void Write(const Char_T_ *str, const SizeT length) { write(str, length); }
     inline void Clear() noexcept { setLength(0); }
 
     void Reset() noexcept {
@@ -285,7 +285,7 @@ class StringStream {
         setStorage(Memory::Allocate<Char_T_>(size));
     }
 
-    void insert(const Char_T_ *str, const SizeT len) {
+    void write(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
             const SizeT current_offset = Length();
             length_ += len;
