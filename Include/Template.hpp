@@ -482,8 +482,8 @@ struct Template {
         }
 
         TagBit(TagType type, SizeT offset, SizeT length_) : type_{type} {
-            content_.offset  = offset;
-            content_.length_ = length_;
+            content_.offset  = static_cast<unsigned int>(offset);
+            content_.length_ = static_cast<unsigned int>(length_);
         }
 
         ~TagBit() {
@@ -1736,12 +1736,12 @@ struct TemplateSub {
     }
 
     bool isEqual(bool &result, QExpresion &left, QExpresion &right) const noexcept {
-        const Value_T_ *left_value  = nullptr;
-        const Value_T_ *right_value = nullptr;
-        const Char_T_  *left_content;
-        const Char_T_  *right_content;
-        SizeT           left_length;
-        SizeT           right_length;
+        const Value_T_ *left_value    = nullptr;
+        const Value_T_ *right_value   = nullptr;
+        const Char_T_  *left_content  = nullptr;
+        const Char_T_  *right_content = nullptr;
+        SizeT           left_length   = 0;
+        SizeT           right_length  = 0;
         bool            left_is_a_number;
         bool            right_is_a_number;
 
