@@ -35,9 +35,9 @@ enum class ValueType : unsigned char {
     Object,
     Array,
     String,
-    UInt64, // unsigned long long
-    Int64,  //          long long
-    Double, //          double
+    UIntLong, // unsigned long long
+    IntLong,  //          long long
+    Double,   //          double
     True,
     False,
     Null
@@ -192,8 +192,8 @@ class Value {
                         break;
                     }
 
-                    case ValueType::UInt64:
-                    case ValueType::Int64:
+                    case ValueType::UIntLong:
+                    case ValueType::IntLong:
                     case ValueType::Double: {
                         number_ = val.number_;
                         break;
@@ -536,11 +536,11 @@ class Value {
                     return (string_ < val.string_);
                 }
 
-                case ValueType::UInt64: {
+                case ValueType::UIntLong: {
                     return (number_.GetUInt64() < val.number_.GetUInt64());
                 }
 
-                case ValueType::Int64: {
+                case ValueType::IntLong: {
                     return (number_.GetInt64() < val.number_.GetInt64());
                 }
 
@@ -577,11 +577,11 @@ class Value {
                     return (string_ > val.string_);
                 }
 
-                case ValueType::UInt64: {
+                case ValueType::UIntLong: {
                     return (number_.GetUInt64() > val.number_.GetUInt64());
                 }
 
-                case ValueType::Int64: {
+                case ValueType::IntLong: {
                     return (number_.GetInt64() > val.number_.GetInt64());
                 }
 
@@ -618,11 +618,11 @@ class Value {
                     return (string_ <= val.string_);
                 }
 
-                case ValueType::UInt64: {
+                case ValueType::UIntLong: {
                     return (number_.GetUInt64() <= val.number_.GetUInt64());
                 }
 
-                case ValueType::Int64: {
+                case ValueType::IntLong: {
                     return (number_.GetInt64() <= val.number_.GetInt64());
                 }
 
@@ -659,11 +659,11 @@ class Value {
                     return (string_ >= val.string_);
                 }
 
-                case ValueType::UInt64: {
+                case ValueType::UIntLong: {
                     return (number_.GetUInt64() >= val.number_.GetUInt64());
                 }
 
-                case ValueType::Int64: {
+                case ValueType::IntLong: {
                     return (number_.GetInt64() >= val.number_.GetInt64());
                 }
 
@@ -700,11 +700,11 @@ class Value {
                     return (string_ == val.string_);
                 }
 
-                case ValueType::UInt64: {
+                case ValueType::UIntLong: {
                     return (number_.GetUInt64() == val.number_.GetUInt64());
                 }
 
-                case ValueType::Int64: {
+                case ValueType::IntLong: {
                     return (number_.GetInt64() == val.number_.GetInt64());
                 }
 
@@ -726,8 +726,8 @@ class Value {
 
     inline bool IsNumber() const noexcept {
         switch (Type()) {
-            case ValueType::UInt64:
-            case ValueType::Int64:
+            case ValueType::UIntLong:
+            case ValueType::IntLong:
             case ValueType::Double: {
                 return true;
                 break;
@@ -743,8 +743,8 @@ class Value {
     inline bool IsObject() const noexcept { return (Type() == ValueType::Object); }
     inline bool IsArray() const noexcept { return (Type() == ValueType::Array); }
     inline bool IsString() const noexcept { return (Type() == ValueType::String); }
-    inline bool IsUInt64() const noexcept { return (Type() == ValueType::UInt64); }
-    inline bool IsInt64() const noexcept { return (Type() == ValueType::Int64); }
+    inline bool IsUInt64() const noexcept { return (Type() == ValueType::UIntLong); }
+    inline bool IsInt64() const noexcept { return (Type() == ValueType::IntLong); }
     inline bool IsDouble() const noexcept { return (Type() == ValueType::Double); }
     inline bool IsTrue() const noexcept { return (Type() == ValueType::True); }
     inline bool IsFalse() const noexcept { return (Type() == ValueType::False); }
@@ -975,12 +975,12 @@ class Value {
                 break;
             }
 
-            case ValueType::UInt64: {
+            case ValueType::UIntLong: {
                 value = Digit<Char_T_>::NumberToString(number_.GetUInt64());
                 break;
             }
 
-            case ValueType::Int64: {
+            case ValueType::IntLong: {
                 value = Digit<Char_T_>::NumberToString(number_.GetInt64());
                 break;
             }
@@ -1021,12 +1021,12 @@ class Value {
                 break;
             }
 
-            case ValueType::UInt64: {
+            case ValueType::UIntLong: {
                 Digit<Char_T_>::NumberToString(stream, number_.GetUInt64());
                 break;
             }
 
-            case ValueType::Int64: {
+            case ValueType::IntLong: {
                 Digit<Char_T_>::NumberToString(stream, number_.GetInt64());
                 break;
             }
@@ -1097,12 +1097,12 @@ class Value {
     template <typename Number_T_>
     bool SetNumber(Number_T_ &value) const noexcept {
         switch (Type()) {
-            case ValueType::UInt64: {
+            case ValueType::UIntLong: {
                 value = static_cast<Number_T_>(number_.GetUInt64());
                 return true;
             }
 
-            case ValueType::Int64: {
+            case ValueType::IntLong: {
                 value = static_cast<Number_T_>(number_.GetInt64());
                 return true;
             }
@@ -1152,12 +1152,12 @@ class Value {
                 return true;
             }
 
-            case ValueType::UInt64: {
+            case ValueType::UIntLong: {
                 value = (number_.GetUInt64() > 0);
                 return true;
             }
 
-            case ValueType::Int64: {
+            case ValueType::IntLong: {
                 value = (number_.GetInt64() > 0);
                 return true;
             }
@@ -1418,12 +1418,12 @@ class Value {
                 break;
             }
 
-            case ValueType::UInt64: {
+            case ValueType::UIntLong: {
                 Digit<Char_T_>::NumberToString(stream, val.number_.GetUInt64());
                 break;
             }
 
-            case ValueType::Int64: {
+            case ValueType::IntLong: {
                 Digit<Char_T_>::NumberToString(stream, val.number_.GetInt64());
                 break;
             }
@@ -1465,8 +1465,8 @@ class Value {
     inline void setTypeToObject() noexcept { setType(ValueType::Object); }
     inline void setTypeToArray() noexcept { setType(ValueType::Array); }
     inline void setTypeToString() noexcept { setType(ValueType::String); }
-    inline void setTypeToUInt64() noexcept { setType(ValueType::UInt64); }
-    inline void setTypeToInt64() noexcept { setType(ValueType::Int64); }
+    inline void setTypeToUInt64() noexcept { setType(ValueType::UIntLong); }
+    inline void setTypeToInt64() noexcept { setType(ValueType::IntLong); }
     inline void setTypeToDouble() noexcept { setType(ValueType::Double); }
     inline void setTypeToTrue() noexcept { setType(ValueType::True); }
     inline void setTypeToFalse() noexcept { setType(ValueType::False); }

@@ -46,11 +46,11 @@ static const char *GetTypeString(ValueType type) noexcept {
         case ValueType::String:
             return "String";
 
-        case ValueType::UInt64:
-            return "UInt64";
+        case ValueType::UIntLong:
+            return "UIntLong";
 
-        case ValueType::Int64:
-            return "Int64";
+        case ValueType::IntLong:
+            return "IntLong";
 
         case ValueType::Double:
             return "Double";
@@ -74,8 +74,8 @@ static void TestGetTypeString(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Object), "Object", 6), "Object", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Array), "Array", 5), "Array", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::String), "String", 6), "String", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::UInt64), "UInt64", 6), "UInt64", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Int64), "Int64", 5), "Int64", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::UIntLong), "UIntLong", 6), "UIntLong", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::IntLong), "IntLong", 5), "IntLong", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Double), "Double", 6), "Double", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::True), "True", 4), "True", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::False), "False", 5), "False", __LINE__);
@@ -132,11 +132,11 @@ static void TestEmptyValue(TestHelper &helper) {
     value1 = ValueC{ValueType::String};
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
 
-    value1 = ValueC{ValueType::UInt64};
+    value1 = ValueC{ValueType::UIntLong};
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
 
-    value1 = ValueC{ValueType::Int64};
+    value1 = ValueC{ValueType::IntLong};
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
 
@@ -451,7 +451,7 @@ static void TestNumberValue2(TestHelper &helper) {
     /////////////////// unsigned
 
     value1 = ValueC{vu_short{10}};
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::UInt64), "Type()", __LINE__);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::UIntLong), "Type()", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
@@ -528,7 +528,7 @@ static void TestNumberValue3(TestHelper &helper) {
     /////////////////// signed
 
     value1 = ValueC{short{-10}};
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Int64), "Type()", __LINE__);
+    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::IntLong), "Type()", __LINE__);
     helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
