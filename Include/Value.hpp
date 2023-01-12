@@ -730,12 +730,11 @@ class Value {
             case ValueType::IntLong:
             case ValueType::Double: {
                 return true;
-                break;
             }
 
             default: {
                 return false;
-            } break;
+            }
         }
     }
 
