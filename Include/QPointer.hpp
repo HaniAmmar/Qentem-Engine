@@ -59,7 +59,7 @@ class QPointer {
     Type_T_ *GetPointer() const noexcept {
         if (Config::PointerTagging) {
             return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
-        } else {
+        } else { // Its OK to use 'else' after return here; because Config::PointerTagging is constexpr
             return pointer_;
         }
     }
