@@ -177,10 +177,10 @@ template <typename, typename, typename>
 struct TemplateSub;
 
 template <typename>
-struct ALEExpressions_T_;
+struct TemplatePatterns_T_;
 
 template <typename>
-struct TemplatePatterns_T_;
+struct QOperationSymbol_T_;
 
 struct Template {
     Template()                            = delete;
@@ -193,13 +193,11 @@ struct Template {
     template <typename>
     struct TagBit;
 
-    union ALENumber;
-
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &value,
                                     StringStream_T_ &stream, const Char_T_ *name, const SizeT name_length) {
         // This is not a thread safe function, and its here to show how to cache geterated tags.
-        // cab be used in single threaded prosesses, but it is better to change it.
+        // Can be used in a single threaded prosess, but it is better to change it.
 
         // Usage:
         // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
@@ -262,12 +260,11 @@ struct Template {
         StringStream_T_     stream;
         const SizeT         length = StringUtils::Count(content);
         const TemplateSubCV temp{content, length, &stream, &value};
-        ALENumber           num;
+        Array<QExpresion>   exprs = temp.parseExpressions(0, length);
+        QExpresion          expr;
 
-        bool ret = temp.evaluate(num, 0, length);
-
-        if (ret) {
-            number = num.Number;
+        if (exprs.IsNotEmpty() && temp.evaluateExpressions(expr, exprs)) {
+            number = expr.Number.Real;
             return true;
         }
 
@@ -283,17 +280,92 @@ struct Template {
         return number;
     }
 
-    union ALENumber {
-        double Number;
-
-        struct {
-            // int is half the size of double. DONT change the type, or it will break.
-            unsigned int Offset;
-            unsigned int Length;
-        } Content{0, 0};
+    // QOperation -------------------------------------------
+    enum class QOperation : unsigned char {
+        NoOp = 0,
+        Or,             // ||
+        And,            // &&
+        Equal,          // ==
+        NotEqual,       // !=
+        GreaterOrEqual, // >=
+        LessOrEqual,    // <=
+        Greater,        // >
+        Less,           // <
+        Addition,       // +
+        Subtraction,    // -
+        Multiplication, // *
+        Division,       // /
+        Remainder,      // %
+        Exponent,       // ^
+        Error           // X
     };
 
-    enum TagType : unsigned char {
+    // ExpresionType -------------------------------------------
+    enum class ExpresionType : unsigned char {
+        Empty,
+        RealNumber,
+        NaturalNumber,
+        IntegerNumber,
+        NotANumber,
+        Variable,
+        SubOperation
+    };
+
+    // VariableTag -------------------------------------------
+    struct VariableTag {
+        SizeT Offset;
+        SizeT Length;
+        SizeT Level;
+    };
+
+    // QNumber -------------------------------------------
+    struct QNumber {
+        union {
+            unsigned long long Natural{0}; // Natural number.
+            long long          Integer;    // Integer number.
+            double             Real;       // Real number.
+        };
+
+        SizeT Offset{0}; // String for use in ==
+        SizeT Length{0};
+    };
+
+    // QExpresion -------------------------------------------
+    struct QExpresion {
+        QExpresion() noexcept {}
+
+        QExpresion(ExpresionType type, QOperation operation) noexcept : Type{type}, Operation{operation} {}
+
+        QExpresion(VariableTag variable, QOperation operation) noexcept
+            : Variable{variable}, Type{ExpresionType::Variable}, Operation{operation} {}
+
+        QExpresion(Array<QExpresion> &&subExpresions, QOperation operation) noexcept
+            : SubExpresions{static_cast<Array<QExpresion> &&>(subExpresions)}, Type{ExpresionType::SubOperation},
+              Operation{operation} {}
+
+        ~QExpresion() {
+            if (Type == ExpresionType::SubOperation) {
+                Memory::Dispose(&SubExpresions);
+            }
+        }
+
+        QExpresion(QExpresion &&expr) noexcept : Number{expr.Number}, Type{expr.Type}, Operation{expr.Operation} {
+            expr.Type   = ExpresionType::Empty;
+            expr.Number = QNumber{};
+        }
+
+        union {
+            QNumber           Number{};
+            Array<QExpresion> SubExpresions;
+            VariableTag       Variable; // {var:...}
+        };
+
+        ExpresionType Type{ExpresionType::Empty};
+        QOperation    Operation{QOperation::NoOp};
+    };
+
+    // TagType -------------------------------------------
+    enum class TagType : unsigned char {
         None = 0,
         Variable,    // {var:x}
         RawVariable, // {raw:x}
@@ -304,9 +376,24 @@ struct Template {
         RawText
     };
 
+    // RawVariableTag -------------------------------------------
+    struct RawVariableTag {
+        SizeT Offset;
+        SizeT Length;
+        SizeT Level;
+    };
+
+    // MathTag -------------------------------------------
+    struct MathTag {
+        Array<QExpresion> Expresions;
+        SizeT             Offset;
+        SizeT             EndOffset;
+    };
+
+    // LoopTag -------------------------------------------
     template <typename Char_T_>
     struct LoopTag_T_ {
-        // TODO: Remove StringStream;
+        // TODO: Remove StringStream, and remove Char_T_;
         StringStream<Char_T_>  SubTemplate;
         Array<TagBit<Char_T_>> SubTags;
         unsigned short         SetOffset;
@@ -316,21 +403,22 @@ struct Template {
         unsigned short         Sort;
     };
 
+    // InlineIfTag -------------------------------------------
     template <typename Char_T_>
     struct InlineIfTag_T_ {
         Array<TagBit<Char_T_>> SubTags;
-        SizeT                  CaseOffset;
-        SizeT                  CaseEndOffset;
+        Array<QExpresion>      Case;
         SizeT                  TrueTagsSize;
     };
 
+    // IfTag -------------------------------------------
     template <typename Char_T_>
     struct IfTagCase_T_ {
         Array<TagBit<Char_T_>> SubTags;
-        const SizeT            CaseOffset;
-        const SizeT            CaseEndOffset;
+        Array<QExpresion>      Case;
     };
 
+    // TagBit -------------------------------------------
     template <typename Char_T_>
     struct TagBit {
       public:
@@ -346,6 +434,27 @@ struct Template {
 
         TagBit(TagType type) : type_{type} {
             switch (type) {
+                case TagType::Variable: {
+                    VariableTag *var_info = Memory::AllocateInit<VariableTag>();
+
+                    info_ = var_info;
+                    break;
+                }
+
+                case TagType::RawVariable: {
+                    RawVariableTag *var_info = Memory::AllocateInit<RawVariableTag>();
+
+                    info_ = var_info;
+                    break;
+                }
+
+                case TagType::Math: {
+                    MathTag *var_info = Memory::AllocateInit<MathTag>();
+
+                    info_ = var_info;
+                    break;
+                }
+
                 case TagType::Loop: {
                     LoopTag_T_<Char_T_> *loop_info = Memory::AllocateInit<LoopTag_T_<Char_T_>>();
 
@@ -379,6 +488,22 @@ struct Template {
 
         ~TagBit() {
             switch (type_) {
+                case TagType::Variable: {
+                    Memory::Deallocate(info_);
+                    break;
+                }
+
+                case TagType::RawVariable: {
+                    Memory::Deallocate(info_);
+                    break;
+                }
+
+                case TagType::Math: {
+                    Memory::Dispose(static_cast<MathTag *>(info_));
+                    Memory::Deallocate(info_);
+                    break;
+                }
+
                 case TagType::Loop: {
                     Memory::Dispose(static_cast<LoopTag_T_<Char_T_> *>(info_));
                     Memory::Deallocate(info_);
@@ -410,14 +535,14 @@ struct Template {
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
-        inline TagType GetType() const noexcept { return type_; }
-        inline SizeT   GetOffset() const noexcept { return content_.offset; }
-        inline SizeT   GetLength() const noexcept { return content_.length_; }
+        inline TagType      GetType() const noexcept { return type_; }
+        inline unsigned int GetOffset() const noexcept { return content_.offset; }
+        inline unsigned int GetLength() const noexcept { return content_.length_; }
 
       private:
         struct Content_ {
-            SizeT offset;
-            SizeT length_;
+            unsigned int offset;
+            unsigned int length_;
         };
 
         union {
@@ -438,16 +563,23 @@ struct TemplateSub {
         : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, level_{level}, length_{length} {}
 
   private:
-    friend struct Qentem::Template;
-
-    using ALENumber        = Template::ALENumber;
-    using TagBit           = Template::TagBit<Char_T_>;
     using TagType          = Template::TagType;
+    using VariableTag      = Template::VariableTag;
+    using RawVariableTag   = Template::RawVariableTag;
+    using MathTag          = Template::MathTag;
     using LoopTag          = Template::LoopTag_T_<Char_T_>;
     using InlineIfTag      = Template::InlineIfTag_T_<Char_T_>;
     using IfTagCase        = Template::IfTagCase_T_<Char_T_>;
-    using IfTag            = Array<Template::IfTagCase_T_<Char_T_>>;
+    using IfTag            = Array<IfTagCase>;
+    using TagBit           = Template::TagBit<Char_T_>;
+    using QExpresion       = Template::QExpresion;
+    using QExpresions      = Array<QExpresion>;
+    using QOperation       = Template::QOperation;
+    using ExpresionType    = Template::ExpresionType;
+    using QNumber          = Template::QNumber;
     using TemplatePatterns = TemplatePatterns_T_<Char_T_>;
+
+    friend struct Template;
 
   public:
     void Render(const TagBit *tag, const TagBit *end) const {
@@ -521,8 +653,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::VariablePrefixLength;
-                                tags_cache += TagBit{TagType::Variable, offset,
-                                                     ((v_end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
+                                tags_cache += TagBit{TagType::Variable};
+                                parseVariableTag(offset, (v_end_offset - TemplatePatterns::InLineSuffixLength),
+                                                 static_cast<VariableTag *>(tags_cache.Last()->GetInfo()));
                                 last_offset = v_end_offset;
                                 offset      = v_end_offset;
                                 continue;
@@ -546,8 +679,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::RawVariablePrefixLength;
-                                tags_cache += TagBit{TagType::RawVariable, offset,
-                                                     ((r_end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
+                                tags_cache += TagBit{TagType::RawVariable};
+                                parseRawVariableTag(offset, (r_end_offset - TemplatePatterns::InLineSuffixLength),
+                                                    static_cast<RawVariableTag *>(tags_cache.Last()->GetInfo()));
                                 last_offset = r_end_offset;
                                 offset      = r_end_offset;
                                 continue;
@@ -570,8 +704,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::MathPrefixLength;
-                                tags_cache += TagBit{TagType::Math, offset,
-                                                     ((m_end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
+                                tags_cache += TagBit{TagType::Math};
+                                parseMathTag(offset, (m_end_offset - TemplatePatterns::InLineSuffixLength),
+                                             static_cast<MathTag *>(tags_cache.Last()->GetInfo()));
                                 last_offset = m_end_offset;
                                 offset      = m_end_offset;
                                 continue;
@@ -596,8 +731,8 @@ struct TemplateSub {
 
                                 offset += TemplatePatterns::InLineIfPrefixLength;
                                 tags_cache += TagBit{TagType::InLineIf};
-                                generateInLineIfInfo(offset, (ii_end_offset - TemplatePatterns::InLineSuffixLength),
-                                                     static_cast<InlineIfTag *>(tags_cache.Last()->GetInfo()));
+                                parseInLineIfTag(offset, (ii_end_offset - TemplatePatterns::InLineSuffixLength),
+                                                 static_cast<InlineIfTag *>(tags_cache.Last()->GetInfo()));
                                 last_offset = ii_end_offset;
                                 offset      = ii_end_offset;
                                 continue;
@@ -628,8 +763,8 @@ struct TemplateSub {
 
                             offset += TemplatePatterns::InLineIfPrefixLength;
                             tags_cache += TagBit{TagType::Loop};
-                            generateLoopContent(offset, (l_end_offset - TemplatePatterns::LoopSuffixLength),
-                                                static_cast<LoopTag *>(tags_cache.Last()->GetInfo()));
+                            parseLoopTag(offset, (l_end_offset - TemplatePatterns::LoopSuffixLength),
+                                         static_cast<LoopTag *>(tags_cache.Last()->GetInfo()));
                             last_offset = l_end_offset;
                             offset      = l_end_offset;
                             continue;
@@ -649,8 +784,8 @@ struct TemplateSub {
 
                             offset += TemplatePatterns::IfPrefixLength;
                             tags_cache += TagBit{TagType::If};
-                            generateIfCases(offset, (i_end_offset - TemplatePatterns::IfSuffixLength),
-                                            static_cast<IfTag *>(tags_cache.Last()->GetInfo()));
+                            parseIfTag(offset, (i_end_offset - TemplatePatterns::IfSuffixLength),
+                                       static_cast<IfTag *>(tags_cache.Last()->GetInfo()));
                             last_offset = i_end_offset;
                             offset      = i_end_offset;
                             continue;
@@ -689,8 +824,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::VariablePrefixLength;
-                            tags_cache += TagBit{TagType::Variable, offset,
-                                                 ((v_end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
+                            tags_cache += TagBit{TagType::Variable};
+                            parseVariableTag(offset, (v_end_offset - TemplatePatterns::InLineSuffixLength),
+                                             static_cast<VariableTag *>(tags_cache.Last()->GetInfo()));
                             last_offset = v_end_offset;
                             offset      = v_end_offset;
                         }
@@ -711,8 +847,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::RawVariablePrefixLength;
-                            tags_cache += TagBit{TagType::RawVariable, offset,
-                                                 ((r_end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
+                            tags_cache += TagBit{TagType::RawVariable};
+                            parseRawVariableTag(offset, (r_end_offset - TemplatePatterns::InLineSuffixLength),
+                                                static_cast<RawVariableTag *>(tags_cache.Last()->GetInfo()));
                             last_offset = r_end_offset;
                             offset      = r_end_offset;
                         }
@@ -733,8 +870,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::MathPrefixLength;
-                            tags_cache += TagBit{TagType::Math, offset,
-                                                 ((m_end_offset - TemplatePatterns::InLineSuffixLength) - offset)};
+                            tags_cache += TagBit{TagType::Math};
+                            parseMathTag(offset, (m_end_offset - TemplatePatterns::InLineSuffixLength),
+                                         static_cast<MathTag *>(tags_cache.Last()->GetInfo()));
                             last_offset = m_end_offset;
                             offset      = m_end_offset;
                         }
@@ -777,7 +915,7 @@ struct TemplateSub {
 
                 case '>': {
                     stream->Insert((str + offset), (index - offset));
-                    stream->Insert(TemplatePatterns::HTMLBigger, TemplatePatterns::HTMLBiggerLength);
+                    stream->Insert(TemplatePatterns::HTMLGreater, TemplatePatterns::HTMLGreaterLength);
                     offset = (++index);
                     break;
                 }
@@ -806,8 +944,9 @@ struct TemplateSub {
     }
 
     void renderVariable(const TagBit *tag) const {
-        const Char_T_  *content = (content_ + tag->GetOffset());
-        const Value_T_ *value   = findValue(content, tag->GetLength());
+        const VariableTag *i_tag   = static_cast<const VariableTag *>(tag->GetInfo());
+        const Char_T_     *content = (content_ + i_tag->Offset);
+        const Value_T_    *value   = findValue(content, i_tag->Length);
 
         if (value != nullptr) {
             if (Config::AutoEscapeHTML) {
@@ -834,14 +973,16 @@ struct TemplateSub {
         }
 
         if (*content != TemplatePatterns::TildeChar) {
-            stream_->Insert((content - TemplatePatterns::VariablePrefixLength),
-                            (tag->GetLength() + TemplatePatterns::VariableFulllength));
+            stream_->Insert(
+                (content - TemplatePatterns::VariablePrefixLength),
+                (i_tag->Length + TemplatePatterns::VariablePrefixLength + TemplatePatterns::InLineSuffixLength));
         }
     }
 
     void renderRawVariable(const TagBit *tag) const {
-        const Char_T_  *content = (content_ + tag->GetOffset());
-        const Value_T_ *value   = findValue(content, tag->GetLength());
+        const RawVariableTag *i_tag   = static_cast<const RawVariableTag *>(tag->GetInfo());
+        const Char_T_        *content = (content_ + i_tag->Offset);
+        const Value_T_       *value   = findValue(content, i_tag->Length);
 
         if ((value != nullptr) && value->CopyStringValueTo(*stream_)) {
             return;
@@ -849,18 +990,20 @@ struct TemplateSub {
 
         if (*content != TemplatePatterns::TildeChar) {
             stream_->Insert((content - TemplatePatterns::RawVariablePrefixLength),
-                            (tag->GetLength() + TemplatePatterns::RawVariableFulllength));
+                            (i_tag->Length + TemplatePatterns::RawVariableFulllength));
         }
     }
 
     void renderMath(const TagBit *tag) const {
-        ALENumber number;
+        const MathTag *i_tag = static_cast<const MathTag *>(tag->GetInfo());
+        QExpresion     number;
 
-        if (evaluate(number, tag->GetOffset(), (tag->GetLength() + tag->GetOffset()))) {
-            Digit<Char_T_>::NumberToString(*stream_, number.Number, 1, 0, 3);
+        if (i_tag->Expresions.IsNotEmpty() && evaluateExpressions(number, i_tag->Expresions)) {
+            Digit<Char_T_>::NumberToString(*stream_, number.Number.Real, 1, 0, 3);
         } else {
-            stream_->Insert(((content_ + tag->GetOffset()) - TemplatePatterns::MathPrefixLength),
-                            (tag->GetLength() + TemplatePatterns::MathFulllength));
+            stream_->Insert(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
+                            ((i_tag->EndOffset - i_tag->Offset) + TemplatePatterns::MathPrefixLength +
+                             TemplatePatterns::InLineSuffixLength));
         }
     }
 
@@ -934,10 +1077,10 @@ struct TemplateSub {
     void renderInLineIf(const TagBit *tag) const {
         const InlineIfTag *i_tag = static_cast<const InlineIfTag *>(tag->GetInfo());
 
-        ALENumber result;
+        QExpresion result;
 
-        if (evaluate(result, i_tag->CaseOffset, i_tag->CaseEndOffset)) {
-            if (result.Number > 0.0) {
+        if (evaluateExpressions(result, i_tag->Case)) {
+            if (result.Number.Real > 0.0) {
                 if (i_tag->TrueTagsSize != 0) {
                     const TagBit *s_tag = i_tag->SubTags.First();
                     const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
@@ -962,23 +1105,42 @@ struct TemplateSub {
         const IfTag     *i_tag = static_cast<const IfTag *>(tag->GetInfo());
         const IfTagCase *item  = i_tag->First();
         const IfTagCase *end   = (item + i_tag->Size());
-        ALENumber        result;
+        QExpresion       result;
 
-        while (item < end) {
-            // <else> without if = (item->CaseLength == 0)
-            if ((item->CaseOffset == item->CaseEndOffset) ||
-                (evaluate(result, item->CaseOffset, item->CaseEndOffset) && (result.Number > 0))) {
-                const TagBit *s_tag = item->SubTags.First();
-                const TagBit *s_end = (s_tag + item->SubTags.Size());
-                Render(s_tag, s_end);
-                break;
-            }
+        if ((item != nullptr) && item->Case.IsNotEmpty()) { // first case should not be empty
+            do {
+                // <else> without if = (item->Case == nothing)
+                if (item->Case.IsEmpty() || (evaluateExpressions(result, item->Case) && (result.Number.Real > 0))) {
+                    const TagBit *s_tag = item->SubTags.First();
+                    const TagBit *s_end = (s_tag + item->SubTags.Size());
+                    Render(s_tag, s_end);
+                    break;
+                }
 
-            ++item;
+                ++item;
+            } while (item < end);
         }
     }
 
     void renderRawText(const TagBit *tag) const { stream_->Insert((content_ + tag->GetOffset()), tag->GetLength()); }
+
+    void parseVariableTag(SizeT offset, SizeT end_offset, VariableTag *tag) const {
+        tag->Offset = offset;
+        tag->Length = (end_offset - offset);
+        tag->Level  = level_;
+    }
+
+    void parseRawVariableTag(SizeT offset, SizeT end_offset, RawVariableTag *tag) const {
+        tag->Offset = offset;
+        tag->Length = (end_offset - offset);
+        tag->Level  = level_;
+    }
+
+    void parseMathTag(SizeT offset, SizeT end_offset, MathTag *tag) const {
+        tag->Expresions = parseExpressions(offset, end_offset);
+        tag->Offset     = offset;
+        tag->EndOffset  = end_offset;
+    }
 
     /*
      * Gets everything between "..."
@@ -993,7 +1155,7 @@ struct TemplateSub {
         return end_offset;
     }
 
-    void generateLoopContent(SizeT offset, SizeT end_offset, LoopTag *tag) const {
+    void parseLoopTag(SizeT offset, SizeT end_offset, LoopTag *tag) const {
         const Char_T_ *loop_value        = nullptr;
         SizeT          loop_value_length = 0;
         SizeT          previous_offset;
@@ -1126,7 +1288,7 @@ struct TemplateSub {
         loop_template.parse(tag->SubTags, 0, tag->SubTemplate.Length());
     }
 
-    void generateInLineIfInfo(SizeT offset, SizeT end_offset, InlineIfTag *tag) const {
+    void parseInLineIfTag(SizeT offset, SizeT end_offset, InlineIfTag *tag) const {
         SizeT true_offset      = 0;
         SizeT true_end_offset  = 0;
         SizeT false_offset     = 0;
@@ -1140,11 +1302,10 @@ struct TemplateSub {
         while ((offset2 != 0) && (offset < end_offset)) {
             switch (content_[offset]) {
                 case TemplatePatterns::CaseChar: {
-                    tag->CaseOffset    = last_offset;
-                    tag->CaseEndOffset = (offset2 - 1); // 1 = (") at the end
-                    offset             = offset2;
-                    offset2            = getQuotedValue(offset, end_offset);
-                    last_offset        = offset;
+                    tag->Case   = parseExpressions(last_offset, (offset2 - 1)); // 1 = (") at the end
+                    offset      = offset2;
+                    offset2     = getQuotedValue(offset, end_offset);
+                    last_offset = offset;
                     offset -= 5U;
                     break;
                 }
@@ -1175,7 +1336,7 @@ struct TemplateSub {
             }
         }
 
-        if (tag->CaseOffset != tag->CaseEndOffset) {
+        if (tag->Case.IsNotEmpty()) {
             if (true_offset != true_end_offset) {
                 lightParse(tag->SubTags, true_offset, true_end_offset);
                 tag->TrueTagsSize = tag->SubTags.Size();
@@ -1187,10 +1348,10 @@ struct TemplateSub {
         }
     }
 
-    void generateIfCases(SizeT offset, const SizeT end_offset, IfTag *tag) const {
+    void parseIfTag(SizeT offset, const SizeT end_offset, IfTag *tag) const {
         Array<TagBit> sub_tags;
         SizeT         offset2 = getQuotedValue(offset, end_offset);
-        SizeT         case_end_offset; // 1 = (") at the end
+        SizeT         case_end_offset;
         SizeT         else_offset;
         SizeT         content_offset;
 
@@ -1204,13 +1365,14 @@ struct TemplateSub {
 
                 if (else_offset == 0) {
                     parse(sub_tags, content_offset, end_offset);
-                    *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), offset, case_end_offset};
+                    *tag +=
+                        IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), parseExpressions(offset, case_end_offset)};
 
                     break;
                 }
 
                 parse(sub_tags, content_offset, (else_offset - TemplatePatterns::ElsePrefixLength));
-                *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), offset, case_end_offset};
+                *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), parseExpressions(offset, case_end_offset)};
 
                 if ((content_[else_offset] != TemplatePatterns::ElseIfChar)) {
                     else_offset = Engine::FindOne<Char_T_>(TemplatePatterns::MultiLineSuffix, content_, else_offset,
@@ -1218,7 +1380,7 @@ struct TemplateSub {
 
                     if (else_offset != 0) {
                         parse(sub_tags, else_offset, end_offset);
-                        *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), 0, 0}; // else without if
+                        *tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), QExpresions{}}; // else without if
                     }
 
                     break;
@@ -1338,351 +1500,564 @@ struct TemplateSub {
         return value;
     }
 
-    enum ALEExpression {
-        None,
-        Or,             // ||
-        And,            // &&
-        Equal,          // ==
-        NotEqual,       // !=
-        BiggerOrEqual,  // >=
-        LessOrEqual,    // <=
-        Bigger,         // >
-        Less,           // <
-        Addition,       // +
-        Subtraction,    // -
-        Multiplication, // *
-        Division,       // /
-        Remainder,      // %
-        Exponent,       // ^
-        Error           // X
-    };
+    // Evaluate /////////////////////////////////////
+    bool evaluateExpressions(QExpresion &number, const QExpresions &exprs) const noexcept {
+        const QExpresion *expr = exprs.First();
 
-    bool evaluate(ALENumber &number, SizeT offset, const SizeT end_offset) const noexcept {
-        const SizeT   num_offset = offset;
-        ALEExpression expr       = getExpression(offset, end_offset);
-        return subEvaluate(number, offset, num_offset, end_offset, expr, ALEExpression::None);
-    }
-
-    bool subEvaluate(ALENumber &left, SizeT &offset, SizeT num_offset, const SizeT end_offset, ALEExpression &expr,
-                     const ALEExpression previous_expr) const noexcept {
-        ALENumber     right;
-        ALEExpression next_expr;
-
-        if (expr != ALEExpression::Error) {
-            const bool no_equal = ((expr != ALEExpression::Equal) && (expr != ALEExpression::NotEqual));
-
-            if (!getExpressionValue(left, num_offset, offset, no_equal)) {
-                return false;
-            }
-
-            while (offset < end_offset) {
-                ++offset;
-
-                if (expr < ALEExpression::Bigger) {
-                    ++offset;
-                }
-
-                num_offset = offset;
-                next_expr  = getExpression(offset, end_offset);
-
-                if (expr >= next_expr) {
-                    if (!getExpressionValue(right, num_offset, offset,
-                                            ((expr != ALEExpression::Equal) && (expr != ALEExpression::NotEqual))) ||
-                        !processExpression(left, right, no_equal, false, expr)) {
-                        return false;
-                    }
-
-                    expr = next_expr;
-
-                    if (previous_expr >= next_expr) {
-                        return true;
-                    }
-                } else {
-                    if (!subEvaluate(right, offset, num_offset, end_offset, next_expr, expr) ||
-                        !processExpression(left, right, no_equal, true, expr)) {
-                        return false;
-                    }
-
-                    expr = next_expr;
-                }
-            }
-
-            return true;
+        if (expr != nullptr) {
+            return processExpressions(number, expr, QOperation::NoOp);
         }
 
         return false;
     }
 
-    bool getExpressionValue(ALENumber &val, SizeT offset, SizeT end_offset, bool no_equal) const noexcept {
-        SizeT length = (end_offset - offset);
-        StringUtils::Trim(content_, offset, length);
+    bool processExpressions(QExpresion &left, const QExpresion *&expr, const QOperation previous_oper) const noexcept {
+        const QExpresion *next_expr;
+        QExpresion        right;
+        const bool not_equal = ((expr->Operation != QOperation::Equal) && (expr->Operation != QOperation::NotEqual));
 
-        if (no_equal) {
-            return getExpressionNumber(val, offset, (length + offset));
-        }
+        if (GetExpressionValue(left, expr, not_equal)) {
+            while (expr->Operation != QOperation::NoOp) {
+                next_expr = (expr + 1U);
 
-        val.Content.Offset = static_cast<unsigned int>(offset);
-        val.Content.Length = static_cast<unsigned int>(length);
+                if (expr->Operation >= next_expr->Operation) {
+                    if (GetExpressionValue(right, next_expr, not_equal) &&
+                        evaluateExpression(left, right, expr->Operation)) {
+                        expr = next_expr;
 
-        return true;
-    }
+                        if (previous_oper < expr->Operation) {
+                            continue;
+                        }
 
-    bool getExpressionNumber(ALENumber &val, SizeT offset, SizeT end_offset) const noexcept {
-        using ALEExpressions = ALEExpressions_T_<Char_T_>;
+                        return true;
+                    }
+                } else if (processExpressions(right, next_expr, expr->Operation) &&
+                           evaluateExpression(left, right, expr->Operation)) {
+                    expr = next_expr;
+                    continue;
+                }
 
-        switch (content_[offset]) {
-            case ALEExpressions::ParenthesStart: {
-                // getExpression check for closed parenthes, so "length" will never go over the actual length.
-                ++offset;     // after (
-                --end_offset; // before )
-
-                return evaluate(val, offset, end_offset);
+                return false;
             }
 
-            case ALEExpressions::BracketStart: {
-                return (setNumber(val, offset, end_offset));
+            return (left.Type != ExpresionType::NotANumber);
+        }
+
+        return false;
+    }
+
+    bool GetExpressionValue(QExpresion &number, const QExpresion *expr, bool not_equal) const noexcept {
+        switch (expr->Type) {
+            case ExpresionType::SubOperation: {
+                const QExpresion *sub_expr = expr->SubExpresions.First();
+                return processExpressions(number, sub_expr, QOperation::NoOp);
+            }
+
+            case ExpresionType::Variable: {
+                if (not_equal) {
+                    const Value_T_ *val =
+                        findValue((content_ + expr->Variable.Offset), static_cast<SizeT>(expr->Variable.Length));
+
+                    if (val != nullptr) {
+                        if (val->IsNumber()) {
+                            // case ValueType::UIntLong: {
+                            //     val->SetNumber(number.Number.Natural);
+                            //     number.Type = ExpresionType::NaturalNumber;
+                            //     break;
+                            // }
+
+                            // case ValueType::IntLong: {
+                            //     val->SetNumber(number.Number.Integer);
+                            //     number.Type = ExpresionType::IntegerNumber;
+                            //     break;
+                            // }
+
+                            // case ValueType::Double: {
+                            //     val->SetNumber(number.Number.Real);
+                            //     number.Type = ExpresionType::RealNumber;
+                            //     break;
+                            // }
+
+                            val->SetNumber(number.Number.Real);
+                            number.Type = ExpresionType::RealNumber;
+
+                            return true;
+                        } else {
+                            if (val->SetNumber(number.Number.Real)) {
+                                number.Type = ExpresionType::RealNumber;
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    number.Number = expr->Number;
+                    number.Type   = expr->Type;
+                }
+
+                return true;
             }
 
             default: {
-                return (Digit<Char_T_>::StringToNumber(val.Number, (content_ + offset), (end_offset - offset)));
+                number.Number = expr->Number;
+                number.Type   = expr->Type;
+                return true;
             }
         }
     }
 
-    bool processExpression(ALENumber &left, ALENumber right, bool left_evaluated, bool right_evaluated,
-                           ALEExpression expr) const noexcept {
-        switch (expr) {
-            case ALEExpression::Exponent: { // ^
-                if (right.Number != 0.0) {
-                    // TODO: Needs more work to evaluate fractions
-                    if (left.Number != 0.0) {
-                        const bool neg = (right.Number < 0);
+    bool evaluateExpression(QExpresion &left, QExpresion &right, const QOperation oper) const noexcept {
+        switch (oper) {
+            case QOperation::Exponent: { // ^
+                if (right.Number.Real != 0.0) {
+                    if (left.Number.Real != 0.0) {
+                        const bool neg = (right.Number.Real < 0);
 
                         if (neg) {
-                            right.Number = -right.Number; // neg ASM
+                            right.Number.Real = -right.Number.Real;
                         }
 
-                        if (right.Number < 1) {
+                        if (right.Number.Real < 1) {
+                            // TODO: Needs more work to evaluate fractions
                             return false;
                         }
 
-                        unsigned int times = static_cast<unsigned int>(right.Number);
-                        const double num   = left.Number;
+                        unsigned int times = static_cast<unsigned int>(right.Number.Real);
+                        const double num   = left.Number.Real;
 
                         while (--times != 0) {
-                            left.Number *= num;
+                            left.Number.Real *= num;
                         }
 
                         if (neg) {
-                            left.Number = (1 / left.Number);
+                            left.Number.Real = (1 / left.Number.Real);
                         }
                     }
 
                     break;
                 }
 
-                left.Number = 1;
+                left.Number.Real = 1;
                 break;
             }
 
-            case ALEExpression::Remainder: { // %
-                left.Number = static_cast<double>(static_cast<unsigned long long>(left.Number) %
-                                                  static_cast<unsigned long long>(right.Number));
+            case QOperation::Remainder: { // %
+                left.Number.Real = static_cast<double>(static_cast<unsigned long long>(left.Number.Real) %
+                                                       static_cast<unsigned long long>(right.Number.Real));
                 break;
             }
 
-            case ALEExpression::Multiplication: { // *
-                left.Number *= right.Number;
+            case QOperation::Multiplication: { // *
+                left.Number.Real *= right.Number.Real;
                 break;
             }
 
-            case ALEExpression::Division: { // /
-                if (right.Number != 0.0) {
-                    left.Number /= right.Number;
+            case QOperation::Division: { // /
+                if (right.Number.Real != 0.0) {
+                    left.Number.Real /= right.Number.Real;
                     break;
                 }
 
                 return false;
             }
 
-            case ALEExpression::Addition: { // +
-                left.Number += right.Number;
+            case QOperation::Addition: { // +
+                left.Number.Real += right.Number.Real;
                 break;
             }
 
-            case ALEExpression::Subtraction: { // -
-                left.Number -= right.Number;
+            case QOperation::Subtraction: { // -
+                left.Number.Real -= right.Number.Real;
                 break;
             }
 
-            case ALEExpression::Less: { // <
-                left.Number = (left.Number < right.Number) ? 1 : 0;
+            case QOperation::Less: { // <
+                left.Number.Real = (left.Number.Real < right.Number.Real) ? 1 : 0;
                 break;
             }
 
-            case ALEExpression::LessOrEqual: { // <=
-                left.Number = (left.Number <= right.Number) ? 1 : 0;
+            case QOperation::LessOrEqual: { // <=
+                left.Number.Real = (left.Number.Real <= right.Number.Real) ? 1 : 0;
                 break;
             }
 
-            case ALEExpression::Bigger: { // >
-                left.Number = (left.Number > right.Number) ? 1 : 0;
+            case QOperation::Greater: { // >
+                left.Number.Real = (left.Number.Real > right.Number.Real) ? 1 : 0;
                 break;
             }
 
-            case ALEExpression::BiggerOrEqual: { // >=
-                left.Number = (left.Number >= right.Number) ? 1 : 0;
+            case QOperation::GreaterOrEqual: { // >=
+                left.Number.Real = (left.Number.Real >= right.Number.Real) ? 1 : 0;
                 break;
             }
 
-            case ALEExpression::And: { // &&
-                left.Number = ((left.Number > 0) && (right.Number > 0)) ? 1 : 0;
+            case QOperation::And: { // &&
+                left.Number.Real = ((left.Number.Real > 0) && (right.Number.Real > 0)) ? 1 : 0;
                 break;
             }
 
-            case ALEExpression::Or: { // ||
-                left.Number = ((left.Number > 0) || (right.Number > 0)) ? 1 : 0;
+            case QOperation::Or: { // ||
+                left.Number.Real = ((left.Number.Real > 0) || (right.Number.Real > 0)) ? 1 : 0;
                 break;
             }
 
-            case ALEExpression::Equal:      // ==
-            case ALEExpression::NotEqual: { // !=
+            case QOperation::Equal: { // =={
                 bool is_equal;
 
-                if (isEqual(is_equal, left, right, left_evaluated, right_evaluated)) {
-                    if (expr == ALEExpression::Equal) {
-                        left.Number = (is_equal ? 1 : 0);
-                    } else {
-                        left.Number = (is_equal ? 0 : 1);
-                    }
-
+                if (isEqual(is_equal, left, right)) {
+                    left.Number.Real = is_equal;
                     break;
                 }
 
                 return false;
             }
 
-            default: {
+            case QOperation::NotEqual: { // !=
+                bool is_equal;
+
+                if (isEqual(is_equal, left, right)) {
+                    left.Number.Real = !is_equal;
+                    break;
+                }
+
+                return false;
+            }
+
+            case QOperation::NoOp:
+            case QOperation::Error: {
+                return false;
             }
         }
 
         return true;
     }
 
-    ALEExpression getExpression(SizeT &offset, const SizeT end_offset) const noexcept {
-        using ALEExpressions = ALEExpressions_T_<Char_T_>;
+    bool isEqual(bool &result, QExpresion &left, QExpresion &right) const noexcept {
+        const Value_T_ *left_value  = nullptr;
+        const Value_T_ *right_value = nullptr;
+        const Char_T_  *left_content;
+        const Char_T_  *right_content;
+        SizeT           left_length;
+        SizeT           right_length;
+        bool            left_is_a_number;
+        bool            right_is_a_number;
+
+        switch (left.Type) {
+            case ExpresionType::RealNumber:
+            case ExpresionType::NaturalNumber:
+            case ExpresionType::IntegerNumber: {
+                left_is_a_number = true;
+                break;
+            }
+
+            case ExpresionType::Variable: {
+                left_value = findValue((content_ + left.Variable.Offset), static_cast<SizeT>(left.Variable.Length));
+
+                if (left_value != nullptr) {
+                    left_is_a_number = left_value->IsNumber();
+
+                    if (left_is_a_number) {
+                        left_value->SetNumber(left.Number.Real);
+                    } else if (!(left_value->SetCharAndLength(left_content, left_length))) {
+                        return false;
+                    }
+
+                    break;
+                }
+
+                return false;
+            }
+
+            case ExpresionType::NotANumber: {
+                left_content     = (content_ + left.Number.Offset);
+                left_length      = left.Number.Length;
+                left_is_a_number = false;
+                break;
+            }
+
+            default: {
+                return false; // It should not get to this.
+            }
+        }
+
+        switch (right.Type) {
+            case ExpresionType::RealNumber:
+            case ExpresionType::NaturalNumber:
+            case ExpresionType::IntegerNumber: {
+                right_is_a_number = true;
+                break;
+            }
+
+            case ExpresionType::Variable: {
+                right_value = findValue((content_ + right.Variable.Offset), static_cast<SizeT>(right.Variable.Length));
+
+                if (right_value != nullptr) {
+                    right_is_a_number = right_value->IsNumber();
+
+                    if (right_is_a_number) {
+                        right_value->SetNumber(right.Number.Real);
+                    } else if (!(right_value->SetCharAndLength(right_content, right_length))) {
+                        return false;
+                    }
+
+                    break;
+                }
+
+                return false;
+            }
+
+            case ExpresionType::NotANumber: {
+                right_content     = (content_ + right.Number.Offset);
+                right_length      = right.Number.Length;
+                right_is_a_number = false;
+                break;
+            }
+
+            default: {
+                return false; // It should not get to this.
+            }
+        }
+
+        if (left_is_a_number || right_is_a_number) {
+            if (!left_is_a_number) {
+                if ((left_value != nullptr) && left_value->SetNumber(left.Number.Real)) {
+                    result = (left.Number.Real == right.Number.Real);
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (!right_is_a_number) {
+                if ((right_value != nullptr) && right_value->SetNumber(right.Number.Real)) {
+                    result = (left.Number.Real == right.Number.Real);
+                    return true;
+                }
+
+                return false;
+            }
+
+            result = (left.Number.Real == right.Number.Real);
+            return true;
+        }
+
+        result = ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
+
+        return true;
+    }
+
+    QExpresions parseExpressions(SizeT offset, const SizeT end_offset) const noexcept {
+        QExpresions exprs;
+        QOperation  last_oper = QOperation::NoOp;
+
+        while (offset < end_offset) {
+            const SizeT      num_offset = offset;
+            const QOperation oper       = getOperation(offset, end_offset);
+
+            if ((oper != QOperation::Error) && parseValue(exprs, oper, last_oper, num_offset, offset)) {
+                ++offset;
+
+                if (oper < QOperation::Greater) {
+                    // ==, &&, ||, !=m <=, >= 2 chars
+                    ++offset;
+                }
+
+                last_oper = oper;
+                continue;
+            }
+
+            break;
+        }
+
+        if (offset > end_offset) {
+            return exprs;
+        }
+
+        return QExpresions{};
+    }
+
+    bool parseValue(QExpresions &exprs, const QOperation oper, const QOperation last_oper, SizeT offset,
+                    SizeT end_offset) const noexcept {
+        using QOperationSymbol = QOperationSymbol_T_<Char_T_>;
+
+        StringUtils::TrimLeft(content_, offset, end_offset);
+        StringUtils::TrimRight(content_, offset, end_offset);
+
+        if (offset != end_offset) {
+            switch (content_[offset]) {
+                case QOperationSymbol::ParenthesStart: {
+                    ++offset;     // Drop (
+                    --end_offset; // Drop )
+
+                    if ((last_oper != oper) || (oper != QOperation::NoOp)) {
+                        QExpresion expr = QExpresion{parseExpressions(offset, end_offset), oper};
+                        if (expr.SubExpresions.Size() != 0) {
+                            exprs += static_cast<QExpresion &&>(expr);
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                    // The entire expression is inside (...)
+                    exprs = parseExpressions(offset, end_offset);
+                    return (exprs.Size() != 0);
+                }
+
+                case QOperationSymbol::BracketStart: {
+                    if (end_offset - offset > TemplatePatterns::VariableFulllength) {
+                        offset += TemplatePatterns::VariablePrefixLength;
+                        end_offset -= TemplatePatterns::InLineSuffixLength;
+
+                        exprs += QExpresion{VariableTag{offset, static_cast<unsigned short>(end_offset - offset),
+                                                        static_cast<unsigned short>(level_)},
+                                            oper};
+                        return true;
+                    }
+
+                    break;
+                }
+
+                default: {
+                    const SizeT length = (end_offset - offset);
+                    QExpresion  expr;
+                    expr.Operation = oper;
+
+                    if (Digit<Char_T_>::StringToNumber(expr.Number.Real, (content_ + offset), length)) {
+                        expr.Type = ExpresionType::RealNumber;
+                    } else {
+                        if (((last_oper != QOperation::Equal) && (last_oper != QOperation::NotEqual) &&
+                             (last_oper != QOperation::NoOp))) {
+                            return false;
+                        }
+
+                        expr.Number.Offset = offset;
+                        expr.Number.Length = length;
+                        expr.Type          = ExpresionType::NotANumber;
+                    }
+
+                    exprs += static_cast<QExpresion &&>(expr);
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    QOperation getOperation(SizeT &offset, const SizeT end_offset) const noexcept {
+        using QOperationSymbol = QOperationSymbol_T_<Char_T_>;
 
         while (offset < end_offset) {
             switch (content_[offset]) {
-                case ALEExpressions::OrExp: { // ||
-                    if (content_[(offset + 1)] == ALEExpressions::OrExp) {
-                        return ALEExpression::Or;
+                case QOperationSymbol::OrExp: { // ||
+                    if (content_[(offset + 1)] == QOperationSymbol::OrExp) {
+                        return QOperation::Or;
                     }
 
-                    return ALEExpression::Error;
+                    return QOperation::Error;
                 }
 
-                case ALEExpressions::AndExp: { // &&
-                    if (content_[(offset + 1)] == ALEExpressions::AndExp) {
-                        return ALEExpression::And;
+                case QOperationSymbol::AndExp: { // &&
+                    if (content_[(offset + 1)] == QOperationSymbol::AndExp) {
+                        return QOperation::And;
                     }
 
-                    return ALEExpression::Error;
+                    return QOperation::Error;
                 }
 
-                case ALEExpressions::BiggerExp: { // > or >=
-                    if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
-                        return ALEExpression::BiggerOrEqual;
+                case QOperationSymbol::GreaterExp: { // > or >=
+                    if (content_[(offset + 1)] == QOperationSymbol::EqualExp) {
+                        return QOperation::GreaterOrEqual;
                     }
 
-                    return ALEExpression::Bigger;
+                    return QOperation::Greater;
                 }
 
-                case ALEExpressions::LessExp: { // < or <=
-                    if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
-                        return ALEExpression::LessOrEqual;
+                case QOperationSymbol::LessExp: { // < or <=
+                    if (content_[(offset + 1)] == QOperationSymbol::EqualExp) {
+                        return QOperation::LessOrEqual;
                     }
 
-                    return ALEExpression::Less;
+                    return QOperation::Less;
                 }
 
-                case ALEExpressions::NotExp: { // !=
-                    if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
-                        return ALEExpression::NotEqual;
+                case QOperationSymbol::NotExp: { // !=
+                    if (content_[(offset + 1)] == QOperationSymbol::EqualExp) {
+                        return QOperation::NotEqual;
                     }
 
-                    return ALEExpression::Error;
+                    return QOperation::Error;
                 }
 
-                case ALEExpressions::EqualExp: { // ==
-                    if (content_[(offset + 1)] == ALEExpressions::EqualExp) {
-                        return ALEExpression::Equal;
+                case QOperationSymbol::EqualExp: { // ==
+                    if (content_[(offset + 1)] == QOperationSymbol::EqualExp) {
+                        return QOperation::Equal;
                     }
 
-                    return ALEExpression::Error;
+                    return QOperation::Error;
                 }
 
-                case ALEExpressions::SubtractExp: {
+                case QOperationSymbol::SubtractExp: {
                     if (isExpression(offset)) {
-                        return ALEExpression::Subtraction;
+                        return QOperation::Subtraction;
                     }
 
                     break;
                 }
 
-                case ALEExpressions::AddExp: {
+                case QOperationSymbol::AddExp: {
                     if (isExpression(offset)) {
-                        return ALEExpression::Addition;
+                        return QOperation::Addition;
                     }
 
                     break;
                 }
 
-                case ALEExpressions::DivideExp: {
-                    return ALEExpression::Division;
+                case QOperationSymbol::DivideExp: {
+                    return QOperation::Division;
                 }
 
-                case ALEExpressions::MultipleExp: {
-                    return ALEExpression::Multiplication;
+                case QOperationSymbol::MultipleExp: {
+                    return QOperation::Multiplication;
                 }
 
-                case ALEExpressions::RemainderExp: {
-                    return ALEExpression::Remainder;
+                case QOperationSymbol::RemainderExp: {
+                    return QOperation::Remainder;
                 }
 
-                case ALEExpressions::ExponentExp: {
-                    return ALEExpression::Exponent;
+                case QOperationSymbol::ExponentExp: {
+                    return QOperation::Exponent;
                 }
 
-                case ALEExpressions::ParenthesStart: {
-                    // (...) are evaluated to numbers.
-
+                case QOperationSymbol::ParenthesStart: {
                     ++offset;
-                    offset =
-                        Engine::SkipInnerPatterns<Char_T_>(ALEExpressions::ParenthesStart, ALEExpressions::ParenthesEnd,
-                                                           content_, offset, end_offset, length_);
+                    offset = Engine::SkipInnerPatterns<Char_T_>(QOperationSymbol::ParenthesStart,
+                                                                QOperationSymbol::ParenthesEnd, content_, offset,
+                                                                end_offset, length_);
 
                     if (offset != 0) {
                         continue;
                     }
 
-                    return ALEExpression::Error;
+                    return QOperation::Error;
                 }
 
-                case ALEExpressions::BracketStart: {
-                    // {...} are evaluated by callback to a number or
-                    // string.
-
+                case QOperationSymbol::BracketStart: {
                     ++offset;
                     offset =
-                        Engine::FindOne<Char_T_>(ALEExpressions::BracketEnd, content_, offset, end_offset, length_);
+                        Engine::FindOne<Char_T_>(QOperationSymbol::BracketEnd, content_, offset, end_offset, length_);
 
                     if (offset != 0) {
                         continue;
                     }
 
                     offset = end_offset;
-                    return ALEExpression::Error;
+                    return QOperation::Error;
                 }
 
                 default: {
@@ -1692,22 +2067,22 @@ struct TemplateSub {
             ++offset;
         }
 
-        return ALEExpression::None;
+        return QOperation::NoOp;
     }
 
     bool isExpression(SizeT offset) const noexcept {
-        using ALEExpressions = ALEExpressions_T_<Char_T_>;
+        using QOperationSymbol = QOperationSymbol_T_<Char_T_>;
 
         while (offset != 0) {
             --offset;
 
             switch (content_[offset]) {
-                case ALEExpressions::SpaceChar: {
+                case QOperationSymbol::SpaceChar: {
                     break;
                 }
 
-                case ALEExpressions::ParenthesEnd:
-                case ALEExpressions::BracketEnd: {
+                case QOperationSymbol::ParenthesEnd:
+                case QOperationSymbol::BracketEnd: {
                     // (...) and {} are numbers.
                     return true;
                 }
@@ -1715,99 +2090,7 @@ struct TemplateSub {
                 default: {
                     // A number
                     const Char_T_ ch = content_[offset];
-                    return ((ch < ALEExpressions::ColonChar) && (ch > ALEExpressions::SlashChar));
-                }
-            }
-        }
-
-        return false;
-    }
-
-    bool setNumber(ALENumber &number, SizeT offset, SizeT end_offset) const noexcept {
-        const Value_T_ *value  = nullptr;
-        SizeT           length = (end_offset - offset);
-
-        if (length > TemplatePatterns::VariableFulllength) {
-            value = findValue((content_ + TemplatePatterns::VariablePrefixLength + offset),
-                              (length - TemplatePatterns::VariableFulllength));
-        }
-
-        return ((value != nullptr) && value->SetNumber(number.Number));
-    }
-
-    bool isEqual(bool &result, ALENumber left, ALENumber right, bool left_evaluated,
-                 bool right_evaluated) const noexcept {
-        using ALEExpressions = ALEExpressions_T_<Char_T_>;
-
-        const Value_T_ *left_value  = nullptr;
-        const Value_T_ *right_value = nullptr;
-
-        const Char_T_ *left_content  = (content_ + left.Content.Offset);
-        const Char_T_ *right_content = (content_ + right.Content.Offset);
-        SizeT          left_length   = left.Content.Length;
-        SizeT          right_length  = right.Content.Length;
-
-        if (!left_evaluated) {
-            if ((*left_content == TemplatePatterns::InLinePrefix) &&
-                (left_length > TemplatePatterns::VariableFulllength)) {
-                left_value = findValue((left_content + TemplatePatterns::VariablePrefixLength),
-                                       (left_length - TemplatePatterns::VariableFulllength)); // {var:x}
-
-                if (left_value != nullptr) {
-                    if (left_value->IsNumber()) {
-                        left_value->SetNumber(left.Number);
-                        left_evaluated = true;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                if (*left_content != ALEExpressions::ParenthesStart) {
-                    left_evaluated = Digit<Char_T_>::StringToNumber(left.Number, left_content, left_length);
-                } else {
-                    left_evaluated =
-                        evaluate(left, (left.Content.Offset + 1), ((left_length - 1) + left.Content.Offset));
-                }
-            }
-        }
-
-        if (!right_evaluated) {
-            if ((*right_content == TemplatePatterns::InLinePrefix) &&
-                (right_length > TemplatePatterns::VariableFulllength)) {
-                right_value = findValue((right_content + TemplatePatterns::VariablePrefixLength),
-                                        (right_length - TemplatePatterns::VariableFulllength)); // {var:x}
-
-                if (right_value != nullptr) {
-                    if (right_value->IsNumber()) {
-                        right_value->SetNumber(right.Number);
-                        right_evaluated = true;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                if (*right_content != ALEExpressions::ParenthesStart) {
-                    right_evaluated = Digit<Char_T_>::StringToNumber(right.Number, right_content, right_length);
-                } else {
-                    right_evaluated =
-                        evaluate(right, (right.Content.Offset + 1), ((right_length - 1) + right.Content.Offset));
-                }
-            }
-        }
-
-        if (left_evaluated || right_evaluated) {
-            if (left_evaluated || ((left_value != nullptr) && left_value->SetNumber(left.Number))) {
-                if (right_evaluated || ((right_value != nullptr) && right_value->SetNumber(right.Number))) {
-                    result = (left.Number == right.Number);
-                    return true;
-                }
-            }
-        } else if ((left_value == nullptr) || left_value->SetCharAndLength(left_content, left_length)) {
-            if ((right_value == nullptr) || right_value->SetCharAndLength(right_content, right_length)) {
-                if ((left_length != 0) && (right_length != 0)) {
-                    result = ((left_length == right_length) &&
-                              StringUtils::IsEqual(left_content, right_content, right_length));
-                    return true;
+                    return ((ch < QOperationSymbol::ColonChar) && (ch > QOperationSymbol::SlashChar));
                 }
             }
         }
@@ -1827,7 +2110,7 @@ struct TemplateSub {
 };
 
 template <typename Char_T_>
-struct ALEExpressions_T_ {
+struct QOperationSymbol_T_ {
   public:
     static constexpr Char_T_ RemainderExp = '%';
     static constexpr Char_T_ MultipleExp  = '*';
@@ -1837,7 +2120,7 @@ struct ALEExpressions_T_ {
     static constexpr Char_T_ EqualExp     = '=';
     static constexpr Char_T_ NotExp       = '!';
     static constexpr Char_T_ LessExp      = '<';
-    static constexpr Char_T_ BiggerExp    = '>';
+    static constexpr Char_T_ GreaterExp   = '>';
     static constexpr Char_T_ AndExp       = '&';
     static constexpr Char_T_ OrExp        = '|';
 
@@ -1935,8 +2218,8 @@ struct TemplatePatterns_T_ {
     static constexpr const Char_T_ *HTMLLess       = TPStrings<Char_T_, size_>::HTMLLess;
 
     // &gt; >
-    static constexpr SizeT          HTMLBiggerLength = 4U;
-    static constexpr const Char_T_ *HTMLBigger       = TPStrings<Char_T_, size_>::HTMLBigger;
+    static constexpr SizeT          HTMLGreaterLength = 4U;
+    static constexpr const Char_T_ *HTMLGreater       = TPStrings<Char_T_, size_>::HTMLGreater;
 
     // &quot; "
     static constexpr SizeT          HTMLQuoteLength = 6U;
@@ -1978,7 +2261,7 @@ struct TPStrings<Char_T_, 1> {
     static constexpr const Char_T_ *ElseSuffix        = "/>";
     static constexpr const Char_T_ *HTMLAnd           = "&amp;";
     static constexpr const Char_T_ *HTMLLess          = "&lt;";
-    static constexpr const Char_T_ *HTMLBigger        = "&gt;";
+    static constexpr const Char_T_ *HTMLGreater       = "&gt;";
     static constexpr const Char_T_ *HTMLQuote         = "&quot;";
     static constexpr const Char_T_ *HTMLSingleQuote   = "&apos;";
 };
@@ -1998,7 +2281,7 @@ struct TPStrings<Char_T_, 2> {
     static constexpr const Char_T_ *ElseSuffix        = u"/>";
     static constexpr const Char_T_ *HTMLAnd           = u"&amp;";
     static constexpr const Char_T_ *HTMLLess          = u"&lt;";
-    static constexpr const Char_T_ *HTMLBigger        = u"&gt;";
+    static constexpr const Char_T_ *HTMLGreater       = u"&gt;";
     static constexpr const Char_T_ *HTMLQuote         = u"&quot;";
     static constexpr const Char_T_ *HTMLSingleQuote   = u"&apos;";
 };
@@ -2018,7 +2301,7 @@ struct TPStrings<Char_T_, 4> {
     static constexpr const Char_T_ *ElseSuffix        = U"/>";
     static constexpr const Char_T_ *HTMLAnd           = U"&amp;";
     static constexpr const Char_T_ *HTMLLess          = U"&lt;";
-    static constexpr const Char_T_ *HTMLBigger        = U"&gt;";
+    static constexpr const Char_T_ *HTMLGreater       = U"&gt;";
     static constexpr const Char_T_ *HTMLQuote         = U"&quot;";
     static constexpr const Char_T_ *HTMLSingleQuote   = U"&apos;";
 };
@@ -2038,7 +2321,7 @@ struct TPStrings<wchar_t, 4> {
     static constexpr const wchar_t *ElseSuffix        = L"/>";
     static constexpr const wchar_t *HTMLAnd           = L"&amp;";
     static constexpr const wchar_t *HTMLLess          = L"&lt;";
-    static constexpr const wchar_t *HTMLBigger        = L"&gt;";
+    static constexpr const wchar_t *HTMLGreater       = L"&gt;";
     static constexpr const wchar_t *HTMLQuote         = L"&quot;";
     static constexpr const wchar_t *HTMLSingleQuote   = L"&apos;";
 };
@@ -2058,11 +2341,10 @@ struct TPStrings<wchar_t, 2> {
     static constexpr const wchar_t *ElseSuffix        = L"/>";
     static constexpr const wchar_t *HTMLAnd           = L"&amp;";
     static constexpr const wchar_t *HTMLLess          = L"&lt;";
-    static constexpr const wchar_t *HTMLBigger        = L"&gt;";
+    static constexpr const wchar_t *HTMLGreater       = L"&gt;";
     static constexpr const wchar_t *HTMLQuote         = L"&quot;";
     static constexpr const wchar_t *HTMLSingleQuote   = L"&apos;";
 };
-
 } // namespace Qentem
 
 #endif
