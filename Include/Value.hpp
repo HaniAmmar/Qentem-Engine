@@ -1473,17 +1473,17 @@ class Value {
     inline void setTypeToNull() noexcept { setType(ValueType::Null); }
 
     inline void initObject() noexcept {
-        Memory::Initialize(&object_, VObject());
+        Memory::Initialize(&object_, VObject{});
         setTypeToObject();
     }
 
     inline void initArray() noexcept {
-        Memory::Initialize(&array_, VArray());
+        Memory::Initialize(&array_, VArray{});
         setTypeToArray();
     }
 
     inline void initString() noexcept {
-        Memory::Initialize(&string_, VString());
+        Memory::Initialize(&string_, VString{});
         setTypeToString();
     }
 
