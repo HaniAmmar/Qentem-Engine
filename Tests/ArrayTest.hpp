@@ -266,7 +266,8 @@ static void TestArray3(TestHelper &helper) {
 
     helper.Equal(sum, 28U, "sum", __LINE__);
 
-    numbers2.Insert(storage1[0]).Insert(storage1[1]);
+    numbers2.Insert(storage1[0]);
+    numbers2.Insert(storage1[1]);
 
     for (SizeT i = 2; i < 8; i++) {
         numbers2.Insert(storage1[i]);

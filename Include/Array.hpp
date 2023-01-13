@@ -150,27 +150,12 @@ class Array {
         ++index_;
     }
 
-    inline void operator+=(const Type_ &item) { *this += static_cast<Type_ &&>(Type_(item)); }
+    inline void operator+=(const Type_ &item) { *this += static_cast<Type_ &&>(Type_{item}); }
 
-    inline Array &Insert(Array &&src) {
-        *this += static_cast<Array &&>(src);
-        return *this;
-    }
-
-    inline Array &Insert(const Array &src) {
-        *this += static_cast<const Array &>(src);
-        return *this;
-    }
-
-    inline Array &Insert(Type_ &&item) {
-        *this += static_cast<Type_ &&>(item);
-        return *this;
-    }
-
-    inline Array &Insert(const Type_ &item) {
-        *this += static_cast<Type_ &&>(Type_(item));
-        return *this;
-    }
+    inline void Insert(Array &&src) { *this += static_cast<Array &&>(src); }
+    inline void Insert(const Array &src) { *this += static_cast<const Array &>(src); }
+    inline void Insert(Type_ &&item) { *this += static_cast<Type_ &&>(item); }
+    inline void Insert(const Type_ &item) { *this += static_cast<Type_ &&>(Type_{item}); }
 
     void Clear() noexcept {
         Type_ *storage = Storage();
@@ -246,7 +231,7 @@ class Array {
 
         if (new_size > Size()) {
             Type_ *current = Storage();
-            Memory::Initialize((current + Size()), (current + new_size), Type_());
+            Memory::Initialize((current + Size()), (current + new_size), Type_{});
         }
 
         setSize(Capacity());
