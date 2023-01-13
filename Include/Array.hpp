@@ -157,6 +157,11 @@ class Array {
     inline void Insert(Type_ &&item) { *this += static_cast<Type_ &&>(item); }
     inline void Insert(const Type_ &item) { *this += static_cast<Type_ &&>(Type_{item}); }
 
+    inline Type_ &InsertGet(Type_ &&item) {
+        *this += static_cast<Type_ &&>(item);
+        return *(Storage() + (Size() - 1));
+    }
+
     void Clear() noexcept {
         Type_ *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));

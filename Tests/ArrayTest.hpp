@@ -312,6 +312,14 @@ static void TestArray3(TestHelper &helper) {
 
     helper.Equal(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr", __LINE__);
     helper.Equal(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr", __LINE__);
+
+    ///////////////////////////
+    numbers1.Clear();
+
+    SizeT &nu1 = numbers1.InsertGet(5);
+    ++nu1;
+
+    helper.Equal(*(numbers1.First()), SizeT{6}, "numbers1.First()", "6", __LINE__);
 }
 
 static void TestArray4(TestHelper &helper) {
