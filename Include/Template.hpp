@@ -369,13 +369,18 @@ struct Template {
 
     // LoopTag -------------------------------------------
     struct LoopTag {
-        Array<TagBit> SubTags;
-        VariableTag   Set;
-        SizeT         ValueOffset;
-        SizeT         GroupOffset;
-        unsigned char ValueLength;
-        unsigned char GroupLength;
-        unsigned char Sort;
+        Array<TagBit>  SubTags;
+        SizeT          Offset;
+        unsigned short SetOffset;
+        unsigned short SetLength;
+        unsigned char  SetLevel;
+        unsigned char  SetIsLoopValue;
+        unsigned char  ValueOffset;
+        unsigned char  GroupOffset;
+        unsigned char  ValueLength;
+        unsigned char  GroupLength;
+        unsigned char  Sort;
+        unsigned char  _reserved_;
     };
 
     // InlineIfTag -------------------------------------------
@@ -982,8 +987,9 @@ struct TemplateSub {
         const Value_T_ *loop_set;
 
         // Set (Array|Object)
-        if (i_tag->Set.Length != 0) {
-            loop_set = getValue(i_tag->Set);
+        if (i_tag->SetLength != 0) {
+            loop_set =
+                getValue((i_tag->Offset + i_tag->SetOffset), i_tag->SetLength, i_tag->SetLevel, i_tag->SetIsLoopValue);
         } else {
             loop_set = value_;
         }
@@ -991,7 +997,8 @@ struct TemplateSub {
         if (loop_set != nullptr) {
             // Group
             if (i_tag->GroupLength != 0) {
-                if (!(loop_set->GroupBy(grouped_set, (content_ + i_tag->GroupOffset), i_tag->GroupLength))) {
+                if (!(loop_set->GroupBy(grouped_set, (content_ + i_tag->Offset + i_tag->GroupOffset),
+                                        i_tag->GroupLength))) {
                     return;
                 }
 
@@ -1012,7 +1019,7 @@ struct TemplateSub {
 
             // Stage 4: Render
             TemplateSub loop_template{content_, length_, stream_, value_, this, level};
-            loop_template.loop_value_offset_ = i_tag->ValueOffset;
+            loop_template.loop_value_offset_ = (i_tag->Offset + i_tag->ValueOffset);
             loop_template.loop_value_length_ = i_tag->ValueLength;
 
             const TagBit *s_tag = i_tag->SubTags.First();
@@ -1147,6 +1154,7 @@ struct TemplateSub {
             Engine::FindOne<Char_T_>(TemplatePatterns::MultiLineSuffix, content_, offset, end_offset, length_);
 
         SizeT offset2     = getQuotedValue(offset, loop_content_offset);
+        tag->Offset       = offset;
         SizeT last_offset = offset;
         offset -= 6U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
@@ -1162,7 +1170,12 @@ struct TemplateSub {
                         set_length -= TemplatePatterns::VariableFulllength;
                     }
 
-                    parseVariableTag(set_offset, (set_offset + set_length), &(tag->Set));
+                    VariableTag set_var{};
+                    parseVariableTag(set_offset, (set_offset + set_length), &set_var);
+                    tag->SetOffset      = static_cast<unsigned char>(set_var.Offset - tag->Offset);
+                    tag->SetLength      = set_var.Length;
+                    tag->SetLevel       = set_var.Level;
+                    tag->SetIsLoopValue = set_var.IsLoopValue;
 
                     offset      = offset2;
                     offset2     = getQuotedValue(offset, loop_content_offset);
@@ -1172,7 +1185,7 @@ struct TemplateSub {
                 }
 
                 case TemplatePatterns::ValueChar: {
-                    tag->ValueOffset = last_offset;
+                    tag->ValueOffset = static_cast<unsigned char>(last_offset - tag->Offset);
                     tag->ValueLength = static_cast<unsigned char>((offset2 - 1U) - last_offset);
                     offset           = offset2;
                     offset2          = getQuotedValue(offset, loop_content_offset);
@@ -1191,7 +1204,7 @@ struct TemplateSub {
                 }
 
                 case TemplatePatterns::GroupChar: {
-                    tag->GroupOffset = last_offset;
+                    tag->GroupOffset = static_cast<unsigned char>(last_offset - tag->Offset);
                     tag->GroupLength = static_cast<unsigned char>((offset2 - 1) - last_offset);
                     offset           = offset2;
                     offset2          = getQuotedValue(offset, loop_content_offset);
@@ -1208,7 +1221,7 @@ struct TemplateSub {
 
         const unsigned short level = (level_ + 1);
         TemplateSub          loop_template{content_, length_, nullptr, nullptr, this, level};
-        loop_template.loop_value_offset_ = tag->ValueOffset;
+        loop_template.loop_value_offset_ = (tag->Offset + tag->ValueOffset);
         loop_template.loop_value_length_ = tag->ValueLength;
         loop_template.parse(tag->SubTags, loop_content_offset, end_offset);
     }
@@ -1353,13 +1366,18 @@ struct TemplateSub {
     }
 
     const Value_T_ *getValue(const VariableTag &variable) const noexcept {
+        return getValue(variable.Offset, variable.Length, variable.Level, variable.IsLoopValue);
+    }
+
+    const Value_T_ *getValue(SizeT v_offset, unsigned short v_length, unsigned char v_level,
+                             unsigned char v_is_loop_value) const noexcept {
         const Value_T_ *value     = nullptr;
-        const Char_T_  *id        = (content_ + variable.Offset);
-        const SizeT     length    = variable.Length;
+        const Char_T_  *id        = (content_ + v_offset);
+        const SizeT     length    = v_length;
         SizeT           offset    = 0;
         const bool      has_index = (id[(length - 1)] == TemplatePatterns::VariableIndexSuffix);
 
-        if (variable.IsLoopValue != 1) {
+        if (v_is_loop_value != 1) {
             if (!has_index) {
                 return value_->GetValue(id, length);
             }
@@ -1374,14 +1392,16 @@ struct TemplateSub {
                 value = value_->GetValue(id, offset);
             }
         } else {
-            const TemplateSub *that    = this;
-            const unsigned int level   = static_cast<unsigned int>(level_);
-            unsigned int       v_level = static_cast<unsigned int>(variable.Level);
-            value                      = loop_value_;
+            const TemplateSub *that = this;
+            {
+                const unsigned int level    = static_cast<unsigned int>(level_);
+                unsigned int       iv_level = static_cast<unsigned int>(v_level);
+                value                       = loop_value_;
 
-            while (v_level < level) {
-                that = that->parent_;
-                ++v_level;
+                while (iv_level < level) {
+                    that = that->parent_;
+                    ++iv_level;
+                }
             }
 
             value = that->loop_value_;
