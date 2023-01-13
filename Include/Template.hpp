@@ -255,32 +255,6 @@ struct Template {
         return Render(content, StringUtils::Count(content), value);
     }
 
-    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
-    inline static bool Evaluate(double &number, const Char_T_ *content, const Value_T_ &value) {
-        // For testing only.
-        using TemplateSubCV        = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
-        const SizeT         length = StringUtils::Count(content);
-        const TemplateSubCV temp{content, length, nullptr, &value};
-        Array<QExpresion>   exprs = temp.parseExpressions(0, length);
-        QExpresion          expr;
-
-        if (temp.evaluateExpressions(expr, exprs)) {
-            number = expr.Number.Real;
-            return true;
-        }
-
-        number = 0;
-        return false;
-    }
-
-    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
-    inline static double Evaluate(const Char_T_ *content, const Value_T_ &value) {
-        // For testing only.
-        double number;
-        Evaluate(number, content, value);
-        return number;
-    }
-
     // QOperation -------------------------------------------
     enum class QOperation : unsigned char {
         NoOp = 0,
@@ -566,8 +540,6 @@ struct TemplateSub {
     using QNumber          = Template::QNumber;
     using TemplatePatterns = TemplatePatterns_T_<Char_T_>;
 
-    friend struct Template;
-
   public:
     void Render(const TagBit *tag, const TagBit *end) const {
         while (tag < end) {
@@ -615,7 +587,21 @@ struct TemplateSub {
         }
     }
 
-    void Parse(Array<TagBit> &tags_cache) const { parse(tags_cache, 0, length_); }
+    inline void Parse(Array<TagBit> &tags_cache) const { parse(tags_cache, 0, length_); }
+
+    inline bool Evaluate(QExpresion &number, const QExpresions &exprs) const noexcept {
+        const QExpresion *expr = exprs.First();
+
+        if (expr != nullptr) {
+            return processExpressions(number, expr, QOperation::NoOp);
+        }
+
+        return false;
+    }
+
+    inline QExpresions ParseExpressions(SizeT offset, const SizeT end_offset) const noexcept {
+        return parseExpressions(offset, end_offset);
+    }
 
   private:
     void parse(Array<TagBit> &tags_cache, SizeT offset, const SizeT end_offset) const {
@@ -980,7 +966,7 @@ struct TemplateSub {
         const MathTag *i_tag = static_cast<const MathTag *>(tag->GetInfo());
         QExpresion     expr;
 
-        if (evaluateExpressions(expr, i_tag->Expresions)) {
+        if (Evaluate(expr, i_tag->Expresions)) {
             Digit<Char_T_>::NumberToString(*stream_, expr.Number.Real, 1, 0, 3);
         } else {
             stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
@@ -1065,7 +1051,7 @@ struct TemplateSub {
 
         QExpresion expr;
 
-        if (evaluateExpressions(expr, i_tag->Case)) {
+        if (Evaluate(expr, i_tag->Case)) {
             if (expr.Number.Real > 0.0) {
                 if (i_tag->TrueTagsSize != 0) {
                     const TagBit *s_tag = i_tag->SubTags.First();
@@ -1096,7 +1082,7 @@ struct TemplateSub {
         if ((item != nullptr) && item->Case.IsNotEmpty()) { // first case should not be empty
             do {
                 // <else> without if = (item->Case == nothing)
-                if (item->Case.IsEmpty() || (evaluateExpressions(expr, item->Case) && (expr.Number.Real > 0))) {
+                if (item->Case.IsEmpty() || (Evaluate(expr, item->Case) && (expr.Number.Real > 0))) {
                     const TagBit *s_tag = item->SubTags.First();
                     const TagBit *s_end = (s_tag + item->SubTags.Size());
                     Render(s_tag, s_end);
@@ -1433,16 +1419,6 @@ struct TemplateSub {
     }
 
     // Evaluate /////////////////////////////////////
-    bool evaluateExpressions(QExpresion &number, const QExpresions &exprs) const noexcept {
-        const QExpresion *expr = exprs.First();
-
-        if (expr != nullptr) {
-            return processExpressions(number, expr, QOperation::NoOp);
-        }
-
-        return false;
-    }
-
     bool processExpressions(QExpresion &left, const QExpresion *&expr, const QOperation previous_oper) const noexcept {
         const QExpresion *next_expr;
         QExpresion        right;
