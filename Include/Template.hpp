@@ -264,7 +264,7 @@ struct Template {
         Array<QExpresion>   exprs = temp.parseExpressions(0, length);
         QExpresion          expr;
 
-        if (exprs.IsNotEmpty() && temp.evaluateExpressions(expr, exprs)) {
+        if (temp.evaluateExpressions(expr, exprs)) {
             number = expr.Number.Real;
             return true;
         }
@@ -323,13 +323,13 @@ struct Template {
     // QNumber -------------------------------------------
     struct QNumber {
         union {
-            unsigned long long Natural; // Natural number.
-            long long          Integer; // Integer number.
-            double             Real;    // Real number.
+            unsigned long long Natural{0}; // Natural number.
+            long long          Integer;    // Integer number.
+            double             Real;       // Real number.
         };
 
-        SizeT Offset; // String for use in ==
-        SizeT Length;
+        SizeT Offset{0}; // String for use in ==
+        SizeT Length{0};
     };
 
     // QExpresion -------------------------------------------
@@ -338,9 +338,9 @@ struct Template {
         QExpresion &operator=(const QExpresion &) = delete;
         QExpresion &operator=(QExpresion &&)      = delete;
 
-        QExpresion() noexcept : Bucket{}, Type{ExpresionType::Empty}, Operation{QOperation::NoOp} {};
+        QExpresion() noexcept : Number{}, Type{ExpresionType::Empty}, Operation{QOperation::NoOp} {};
 
-        QExpresion(ExpresionType type, QOperation operation) noexcept : Bucket{}, Type{type}, Operation{operation} {}
+        QExpresion(ExpresionType type, QOperation operation) noexcept : Number{}, Type{type}, Operation{operation} {}
 
         QExpresion(Array<QExpresion> &&subExpresions, QOperation operation) noexcept
             : SubExpresions{static_cast<Array<QExpresion> &&>(subExpresions)}, Type{ExpresionType::SubOperation},
@@ -352,9 +352,9 @@ struct Template {
             }
         }
 
-        QExpresion(QExpresion &&expr) noexcept : Bucket{expr.Bucket}, Type{expr.Type}, Operation{expr.Operation} {
+        QExpresion(QExpresion &&expr) noexcept : Number{expr.Number}, Type{expr.Type}, Operation{expr.Operation} {
             expr.Type = ExpresionType::Empty;
-            // expr.Tag  = Bucket{};
+            // expr.Number  = QNumber{};
         }
 
         struct Bucket_ {
@@ -364,7 +364,7 @@ struct Template {
         };
 
         union {
-            Bucket_           Bucket;
+            // Bucket_           Bucket;
             Array<QExpresion> SubExpresions{}; // Thanks GCC
             QNumber           Number;
             VariableTag       Variable; // {var:...}
@@ -980,7 +980,7 @@ struct TemplateSub {
         const MathTag *i_tag = static_cast<const MathTag *>(tag->GetInfo());
         QExpresion     expr;
 
-        if (i_tag->Expresions.IsNotEmpty() && evaluateExpressions(expr, i_tag->Expresions)) {
+        if (evaluateExpressions(expr, i_tag->Expresions)) {
             Digit<Char_T_>::NumberToString(*stream_, expr.Number.Real, 1, 0, 3);
         } else {
             stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
