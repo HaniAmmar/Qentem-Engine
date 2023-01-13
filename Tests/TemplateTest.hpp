@@ -221,24 +221,6 @@ static void TestVariableTag1(TestHelper &helper) {
 
     content = R"({var:6key3]})";
     helper.Equal(Template::Render(content, value), R"({var:6key3]})", R"(Render())", __LINE__);
-
-    content = R"({var:~2})";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"({var:~~~~~~~2})";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"({var:~2]})";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"({var:~[2]]})";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"({var:~~~~~~~~2]})";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"({var:~~~~~~~~[2]})";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 }
 
 static void TestVariableTag2(TestHelper &helper) {
@@ -1822,11 +1804,11 @@ static void TestLoopTag1(TestHelper &helper) {
     value1 += nullptr;
     value1 += 3;
 
-    content = R"(<loop value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value1), R"(100, -50, Qentem, true, false, null, 3, )", R"(Render())",
                  __LINE__);
 
-    content = R"(<loop value="loop1-value">loop1-value, loop1-value </loop>)";
+    content = R"(<loop value="loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
     helper.Equal(Template::Render(content, value1),
                  R"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", R"(Render())",
                  __LINE__);
@@ -1837,14 +1819,24 @@ static void TestLoopTag1(TestHelper &helper) {
     value1 += 0;
     value1 += 1;
 
-    content = R"(<loop value="loop1-value"><loop value="loop2-value">(loop1-value: loop2-value) </loop></loop>)";
+    content =
+        R"(<loop value="loop1-value"><loop value="loop2-value">({var:loop1-value}: {var:loop2-value}) </loop></loop>)";
     helper.Equal(Template::Render(content, value1), R"((0: 0) (0: 1) (1: 0) (1: 1) )", R"(Render())", __LINE__);
 
     content = R"(<loop value="loop1-value"><loop value="loop2-value"><loop
-                 value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
+                 value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
     helper.Equal(Template::Render(content, value1),
                  R"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", R"(Render())",
                  __LINE__);
+
+    content = R"(<loop value="loop1-value"><loop value="loop2-value"><loop
+                 value="loop3-value"><loop value="loop4-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}: {var:loop4-value}) </loop></loop></loop></loop>)";
+    helper.Equal(
+        Template::Render(content, value1),
+        R"((0: 0: 0: 0) (0: 0: 0: 1) (0: 0: 1: 0) (0: 0: 1: 1) (0: 1: 0: 0) (0: 1: 0: 1) (0: 1: 1: 0) (0: 1: 1: 1) (1: 0: 0: 0) (1: 0: 0: 1) (1: 0: 1: 0) (1: 0: 1: 1) (1: 1: 0: 0) (1: 1: 0: 1) (1: 1: 1: 0) (1: 1: 1: 1) )",
+        R"(Render())", __LINE__);
+
+    //////////////////////
 
     value1             = JSON::Parse(R"([100, -50, "A", true, false, null])");
     Value<char> value2 = JSON::Parse(R"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
@@ -1852,79 +1844,82 @@ static void TestLoopTag1(TestHelper &helper) {
     //////////////////////
     value3[R"(arr1)"] = value1;
 
-    content = R"(<loop value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value1), R"(100, -50, A, true, false, null, )", R"(Render())", __LINE__);
 
-    content = R"(<loop value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value2), R"(4, 1.5, ABC, true, false, null, )", R"(Render())", __LINE__);
 
-    content = R"(<loop set="arr1" value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop set="arr1" value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(100, -50, A, true, false, null, )", R"(Render())", __LINE__);
 
     value3[R"(arr1)"] = value2;
 
-    content = R"(<loop set="arr1" value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop set="arr1" value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(4, 1.5, ABC, true, false, null, )", R"(Render())", __LINE__);
 
     //////////////////////
     value3[R"(arr1)"] = value1;
 
-    content = R"(<loop value="loop1-value" >loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value" >{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value1), R"(100, -50, A, true, false, null, )", R"(Render())", __LINE__);
 
-    content = R"(<loop value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value2), R"(4, 1.5, ABC, true, false, null, )", R"(Render())", __LINE__);
 
-    content = R"(<loop value="loop1-value"set="arr1">loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value"set="arr1">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(100, -50, A, true, false, null, )", R"(Render())", __LINE__);
 
     value3[R"(arr1)"] = value2;
 
-    content = R"(<loop set="arr1" value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop set="arr1" value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(4, 1.5, ABC, true, false, null, )", R"(Render())", __LINE__);
 
     //////////////////////
     value3.Reset();
     value3[R"(arr1)"][R"(arr2)"][R"(arr3)"] = value1;
 
-    content = R"(<loop set="arr1[arr2][arr3]" value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop set="arr1[arr2][arr3]" value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(100, -50, A, true, false, null, )", R"(Render())", __LINE__);
 
     value3.Reset();
     value3[0][0] += value2;
 
-    content = R"(<loop set="0[0][0]"value="loop1-value">loop1-value, </loop>)";
+    content = R"(<loop set="0[0][0]"value="loop1-value">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(4, 1.5, ABC, true, false, null, )", R"(Render())", __LINE__);
 
     value3.Reset();
     value3[R"(k1)"][0][R"(k3)"] = value1;
 
-    content = R"(<loop value="loop1-value" set="k1[0][k3]">loop1-value, </loop>)";
+    content = R"(<loop value="loop1-value" set="k1[0][k3]">{var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3), R"(100, -50, A, true, false, null, )", R"(Render())", __LINE__);
 
     value3.Reset();
     value3[0][R"(k2)"] += value2;
 
-    content = R"(<loop set="0[k2][0]"value="loop1-value">loop1-value, loop1-value, </loop>)";
+    content = R"(<loop set="0[k2][0]"value="loop1-value">{var:loop1-value}, {var:loop1-value}, </loop>)";
     helper.Equal(Template::Render(content, value3),
                  R"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )", R"(Render())", __LINE__);
 
     value3 = JSON::Parse(R"({"group":[[10],[20],[30]]})");
 
-    content = R"(<loop set="group" value="_Val1"><loop set="_Val1" value="_Val2">_Val2</loop></loop>)";
+    content = R"(<loop set="group" value="_Val1"><loop set="_Val1" value="_Val2">{var:_Val2}</loop></loop>)";
     helper.Equal(Template::Render(content, value3), R"(102030)", R"(Render())", __LINE__);
 
     value3 = JSON::Parse(R"({"group":[1,2,3,4]})");
 
-    content = R"(<loop set="group" value="_Val">_Val</loop>)";
+    content = R"(<loop set="group" value="_Val">{var:_Val}</loop>)";
     helper.Equal(Template::Render(content, value3), R"(1234)", R"(Render())", __LINE__);
 
     value3  = JSON::Parse(R"({"numbers":[1,2,3,4,5,6,7,8]})");
-    content = R"(A<loop set="numbers" value="t">t</loop>B)";
+    content = R"(A<loop set="numbers" value="l_id1">{var:l_id1}</loop>B)";
     helper.Equal(Template::Render(content, value3), R"(A12345678B)", R"(Render())", __LINE__);
 
-    content = R"(<loop set="numbers" value="t">t[0]</loop>)";
-    helper.Equal(Template::Render(content, value3), R"()", R"(Render())", __LINE__);
+    content = R"(<loop set="numbers" value="l_id1">{var:l_id1[0]}</loop>)";
+    helper.Equal(
+        Template::Render(content, value3),
+        R"({var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]}{var:l_id1[0]})",
+        R"(Render())", __LINE__);
 }
 
 static void TestLoopTag2(TestHelper &helper) {
@@ -1949,27 +1944,18 @@ static void TestLoopTag2(TestHelper &helper) {
     content = R"(<loop></loop><loop>A</loop>)";
     helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 
-    content = R"(<loop value="a">a</loop>)";
+    content = R"(<loop value="a">{var:a}</loop>)";
     helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 
-    content = R"(<loop set="ss" value="a">a</loop>)";
+    content = R"(<loop set="ss" value="a">{var:a}</loop>)";
     helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 
-    content = R"(<loop set="" value="a">a</loop>)";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"(<loop repeat="2" A</loop>)";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"(<loop repeat="OOO">A</loop>)";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"(<loop repeat="{var:10}">A</loop>)";
+    content = R"(<loop set="" value="a">{var:a}</loop>)";
     helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 
     value[R"(in)"] = Array<Value<char>>();
 
-    content = R"(<loop value="v">v</loop>)";
+    content = R"(<loop value="v">{var:v}</loop>)";
     helper.Equal(Template::Render(content, value), R"(in)", R"(Render())", __LINE__);
 
     value.Reset();
@@ -1982,16 +1968,16 @@ static void TestLoopTag2(TestHelper &helper) {
 
     value[R"(k2)"].Reset();
 
-    content = R"(<loop value="v">v</loop>)";
+    content = R"(<loop value="v">{var:v}</loop>)";
     helper.Equal(Template::Render(content, value), R"(1030)", R"(Render())", __LINE__);
 
     value.RemoveIndex(1);
 
-    content = R"(<loop value="v">v)";
-    helper.Equal(Template::Render(content, value), R"(<loop value="v">v)", R"(Render())", __LINE__);
+    content = R"(<loop value="v">{var:v})";
+    helper.Equal(Template::Render(content, value), R"(<loop value="v">{var:v})", R"(Render())", __LINE__);
 
-    content = R"(<loop value="v">v     )";
-    helper.Equal(Template::Render(content, value), R"(<loop value="v">v     )", R"(Render())", __LINE__);
+    content = R"(<loop value="v">{var:v}     )";
+    helper.Equal(Template::Render(content, value), R"(<loop value="v">{var:v}     )", R"(Render())", __LINE__);
 
     value.Reset();
     value += 10;
@@ -2000,7 +1986,7 @@ static void TestLoopTag2(TestHelper &helper) {
 
     value.RemoveIndex(1);
 
-    content = R"(<loop value="v">v</loop>)";
+    content = R"(<loop value="v">{var:v}</loop>)";
     helper.Equal(Template::Render(content, value), R"(1030)", R"(Render())", __LINE__);
 
     value = JSON::Parse(R"(
@@ -2024,17 +2010,22 @@ static void TestLoopTag2(TestHelper &helper) {
 }
     )");
 
-    content = R"(<loop set="object" value="item">item[var1]item[var2]item[var3] item[var4]</loop>)";
+    content =
+        R"(<loop set="object" value="item">{var:item[var1]}{var:item[var2]}{var:item[var3]} {var:item[var4]}</loop>)";
     helper.Equal(Template::Render(content, value), R"(value1value2value3 value4)", R"(Render())", __LINE__);
 
-    content = R"(<loop set="array" value="item"> item[0] item[1] item[2] item[3] </loop>)";
+    content = R"(<loop set="array" value="item"> {var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]} </loop>)";
     helper.Equal(Template::Render(content, value), R"( value10 value20 value30 value40 )", R"(Render())", __LINE__);
 
-    content = R"(<loop set="object" value="item">item[var11]item[var22]item[var33] item[var44]</loop>)";
-    helper.Equal(Template::Render(content, value), R"( )", R"(Render())", __LINE__);
+    content =
+        R"(<loop set="object" value="item">{var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]}</loop>)";
+    helper.Equal(Template::Render(content, value),
+                 R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", R"(Render())", __LINE__);
 
-    content = R"(<loop set="array" value="item">item[var11]item[var22]item[var33] item[var44]</loop>)";
-    helper.Equal(Template::Render(content, value), R"( )", R"(Render())", __LINE__);
+    content =
+        R"(<loop set="array" value="item">{var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]}</loop>)";
+    helper.Equal(Template::Render(content, value),
+                 R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", R"(Render())", __LINE__);
 
     value.RemoveIndex(0);
     content = R"(<loop><l</loop>)";
@@ -2071,7 +2062,7 @@ static void TestLoopTag2(TestHelper &helper) {
         value2 += i;
     }
 
-    content2 += R"(<loop value="loop1-value">A loop1-value B</loop>)";
+    content2 += R"(<loop value="loop1-value">A {var:loop1-value} B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += R"(A )";
         Digit<char>::NumberToString(output, i);
@@ -2151,24 +2142,24 @@ static void TestLoopTag3(TestHelper &helper) {
     )");
 
     content =
-        R"(<loop value="val1_" group="year111" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">val3_</loop></loop></loop>)";
+        R"(<loop value="val1_" group="year111" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">{var:val3_}</loop></loop></loop>)";
 
     helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 
     content =
-        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">val3_</loop></loop></loop>)";
+        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">{var:val3_}</loop></loop></loop>)";
 
     helper.Equal(Template::Render(content, value), R"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)",
                  R"(Render())", __LINE__);
 
     content =
-        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_" group="quarter" sort="ascend"><loop set="val2_" value="val3_"><loop set="val3_" value="val4_">val4_</loop></loop></loop></loop>)";
+        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_" group="quarter" sort="ascend"><loop set="val2_" value="val3_"><loop set="val3_" value="val4_">{var:val4_}</loop></loop></loop></loop>)";
 
     helper.Equal(Template::Render(content, value), R"(1400145014501100112512002300120023002300)", R"(Render())",
                  __LINE__);
 
     content =
-        R"(<loop value="val1_" group="year" sort="descend">-- val1_-<loop set="val1_" value="val2_" group="quarter" sort="ascend">val2_-<loop set="val2_" value="val3_" group="week" sort="ascend">val2_:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> val5_</loop></loop></loop></loop></loop>)";
+        R"(<loop value="val1_" group="year" sort="descend">-- {var:val1_}-<loop set="val1_" value="val2_" group="quarter" sort="ascend">{var:val2_}-<loop set="val2_" value="val3_" group="week" sort="ascend">{var:val2_}:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> {var:val5_}</loop></loop></loop></loop></loop>)";
 
     helper.Equal(
         Template::Render(content, value),
@@ -2176,7 +2167,7 @@ static void TestLoopTag3(TestHelper &helper) {
         R"(Render())", __LINE__);
 
     content =
-        R"(<loop value="val1_" group="year">-- val1_-<loop set="val1_" value="val2_" group="quarter">val2_-<loop set="val2_" value="val3_" group="week">val2_:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> val5_</loop></loop></loop></loop></loop>)";
+        R"(<loop value="val1_" group="year">-- {var:val1_}-<loop set="val1_" value="val2_" group="quarter">{var:val2_}-<loop set="val2_" value="val3_" group="week">{var:val2_}:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> {var:val5_}</loop></loop></loop></loop></loop>)";
 
     helper.Equal(
         Template::Render(content, value),
@@ -2195,11 +2186,11 @@ static void TestLoopTag3(TestHelper &helper) {
     value += 7;
     value += 6;
 
-    content = R"(<loop value="val1_" sort="a">val1_</loop>)";
+    content = R"(<loop value="val1_" sort="a">{var:val1_}</loop>)";
 
     helper.Equal(Template::Render(content, value), R"(1234567)", R"(Render())", __LINE__);
 
-    content = R"(<loop value="val1_" sort="d">val1_</loop>)";
+    content = R"(<loop value="val1_" sort="d">{var:val1_}</loop>)";
 
     helper.Equal(Template::Render(content, value), R"(7654321)", R"(Render())", __LINE__);
 }
@@ -2536,30 +2527,40 @@ static void TestRender2(TestHelper &helper) {
     value += 5;
     value += 10;
 
-    content = R"(<loop set="numbers" value="val_">val_</loop>)";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"(<loop value="this_number"><if case="(this_number % 2) == 1">this_number</if></loop>)";
-    helper.Equal(Template::Render(content, value), R"(15)", R"(Render())", __LINE__);
-
-    content = R"(<loop value="loop1_val">{if case="loop1_val < 5", true="loop1_val"}</loop>)";
-    helper.Equal(Template::Render(content, value), R"(012)", R"(Render())", __LINE__);
-
-    content = R"(<loop value="loop1_val">{if case="loop1_val < 5", true="{var:4}"}</loop>)";
-    helper.Equal(Template::Render(content, value), R"(101010)", R"(Render())", __LINE__);
-
-    content = R"(<loop value="loop1_val">loop1_val[]</loop>)";
-    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
-
-    content = R"(<loop value="loop1_val">loop1_val[0 </loop>)";
+    content = R"(<loop value="loop1_val">{var:~loop1_val[0 </loop>)";
     helper.Equal(Template::Render(content, value),
                  R"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
                  R"(Render())", __LINE__);
 
+    content = R"(<loop value="loop1_val">{var:loop1_val[]}</loop>)";
+    helper.Equal(Template::Render(content, value),
+                 R"({var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]})",
+                 R"(Render())", __LINE__);
+
+    content = R"(<loop set="numbers" value="val_">{var:val_}</loop>)";
+    helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
+
+    content = R"(<loop value="this_number"><if case="({var:this_number} % 2) == 1">{var:this_number}</if></loop>)";
+    helper.Equal(Template::Render(content, value), R"(15)", R"(Render())", __LINE__);
+
+    content = R"(<loop value="loop1_val">{if case="{var:loop1_val} < 5", true="{var:loop1_val}"}</loop>)";
+    helper.Equal(Template::Render(content, value), R"(012)", R"(Render())", __LINE__);
+
+    content = R"(<loop value="loop1_val">{if case="{var:loop1_val} < 5", true="{var:4}"}</loop>)";
+    helper.Equal(Template::Render(content, value), R"(101010)", R"(Render())", __LINE__);
+
     value = JSON::Parse(R"([[[1,2,3]]])");
 
-    content = R"(<loop value="loop1_val">loop1_val[0][2]</loop>)";
+    content = R"(<loop value="loop1_val">{var:loop1_val[0][2]}</loop>)";
     helper.Equal(Template::Render(content, value), R"(3)", R"(Render())", __LINE__);
+
+    value = Qentem::JSON::Parse(R"({"abc": [0,10,300], "xyz":[[1],[2],[3]]})");
+
+    content = R"(<loop set="xyz" value="lvar"> {var:lvar[0]} </loop>)";
+    helper.Equal(Template::Render(content, value), R"( 1  2  3 )", R"(Render())", __LINE__);
+
+    content = R"(<loop set="xyz" value="lvar"><loop set="lvar" value="lvar2"> {math:{var:lvar2}+3} </loop></loop>)";
+    helper.Equal(Template::Render(content, value), R"( 4  5  6 )", R"(Render())", __LINE__);
 }
 
 static int RunTemplateTests() {

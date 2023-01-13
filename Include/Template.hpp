@@ -20,10 +20,9 @@
  * SOFTWARE.
  */
 
+#include "Engine.hpp"
 #include "Array.hpp"
 #include "Digit.hpp"
-#include "Engine.hpp"
-#include "HArray.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_TEMPLATE_H_
@@ -140,27 +139,27 @@ namespace Qentem {
  * <loop set="..." value="..." group="..." sort="...">...</loop>
  *
  * <loop set="tree_name" value="loop1-value">
- *     loop1-value
+ *     {var:loop1-value}
  * </loop>
  *
  * <loop set="items" value="item">
- *     item[subitem1], item[subitem2], item[subitem3]
+ *     {var:item[subitem1]}, {var:item[subitem2]}, {var:item[subitem3]}
  * </loop>
  *
  * <loop set="tree_name" value="loop1-value">
- *      loop1-value
+ *      {var:loop1-value}
  *
  *      <loop set="tree_name2" value="loop2-value">
- *          loop2-value
+ *          {var:loop2-value}
  *      </loop>
  * </loop>
  *
  * <loop value="loop1-value" sort="ascend|descend">
- *     loop1-value
+ *     {var:loop1-value}
  * </loop>
  *
  * <loop value="loop1-value" group="xyz">
- *     loop1-value
+ *     {var:loop1-value}
  * </loop>
  */
 
@@ -190,38 +189,41 @@ struct Template {
     Template &operator=(const Template &) = delete;
     ~Template()                           = delete;
 
-    template <typename>
     struct TagBit;
+    struct QExpresion;
 
-    template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &value,
-                                    StringStream_T_ &stream, const Char_T_ *name, const SizeT name_length) {
-        // This is not a thread safe function, and its here to show how to cache geterated tags.
-        // Can be used in a single threaded prosess, but it is better to change it.
+    // template <typename Char_T_, typename Value_T_, typename StringStream_T_>
+    // inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &value,
+    //                                 StringStream_T_ &stream, const Char_T_ *name, const SizeT name_length) {
+    //     // This is not a thread safe function, and its here to show how to cache geterated tags.
+    //     // Can be used in a single threaded prosess, but it is better to change it.
 
-        // Usage:
-        // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
+    //     // Usage:
+    //     // #include "HArray.hpp"
+    //     // #include "Template.hpp"
+    //     //
+    //     // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
 
-        using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
+    //     using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
 
-        const TemplateSubCV temp{content, length, &stream, &value};
+    //     const TemplateSubCV temp{content, length, &stream, &value};
 
-        static HArray<Array<TagBit<Char_T_>>, Char_T_> cache;
+    //     static HArray<Array<TagBit>, Char_T_> cache;
 
-        Array<TagBit<Char_T_>> &tags = cache.GetOrAdd(name, name_length);
+    //     Array<TagBit> &tags = cache.GetOrAdd(name, name_length);
 
-        if (tags.IsEmpty()) {
-            temp.Parse(tags);
-        }
+    //     if (tags.IsEmpty()) {
+    //         temp.Parse(tags);
+    //     }
 
-        const TagBit<Char_T_> *tag = tags.First();
-        const TagBit<Char_T_> *end = (tag + tags.Size());
-        temp.Render(tag, end);
-    }
+    //     const TagBit *tag = tags.First();
+    //     const TagBit *end = (tag + tags.Size());
+    //     temp.Render(tag, end);
+    // }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &value, StringStream_T_ &stream,
-                              Array<TagBit<Char_T_>> &tags_cache) {
+                              Array<TagBit> &tags_cache) {
         using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
         const TemplateSubCV temp{content, length, &stream, &value};
 
@@ -229,15 +231,15 @@ struct Template {
             temp.Parse(tags_cache);
         }
 
-        const TagBit<Char_T_> *tag = tags_cache.First();
-        const TagBit<Char_T_> *end = (tag + tags_cache.Size());
+        const TagBit *tag = tags_cache.First();
+        const TagBit *end = (tag + tags_cache.Size());
         temp.Render(tag, end);
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     inline static void Render(const Char_T_ *content, const SizeT length, const Value_T_ &value,
                               StringStream_T_ &stream) {
-        Array<TagBit<Char_T_>> tags_cache;
+        Array<TagBit> tags_cache;
         Render(content, length, value, stream, tags_cache);
     }
 
@@ -256,10 +258,9 @@ struct Template {
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
     inline static bool Evaluate(double &number, const Char_T_ *content, const Value_T_ &value) {
         // For testing only.
-        using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
-        StringStream_T_     stream;
+        using TemplateSubCV        = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
         const SizeT         length = StringUtils::Count(content);
-        const TemplateSubCV temp{content, length, &stream, &value};
+        const TemplateSubCV temp{content, length, nullptr, &value};
         Array<QExpresion>   exprs = temp.parseExpressions(0, length);
         QExpresion          expr;
 
@@ -302,7 +303,7 @@ struct Template {
 
     // ExpresionType -------------------------------------------
     enum class ExpresionType : unsigned char {
-        Empty,
+        Empty = 0,
         RealNumber,
         NaturalNumber,
         IntegerNumber,
@@ -313,31 +314,33 @@ struct Template {
 
     // VariableTag -------------------------------------------
     struct VariableTag {
-        SizeT Offset;
-        SizeT Length;
-        SizeT Level;
+        SizeT          Offset;
+        unsigned short Length;
+        unsigned char  Level;
+        unsigned char  IsLoopValue;
     };
 
     // QNumber -------------------------------------------
     struct QNumber {
         union {
-            unsigned long long Natural{0}; // Natural number.
-            long long          Integer;    // Integer number.
-            double             Real;       // Real number.
+            unsigned long long Natural; // Natural number.
+            long long          Integer; // Integer number.
+            double             Real;    // Real number.
         };
 
-        SizeT Offset{0}; // String for use in ==
-        SizeT Length{0};
+        SizeT Offset; // String for use in ==
+        SizeT Length;
     };
 
     // QExpresion -------------------------------------------
     struct QExpresion {
-        QExpresion() noexcept {}
+        QExpresion(const QExpresion &)            = delete;
+        QExpresion &operator=(const QExpresion &) = delete;
+        QExpresion &operator=(QExpresion &&)      = delete;
 
-        QExpresion(ExpresionType type, QOperation operation) noexcept : Type{type}, Operation{operation} {}
+        QExpresion() noexcept : Bucket{}, Type{ExpresionType::Empty}, Operation{QOperation::NoOp} {};
 
-        QExpresion(VariableTag variable, QOperation operation) noexcept
-            : Variable{variable}, Type{ExpresionType::Variable}, Operation{operation} {}
+        QExpresion(ExpresionType type, QOperation operation) noexcept : Bucket{}, Type{type}, Operation{operation} {}
 
         QExpresion(Array<QExpresion> &&subExpresions, QOperation operation) noexcept
             : SubExpresions{static_cast<Array<QExpresion> &&>(subExpresions)}, Type{ExpresionType::SubOperation},
@@ -349,19 +352,26 @@ struct Template {
             }
         }
 
-        QExpresion(QExpresion &&expr) noexcept : Number{expr.Number}, Type{expr.Type}, Operation{expr.Operation} {
-            expr.Type   = ExpresionType::Empty;
-            expr.Number = QNumber{};
+        QExpresion(QExpresion &&expr) noexcept : Bucket{expr.Bucket}, Type{expr.Type}, Operation{expr.Operation} {
+            expr.Type = ExpresionType::Empty;
+            // expr.Tag  = Bucket{};
         }
 
+        struct Bucket_ {
+            SizeT  padding1{0};
+            SizeT  padding2{0};
+            SizeT *padding3{nullptr};
+        };
+
         union {
-            QNumber           Number{};
-            Array<QExpresion> SubExpresions;
+            Bucket_           Bucket;
+            Array<QExpresion> SubExpresions{}; // Thanks GCC
+            QNumber           Number;
             VariableTag       Variable; // {var:...}
         };
 
-        ExpresionType Type{ExpresionType::Empty};
-        QOperation    Operation{QOperation::NoOp};
+        ExpresionType Type;
+        QOperation    Operation;
     };
 
     // TagType -------------------------------------------
@@ -376,13 +386,6 @@ struct Template {
         RawText
     };
 
-    // RawVariableTag -------------------------------------------
-    struct RawVariableTag {
-        SizeT Offset;
-        SizeT Length;
-        SizeT Level;
-    };
-
     // MathTag -------------------------------------------
     struct MathTag {
         Array<QExpresion> Expresions;
@@ -391,41 +394,36 @@ struct Template {
     };
 
     // LoopTag -------------------------------------------
-    template <typename Char_T_>
-    struct LoopTag_T_ {
-        // TODO: Remove StringStream, and remove Char_T_;
-        StringStream<Char_T_>  SubTemplate;
-        Array<TagBit<Char_T_>> SubTags;
-        unsigned short         SetOffset;
-        unsigned short         SetLength;
-        unsigned short         GroupOffset;
-        unsigned short         GroupLength;
-        unsigned short         Sort;
+    struct LoopTag {
+        Array<TagBit> SubTags;
+        VariableTag   Set;
+        SizeT         ValueOffset;
+        SizeT         GroupOffset;
+        unsigned char ValueLength;
+        unsigned char GroupLength;
+        unsigned char Sort;
     };
 
     // InlineIfTag -------------------------------------------
-    template <typename Char_T_>
-    struct InlineIfTag_T_ {
-        Array<TagBit<Char_T_>> SubTags;
-        Array<QExpresion>      Case;
-        SizeT                  TrueTagsSize;
+    struct InlineIfTag {
+        Array<TagBit>     SubTags;
+        Array<QExpresion> Case;
+        SizeT             TrueTagsSize;
     };
 
     // IfTag -------------------------------------------
-    template <typename Char_T_>
-    struct IfTagCase_T_ {
-        Array<TagBit<Char_T_>> SubTags;
-        Array<QExpresion>      Case;
+    struct IfTagCase {
+        Array<TagBit>     SubTags;
+        Array<QExpresion> Case;
     };
 
     // TagBit -------------------------------------------
-    template <typename Char_T_>
     struct TagBit {
       public:
-        TagBit()                             = delete;
-        TagBit(const TagBit &tag)            = delete;
-        TagBit &operator=(const TagBit &tag) = delete;
-        TagBit &operator=(TagBit &&)         = delete;
+        TagBit()                          = delete;
+        TagBit(const TagBit &)            = delete;
+        TagBit &operator=(const TagBit &) = delete;
+        TagBit &operator=(TagBit &&)      = delete;
 
         TagBit(TagBit &&tag) noexcept : content_(tag.content_), type_{tag.type_} {
             // tag.content_ = {0, 0};
@@ -434,15 +432,9 @@ struct Template {
 
         TagBit(TagType type) : type_{type} {
             switch (type) {
-                case TagType::Variable: {
-                    VariableTag *var_info = Memory::AllocateInit<VariableTag>();
-
-                    info_ = var_info;
-                    break;
-                }
-
+                case TagType::Variable:
                 case TagType::RawVariable: {
-                    RawVariableTag *var_info = Memory::AllocateInit<RawVariableTag>();
+                    VariableTag *var_info = Memory::AllocateInit<VariableTag>();
 
                     info_ = var_info;
                     break;
@@ -456,21 +448,21 @@ struct Template {
                 }
 
                 case TagType::Loop: {
-                    LoopTag_T_<Char_T_> *loop_info = Memory::AllocateInit<LoopTag_T_<Char_T_>>();
+                    LoopTag *loop_info = Memory::AllocateInit<LoopTag>();
 
                     info_ = loop_info;
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    InlineIfTag_T_<Char_T_> *i_if_info = Memory::AllocateInit<InlineIfTag_T_<Char_T_>>();
+                    InlineIfTag *i_if_info = Memory::AllocateInit<InlineIfTag>();
 
                     info_ = i_if_info;
                     break;
                 }
 
                 case TagType::If: {
-                    Array<IfTagCase_T_<Char_T_>> *if_info = Memory::AllocateInit<Array<IfTagCase_T_<Char_T_>>>();
+                    Array<IfTagCase> *if_info = Memory::AllocateInit<Array<IfTagCase>>();
 
                     info_ = if_info;
                     break;
@@ -481,18 +473,14 @@ struct Template {
             }
         }
 
-        TagBit(TagType type, SizeT offset, SizeT length_) : type_{type} {
-            content_.offset  = static_cast<unsigned int>(offset);
-            content_.length_ = static_cast<unsigned int>(length_);
+        TagBit(TagType type, SizeT offset, SizeT length) : type_{type} {
+            content_.offset = static_cast<unsigned int>(offset);
+            content_.length = static_cast<unsigned int>(length);
         }
 
         ~TagBit() {
             switch (type_) {
-                case TagType::Variable: {
-                    Memory::Deallocate(info_);
-                    break;
-                }
-
+                case TagType::Variable:
                 case TagType::RawVariable: {
                     Memory::Deallocate(info_);
                     break;
@@ -505,19 +493,19 @@ struct Template {
                 }
 
                 case TagType::Loop: {
-                    Memory::Dispose(static_cast<LoopTag_T_<Char_T_> *>(info_));
+                    Memory::Dispose(static_cast<LoopTag *>(info_));
                     Memory::Deallocate(info_);
                     break;
                 }
 
                 case TagType::InLineIf: {
-                    Memory::Dispose(static_cast<InlineIfTag_T_<Char_T_> *>(info_));
+                    Memory::Dispose(static_cast<InlineIfTag *>(info_));
                     Memory::Deallocate(info_);
                     break;
                 }
 
                 case TagType::If: {
-                    Memory::Dispose(static_cast<Array<IfTagCase_T_<Char_T_>> *>(info_));
+                    Memory::Dispose(static_cast<Array<IfTagCase> *>(info_));
                     Memory::Deallocate(info_);
                     break;
                 }
@@ -537,12 +525,12 @@ struct Template {
 #endif
         inline TagType      GetType() const noexcept { return type_; }
         inline unsigned int GetOffset() const noexcept { return content_.offset; }
-        inline unsigned int GetLength() const noexcept { return content_.length_; }
+        inline unsigned int GetLength() const noexcept { return content_.length; }
 
       private:
         struct Content_ {
             unsigned int offset;
-            unsigned int length_;
+            unsigned int length;
         };
 
         union {
@@ -559,19 +547,18 @@ struct TemplateSub {
     TemplateSub() = delete;
 
     TemplateSub(const Char_T_ *content, SizeT length, StringStream_T_ *stream, const Value_T_ *root_value,
-                const TemplateSub *parent = nullptr, const SizeT level = 0) noexcept
-        : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, level_{level}, length_{length} {}
+                const TemplateSub *parent = nullptr, const unsigned short level = 0) noexcept
+        : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, length_{length}, level_{level} {}
 
   private:
     using TagType          = Template::TagType;
     using VariableTag      = Template::VariableTag;
-    using RawVariableTag   = Template::RawVariableTag;
     using MathTag          = Template::MathTag;
-    using LoopTag          = Template::LoopTag_T_<Char_T_>;
-    using InlineIfTag      = Template::InlineIfTag_T_<Char_T_>;
-    using IfTagCase        = Template::IfTagCase_T_<Char_T_>;
+    using LoopTag          = Template::LoopTag;
+    using InlineIfTag      = Template::InlineIfTag;
+    using IfTagCase        = Template::IfTagCase;
     using IfTag            = Array<IfTagCase>;
-    using TagBit           = Template::TagBit<Char_T_>;
+    using TagBit           = Template::TagBit;
     using QExpresion       = Template::QExpresion;
     using QExpresions      = Array<QExpresion>;
     using QOperation       = Template::QOperation;
@@ -653,9 +640,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::VariablePrefixLength;
-                                tags_cache += TagBit{TagType::Variable};
+                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
                                 parseVariableTag(offset, (v_end_offset - TemplatePatterns::InLineSuffixLength),
-                                                 static_cast<VariableTag *>(tags_cache.Last()->GetInfo()));
+                                                 static_cast<VariableTag *>(tag.GetInfo()));
                                 last_offset = v_end_offset;
                                 offset      = v_end_offset;
                                 continue;
@@ -679,9 +666,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::RawVariablePrefixLength;
-                                tags_cache += TagBit{TagType::RawVariable};
-                                parseRawVariableTag(offset, (r_end_offset - TemplatePatterns::InLineSuffixLength),
-                                                    static_cast<RawVariableTag *>(tags_cache.Last()->GetInfo()));
+                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
+                                parseVariableTag(offset, (r_end_offset - TemplatePatterns::InLineSuffixLength),
+                                                 static_cast<VariableTag *>(tag.GetInfo()));
                                 last_offset = r_end_offset;
                                 offset      = r_end_offset;
                                 continue;
@@ -704,9 +691,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::MathPrefixLength;
-                                tags_cache += TagBit{TagType::Math};
+                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
                                 parseMathTag(offset, (m_end_offset - TemplatePatterns::InLineSuffixLength),
-                                             static_cast<MathTag *>(tags_cache.Last()->GetInfo()));
+                                             static_cast<MathTag *>(tag.GetInfo()));
                                 last_offset = m_end_offset;
                                 offset      = m_end_offset;
                                 continue;
@@ -730,9 +717,9 @@ struct TemplateSub {
                                 }
 
                                 offset += TemplatePatterns::InLineIfPrefixLength;
-                                tags_cache += TagBit{TagType::InLineIf};
+                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::InLineIf});
                                 parseInLineIfTag(offset, (ii_end_offset - TemplatePatterns::InLineSuffixLength),
-                                                 static_cast<InlineIfTag *>(tags_cache.Last()->GetInfo()));
+                                                 static_cast<InlineIfTag *>(tag.GetInfo()));
                                 last_offset = ii_end_offset;
                                 offset      = ii_end_offset;
                                 continue;
@@ -762,9 +749,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::InLineIfPrefixLength;
-                            tags_cache += TagBit{TagType::Loop};
+                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Loop});
                             parseLoopTag(offset, (l_end_offset - TemplatePatterns::LoopSuffixLength),
-                                         static_cast<LoopTag *>(tags_cache.Last()->GetInfo()));
+                                         static_cast<LoopTag *>(tag.GetInfo()));
                             last_offset = l_end_offset;
                             offset      = l_end_offset;
                             continue;
@@ -783,9 +770,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::IfPrefixLength;
-                            tags_cache += TagBit{TagType::If};
+                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::If});
                             parseIfTag(offset, (i_end_offset - TemplatePatterns::IfSuffixLength),
-                                       static_cast<IfTag *>(tags_cache.Last()->GetInfo()));
+                                       static_cast<IfTag *>(tag.GetInfo()));
                             last_offset = i_end_offset;
                             offset      = i_end_offset;
                             continue;
@@ -824,9 +811,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::VariablePrefixLength;
-                            tags_cache += TagBit{TagType::Variable};
+                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
                             parseVariableTag(offset, (v_end_offset - TemplatePatterns::InLineSuffixLength),
-                                             static_cast<VariableTag *>(tags_cache.Last()->GetInfo()));
+                                             static_cast<VariableTag *>(tag.GetInfo()));
                             last_offset = v_end_offset;
                             offset      = v_end_offset;
                         }
@@ -847,9 +834,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::RawVariablePrefixLength;
-                            tags_cache += TagBit{TagType::RawVariable};
-                            parseRawVariableTag(offset, (r_end_offset - TemplatePatterns::InLineSuffixLength),
-                                                static_cast<RawVariableTag *>(tags_cache.Last()->GetInfo()));
+                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
+                            parseVariableTag(offset, (r_end_offset - TemplatePatterns::InLineSuffixLength),
+                                             static_cast<VariableTag *>(tag.GetInfo()));
                             last_offset = r_end_offset;
                             offset      = r_end_offset;
                         }
@@ -870,9 +857,9 @@ struct TemplateSub {
                             }
 
                             offset += TemplatePatterns::MathPrefixLength;
-                            tags_cache += TagBit{TagType::Math};
+                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
                             parseMathTag(offset, (m_end_offset - TemplatePatterns::InLineSuffixLength),
-                                         static_cast<MathTag *>(tags_cache.Last()->GetInfo()));
+                                         static_cast<MathTag *>(tag.GetInfo()));
                             last_offset = m_end_offset;
                             offset      = m_end_offset;
                         }
@@ -944,9 +931,8 @@ struct TemplateSub {
     }
 
     void renderVariable(const TagBit *tag) const {
-        const VariableTag *i_tag   = static_cast<const VariableTag *>(tag->GetInfo());
-        const Char_T_     *content = (content_ + i_tag->Offset);
-        const Value_T_    *value   = findValue(content, i_tag->Length);
+        const VariableTag *i_tag = static_cast<const VariableTag *>(tag->GetInfo());
+        const Value_T_    *value = getValue(*i_tag);
 
         if (value != nullptr) {
             if (Config::AutoEscapeHTML) {
@@ -963,43 +949,39 @@ struct TemplateSub {
                 return;
             }
 
-            if ((*content == TemplatePatterns::TildeChar) && (loop_key_ != nullptr)) {
+            if ((i_tag->IsLoopValue == 1) && (loop_key_ != nullptr)) {
                 if (Config::AutoEscapeHTML) {
                     escapeHTMLSpecialChars(stream_, loop_key_, loop_key_length_);
                 } else {
                     stream_->Write(loop_key_, loop_key_length_);
                 }
+
+                return;
             }
         }
 
-        if (*content != TemplatePatterns::TildeChar) {
-            stream_->Write(
-                (content - TemplatePatterns::VariablePrefixLength),
-                (i_tag->Length + TemplatePatterns::VariablePrefixLength + TemplatePatterns::InLineSuffixLength));
-        }
+        stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::VariablePrefixLength),
+                       (i_tag->Length + TemplatePatterns::VariablePrefixLength + TemplatePatterns::InLineSuffixLength));
     }
 
     void renderRawVariable(const TagBit *tag) const {
-        const RawVariableTag *i_tag   = static_cast<const RawVariableTag *>(tag->GetInfo());
-        const Char_T_        *content = (content_ + i_tag->Offset);
-        const Value_T_       *value   = findValue(content, i_tag->Length);
+        const VariableTag *i_tag = static_cast<const VariableTag *>(tag->GetInfo());
+        const Value_T_    *value = getValue(*i_tag);
 
         if ((value != nullptr) && value->CopyStringValueTo(*stream_)) {
             return;
         }
 
-        if (*content != TemplatePatterns::TildeChar) {
-            stream_->Write((content - TemplatePatterns::RawVariablePrefixLength),
-                           (i_tag->Length + TemplatePatterns::RawVariableFulllength));
-        }
+        stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::RawVariablePrefixLength),
+                       (i_tag->Length + TemplatePatterns::RawVariableFulllength));
     }
 
     void renderMath(const TagBit *tag) const {
         const MathTag *i_tag = static_cast<const MathTag *>(tag->GetInfo());
-        QExpresion     number;
+        QExpresion     expr;
 
-        if (i_tag->Expresions.IsNotEmpty() && evaluateExpressions(number, i_tag->Expresions)) {
-            Digit<Char_T_>::NumberToString(*stream_, number.Number.Real, 1, 0, 3);
+        if (i_tag->Expresions.IsNotEmpty() && evaluateExpressions(expr, i_tag->Expresions)) {
+            Digit<Char_T_>::NumberToString(*stream_, expr.Number.Real, 1, 0, 3);
         } else {
             stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
                            ((i_tag->EndOffset - i_tag->Offset) + TemplatePatterns::MathPrefixLength +
@@ -1014,8 +996,8 @@ struct TemplateSub {
         const Value_T_ *loop_set;
 
         // Set (Array|Object)
-        if (i_tag->SetLength != 0) {
-            loop_set = findValue((content_ + i_tag->SetOffset), i_tag->SetLength);
+        if (i_tag->Set.Length != 0) {
+            loop_set = getValue(i_tag->Set);
         } else {
             loop_set = value_;
         }
@@ -1031,18 +1013,22 @@ struct TemplateSub {
             }
 
             // Sort
-            if (i_tag->Sort != 0) {
+            if (i_tag->Sort != '\0') {
                 if (i_tag->GroupLength == 0) {
                     grouped_set = *loop_set;
                     loop_set    = &grouped_set;
                 }
 
-                grouped_set.Sort(i_tag->Sort == 1);
+                grouped_set.Sort(i_tag->Sort == 'a');
             }
 
+            const unsigned short level = (level_ + 1);
+
             // Stage 4: Render
-            TemplateSub loop_template{
-                i_tag->SubTemplate.First(), i_tag->SubTemplate.Length(), stream_, value_, this, (level_ + 1)};
+            TemplateSub loop_template{content_, length_, stream_, value_, this, level};
+            loop_template.loop_value_offset_ = i_tag->ValueOffset;
+            loop_template.loop_value_length_ = i_tag->ValueLength;
+
             const TagBit *s_tag = i_tag->SubTags.First();
             const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
 
@@ -1077,10 +1063,10 @@ struct TemplateSub {
     void renderInLineIf(const TagBit *tag) const {
         const InlineIfTag *i_tag = static_cast<const InlineIfTag *>(tag->GetInfo());
 
-        QExpresion result;
+        QExpresion expr;
 
-        if (evaluateExpressions(result, i_tag->Case)) {
-            if (result.Number.Real > 0.0) {
+        if (evaluateExpressions(expr, i_tag->Case)) {
+            if (expr.Number.Real > 0.0) {
                 if (i_tag->TrueTagsSize != 0) {
                     const TagBit *s_tag = i_tag->SubTags.First();
                     const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
@@ -1105,12 +1091,12 @@ struct TemplateSub {
         const IfTag     *i_tag = static_cast<const IfTag *>(tag->GetInfo());
         const IfTagCase *item  = i_tag->First();
         const IfTagCase *end   = (item + i_tag->Size());
-        QExpresion       result;
+        QExpresion       expr;
 
         if ((item != nullptr) && item->Case.IsNotEmpty()) { // first case should not be empty
             do {
                 // <else> without if = (item->Case == nothing)
-                if (item->Case.IsEmpty() || (evaluateExpressions(result, item->Case) && (result.Number.Real > 0))) {
+                if (item->Case.IsEmpty() || (evaluateExpressions(expr, item->Case) && (expr.Number.Real > 0))) {
                     const TagBit *s_tag = item->SubTags.First();
                     const TagBit *s_end = (s_tag + item->SubTags.Size());
                     Render(s_tag, s_end);
@@ -1126,14 +1112,29 @@ struct TemplateSub {
 
     void parseVariableTag(SizeT offset, SizeT end_offset, VariableTag *tag) const {
         tag->Offset = offset;
-        tag->Length = (end_offset - offset);
-        tag->Level  = level_;
-    }
+        tag->Length = static_cast<unsigned char>(end_offset - offset);
 
-    void parseRawVariableTag(SizeT offset, SizeT end_offset, RawVariableTag *tag) const {
-        tag->Offset = offset;
-        tag->Length = (end_offset - offset);
-        tag->Level  = level_;
+        if (loop_value_length_ != 0) {
+            const TemplateSub *temp = this;
+
+            SizeT l_offset;
+            SizeT length;
+            SizeT level = level_;
+
+            while (level > 0) {
+                l_offset = temp->loop_value_offset_;
+                length   = temp->loop_value_length_;
+
+                if (StringUtils::IsEqual((content_ + offset), (content_ + l_offset), length)) {
+                    tag->IsLoopValue = 1;
+                    tag->Level       = static_cast<unsigned char>(level);
+                    break;
+                }
+
+                temp = temp->parent_;
+                --level;
+            }
+        }
     }
 
     void parseMathTag(SizeT offset, SizeT end_offset, MathTag *tag) const {
@@ -1156,18 +1157,14 @@ struct TemplateSub {
     }
 
     void parseLoopTag(SizeT offset, SizeT end_offset, LoopTag *tag) const {
-        const Char_T_ *loop_value        = nullptr;
-        SizeT          loop_value_length = 0;
-        SizeT          previous_offset;
-
-        const SizeT sub_content_offset =
+        const SizeT loop_content_offset =
             Engine::FindOne<Char_T_>(TemplatePatterns::MultiLineSuffix, content_, offset, end_offset, length_);
 
-        SizeT offset2     = getQuotedValue(offset, sub_content_offset);
+        SizeT offset2     = getQuotedValue(offset, loop_content_offset);
         SizeT last_offset = offset;
         offset -= 6U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
-        while ((offset2 != 0) && (offset < sub_content_offset)) {
+        while ((offset2 != 0) && (offset < loop_content_offset)) {
             switch (content_[offset]) {
                 case TemplatePatterns::SetChar: {
                     SizeT set_offset = last_offset;
@@ -1176,43 +1173,42 @@ struct TemplateSub {
                     if ((content_[last_offset] == TemplatePatterns::InLinePrefix) &&
                         (set_length > TemplatePatterns::VariableFulllength)) {
                         set_offset += TemplatePatterns::VariablePrefixLength;
-                        set_length -= static_cast<unsigned short>(TemplatePatterns::VariableFulllength);
+                        set_length -= TemplatePatterns::VariableFulllength;
                     }
 
-                    tag->SetOffset = static_cast<unsigned short>(set_offset);
-                    tag->SetLength = static_cast<unsigned short>(set_length);
+                    parseVariableTag(set_offset, (set_offset + set_length), &(tag->Set));
 
                     offset      = offset2;
-                    offset2     = getQuotedValue(offset, sub_content_offset);
+                    offset2     = getQuotedValue(offset, loop_content_offset);
                     last_offset = offset;
                     offset -= 6U;
                     break;
                 }
 
                 case TemplatePatterns::ValueChar: {
-                    loop_value        = (content_ + last_offset);
-                    loop_value_length = ((offset2 - 1) - last_offset);
-                    offset            = offset2;
-                    offset2           = getQuotedValue(offset, sub_content_offset);
-                    last_offset       = offset;
+                    tag->ValueOffset = last_offset;
+                    tag->ValueLength = static_cast<unsigned char>((offset2 - 1U) - last_offset);
+                    offset           = offset2;
+                    offset2          = getQuotedValue(offset, loop_content_offset);
+                    last_offset      = offset;
                     offset -= 6U;
                     break;
                 }
 
                 case TemplatePatterns::SortChar: {
-                    tag->Sort   = ((content_[last_offset] == 'a') ? 1 : 2);
+                    tag->Sort   = static_cast<unsigned char>(content_[last_offset]);
                     offset      = offset2;
-                    offset2     = getQuotedValue(offset, sub_content_offset);
+                    offset2     = getQuotedValue(offset, loop_content_offset);
                     last_offset = offset;
                     offset -= 6U;
                     break;
                 }
 
                 case TemplatePatterns::GroupChar: {
-                    tag->GroupOffset = static_cast<unsigned short>(last_offset);
-                    tag->GroupLength = static_cast<unsigned short>((offset2 - 1) - last_offset);
+                    tag->GroupOffset = last_offset;
+                    tag->GroupLength = static_cast<unsigned char>((offset2 - 1) - last_offset);
                     offset           = offset2;
-                    offset2          = getQuotedValue(offset, sub_content_offset);
+                    offset2          = getQuotedValue(offset, loop_content_offset);
                     last_offset      = offset;
                     offset -= 6U;
                     break;
@@ -1224,68 +1220,11 @@ struct TemplateSub {
             }
         }
 
-        offset          = sub_content_offset;
-        previous_offset = sub_content_offset;
-
-        if (loop_value != nullptr) {
-            while (true) {
-                if (loop_value_length > 1U) {
-                    offset = Engine::Find<Char_T_>(loop_value, loop_value_length, content_, previous_offset, end_offset,
-                                                   length_);
-                } else {
-                    offset = Engine::FindOne<Char_T_>(*loop_value, content_, previous_offset, end_offset, length_);
-                }
-
-                if (offset == 0) {
-                    break;
-                }
-
-                tag->SubTemplate.Write((content_ + previous_offset), ((offset - loop_value_length) - previous_offset));
-                tag->SubTemplate.Write(TemplatePatterns::VariablePrefix, TemplatePatterns::VariablePrefixLength);
-
-                Char_T_ *buffer = tag->SubTemplate.Buffer(level_ + 1);
-                SizeT    lvl    = level_;
-
-                while (true) {
-                    buffer[lvl] = TemplatePatterns::TildeChar;
-
-                    if (lvl == 0) {
-                        break;
-                    }
-
-                    --lvl;
-                }
-
-                SizeT sub_offset = offset;
-
-                while (content_[sub_offset] == TemplatePatterns::VariableIndexPrefix) {
-                    while ((content_[sub_offset] != TemplatePatterns::VariableIndexSuffix) &&
-                           (sub_offset < end_offset)) {
-                        ++sub_offset;
-                    }
-
-                    ++sub_offset;
-                }
-
-                if (sub_offset > end_offset) {
-                    // Unclosed bracket
-                    break;
-                }
-
-                if ((content_[(sub_offset - 1)] == TemplatePatterns::VariableIndexSuffix)) {
-                    tag->SubTemplate.Write((content_ + offset), (sub_offset - offset));
-                }
-
-                previous_offset = sub_offset;
-                tag->SubTemplate += TemplatePatterns::InLineSuffix;
-            }
-        }
-
-        tag->SubTemplate.Write((content_ + previous_offset), (end_offset - previous_offset));
-
-        TemplateSub loop_template{
-            tag->SubTemplate.First(), tag->SubTemplate.Length(), nullptr, nullptr, nullptr, (level_ + 1)};
-        loop_template.parse(tag->SubTags, 0, tag->SubTemplate.Length());
+        const unsigned short level = (level_ + 1);
+        TemplateSub          loop_template{content_, length_, nullptr, nullptr, this, level};
+        loop_template.loop_value_offset_ = tag->ValueOffset;
+        loop_template.loop_value_length_ = tag->ValueLength;
+        loop_template.parse(tag->SubTags, loop_content_offset, end_offset);
     }
 
     void parseInLineIfTag(SizeT offset, SizeT end_offset, InlineIfTag *tag) const {
@@ -1427,74 +1366,67 @@ struct TemplateSub {
         return else_offset;
     }
 
-    const Value_T_ *findValue(const Char_T_ *key, const SizeT length) const noexcept {
-        const Value_T_ *value = nullptr;
+    const Value_T_ *getValue(const VariableTag &variable) const noexcept {
+        const Value_T_ *value     = nullptr;
+        const Char_T_  *id        = (content_ + variable.Offset);
+        const SizeT     length    = variable.Length;
+        SizeT           offset    = 0;
+        const bool      has_index = (id[(length - 1)] == TemplatePatterns::VariableIndexSuffix);
 
-        if (length != 0) {
-            SizeT offset = 0;
-            SizeT tmp    = 1;
+        if (variable.IsLoopValue != 1) {
+            if (!has_index) {
+                return value_->GetValue(id, length);
+            }
 
-            if (*key != TemplatePatterns::TildeChar) {
-                if ((key[(length - 1)] != TemplatePatterns::VariableIndexSuffix)) {
-                    return value_->GetValue(key, length);
-                }
-
-                // [...]
-                while ((tmp < length) && (key[tmp] != TemplatePatterns::VariableIndexPrefix)) {
-                    ++tmp;
-                }
-
-                value = value_;
-            } else {
-                const TemplateSub *obj = this;
-
-                do {
-                    ++offset;
-                } while (key[offset] == TemplatePatterns::TildeChar);
-
-                if (offset > level_) {
-                    return nullptr;
-                }
-
-                SizeT lvl = offset;
-
-                while (lvl < level_) {
-                    ++lvl;
-                    obj = obj->parent_;
-                }
-
-                if ((key[(length - 1)] != TemplatePatterns::VariableIndexSuffix)) {
-                    return obj->loop_value_;
-                }
-
-                // [...]
-                while (key[tmp] != TemplatePatterns::VariableIndexSuffix) {
-                    ++tmp;
-                }
-
-                value = obj->loop_value_;
+            while ((offset < length) && (id[offset] != TemplatePatterns::VariableIndexPrefix)) {
                 ++offset;
             }
 
-            do {
-                value = value->GetValue((key + offset), (tmp - offset));
+            if (offset != 0) {
+                // {var:abc[...]}
+                // if offset == 0 then its {var:[...]}
+                value = value_->GetValue(id, offset);
+            }
+        } else {
+            const TemplateSub *that    = this;
+            const unsigned int level   = static_cast<unsigned int>(level_);
+            unsigned int       v_level = static_cast<unsigned int>(variable.Level);
+            value                      = loop_value_;
 
-                ++tmp;
+            while (v_level < level) {
+                that = that->parent_;
+                ++v_level;
+            }
 
-                if (tmp >= length) {
-                    break;
-                }
+            value = that->loop_value_;
 
-                if (key[tmp] == TemplatePatterns::VariableIndexPrefix) {
-                    ++tmp;
-                }
+            if (!has_index) {
+                return value;
+            }
 
-                offset = tmp;
+            offset += loop_value_length_;
+        }
 
-                while (key[tmp] != TemplatePatterns::VariableIndexSuffix) {
-                    ++tmp;
-                }
-            } while (value != nullptr);
+        SizeT offset2;
+
+        while (value != nullptr) {
+            ++offset; // The char after [
+
+            offset2 = offset;
+
+            while ((offset2 < length) && (id[offset2] != TemplatePatterns::VariableIndexSuffix)) {
+                ++offset2;
+            };
+
+            value = value->GetValue((id + offset), (offset2 - offset));
+
+            ++offset2; // The char after ]
+
+            if (id[offset2] != TemplatePatterns::VariableIndexPrefix) {
+                break;
+            }
+
+            offset = offset2;
         }
 
         return value;
@@ -1555,8 +1487,7 @@ struct TemplateSub {
 
             case ExpresionType::Variable: {
                 if (not_equal) {
-                    const Value_T_ *val =
-                        findValue((content_ + expr->Variable.Offset), static_cast<SizeT>(expr->Variable.Length));
+                    const Value_T_ *val = getValue(expr->Variable);
 
                     if (val != nullptr) {
                         if (val->IsNumber()) {
@@ -1753,7 +1684,7 @@ struct TemplateSub {
             }
 
             case ExpresionType::Variable: {
-                left_value = findValue((content_ + left.Variable.Offset), static_cast<SizeT>(left.Variable.Length));
+                left_value = getValue(left.Variable);
 
                 if (left_value != nullptr) {
                     left_is_a_number = left_value->IsNumber();
@@ -1791,7 +1722,7 @@ struct TemplateSub {
             }
 
             case ExpresionType::Variable: {
-                right_value = findValue((content_ + right.Variable.Offset), static_cast<SizeT>(right.Variable.Length));
+                right_value = getValue(right.Variable);
 
                 if (right_value != nullptr) {
                     right_is_a_number = right_value->IsNumber();
@@ -1892,13 +1823,8 @@ struct TemplateSub {
                     --end_offset; // Drop )
 
                     if ((last_oper != oper) || (oper != QOperation::NoOp)) {
-                        QExpresion expr = QExpresion{parseExpressions(offset, end_offset), oper};
-                        if (expr.SubExpresions.Size() != 0) {
-                            exprs += static_cast<QExpresion &&>(expr);
-                            return true;
-                        }
-
-                        return false;
+                        QExpresion &expr = exprs.InsertGet(QExpresion{parseExpressions(offset, end_offset), oper});
+                        return (expr.SubExpresions.Size() != 0);
                     }
 
                     // The entire expression is inside (...)
@@ -1911,9 +1837,8 @@ struct TemplateSub {
                         offset += TemplatePatterns::VariablePrefixLength;
                         end_offset -= TemplatePatterns::InLineSuffixLength;
 
-                        exprs += QExpresion{VariableTag{offset, static_cast<unsigned short>(end_offset - offset),
-                                                        static_cast<unsigned short>(level_)},
-                                            oper};
+                        QExpresion &expr = exprs.InsertGet(QExpresion{ExpresionType::Variable, oper});
+                        parseVariableTag(offset, end_offset, &(expr.Variable));
                         return true;
                     }
 
@@ -2097,15 +2022,17 @@ struct TemplateSub {
         return false;
     }
 
-    const Char_T_     *content_;
-    StringStream_T_   *stream_;
-    const Value_T_    *value_;
-    const TemplateSub *parent_;
-    const Value_T_    *loop_value_{nullptr};
-    const Char_T_     *loop_key_{nullptr};
-    SizeT              loop_key_length_{0};
-    const SizeT        level_;
-    const SizeT        length_;
+    const Char_T_       *content_;
+    StringStream_T_     *stream_;
+    const Value_T_      *value_;
+    const TemplateSub   *parent_;
+    const Value_T_      *loop_value_{nullptr};
+    const Char_T_       *loop_key_{nullptr};
+    SizeT                loop_key_length_{0};
+    SizeT                loop_value_offset_{0};
+    const SizeT          length_;
+    unsigned short       loop_value_length_{0};
+    const unsigned short level_;
 };
 
 template <typename Char_T_>
