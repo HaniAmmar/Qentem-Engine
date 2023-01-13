@@ -53,10 +53,8 @@ class Value {
   public:
     Value() noexcept : number_{} {}
 
-    Value(Value &&val) noexcept : number_{val.number_} {
-        if (Config::PointerTagging) {
-            val.number_.ClearAll();
-        } else {
+    Value(Value &&val) noexcept : number_{static_cast<VNumber &&>(val.number_)} {
+        if (!Config::PointerTagging) {
             setType(val.Type());
             val.setTypeToUndefined();
         }
@@ -1565,6 +1563,11 @@ class Value {
     struct VNumber {
       public:
         VNumber() = default;
+
+        VNumber(VNumber &&v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
+            v_num.number_.ull = 0;
+            v_num.p_number_   = 0;
+        }
 
         VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {}
         VNumber &operator=(const VNumber &v_num) {
