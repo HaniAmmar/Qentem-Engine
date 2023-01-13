@@ -476,6 +476,8 @@ class HArray {
     // For STL
     inline const HAItem_ *begin() const noexcept { return First(); }
     inline const HAItem_ *end() const noexcept { return End(); }
+    inline HAItem_       *begin() noexcept { return Storage(); }
+    inline HAItem_       *end() noexcept { return (Storage() + Size()); }
 
     inline HAItem_ *Last() const noexcept {
         if (IsNotEmpty()) {

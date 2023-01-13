@@ -253,6 +253,8 @@ class Array {
     // For STL
     inline const Type_ *begin() const noexcept { return First(); }
     inline const Type_ *end() const noexcept { return End(); }
+    inline Type_       *begin() noexcept { return Storage(); }
+    inline Type_       *end() noexcept { return (Storage() + Size()); }
 
     inline Type_ *Last() const noexcept {
         if (IsNotEmpty()) {

@@ -942,6 +942,17 @@ static void TestHArraySort(TestHelper &helper) {
     }
 
     helper.Equal(total, 10095U, "total", __LINE__);
+
+    for (auto &item : strings) {
+        item.Value += 5;
+    }
+
+    helper.Equal(strings["2021"], 2026U, "strings[2021]", __LINE__);
+    helper.Equal(strings["2020"], 2025U, "strings[2020]", __LINE__);
+    helper.Equal(strings["2019"], 2024U, "strings[2019]", __LINE__);
+    helper.Equal(strings["2018"], 2023U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2018"], 2023U, "strings[2018]", __LINE__);
+    helper.Equal(strings["2017"], 2022U, "strings[2017]", __LINE__);
 }
 
 static int RunHArrayTests() {

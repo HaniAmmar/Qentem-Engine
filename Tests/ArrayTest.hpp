@@ -320,6 +320,15 @@ static void TestArray3(TestHelper &helper) {
     ++nu1;
 
     helper.Equal(*(numbers1.First()), SizeT{6}, "numbers1.First()", "6", __LINE__);
+
+    /////////////////////
+    numbers1.Reset();
+    numbers1 += 1;
+    for (SizeT &num : numbers1) {
+        num += 10;
+    }
+
+    helper.Equal(*(numbers1.First()), SizeT{11}, "numbers1.First()", "11", __LINE__);
 }
 
 static void TestArray4(TestHelper &helper) {
