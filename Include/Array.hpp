@@ -196,19 +196,19 @@ class Array {
     }
 
     void Resize(SizeT new_size) {
-        if (new_size == 0) {
-            Reset();
+        if (new_size != 0) {
+            if (Size() > new_size) {
+                // Shrink
+                Type_ *storage = Storage();
+                Memory::Dispose((storage + new_size), (storage + Size()));
+                setSize(new_size);
+            }
+
+            resize(new_size);
             return;
         }
 
-        if (Size() > new_size) {
-            // Shrink
-            Type_ *storage = Storage();
-            Memory::Dispose((storage + new_size), (storage + Size()));
-            setSize(new_size);
-        }
-
-        resize(new_size);
+        Reset();
     }
 
     inline void Expect(SizeT size) {
@@ -226,9 +226,7 @@ class Array {
 
     void Compress() {
         // Remove excess storage;
-        if (Size() != Capacity()) {
-            Resize(Size());
-        }
+        Resize(Size());
     }
 
     void ResizeAndInitialize(SizeT new_size) {

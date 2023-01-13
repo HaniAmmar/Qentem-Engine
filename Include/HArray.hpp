@@ -440,15 +440,15 @@ class HArray {
     void Compress() {
         const SizeT size = ActualSize();
 
-        if (size == 0) {
-            Reset();
-        } else {
-            const SizeT n_cap = Memory::AligneSize(size);
-
-            if ((size < Size()) || (n_cap < Capacity())) {
-                resize(n_cap);
+        if (size != 0) {
+            if (size < Size()) {
+                resize(Memory::AligneSize(size));
             }
+
+            return;
         }
+
+        Reset();
     }
 
     // Returns the actual number of items.
