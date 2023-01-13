@@ -53,6 +53,8 @@ struct Config {
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
 #endif
+#else
+#undef QENTEM_POINTER_TAGGING
 #endif
 /////////////////
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
