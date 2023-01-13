@@ -411,6 +411,23 @@ static void TestString2(TestHelper &helper) {
     sis << str1;
 
     helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8U), "SimpleStream", __LINE__);
+
+    str1.Reset();
+    str1 = "1234";
+
+    SizeT total = 0;
+
+    for (const auto &item : str1) {
+        total += static_cast<SizeT>(item - '0');
+    }
+
+    helper.Equal(total, SizeT{10}, "total", __LINE__);
+
+    for (auto &item : str1) {
+        item += '0';
+    }
+
+    helper.Equal(str1, "abcd", "str1.First()", __LINE__);
 }
 
 static void TestStringTrim(TestHelper &helper) {
