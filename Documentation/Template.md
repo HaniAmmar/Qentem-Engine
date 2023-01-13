@@ -446,7 +446,7 @@ int main() {
 
     const char *content = R"(
 <loop value="loop1-value">
-loop1-value[name]: loop1-value[value]</loop>
+{var:loop1-value[name]}: {var:loop1-value[value]}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -480,7 +480,7 @@ int main() {
 
     const char *content = R"(
 <loop set="some_set" value="loop1-value">
-loop1-value</loop>
+{var:loop1-value}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -514,7 +514,7 @@ int main() {
 
     const char *content = R"(
 <loop value="loop1-value">
-loop1-value</loop>
+{var:loop1-value}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -550,8 +550,7 @@ int main() {
     const char *content = R"(
 <loop value="loop1-val">
     <loop set="loop1-val" value="loop2-val">
-        <loop set="loop2-val" value="loop3-val">
-            loop3-val
+        <loop set="loop2-val" value="loop3-val">{var:loop3-val}
         </loop>
     </loop>
 </loop>
@@ -588,7 +587,7 @@ int main() {
 }
 ```
 
-### Loop Example 5 (repeat)
+### Loop Example 5
 
 ```cpp
 #include "Template.hpp"
@@ -606,19 +605,18 @@ int main() {
     value += 1;
 
     const char *content =
-        R"(<loop repeat="2" value="loop1-value"><loop repeat="2" value="loop2-value"><loop
-        repeat="2" value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
+        R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
 
     std::cout << Template::Render(content, value) << '\n';
 
     /*
         Output:
-(0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1)
+                (0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1)
     */
 }
 ```
 
-### Loop Example 6 (index)
+### Loop Example 6
 
 ```cpp
 #include "Template.hpp"
@@ -638,27 +636,13 @@ int main() {
 
     value["size"] = 5;
 
-    const char *content =
-        R"(<loop set="list" repeat="{var:size}" index="5" value="loop1-value">loop1-value</loop>)";
+    const char *content = R"(<loop set="list" value="loop1-value">{var:loop1-value}</loop>)";
 
     std::cout << Template::Render(content, value) << '\n';
 
     /*
         Output:
-            56789
-    */
-
-    value["size"]     = 7;
-    value["start_at"] = 3;
-
-    content =
-        R"(<loop set="list" repeat="{var:size}" index="{var:start_at}" value="loop1-value">loop1-value</loop>)";
-
-    std::cout << Template::Render(content, value) << '\n';
-
-    /*
-        Output:
-            3456789
+            0123456789
     */
 }
 ```
@@ -709,10 +693,10 @@ int main() {
 
     const char *content = R"(
 <loop set="object" value="item">
-item[var1] item[var2] item[var3] item[var4]</loop>
+{var:item[var1]} {var:item[var2]} {var:item[var3]} {var:item[var4]}</loop>
 
 <loop set="array" value="item">
-item[0] item[1] item[2] item[3]</loop>
+{var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -752,7 +736,7 @@ int main() {
     value += 3;
 
     const char *content = R"(
-<loop value="val1_" sort="ascend">val1_ </loop>
+<loop value="val1_" sort="ascend">{var:val1_} </loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -761,7 +745,7 @@ int main() {
     */
 
     content = R"(
-<loop value="val1_" sort="descend">val1_ </loop>
+<loop value="val1_" sort="descend">{var:val1_} </loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -787,8 +771,8 @@ int main() {
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
 
     const char *content = R"(
-<loop value="val1_" group="year" sort="ascend">Year(val1_):
-    <loop set="val1_" value="val2_">Month(val2_[month])
+<loop value="val1_" group="year" sort="ascend">Year({var:val1_}):
+    <loop set="val1_" value="val2_">Month({var:val2_[month]})
     </loop>
 </loop>
     )";
@@ -811,6 +795,16 @@ int main() {
                 Month(5)
                 Month(7)
     */
+
+    // Without values names.
+    const char *content2 = R"(
+<loop value="val1_" group="year" sort="ascend">Year({var:val1_}):
+    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">{var:val3_}</loop>)
+    </loop>
+</loop>
+    )";
+
+    std::cout << Template::Render(content2, value) << '\n';
 }
 ```
 

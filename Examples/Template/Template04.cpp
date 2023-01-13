@@ -15,7 +15,7 @@ int main() {
 
     const char *content = R"(
 <loop set="some_set" value="loop1-value">
-loop1-value</loop>
+{var:loop1-value}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';

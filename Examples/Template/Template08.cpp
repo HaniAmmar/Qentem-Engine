@@ -15,7 +15,7 @@ int main() {
 
     value["size"] = 5;
 
-    const char *content = R"(<loop set="list" value="loop1-value">loop1-value</loop>)";
+    const char *content = R"(<loop set="list" value="loop1-value">{var:loop1-value}</loop>)";
 
     std::cout << Template::Render(content, value) << '\n';
 

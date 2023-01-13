@@ -13,7 +13,7 @@ int main() {
     value += 1;
 
     const char *content =
-        R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">(loop1-value: loop2-value: loop3-value) </loop></loop></loop>)";
+        R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
 
     std::cout << Template::Render(content, value) << '\n';
 

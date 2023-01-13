@@ -26,7 +26,7 @@ int main() {
 
     const char *content = R"(
 <loop value="loop1-value">
-loop1-value[name]: loop1-value[value]</loop>
+{var:loop1-value[name]}: {var:loop1-value[value]}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';

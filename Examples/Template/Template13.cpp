@@ -84,13 +84,9 @@ int main() {
     )css");
 
     const char *content = R"HTML(
-<!DOCTYPE html>
 <html dir="{var:dir}">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>{var:title}</title>
     <style>
         body {
             background-color: {raw:body[bc]};
@@ -115,20 +111,20 @@ int main() {
     <h1>{var:body[H1]}</h1>
 
     <loop set="news" value="value_s">
-    <h2>value_s[name]</h2>
+    <h2>{var:value_s[name]}</h2>
     <div>
         <ul>
             <loop set="value_s[list]" value="value">
-            <li><span class="value[options]">value[text]</span> -
+            <li><span class="{var:value[options]}">{var:value[text]}</span> -
                 <span>
-                    <if case="value[date] == 1">
+                    <if case="{var:value[date]} == 1">
                     New
-                    <elseif case="value[date] == 2" />
+                    <elseif case="{var:value[date]} == 2" />
                     Yesterday
-                    <elseif case="value[date] == 3" />
+                    <elseif case="{var:value[date]} == 3" />
                     Two days ago
                     <else />
-                    value[date]
+                    {var:value[date]}
                     </if>
                 </span>
             </li>

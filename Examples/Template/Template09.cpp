@@ -41,10 +41,10 @@ int main() {
 
     const char *content = R"(
 <loop set="object" value="item">
-item[var1] item[var2] item[var3] item[var4]</loop>
+{var:item[var1]} {var:item[var2]} {var:item[var3]} {var:item[var4]}</loop>
 
 <loop set="array" value="item">
-item[0] item[1] item[2] item[3]</loop>
+{var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]}</loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';

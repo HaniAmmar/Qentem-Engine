@@ -17,8 +17,7 @@ int main() {
     const char *content = R"(
 <loop value="loop1-val">
     <loop set="loop1-val" value="loop2-val">
-        <loop set="loop2-val" value="loop3-val">
-            loop3-val
+        <loop set="loop2-val" value="loop3-val">{var:loop3-val}
         </loop>
     </loop>
 </loop>

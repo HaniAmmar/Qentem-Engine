@@ -18,7 +18,7 @@ int main() {
     value += 3;
 
     const char *content = R"(
-<loop value="val1_" sort="ascend">val1_ </loop>
+<loop value="val1_" sort="ascend">{var:val1_} </loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';
@@ -27,7 +27,7 @@ int main() {
     */
 
     content = R"(
-<loop value="val1_" sort="descend">val1_ </loop>
+<loop value="val1_" sort="descend">{var:val1_} </loop>
     )";
 
     std::cout << Template::Render(content, value) << '\n';

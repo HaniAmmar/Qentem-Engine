@@ -11,8 +11,8 @@ int main() {
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
 
     const char *content = R"(
-<loop value="val1_" group="year" sort="ascend">Year(val1_):
-    <loop set="val1_" value="val2_">Month(val2_[month])
+<loop value="val1_" group="year" sort="ascend">Year({var:val1_}):
+    <loop set="val1_" value="val2_">Month({var:val2_[month]})
     </loop>
 </loop>
     )";
@@ -36,13 +36,13 @@ int main() {
                 Month(7)
     */
 
-    // Without the names of the values.
+    // Without values names.
     const char *content2 = R"(
-<loop value="val1_" group="year" sort="ascend">Year(val1_):
-    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">val3_</loop>)
+<loop value="val1_" group="year" sort="ascend">Year({var:val1_}):
+    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">{var:val3_}</loop>)
     </loop>
 </loop>
     )";
 
-    std::cout << Template::Render(content2, &value) << '\n';
+    std::cout << Template::Render(content2, value) << '\n';
 }
