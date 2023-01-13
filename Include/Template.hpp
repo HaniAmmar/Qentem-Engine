@@ -1853,8 +1853,8 @@ struct TemplateSub {
                     if (Digit<Char_T_>::StringToNumber(expr.Number.Real, (content_ + offset), length)) {
                         expr.Type = ExpresionType::RealNumber;
                     } else {
-                        if (((last_oper != QOperation::Equal) && (last_oper != QOperation::NotEqual) &&
-                             (last_oper != QOperation::NoOp))) {
+                        if ((last_oper != QOperation::Equal) && (last_oper != QOperation::NotEqual) &&
+                            (oper != QOperation::Equal) && (oper != QOperation::NotEqual)) {
                             return false;
                         }
 

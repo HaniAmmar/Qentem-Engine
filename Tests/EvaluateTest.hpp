@@ -3223,6 +3223,10 @@ static void TestEvaluate13(TestHelper &helper) {
     content  = "{var:}&&0";
     is_valid = Template::Evaluate(number, content, value);
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    content  = "aa > 0";
+    is_valid = Template::Evaluate(number, content, value);
+    helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 }
 
 static void TestEvaluate14(TestHelper &helper) {
