@@ -242,11 +242,11 @@ static void TestStringStream(TestHelper &helper) {
     ss2.Reset();
 
     /////////
-    ss2 += "123456789123456789";
+    ss2 += "123456789123456789123456789123456789";
     const char *ss2_p = ss2.First();
     str               = ss2.GetString();
     helper.Equal(ss2_p, str.First(), "StringStream", __LINE__);
-    helper.Equal(str, "123456789123456789", "StringStream", __LINE__);
+    helper.Equal(str, "123456789123456789123456789123456789", "StringStream", __LINE__);
 
     /////////
 
