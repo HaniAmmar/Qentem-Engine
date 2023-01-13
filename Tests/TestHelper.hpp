@@ -282,7 +282,7 @@ struct TestHelper {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
         if (Config::Is64bit) {
-            TestOutPut::Print("Arch: 64BIT\n");
+            TestOutPut::Print("Arch: 64Bit\n");
 
             if (Config::PointerTagging) {
                 TestOutPut::Print("Tagged Pointers: On\n");
@@ -297,7 +297,7 @@ struct TestHelper {
                 TestOutPut::Print("Short String Optimization: Off\n");
             }
         } else {
-            TestOutPut::Print("Arch: 32BIT\n");
+            TestOutPut::Print("Arch: 32Bit\n");
             TestOutPut::Print("Tagged Pointers: Off\n");
             TestOutPut::Print("Short String Optimization: Off\n");
         }
