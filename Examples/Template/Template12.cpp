@@ -40,7 +40,7 @@ int main() {
             <ul>
             <loop set="department_val[students]" value="student_val">
                 <li>
-                    <span>Name: {var:student_val[Name]</span>
+                    <span>Name: {var:student_val[Name]}</span>
                     <span>
                         GPA: {var:student_val[GPA]}
                         <if case="{var:student_val[GPA]} < 2.5"> (Inform adviser!)
