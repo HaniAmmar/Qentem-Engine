@@ -598,7 +598,7 @@ struct TemplateSub {
         const QExpresion *expr = exprs.First();
 
         if (expr != nullptr) {
-            return processExpressions(number, expr, QOperation::NoOp);
+            return evaluate(number, expr, QOperation::NoOp);
         }
 
         return false;
@@ -968,11 +968,12 @@ struct TemplateSub {
     }
 
     void renderMath(const TagBit *tag) const {
-        const MathTag *i_tag = static_cast<const MathTag *>(tag->GetInfo());
-        QExpresion     expr;
+        const MathTag    *i_tag = static_cast<const MathTag *>(tag->GetInfo());
+        const QExpresion *expr  = i_tag->Expresions.First();
+        QExpresion        result;
 
-        if (Evaluate(expr, i_tag->Expresions)) {
-            Digit<Char_T_>::NumberToString(*stream_, expr.Number.Real, 1, 0, 3);
+        if (i_tag->Expresions.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
+            Digit<Char_T_>::NumberToString(*stream_, result.Number.Real, 1, 0, 3);
         } else {
             stream_->Write(((content_ + i_tag->Offset) - TemplatePatterns::MathPrefixLength),
                            ((i_tag->EndOffset - i_tag->Offset) + TemplatePatterns::MathPrefixLength +
@@ -1055,24 +1056,22 @@ struct TemplateSub {
 
     void renderInLineIf(const TagBit *tag) const {
         const InlineIfTag *i_tag = static_cast<const InlineIfTag *>(tag->GetInfo());
+        const QExpresion  *expr  = i_tag->Case.First();
+        QExpresion         result;
 
-        QExpresion expr;
+        if (i_tag->Case.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
+            const TagBit *s_tag = i_tag->SubTags.First();
+            const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
 
-        if (Evaluate(expr, i_tag->Case)) {
-            if (expr.Number.Real > 0.0) {
+            if (result.Number.Real > 0.0) {
                 if (i_tag->TrueTagsSize != 0) {
-                    const TagBit *s_tag = i_tag->SubTags.First();
-                    const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
-
                     if (i_tag->SubTags.Size() != i_tag->TrueTagsSize) {
                         s_end -= i_tag->TrueTagsSize;
                     }
 
                     Render(s_tag, s_end);
                 }
-            } else if (i_tag->SubTags.IsNotEmpty()) {
-                const TagBit *s_tag = i_tag->SubTags.First();
-                const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
+            } else {
                 s_tag += i_tag->TrueTagsSize;
 
                 Render(s_tag, s_end);
@@ -1084,12 +1083,14 @@ struct TemplateSub {
         const IfTag     *i_tag = static_cast<const IfTag *>(tag->GetInfo());
         const IfTagCase *item  = i_tag->First();
         const IfTagCase *end   = (item + i_tag->Size());
-        QExpresion       expr;
+        QExpresion       result;
 
-        if ((item != nullptr) && item->Case.IsNotEmpty()) { // first case should not be empty
+        if ((item != nullptr) && item->Case.IsNotEmpty()) { // First case should not be empty
             do {
                 // <else> without if = (item->Case == nothing)
-                if (item->Case.IsEmpty() || (Evaluate(expr, item->Case) && (expr.Number.Real > 0))) {
+                const QExpresion *expr = item->Case.First();
+
+                if (item->Case.IsEmpty() || (evaluate(result, expr, QOperation::NoOp) && (result.Number.Real > 0))) {
                     const TagBit *s_tag = item->SubTags.First();
                     const TagBit *s_end = (s_tag + item->SubTags.Size());
                     Render(s_tag, s_end);
@@ -1439,7 +1440,7 @@ struct TemplateSub {
     }
 
     // Evaluate /////////////////////////////////////
-    bool processExpressions(QExpresion &left, const QExpresion *&expr, const QOperation previous_oper) const noexcept {
+    bool evaluate(QExpresion &left, const QExpresion *&expr, const QOperation previous_oper) const noexcept {
         const QExpresion *next_expr;
         QExpresion        right;
         const bool not_equal = ((expr->Operation != QOperation::Equal) && (expr->Operation != QOperation::NotEqual));
@@ -1459,7 +1460,7 @@ struct TemplateSub {
 
                         return true;
                     }
-                } else if (processExpressions(right, next_expr, expr->Operation) &&
+                } else if (evaluate(right, next_expr, expr->Operation) &&
                            evaluateExpression(left, right, expr->Operation)) {
                     expr = next_expr;
                     continue;
@@ -1478,7 +1479,7 @@ struct TemplateSub {
         switch (expr->Type) {
             case ExpresionType::SubOperation: {
                 const QExpresion *sub_expr = expr->SubExpresions.First();
-                return processExpressions(number, sub_expr, QOperation::NoOp);
+                return evaluate(number, sub_expr, QOperation::NoOp);
             }
 
             case ExpresionType::Variable: {
