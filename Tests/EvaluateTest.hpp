@@ -33,14 +33,34 @@ namespace Qentem {
 namespace Test {
 
 QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, const Value<char> &value) {
-    using TemplateSubCV                = TemplateSub<char, Value<char>, StringStream<char>>;
-    const SizeT                 length = StringUtils::Count(content);
-    const TemplateSubCV         temp{content, length, nullptr, &value};
-    Array<Template::QExpresion> exprs = temp.ParseExpressions(0, length);
-    Template::QExpresion        expr;
+    using QExpresion           = QExpresion<Template::VariableTag>;
+    using TemplateSubCV        = TemplateSub<char, Value<char>, StringStream<char>>;
+    const SizeT         length = StringUtils::Count(content);
+    const TemplateSubCV temp{content, length, nullptr, &value};
+    Array<QExpresion>   exprs = temp.ParseExpressions(0, length);
+    QExpresion          result;
 
-    if (temp.Evaluate(expr, exprs)) {
-        number = expr.Number.Real;
+    if (temp.Evaluate(result, exprs)) {
+        switch (result.Type) {
+            case QExpresion::ExpresionType::NaturalNumber: {
+                number = static_cast<double>(result.Number.Natural);
+                break;
+            }
+
+            case QExpresion::ExpresionType::IntegerNumber: {
+                number = static_cast<double>(result.Number.Integer);
+                break;
+            }
+
+            case QExpresion::ExpresionType::RealNumber: {
+                number = result.Number.Real;
+                break;
+            }
+
+            default: {
+            }
+        }
+
         return true;
     }
 
@@ -718,7 +738,7 @@ static void TestEvaluate4(TestHelper &helper) {
 
     content = "-8^-2";
     number  = TestEvaluate(content, value);
-    helper.Equal(number, 0.015625, "number", __LINE__);
+    helper.Equal(number, -0.015625, "number", __LINE__);
 
     content = "-4 * 5";
     number  = TestEvaluate(content, value);
@@ -3109,7 +3129,7 @@ static void TestEvaluate13(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
 
     value["1"]   = 6;
-    value["A"]   = 6;
+    value["A"]   = 6U;
     value["AB"]  = 13;
     value["ABC"] = 26;
     value["Q"]   = "Qentem";
@@ -3259,7 +3279,7 @@ static void TestEvaluate14(TestHelper &helper) {
     bool        is_valid;
 
     value["1"]   = 6;
-    value["A"]   = 6;
+    value["A"]   = 6U;
     value["AB"]  = 13;
     value["ABC"] = 26;
     value["Q"]   = "Qentem";
@@ -3557,7 +3577,7 @@ static void TestEvaluate15(TestHelper &helper) {
     bool        is_valid;
 
     value["1"]   = 6;
-    value["A"]   = 6;
+    value["A"]   = 6U;
     value["AB"]  = 13;
     value["ABC"] = 26;
     value["Q"]   = "Qentem";
@@ -3732,7 +3752,7 @@ static void TestEvaluate16(TestHelper &helper) {
     bool        is_valid;
 
     value["1"]   = 6;
-    value["A"]   = 6;
+    value["A"]   = 6U;
     value["AB"]  = 13;
     value["ABC"] = 26;
     value["Q"]   = "Qentem";
