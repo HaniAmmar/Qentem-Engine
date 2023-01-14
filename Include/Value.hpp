@@ -321,7 +321,7 @@ class Value {
         constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
         constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
 
-        if (!IsNumber() && !IsUndefined()) {
+        if (!IsNumber()) {
             reset();
         }
 
@@ -732,6 +732,30 @@ class Value {
 
             default: {
                 return false;
+            }
+        }
+    }
+
+    inline unsigned int GetNumberType() const noexcept {
+        switch (Type()) {
+            case ValueType::UIntLong: {
+                // Natural number.
+                return 1U;
+            }
+
+            case ValueType::IntLong: {
+                // Integer number.
+                return 2U;
+            }
+
+            case ValueType::Double: {
+                // Real number.
+                return 3U;
+            }
+
+            default: {
+                // NAN: Not A Number
+                return 0;
             }
         }
     }
