@@ -2540,8 +2540,8 @@ static void TestRender2(TestHelper &helper) {
     content = R"(<loop set="numbers" value="val_">{var:val_}</loop>)";
     helper.Equal(Template::Render(content, value), R"()", R"(Render())", __LINE__);
 
-    content = R"(<loop value="this_number"><if case="({var:this_number} % 2) == 1">{var:this_number}</if></loop>)";
-    helper.Equal(Template::Render(content, value), R"(15)", R"(Render())", __LINE__);
+    content = R"(<loop value="this_number"><if case="({var:this_number} % 2) == 1">{var:this_number},</if></loop>)";
+    helper.Equal(Template::Render(content, value), R"(1,5,)", R"(Render())", __LINE__);
 
     content = R"(<loop value="loop1_val">{if case="{var:loop1_val} < 5", true="{var:loop1_val}"}</loop>)";
     helper.Equal(Template::Render(content, value), R"(012)", R"(Render())", __LINE__);

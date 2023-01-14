@@ -2553,8 +2553,8 @@ static void TestRenderU2(TestHelper &helper) {
     content = uR"(<loop set="numbers" value="val_">{var:val_}</loop>)";
     helper.Equal(Template::Render(content, value), uR"()", uR"(Render())", __LINE__);
 
-    content = uR"(<loop value="this_number"><if case="({var:this_number} % 2) == 1">{var:this_number}</if></loop>)";
-    helper.Equal(Template::Render(content, value), uR"(15)", uR"(Render())", __LINE__);
+    content = uR"(<loop value="this_number"><if case="({var:this_number} % 2) == 1">{var:this_number},</if></loop>)";
+    helper.Equal(Template::Render(content, value), uR"(1,5,)", uR"(Render())", __LINE__);
 
     content = uR"(<loop value="loop1_val">{if case="{var:loop1_val} < 5", true="{var:loop1_val}"}</loop>)";
     helper.Equal(Template::Render(content, value), uR"(012)", uR"(Render())", __LINE__);
