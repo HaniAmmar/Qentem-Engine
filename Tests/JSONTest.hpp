@@ -30,8 +30,6 @@
 namespace Qentem {
 namespace Test {
 
-namespace JSON = Qentem::JSON;
-
 static void TestParse1(TestHelper &helper) {
     Value<char> value;
 

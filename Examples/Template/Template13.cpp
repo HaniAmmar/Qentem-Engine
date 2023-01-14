@@ -3,11 +3,12 @@
 
 #include <iostream>
 
+using Qentem::JSON;
 using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"css(
+    auto value = JSON::Parse(R"css(
 {
     "dir": "ltr",
     "title": "Wishful News",

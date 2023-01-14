@@ -71,9 +71,10 @@ Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 [
     {
         "major": "Computer Science",
@@ -141,7 +142,7 @@ int main() {
 #include <iostream>
 
 using Value    = Qentem::Value<char>;
-namespace JSON = Qentem::JSON;
+using Qentem::JSON;
 
 int main() {
  Value abc = JSON::Parse(R"(["A","B","C"])");

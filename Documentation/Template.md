@@ -357,9 +357,10 @@ Not zero or one or two.
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"([0,1,2,3])");
+    auto value = JSON::Parse(R"([0,1,2,3])");
 
     const char *content = R"(
 <if case="{var:0} == 0">
@@ -425,9 +426,10 @@ Loops over a set and replaces the values with the string inside `value`. The siz
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 [
     {
         "name": "a",
@@ -537,10 +539,11 @@ int main() {
 #include <iostream>
 
 using Qentem::Template;
+using Qentem::JSON;
 using Qentem::Value;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 {
     "Group-1": [["A","B","C"],["DD","EE","FF"],["GGG","HHH","Qentem"]],
     "Group-2": [[1,2,3],[10,20,30],[100,200,300]]
@@ -657,9 +660,10 @@ int main() {
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 {
     "object": [
         {
@@ -765,9 +769,10 @@ int main() {
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    const Value<char> value = Qentem::JSON::Parse(
+    const Value<char> value = JSON::Parse(
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
 
     const char *content = R"(
@@ -818,9 +823,10 @@ int main() {
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 [
     {
         "major": "Computer Science",
@@ -891,9 +897,10 @@ int main() {
 
 using Qentem::Template;
 using Qentem::Value;
+using Qentem::JSON;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"css(
+    auto value = JSON::Parse(R"css(
 {
     "dir": "ltr",
     "title": "Wishful News",

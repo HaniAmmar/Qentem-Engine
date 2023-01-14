@@ -27,7 +27,6 @@
 #define QENTEM_JSONUTILS_H_
 
 namespace Qentem {
-namespace JSON {
 
 template <typename>
 struct JSONotation_T_;
@@ -321,7 +320,6 @@ struct JSONotationStrings<wchar_t, 2> {
     static constexpr const wchar_t *NullString  = L"null";
 };
 
-} // namespace JSON
 } // namespace Qentem
 
 #endif

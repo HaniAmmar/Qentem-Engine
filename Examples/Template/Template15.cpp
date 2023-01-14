@@ -3,11 +3,12 @@
 
 #include <iostream>
 
+using Qentem::JSON;
 using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    const Value<char> value = Qentem::JSON::Parse(
+    const Value<char> value = JSON::Parse(
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
 
     const char *content = R"(

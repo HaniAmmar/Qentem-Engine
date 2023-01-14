@@ -45,7 +45,7 @@ enum class ValueType : unsigned char {
 
 template <typename Char_T_>
 class Value {
-    using JSONotation = JSON::JSONotation_T_<Char_T_>;
+    using JSONotation = JSONotation_T_<Char_T_>;
     using VObject     = HArray<Value, Char_T_>;
     using VArray      = Array<Value>;
     using VString     = String<Char_T_>;
@@ -1357,7 +1357,7 @@ class Value {
         for (const V_item_ *h_item = obj.First(), *end = (h_item + obj.Size()); h_item != end; h_item++) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 stream += JSONotation::QuoteChar;
-                JSON::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
+                EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 
@@ -1410,7 +1410,7 @@ class Value {
 
             case ValueType::String: {
                 stream += JSONotation::QuoteChar;
-                JSON::EscapeJSON(val.string_.First(), val.string_.Length(), stream);
+                EscapeJSON(val.string_.First(), val.string_.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 break;
             }

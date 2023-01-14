@@ -3,11 +3,12 @@
 
 #include <iostream>
 
+using Qentem::JSON;
 using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"([0,1,2,3])");
+    auto value = JSON::Parse(R"([0,1,2,3])");
 
     const char *content = R"(
 <if case="{var:0} == 0">

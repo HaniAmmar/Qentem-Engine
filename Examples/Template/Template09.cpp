@@ -3,11 +3,12 @@
 
 #include <iostream>
 
+using Qentem::JSON;
 using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 {
     "object": [
         {

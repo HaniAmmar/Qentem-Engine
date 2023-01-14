@@ -3,11 +3,12 @@
 
 #include <iostream>
 
+using Qentem::JSON;
 using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    auto value = Qentem::JSON::Parse(R"(
+    auto value = JSON::Parse(R"(
 {
     "Group-1": [["A","B","C"],["DD","EE","FF"],["GGG","HHH","Qentem"]],
     "Group-2": [[1,2,3],[10,20,30],[100,200,300]]

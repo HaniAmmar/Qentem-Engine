@@ -2,8 +2,8 @@
 
 #include <iostream>
 
-using Value    = Qentem::Value<char>;
-namespace JSON = Qentem::JSON;
+using Value = Qentem::Value<char>;
+using Qentem::JSON;
 
 int main() {
     Value abc = JSON::Parse(R"(["A","B","C"])");
