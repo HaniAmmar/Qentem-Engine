@@ -387,7 +387,6 @@ struct Template {
     struct InlineIfTag {
         Array<TagBit>     SubTags;
         Array<QExpresion> Case;
-        SizeT             TrueTagsSize;
     };
 
     // IfTag -------------------------------------------
@@ -1060,19 +1059,24 @@ struct TemplateSub {
         QExpresion         result;
 
         if (i_tag->Case.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
-            const TagBit *s_tag = i_tag->SubTags.First();
-            const TagBit *s_end = (s_tag + i_tag->SubTags.Size());
+            const TagBit *s_tag     = i_tag->SubTags.First();
+            const TagBit *s_end     = (s_tag + i_tag->SubTags.Size());
+            SizeT         true_size = 0;
+
+            if (++expr != i_tag->Case.End()) {
+                true_size = static_cast<SizeT>(expr->Number.Natural);
+            }
 
             if (result.Number.Real > 0.0) {
-                if (i_tag->TrueTagsSize != 0) {
-                    if (i_tag->SubTags.Size() != i_tag->TrueTagsSize) {
-                        s_end -= i_tag->TrueTagsSize;
+                if (true_size != 0) {
+                    if (i_tag->SubTags.Size() != true_size) {
+                        s_end -= true_size;
                     }
 
                     Render(s_tag, s_end);
                 }
             } else {
-                s_tag += i_tag->TrueTagsSize;
+                s_tag += true_size;
 
                 Render(s_tag, s_end);
             }
@@ -1278,7 +1282,8 @@ struct TemplateSub {
         if (tag->Case.IsNotEmpty()) {
             if (true_offset != true_end_offset) {
                 lightParse(tag->SubTags, true_offset, true_end_offset);
-                tag->TrueTagsSize = tag->SubTags.Size();
+                QExpresion &expr    = tag->Case.InsertGet(QExpresion{});
+                expr.Number.Natural = tag->SubTags.Size(); // To use only one heap for true and false.
             }
 
             if (false_offset != false_end_offset) {
