@@ -512,28 +512,7 @@ class HArray {
     void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
     void expand() { resize(((Capacity() != 0) ? (Capacity() * SizeT{2}) : SizeT{2})); }
 
-    HAItem_ *find(SizeT *&index, const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT   *ht      = getHashTable();
-        HAItem_ *storage = reinterpret_cast<HAItem_ *>(ht + Capacity());
-        HAItem_ *item;
-        index     = (ht + (hash & getBase()));
-        SizeT tmp = *index;
-
-        while (tmp != 0) {
-            item = (storage + (tmp - 1));
-
-            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
-                return item;
-            }
-
-            index = &(item->Next);
-            tmp   = *index;
-        }
-
-        return nullptr;
-    }
-
-    inline HAItem_ *insert(SizeT *index, Key_ &&key, const SizeT hash) noexcept {
+    HAItem_ *insert(SizeT *index, Key_ &&key, const SizeT hash) noexcept {
         HAItem_ *item = (Storage() + Size());
         ++index_;
         *index = Size();
@@ -603,6 +582,28 @@ class HArray {
         setSize(static_cast<SizeT>(storage_item - storage));
         Memory::Deallocate(ht);
         generateHash();
+    }
+
+    HAItem_ *find(SizeT *&index, const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT   *ht      = getHashTable();
+        HAItem_ *storage = reinterpret_cast<HAItem_ *>(ht + Capacity());
+        HAItem_ *item;
+        index     = (ht + (hash & getBase()));
+        SizeT tmp = *index;
+
+        while (tmp != 0) {
+            item = (storage + tmp);
+            --item;
+
+            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
+                return item;
+            }
+
+            index = &(item->Next);
+            tmp   = *index;
+        }
+
+        return nullptr;
     }
 
     void generateHash() const noexcept {
