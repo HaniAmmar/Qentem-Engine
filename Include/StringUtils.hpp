@@ -30,7 +30,7 @@ namespace Qentem {
 class StringUtils {
   public:
     template <typename Char_T_>
-    class WhiteSpaceChars {
+    class WhiteSpaceChars_T_ {
       public:
         static constexpr Char_T_ SpaceChar           = ' ';
         static constexpr Char_T_ LineControlChar     = '\n';
@@ -53,14 +53,14 @@ class StringUtils {
 
     template <typename Char_T_, typename Number_T_>
     static void TrimLeft(const Char_T_ *str, Number_T_ &offset, const Number_T_ end_offset) noexcept {
-        using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
+        using WhiteSpaceChars = WhiteSpaceChars_T_<Char_T_>;
 
         while (offset < end_offset) {
             switch (str[offset]) {
-                case WhiteSpaceChars_T_::SpaceChar:
-                case WhiteSpaceChars_T_::LineControlChar:
-                case WhiteSpaceChars_T_::TabControlChar:
-                case WhiteSpaceChars_T_::CarriageControlChar:
+                case WhiteSpaceChars::SpaceChar:
+                case WhiteSpaceChars::LineControlChar:
+                case WhiteSpaceChars::TabControlChar:
+                case WhiteSpaceChars::CarriageControlChar:
                     break;
 
                 default: {
@@ -74,17 +74,17 @@ class StringUtils {
 
     template <typename Char_T_, typename Number_T_>
     static void TrimRight(const Char_T_ *str, const Number_T_ offset, Number_T_ &end_offset) noexcept {
-        using WhiteSpaceChars_T_ = WhiteSpaceChars<Char_T_>;
+        using WhiteSpaceChars = WhiteSpaceChars_T_<Char_T_>;
 
         if (end_offset > offset) {
             do {
                 --end_offset;
 
                 switch (str[end_offset]) {
-                    case WhiteSpaceChars_T_::SpaceChar:
-                    case WhiteSpaceChars_T_::LineControlChar:
-                    case WhiteSpaceChars_T_::TabControlChar:
-                    case WhiteSpaceChars_T_::CarriageControlChar:
+                    case WhiteSpaceChars::SpaceChar:
+                    case WhiteSpaceChars::LineControlChar:
+                    case WhiteSpaceChars::TabControlChar:
+                    case WhiteSpaceChars::CarriageControlChar:
                         break;
 
                     default: {
