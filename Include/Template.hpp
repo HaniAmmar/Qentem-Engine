@@ -56,7 +56,7 @@ namespace Qentem {
  *  <...>
  *  - <loop set="s"? value="s"? group="s"? sort="ascend|descend"?>...</loop>
  *
- *      - s: String, n: Number, var: Raw ariable,
+ *      - s: String, n: Number.
  *      - set: child name in the passed colloction: Optional.
  *      - value: the current value in the colloction: Optional.
  *          Note: Choose a unique name.
