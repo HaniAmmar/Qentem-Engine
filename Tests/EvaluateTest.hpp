@@ -33,7 +33,6 @@ namespace Qentem {
 namespace Test {
 
 QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, const Value<char> &value) {
-    using QExpresion           = QExpresion<Template::VariableTag>;
     using TemplateSubCV        = TemplateSub<char, Value<char>, StringStream<char>>;
     const SizeT         length = StringUtils::Count(content);
     const TemplateSubCV temp{content, length, nullptr, &value};

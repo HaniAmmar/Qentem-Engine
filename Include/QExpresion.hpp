@@ -20,14 +20,13 @@
  * SOFTWARE.
  */
 
-#include "Array.hpp"
+#include "Tags.hpp"
 
 #ifndef QENTEM_Q_EXPRESION_H_
 #define QENTEM_Q_EXPRESION_H_
 
 namespace Qentem {
 
-template <typename Variable_T_>
 struct QExpresion {
     // ExpresionType -------------------------------------------
     enum class ExpresionType : unsigned char {
@@ -1095,11 +1094,36 @@ struct QExpresion {
         // Bucket_           bucket_;
         Array<QExpresion> SubExpresions{};
         QNumber           Number;
-        Variable_T_       Variable; // {var:...}
+        Tags::VariableTag Variable; // {var:...}
     };
 
     ExpresionType Type;
     QOperation    Operation;
+};
+
+template <typename Char_T_>
+struct QOperationSymbol_T_ {
+  public:
+    static constexpr Char_T_ RemainderExp = '%';
+    static constexpr Char_T_ MultipleExp  = '*';
+    static constexpr Char_T_ DivideExp    = '/';
+    static constexpr Char_T_ AddExp       = '+';
+    static constexpr Char_T_ SubtractExp  = '-';
+    static constexpr Char_T_ EqualExp     = '=';
+    static constexpr Char_T_ NotExp       = '!';
+    static constexpr Char_T_ LessExp      = '<';
+    static constexpr Char_T_ GreaterExp   = '>';
+    static constexpr Char_T_ AndExp       = '&';
+    static constexpr Char_T_ OrExp        = '|';
+
+    static constexpr Char_T_ ParenthesStart = '(';
+    static constexpr Char_T_ ParenthesEnd   = ')';
+    static constexpr Char_T_ BracketStart   = '{';
+    static constexpr Char_T_ BracketEnd     = '}';
+    static constexpr Char_T_ ExponentExp    = '^';
+    static constexpr Char_T_ SpaceChar      = ' ';
+    static constexpr Char_T_ ColonChar      = ':';
+    static constexpr Char_T_ SlashChar      = '/';
 };
 
 } // namespace Qentem
