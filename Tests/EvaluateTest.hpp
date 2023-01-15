@@ -715,13 +715,13 @@ static void TestEvaluate4(TestHelper &helper) {
     const char *content;
     bool        is_valid;
 
-    content = "16 ^ -2";
+    content = "2 ^ -2";
     number  = TestEvaluate(content, value);
-    helper.Equal(number, 0.00390625, "number", __LINE__);
+    helper.Equal(number, 0.25, "number", __LINE__);
 
-    content = "8 ^-2";
+    content = "4 ^-2";
     number  = TestEvaluate(content, value);
-    helper.Equal(number, 0.015625, "number", __LINE__);
+    helper.Equal(number, 0.0625, "number", __LINE__);
 
     content = "-3^0";
     number  = TestEvaluate(content, value);
@@ -3812,6 +3812,839 @@ static void TestEvaluate16(TestHelper &helper) {
     content  = "{var:A}==1U0";
     is_valid = TestEvaluate(number, content, value);
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    content  = "5+{var:QA}";
+    is_valid = TestEvaluate(number, content, value);
+    helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    value.Reset();
+    value += -2;
+    value += 3U;
+    value += 3.5;
+    value += 0.5;
+
+    value += "-2";
+    value += "3";
+    value += "3.5";
+    value += "0.5";
+
+    content = "{var:0}==-2";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}==3";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}==3.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:3}==0.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "-2=={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "3=={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "3.5=={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "0.5=={var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    //////
+    content = "{var:4}==-2";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:5}==3";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:6}==3.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:7}==0.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "-2=={var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "3=={var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "3.5=={var:6}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "0.5=={var:7}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    ///////////
+    content = "{var:0}+-2";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -4, "number", __LINE__);
+
+    content = "{var:1}+3";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 6, "number", __LINE__);
+
+    content = "{var:2}+3.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 7, "number", __LINE__);
+
+    content = "{var:3}+0.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "-2+{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -4, "number", __LINE__);
+
+    content = "3+{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 6, "number", __LINE__);
+
+    content = "3.5+{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 7, "number", __LINE__);
+
+    content = "0.5+{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    //////
+    content = "{var:4}+-2";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -4, "number", __LINE__);
+
+    content = "{var:5}+3";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 6, "number", __LINE__);
+
+    content = "{var:6}+3.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 7, "number", __LINE__);
+
+    content = "{var:7}+0.5";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "-2+{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -4, "number", __LINE__);
+
+    content = "3+{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 6, "number", __LINE__);
+
+    content = "3.5+{var:6}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 7, "number", __LINE__);
+
+    content = "0.5+{var:7}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+}
+
+static void TestEvaluate17(TestHelper &helper) {
+    Value<char> value;
+    double      number = -1;
+    const char *content;
+
+    value += -3;
+    value += 5U;
+    value += 8.5;
+
+    content = "{var:0}+{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -6, "number", __LINE__);
+
+    content = "{var:1}+{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 10, "number", __LINE__);
+
+    content = "{var:2}+{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 17, "number", __LINE__);
+
+    content = "{var:0}+{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:1}+{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:0}+{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 5.5, "number", __LINE__);
+
+    content = "{var:2}+{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 5.5, "number", __LINE__);
+
+    content = "{var:2}+{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 13.5, "number", __LINE__);
+
+    content = "{var:1}+{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 13.5, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}-{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}-{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}-{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}-{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -8, "number", __LINE__);
+
+    content = "{var:1}-{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 8, "number", __LINE__);
+
+    content = "{var:0}-{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -11.5, "number", __LINE__);
+
+    content = "{var:2}-{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 11.5, "number", __LINE__);
+
+    content = "{var:2}-{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 3.5, "number", __LINE__);
+
+    content = "{var:1}-{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -3.5, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}*{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 9, "number", __LINE__);
+
+    content = "{var:1}*{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 25, "number", __LINE__);
+
+    content = "{var:2}*{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 72.25, "number", __LINE__);
+
+    content = "{var:0}*{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -15, "number", __LINE__);
+
+    content = "{var:1}*{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -15, "number", __LINE__);
+
+    content = "{var:0}*{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -25.5, "number", __LINE__);
+
+    content = "{var:2}*{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -25.5, "number", __LINE__);
+
+    content = "{var:2}*{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 42.5, "number", __LINE__);
+
+    content = "{var:1}*{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 42.5, "number", __LINE__);
+
+    ///////////////////////////////////
+    value.Reset();
+    value += -8;
+    value += 16U;
+    value += 4;
+
+    content = "{var:0}/{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}/{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}/{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:0}/{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -0.5, "number", __LINE__);
+
+    content = "{var:1}/{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:0}/{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:2}/{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -0.5, "number", __LINE__);
+
+    content = "{var:2}/{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0.25, "number", __LINE__);
+
+    content = "{var:1}/{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 4, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}=={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}=={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}=={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:0}=={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}=={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}=={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}=={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}=={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}=={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}>={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}>={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}>={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:0}>={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}>={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:0}>={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}>={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}>={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}>={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}<={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}<={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}<={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:0}<={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}<={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}<={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}<={var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}<={var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}<={var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}>{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}>{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}>{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}>{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}>{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:0}>{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}>{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}>{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}>{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    ///////////////////////////////////
+
+    content = "{var:0}<{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}<{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}<{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}<{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}<{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}<{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}<{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}<{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}<{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+}
+
+static void TestEvaluate18(TestHelper &helper) {
+    Value<char> value;
+    double      number = -1;
+    const char *content;
+
+    value += 2U;
+    value += 3U;
+    value += -2;
+    value += -3;
+    value += 4.0F;
+    value += -4.0F;
+
+    content = "{var:0}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:0}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:0}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:0}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:0}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    //////////////////
+
+    content = "{var:1}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:1}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 3, "number", __LINE__);
+
+    content = "{var:1}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 3, "number", __LINE__);
+
+    //////////////////
+
+    content = "{var:2}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:2}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:2}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:2}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    //////////////////
+
+    content = "{var:3}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    content = "{var:3}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:3}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    content = "{var:3}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:3}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -3, "number", __LINE__);
+
+    content = "{var:3}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -3, "number", __LINE__);
+
+    //////////
+
+    content = "{var:4}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:4}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:4}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:4}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:4}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:4}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    //////////
+
+    content = "{var:5}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:5}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    content = "{var:5}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:5}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    content = "{var:5}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:5}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    ////////////////////////////////////////
+
+    content = "{var:1}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:2}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:3}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    content = "{var:4}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:5}%{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    //////////////////
+
+    content = "{var:0}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:2}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:3}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:4}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:5}%{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    //////////////////
+
+    content = "{var:0}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:1}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:3}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    content = "{var:4}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:5}%{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    //////////////////
+
+    content = "{var:0}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:1}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    content = "{var:2}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:4}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 1, "number", __LINE__);
+
+    content = "{var:5}%{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -1, "number", __LINE__);
+
+    //////////
+
+    content = "{var:0}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:1}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 3, "number", __LINE__);
+
+    content = "{var:2}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:3}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -3, "number", __LINE__);
+
+    content = "{var:5}%{var:4}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+
+    //////////
+
+    content = "{var:0}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 2, "number", __LINE__);
+
+    content = "{var:1}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 3, "number", __LINE__);
+
+    content = "{var:2}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -2, "number", __LINE__);
+
+    content = "{var:3}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -3, "number", __LINE__);
+
+    content = "{var:4}%{var:5}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0, "number", __LINE__);
+}
+
+static void TestEvaluate19(TestHelper &helper) {
+    Value<char> value;
+    double      number = -1;
+    const char *content;
+
+    value += 2U;
+    value += 3U;
+    value += -2;
+    value += int(2);
+    value += 4.0F;
+    value += -4.0F;
+    value += 0.25F;
+
+    content       = "{var:6}^{var:1}";
+    bool is_valid = TestEvaluate(number, content, value);
+    helper.EqualsFalse(is_valid, "is_valid", __LINE__);
+
+    content = "{var:0}^{var:0}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 4, "number", __LINE__);
+
+    content = "{var:2}^{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -8, "number", __LINE__);
+
+    content = "{var:0}^{var:2}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 0.25, "number", __LINE__);
+
+    content = "{var:0}^{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 4, "number", __LINE__);
 }
 
 static int RunEvaluateTests() {
@@ -3835,6 +4668,9 @@ static int RunEvaluateTests() {
     helper.Test("Evaluate Test 14", TestEvaluate14);
     helper.Test("Evaluate Test 15", TestEvaluate15);
     helper.Test("Evaluate Test 16", TestEvaluate16);
+    helper.Test("Evaluate Test 17", TestEvaluate17);
+    helper.Test("Evaluate Test 18", TestEvaluate18);
+    helper.Test("Evaluate Test 19", TestEvaluate19);
 
     return helper.EndTests();
 }
