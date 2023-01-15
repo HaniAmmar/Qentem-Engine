@@ -3968,6 +3968,7 @@ static void TestEvaluate17(TestHelper &helper) {
     value += -3;
     value += 5U;
     value += 8.5;
+    value += int(3);
 
     content = "{var:0}+{var:0}";
     number  = TestEvaluate(content, value);
@@ -4081,6 +4082,13 @@ static void TestEvaluate17(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, 42.5, "number", __LINE__);
 
+    content = "{var:3}*{var:1}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 15, "number", __LINE__);
+
+    content = "{var:1}*{var:3}";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 15, "number", __LINE__);
     ///////////////////////////////////
     value.Reset();
     value += -8;
