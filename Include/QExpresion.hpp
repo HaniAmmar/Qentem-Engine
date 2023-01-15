@@ -631,15 +631,11 @@ struct QExpresion {
                         return (static_cast<long long>(Number.Natural) >= right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Natural) >= right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Natural) >= right.Number.Real);
             }
 
             case ExpresionType::IntegerNumber: {
@@ -652,15 +648,11 @@ struct QExpresion {
                         return (Number.Integer >= right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Integer) >= right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Integer) >= right.Number.Real);
             }
 
             case ExpresionType::RealNumber: {
@@ -697,15 +689,11 @@ struct QExpresion {
                         return (static_cast<long long>(Number.Natural) > right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Natural) > right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Natural) > right.Number.Real);
             }
 
             case ExpresionType::IntegerNumber: {
@@ -718,15 +706,11 @@ struct QExpresion {
                         return (Number.Integer > right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Integer) > right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Integer) > right.Number.Real);
             }
 
             case ExpresionType::RealNumber: {
@@ -763,15 +747,11 @@ struct QExpresion {
                         return (static_cast<long long>(Number.Natural) <= right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Natural) <= right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Natural) <= right.Number.Real);
             }
 
             case ExpresionType::IntegerNumber: {
@@ -784,15 +764,11 @@ struct QExpresion {
                         return (Number.Integer <= right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Integer) <= right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Integer) <= right.Number.Real);
             }
 
             case ExpresionType::RealNumber: {
@@ -829,15 +805,11 @@ struct QExpresion {
                         return (static_cast<long long>(Number.Natural) < right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Natural) < right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Natural) < right.Number.Real);
             }
 
             case ExpresionType::IntegerNumber: {
@@ -850,15 +822,11 @@ struct QExpresion {
                         return (Number.Integer < right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Integer) < right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Integer) < right.Number.Real);
             }
 
             case ExpresionType::RealNumber: {
@@ -895,15 +863,11 @@ struct QExpresion {
                         return (static_cast<long long>(Number.Natural) == right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Natural) == right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Natural) == right.Number.Real);
             }
 
             case ExpresionType::IntegerNumber: {
@@ -916,15 +880,11 @@ struct QExpresion {
                         return (Number.Integer == right.Number.Integer);
                     }
 
-                    case ExpresionType::RealNumber: {
-                        return (static_cast<double>(Number.Integer) == right.Number.Real);
-                    }
-
                     default: {
                     }
                 }
 
-                break;
+                return (static_cast<double>(Number.Integer) == right.Number.Real);
             }
 
             case ExpresionType::RealNumber: {
@@ -961,10 +921,9 @@ struct QExpresion {
             }
 
             default: {
+                return (Number.Real != static_cast<double>(number));
             }
         }
-
-        return (Number.Real != static_cast<double>(number));
     }
 
     // struct Bucket_ {

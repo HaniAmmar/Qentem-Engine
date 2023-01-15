@@ -914,12 +914,6 @@ struct TemplateSub {
                     SizeT set_offset = last_offset;
                     SizeT set_length = ((offset2 - 1) - last_offset);
 
-                    if ((content_[last_offset] == TagPatterns::InLinePrefix) &&
-                        (set_length > TagPatterns::VariableFulllength)) {
-                        set_offset += TagPatterns::VariablePrefixLength;
-                        set_length -= TagPatterns::VariableFulllength;
-                    }
-
                     VariableTag set_var{};
                     parseVariableTag(set_offset, (set_offset + set_length), &set_var);
                     i_tag.SetOffset = static_cast<unsigned char>(set_var.Offset - i_tag.Offset);
@@ -1447,15 +1441,10 @@ struct TemplateSub {
                 return false;
             }
 
-            case ExpresionType::NotANumber: {
+            default: {
                 left_content     = (content_ + left.Number.Offset);
                 left_length      = left.Number.Length;
                 left_is_a_number = false;
-                break;
-            }
-
-            default: {
-                return false; // It should not get to this.
             }
         }
 
@@ -1508,15 +1497,10 @@ struct TemplateSub {
                 return false;
             }
 
-            case ExpresionType::NotANumber: {
+            default: {
                 right_content     = (content_ + right.Number.Offset);
                 right_length      = right.Number.Length;
                 right_is_a_number = false;
-                break;
-            }
-
-            default: {
-                return false; // It should not get to this.
             }
         }
 
