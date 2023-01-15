@@ -353,10 +353,10 @@ struct QExpresion {
     }
 
     bool operator^=(const QExpresion &right) noexcept {
-        unsigned long long num_left;
-        unsigned long long num_right;
-        bool               left_negative;
-        bool               right_negative;
+        unsigned long long num_left       = 0;
+        unsigned long long num_right      = 0;
+        bool               left_negative  = false;
+        bool               right_negative = false;
 
         switch (Type) {
             case ExpresionType::NaturalNumber: {
