@@ -1298,8 +1298,8 @@ struct TemplateSub {
             }
 
             case QOperation::Remainder: { // %
-                left.Number.Natural = (left % right);
-                left.Type           = ExpresionType::NaturalNumber;
+                left.Number.Integer = (left % right);
+                left.Type           = ExpresionType::IntegerNumber;
                 break;
             }
 
