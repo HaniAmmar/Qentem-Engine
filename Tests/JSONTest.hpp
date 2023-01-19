@@ -745,6 +745,24 @@ static void TestParse3(TestHelper &helper) {
     value = JSON::Parse(R"({"a":{"b":"c"}})");
     helper.Equal(value.Stringify(), R"({"a":{"b":"c"}})", "Stringify()", __LINE__);
 
+    value = JSON::Parse(R"([12.12112121212121])");
+    helper.Equal(value.Stringify(), R"([12.12112121212121])", "Stringify()", __LINE__);
+
+    value = JSON::Parse(R"([-12.12112121212121])");
+    helper.Equal(value.Stringify(), R"([-12.12112121212121])", "Stringify()", __LINE__);
+
+    value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789])");
+    helper.Equal(value.Stringify(), R"([3.123456789123457])", "Stringify()", __LINE__);
+
+    value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e+10])");
+    helper.Equal(value.Stringify(), R"([31234567891.23457])", "Stringify()", __LINE__);
+
+    value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e-10])");
+    helper.Equal(value.Stringify(), R"([3.1234567e-10])", "Stringify()", __LINE__);
+
+    // value = JSON::Parse(R"([1.0e308])");
+    // helper.Equal(value.Stringify(), R"([1.0e308])", "Stringify()", __LINE__);
+
     value = JSON::Parse(
         R"([                                                                 1,
                                                                                                2
@@ -1179,6 +1197,21 @@ static void TestParse6(TestHelper &helper) {
     helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
 
     value = JSON::Parse("[\"WHAT?\"}");
+    helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
+
+    value = JSON::Parse(R"([1e])");
+    helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
+
+    value = JSON::Parse(R"([1e+])");
+    helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
+
+    value = JSON::Parse(R"([1e-])");
+    helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
+
+    value = JSON::Parse(R"([1e++])");
+    helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
+
+    value = JSON::Parse(R"([1e--])");
     helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
 }
 

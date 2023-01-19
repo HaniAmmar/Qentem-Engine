@@ -36,22 +36,22 @@ QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, co
     using TemplateSubCV        = TemplateSub<char, Value<char>, StringStream<char>>;
     const SizeT         length = StringUtils::Count(content);
     const TemplateSubCV temp{content, length, nullptr, &value};
-    Array<QExpresion>   exprs = temp.ParseExpressions(0, length);
-    QExpresion          result;
+    Array<QExpression>  exprs = temp.ParseExpressions(0, length);
+    QExpression         result;
 
     if (temp.Evaluate(result, exprs)) {
         switch (result.Type) {
-            case QExpresion::ExpresionType::NaturalNumber: {
+            case QExpression::ExpressionType::NaturalNumber: {
                 number = static_cast<double>(result.Number.Natural);
                 break;
             }
 
-            case QExpresion::ExpresionType::IntegerNumber: {
+            case QExpression::ExpressionType::IntegerNumber: {
                 number = static_cast<double>(result.Number.Integer);
                 break;
             }
 
-            case QExpresion::ExpresionType::RealNumber: {
+            case QExpression::ExpressionType::RealNumber: {
                 number = result.Number.Real;
                 break;
             }
@@ -759,6 +759,14 @@ static void TestEvaluate4(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, -3.5, "number", __LINE__);
 
+    content = "7 + -2";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, 5, "number", __LINE__);
+
+    content = "2 + -7";
+    number  = TestEvaluate(content, value);
+    helper.Equal(number, -5, "number", __LINE__);
+
     content = "-9 / -3";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 3, "number", __LINE__);
@@ -783,19 +791,6 @@ static void TestEvaluate4(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, -11, "number", __LINE__);
 
-    content = "5 ---2";
-    number  = TestEvaluate(content, value);
-    helper.Equal(number, 3, "number", __LINE__);
-
-    content = "---5 ---2";
-    number  = TestEvaluate(content, value);
-    helper.Equal(number, -7, "number", __LINE__);
-
-    content  = " 5 == - 5 ";
-    is_valid = TestEvaluate(number, content, value);
-    helper.Equal(number, 0, "number", __LINE__);
-    helper.EqualsTrue(is_valid, "is_valid", __LINE__);
-
     content  = " 5 == -5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
@@ -811,7 +806,7 @@ static void TestEvaluate4(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content  = " - 5 == 5 ";
+    content  = " -5 == 5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
@@ -828,15 +823,11 @@ static void TestEvaluate4(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content = " -  10 != 10 ";
-    number  = TestEvaluate(content, value);
-    helper.Equal(number, 1, "number", __LINE__);
-
     content = " 10 !=-10 ";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content = " 10 !=- 10";
+    content = " 10 != -10";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
@@ -866,11 +857,11 @@ static void TestEvaluate4(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content = "-1 >=- 100";
+    content = "-1 >=-100";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content = "-8 >= -   8";
+    content = "-8 >=-8";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
@@ -911,12 +902,12 @@ static void TestEvaluate4(TestHelper &helper) {
     is_valid = TestEvaluate(number, content, value);
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 
-    content  = "-5 <=- 19";
+    content  = "-5 <=-19 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content = "-8 <= -   8";
+    content = "-8 <= -8";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
@@ -929,7 +920,7 @@ static void TestEvaluate4(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content  = "1 &&- 800";
+    content  = "1 &&   -800";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
@@ -952,7 +943,7 @@ static void TestEvaluate4(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content  = "0 || - 9";
+    content  = "0 ||           -9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
@@ -1037,11 +1028,11 @@ static void TestEvaluate5(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, +11, "number", __LINE__);
 
-    content = "5 +++2";
+    content = "5 + +2";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 7, "number", __LINE__);
 
-    content = "+++5 +++2";
+    content = "+5 + +2";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 7, "number", __LINE__);
 
@@ -1110,12 +1101,12 @@ static void TestEvaluate5(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content  = "+1 >=+ 100";
+    content  = "+1 >=+100 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content = "+8 >= +   8";
+    content = "+8 >=  +8 ";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
@@ -1150,12 +1141,12 @@ static void TestEvaluate5(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content  = "+5 <=+ 19";
+    content  = "+5 <=+19";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 1, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content = "+8 <= +   8";
+    content = "+8 <= +8";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
@@ -1168,7 +1159,7 @@ static void TestEvaluate5(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content  = "1 &&+ 800";
+    content  = "1&&+800";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 1, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
@@ -1198,7 +1189,7 @@ static void TestEvaluate5(TestHelper &helper) {
     number = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content  = "0 || + 9";
+    content  = "0 || +9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 1, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
@@ -1272,11 +1263,11 @@ static void TestEvaluate6(TestHelper &helper) {
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content = "(       +      1             )";
+    content = "(       +1             )";
     number  = TestEvaluate(content, value);
     helper.Equal(number, 1, "number", __LINE__);
 
-    content = "(        -       1           )";
+    content = "(        -1           )";
     number  = TestEvaluate(content, value);
     helper.Equal(number, -1, "number", __LINE__);
 
@@ -1330,7 +1321,7 @@ static void TestEvaluate6(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content  = "(  10  -  +  9  )>5";
+    content  = "(  10  -  +9  )>5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
@@ -1605,7 +1596,7 @@ static void TestEvaluate7(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 
-    content  = "(  10  -  +  9  )>(3+2)";
+    content  = "(  10-+9  )>(3+2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number, 0, "number", __LINE__);
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
