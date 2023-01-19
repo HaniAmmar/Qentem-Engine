@@ -259,61 +259,27 @@ struct JSON {
                 }
 
                 default: {
-                    const SizeT    num_offset      = offset;
-                    const Char_T_ *num_content     = (content + num_offset);
-                    const bool     is_not_negative = (content[offset] != JSONotation::NegativeChar);
-                    bool           is_float        = false;
+                    QNumber number;
 
-                    while (offset < length) {
-                        switch (content[offset]) {
-                            case JSONotation::DotChar:
-                            case JSONotation::E_Char:
-                            case JSONotation::CE_Char: {
-                                is_float = true;
-                                break;
-                            }
-
-                            case JSONotation::SpaceChar:
-                            case JSONotation::LineControlChar:
-                            case JSONotation::TabControlChar:
-                            case JSONotation::CarriageControlChar:
-                            case JSONotation::CommaChar:
-                            case JSONotation::ECurlyChar:
-                            case JSONotation::ESquareChar: {
-                                const SizeT len = (offset - num_offset);
-
-                                if (is_float || (len > 19)) {
-                                    double num;
-
-                                    if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
-                                        value = num;
-                                        return;
-                                    }
-                                } else if (is_not_negative) {
-                                    unsigned long long num;
-
-                                    if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
-                                        value = num;
-                                        return;
-                                    }
-                                } else {
-                                    long long num;
-
-                                    if (Digit<Char_T_>::StringToNumber(num, num_content, (offset - num_offset))) {
-                                        value = num;
-                                        return;
-                                    }
-                                }
-
-                                offset = length;
-                            }
-
-                            default: {
-                            }
+                    switch (Digit<Char_T_>::StringToNumber(number, content, offset, length)) {
+                        case 1: {
+                            value = number.Natural;
+                            return;
                         }
 
-                        ++offset;
-                    }
+                        case 2: {
+                            value = number.Integer;
+                            return;
+                        }
+
+                        case 3: {
+                            value = number.Real;
+                            return;
+                        }
+
+                        default: {
+                        }
+                    };
                 }
             }
 
