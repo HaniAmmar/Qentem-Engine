@@ -387,6 +387,7 @@ struct Digit {
         unsigned int exponent_diff = 0U;
         Char_T_      digit         = 0;
         bool         keep_on       = true;
+        bool         is_diff_set   = false;
 
         while ((offset < end_offset) && keep_on) {
             do {
@@ -403,6 +404,7 @@ struct Digit {
             switch (digit) {
                 case DigitChars::DotChar: {
                     exponent_diff = (offset - last_offset);
+                    is_diff_set   = true;
 
                     ++offset;
                     continue;
@@ -413,7 +415,7 @@ struct Digit {
                     if ((flags & stringToNumberFlags::Real) == 0U) {
                         flags |= stringToNumberFlags::Real;
 
-                        if (exponent_diff == 0) {
+                        if (!is_diff_set) {
                             exponent_diff = (offset - last_offset);
                         }
                     } else {
@@ -429,7 +431,7 @@ struct Digit {
                 }
 
                 default: {
-                    if (((flags & stringToNumberFlags::Real) == 0U) && (exponent_diff == 0)) {
+                    if (((flags & stringToNumberFlags::Real) == 0U) && !is_diff_set) {
                         exponent_diff = (offset - last_offset);
                     }
 
