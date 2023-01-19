@@ -729,6 +729,16 @@ static void TestStringToNumber4(TestHelper &helper) {
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 17.976931348623154, "number", __LINE__);
 
+    str   = "4856312379865454687821527487362783273278723787e-7";
+    valid = StringToNumberCount(d_number, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(d_number, 4.856312379865455e+38, "number", __LINE__);
+
+    str   = "4856312379865454687821527487362783273278723787e+7";
+    valid = StringToNumberCount(d_number, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(d_number, 4.856312379865455e+52, "number", __LINE__);
+
     // str   = "1.0e308";
     // valid = StringToNumberCount(d_number, str);
     // helper.EqualsTrue(valid, "valid", __LINE__);
