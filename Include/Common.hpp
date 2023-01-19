@@ -133,6 +133,12 @@ using SizeT = unsigned long;
 
 using NullType = decltype(nullptr);
 
+union QNumber {
+    unsigned long long Natural{0};
+    long long          Integer;
+    double             Real;
+};
+
 } // namespace Qentem
 
 #endif
