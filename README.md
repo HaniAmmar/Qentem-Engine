@@ -294,7 +294,7 @@ int main() {
 
 ## Tests
 
-There are over 15k lines of code for testing; 5 times the size of the library, and some tests can be used as examples. To run the tests:
+There are over 15k lines of code for testing; 5 times the size of the library, and some tests can be examples. To run the tests:
 
 -   cmake
 
