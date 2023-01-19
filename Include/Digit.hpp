@@ -403,7 +403,7 @@ struct Digit {
 
             switch (digit) {
                 case DigitChars::DotChar: {
-                    exponent_diff = (offset - last_offset);
+                    exponent_diff = static_cast<unsigned int>(offset - last_offset);
                     is_diff_set   = true;
 
                     ++offset;
@@ -416,7 +416,7 @@ struct Digit {
                         flags |= stringToNumberFlags::Real;
 
                         if (!is_diff_set) {
-                            exponent_diff = (offset - last_offset);
+                            exponent_diff = static_cast<unsigned int>(offset - last_offset);
                         }
                     } else {
                         exponent = (static_cast<unsigned int>(last_offset) - exponent);
@@ -432,7 +432,7 @@ struct Digit {
 
                 default: {
                     if (((flags & stringToNumberFlags::Real) == 0U) && !is_diff_set) {
-                        exponent_diff = (offset - last_offset);
+                        exponent_diff = static_cast<unsigned int>(offset - last_offset);
                     }
 
                     keep_on = false;
@@ -475,7 +475,7 @@ struct Digit {
                     exponent += exponent_diff;
                 } else {
                     if (exponent < exponent_diff) {
-                        exponent = (exponent_diff - exponent);
+                        exponent = static_cast<unsigned int>(exponent_diff - exponent);
                         flags ^= stringToNumberFlags::NegativeExponent;
                     } else {
                         exponent -= exponent_diff;
