@@ -27,7 +27,7 @@
 #define QENTEM_TAGS_H_
 
 namespace Qentem {
-struct QExpresion;
+struct QExpression;
 
 namespace Tags {
 
@@ -55,9 +55,9 @@ enum class TagType : unsigned char {
 
 // MathTag -------------------------------------------
 struct MathTag {
-    Array<QExpresion> Expresions;
-    SizeT             Offset;
-    SizeT             EndOffset;
+    Array<QExpression> Expressions;
+    SizeT              Offset;
+    SizeT              EndOffset;
 };
 
 // LoopTagOptions -------------------------------------------
@@ -84,14 +84,14 @@ struct LoopTag {
 
 // InLineIfTag -------------------------------------------
 struct InLineIfTag {
-    Array<TagBit>     SubTags;
-    Array<QExpresion> Case;
+    Array<TagBit>      SubTags;
+    Array<QExpression> Case;
 };
 
 // IfTag -------------------------------------------
 struct IfTagCase {
-    Array<TagBit>     SubTags;
-    Array<QExpresion> Case;
+    Array<TagBit>      SubTags;
+    Array<QExpression> Case;
 };
 
 // TagBit -------------------------------------------
