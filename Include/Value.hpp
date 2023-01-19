@@ -828,54 +828,64 @@ class Value {
     }
 
     Value *GetValue(SizeT index) const noexcept {
-        const ValueType type = Type();
+        switch (Type()) {
+            case ValueType::Object: {
+                Value *val = object_.GetValue(index);
 
-        if ((type == ValueType::Array) && (index < array_.Size())) {
-            Value *val = (array_.Storage() + index);
+                if ((val != nullptr) && (!(val->IsUndefined()))) {
+                    return val;
+                }
 
-            if (!(val->IsUndefined())) {
-                return val;
+                return nullptr;
             }
 
-            return nullptr;
-        }
+            case ValueType::Array: {
+                if (index < array_.Size()) {
+                    Value *val = (array_.Storage() + index);
 
-        if (type == ValueType::Object) {
-            Value *val = object_.GetValue(index);
+                    if (!(val->IsUndefined())) {
+                        return val;
+                    }
+                }
 
-            if ((val != nullptr) && (!(val->IsUndefined()))) {
-                return val;
+                return nullptr;
             }
-        }
 
-        return nullptr;
+            default:
+                return nullptr;
+        }
     }
 
     Value *GetValue(const Char_T_ *key, SizeT length) const noexcept {
-        const ValueType type = Type();
+        switch (Type()) {
+            case ValueType::Object: {
+                Value *val = object_.GetValue(key, length);
 
-        if (type == ValueType::Object) {
-            Value *val = object_.GetValue(key, length);
+                if ((val != nullptr) && !(val->IsUndefined())) {
+                    return val;
+                }
 
-            if ((val != nullptr) && !(val->IsUndefined())) {
-                return val;
+                return nullptr;
             }
 
-            return nullptr;
-        }
+            case ValueType::Array: {
+                SizeT index;
+                Digit<Char_T_>::FastStringToNumber(index, key, length);
 
-        SizeT index;
+                if (index < array_.Size()) {
+                    Value *val = (array_.Storage() + index);
 
-        if ((type == ValueType::Array) && (Digit<Char_T_>::StringToNumber(index, key, length)) &&
-            (index < array_.Size())) {
-            Value *val = (array_.Storage() + index);
+                    if (!(val->IsUndefined())) {
+                        return val;
+                    }
+                }
 
-            if (!(val->IsUndefined())) {
-                return val;
+                return nullptr;
             }
-        }
 
-        return nullptr;
+            default:
+                return nullptr;
+        }
     }
 
     const VString *GetKey(SizeT index) const noexcept {
