@@ -642,6 +642,11 @@ static void TestStringToNumber4(TestHelper &helper) {
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -9223372036854775808.0, "number", __LINE__);
 
+    str   = "-9223372036854775808.0";
+    valid = StringToNumberCount(d_number, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(d_number, -9223372036854775808.0, "number", __LINE__);
+
     str   = "5000000000000000000000000000000000";
     valid = StringToNumberCount(d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
