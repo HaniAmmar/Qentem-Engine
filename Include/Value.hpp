@@ -1106,60 +1106,109 @@ class Value {
     }
 
     unsigned long long GetUInt64() const noexcept {
-        unsigned long long num = 0;
-        SetNumber(num);
-        return num;
+        QNumber number;
+
+        switch (SetNumber(number)) {
+            case 1: {
+                return number.Natural;
+            }
+
+            case 2: {
+                return static_cast<unsigned long long>(number.Integer);
+            }
+
+            case 3: {
+                return static_cast<unsigned long long>(number.Real);
+            }
+
+            default: {
+                return 0U;
+            }
+        };
     }
 
     long long GetInt64() const noexcept {
-        long long num = 0;
-        SetNumber(num);
-        return num;
+        QNumber number;
+
+        switch (SetNumber(number)) {
+            case 1: {
+                return static_cast<long long>(number.Natural);
+            }
+
+            case 2: {
+                return number.Integer;
+            }
+
+            case 3: {
+                return static_cast<long long>(number.Real);
+            }
+
+            default: {
+                return 0;
+            }
+        };
     }
 
     double GetDouble() const noexcept {
-        double num = 0;
-        SetNumber(num);
-        return num;
+        QNumber number;
+
+        switch (SetNumber(number)) {
+            case 1: {
+                return static_cast<double>(number.Natural);
+            }
+
+            case 2: {
+                return static_cast<double>(number.Integer);
+            }
+
+            case 3: {
+                return number.Real;
+            }
+
+            default: {
+                return 0.0;
+            }
+        };
     }
 
     double GetNumber() const noexcept { return GetDouble(); }
 
-    template <typename Number_T_>
-    bool SetNumber(Number_T_ &value) const noexcept {
+    unsigned int SetNumber(QNumber &number) const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
-                value = static_cast<Number_T_>(number_.GetUInt64());
-                return true;
+                number.Natural = number_.GetUInt64();
+                return 1;
             }
 
             case ValueType::IntLong: {
-                value = static_cast<Number_T_>(number_.GetInt64());
-                return true;
+                number.Integer = number_.GetInt64();
+                return 2;
             }
 
             case ValueType::Double: {
-                value = static_cast<Number_T_>(number_.GetDouble());
-                return true;
+                number.Real = number_.GetDouble();
+                return 3;
             }
 
             case ValueType::True: {
-                value = 1;
-                return true;
+                number.Natural = 1;
+                return 1;
             }
 
             case ValueType::False:
             case ValueType::Null: {
-                value = 0;
-                return true;
+                number.Natural = 0;
+                return 1;
             }
 
             case ValueType::String: {
-                double num;
+                SizeT              offset = 0;
+                const SizeT        length = string_.Length();
+                const unsigned int n_type =
+                    Digit<Char_T_>::StringToNumber(number, string_.First(), offset, string_.Length());
 
-                if (Digit<Char_T_>::StringToNumber(num, string_.First(), string_.Length())) {
-                    value = static_cast<Number_T_>(num);
-                    return true;
+                if (offset == length) {
+                    return n_type;
                 }
             }
 
@@ -1167,7 +1216,7 @@ class Value {
             }
         }
 
-        return false;
+        return 0;
     }
 
     bool GetBool(bool &value) const noexcept {
