@@ -27,11 +27,9 @@
 
 namespace Qentem {
 
-class StringUtils {
-  public:
+struct StringUtils {
     template <typename Char_T_>
-    class WhiteSpaceChars_T_ {
-      public:
+    struct WhiteSpaceChars_T_ {
         static constexpr Char_T_ SpaceChar           = ' ';
         static constexpr Char_T_ LineControlChar     = '\n';
         static constexpr Char_T_ TabControlChar      = '\t';
@@ -42,11 +40,11 @@ class StringUtils {
     static Number_T_ Count(const Char_T_ *str) noexcept {
         const Char_T_ *str_2 = str;
 
-        // if (str_2 != nullptr) {
-        while (*str_2 != '\0') {
-            ++str_2;
+        if (str_2 != nullptr) {
+            while (*str_2 != '\0') {
+                ++str_2;
+            }
         }
-        // }
 
         return static_cast<Number_T_>(str_2 - str);
     }
@@ -164,15 +162,14 @@ class StringUtils {
 
     template <typename Char_T_>
     static SizeT Hash(const Char_T_ *key, SizeT length) noexcept {
-        static constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - 1));
+        constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
 
-        SizeT hash   = 11;
-        SizeT base   = 33;
+        SizeT hash   = 11U;
+        SizeT base   = 33U;
         SizeT offset = 0;
 
         while (offset < length) {
             const SizeT num = static_cast<SizeT>(key[offset]);
-            ++offset;
             hash += (base * offset * num);
             base += offset;
 
@@ -182,9 +179,11 @@ class StringUtils {
                 --length;
                 hash += static_cast<SizeT>(key[length]);
             }
+
+            ++offset;
         }
 
-        return (hash | highest_bit); // Never return zero.
+        return (hash | highest_bit);
     }
 };
 
