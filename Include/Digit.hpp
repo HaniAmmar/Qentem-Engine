@@ -441,7 +441,7 @@ struct Digit {
         }
 
         if ((flags & stringToNumberFlags::Real) == 0U) {
-            if (exponent_diff <= 1U) {
+            if ((exponent_diff == 0U) || ((exponent_diff == 1U) && (number.Natural < 0x2000000000000000))) {
                 digit                  = content[last_offset];
                 unsigned long long tmp = number.Natural;
 
@@ -470,14 +470,16 @@ struct Digit {
                 flags |= stringToNumberFlags::NegativeExponent;
             }
 
-            if ((flags & stringToNumberFlags::NegativeExponent) == 0U) {
-                exponent += exponent_diff;
-            } else {
-                if (exponent < exponent_diff) {
-                    exponent = (exponent_diff - exponent);
-                    flags |= stringToNumberFlags::NegativeExponent;
+            if (exponent_diff != 0) {
+                if ((flags & stringToNumberFlags::NegativeExponent) == 0U) {
+                    exponent += exponent_diff;
                 } else {
-                    exponent -= exponent_diff;
+                    if (exponent < exponent_diff) {
+                        exponent = (exponent_diff - exponent);
+                        flags ^= stringToNumberFlags::NegativeExponent;
+                    } else {
+                        exponent -= exponent_diff;
+                    }
                 }
             }
 
@@ -493,7 +495,11 @@ struct Digit {
                 number.Real = -number.Real;
             }
 
-            return 3U;
+            if (number.Natural != 9218868437227405312) {
+                return 3U;
+            }
+
+            return 0U;
         }
 
         if ((flags & stringToNumberFlags::Negative) == 0U) {
