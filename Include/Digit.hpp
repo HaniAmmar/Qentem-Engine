@@ -28,57 +28,11 @@
 namespace Qentem {
 
 /*
- * Basic number conversion.
+ * For converting numbers from and to strings.
  */
 
 template <typename Char_T_>
-class Digit {
-  private:
-    class DigitChars {
-      public:
-        static constexpr Char_T_ ZeroChar     = '0';
-        static constexpr Char_T_ NineChar     = '9';
-        static constexpr Char_T_ SevenChar    = '7';
-        static constexpr Char_T_ E_Char       = 'e';
-        static constexpr Char_T_ UE_Char      = 'E';
-        static constexpr Char_T_ DotChar      = '.';
-        static constexpr Char_T_ PositiveChar = '+';
-        static constexpr Char_T_ NegativeChar = '-';
-        static constexpr Char_T_ ColonChar    = ':';
-        static constexpr Char_T_ SlashChar    = '/';
-        static constexpr Char_T_ UA_Char      = 'A';
-        static constexpr Char_T_ UF_Char      = 'F';
-        static constexpr Char_T_ A_Char       = 'a';
-        static constexpr Char_T_ F_Char       = 'f';
-        static constexpr Char_T_ UW_Char      = 'W';
-    };
-
-  public:
-    static unsigned int HexStringToNumber(const Char_T_ *str, SizeT length) noexcept {
-        unsigned int value = 0;
-
-        if (str != nullptr) {
-            unsigned int base = 0;
-
-            while (length != 0) {
-                --length;
-
-                if ((str[length] > DigitChars::ZeroChar) && (str[length] < DigitChars::ColonChar)) {
-                    // No use for 0
-                    value += ((static_cast<unsigned int>(str[length]) - DigitChars::ZeroChar) << base);    // 1-9
-                } else if ((str[length] >= DigitChars::UA_Char) && (str[length] <= DigitChars::UF_Char)) { // A-F
-                    value += ((static_cast<unsigned int>(str[length]) - DigitChars::SevenChar) << base);
-                } else if ((str[length] >= DigitChars::A_Char) && (str[length] <= DigitChars::F_Char)) { // a-f
-                    value += ((static_cast<unsigned int>(str[length]) - DigitChars::UW_Char) << base);
-                }
-
-                base += 4U;
-            }
-        }
-
-        return value;
-    }
-
+struct Digit {
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
         unsignedIntToString(stream, number);
@@ -129,17 +83,16 @@ class Digit {
     /*
      * "min" is the minimum digits to the left of the pieried. Zeros will be
      * added if the digits on the left are less than "min". "r_min" is the same
-     * as "min" but for the right side. "precision" is the precision of the
-     * decimal.
+     * as "min" but for the right side.
      */
-    inline static String<Char_T_> NumberToString(double number, unsigned int min = 1, unsigned int r_min = 0,
+    inline static String<Char_T_> NumberToString(double number, SizeT min = 1, SizeT r_min = 0,
                                                  unsigned int precision = 0) {
         String<Char_T_> str;
         doubleToString(str, number, min, r_min, precision);
         return str;
     }
 
-    inline static String<Char_T_> NumberToString(float f_number, unsigned int min = 1, unsigned int r_min = 0,
+    inline static String<Char_T_> NumberToString(float f_number, SizeT min = 1, SizeT r_min = 0,
                                                  unsigned int precision = 0) {
         String<Char_T_> str;
         doubleToString(str, static_cast<double>(f_number), min, r_min, precision);
@@ -147,290 +100,461 @@ class Digit {
     }
 
     template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, double number, unsigned int min = 1, unsigned int r_min = 0,
+    inline static void NumberToString(Stream_T_ &stream, double number, SizeT min = 1, SizeT r_min = 0,
                                       unsigned int precision = 0) {
         doubleToString(stream, number, min, r_min, precision);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, float f_number, unsigned int min = 1, unsigned int r_min = 0,
+    inline static void NumberToString(Stream_T_ &stream, float f_number, SizeT min = 1, SizeT r_min = 0,
                                       unsigned int precision = 0) {
         doubleToString(stream, static_cast<double>(f_number), min, r_min, precision);
     }
 
     /////////////////////////////////////////////////////////////////
 
-    template <typename Number_T_>
-    inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-        constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
-
-        return StringToNumberHelper<Number_T_, is_unsigned, is_float>::StringToNumber(number, str, length);
-    }
-
-    //////////// Private ////////////
-
-  private:
-    template <typename Number_T_, bool IS_UNSIGNED, bool IS_FLOAT>
-    class StringToNumberHelper {
-      public:
-        inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-            return stringToFloat(number, str, length);
-        }
-    };
-
-    template <typename Number_T_>
-    class StringToNumberHelper<Number_T_, true, false> {
-      public:
-        inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-            return stringToUnsignedInt(number, str, length);
-        }
-    };
-
-    template <typename Number_T_>
-    class StringToNumberHelper<Number_T_, false, false> {
-      public:
-        inline static bool StringToNumber(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-            return stringToSignedInt(number, str, length);
-        }
-    };
-
-    template <typename Number_T_>
-    inline static bool stringToInt(Number_T_ &number, const Char_T_ *str, const SizeT length) noexcept {
-        SizeT offset = 0;
+    static unsigned int HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
+        unsigned int number = 0;
+        unsigned int offset = 0;
 
         while (offset < length) {
-            const Char_T_ chr = str[offset];
+            const Char_T_ digit = value[offset];
+            number <<= 4U;
+
+            if ((digit >= DigitChars::OneChar) && (digit <= DigitChars::NineChar)) {
+                // No need for 0
+                number |= (static_cast<unsigned int>(digit - DigitChars::ZeroChar));       // 1-9
+            } else if ((digit >= DigitChars::UA_Char) && (digit <= DigitChars::UF_Char)) { // A-F
+                number |= (static_cast<unsigned int>(digit - DigitChars::SevenChar));
+            } else if ((digit >= DigitChars::A_Char) && (digit <= DigitChars::F_Char)) { // a-f
+                number |= (static_cast<unsigned int>(digit - DigitChars::UW_Char));
+            }
+
+            ++offset;
+        }
+
+        return number;
+    }
+
+    /////////////////////////////////////////////////////////////////
+
+    template <typename Number_T>
+    static void FastStringToNumber(Number_T &number, const Char_T_ *content, SizeT length) noexcept {
+        SizeT offset = 0;
+        number       = 0;
+
+        if (offset < length) {
+            number += (static_cast<Number_T>(content[offset] - DigitChars::ZeroChar));
             ++offset;
 
-            if ((chr < DigitChars::SlashChar) || (chr > DigitChars::ColonChar)) {
-                number = 0;
-                return false;
-            }
-
-            number *= Number_T_{10};
-            number += (static_cast<Number_T_>(chr - DigitChars::ZeroChar));
-        }
-
-        return true;
-    }
-
-    template <typename Number_T_>
-    static bool stringToUnsignedInt(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-        number = 0;
-
-        if (length != 0) {
-            if ((length > 1) && (str[0] == DigitChars::ZeroChar)) {
-                return false; // No leanding zeros.
-            }
-
-            if (str[0] != DigitChars::PositiveChar) {
-                return stringToInt(number, str, length);
-            }
-
-            if (length > 1) {
-                SizeT offset = 1;
-                StringUtils::TrimLeft(str, offset, length);
-                length -= offset;
-                return stringToUnsignedInt(number, &(str[offset]), length);
+            while (offset < length) {
+                number *= 10ULL;
+                number += (static_cast<Number_T>(content[offset] - DigitChars::ZeroChar));
+                ++offset;
             }
         }
-
-        return false;
     }
 
-    template <typename Number_T_>
-    static bool stringToSignedInt(Number_T_ &number, const Char_T_ *s_str, SizeT length) noexcept {
-        number = 0;
+    static unsigned int StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
+                                       SizeT end_offset) noexcept {
+        SizeT        o_offset = offset;
+        SizeT        max_end_offset;
+        unsigned int flags    = 0;
+        unsigned int exponent = 0;
+        number.Natural        = 0;
 
-        if (length != 0) {
-            if ((length > 1) && (s_str[0] == DigitChars::ZeroChar)) {
-                return false; // No leanding zeros.
-            }
+        if (offset < end_offset) {
+            Char_T_ digit = content[offset];
 
-            switch (s_str[0]) {
+            switch (digit) {
                 case DigitChars::NegativeChar: {
-                    SizeT offset = 1;
-                    StringUtils::TrimLeft(s_str, offset, length);
-                    length -= offset;
+                    ++offset;
 
-                    if (stringToSignedInt(number, &(s_str[offset]), length)) {
-                        number = -number;
-                        return true;
+                    if (offset < end_offset) {
+                        flags |= stringToNumberFlags::Negative;
+                        digit = content[offset];
+                        break;
                     }
 
-                    break;
+                    return 0U;
                 }
 
                 case DigitChars::PositiveChar: {
-                    SizeT offset = 1;
-                    StringUtils::TrimLeft(s_str, offset, length);
-                    length -= offset;
-                    return stringToSignedInt(number, &(s_str[offset]), length);
+                    ++offset;
+
+                    if (offset < end_offset) {
+                        digit = content[offset];
+                        break;
+                    }
+
+                    return 0U;
                 }
 
                 default: {
-                    return stringToInt(number, s_str, length);
-                }
-            }
-        }
-
-        return false;
-    }
-
-    template <typename Number_T_>
-    static bool stringToFloat(Number_T_ &number, const Char_T_ *str, SizeT length) noexcept {
-        number = 0;
-
-        if (length != 0) {
-            if (((length > 1) && ((str[0] == DigitChars::ZeroChar) && (str[1] != DigitChars::DotChar)))) {
-                number = 0;
-                return false; // No leanding zeros.
-            }
-
-            switch (str[0]) {
-                case DigitChars::NegativeChar: {
-                    SizeT n_offset = 1;
-                    StringUtils::TrimLeft(str, n_offset, length);
-                    length -= n_offset;
-
-                    if (stringToFloat(number, &(str[n_offset]), length)) {
-                        number = -number;
-                        return true;
-                    }
-
-                    break;
-                }
-
-                case DigitChars::PositiveChar: {
-                    SizeT offset = 1;
-                    StringUtils::TrimLeft(str, offset, length);
-                    length -= offset;
-                    return stringToFloat(number, &(str[offset]), length);
-                }
-
-                default: {
-                    int exponent = 0;
-
-                    if (parseExponent(exponent, str, length) && stringToFloat(number, exponent, str, length)) {
-                        return true;
-                    }
                 }
             }
 
-            number = 0;
-        }
-
-        return false;
-    }
-
-    template <typename Number_T_>
-    QENTEM_NOINLINE static bool stringToFloat(Number_T_ &number, int exponent, const Char_T_ *str,
-                                              SizeT length) noexcept {
-        unsigned long long w_number = 0;
-        SizeT              len      = ((length < 18) ? length : 17);
-        unsigned int       offset   = 0;
-        Char_T_            c;
-        bool               has_dot = false;
-
-        do {
-            c = str[offset];
-            ++offset;
-
-            if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
-                w_number *= 10;
-                w_number += (static_cast<unsigned long long>(c) - DigitChars::ZeroChar);
-            } else if (c == DigitChars::DotChar) {
-                if (has_dot || (offset == length)) {
-                    return false;
-                }
-
-                has_dot = true;
-                break;
+            if ((end_offset - offset) < 19U) {
+                max_end_offset = end_offset;
             } else {
-                return false;
-            }
-        } while (offset < len);
+                max_end_offset = offset + 19U;
 
-        if (has_dot) {
-            Number_T_ base = 1;
-            len            = ((length < 20) ? length : 19);
-
-            do {
-                c = str[offset];
-
-                if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
-                    base *= 10;
-                    number += (static_cast<Number_T_>(c) - DigitChars::ZeroChar) / base;
-                } else {
-                    return false;
+                if ((flags & stringToNumberFlags::Negative) != 0) {
+                    --max_end_offset;
                 }
 
-                ++offset;
-            } while (offset < len);
-        } else if (offset != length) {
-            do {
-                c = str[offset];
-
-                if ((c > DigitChars::SlashChar) && (c < DigitChars::ColonChar)) {
-                    ++exponent;
-                } else if (c == DigitChars::DotChar) {
-                    break;
-                } else {
-                    return false;
-                }
-
-                ++offset;
-            } while (offset < length);
-        }
-
-        number += static_cast<Number_T_>(w_number);
-
-        if (exponent != 0) {
-            bool negative = false;
-
-            if (exponent < 0) {
-                negative = true;
-                exponent = -exponent;
+                flags |= stringToNumberFlags::OverFlow;
             }
 
-            do {
-                Number_T_ number2;
+            if (offset < max_end_offset) {
+                if ((digit == DigitChars::ZeroChar) && ((max_end_offset - offset) > 1)) {
+                    digit = content[offset + 1];
 
-                if (exponent > 9) {
-                    number2 = 1E10;
-                    exponent -= 10;
-                } else {
-                    number2 = 1E1;
-                    --exponent;
+                    if ((digit >= DigitChars::ZeroChar) && (digit <= DigitChars::NineChar)) {
+                        return 0U; // Leading zero.
+                    }
                 }
 
-                if (negative) {
-                    number /= number2;
-                } else {
-                    number *= number2;
+                while (true) {
+                    while (offset < max_end_offset) {
+                        digit = content[offset];
+
+                        if ((digit >= DigitChars::ZeroChar) && (digit <= DigitChars::NineChar)) {
+                            number.Natural *= 10ULL;
+                            number.Natural += (static_cast<unsigned long long>(digit - DigitChars::ZeroChar));
+                            ++offset;
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    switch (digit) {
+                        case DigitChars::DotChar: {
+                            if ((flags & stringToNumberFlags::Real) == 0U) {
+                                flags |= stringToNumberFlags::Real;
+                                ++offset;
+                                ++o_offset;
+
+                                exponent = static_cast<unsigned int>(offset);
+
+                                if (offset == max_end_offset) {
+                                    digit = 0;
+                                }
+
+                                continue;
+                            }
+
+                            return 0;
+                        }
+
+                        case DigitChars::UE_Char:
+                        case DigitChars::E_Char: {
+                            if (number.Natural != 0) {
+                                if ((flags & stringToNumberFlags::Real) != 0U) {
+                                    exponent = (static_cast<unsigned int>(offset) - exponent);
+                                }
+
+                                if ((offset < end_offset) &&
+                                    exponentToNumber(exponent, flags, content, offset, end_offset)) {
+                                    digit          = 0;
+                                    max_end_offset = offset;
+                                    continue;
+                                }
+                            }
+
+                            return 0;
+                        }
+
+                        default: {
+                            if (o_offset != offset) {
+                                if ((offset < max_end_offset) || ((flags & stringToNumberFlags::OverFlow) == 0U)) {
+                                    if ((flags & stringToNumberFlags::Real) == 0U) {
+                                        if ((flags & stringToNumberFlags::Negative) == 0U) {
+                                            return 1U;
+                                        }
+
+                                        if (number.Integer != 0) {
+                                            number.Integer = -number.Integer;
+                                            return 2U;
+                                        }
+                                    }
+
+                                    number.Real = static_cast<double>(number.Natural);
+
+                                    if ((flags & stringToNumberFlags::MergedExponent) == 0U) {
+                                        exponent = (static_cast<unsigned int>(offset) - exponent);
+                                        flags |= stringToNumberFlags::NegativeExponent;
+                                    }
+
+                                    if (((flags & stringToNumberFlags::NegativeExponent) != 0U)) {
+                                        powerOfNegativeTen(number.Real, exponent);
+                                    } else {
+                                        powerOfTen(number.Real, exponent);
+                                    }
+
+                                    if ((flags & stringToNumberFlags::Negative) != 0) {
+                                        number.Real = -number.Real;
+                                    }
+
+                                    return 3U;
+                                }
+
+                                return roundNumber(number, exponent, flags, content, offset, end_offset);
+                            }
+
+                            return 0U;
+                        }
+                    }
                 }
-            } while (exponent != 0);
+            }
         }
 
-        return true;
+        return 0U;
+    }
+
+  private:
+    //////////// Private ////////////
+
+    struct stringToNumberFlags {
+        static constexpr unsigned int Real             = 1U;
+        static constexpr unsigned int Negative         = 2U;
+        static constexpr unsigned int NegativeExponent = 4U;
+        static constexpr unsigned int MergedExponent   = 8U;
+        static constexpr unsigned int OverFlow         = 16U;
+    };
+
+    QENTEM_NOINLINE static int exponentToNumber(unsigned int &exponent, unsigned int &flags, const Char_T_ *content,
+                                                SizeT &offset, SizeT end_offset) noexcept {
+        flags |= stringToNumberFlags::Real;
+        flags |= stringToNumberFlags::MergedExponent;
+
+        ++offset;
+        Char_T_ digit = content[offset];
+
+        switch (digit) {
+            case DigitChars::NegativeChar: {
+                flags |= stringToNumberFlags::NegativeExponent;
+                ++offset;
+                break;
+            }
+
+            case DigitChars::PositiveChar: {
+                ++offset;
+                break;
+            }
+
+            default: {
+                if ((digit < DigitChars::ZeroChar) && (digit > DigitChars::NineChar)) {
+                    return false;
+                }
+            }
+        }
+
+        const SizeT  sci_offset   = offset;
+        unsigned int sci_exponent = 0U;
+
+        while (offset < end_offset) {
+            digit = content[offset];
+
+            if ((digit >= DigitChars::ZeroChar) && (digit <= DigitChars::NineChar)) {
+                sci_exponent *= 10ULL;
+                sci_exponent += (static_cast<unsigned int>(digit - DigitChars::ZeroChar));
+                ++offset;
+                continue;
+            }
+
+            break;
+        }
+
+        if ((flags & stringToNumberFlags::NegativeExponent) == 0U) {
+            if (exponent <= sci_exponent) {
+                exponent = (sci_exponent - exponent);
+            } else {
+                exponent = (exponent - sci_exponent);
+                flags |= stringToNumberFlags::NegativeExponent;
+            }
+        } else {
+            exponent += sci_exponent;
+        }
+
+        return (sci_offset != offset);
+    }
+
+    QENTEM_NOINLINE static unsigned int roundNumber(QNumber &number, unsigned int &exponent, unsigned int &flags,
+                                                    const Char_T_ *content, SizeT &offset, SizeT end_offset) {
+        const SizeT  last_offset   = offset;
+        unsigned int exponent_diff = 0U;
+        Char_T_      digit         = 0;
+        bool         keep_on       = true;
+
+        while ((offset < end_offset) && keep_on) {
+            do {
+                digit = content[offset];
+
+                if ((digit >= DigitChars::ZeroChar) && (digit <= DigitChars::NineChar)) {
+                    ++offset;
+                    continue;
+                }
+
+                break;
+            } while (offset < end_offset);
+
+            switch (digit) {
+                case DigitChars::DotChar: {
+                    exponent_diff = (offset - last_offset);
+
+                    ++offset;
+                    continue;
+                }
+
+                case DigitChars::E_Char:
+                case DigitChars::UE_Char: {
+                    if ((flags & stringToNumberFlags::Real) == 0U) {
+                        flags |= stringToNumberFlags::Real;
+
+                        if (exponent_diff == 0) {
+                            exponent_diff = (offset - last_offset);
+                        }
+                    } else {
+                        exponent = (static_cast<unsigned int>(last_offset) - exponent);
+                    }
+
+                    if ((offset < end_offset) && exponentToNumber(exponent, flags, content, offset, end_offset)) {
+                        keep_on = false;
+                        continue;
+                    }
+
+                    return 0U;
+                }
+
+                default: {
+                    if (((flags & stringToNumberFlags::Real) == 0U) && (exponent_diff == 0)) {
+                        exponent_diff = (offset - last_offset);
+                    }
+
+                    keep_on = false;
+                }
+            }
+        }
+
+        if ((flags & stringToNumberFlags::Real) == 0U) {
+            if (exponent_diff <= 1U) {
+                digit                  = content[last_offset];
+                unsigned long long tmp = number.Natural;
+
+                if ((digit >= DigitChars::ZeroChar) && (digit <= DigitChars::NineChar)) {
+                    tmp *= 10U;
+                    tmp += (static_cast<unsigned long long>(digit - DigitChars::ZeroChar));
+
+                    if ((flags & stringToNumberFlags::Negative) != 0) {
+                        tmp &= 0x7FFFFFFFFFFFFFFFULL;
+                    }
+
+                    if (tmp > number.Natural) {
+                        number.Natural = tmp;
+                    } else {
+                        flags |= stringToNumberFlags::Real;
+                    }
+                }
+            } else {
+                flags |= stringToNumberFlags::Real;
+            }
+        }
+
+        if ((flags & stringToNumberFlags::Real) != 0U) {
+            if (exponent != 0 && ((flags & stringToNumberFlags::MergedExponent) == 0U)) {
+                exponent = (static_cast<unsigned int>(last_offset) - exponent);
+                flags |= stringToNumberFlags::NegativeExponent;
+            }
+
+            if ((flags & stringToNumberFlags::NegativeExponent) == 0U) {
+                exponent += exponent_diff;
+            } else {
+                if (exponent < exponent_diff) {
+                    exponent = (exponent_diff - exponent);
+                    flags |= stringToNumberFlags::NegativeExponent;
+                } else {
+                    exponent -= exponent_diff;
+                }
+            }
+
+            number.Real = static_cast<double>(number.Natural);
+
+            if (((flags & stringToNumberFlags::NegativeExponent) != 0U)) {
+                powerOfNegativeTen(number.Real, exponent);
+            } else {
+                powerOfTen(number.Real, exponent);
+            }
+
+            if ((flags & stringToNumberFlags::Negative) != 0) {
+                number.Real = -number.Real;
+            }
+
+            return 3U;
+        }
+
+        if ((flags & stringToNumberFlags::Negative) == 0U) {
+            return 1U;
+        }
+
+        if (number.Integer != 0) {
+            number.Integer = -number.Integer;
+            return 2U;
+        }
+
+        return 0U;
+    }
+
+    static void powerOfTen(double &number, unsigned int exponent) {
+        while (exponent >= 100) {
+            number *= 1e100;
+            exponent -= 100;
+        }
+
+        while (exponent >= 10) {
+            number *= 1e10;
+            exponent -= 10;
+        }
+
+        while (exponent > 0) {
+            number *= 10;
+            --exponent;
+        }
+    }
+
+    static void powerOfNegativeTen(double &number, unsigned int exponent) {
+        while (exponent >= 100) {
+            number /= 1e100;
+            exponent -= 100;
+        }
+
+        while (exponent >= 10) {
+            number /= 1e10;
+            exponent -= 10;
+        }
+
+        while (exponent > 0) {
+            number /= 10;
+            --exponent;
+        }
     }
 
     QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
         using NumberT_ = unsigned long long;
 
-        static constexpr char lookup_table[] = {"000102030405060708091011121314151617181920212223242526272829"
-                                                "303132333435363738394041424344454647484950515253545556575859"
-                                                "606162636465666768697071727374757677787980818283848586878889"
-                                                "90919293949596979899"};
+        static constexpr char table[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                         "303132333435363738394041424344454647484950515253545556575859"
+                                         "606162636465666768697071727374757677787980818283848586878889"
+                                         "90919293949596979899"};
 
         while (number >= NumberT_{100}) {
             offset -= SizeT{2};
             const SizeT index = (static_cast<SizeT>(number % NumberT_{100}) * SizeT{2});
             number /= NumberT_{100};
 
-            storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
+            storage[offset]            = static_cast<Char_T_>(table[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(table[index + SizeT{1}]);
         }
 
         if (number < NumberT_{10}) {
@@ -439,8 +563,8 @@ class Digit {
         } else {
             offset -= SizeT{2};
             const SizeT index          = (static_cast<SizeT>(number) * SizeT{2});
-            storage[offset]            = static_cast<Char_T_>(lookup_table[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(lookup_table[index + SizeT{1}]);
+            storage[offset]            = static_cast<Char_T_>(table[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(table[index + SizeT{1}]);
         }
     }
 
@@ -498,16 +622,16 @@ class Digit {
     }
 
     template <typename String_T_>
-    QENTEM_NOINLINE static void doubleToString(String_T_ &dstring, double number, unsigned int min, unsigned int r_min,
-                                               unsigned int precision) {
-        constexpr SizeT max_length = (Config::FloatMaxLength - 1U);
+    QENTEM_NOINLINE static void doubleToString(String_T_ &dstring, double number, SizeT min, SizeT r_min,
+                                               SizeT precision) {
+        constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
 
-        Char_T_            tmp[max_length];
+        Char_T_            tmp[max_end_offset];
         Char_T_            tmp2[Config::FloatMaxLength];
         unsigned long long fraction        = 0;
-        SizeT              end_offset      = max_length;
-        unsigned int       fraction_length = 0;
-        unsigned int       offset          = 0;
+        SizeT              end_offset      = max_end_offset;
+        SizeT              fraction_length = 0;
+        SizeT              offset          = 0;
         int                exponent        = 0;
         const bool         negative        = (number < 0);
         const bool         no_exponent     = (r_min != 0);
@@ -530,20 +654,20 @@ class Digit {
             intToString(&(tmp[0]), end_offset, tmp_number);
         }
 
-        SizeT left_length = (max_length - end_offset);
+        SizeT left_length = (max_end_offset - end_offset);
 
         if (end_offset != 0) { // Full
             number -= static_cast<double>(left_number);
 
             if (number != 0) {
-                unsigned int precision2 = 17;
+                SizeT precision2 = 17;
 
                 if (left_length != 0) {
                     --precision2;
                     precision2 -= left_length;
                 }
 
-                if ((precision == 0) || (precision > precision2)) {
+                if ((precision == 0U) || (precision > precision2)) {
                     precision = precision2;
                 }
 
@@ -557,19 +681,19 @@ class Digit {
                 }
 
                 // Removing all zeros from the fraction.
-                while ((precision != 0) && ((fraction % 10) == 0)) {
+                while ((precision != 0) && ((fraction % 10) == 0U)) {
                     fraction /= 10;
                     --precision;
                 }
 
-                if ((precision == 0) && (fraction == 1)) {
+                if ((precision == 0U) && (fraction == 1)) {
                     fraction = 0;
                     ++left_number;
-                    end_offset = max_length;
+                    end_offset = max_end_offset;
 
                     intToString(&(tmp[0]), end_offset, left_number);
 
-                    left_length = (max_length - end_offset);
+                    left_length = (max_end_offset - end_offset);
                 }
 
                 fraction_length = precision;
@@ -586,7 +710,7 @@ class Digit {
             ++fraction_length; // One for DotChar
         }
 
-        while (end_offset < max_length) {
+        while (end_offset < max_end_offset) {
             tmp2[offset] = tmp[end_offset];
             ++offset;
             ++end_offset;
@@ -599,7 +723,7 @@ class Digit {
                 intToString(&(tmp[0]), end_offset, fraction);
             }
 
-            if (((end_offset == 0) && (exponent == 0)) || (left_length != 0) || no_exponent) {
+            if (((end_offset == 0U) && (exponent == 0U)) || (left_length != 0) || no_exponent) {
                 SizeT offset2 = end_offset;
 
                 tmp2[offset] = DigitChars::DotChar;
@@ -744,7 +868,7 @@ class Digit {
         }
     }
 
-    static unsigned long long extractFraction(double number, unsigned int precision) noexcept {
+    static unsigned long long extractFraction(double number, SizeT precision) noexcept {
         static constexpr double mul[] = {1,    1E2,  1E3,  1E4,  1E5,  1E6,  1E7,  1E8, 1E9,
                                          1E10, 1E11, 1E12, 1E13, 1E14, 1E15, 1E16, 1E17};
 
@@ -755,73 +879,25 @@ class Digit {
         return static_cast<unsigned long long>(number * 1E18);
     }
 
-    QENTEM_NOINLINE static bool parseExponent(int &exponent, const Char_T_ *str, SizeT &length) noexcept {
-        SizeT        offset     = (length - 1);
-        SizeT        offset2    = 0;
-        SizeT        MAX_LENGTH = Config::ExponentMaxLength; // e(-|+)xxx
-        unsigned int sign       = 0;
-
-        while ((offset != 0) && (MAX_LENGTH != 0)) {
-            const Char_T_ c = str[offset];
-
-            if ((c < DigitChars::ZeroChar) || (c > DigitChars::NineChar)) {
-                switch (c) {
-                    case DigitChars::DotChar: {
-                        return true;
-                    }
-
-                    case DigitChars::E_Char:
-                    case DigitChars::UE_Char: {
-                        if (MAX_LENGTH == Config::ExponentMaxLength) {
-                            // No number.
-                            return false;
-                        }
-
-                        offset2    = offset;
-                        MAX_LENGTH = 0;
-                        continue;
-                    }
-
-                    case DigitChars::NegativeChar:
-                    case DigitChars::PositiveChar: {
-                        if ((MAX_LENGTH == Config::ExponentMaxLength) || (sign != 0)) {
-                            // No number, or double sign.
-                            return false;
-                        }
-
-                        sign = ((c == DigitChars::NegativeChar) ? 2 : 1);
-                        break;
-                    }
-
-                    default: {
-                        return false;
-                    }
-                }
-            }
-
-            --MAX_LENGTH;
-            --offset;
-        }
-
-        if (offset2 != 0) {
-            if (sign != 0) {
-                ++offset2;
-            }
-
-            while (++offset2 < length) {
-                exponent *= int(10);
-                exponent += static_cast<int>(str[offset2] - DigitChars::ZeroChar);
-            }
-
-            if (sign == 2) {
-                exponent = -exponent;
-            }
-
-            length = offset;
-        }
-
-        return true;
-    }
+  private:
+    class DigitChars {
+      public:
+        static constexpr Char_T_ ZeroChar     = '0';
+        static constexpr Char_T_ OneChar      = '1';
+        static constexpr Char_T_ FiveChar     = '5';
+        static constexpr Char_T_ SevenChar    = '7';
+        static constexpr Char_T_ NineChar     = '9';
+        static constexpr Char_T_ E_Char       = 'e';
+        static constexpr Char_T_ UE_Char      = 'E';
+        static constexpr Char_T_ DotChar      = '.';
+        static constexpr Char_T_ PositiveChar = '+';
+        static constexpr Char_T_ NegativeChar = '-';
+        static constexpr Char_T_ UA_Char      = 'A';
+        static constexpr Char_T_ UF_Char      = 'F';
+        static constexpr Char_T_ A_Char       = 'a';
+        static constexpr Char_T_ F_Char       = 'f';
+        static constexpr Char_T_ UW_Char      = 'W';
+    };
 };
 
 } // namespace Qentem
