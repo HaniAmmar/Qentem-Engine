@@ -442,7 +442,7 @@ class HArray {
 
         if (size != 0) {
             if (size < Size()) {
-                resize(Memory::AligneSize(size));
+                resize(Memory::AlignSize(size));
             }
 
             return;
@@ -495,7 +495,7 @@ class HArray {
     void   setHashTable(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
 
     HAItem_ *allocate(SizeT new_cpacity) {
-        new_cpacity = Memory::AligneSize(new_cpacity);
+        new_cpacity = Memory::AlignSize(new_cpacity);
         setCapacity(new_cpacity);
 
         const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_)) * new_cpacity);
