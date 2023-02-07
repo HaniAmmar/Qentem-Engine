@@ -35,12 +35,18 @@ template <typename Char_T_>
 struct Digit {
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
-        unsignedIntToString(stream, number);
+        intToString(stream, number);
     }
 
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, long long number) {
-        signedIntToString(stream, number);
+        if (number < 0) {
+            number                = -number;
+            constexpr Char_T_ arr = {DigitChars::NegativeChar};
+            stream.Write(&arr, 1);
+        }
+
+        intToString(stream, static_cast<unsigned long long>(number));
     }
 
     template <typename Number_T_>
@@ -577,55 +583,11 @@ struct Digit {
     }
 
     template <typename Stream_T_>
-    inline static void unsignedIntToString(Stream_T_ &stream, unsigned long long number) {
+    inline static void intToString(Stream_T_ &stream, unsigned long long number) {
         Char_T_ storage[Config::IntMaxLength];
         SizeT   offset = Config::IntMaxLength;
 
-        /*
-         *   18446744073709551615 MAX unsigned long long   20
-         *  -9223372036854775807  MAX long long            19 + (-|+) = 20
-         *
-         *   4294967295           MAX unsigned int         10
-         *  -2147483647           MAX int                  10 + (-|+) = 11
-         *
-         *   65535                MAX unsigned short       5
-         *  -32767                MAX short                5 + (-|+) = 6
-         */
-
         intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-        stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
-    }
-
-    template <typename Stream_T_>
-    inline static void signedIntToString(Stream_T_ &stream, long long number) {
-        Char_T_ storage[Config::IntMaxLength];
-        SizeT   offset = Config::IntMaxLength;
-
-        /*
-         *   18446744073709551615 MAX unsigned long long   20
-         *  -9223372036854775807  MAX long long            19 + (-|+) = 20
-         *
-         *   4294967295           MAX unsigned int         10
-         *  -2147483647           MAX int                  10 + (-|+) = 11
-         *
-         *   65535                MAX unsigned short       5
-         *  -32767                MAX short                5 + (-|+) = 6
-         */
-
-        bool negative = false;
-
-        if (number < 0) {
-            number   = -number;
-            negative = true;
-        }
-
-        intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-
-        if (negative) {
-            --offset;
-            storage[offset] = DigitChars::NegativeChar;
-        }
-
         stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
