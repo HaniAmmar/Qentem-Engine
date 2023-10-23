@@ -494,15 +494,15 @@ class HArray {
     SizeT *getHashTable() const noexcept { return hashTable_.GetPointer(); }
     void   setHashTable(SizeT *ptr) noexcept { hashTable_.SetPointer(ptr); }
 
-    HAItem_ *allocate(SizeT new_cpacity) {
-        new_cpacity = Memory::AlignSize(new_cpacity);
-        setCapacity(new_cpacity);
+    HAItem_ *allocate(SizeT new_capacity) {
+        new_capacity = Memory::AlignSize(new_capacity);
+        setCapacity(new_capacity);
 
-        const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_)) * new_cpacity);
+        const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_)) * new_capacity);
         SizeT      *ht   = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
 
         setHashTable(ht);
-        Memory::SetToZero(ht, (sizeof(SizeT) * new_cpacity));
+        Memory::SetToZero(ht, (sizeof(SizeT) * new_capacity));
 
         return reinterpret_cast<HAItem_ *>(ht + Capacity());
     }

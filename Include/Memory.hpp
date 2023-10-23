@@ -170,7 +170,7 @@ template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
     Type_ *pointer = static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
 
-#ifdef QENTEM_TESTHELPER_H_
+#ifdef QENTEM_TEST_HELPER_H_
     MemoryRecord::AddAllocation(pointer);
 #endif
     // TODO: Build Allocator
@@ -241,9 +241,9 @@ inline static Type_ *AllocateInit(const Values_T_ &...values) {
 }
 
 inline static void Deallocate(void *pointer) {
-#ifdef QENTEM_TESTHELPER_H_
+#ifdef QENTEM_TEST_HELPER_H_
     if (pointer != nullptr) {
-        MemoryRecord::Removeallocation(pointer);
+        MemoryRecord::RemoveAllocation(pointer);
     }
 #endif
     ::operator delete(pointer);

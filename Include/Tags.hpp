@@ -182,10 +182,21 @@ struct TagBit {
         }
     }
 
-    inline void        *GetInfo() const noexcept { return info_; }
-    inline TagType      GetType() const noexcept { return type_; }
-    inline unsigned int GetOffset() const noexcept { return content_.offset; }
-    inline unsigned int GetLength() const noexcept { return content_.length; }
+    inline void *GetInfo() const noexcept {
+        return info_;
+    }
+
+    inline TagType GetType() const noexcept {
+        return type_;
+    }
+
+    inline unsigned int GetOffset() const noexcept {
+        return content_.offset;
+    }
+
+    inline unsigned int GetLength() const noexcept {
+        return content_.length;
+    }
 
   private:
     struct Content_ {
@@ -229,19 +240,19 @@ struct TagPatterns_T_ {
     // {var:
     static constexpr Char_T_        Var_2ND_Char         = 'v'; // Second character
     static constexpr SizeT          VariablePrefixLength = 5U;
-    static constexpr SizeT          VariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
+    static constexpr SizeT          VariableFullLength   = (VariablePrefixLength + InLineSuffixLength);
     static constexpr const Char_T_ *VariablePrefix       = TPStrings<Char_T_, size_>::VariablePrefix;
 
     // {raw:
     static constexpr Char_T_        Raw_2ND_Char            = 'r'; // Second character
     static constexpr SizeT          RawVariablePrefixLength = 5U;
-    static constexpr SizeT          RawVariableFulllength   = (VariablePrefixLength + InLineSuffixLength);
+    static constexpr SizeT          RawVariableFullLength   = (VariablePrefixLength + InLineSuffixLength);
     static constexpr const Char_T_ *RawVariablePrefix       = TPStrings<Char_T_, size_>::RawVariablePrefix;
 
     // {math:
     static constexpr Char_T_        Math_2ND_Char    = 'm'; // Second character
     static constexpr SizeT          MathPrefixLength = 6U;
-    static constexpr SizeT          MathFulllength   = (MathPrefixLength + InLineSuffixLength);
+    static constexpr SizeT          MathFullLength   = (MathPrefixLength + InLineSuffixLength);
     static constexpr const Char_T_ *MathPrefix       = TPStrings<Char_T_, size_>::MathPrefix;
 
     // {if:

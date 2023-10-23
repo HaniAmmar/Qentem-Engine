@@ -23,8 +23,8 @@
 #include "Digit.hpp"
 #include "Unicode.hpp"
 
-#ifndef QENTEM_JSONUTILS_H_
-#define QENTEM_JSONUTILS_H_
+#ifndef QENTEM_JSON_UTILS_H_
+#define QENTEM_JSON_UTILS_H_
 
 namespace Qentem {
 

@@ -87,7 +87,7 @@ struct Digit {
     }
 
     /*
-     * "min" is the minimum digits to the left of the pieried. Zeros will be
+     * "min" is the minimum digits before the dot. Zeros will be
      * added if the digits on the left are less than "min". "r_min" is the same
      * as "min" but for the right side.
      */
@@ -592,7 +592,7 @@ struct Digit {
     }
 
     template <typename String_T_>
-    QENTEM_NOINLINE static void doubleToString(String_T_ &dstring, double number, SizeT min, SizeT r_min,
+    QENTEM_NOINLINE static void doubleToString(String_T_ &d_string, double number, SizeT min, SizeT r_min,
                                                SizeT precision) {
         constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
 
@@ -776,7 +776,7 @@ struct Digit {
             min = 0;
         }
 
-        Char_T_     *str     = getCharForNumber(dstring, end_offset);
+        Char_T_     *str     = getCharForNumber(d_string, end_offset);
         unsigned int offset2 = 0;
 
         if (negative) {
@@ -798,9 +798,9 @@ struct Digit {
         }
     }
 
-    inline static Char_T_ *getCharForNumber(String<Char_T_> &dstring, SizeT length) {
-        dstring = String<Char_T_>{length};
-        return dstring.Storage();
+    inline static Char_T_ *getCharForNumber(String<Char_T_> &d_string, SizeT length) {
+        d_string = String<Char_T_>{length};
+        return d_string.Storage();
     }
 
     template <typename Stream_T_>

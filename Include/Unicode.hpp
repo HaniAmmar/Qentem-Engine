@@ -81,7 +81,9 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
 // UTF32
 template <typename Char_T_, typename Stream_T_>
 struct UnicodeToUTF<Char_T_, Stream_T_, 4> {
-    static void ToUTF(unsigned int unicode, Stream_T_ &stream) { stream += static_cast<Char_T_>(unicode); }
+    static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
+        stream += static_cast<Char_T_>(unicode);
+    }
 };
 
 } // namespace Unicode

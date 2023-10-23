@@ -36,7 +36,10 @@ class StringStream {
 
   public:
     StringStream() = default;
-    ~StringStream() { Memory::Deallocate(Storage()); }
+
+    ~StringStream() {
+        Memory::Deallocate(Storage());
+    }
 
     explicit StringStream(SizeT size) {
         if (size != 0) {
@@ -120,9 +123,17 @@ class StringStream {
         ++length_;
     }
 
-    inline void operator+=(const StringStream<Char_T_> &src) { write(src.First(), src.Length()); }
-    inline void operator+=(const String<Char_T_> &src) { write(src.First(), src.Length()); }
-    inline void operator+=(const Char_T_ *str) { write(str, StringUtils::Count(str)); }
+    inline void operator+=(const StringStream<Char_T_> &src) {
+        write(src.First(), src.Length());
+    }
+
+    inline void operator+=(const String<Char_T_> &src) {
+        write(src.First(), src.Length());
+    }
+
+    inline void operator+=(const Char_T_ *str) {
+        write(str, StringUtils::Count(str));
+    }
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const StringStream &src) {
@@ -194,11 +205,25 @@ class StringStream {
         return StringUtils::IsEqual(First(), str, length);
     }
 
-    inline bool operator!=(const StringStream &stream) const noexcept { return (!(*this == stream)); }
-    inline bool operator!=(const String<Char_T_> &string) const noexcept { return (!(*this == string)); }
-    inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
-    inline void Write(const Char_T_ *str, const SizeT length) { write(str, length); }
-    inline void Clear() noexcept { setLength(0); }
+    inline bool operator!=(const StringStream &stream) const noexcept {
+        return (!(*this == stream));
+    }
+
+    inline bool operator!=(const String<Char_T_> &string) const noexcept {
+        return (!(*this == string));
+    }
+
+    inline bool operator!=(const Char_T_ *str) const noexcept {
+        return (!(*this == str));
+    }
+
+    inline void Write(const Char_T_ *str, const SizeT length) {
+        write(str, length);
+    }
+
+    inline void Clear() noexcept {
+        setLength(0);
+    }
 
     void Reset() noexcept {
         setLength(0);
@@ -270,12 +295,29 @@ class StringStream {
         return str;
     }
 
-    inline Char_T_       *Storage() const noexcept { return storage_; }
-    inline SizeT          Length() const noexcept { return length_; }
-    inline SizeT          Capacity() const noexcept { return capacity_; }
-    inline const Char_T_ *First() const noexcept { return Storage(); }
-    inline bool           IsEmpty() const noexcept { return (Length() == 0); }
-    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline Char_T_ *Storage() const noexcept {
+        return storage_;
+    }
+
+    inline SizeT Length() const noexcept {
+        return length_;
+    }
+
+    inline SizeT Capacity() const noexcept {
+        return capacity_;
+    }
+
+    inline const Char_T_ *First() const noexcept {
+        return Storage();
+    }
+
+    inline bool IsEmpty() const noexcept {
+        return (Length() == 0);
+    }
+
+    inline bool IsNotEmpty() const noexcept {
+        return !(IsEmpty());
+    }
 
     inline Char_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
@@ -288,10 +330,21 @@ class StringStream {
     //////////// Private ////////////
 
   private:
-    void setStorage(Char_T_ *new_storage) noexcept { storage_ = new_storage; }
-    void clearStorage() noexcept { setStorage(nullptr); }
-    void setLength(const SizeT new_length) noexcept { length_ = new_length; }
-    void setCapacity(const SizeT new_capacity) noexcept { capacity_ = new_capacity; }
+    void setStorage(Char_T_ *new_storage) noexcept {
+        storage_ = new_storage;
+    }
+
+    void clearStorage() noexcept {
+        setStorage(nullptr);
+    }
+
+    void setLength(const SizeT new_length) noexcept {
+        length_ = new_length;
+    }
+
+    void setCapacity(const SizeT new_capacity) noexcept {
+        capacity_ = new_capacity;
+    }
 
     void allocate(SizeT size) {
         size = (Memory::AlignSize(size, 4U) * SizeT{2});

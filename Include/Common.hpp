@@ -49,7 +49,7 @@ struct Config {
 ///////////////////////////////////////////////
 #ifdef QENTEM_64BIT_ARCH
 // 64bit arch only uses the lower 48 bits for pointers,
-// the upper 16 bits can be used for taging.
+// the upper 16 bits can be used for tagging.
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
 #endif

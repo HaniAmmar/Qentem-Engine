@@ -48,7 +48,9 @@ class String {
         src.clearLength();
     }
 
-    String(const String &src) { copyString(src.First(), src.Length()); }
+    String(const String &src) {
+        copyString(src.First(), src.Length());
+    }
 
     explicit String(SizeT len) {
         if (len != 0) {
@@ -71,11 +73,17 @@ class String {
         setStorage(str);
     }
 
-    String(const Char_T_ *str, SizeT len) { copyString(str, len); }
+    String(const Char_T_ *str, SizeT len) {
+        copyString(str, len);
+    }
 
-    String(const Char_T_ *str) { copyString(str, StringUtils::Count(str)); }
+    String(const Char_T_ *str) {
+        copyString(str, StringUtils::Count(str));
+    }
 
-    ~String() { deallocate(Storage()); }
+    ~String() {
+        deallocate(Storage());
+    }
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
@@ -135,8 +143,13 @@ class String {
         return ns;
     }
 
-    inline String operator+(const String &src) const { return Merge(*this, src); }
-    String        operator+(const Char_T_ *str) const { return merge(First(), Length(), str, StringUtils::Count(str)); }
+    inline String operator+(const String &src) const {
+        return Merge(*this, src);
+    }
+
+    String operator+(const Char_T_ *str) const {
+        return merge(First(), Length(), str, StringUtils::Count(str));
+    }
 
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const String &src) {
@@ -164,8 +177,13 @@ class String {
         return StringUtils::IsEqual(First(), str, len);
     }
 
-    inline bool operator!=(const String &string) const noexcept { return (!(*this == string)); }
-    inline bool operator!=(const Char_T_ *str) const noexcept { return (!(*this == str)); }
+    inline bool operator!=(const String &string) const noexcept {
+        return (!(*this == string));
+    }
+
+    inline bool operator!=(const Char_T_ *str) const noexcept {
+        return (!(*this == str));
+    }
 
     inline bool operator<(const String &string) const noexcept {
         return StringUtils::IsLess(First(), string.First(), Length(), string.Length(), false);
@@ -321,16 +339,38 @@ class String {
         return nullptr;
     }
 
-    inline const Char_T_ *First() const noexcept { return Storage(); }
-    inline const Char_T_ *End() const noexcept { return (First() + Length()); }
-    inline bool           IsEmpty() const noexcept { return (Length() == 0); }
-    inline bool           IsNotEmpty() const noexcept { return !(IsEmpty()); }
+    inline const Char_T_ *First() const noexcept {
+        return Storage();
+    }
+
+    inline const Char_T_ *End() const noexcept {
+        return (First() + Length());
+    }
+
+    inline bool IsEmpty() const noexcept {
+        return (Length() == 0);
+    }
+
+    inline bool IsNotEmpty() const noexcept {
+        return !(IsEmpty());
+    }
 
     // For STL
-    inline const Char_T_ *begin() const noexcept { return First(); }
-    inline const Char_T_ *end() const noexcept { return End(); }
-    inline Char_T_       *begin() noexcept { return Storage(); }
-    inline Char_T_       *end() noexcept { return (Storage() + Length()); }
+    inline const Char_T_ *begin() const noexcept {
+        return First();
+    }
+
+    inline const Char_T_ *end() const noexcept {
+        return End();
+    }
+
+    inline Char_T_ *begin() noexcept {
+        return Storage();
+    }
+
+    inline Char_T_ *end() noexcept {
+        return (Storage() + Length());
+    }
 
     //////////// Private ////////////
 
@@ -356,7 +396,9 @@ class String {
         }
     }
 
-    void setStorage(Char_T_ *ptr) noexcept { storage_.SetPointer(ptr); }
+    void setStorage(Char_T_ *ptr) noexcept {
+        storage_.SetPointer(ptr);
+    }
 
     Char_T_ *allocate(SizeT new_size) {
         if (Config::ShortStringOptimization) {
@@ -385,7 +427,9 @@ class String {
         }
     }
 
-    void clearStorage() noexcept { storage_.Reset(); }
+    void clearStorage() noexcept {
+        storage_.Reset();
+    }
 
     static String merge(const Char_T_ *str1, const SizeT len1, const Char_T_ *str2, const SizeT len2) {
         String   ns  = String{(len1 + len2)};
@@ -415,8 +459,8 @@ class String {
     QPointer<Char_T_> storage_{};
 #else
     QPointer<Char_T_> storage_{};
-    SizeT padding_{0};
-    SizeT length_{0};
+    SizeT             padding_{0};
+    SizeT             length_{0};
 #endif
 };
 

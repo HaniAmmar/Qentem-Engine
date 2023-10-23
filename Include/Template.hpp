@@ -57,8 +57,8 @@ namespace Qentem {
  *  - <loop set="s"? value="s"? group="s"? sort="ascend|descend"?>...</loop>
  *
  *      - s: String, n: Number.
- *      - set: child name in the passed colloction: Optional.
- *      - value: the current value in the colloction: Optional.
+ *      - set: child name in the passed collection: Optional.
+ *      - value: the current value in the collection: Optional.
  *          Note: Choose a unique name.
  *      - group: group an array using sub value of an object.
  *      - sort: sort an array or object (ascend or descend).
@@ -191,8 +191,8 @@ struct Template {
     // template <typename Char_T_, typename Value_T_, typename StringStream_T_>
     // inline static void CachedRender(const Char_T_ *content, const SizeT length, const Value_T_ &value,
     //                                 StringStream_T_ &stream, const Char_T_ *name, const SizeT name_length) {
-    //     // This is not a thread safe function, and its here to show how to cache geterated tags.
-    //     // Can be used in a single threaded prosess, but it is better to change it.
+    //     // This is not a thread safe function, and its here to show how to cache processed tags.
+    //     // Can be used in a single threaded process to build on.
 
     //     // Usage:
     //     // #include "HArray.hpp"
@@ -259,7 +259,8 @@ struct TemplateSub {
 
     TemplateSub(const Char_T_ *content, SizeT length, StringStream_T_ *stream, const Value_T_ *root_value,
                 const TemplateSub *parent = nullptr, const unsigned short level = 0) noexcept
-        : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, length_{length}, level_{level} {}
+        : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, length_{length}, level_{level} {
+    }
 
   private:
     using TagType         = Tags::TagType;
@@ -324,7 +325,9 @@ struct TemplateSub {
         }
     }
 
-    inline void Parse(Array<TagBit> &tags_cache) const { parse(tags_cache, 0, length_); }
+    inline void Parse(Array<TagBit> &tags_cache) const {
+        parse(tags_cache, 0, length_);
+    }
 
     inline bool Evaluate(QExpression &number, const QExpressions &exprs) const noexcept {
         const QExpression *expr = exprs.First();
@@ -687,7 +690,7 @@ struct TemplateSub {
         }
 
         stream_->Write(((content_ + i_tag.Offset) - TagPatterns::RawVariablePrefixLength),
-                       (i_tag.Length + TagPatterns::RawVariableFulllength));
+                       (i_tag.Length + TagPatterns::RawVariableFullLength));
     }
 
     void renderMath(const TagBit *tag) const {
@@ -848,7 +851,9 @@ struct TemplateSub {
         }
     }
 
-    void renderRawText(const TagBit *tag) const { stream_->Write((content_ + tag->GetOffset()), tag->GetLength()); }
+    void renderRawText(const TagBit *tag) const {
+        stream_->Write((content_ + tag->GetOffset()), tag->GetLength());
+    }
 
     void parseVariableTag(SizeT offset, SizeT end_offset, void *tag) const {
         VariableTag &i_tag = *(static_cast<VariableTag *>(tag));
@@ -1626,7 +1631,7 @@ struct TemplateSub {
 
         if (offset != end_offset) {
             switch (content_[offset]) {
-                case QOperationSymbol::ParenthesStart: {
+                case QOperationSymbol::ParenthesesStart: {
                     ++offset;     // Drop (
                     --end_offset; // Drop )
 
@@ -1641,7 +1646,7 @@ struct TemplateSub {
                 }
 
                 case QOperationSymbol::BracketStart: {
-                    if (end_offset - offset > TagPatterns::VariableFulllength) {
+                    if (end_offset - offset > TagPatterns::VariableFullLength) {
                         offset += TagPatterns::VariablePrefixLength;
                         end_offset -= TagPatterns::InLineSuffixLength;
 
@@ -1790,10 +1795,10 @@ struct TemplateSub {
                     return QOperation::Exponent;
                 }
 
-                case QOperationSymbol::ParenthesStart: {
+                case QOperationSymbol::ParenthesesStart: {
                     ++offset;
-                    offset = Engine::SkipInnerPatterns<Char_T_>(QOperationSymbol::ParenthesStart,
-                                                                QOperationSymbol::ParenthesEnd, content_, offset,
+                    offset = Engine::SkipInnerPatterns<Char_T_>(QOperationSymbol::ParenthesesStart,
+                                                                QOperationSymbol::ParenthesesEnd, content_, offset,
                                                                 end_offset, length_);
 
                     if (offset != 0) {
@@ -1837,7 +1842,7 @@ struct TemplateSub {
                     break;
                 }
 
-                case QOperationSymbol::ParenthesEnd:
+                case QOperationSymbol::ParenthesesEnd:
                 case QOperationSymbol::BracketEnd: {
                     // (...) and {} are numbers.
                     return true;

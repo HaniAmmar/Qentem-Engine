@@ -249,7 +249,9 @@ inline static QENTEM_SIMD_VAR SMIDSetToOne(const Char_T_ value) noexcept {
 // char
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 1> {
-    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept { return QENTEM_SIMD_SET_TO_ONE_8(value); }
+    inline static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {
+        return QENTEM_SIMD_SET_TO_ONE_8(value);
+    }
 };
 
 // char16

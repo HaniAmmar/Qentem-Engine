@@ -39,8 +39,8 @@
 #define QENTEM_OUTPUT_STREAM std::wcout
 #endif
 
-#ifndef QENTEM_TESTHELPER_H_
-#define QENTEM_TESTHELPER_H_
+#ifndef QENTEM_TEST_HELPER_H_
+#define QENTEM_TEST_HELPER_H_
 
 namespace Qentem {
 
@@ -79,7 +79,9 @@ struct TestOutPut {
         return "";
     }
 
-    void static SetColoredOutput(bool value) { coloredOutput_ = value; }
+    void static SetColoredOutput(bool value) {
+        coloredOutput_ = value;
+    }
 
   private:
     static bool coloredOutput_;
@@ -97,20 +99,20 @@ struct MemoryRecord {
 
     struct Records {
         SizeT  allocations{0};
-        SizeT  dellocations{0};
+        SizeT  deallocations{0};
         SizeT  subAllocations{0};
-        SizeT  subDellocations{0};
+        SizeT  subDeallocations{0};
         size_t remainingSize{0};
         size_t peakSize{0};
     };
 
     QENTEM_NOINLINE static void ResetSubMemory() noexcept {
-        records_.subAllocations  = 0;
-        records_.subDellocations = 0;
+        records_.subAllocations   = 0;
+        records_.subDeallocations = 0;
     }
 
     QENTEM_NOINLINE static SizeT CheckSubMemory() noexcept {
-        return (records_.subAllocations - records_.subDellocations);
+        return (records_.subAllocations - records_.subDeallocations);
     }
 
     QENTEM_NOINLINE static void AddAllocation(void *pointer) noexcept {
@@ -130,9 +132,9 @@ struct MemoryRecord {
         }
     }
 
-    QENTEM_NOINLINE static void Removeallocation(void *pointer) noexcept {
-        ++(records_.dellocations);
-        ++(records_.subDellocations);
+    QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
+        ++(records_.deallocations);
+        ++(records_.subDeallocations);
 
 #if defined(_WIN32) || defined(_WIN64)
         records_.remainingSize -= _msize(pointer);
@@ -147,14 +149,14 @@ struct MemoryRecord {
         TestOutPut::Print("\nMemory: ", (static_cast<double>(records_.remainingSize) / 1024),
                           " KB, Peak: ", (static_cast<double>(records_.peakSize) / 1024), " KB.\n");
 
-        TestOutPut::Print("Allocations: ", records_.allocations, ", Deallocations: ", records_.dellocations, ".\n");
+        TestOutPut::Print("Allocations: ", records_.allocations, ", Deallocations: ", records_.deallocations, ".\n");
 
-        SizeT remaining_dellocations = (records_.allocations - records_.dellocations);
+        SizeT remaining_deallocations = (records_.allocations - records_.deallocations);
 
-        if (remaining_dellocations != 0) {
+        if (remaining_deallocations != 0) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_dellocations,
-                              " Remaining Dellocations.\n\n");
+                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_deallocations,
+                              " Remaining deallocations.\n\n");
         }
     }
 
@@ -169,8 +171,8 @@ struct TestHelper {
     ~TestHelper() = default;
 
     QENTEM_NOINLINE
-    TestHelper(const char *name, const char *file_fullname) noexcept
-        : test_name_{name}, file_fullname_{file_fullname} {}
+    TestHelper(const char *name, const char *file_fullname) noexcept : test_name_{name}, file_fullname_{file_fullname} {
+    }
 
     QENTEM_NOINLINE void PrintGroupName() const noexcept {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
@@ -200,13 +202,13 @@ struct TestHelper {
                                   TestOutPut::GetColor(TestOutPut::Colors::END), ": ", name, '\n');
             }
 
-            SizeT remaining_dellocations = MemoryRecord::CheckSubMemory();
+            SizeT remaining_deallocations = MemoryRecord::CheckSubMemory();
             MemoryRecord::ResetSubMemory();
 
-            if (remaining_dellocations != 0) {
+            if (remaining_deallocations != 0) {
                 TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_dellocations,
-                                  " Remaining Dellocations.\n");
+                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_deallocations,
+                                  " Remaining deallocations.\n");
             }
         }
     }

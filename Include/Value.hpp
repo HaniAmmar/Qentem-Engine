@@ -51,7 +51,8 @@ class Value {
     using VString     = String<Char_T_>;
 
   public:
-    Value() noexcept : number_{} {}
+    Value() noexcept : number_{} {
+    }
 
     Value(Value &&val) noexcept : number_{static_cast<VNumber &&>(val.number_)} {
         if (!Config::PointerTagging) {
@@ -60,7 +61,9 @@ class Value {
         }
     }
 
-    Value(const Value &val) { copyValue(val); }
+    Value(const Value &val) {
+        copyValue(val);
+    }
 
     ~Value() {
         switch (Type()) {
@@ -107,16 +110,45 @@ class Value {
         }
     }
 
-    explicit Value(VObject &&obj) noexcept : object_{static_cast<VObject &&>(obj)} { setTypeToObject(); }
-    explicit Value(VArray &&arr) noexcept : array_{static_cast<VArray &&>(arr)} { setTypeToArray(); }
-    explicit Value(VString &&str) noexcept : string_{static_cast<VString &&>(str)} { setTypeToString(); }
-    explicit Value(const VObject &obj) noexcept : object_{obj} { setTypeToObject(); }
-    explicit Value(const VArray &arr) noexcept : array_{arr} { setTypeToArray(); }
-    explicit Value(const VString &str) noexcept : string_{str} { setTypeToString(); }
-    explicit Value(const Char_T_ *str, SizeT length) : string_{str, length} { setTypeToString(); }
-    explicit Value(unsigned long long num) noexcept : number_{num} { setTypeToUInt64(); }
-    explicit Value(long long num) noexcept : number_{num} { setTypeToInt64(); }
-    explicit Value(double num) noexcept : number_{num} { setTypeToDouble(); }
+    explicit Value(VObject &&obj) noexcept : object_{static_cast<VObject &&>(obj)} {
+        setTypeToObject();
+    }
+
+    explicit Value(VArray &&arr) noexcept : array_{static_cast<VArray &&>(arr)} {
+        setTypeToArray();
+    }
+
+    explicit Value(VString &&str) noexcept : string_{static_cast<VString &&>(str)} {
+        setTypeToString();
+    }
+
+    explicit Value(const VObject &obj) noexcept : object_{obj} {
+        setTypeToObject();
+    }
+
+    explicit Value(const VArray &arr) noexcept : array_{arr} {
+        setTypeToArray();
+    }
+
+    explicit Value(const VString &str) noexcept : string_{str} {
+        setTypeToString();
+    }
+
+    explicit Value(const Char_T_ *str, SizeT length) : string_{str, length} {
+        setTypeToString();
+    }
+
+    explicit Value(unsigned long long num) noexcept : number_{num} {
+        setTypeToUInt64();
+    }
+
+    explicit Value(long long num) noexcept : number_{num} {
+        setTypeToInt64();
+    }
+
+    explicit Value(double num) noexcept : number_{num} {
+        setTypeToDouble();
+    }
 
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
@@ -135,7 +167,9 @@ class Value {
         }
     }
 
-    explicit Value(NullType) noexcept { setTypeToNull(); }
+    explicit Value(NullType) noexcept {
+        setTypeToNull();
+    }
     explicit Value(bool bl) noexcept {
         if (bl) {
             setTypeToTrue();
@@ -395,7 +429,9 @@ class Value {
         }
     }
 
-    void operator+=(const VObject &obj) { *this += static_cast<VObject &&>(VObject(obj)); }
+    void operator+=(const VObject &obj) {
+        *this += static_cast<VObject &&>(VObject(obj));
+    }
 
     void operator+=(VArray &&arr) {
         if (!IsArray()) {
@@ -410,7 +446,9 @@ class Value {
         }
     }
 
-    void operator+=(const VArray &arr) { (*this) += static_cast<VArray &&>(VArray(arr)); }
+    void operator+=(const VArray &arr) {
+        (*this) += static_cast<VArray &&>(VArray(arr));
+    }
 
     void operator+=(VString &&str) {
         if (!IsArray()) {
@@ -421,8 +459,13 @@ class Value {
         array_ += Value{static_cast<VString &&>(str)};
     }
 
-    void operator+=(const VString &str) { *this += static_cast<VString &&>(VString(str)); }
-    void operator+=(const Char_T_ *str) { *this += static_cast<VString &&>(VString(str)); }
+    void operator+=(const VString &str) {
+        *this += static_cast<VString &&>(VString(str));
+    }
+
+    void operator+=(const Char_T_ *str) {
+        *this += static_cast<VString &&>(VString(str));
+    }
 
     template <typename Number_T_>
     void operator+=(Number_T_ num) {
@@ -760,16 +803,45 @@ class Value {
         }
     }
 
-    inline bool IsUndefined() const noexcept { return (Type() == ValueType::Undefined); }
-    inline bool IsObject() const noexcept { return (Type() == ValueType::Object); }
-    inline bool IsArray() const noexcept { return (Type() == ValueType::Array); }
-    inline bool IsString() const noexcept { return (Type() == ValueType::String); }
-    inline bool IsUInt64() const noexcept { return (Type() == ValueType::UIntLong); }
-    inline bool IsInt64() const noexcept { return (Type() == ValueType::IntLong); }
-    inline bool IsDouble() const noexcept { return (Type() == ValueType::Double); }
-    inline bool IsTrue() const noexcept { return (Type() == ValueType::True); }
-    inline bool IsFalse() const noexcept { return (Type() == ValueType::False); }
-    inline bool IsNull() const noexcept { return (Type() == ValueType::Null); }
+    inline bool IsUndefined() const noexcept {
+        return (Type() == ValueType::Undefined);
+    }
+
+    inline bool IsObject() const noexcept {
+        return (Type() == ValueType::Object);
+    }
+
+    inline bool IsArray() const noexcept {
+        return (Type() == ValueType::Array);
+    }
+
+    inline bool IsString() const noexcept {
+        return (Type() == ValueType::String);
+    }
+
+    inline bool IsUInt64() const noexcept {
+        return (Type() == ValueType::UIntLong);
+    }
+
+    inline bool IsInt64() const noexcept {
+        return (Type() == ValueType::IntLong);
+    }
+
+    inline bool IsDouble() const noexcept {
+        return (Type() == ValueType::Double);
+    }
+
+    inline bool IsTrue() const noexcept {
+        return (Type() == ValueType::True);
+    }
+
+    inline bool IsFalse() const noexcept {
+        return (Type() == ValueType::False);
+    }
+
+    inline bool IsNull() const noexcept {
+        return (Type() == ValueType::Null);
+    }
 
     SizeT Size() const noexcept {
         if (IsObject()) {
@@ -1171,7 +1243,9 @@ class Value {
         };
     }
 
-    double GetNumber() const noexcept { return GetDouble(); }
+    double GetNumber() const noexcept {
+        return GetDouble();
+    }
 
     unsigned int SetNumber(QNumber &number) const noexcept {
         switch (Type()) {
@@ -1272,8 +1346,13 @@ class Value {
         }
     }
 
-    inline void Remove(const VString &key) const noexcept { Remove(key.First(), key.Length()); }
-    inline void Remove(const Char_T_ *key) const noexcept { Remove(key, StringUtils::Count(key)); }
+    inline void Remove(const VString &key) const noexcept {
+        Remove(key.First(), key.Length());
+    }
+
+    inline void Remove(const Char_T_ *key) const noexcept {
+        Remove(key, StringUtils::Count(key));
+    }
 
     void RemoveIndex(SizeT index) const noexcept {
         if (IsObject()) {
@@ -1541,16 +1620,45 @@ class Value {
 #endif
     }
 
-    inline void setTypeToUndefined() noexcept { setType(ValueType::Undefined); }
-    inline void setTypeToObject() noexcept { setType(ValueType::Object); }
-    inline void setTypeToArray() noexcept { setType(ValueType::Array); }
-    inline void setTypeToString() noexcept { setType(ValueType::String); }
-    inline void setTypeToUInt64() noexcept { setType(ValueType::UIntLong); }
-    inline void setTypeToInt64() noexcept { setType(ValueType::IntLong); }
-    inline void setTypeToDouble() noexcept { setType(ValueType::Double); }
-    inline void setTypeToTrue() noexcept { setType(ValueType::True); }
-    inline void setTypeToFalse() noexcept { setType(ValueType::False); }
-    inline void setTypeToNull() noexcept { setType(ValueType::Null); }
+    inline void setTypeToUndefined() noexcept {
+        setType(ValueType::Undefined);
+    }
+
+    inline void setTypeToObject() noexcept {
+        setType(ValueType::Object);
+    }
+
+    inline void setTypeToArray() noexcept {
+        setType(ValueType::Array);
+    }
+
+    inline void setTypeToString() noexcept {
+        setType(ValueType::String);
+    }
+
+    inline void setTypeToUInt64() noexcept {
+        setType(ValueType::UIntLong);
+    }
+
+    inline void setTypeToInt64() noexcept {
+        setType(ValueType::IntLong);
+    }
+
+    inline void setTypeToDouble() noexcept {
+        setType(ValueType::Double);
+    }
+
+    inline void setTypeToTrue() noexcept {
+        setType(ValueType::True);
+    }
+
+    inline void setTypeToFalse() noexcept {
+        setType(ValueType::False);
+    }
+
+    inline void setTypeToNull() noexcept {
+        setType(ValueType::Null);
+    }
 
     inline void initObject() noexcept {
         Memory::Initialize(&object_, VObject{});
@@ -1652,7 +1760,9 @@ class Value {
             v_num.p_number_   = 0;
         }
 
-        VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {}
+        VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
+        }
+
         VNumber &operator=(const VNumber &v_num) {
             if (this != &v_num) {
                 number_   = v_num.number_;
@@ -1663,13 +1773,32 @@ class Value {
         }
 
         template <typename Number_T_>
-        explicit VNumber(const Number_T_ &num) noexcept : number_{num} {}
-        inline void               SetNumber(double num) noexcept { number_.ddl = num; }
-        inline void               SetNumber(unsigned long long num) noexcept { number_.ull = num; }
-        inline void               SetNumber(long long num) noexcept { number_.sll = num; }
-        inline unsigned long long GetUInt64() const noexcept { return number_.ull; }
-        inline long long          GetInt64() const noexcept { return number_.sll; }
-        inline double             GetDouble() const noexcept { return number_.ddl; }
+        explicit VNumber(const Number_T_ &num) noexcept : number_{num} {
+        }
+
+        inline void SetNumber(double num) noexcept {
+            number_.ddl = num;
+        }
+
+        inline void SetNumber(unsigned long long num) noexcept {
+            number_.ull = num;
+        }
+
+        inline void SetNumber(long long num) noexcept {
+            number_.sll = num;
+        }
+
+        inline unsigned long long GetUInt64() const noexcept {
+            return number_.ull;
+        }
+
+        inline long long GetInt64() const noexcept {
+            return number_.sll;
+        }
+
+        inline double GetDouble() const noexcept {
+            return number_.ddl;
+        }
 
         inline void ClearAll() noexcept {
             if (Config::PointerTagging) {
@@ -1681,9 +1810,14 @@ class Value {
       private:
         union Number_T_ {
             Number_T_() = default;
-            explicit Number_T_(unsigned long long num) noexcept : ull{num} {}
-            explicit Number_T_(long long num) noexcept : sll{num} {}
-            explicit Number_T_(double num) noexcept : ddl{num} {}
+            explicit Number_T_(unsigned long long num) noexcept : ull{num} {
+            }
+
+            explicit Number_T_(long long num) noexcept : sll{num} {
+            }
+
+            explicit Number_T_(double num) noexcept : ddl{num} {
+            }
 
             unsigned long long ull;
             long long          sll;

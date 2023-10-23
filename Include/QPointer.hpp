@@ -35,8 +35,12 @@ class QPointer {
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
-    explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {}
-    QPointer(QPointer &&src) noexcept : pointer_{src.pointer_} { src.pointer_ = nullptr; }
+    explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {
+    }
+
+    QPointer(QPointer &&src) noexcept : pointer_{src.pointer_} {
+        src.pointer_ = nullptr;
+    }
 
     QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
@@ -75,18 +79,42 @@ class QPointer {
     }
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    void          SetHighByte(unsigned char byte) noexcept { bits_.high_byte_ = byte; }
-    unsigned char GetHighByte() const noexcept { return bits_.high_byte_; }
-    void          SetLowByte(unsigned char byte) noexcept { bits_.low_byte_ = byte; }
-    unsigned char GetLowByte() const noexcept { return bits_.low_byte_; }
+    void SetHighByte(unsigned char byte) noexcept {
+        bits_.high_byte_ = byte;
+    }
+
+    unsigned char GetHighByte() const noexcept {
+        return bits_.high_byte_;
+    }
+
+    void SetLowByte(unsigned char byte) noexcept {
+        bits_.low_byte_ = byte;
+    }
+
+    unsigned char GetLowByte() const noexcept {
+        return bits_.low_byte_;
+    }
 #else
-    void SetHighByte(unsigned char byte) noexcept { (void)byte; }
-    unsigned char GetHighByte() const noexcept { return 0; }
-    void SetLowByte(unsigned char byte) noexcept { (void)byte; }
-    unsigned char GetLowByte() const noexcept { return 0; }
+    void SetHighByte(unsigned char byte) noexcept {
+        (void)byte;
+    }
+
+    unsigned char GetHighByte() const noexcept {
+        return 0;
+    }
+
+    void SetLowByte(unsigned char byte) noexcept {
+        (void)byte;
+    }
+
+    unsigned char GetLowByte() const noexcept {
+        return 0;
+    }
 #endif
 
-    void Reset() noexcept { pointer_ = nullptr; }
+    void Reset() noexcept {
+        pointer_ = nullptr;
+    }
 
   private:
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)

@@ -77,11 +77,13 @@ struct QExpression {
 
     QExpression() noexcept : Number{}, Type{ExpressionType::Empty}, Operation{QOperation::NoOp} {};
 
-    QExpression(ExpressionType type, QOperation operation) noexcept : Number{}, Type{type}, Operation{operation} {}
+    QExpression(ExpressionType type, QOperation operation) noexcept : Number{}, Type{type}, Operation{operation} {
+    }
 
     QExpression(Array<QExpression> &&subExpressions, QOperation operation) noexcept
         : SubExpressions{static_cast<Array<QExpression> &&>(subExpressions)}, Type{ExpressionType::SubOperation},
-          Operation{operation} {}
+          Operation{operation} {
+    }
 
     ~QExpression() {
         if (Type == ExpressionType::SubOperation) {
@@ -960,14 +962,14 @@ struct QOperationSymbol_T_ {
     static constexpr Char_T_ AndExp       = '&';
     static constexpr Char_T_ OrExp        = '|';
 
-    static constexpr Char_T_ ParenthesStart = '(';
-    static constexpr Char_T_ ParenthesEnd   = ')';
-    static constexpr Char_T_ BracketStart   = '{';
-    static constexpr Char_T_ BracketEnd     = '}';
-    static constexpr Char_T_ ExponentExp    = '^';
-    static constexpr Char_T_ SpaceChar      = ' ';
-    static constexpr Char_T_ ColonChar      = ':';
-    static constexpr Char_T_ SlashChar      = '/';
+    static constexpr Char_T_ ParenthesesStart = '(';
+    static constexpr Char_T_ ParenthesesEnd   = ')';
+    static constexpr Char_T_ BracketStart     = '{';
+    static constexpr Char_T_ BracketEnd       = '}';
+    static constexpr Char_T_ ExponentExp      = '^';
+    static constexpr Char_T_ SpaceChar        = ' ';
+    static constexpr Char_T_ ColonChar        = ':';
+    static constexpr Char_T_ SlashChar        = '/';
 };
 
 } // namespace Qentem

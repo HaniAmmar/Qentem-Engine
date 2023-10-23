@@ -22,8 +22,8 @@
 
 #include "Common.hpp"
 
-#ifndef QENTEM_STRINGUTILS_H_
-#define QENTEM_STRINGUTILS_H_
+#ifndef QENTEM_STRING_UTILS_H_
+#define QENTEM_STRING_UTILS_H_
 
 namespace Qentem {
 
