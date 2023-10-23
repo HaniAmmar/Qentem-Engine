@@ -346,7 +346,7 @@ struct QExpression {
                 left *= left;
             } else {
                 --right;
-                unsigned long long num = left;
+                const unsigned long long num = left;
                 EvenPowerOf(left, (right / 2U));
                 left *= left;
                 left *= num;
