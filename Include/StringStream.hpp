@@ -213,6 +213,20 @@ class StringStream {
         }
     }
 
+    inline void Reverse() noexcept {
+        SizeT index = 0;
+        SizeT end   = Length();
+
+        while (index < end) {
+            const Char_T_ tmp = storage_[index];
+
+            --end;
+            storage_[index] = storage_[end];
+            storage_[end]   = tmp;
+            ++index;
+        }
+    }
+
     // Set the needed length to write directly to the buffer,
     Char_T_ *Buffer(const SizeT len) {
         const SizeT current_offset = Length();
