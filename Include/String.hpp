@@ -134,6 +134,14 @@ class String {
         return *this;
     }
 
+    String &operator+=(const Char_T_ ch) {
+        Char_T_ arr[1];
+        arr[0] = ch;
+        Write(&(arr[0]), 1);
+
+        return *this;
+    }
+
     String operator+(String &&src) const {
         String ns{Merge(*this, src)};
         src.deallocate(src.Storage());
