@@ -49,9 +49,8 @@ struct Digit {
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, long long number) {
         if (number < 0) {
-            number                = -number;
-            constexpr Char_T_ arr = {DigitChars::NegativeChar};
-            stream.Write(&arr, 1);
+            number = -number;
+            stream += DigitChars::NegativeChar;
         }
 
         NumberToString(stream, static_cast<unsigned long long>(number));
