@@ -313,24 +313,24 @@ static void TestHArray4(TestHelper &helper) {
     numbers1["key7"] = 70;
     numbers1["key8"] = 80;
 
-    SizeT keyindex = 100;
+    SizeT key_index = 100;
 
-    numbers1.GetKeyIndex(keyindex, "key1", 4);
-    helper.Equal(keyindex, 0U, "key1 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key2", 4);
-    helper.Equal(keyindex, 1U, "key2 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key3", 4);
-    helper.Equal(keyindex, 2U, "key3 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key4", 4);
-    helper.Equal(keyindex, 3U, "key4 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key5", 4);
-    helper.Equal(keyindex, 4U, "key5 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key6", 4);
-    helper.Equal(keyindex, 5U, "key6 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key7", 4);
-    helper.Equal(keyindex, 6U, "key7 Index", __LINE__);
-    numbers1.GetKeyIndex(keyindex, "key8", 4);
-    helper.Equal(keyindex, 7U, "key8 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key1", 4);
+    helper.Equal(key_index, 0U, "key1 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key2", 4);
+    helper.Equal(key_index, 1U, "key2 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key3", 4);
+    helper.Equal(key_index, 2U, "key3 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key4", 4);
+    helper.Equal(key_index, 3U, "key4 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key5", 4);
+    helper.Equal(key_index, 4U, "key5 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key6", 4);
+    helper.Equal(key_index, 5U, "key6 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key7", 4);
+    helper.Equal(key_index, 6U, "key7 Index", __LINE__);
+    numbers1.GetKeyIndex(key_index, "key8", 4);
+    helper.Equal(key_index, 7U, "key8 Index", __LINE__);
 
     numbers2["key1"]  = 100;
     numbers2["key3"]  = 300;

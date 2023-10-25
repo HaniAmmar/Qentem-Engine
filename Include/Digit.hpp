@@ -33,9 +33,17 @@ namespace Qentem {
 
 template <typename Char_T_>
 struct Digit {
+    static void RawIntToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
+        intToString(storage, offset, number);
+    }
+
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
-        intToString(stream, number);
+        Char_T_ storage[Config::IntMaxLength];
+        SizeT   offset = Config::IntMaxLength;
+
+        RawIntToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
+        stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
     template <typename Stream_T_>
@@ -46,7 +54,7 @@ struct Digit {
             stream.Write(&arr, 1);
         }
 
-        intToString(stream, static_cast<unsigned long long>(number));
+        NumberToString(stream, static_cast<unsigned long long>(number));
     }
 
     template <typename Number_T_>
@@ -557,38 +565,30 @@ struct Digit {
     QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
         using NumberT_ = unsigned long long;
 
-        static constexpr char table[] = {"000102030405060708091011121314151617181920212223242526272829"
-                                         "303132333435363738394041424344454647484950515253545556575859"
-                                         "606162636465666768697071727374757677787980818283848586878889"
-                                         "90919293949596979899"};
+        static const char table[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                     "303132333435363738394041424344454647484950515253545556575859"
+                                     "606162636465666768697071727374757677787980818283848586878889"
+                                     "90919293949596979899"};
 
         while (number >= NumberT_{100}) {
-            offset -= SizeT{2};
             const SizeT index = (static_cast<SizeT>(number % NumberT_{100}) * SizeT{2});
             number /= NumberT_{100};
 
+            offset -= SizeT{2};
             storage[offset]            = static_cast<Char_T_>(table[index]);
             storage[offset + SizeT{1}] = static_cast<Char_T_>(table[index + SizeT{1}]);
         }
 
         if (number < NumberT_{10}) {
             --offset;
-            storage[offset] = static_cast<Char_T_>(number) + DigitChars::ZeroChar;
+            storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
         } else {
+            const SizeT index = (static_cast<SizeT>(number) * SizeT{2});
+
             offset -= SizeT{2};
-            const SizeT index          = (static_cast<SizeT>(number) * SizeT{2});
             storage[offset]            = static_cast<Char_T_>(table[index]);
             storage[offset + SizeT{1}] = static_cast<Char_T_>(table[index + SizeT{1}]);
         }
-    }
-
-    template <typename Stream_T_>
-    inline static void intToString(Stream_T_ &stream, unsigned long long number) {
-        Char_T_ storage[Config::IntMaxLength];
-        SizeT   offset = Config::IntMaxLength;
-
-        intToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-        stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
     }
 
     template <typename String_T_>

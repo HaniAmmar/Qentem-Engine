@@ -87,7 +87,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - clang++ -g -O0 -Wall -Wextra -D QENTEM_AUTOESCAPE_HTML=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - clang++ -g -O0 -Wall -Wextra -D QENTEM_AUTO_ESCAPE_HTML=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 

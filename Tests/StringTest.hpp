@@ -34,7 +34,7 @@ using String8 = String<char>;
 
 static void TestString1(TestHelper &helper) {
     SizeT length;
-    char *strptr;
+    char *str_ptr;
 
     String8 str1;
     helper.Equal(str1.Length(), 0U, "Length", __LINE__);
@@ -66,16 +66,16 @@ static void TestString1(TestHelper &helper) {
     str1 = "ABCDEF0123456789ABCDEF0123456789";
     helper.Equal(str1.Length(), 32U, "Length", __LINE__);
 
-    length = str1.Length();
-    strptr = str1.Detach();
-    helper.NotEqual(strptr, nullptr, "Detach", "null", __LINE__);
+    length  = str1.Length();
+    str_ptr = str1.Detach();
+    helper.NotEqual(str_ptr, nullptr, "Detach", "null", __LINE__);
 
-    str2 = String8(strptr, length); // Manage
-    helper.Equal(str2.First(), strptr, "First()", "strptr", __LINE__);
+    str2 = String8(str_ptr, length); // Manage
+    helper.Equal(str2.First(), str_ptr, "First()", "str_ptr", __LINE__);
     helper.Equal(str2.Length(), length, "Length", __LINE__);
 
     str1 = static_cast<String8 &&>(str2); // Move
-    helper.Equal(str1.First(), strptr, "First()", __LINE__);
+    helper.Equal(str1.First(), str_ptr, "First()", __LINE__);
     helper.Equal(str1.Length(), length, "Length", __LINE__);
     helper.Equal(str2.Length(), 0U, "Length", __LINE__);
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
@@ -114,9 +114,9 @@ static void TestString1(TestHelper &helper) {
 
     str1 = "A";
     helper.Equal(str1.Length(), 1U, "Length", __LINE__);
-    strptr = str1.Detach();
-    helper.Equal(strptr[0], 'A', "strptr[0]", "A", __LINE__);
-    Memory::Deallocate(strptr);
+    str_ptr = str1.Detach();
+    helper.Equal(str_ptr[0], 'A', "str_ptr[0]", "A", __LINE__);
+    Memory::Deallocate(str_ptr);
 
     char   *tmp_size_2 = Memory::Allocate<char>(2);
     String8 str_size_2 = String8(tmp_size_2, 2U);

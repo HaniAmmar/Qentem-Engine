@@ -2447,7 +2447,8 @@ static void TestRenderU1(TestHelper &helper) {
 
     for (unsigned int i = 0; i < size_4; i++) {
         content += uR"({var:)";
-        str = Digit<char16_t>::NumberToString(i);
+        str.Reset();
+        Digit<char16_t>::NumberToString(str, i);
         content += str;
         output += str;
         content += uR"(})";
@@ -2462,7 +2463,8 @@ static void TestRenderU1(TestHelper &helper) {
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += uR"({var:)";
-            str = Digit<char16_t>::NumberToString(i);
+            str.Reset();
+            Digit<char16_t>::NumberToString(str, i);
             content += str;
             content += uR"(})";
 
@@ -2471,7 +2473,8 @@ static void TestRenderU1(TestHelper &helper) {
             size += 8;
 
             content += uR"({math: 1 + )";
-            str = Digit<char16_t>::NumberToString(i);
+            str.Reset();
+            Digit<char16_t>::NumberToString(str, i);
             content += str;
             content += uR"(})";
 
@@ -2488,7 +2491,8 @@ static void TestRenderU1(TestHelper &helper) {
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += uR"({var:)";
-            str = Digit<char16_t>::NumberToString(i);
+            str.Reset();
+            Digit<char16_t>::NumberToString(str, i);
             content += str;
             content += uR"(})";
 
@@ -2515,7 +2519,8 @@ static void TestRenderU1(TestHelper &helper) {
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += uR"({var:)";
-            str = Digit<char16_t>::NumberToString(i);
+            str.Reset();
+            Digit<char16_t>::NumberToString(str, i);
             content += str;
             content += uR"(})";
 

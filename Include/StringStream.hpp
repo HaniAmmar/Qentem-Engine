@@ -238,9 +238,8 @@ class StringStream {
         }
     }
 
-    inline void Reverse() noexcept {
-        SizeT index = 0;
-        SizeT end   = Length();
+    inline void Reverse(SizeT index = 0) noexcept {
+        SizeT end = Length();
 
         while (index < end) {
             const Char_T_ tmp = storage_[index];

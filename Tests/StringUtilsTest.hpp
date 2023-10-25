@@ -24,8 +24,8 @@
 
 #include "StringUtils.hpp"
 
-#ifndef QENTEM_STRINGUTILS_TESTS_H_
-#define QENTEM_STRINGUTILS_TESTS_H_
+#ifndef QENTEM_STRING_UTILS_TESTS_H_
+#define QENTEM_STRING_UTILS_TESTS_H_
 
 namespace Qentem {
 namespace Test {

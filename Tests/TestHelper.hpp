@@ -311,9 +311,9 @@ struct TestHelper {
         }
 
         if (Config::AutoEscapeHTML) {
-            TestOutPut::Print("Autoescape HTML: On\n");
+            TestOutPut::Print("Auto Escape HTML: On\n");
         } else {
-            TestOutPut::Print("Autoescape HTML: Off\n");
+            TestOutPut::Print("Auto Escape HTML: Off\n");
         }
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)

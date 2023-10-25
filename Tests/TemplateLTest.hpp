@@ -2447,7 +2447,8 @@ static void TestRenderL1(TestHelper &helper) {
 
     for (unsigned int i = 0; i < size_4; i++) {
         content += LR"({var:)";
-        str = Digit<wchar_t>::NumberToString(i);
+        str.Reset();
+        Digit<wchar_t>::NumberToString(str, i);
         content += str;
         output += str;
         content += LR"(})";
@@ -2462,7 +2463,8 @@ static void TestRenderL1(TestHelper &helper) {
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += LR"({var:)";
-            str = Digit<wchar_t>::NumberToString(i);
+            str.Reset();
+            Digit<wchar_t>::NumberToString(str, i);
             content += str;
             content += LR"(})";
 
@@ -2471,7 +2473,8 @@ static void TestRenderL1(TestHelper &helper) {
             size += 8;
 
             content += LR"({math: 1 + )";
-            str = Digit<wchar_t>::NumberToString(i);
+            str.Reset();
+            Digit<wchar_t>::NumberToString(str, i);
             content += str;
             content += LR"(})";
 
@@ -2488,7 +2491,8 @@ static void TestRenderL1(TestHelper &helper) {
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += LR"({var:)";
-            str = Digit<wchar_t>::NumberToString(i);
+            str.Reset();
+            Digit<wchar_t>::NumberToString(str, i);
             content += str;
             content += LR"(})";
 
@@ -2515,7 +2519,8 @@ static void TestRenderL1(TestHelper &helper) {
     for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += LR"({var:)";
-            str = Digit<wchar_t>::NumberToString(i);
+            str.Reset();
+            Digit<wchar_t>::NumberToString(str, i);
             content += str;
             content += LR"(})";
 

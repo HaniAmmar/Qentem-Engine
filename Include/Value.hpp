@@ -1079,17 +1079,20 @@ class Value {
             }
 
             case ValueType::UIntLong: {
-                value = Digit<Char_T_>::NumberToString(number_.GetUInt64());
+                value.Reset();
+                Digit<Char_T_>::NumberToString(value, number_.GetUInt64());
                 break;
             }
 
             case ValueType::IntLong: {
-                value = Digit<Char_T_>::NumberToString(number_.GetInt64());
+                value.Reset();
+                Digit<Char_T_>::NumberToString(value, number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
-                value = Digit<Char_T_>::NumberToString(number_.GetDouble(), 1, 0, Config::FloatDoublePrecision);
+                value.Reset();
+                Digit<Char_T_>::NumberToString(value, number_.GetDouble(), 1, 0, Config::FloatDoublePrecision);
                 break;
             }
 

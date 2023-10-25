@@ -79,11 +79,11 @@ struct Config {
 #endif
 
     ///////////////////////////////////////////////
-#ifndef QENTEM_AUTOESCAPE_HTML
-#define QENTEM_AUTOESCAPE_HTML 1
+#ifndef QENTEM_AUTO_ESCAPE_HTML
+#define QENTEM_AUTO_ESCAPE_HTML 1
 #endif
 /////////////////
-#if defined(QENTEM_AUTOESCAPE_HTML) && (QENTEM_AUTOESCAPE_HTML == 1)
+#if defined(QENTEM_AUTO_ESCAPE_HTML) && (QENTEM_AUTO_ESCAPE_HTML == 1)
     static constexpr bool AutoEscapeHTML = true;
 #else
     static constexpr bool AutoEscapeHTML          = false;
