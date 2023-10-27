@@ -25,25 +25,31 @@
 #ifndef QENTEM_DIGIT_H_
 #define QENTEM_DIGIT_H_
 
-namespace Qentem {
-
 /*
  * For converting numbers from and to strings.
  */
 
+namespace Qentem {
+static const char DigitsTable[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                   "303132333435363738394041424344454647484950515253545556575859"
+                                   "606162636465666768697071727374757677787980818283848586878889"
+                                   "90919293949596979899"};
+
 template <typename Char_T_>
 struct Digit {
-    static void RawIntToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
-        intToString(storage, offset, number);
-    }
-
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
-        Char_T_ storage[Config::IntMaxLength];
-        SizeT   offset = Config::IntMaxLength;
+        constexpr unsigned int max_number_of_digits = (((sizeof(number) * 8U * 30103U) / 100000U) + 1U);
+
+        Char_T_ storage[max_number_of_digits];
+        SizeT   offset = max_number_of_digits;
 
         RawIntToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-        stream.Write(&(storage[offset]), (Config::IntMaxLength - offset));
+        stream.Write(&(storage[offset]), (max_number_of_digits - offset));
+    }
+
+    static void RawIntToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
+        intToString(storage, offset, number);
     }
 
     template <typename Stream_T_>
@@ -92,7 +98,7 @@ struct Digit {
     inline static void NumberToString(Stream_T_ &stream, long number) {
         NumberToString(stream, static_cast<long long>(number));
     }
-
+    /////////////////////////////////////////////////////////////////
     /*
      * "min" is the minimum digits before the dot. Zeros will be
      * added if the digits on the left are less than "min". "r_min" is the same
@@ -123,9 +129,7 @@ struct Digit {
                                       unsigned int precision = 0) {
         doubleToString(stream, static_cast<double>(f_number), min, r_min, precision);
     }
-
     /////////////////////////////////////////////////////////////////
-
     static unsigned int HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
         unsigned int number = 0;
         unsigned int offset = 0;
@@ -148,21 +152,19 @@ struct Digit {
 
         return number;
     }
-
     /////////////////////////////////////////////////////////////////
-
-    template <typename Number_T>
-    static void FastStringToNumber(Number_T &number, const Char_T_ *content, SizeT length) noexcept {
+    template <typename Number_T_>
+    static void FastStringToNumber(Number_T_ &number, const Char_T_ *content, SizeT length) noexcept {
         SizeT offset = 0;
         number       = 0;
 
         if (offset < length) {
-            number += (static_cast<Number_T>(content[offset] - DigitChars::ZeroChar));
+            number += (static_cast<Number_T_>(content[offset] - DigitChars::ZeroChar));
             ++offset;
 
             while (offset < length) {
-                number *= 10ULL;
-                number += (static_cast<Number_T>(content[offset] - DigitChars::ZeroChar));
+                number *= Number_T_{10};
+                number += (static_cast<Number_T_>(content[offset] - DigitChars::ZeroChar));
                 ++offset;
             }
         }
@@ -561,32 +563,26 @@ struct Digit {
         }
     }
 
-    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
-        using NumberT_ = unsigned long long;
-
-        static const char table[] = {"000102030405060708091011121314151617181920212223242526272829"
-                                     "303132333435363738394041424344454647484950515253545556575859"
-                                     "606162636465666768697071727374757677787980818283848586878889"
-                                     "90919293949596979899"};
-
-        while (number >= NumberT_{100}) {
-            const SizeT index = (static_cast<SizeT>(number % NumberT_{100}) * SizeT{2});
-            number /= NumberT_{100};
+    template <typename Number_T_>
+    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+        while (number >= Number_T_{100}) {
+            const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
+            number /= Number_T_{100};
 
             offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(table[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(table[index + SizeT{1}]);
+            storage[offset]            = static_cast<Char_T_>(DigitsTable[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitsTable[index + SizeT{1}]);
         }
 
-        if (number < NumberT_{10}) {
+        if (number < Number_T_{10}) {
             --offset;
             storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
         } else {
             const SizeT index = (static_cast<SizeT>(number) * SizeT{2});
 
             offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(table[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(table[index + SizeT{1}]);
+            storage[offset]            = static_cast<Char_T_>(DigitsTable[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitsTable[index + SizeT{1}]);
         }
     }
 

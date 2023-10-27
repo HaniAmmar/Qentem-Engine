@@ -91,7 +91,6 @@ struct Config {
 
     static constexpr unsigned int FloatMaxLength       = 22;
     static constexpr unsigned int ExponentMaxLength    = 5;
-    static constexpr unsigned int IntMaxLength         = 20;
     static constexpr unsigned int FloatDoublePrecision = 15;
 };
 ///////////////////////////////////////////////
