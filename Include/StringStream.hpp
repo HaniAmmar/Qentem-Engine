@@ -310,14 +310,6 @@ class StringStream {
         return Storage();
     }
 
-    inline bool IsEmpty() const noexcept {
-        return (Length() == 0);
-    }
-
-    inline bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
-    }
-
     inline Char_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Length() - 1));
@@ -326,6 +318,34 @@ class StringStream {
         return nullptr;
     }
 
+    inline const Char_T_ *End() const noexcept {
+        return (First() + Length());
+    }
+
+    inline bool IsEmpty() const noexcept {
+        return (Length() == 0);
+    }
+
+    inline bool IsNotEmpty() const noexcept {
+        return !(IsEmpty());
+    }
+
+    // For STL
+    inline const Char_T_ *begin() const noexcept {
+        return First();
+    }
+
+    inline const Char_T_ *end() const noexcept {
+        return End();
+    }
+
+    inline Char_T_ *begin() noexcept {
+        return Storage();
+    }
+
+    inline Char_T_ *end() noexcept {
+        return (Storage() + Length());
+    }
     //////////// Private ////////////
 
   private:
