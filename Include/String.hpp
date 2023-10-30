@@ -339,16 +339,16 @@ class String {
         return String((str + offset), length);
     }
 
+    inline const Char_T_ *First() const noexcept {
+        return Storage();
+    }
+
     inline Char_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Length() - 1));
         }
 
         return nullptr;
-    }
-
-    inline const Char_T_ *First() const noexcept {
-        return Storage();
     }
 
     inline const Char_T_ *End() const noexcept {
