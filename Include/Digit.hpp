@@ -62,13 +62,6 @@ struct Digit {
         NumberToString(stream, static_cast<unsigned long long>(number));
     }
 
-    template <typename Number_T_>
-    inline static String<Char_T_> NumberToString(Number_T_ number) {
-        String<Char_T_> str;
-        NumberToString(str, number);
-        return str;
-    }
-
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned short number) {
         NumberToString(stream, static_cast<unsigned long long>(number));
@@ -98,36 +91,15 @@ struct Digit {
     inline static void NumberToString(Stream_T_ &stream, long number) {
         NumberToString(stream, static_cast<long long>(number));
     }
-    /////////////////////////////////////////////////////////////////
-    /*
-     * "min" is the minimum digits before the dot. Zeros will be
-     * added if the digits on the left are less than "min". "r_min" is the same
-     * as "min" but for the right side.
-     */
-    inline static String<Char_T_> NumberToString(double number, SizeT min = 1, SizeT r_min = 0,
-                                                 unsigned int precision = 0) {
-        String<Char_T_> str;
-        doubleToString(str, number, min, r_min, precision);
-        return str;
-    }
 
-    inline static String<Char_T_> NumberToString(float f_number, SizeT min = 1, SizeT r_min = 0,
-                                                 unsigned int precision = 0) {
-        String<Char_T_> str;
-        doubleToString(str, static_cast<double>(f_number), min, r_min, precision);
-        return str;
+    template <typename Stream_T_>
+    inline static void NumberToString(Stream_T_ &stream, double number, unsigned int precision = 0) {
+        doubleToString(stream, number, precision);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, double number, SizeT min = 1, SizeT r_min = 0,
-                                      unsigned int precision = 0) {
-        doubleToString(stream, number, min, r_min, precision);
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, float f_number, SizeT min = 1, SizeT r_min = 0,
-                                      unsigned int precision = 0) {
-        doubleToString(stream, static_cast<double>(f_number), min, r_min, precision);
+    inline static void NumberToString(Stream_T_ &stream, float f_number, unsigned int precision = 0) {
+        doubleToString(stream, static_cast<double>(f_number), precision);
     }
     /////////////////////////////////////////////////////////////////
     static unsigned int HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
@@ -587,8 +559,7 @@ struct Digit {
     }
 
     template <typename String_T_>
-    QENTEM_NOINLINE static void doubleToString(String_T_ &d_string, double number, SizeT min, SizeT r_min,
-                                               SizeT precision) {
+    QENTEM_NOINLINE static void doubleToString(String_T_ &d_string, double number, SizeT precision) {
         constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
 
         Char_T_            tmp[max_end_offset];
@@ -599,7 +570,8 @@ struct Digit {
         SizeT              offset          = 0;
         int                exponent        = 0;
         const bool         negative        = (number < 0);
-        const bool         no_exponent     = (r_min != 0);
+        SizeT              min             = 1;
+        SizeT              r_min           = 0;
 
         if (negative) {
             number = -number;
@@ -665,7 +637,7 @@ struct Digit {
             }
         }
 
-        if ((fraction_length != 0) || no_exponent) {
+        if (fraction_length != 0) {
             if (r_min > fraction_length) {
                 r_min -= fraction_length;
             } else {
@@ -688,7 +660,7 @@ struct Digit {
                 intToString(&(tmp[0]), end_offset, fraction);
             }
 
-            if (((end_offset == 0U) && (exponent == 0U)) || (left_length != 0) || no_exponent) {
+            if (((end_offset == 0U) && (exponent == 0U)) || (left_length != 0)) {
                 SizeT offset2 = end_offset;
 
                 tmp2[offset] = DigitChars::DotChar;

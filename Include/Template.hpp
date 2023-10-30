@@ -711,7 +711,7 @@ struct TemplateSub {
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit<Char_T_>::NumberToString(*stream_, result.Number.Real, 1, 0, 3);
+                    Digit<Char_T_>::NumberToString(*stream_, result.Number.Real, 3);
                     break;
                 }
 

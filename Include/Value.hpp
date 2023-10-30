@@ -1092,7 +1092,7 @@ class Value {
 
             case ValueType::Double: {
                 value.Reset();
-                Digit<Char_T_>::NumberToString(value, number_.GetDouble(), 1, 0, Config::FloatDoublePrecision);
+                Digit<Char_T_>::NumberToString(value, number_.GetDouble(), Config::FloatDoublePrecision);
                 break;
             }
 
@@ -1138,7 +1138,7 @@ class Value {
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToString(stream, number_.GetDouble(), 1, 0, Config::FloatDoublePrecision);
+                Digit<Char_T_>::NumberToString(stream, number_.GetDouble(), Config::FloatDoublePrecision);
                 break;
             }
 

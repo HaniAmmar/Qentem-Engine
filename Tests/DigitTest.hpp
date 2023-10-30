@@ -22,6 +22,7 @@
 
 #include "TestHelper.hpp"
 
+#include "StringStream.hpp"
 #include "Digit.hpp"
 
 #ifndef QENTEM_DIGIT_TESTS_H_
@@ -30,19 +31,33 @@
 namespace Qentem {
 namespace Test {
 
-using DigitC = Digit<char>;
-
 static SizeT HexStringToNumber(const char *str) noexcept {
     return Digit<char>::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
 template <typename Number_T_>
-bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
+static void IntToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number, const char *expected,
+                             const char *name, unsigned long line) {
+    Digit<char>::NumberToString(stream, number);
+    helper.Equal(stream, expected, name, line);
+    stream.Clear();
+}
+
+template <typename Number_T_>
+static void RealToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number, unsigned int precision,
+                              const char *expected, const char *name, unsigned long line) {
+    Digit<char>::NumberToString(stream, number, precision);
+    helper.Equal(stream, expected, name, line);
+    stream.Clear();
+}
+
+template <typename Number_T_>
+static bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
     QNumber number;
     SizeT   offset = 0;
     SizeT   length = StringUtils::Count(str);
 
-    switch (DigitC::StringToNumber(number, str, offset, length)) {
+    switch (Digit<char>::StringToNumber(number, str, offset, length)) {
         case 1: {
             num = static_cast<Number_T_>(number.Natural);
             break;
@@ -853,471 +868,317 @@ static void TestStringToNumber5(TestHelper &helper) {
 }
 
 static void TestNumberToString1(TestHelper &helper) {
-    int           number_int;
-    unsigned int  number_uint;
-    long          number_long;
-    unsigned long number_ulong;
-    float         number_float;
-    double        number_double;
+    StringStream<char> stream;
+    int                number_int;
+    unsigned int       number_uint;
+    long               number_long;
+    unsigned long      number_ulong;
+    float              number_float;
+    double             number_double;
 
     number_int = -1;
-    helper.Equal(DigitC::NumberToString(number_int), "-1", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_int, "-1", "return", __LINE__);
 
     number_int = 1;
-    helper.Equal(DigitC::NumberToString(number_int), "1", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_int, "1", "return", __LINE__);
 
     number_long = -100000;
-    helper.Equal(DigitC::NumberToString(number_long), "-100000", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_long, "-100000", "return", __LINE__);
 
     number_long = 100000;
-    helper.Equal(DigitC::NumberToString(number_long), "100000", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_long, "100000", "return", __LINE__);
 
     number_uint = 0;
-    helper.Equal(DigitC::NumberToString(number_uint), "0", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_uint, "0", "return", __LINE__);
 
     number_ulong = 1;
-    helper.Equal(DigitC::NumberToString(number_ulong), "1", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_ulong, "1", "return", __LINE__);
 
     number_ulong = 4;
-    helper.Equal(DigitC::NumberToString(number_ulong), "4", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_ulong, "4", "return", __LINE__);
 
     number_int = -7;
-    helper.Equal(DigitC::NumberToString(number_int), "-7", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_int, "-7", "return", __LINE__);
 
     number_uint = 10;
-    helper.Equal(DigitC::NumberToString(number_uint), "10", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_uint, "10", "return", __LINE__);
 
     number_ulong = 3;
-    helper.Equal(DigitC::NumberToString(number_ulong), "3", "return", __LINE__);
+    IntToStreamEqual(helper, stream, number_ulong, "3", "return", __LINE__);
+
+    number_long = 9223372036854775807LL;
+    IntToStreamEqual(helper, stream, number_long, "9223372036854775807", "return", __LINE__);
+
+    number_long = -9223372036854775807LL;
+    IntToStreamEqual(helper, stream, number_long, "-9223372036854775807", "return", __LINE__);
+
+    number_ulong = 18446744073709551615ULL;
+    IntToStreamEqual(helper, stream, number_ulong, "18446744073709551615", "return", __LINE__);
 
     number_float = 1;
-    helper.Equal(DigitC::NumberToString(number_float), "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_float, 0U, "1", "return", __LINE__);
 
     number_double = 0;
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), ".0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "0.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), ".00000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "00.00", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 0U, "0", "return", __LINE__);
 
     number_double = 1;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "1.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "1.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "001", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "1.00000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "01.00", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 0U, "1", "return", __LINE__);
 
     number_double = 15;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "15", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "15", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "15.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "15.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "015", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "15.00000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "15.00", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 0U, "15", "return", __LINE__);
 
     number_double = 12345;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "12345", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "12345", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "12345.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "12345.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "12345", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "12345.00000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "12345.00", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 0U, "12345", "return", __LINE__);
 
     number_double = 1.1;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "001.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "1.10000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "01.10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 0U, "1.1", "return", __LINE__);
 
     number_double = 100.5;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 0U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 0U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 0U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 0U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 0U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 0U), "100.50000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 0U), "100.50", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 0U, "100.5", "return", __LINE__);
 
     number_double = 1.123456;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "001.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "1.10000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "01.10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 1U, "1.1", "return", __LINE__);
 
     number_double = 80.123456;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "80.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "80.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "80.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "80.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "080.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "80.10000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "80.10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 1U, "80.1", "return", __LINE__);
 
     number_double = 12345.123456;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "12345.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "12345.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "12345.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "12345.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "12345.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "12345.10000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "12345.10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 1U, "12345.1", "return", __LINE__);
 
     number_double = 1.123456;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "1.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "001.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "1.10000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "01.10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 1U, "1.1", "return", __LINE__);
 
     number_double = 100.123456;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "100.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "100.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "100.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "100.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "100.1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "100.10000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "100.10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 1U, "100.1", "return", __LINE__);
 
     number_double = 100.523456;
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 0U, 1U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 0U, 1U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 1U, 1U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 1U, 1U, 1U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 3U, 0U, 1U), "100.5", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 0U, 5U, 1U), "100.50000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number_double, 2U, 2U, 1U), "100.50", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number_double, 1U, "100.5", "return", __LINE__);
 }
 
 static void TestNumberToString2(TestHelper &helper) {
+    StringStream<char> stream;
+
     double number = 1.123456;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "001.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "1.12000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "01.12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "1.12", "return", __LINE__);
 
     number = 80.123456;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "80.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "80.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "80.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "80.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "080.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "80.12000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "80.12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "80.12", "return", __LINE__);
 
     number = 12345.123456;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "12345.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "12345.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "12345.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "12345.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "12345.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "12345.12000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "12345.12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "12345.12", "return", __LINE__);
 
     number = 1.123456;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "1.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "001.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "1.12000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "01.12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "1.12", "return", __LINE__);
 
     number = 100.123456;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "100.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "100.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "100.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "100.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "100.12", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "100.12000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "100.12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "100.12", "return", __LINE__);
 
     number = 100.523456;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "100.52", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 2U), "100.52", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), "100.52", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 2U), "100.52", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 2U), "100.52", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 2U), "100.52000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 2U), "100.52", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "100.52", "return", __LINE__);
 
     number = 100.1234;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 5U), "100.1234", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 5U), "100.1234", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 5U), "100.1234", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 1U, 5U), "100.1234", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 0U, 5U), "100.1234", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 5U, 5U), "100.12340", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 2U, 2U, 5U), "100.1234", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 5U, "100.1234", "return", __LINE__);
 }
 
 static void TestNumberToString3(TestHelper &helper) {
-    double number;
+    StringStream<char> stream;
+    double             number;
 
     number = 5.15;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "5.15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 3U, "5.15", "return", __LINE__);
 
     number = 5.55;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "5.55", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "5.55", "return", __LINE__);
 
-    // number = 5.55; // NOTE: Fix
-    // EQ_VALUE(DigitC::NumberToString(number, 0U, 0U, 1U), "5.6",
-    // "return");
+    number = 5.55; // NOTE: Fix
+    // RealToStreamEqual(helper, stream, number, 1U, "5.6", "return", __LINE__);
 
     number = 5.57;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "5.6", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "5.6", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "5.60", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "005.600", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "5.6", "return", __LINE__);
 
     number = 0.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "1.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "1.00", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "001.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "1", "return", __LINE__);
 
     number = 0.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), ".99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 2U), ".99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 2U), ".99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 2U), "000.990", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "0.99", "return", __LINE__);
 
     number = 0.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 5U), ".99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 5U), ".99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 5U), ".99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 5U), "000.990", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 5U, "0.99", "return", __LINE__);
 
     number = 5.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "6", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "6.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "6.00", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "006.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "6", "return", __LINE__);
 
     number = 9.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "10", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "10.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "10.00", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "010.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "10", "return", __LINE__);
 
     number = 90.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "91", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "91.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "91.00", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "091.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "91", "return", __LINE__);
 
     number = 99.99;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "100", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 1U, 1U), "100.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 2U, 1U), "100.00", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 3U, 3U, 1U), "100.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "100", "return", __LINE__);
 
     number = 99.0099;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 1U), "99", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "99.01", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "99.01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 1U, "99", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "99.01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 3U, "99.01", "return", __LINE__);
 
     number = 99.0009;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "99.001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 3U, "99.001", "return", __LINE__);
 
     number = 456789.0029;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "456789.003", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 3U, "456789.003", "return", __LINE__);
 
     number = -456789.0024;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 3U), "-456789.002", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(18446744073709551615ULL), "18446744073709551615", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(-9223372036854775807LL), "-9223372036854775807", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(9223372036854775807LL), "9223372036854775807", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 3U, "-456789.002", "return", __LINE__);
 }
 
 static void TestNumberToString4(TestHelper &helper) {
-    double number = -123456;
-    helper.Equal(DigitC::NumberToString(number, 30U, 0U, 0U), "-000000000000000123456", "return", __LINE__);
+    StringStream<char> stream;
 
-    number = -2;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 0U), "-2", "return", __LINE__);
-
-    number = -3.1;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 0U), "-3.1", "return", __LINE__);
+    double number = -2;
+    RealToStreamEqual(helper, stream, number, 0U, "-2", "return", __LINE__);
 
     number = -3.1;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 0U), "-3.1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 0U, "-3.1", "return", __LINE__);
+
+    number = -3.1;
+    RealToStreamEqual(helper, stream, number, 0U, "-3.1", "return", __LINE__);
 
     number = -22.87;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 2U), "-22.87", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 2U, "-22.87", "return", __LINE__);
 
     number = -55.0055;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 10U), "-55.0055", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 10U, "-55.0055", "return", __LINE__);
 
     number = -0.123455678987455;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "-0.123455678987455", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 0U, "-0.123455678987455", "return", __LINE__);
 
     number = -0.123455678987452;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "-0.123455678987452", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 0U, "-0.123455678987452", "return", __LINE__);
     number = 0.999999;
-    helper.Equal(DigitC::NumberToString(number, 0U, 0U, 5U), "1", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 6U), "0.999999", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 10U), "0.999999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 5U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 6U, "0.999999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 10U, "0.999999", "return", __LINE__);
 
     number = 0.123e-11;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "1.23e-12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 0U, "1.23e-12", "return", __LINE__);
 
     number = -2.00000000000099;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "-2.00000000000099", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 14U, "-2.00000000000099", "return", __LINE__);
 
     number = 3.9999999999999;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "3.9999999999999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 14U, "3.9999999999999", "return", __LINE__);
 
     number = 99.1005099;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 10U), "99.1005099", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 10U, "99.1005099", "return", __LINE__);
 
     number = 99.1005099;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 7U), "99.1005099", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 7U, "99.1005099", "return", __LINE__);
 
     number = 871.080055555;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 9U), "871.080055555", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 9U, "871.080055555", "return", __LINE__);
 
     number = 0.00056599999999999999;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 3U), "1e-3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 3U, "1e-3", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(number), "5.66e-4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 0U, "5.66e-4", "return", __LINE__);
 
     number = 3.99999999999909;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 0U), "3.99999999999909", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 0U, "3.99999999999909", "return", __LINE__);
 
     number = 2.00000000000015;
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "2.00000000000015", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 14U, "2.00000000000015", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(number, 1U, 0U, 14U), "2.00000000000015", "return", __LINE__);
+    RealToStreamEqual(helper, stream, number, 14U, "2.00000000000015", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(7.0, 1U, 3U, 3U), "7.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.93002099999999999, 3U, "0.93", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-7.0, 1U, 3U, 3U), "-7.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -9223372036854775807.0, 1U, "-9223372036854775808", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(8.0, 3U, 3U, 3U), "008.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.9223372036854775, 20U, "-0.9223372036854775", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-8.0, 3U, 3U, 3U), "-008.000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -92233.0, 0U, "-92233", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(7.1, 1U, 3U, 3U), "7.100", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775, 20U, "0.9223372036854775", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-7.1, 1U, 3U, 3U), "-7.100", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999, 3U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.9999, 3U, "-1", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(8.1, 3U, 3U, 3U), "008.100", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9, 1U, "0.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.9, 1U, "-0.9", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-8.1, 3U, 3U, 3U), "-008.100", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999, 4U, "0.9999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.9999, 4U, "-0.9999", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.93002099999999999, 1U, 3U, 3U), "0.930", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 12345678912345.345, 2U, "12345678912345.35", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-9223372036854775807.0, 1U), "-9223372036854775808", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 45.12345678912345, 14U, "45.12345678912345", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-0.9223372036854775, 1U, 1U), "-0.9223372036854775", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(-92233.0, 10U), "-0000092233", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 45.12345678912345, 3U, "45.123", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-92233.0, 1U), "-92233", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -10.9999, 0U, "-10.9999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10.9999, 0U, "10.9999", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775, 1U), "0.9223372036854775", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(0.9999, 1U, 1U, 3U), "1.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(-0.9999, 1U, 1U, 3U), "-1.0", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(0.9999, 3U, 1U, 3U), "001.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(-0.9999, 3U, 1U, 3U), "-001.0", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(0.9999, 3U, 3U, 3U), "001.000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(-0.9999, 3U, 3U, 3U), "-001.000", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(0.9, 1U, 1U), "0.9", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(-0.9, 1U, 1U), "-0.9", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(0.9999, 1U, 1U), "0.9999", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(-0.9999, 1U, 1U), "-0.9999", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(12345678912345.345, 1U, 1U, 2U), "12345678912345.35", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(45.12345678912345, 1U, 1U, 14U), "45.12345678912345", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(45.12345678912345, 1U, 1U, 3U), "45.123", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(-10.9999, 1U, 1U, 0U), "-10.9999", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(10.9999, 1U, 1U, 0U), "10.9999", "return", __LINE__);
-
-    helper.Equal(DigitC::NumberToString(-10.9999, 1U, 1U, 2U), "-11.0", "return", __LINE__);
-    helper.Equal(DigitC::NumberToString(10.9999, 1U, 1U, 2U), "11.0", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -10.9999, 2U, "-11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10.9999, 2U, "11", "return", __LINE__);
 }
 
 static void TestNumberToString5(TestHelper &helper) {
-    helper.Equal(DigitC::NumberToString(1e308), "1e308", "return", __LINE__);
+    StringStream<char> stream;
 
-    helper.Equal(DigitC::NumberToString(1e-308), "1e-308", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e308, 0U, "1e308", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(15e100), "1.5e101", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-308, 0U, "1e-308", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(1.6866831148613157e308), "1.686683114861316e308", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 15e100, 0U, "1.5e101", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(99999999999999999999.0), "1e20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.6866831148613157e308, 0U, "1.686683114861316e308", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.000000000000000009), "9e-18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99999999999999999999.0, 0U, "1e20", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.000000000009), "9e-12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000000000009, 0U, "9e-18", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(-0.000000000009), "-9e-12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000009, 0U, "9e-12", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.100009), "0.100009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.000000000009, 0U, "-9e-12", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.100009, 0U), ".100009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.100009, 0U, "0.100009", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.000009), "9e-6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000009, 0U, "9e-6", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(1.000009), "1.000009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000009, 0U, "1.000009", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 1U), "0.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 1U, "0.9", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 2U), "0.92", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 2U, "0.92", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 3U), "0.922", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 3U, "0.922", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 4U), "0.9223", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 4U, "0.9223", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 5U), "0.92234", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 5U, "0.92234", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 6U), "0.922337", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 6U, "0.922337", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 7U), "0.9223372", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 7U, "0.9223372", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 8U), "0.9223372", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 8U, "0.9223372", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 9U), "0.922337204", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 9U, "0.922337204", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 10U), "0.9223372037", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 10U, "0.9223372037", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 11U), "0.92233720369", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 11U, "0.92233720369", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 12U), "0.922337203685", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 12U, "0.922337203685", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 13U), "0.9223372036855", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 13U, "0.9223372036855", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 14U), "0.92233720368548", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 14U, "0.92233720368548", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 15U), "0.922337203685478", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 15U, "0.922337203685478", "return", __LINE__);
 
-    helper.Equal(DigitC::NumberToString(0.9223372036854775807, 1U, 1U, 16U), "0.9223372036854776", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9223372036854775807, 16U, "0.9223372036854776", "return", __LINE__);
 }
 
 static void TestHexConv(TestHelper &helper) {
