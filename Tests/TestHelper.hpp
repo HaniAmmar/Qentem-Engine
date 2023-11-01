@@ -192,7 +192,7 @@ struct TestHelper {
 
     template <typename Char_T_, typename FUNC_T_>
     QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func) {
-        if (!error_) {
+        if (!error_ || continue_on_error_) {
             part_name_ = name;
 
             func(*this);
@@ -215,7 +215,7 @@ struct TestHelper {
 
     template <typename Char_T_>
     QENTEM_NOINLINE void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
-        if (!error_ && !value) {
+        if ((!error_ || continue_on_error_) && !value) {
             error_ = true;
             TestHelper::PrintErrorMessage1(false, name, line);
         }
@@ -223,7 +223,7 @@ struct TestHelper {
 
     template <typename Char_T_>
     QENTEM_NOINLINE void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
-        if (!error_ && value) {
+        if ((!error_ || continue_on_error_) && value) {
             error_ = true;
             TestHelper::PrintErrorMessage1(true, name, line);
         }
@@ -232,7 +232,7 @@ struct TestHelper {
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
     QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
                                const Value3_T_ &value, unsigned long line) {
-        if (!error_ && (left != right)) {
+        if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(false, name, left, value, line);
         }
@@ -241,7 +241,7 @@ struct TestHelper {
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
     QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
                                   const Value3_T_ &value, unsigned long line) {
-        if (!error_ && (left == right)) {
+        if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(true, name, left, value, line);
         }
@@ -249,7 +249,7 @@ struct TestHelper {
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
-        if (!error_ && (left != right)) {
+        if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(false, name, left, right, line);
         }
@@ -258,7 +258,7 @@ struct TestHelper {
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
     QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
                                   unsigned long line) {
-        if (!error_ && (left == right)) {
+        if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(true, name, left, right, line);
         }
@@ -278,6 +278,10 @@ struct TestHelper {
                           TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n', file_fullname_, ":",
                           line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `", value2,
                           "`\n Returned Value: `", value1, "`\n\n");
+    }
+
+    inline void ContinueOnError(bool continue_on_error) noexcept {
+        continue_on_error_ = continue_on_error;
     }
 
     QENTEM_NOINLINE static void PrintInfo() {
@@ -331,6 +335,7 @@ struct TestHelper {
     const char *test_name_;
     const char *file_fullname_;
     bool        error_{false};
+    bool        continue_on_error_{false};
 };
 
 } // namespace Qentem
