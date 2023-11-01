@@ -194,22 +194,17 @@ struct TestHelper {
     QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func) {
         if (!error_ || continue_on_error_) {
             part_name_ = name;
-
             func(*this);
+            afterTest(true);
+        }
+    }
 
-            if (!error_) {
-                TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "Pass",
-                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", name, '\n');
-            }
-
-            SizeT remaining_deallocations = MemoryRecord::CheckSubMemory();
-            MemoryRecord::ResetSubMemory();
-
-            if (remaining_deallocations != 0) {
-                TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_deallocations,
-                                  " Remaining deallocations.\n");
-            }
+    template <typename Char_T_, typename FUNC_T_, typename... Values_T_>
+    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
+        if (!error_) {
+            part_name_ = name;
+            func(*this, values...);
+            afterTest(test_for_leaks);
         }
     }
 
@@ -331,6 +326,24 @@ struct TestHelper {
     }
 
   private:
+    QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
+        if (!error_) {
+            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "Pass",
+                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n');
+        }
+
+        if (test_for_leaks) {
+            const SizeT remaining_deallocations = MemoryRecord::CheckSubMemory();
+            MemoryRecord::ResetSubMemory();
+
+            if (remaining_deallocations != 0) {
+                TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
+                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_deallocations,
+                                  " Remaining deallocations.\n");
+            }
+        }
+    }
+
     const char *part_name_;
     const char *test_name_;
     const char *file_fullname_;
