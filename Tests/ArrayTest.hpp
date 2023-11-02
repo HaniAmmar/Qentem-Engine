@@ -360,6 +360,32 @@ static void TestArray4(TestHelper &helper) {
     helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(storage2[0].First(), str1_cstr, "storage2[0].First()", "str1_cstr", __LINE__);
     helper.Equal(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr", __LINE__);
+
+    strings2.Reset();
+
+    strings2.Expect(0);
+    helper.Equal(strings2.Capacity(), 0U, "Capacity", __LINE__);
+
+    strings2.Expect(1);
+    helper.Equal(strings2.Capacity(), 1U, "Capacity", __LINE__);
+
+    strings2.Expect(2);
+    helper.Equal(strings2.Capacity(), 2U, "Capacity", __LINE__);
+
+    strings2.Expect(3);
+    helper.Equal(strings2.Capacity(), 4U, "Capacity", __LINE__);
+
+    strings2.Expect(4);
+    helper.Equal(strings2.Capacity(), 4U, "Capacity", __LINE__);
+
+    strings2.Expect(5);
+    helper.Equal(strings2.Capacity(), 8U, "Capacity", __LINE__);
+
+    strings2.Expect(10);
+    helper.Equal(strings2.Capacity(), 16U, "Capacity", __LINE__);
+
+    strings2.Expect(11);
+    helper.Equal(strings2.Capacity(), 16U, "Capacity", __LINE__);
 }
 
 static void TestArraySort(TestHelper &helper) {
