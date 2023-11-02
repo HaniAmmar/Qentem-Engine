@@ -366,7 +366,7 @@ class StringStream {
     }
 
     void allocate(SizeT size) {
-        size = (Memory::AlignSize(size, 4U) * SizeT{2});
+        size = Memory::AlignSize(size);
         setCapacity(size);
         setStorage(Memory::Allocate<Char_T_>(size));
     }

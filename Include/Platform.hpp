@@ -106,80 +106,84 @@ namespace Platform {
 
 #ifdef QENTEM_64BIT_ARCH
 inline static unsigned int CTZ(unsigned long long value) noexcept {
+    // 'value' should be bigger than zero.
     unsigned long index = 0;
-    return ((_BitScanForward64(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
+    _BitScanForward64(&index, value);
+    return static_cast<unsigned int>(index);
 }
 
 inline static unsigned int CLZ(unsigned long long value) noexcept {
+    // 'value' should be bigger than zero.
     unsigned long index = 0;
-    return ((_BitScanReverse64(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
+    _BitScanReverse64(&index, value);
+    return static_cast<unsigned int>(index);
 }
 
 #else
 
 inline static unsigned int CTZ(unsigned long value) noexcept {
+    // 'value' should be bigger than zero.
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
+    _BitScanForward(&index, value);
+    return static_cast<unsigned int>(index);
 }
 
 inline static unsigned int CLZ(unsigned long value) noexcept {
+    // 'value' should be bigger than zero.
     unsigned long index = 0;
-    return ((_BitScanReverse(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
+    _BitScanReverse(&index, value);
+    return static_cast<unsigned int>(index);
 }
 
 inline static unsigned int CTZ(unsigned int value) noexcept {
+    // 'value' should be bigger than zero.
     unsigned long index = 0;
-    return ((_BitScanForward(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
+    _BitScanForward(&index, value);
+    return static_cast<unsigned int>(index);
 }
 
 inline static unsigned int CLZ(unsigned int value) noexcept {
+    // 'value' should be bigger than zero.
     unsigned long index = 0;
-    return ((_BitScanReverse(&index, value) != 0) ? static_cast<unsigned int>(++index) : 0);
+    _BitScanReverse(&index, value);
+    return static_cast<unsigned int>(index);
 }
 #endif
-
+///////////////////////////////////////
 #else
 
 #ifdef QENTEM_64BIT_ARCH
 template <typename Number_T_>
 inline static unsigned int CTZ(Number_T_ value) noexcept {
-    if (value > 0) {
-        unsigned int index = static_cast<unsigned int>(__builtin_ctzl(static_cast<unsigned long>(value)));
-        return ++index;
-    }
-
-    return 0;
+    // 'value' should be bigger than zero.
+    return static_cast<unsigned int>(__builtin_ctzl(static_cast<unsigned long>(value)));
 }
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
-    return (value > 0)
-               ? ((sizeof(long) * 8U) - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))))
-               : 0;
+    // 'value' should be bigger than zero.
+    constexpr unsigned int size = (sizeof(long) * 8U) - 1U;
+    return (size - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
 }
 
 #else
 
 template <typename Number_T_>
 inline static unsigned int CTZ(Number_T_ value) noexcept {
-    if (value > 0) {
-        unsigned int index = static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
-        return ++index;
-    }
-
-    return 0;
+    // 'value' should be bigger than zero.
+    return static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
 }
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
-    return (value > 0)
-               ? ((sizeof(int) * 8U) - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))))
-               : 0;
+    // 'value' should be bigger than zero.
+    constexpr unsigned int size = (sizeof(int) * 8U) - 1U;
+    return (size - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))));
 }
 
 #endif
 #endif
-
+///////////////////////////////////////
 #ifdef QENTEM_SIMD_ENABLED
 
 template <typename Char_T_, typename SIMDValue, int CharSize>
@@ -208,7 +212,7 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 2> {
         const unsigned int   shift  = 2U;
 
         while (bits16 != 0) {
-            bits |= ((1U & bits16) << count);
+            bits |= ((bits16 & 1U) << count);
             bits16 >>= shift;
             ++count;
         }
@@ -227,7 +231,7 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 4> {
         const unsigned int   shift  = 4U;
 
         while (bits32 != 0) {
-            bits |= ((1U & bits32) << count);
+            bits |= ((bits32 & 1U) << count);
             bits32 >>= shift;
             ++count;
         }
