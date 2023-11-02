@@ -89,6 +89,11 @@ static void TestHArray1(TestHelper &helper) {
     numbers2.Resize(0);
     helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
+
+    numbers1.Reset();
+    numbers2.Reset();
+
+    numbers2 = numbers1;
 }
 
 static void TestHArray2(TestHelper &helper) {
