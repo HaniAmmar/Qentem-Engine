@@ -871,8 +871,8 @@ static void TestNumberToString1(TestHelper &helper) {
     StringStream<char> stream;
     int                number_int;
     unsigned int       number_uint;
-    long               number_long;
-    unsigned long      number_ulong;
+    long long          number_long;
+    unsigned long long number_ulong;
     float              number_float;
     double             number_double;
 
