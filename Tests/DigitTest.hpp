@@ -32,13 +32,13 @@ namespace Qentem {
 namespace Test {
 
 static SizeT HexStringToNumber(const char *str) noexcept {
-    return Digit<char>::HexStringToNumber(str, Qentem::StringUtils::Count(str));
+    return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
 template <typename Number_T_>
 static void IntToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number, const char *expected,
                              const char *name, unsigned long line) {
-    Digit<char>::NumberToString(stream, number);
+    Digit::NumberToString(stream, number);
     helper.Equal(stream, expected, name, line);
     stream.Clear();
 }
@@ -46,7 +46,7 @@ static void IntToStreamEqual(TestHelper &helper, StringStream<char> &stream, Num
 template <typename Number_T_>
 static void RealToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number, unsigned int precision,
                               const char *expected, const char *name, unsigned long line) {
-    Digit<char>::NumberToString(stream, number, precision);
+    Digit::NumberToString(stream, number, precision);
     helper.Equal(stream, expected, name, line);
     stream.Clear();
 }
@@ -57,7 +57,7 @@ static bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
     SizeT   offset = 0;
     SizeT   length = StringUtils::Count(str);
 
-    switch (Digit<char>::StringToNumber(number, str, offset, length)) {
+    switch (Digit::StringToNumber(number, str, offset, length)) {
         case 1: {
             num = static_cast<Number_T_>(number.Natural);
             break;
@@ -772,97 +772,97 @@ static void TestStringToNumber5(TestHelper &helper) {
     SizeT        offset = 0;
 
     content = "0]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 1U, "type", __LINE__);
     helper.Equal(number.Natural, 0U, "number", __LINE__);
 
     offset  = 0;
     content = ".0]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, 0.0, "number", __LINE__);
 
     offset  = 0;
     content = "0.]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, 0.0, "number", __LINE__);
 
     offset  = 0;
     content = "0.0]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-0]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-.0]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-0.]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-0.0]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "1]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 1U, "type", __LINE__);
     helper.Equal(number.Natural, 1U, "number", __LINE__);
 
     offset  = 0;
     content = ".2]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, 0.2, "number", __LINE__);
 
     offset  = 0;
     content = "3.]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, 3.0, "number", __LINE__);
 
     offset  = 0;
     content = "4.5]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, 4.5, "number", __LINE__);
 
     offset  = 0;
     content = "-1]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 2U, "type", __LINE__);
     helper.Equal(number.Integer, -1, "number", __LINE__);
 
     offset  = 0;
     content = "-.2]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -0.2, "number", __LINE__);
 
     offset  = 0;
     content = "-3.]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -3.0, "number", __LINE__);
 
     offset  = 0;
     content = "-4.5]";
-    type    = Digit<char>::StringToNumber(number, content, offset, StringUtils::Count(content));
+    type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
     helper.Equal(type, 3U, "type", __LINE__);
     helper.Equal(number.Real, -4.5, "number", __LINE__);
 }

@@ -2074,7 +2074,7 @@ static void TestLoopLTag2(TestHelper &helper) {
     content2 += LR"(<loop value="loop1-value">A {var:loop1-value} B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += LR"(A )";
-        Digit<wchar_t>::NumberToString(output, i);
+        Digit::NumberToString(output, i);
         output += LR"( B)";
     }
 
@@ -2448,7 +2448,7 @@ static void TestRenderL1(TestHelper &helper) {
     for (unsigned int i = 0; i < size_4; i++) {
         content += LR"({var:)";
         str.Reset();
-        Digit<wchar_t>::NumberToString(str, i);
+        Digit::NumberToString(str, i);
         content += str;
         output += str;
         content += LR"(})";
@@ -2464,7 +2464,7 @@ static void TestRenderL1(TestHelper &helper) {
         if (x != size) {
             content += LR"({var:)";
             str.Reset();
-            Digit<wchar_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += LR"(})";
 
@@ -2474,11 +2474,11 @@ static void TestRenderL1(TestHelper &helper) {
 
             content += LR"({math: 1 + )";
             str.Reset();
-            Digit<wchar_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += LR"(})";
 
-            Digit<wchar_t>::NumberToString(output, 1U + i);
+            Digit::NumberToString(output, 1U + i);
         }
     }
 
@@ -2492,7 +2492,7 @@ static void TestRenderL1(TestHelper &helper) {
         if (x != size) {
             content += LR"({var:)";
             str.Reset();
-            Digit<wchar_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += LR"(})";
 
@@ -2501,9 +2501,9 @@ static void TestRenderL1(TestHelper &helper) {
             size += 8;
 
             content += LR"({if case="{var:)";
-            Digit<wchar_t>::NumberToString(content, i);
+            Digit::NumberToString(content, i);
             content += LR"(}<)";
-            Digit<wchar_t>::NumberToString(content, 1U + i);
+            Digit::NumberToString(content, 1U + i);
             content += LR"(" true="yes"})";
 
             output += LR"(yes)";
@@ -2520,7 +2520,7 @@ static void TestRenderL1(TestHelper &helper) {
         if (x != size) {
             content += LR"({var:)";
             str.Reset();
-            Digit<wchar_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += LR"(})";
 

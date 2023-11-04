@@ -85,7 +85,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
                         ++offset;
 
                         if ((length - offset) > 3) {
-                            unsigned int code = Digit<Char_T_>::HexStringToNumber((content + offset), 4);
+                            unsigned int code = Digit::HexStringToNumber((content + offset), 4);
                             offset += 4;
                             offset2 = offset;
 
@@ -99,7 +99,7 @@ QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT leng
                                 code = (code ^ 0xD800U) << 10U;
                                 offset += SizeT{2};
 
-                                code += Digit<Char_T_>::HexStringToNumber((content + offset), 4) & 0x3FFU;
+                                code += Digit::HexStringToNumber((content + offset), 4) & 0x3FFU;
                                 code += 0x10000U;
 
                                 Unicode::ToUTF<Char_T_>(code, stream);

@@ -35,19 +35,20 @@ static const char DigitTable[] = {"000102030405060708091011121314151617181920212
                                   "606162636465666768697071727374757677787980818283848586878889"
                                   "90919293949596979899"};
 
-template <typename Char_T_>
 struct Digit {
     template <typename Stream_T_>
     inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
         constexpr unsigned int max_number_of_digits = (((sizeof(number) * 8U * 30103U) / 100000U) + 1U);
+        using CharType                              = typename Stream_T_::CharType;
 
-        Char_T_ storage[max_number_of_digits];
-        SizeT   offset = max_number_of_digits;
+        CharType storage[max_number_of_digits];
+        SizeT    offset = max_number_of_digits;
 
         RawIntToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
         stream.Write(&(storage[offset]), (max_number_of_digits - offset));
     }
 
+    template <typename Char_T_>
     static void RawIntToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
         intToString(storage, offset, number);
     }
@@ -102,6 +103,7 @@ struct Digit {
         doubleToString(stream, static_cast<double>(f_number), precision);
     }
     /////////////////////////////////////////////////////////////////
+    template <typename Char_T_>
     static unsigned int HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
         unsigned int number = 0;
         unsigned int offset = 0;
@@ -125,7 +127,7 @@ struct Digit {
         return number;
     }
     /////////////////////////////////////////////////////////////////
-    template <typename Number_T_>
+    template <typename Number_T_, typename Char_T_>
     static void FastStringToNumber(Number_T_ &number, const Char_T_ *content, SizeT length) noexcept {
         SizeT offset = 0;
         number       = 0;
@@ -142,6 +144,7 @@ struct Digit {
         }
     }
 
+    template <typename Char_T_>
     static unsigned int StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
                                        SizeT end_offset) noexcept {
         SizeT        o_offset = offset;
@@ -311,6 +314,7 @@ struct Digit {
         static constexpr unsigned int OverFlow         = 16U;
     };
 
+    template <typename Char_T_>
     QENTEM_NOINLINE static int exponentToNumber(unsigned int &exponent, unsigned int &flags, const Char_T_ *content,
                                                 SizeT &offset, SizeT end_offset) noexcept {
         flags |= stringToNumberFlags::Real;
@@ -368,6 +372,7 @@ struct Digit {
         return (sci_offset != offset);
     }
 
+    template <typename Char_T_>
     QENTEM_NOINLINE static unsigned int roundNumber(QNumber &number, unsigned int &exponent, unsigned int &flags,
                                                     const Char_T_ *content, SizeT &offset, SizeT end_offset) {
         const SizeT  last_offset   = offset;
@@ -535,7 +540,7 @@ struct Digit {
         }
     }
 
-    template <typename Number_T_>
+    template <typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
         while (number >= Number_T_{100}) {
             const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
@@ -558,8 +563,10 @@ struct Digit {
         }
     }
 
-    template <typename String_T_>
-    QENTEM_NOINLINE static void doubleToString(String_T_ &d_string, double number, SizeT precision) {
+    template <typename Stream_T_>
+    QENTEM_NOINLINE static void doubleToString(Stream_T_ &d_string, double number, SizeT precision) {
+        using Char_T_ = typename Stream_T_::CharType;
+
         constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
 
         Char_T_            tmp[max_end_offset];
@@ -743,7 +750,7 @@ struct Digit {
             min = 0;
         }
 
-        Char_T_     *str     = getCharForNumber(d_string, end_offset);
+        Char_T_     *str     = getCharForNumber<Char_T_>(d_string, end_offset);
         unsigned int offset2 = 0;
 
         if (negative) {
@@ -765,12 +772,13 @@ struct Digit {
         }
     }
 
+    template <typename Char_T_>
     inline static Char_T_ *getCharForNumber(String<Char_T_> &d_string, SizeT length) {
         d_string = String<Char_T_>{length};
         return d_string.Storage();
     }
 
-    template <typename Stream_T_>
+    template <typename Char_T_, typename Stream_T_>
     inline static Char_T_ *getCharForNumber(Stream_T_ &string, SizeT length) {
         return string.Buffer(length);
     }
@@ -819,21 +827,21 @@ struct Digit {
   private:
     class DigitChars {
       public:
-        static constexpr Char_T_ ZeroChar     = '0';
-        static constexpr Char_T_ OneChar      = '1';
-        static constexpr Char_T_ FiveChar     = '5';
-        static constexpr Char_T_ SevenChar    = '7';
-        static constexpr Char_T_ NineChar     = '9';
-        static constexpr Char_T_ E_Char       = 'e';
-        static constexpr Char_T_ UE_Char      = 'E';
-        static constexpr Char_T_ DotChar      = '.';
-        static constexpr Char_T_ PositiveChar = '+';
-        static constexpr Char_T_ NegativeChar = '-';
-        static constexpr Char_T_ UA_Char      = 'A';
-        static constexpr Char_T_ UF_Char      = 'F';
-        static constexpr Char_T_ A_Char       = 'a';
-        static constexpr Char_T_ F_Char       = 'f';
-        static constexpr Char_T_ UW_Char      = 'W';
+        static constexpr char ZeroChar     = '0';
+        static constexpr char OneChar      = '1';
+        static constexpr char FiveChar     = '5';
+        static constexpr char SevenChar    = '7';
+        static constexpr char NineChar     = '9';
+        static constexpr char E_Char       = 'e';
+        static constexpr char UE_Char      = 'E';
+        static constexpr char DotChar      = '.';
+        static constexpr char PositiveChar = '+';
+        static constexpr char NegativeChar = '-';
+        static constexpr char UA_Char      = 'A';
+        static constexpr char UF_Char      = 'F';
+        static constexpr char A_Char       = 'a';
+        static constexpr char F_Char       = 'f';
+        static constexpr char UW_Char      = 'W';
     };
 };
 

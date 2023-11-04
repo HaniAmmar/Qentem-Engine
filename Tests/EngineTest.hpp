@@ -958,9 +958,9 @@ static void to_JSON(StringStream<char> &stream, const Array<Item2Engine> &items,
         stream += "\":{";
 
         stream += "\"O\":";
-        Digit<char>::NumberToString(stream, storage[i].Offset);
+        Digit::NumberToString(stream, storage[i].Offset);
         stream += ",\"L\":";
-        Digit<char>::NumberToString(stream, storage[i].Length);
+        Digit::NumberToString(stream, storage[i].Length);
 
         if (storage[i].SubItems.IsNotEmpty()) {
             stream += ",\"S\":";

@@ -465,7 +465,7 @@ static void TestHArray4(TestHelper &helper) {
         String<char> key;
         String<char> key2;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         key2 = key;
 
         numbers1.Insert(static_cast<String<char> &&>(key2), SizeT{i});
@@ -482,7 +482,7 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 1; i < 11; i++) {
         String<char> key = "k-";
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         numbers1[key] = i;
         value         = numbers1.GetValue(key.First(), key.Length());
         helper.NotEqual(value, nullptr, "value", "null", __LINE__);
@@ -494,7 +494,7 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 1; i < 1001; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         numbers1[key] = i;
         value         = numbers1.GetValue(key);
         helper.NotEqual(value, nullptr, "value", "null", __LINE__);
@@ -504,7 +504,7 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 1; i < 10; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(numbers1[key], i, "key.First()", __LINE__);
     }
 
@@ -515,14 +515,14 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 1; i < 11; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
     for (SizeT i = 1; i < 11; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(numbers1.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
@@ -534,14 +534,14 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 1; i < 101; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
     for (SizeT i = 1; i < 101; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(numbers1.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
@@ -552,14 +552,14 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 101; i < 201; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
     for (SizeT i = 101; i < 201; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(numbers1.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
@@ -570,14 +570,14 @@ static void TestHArray5(TestHelper &helper) {
     for (SizeT i = 0; i < 1001; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
     for (SizeT i = 0; i < 1001; i++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(numbers1.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
@@ -685,14 +685,14 @@ static void TestHArray7(TestHelper &helper) {
     for (SizeT x = 0; x < id; x++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, x);
+        Digit::NumberToString(key, x);
         numbers1[key] = x;
     }
 
     for (SizeT z = 0; z < id; z++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, z);
+        Digit::NumberToString(key, z);
         numbers1.Remove(key);
         helper.Equal(numbers1.GetKey(z), nullptr, "GetKey(id)->First()", "null", __LINE__);
     }
@@ -704,14 +704,14 @@ static void TestHArray7(TestHelper &helper) {
     for (SizeT y = 0; y < id; y++) {
         String<char> key;
 
-        Digit<char>::NumberToString(key, y);
+        Digit::NumberToString(key, y);
         numbers1[key] = y;
     }
 
     do {
         --id;
         String<char> key;
-        Digit<char>::NumberToString(key, id);
+        Digit::NumberToString(key, id);
 
         numbers1.Remove(key);
         helper.Equal(numbers1.GetKey(id), nullptr, "GetKey(id)->First()", id, __LINE__);
@@ -729,7 +729,7 @@ static void TestHArray8(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         list[key] = i;
     }
 
@@ -737,8 +737,8 @@ static void TestHArray8(TestHelper &helper) {
         String<char> key1("k-");
         String<char> key2;
 
-        Digit<char>::NumberToString(key1, i);
-        Digit<char>::NumberToString(key2, i);
+        Digit::NumberToString(key1, i);
+        Digit::NumberToString(key2, i);
         key2 += "-k";
 
         helper.EqualsTrue(list.Rename(key1, key2), "Rename()", __LINE__);
@@ -761,8 +761,8 @@ static void TestHArray8(TestHelper &helper) {
         String<char> key1("k-");
         String<char> key2;
 
-        Digit<char>::NumberToString(key1, j);
-        Digit<char>::NumberToString(key2, j);
+        Digit::NumberToString(key1, j);
+        Digit::NumberToString(key2, j);
         key2 += "-k";
 
         helper.EqualsTrue(list.Rename(key2, key1), "Rename()", __LINE__);
@@ -771,7 +771,7 @@ static void TestHArray8(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key1("k-");
 
-        Digit<char>::NumberToString(key1, i);
+        Digit::NumberToString(key1, i);
         const SizeT *y = list.GetValue(key1);
         SizeT        w = id + 1;
 
@@ -785,7 +785,7 @@ static void TestHArray8(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key2;
 
-        Digit<char>::NumberToString(key2, i);
+        Digit::NumberToString(key2, i);
         key2 += "-k";
 
         helper.Equal(list.GetValue(key2), nullptr, "value", "null", __LINE__);
@@ -803,7 +803,7 @@ static void TestHArray9(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
 
         list[key] = i;
         item      = list.GetItem(i);
@@ -830,7 +830,7 @@ static void TestHArray9(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         list.RemoveIndex(i);
 
         helper.Equal(list.GetValue(key), nullptr, "value", "null", __LINE__);
@@ -841,7 +841,7 @@ static void TestHArray9(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         list[key] = i;
     }
 
@@ -853,7 +853,7 @@ static void TestHArray9(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(list.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
@@ -862,7 +862,7 @@ static void TestHArray9(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         list[key] = i;
     }
 
@@ -873,7 +873,7 @@ static void TestHArray9(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         helper.Equal(list.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 }
@@ -886,7 +886,7 @@ static void TestHArray10(TestHelper &helper) {
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         list[key] = i;
 
         const Qentem::HAItem_T_<SizeT, char> *item = list.GetItem(key);
@@ -897,7 +897,7 @@ static void TestHArray10(TestHelper &helper) {
 
     String<char> key1("k-");
 
-    Digit<char>::NumberToString(key1, 100);
+    Digit::NumberToString(key1, 100);
     helper.Equal(list.GetItem(key1), nullptr, "GetItem(k-100)", "null", __LINE__);
 }
 

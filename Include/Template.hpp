@@ -701,17 +701,17 @@ struct TemplateSub {
         if (i_tag.Expressions.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
             switch (result.Type) {
                 case ExpressionType::NaturalNumber: {
-                    Digit<Char_T_>::NumberToString(*stream_, result.Number.Natural);
+                    Digit::NumberToString(*stream_, result.Number.Natural);
                     break;
                 }
 
                 case ExpressionType::IntegerNumber: {
-                    Digit<Char_T_>::NumberToString(*stream_, result.Number.Integer);
+                    Digit::NumberToString(*stream_, result.Number.Integer);
                     break;
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit<Char_T_>::NumberToString(*stream_, result.Number.Real, 3);
+                    Digit::NumberToString(*stream_, result.Number.Real, 3);
                     break;
                 }
 
@@ -1664,7 +1664,7 @@ struct TemplateSub {
                     QNumber     number;
                     expr.Operation = oper;
 
-                    const unsigned int n_type = Digit<Char_T_>::StringToNumber(number, content_, offset, end_offset);
+                    const unsigned int n_type = Digit::StringToNumber(number, content_, offset, end_offset);
 
                     if ((n_type != 0) && (offset == end_offset)) {
                         switch (n_type) {

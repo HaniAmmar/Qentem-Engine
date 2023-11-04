@@ -2074,7 +2074,7 @@ static void TestLoopUTag2(TestHelper &helper) {
     content2 += uR"(<loop value="loop1-value">A {var:loop1-value} B</loop>)";
     for (unsigned int i = 0; i < size_4; i++) {
         output += uR"(A )";
-        Digit<char16_t>::NumberToString(output, i);
+        Digit::NumberToString(output, i);
         output += uR"( B)";
     }
 
@@ -2448,7 +2448,7 @@ static void TestRenderU1(TestHelper &helper) {
     for (unsigned int i = 0; i < size_4; i++) {
         content += uR"({var:)";
         str.Reset();
-        Digit<char16_t>::NumberToString(str, i);
+        Digit::NumberToString(str, i);
         content += str;
         output += str;
         content += uR"(})";
@@ -2464,7 +2464,7 @@ static void TestRenderU1(TestHelper &helper) {
         if (x != size) {
             content += uR"({var:)";
             str.Reset();
-            Digit<char16_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += uR"(})";
 
@@ -2474,11 +2474,11 @@ static void TestRenderU1(TestHelper &helper) {
 
             content += uR"({math: 1 + )";
             str.Reset();
-            Digit<char16_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += uR"(})";
 
-            Digit<char16_t>::NumberToString(output, 1U + i);
+            Digit::NumberToString(output, 1U + i);
         }
     }
 
@@ -2492,7 +2492,7 @@ static void TestRenderU1(TestHelper &helper) {
         if (x != size) {
             content += uR"({var:)";
             str.Reset();
-            Digit<char16_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += uR"(})";
 
@@ -2501,9 +2501,9 @@ static void TestRenderU1(TestHelper &helper) {
             size += 8;
 
             content += uR"({if case="{var:)";
-            Digit<char16_t>::NumberToString(content, i);
+            Digit::NumberToString(content, i);
             content += uR"(}<)";
-            Digit<char16_t>::NumberToString(content, 1U + i);
+            Digit::NumberToString(content, 1U + i);
             content += uR"(" true="yes"})";
 
             output += uR"(yes)";
@@ -2520,7 +2520,7 @@ static void TestRenderU1(TestHelper &helper) {
         if (x != size) {
             content += uR"({var:)";
             str.Reset();
-            Digit<char16_t>::NumberToString(str, i);
+            Digit::NumberToString(str, i);
             content += str;
             content += uR"(})";
 

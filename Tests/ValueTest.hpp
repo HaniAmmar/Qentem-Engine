@@ -1145,7 +1145,7 @@ static void TestObjectValue1(TestHelper &helper) {
 
     for (unsigned int i = 0; i < 5; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -1187,7 +1187,7 @@ static void TestObjectValue1(TestHelper &helper) {
     h_arr_var.Reset();
     for (unsigned int i = 0; i < 10; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -1210,7 +1210,7 @@ static void TestObjectValue1(TestHelper &helper) {
     // Testing empty values
     for (unsigned int i = 0; i < 10; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key];
     }
 
@@ -1220,7 +1220,7 @@ static void TestObjectValue1(TestHelper &helper) {
     h_arr_var.Reset();
     for (SizeT i = 0; i < 7; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -1244,7 +1244,7 @@ static void TestObjectValue1(TestHelper &helper) {
 
     for (unsigned int i = 0; i < 7; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -1277,7 +1277,7 @@ static void TestObjectValue2(TestHelper &helper) {
     h_arr_var.Reset();
     for (unsigned int i = 0; i < 7; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -1297,7 +1297,7 @@ static void TestObjectValue2(TestHelper &helper) {
     h_arr_var.Reset();
     for (unsigned int i = 0; i < 3; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -1310,7 +1310,7 @@ static void TestObjectValue2(TestHelper &helper) {
 
     for (unsigned int i = 0; i < 13; i++) {
         VString key("Key_");
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2375,7 +2375,7 @@ static void TestCopyValue1(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2439,7 +2439,7 @@ static void TestCopyValue1(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2503,7 +2503,7 @@ static void TestCopyValue1(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2567,7 +2567,7 @@ static void TestCopyValue1(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2639,7 +2639,7 @@ static void TestCopyValue2(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2680,7 +2680,7 @@ static void TestCopyValue2(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2827,7 +2827,7 @@ static void TestCopyValue3(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -2923,7 +2923,7 @@ static void TestCopyValue3(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -3019,7 +3019,7 @@ static void TestCopyValue3(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -3114,7 +3114,7 @@ static void TestCopyValue3(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -3227,7 +3227,7 @@ static void TestCopyValue4(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 
@@ -3305,7 +3305,7 @@ static void TestCopyValue4(TestHelper &helper) {
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
 
-        Digit<char>::NumberToString(key, i);
+        Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
 

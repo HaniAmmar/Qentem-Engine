@@ -261,7 +261,7 @@ struct JSON {
                 default: {
                     QNumber number;
 
-                    switch (Digit<Char_T_>::StringToNumber(number, content, offset, length)) {
+                    switch (Digit::StringToNumber(number, content, offset, length)) {
                         case 1: {
                             value = number.Natural;
                             return;

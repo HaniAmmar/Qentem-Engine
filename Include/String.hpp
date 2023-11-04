@@ -38,6 +38,8 @@ namespace Qentem {
 template <typename Char_T_>
 class String {
   public:
+    typedef Char_T_ CharType;
+
     // Two numbers, and one pointer -2 for tagging bytes (see QPointer).
     static constexpr SizeT ShortStringMax = (((sizeof(void *) - 2) + (sizeof(SizeT) * 2)) / sizeof(Char_T_));
 

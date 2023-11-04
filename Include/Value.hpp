@@ -942,7 +942,7 @@ class Value {
 
             case ValueType::Array: {
                 SizeT index;
-                Digit<Char_T_>::FastStringToNumber(index, key, length);
+                Digit::FastStringToNumber(index, key, length);
 
                 if (index < array_.Size()) {
                     Value *val = (array_.Storage() + index);
@@ -1080,19 +1080,19 @@ class Value {
 
             case ValueType::UIntLong: {
                 value.Reset();
-                Digit<Char_T_>::NumberToString(value, number_.GetUInt64());
+                Digit::NumberToString(value, number_.GetUInt64());
                 break;
             }
 
             case ValueType::IntLong: {
                 value.Reset();
-                Digit<Char_T_>::NumberToString(value, number_.GetInt64());
+                Digit::NumberToString(value, number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
                 value.Reset();
-                Digit<Char_T_>::NumberToString(value, number_.GetDouble(), Config::FloatDoublePrecision);
+                Digit::NumberToString(value, number_.GetDouble(), Config::FloatDoublePrecision);
                 break;
             }
 
@@ -1128,17 +1128,17 @@ class Value {
             }
 
             case ValueType::UIntLong: {
-                Digit<Char_T_>::NumberToString(stream, number_.GetUInt64());
+                Digit::NumberToString(stream, number_.GetUInt64());
                 break;
             }
 
             case ValueType::IntLong: {
-                Digit<Char_T_>::NumberToString(stream, number_.GetInt64());
+                Digit::NumberToString(stream, number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToString(stream, number_.GetDouble(), Config::FloatDoublePrecision);
+                Digit::NumberToString(stream, number_.GetDouble(), Config::FloatDoublePrecision);
                 break;
             }
 
@@ -1281,8 +1281,7 @@ class Value {
             case ValueType::String: {
                 SizeT              offset = 0;
                 const SizeT        length = string_.Length();
-                const unsigned int n_type =
-                    Digit<Char_T_>::StringToNumber(number, string_.First(), offset, string_.Length());
+                const unsigned int n_type = Digit::StringToNumber(number, string_.First(), offset, string_.Length());
 
                 if (offset == length) {
                     return n_type;
@@ -1581,17 +1580,17 @@ class Value {
             }
 
             case ValueType::UIntLong: {
-                Digit<Char_T_>::NumberToString(stream, val.number_.GetUInt64());
+                Digit::NumberToString(stream, val.number_.GetUInt64());
                 break;
             }
 
             case ValueType::IntLong: {
-                Digit<Char_T_>::NumberToString(stream, val.number_.GetInt64());
+                Digit::NumberToString(stream, val.number_.GetInt64());
                 break;
             }
 
             case ValueType::Double: {
-                Digit<Char_T_>::NumberToString(stream, val.number_.GetDouble());
+                Digit::NumberToString(stream, val.number_.GetDouble());
                 break;
             }
 
