@@ -341,15 +341,15 @@ struct QExpression {
         }
     }
 
-    static void EvenPowerOf(unsigned long long &left, unsigned long long right) noexcept {
+    static void PowerOf(unsigned long long &left, unsigned long long right) noexcept {
         if (right > 1U) {
             if ((right & 1U) != 1U) {
-                EvenPowerOf(left, (right / 2U));
+                PowerOf(left, (right / 2U));
                 left *= left;
             } else {
                 --right;
                 const unsigned long long num = left;
-                EvenPowerOf(left, (right / 2U));
+                PowerOf(left, (right / 2U));
                 left *= left;
                 left *= num;
             }
@@ -448,7 +448,7 @@ struct QExpression {
             if (num_right != 0) {
                 const bool right_odd = (num_right & 1U);
 
-                EvenPowerOf(num_left, num_right);
+                PowerOf(num_left, num_right);
 
                 if (right_negative) {
                     Number.Real = static_cast<double>(num_left);

@@ -30,10 +30,10 @@
  */
 
 namespace Qentem {
-static const char DigitsTable[] = {"000102030405060708091011121314151617181920212223242526272829"
-                                   "303132333435363738394041424344454647484950515253545556575859"
-                                   "606162636465666768697071727374757677787980818283848586878889"
-                                   "90919293949596979899"};
+static const char DigitTable[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                  "303132333435363738394041424344454647484950515253545556575859"
+                                  "606162636465666768697071727374757677787980818283848586878889"
+                                  "90919293949596979899"};
 
 template <typename Char_T_>
 struct Digit {
@@ -542,8 +542,8 @@ struct Digit {
             number /= Number_T_{100};
 
             offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(DigitsTable[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitsTable[index + SizeT{1}]);
+            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
         }
 
         if (number < Number_T_{10}) {
@@ -553,8 +553,8 @@ struct Digit {
             const SizeT index = (static_cast<SizeT>(number) * SizeT{2});
 
             offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(DigitsTable[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitsTable[index + SizeT{1}]);
+            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
         }
     }
 
