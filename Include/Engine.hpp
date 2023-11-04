@@ -168,16 +168,12 @@ class Engine {
                                        const Number_T_ end_offset, Number_T_ full_length = 0) noexcept {
         Number_T_ offset2 = offset;
 
-        while (true) {
+        do {
             offset2 = Find(suffix, suffix_length, content, offset2, end_offset, full_length);
             offset  = Find(prefix, prefix_length, content, offset, offset2, full_length);
+        } while (offset != 0);
 
-            if (offset == 0) {
-                return offset2;
-            }
-        }
-
-        return 0;
+        return offset2;
     }
 
     /*
@@ -194,16 +190,12 @@ class Engine {
                                        Number_T_ full_length = 0) noexcept {
         Number_T_ offset2 = offset;
 
-        while (true) {
+        do {
             offset2 = FindOne(suffix, content, offset2, end_offset, full_length);
             offset  = FindOne(prefix, content, offset, offset2, full_length);
+        } while (offset != 0);
 
-            if (offset == 0) {
-                return offset2;
-            }
-        }
-
-        return 0;
+        return offset2;
     }
 };
 
