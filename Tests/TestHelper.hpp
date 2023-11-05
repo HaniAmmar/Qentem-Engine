@@ -201,7 +201,7 @@ struct TestHelper {
 
     template <typename Char_T_, typename FUNC_T_, typename... Values_T_>
     QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
-        if (!error_) {
+        if (!error_ || continue_on_error_) {
             part_name_ = name;
             func(*this, values...);
             afterTest(test_for_leaks);
@@ -277,6 +277,14 @@ struct TestHelper {
 
     inline void ContinueOnError(bool continue_on_error) noexcept {
         continue_on_error_ = continue_on_error;
+    }
+
+    inline bool HasError() const noexcept {
+        return error_;
+    }
+
+    inline bool IsContinueOnError() const noexcept {
+        return continue_on_error_;
     }
 
     QENTEM_NOINLINE static void PrintInfo() {
