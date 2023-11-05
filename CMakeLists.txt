@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(Qentem_Engine CXX)
 set(CMAKE_CXX_STANDARD 11)
 include_directories("Include")
@@ -135,18 +135,18 @@ if (ENABLE_COVERAGE)
     target_link_libraries(TemplateTest --coverage)
 endif()
 
-# Template (16bit character)
-add_executable(TemplateUTest Tests/TemplateUTest.cpp)
-add_test(NAME TemplateUTest COMMAND TemplateUTest)
-
-if (ENABLE_COVERAGE)
-    target_link_libraries(TemplateUTest --coverage)
- endif()
-
 # Template (Wide character)
 add_executable(TemplateLTest Tests/TemplateLTest.cpp)
 add_test(NAME TemplateLTest COMMAND TemplateLTest)
 
 if (ENABLE_COVERAGE)
     target_link_libraries(TemplateLTest --coverage)
+ endif()
+
+# Template (16bit character)
+add_executable(TemplateUTest Tests/TemplateUTest.cpp)
+add_test(NAME TemplateUTest COMMAND TemplateUTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(TemplateUTest --coverage)
  endif()
