@@ -36,71 +36,36 @@ static const char DigitTable[] = {"000102030405060708091011121314151617181920212
                                   "90919293949596979899"};
 
 struct Digit {
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, unsigned long long number) {
+    template <typename Stream_T_, typename Number_T_>
+    inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
         constexpr unsigned int max_number_of_digits = (((sizeof(number) * 8U * 30103U) / 100000U) + 1U);
-        using CharType                              = typename Stream_T_::CharType;
+        using Char_T_                               = typename Stream_T_::CharType;
 
-        CharType storage[max_number_of_digits];
-        SizeT    offset = max_number_of_digits;
-
-        RawIntToString(&(storage[0]), offset, static_cast<unsigned long long>(number));
-        stream.Write(&(storage[offset]), (max_number_of_digits - offset));
-    }
-
-    template <typename Char_T_>
-    static void RawIntToString(Char_T_ *storage, SizeT &offset, unsigned long long number) {
-        intToString(storage, offset, number);
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, long long number) {
         if (number < 0) {
             number = -number;
             stream += DigitChars::NegativeChar;
         }
 
-        NumberToString(stream, static_cast<unsigned long long>(number));
+        Char_T_ storage[max_number_of_digits];
+        SizeT   offset = max_number_of_digits;
+
+        RawIntToString(&(storage[0]), offset, number);
+        stream.Write(&(storage[offset]), (max_number_of_digits - offset));
+    }
+
+    template <typename Char_T_, typename Number_T_>
+    static void RawIntToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+        intToString(storage, offset, number);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, unsigned short number) {
-        NumberToString(stream, static_cast<unsigned long long>(number));
+    inline static void NumberToString(Stream_T_ &stream, double number, unsigned int precision = 15U) {
+        realToString(stream, number, precision);
     }
 
     template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, unsigned int number) {
-        NumberToString(stream, static_cast<unsigned long long>(number));
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, unsigned long number) {
-        NumberToString(stream, static_cast<unsigned long long>(number));
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, short number) {
-        NumberToString(stream, static_cast<long long>(number));
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, int number) {
-        NumberToString(stream, static_cast<long long>(number));
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, long number) {
-        NumberToString(stream, static_cast<long long>(number));
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, double number, unsigned int precision = 0) {
-        doubleToString(stream, number, precision);
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, float f_number, unsigned int precision = 0) {
-        doubleToString(stream, static_cast<double>(f_number), precision);
+    inline static void NumberToString(Stream_T_ &stream, float f_number, unsigned int precision = 15U) {
+        realToString(stream, static_cast<double>(f_number), precision);
     }
     /////////////////////////////////////////////////////////////////
     template <typename Char_T_>
@@ -313,6 +278,29 @@ struct Digit {
         static constexpr unsigned int MergedExponent   = 8U;
         static constexpr unsigned int OverFlow         = 16U;
     };
+
+    template <typename Char_T_, typename Number_T_>
+    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+        while (number >= Number_T_{100}) {
+            const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
+            number /= Number_T_{100};
+
+            offset -= SizeT{2};
+            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
+        }
+
+        if (number < Number_T_{10}) {
+            --offset;
+            storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
+        } else {
+            const SizeT index = (static_cast<SizeT>(number) * SizeT{2});
+
+            offset -= SizeT{2};
+            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
+            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
+        }
+    }
 
     template <typename Char_T_>
     QENTEM_NOINLINE static int exponentToNumber(unsigned int &exponent, unsigned int &flags, const Char_T_ *content,
@@ -540,31 +528,8 @@ struct Digit {
         }
     }
 
-    template <typename Char_T_, typename Number_T_>
-    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
-        while (number >= Number_T_{100}) {
-            const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
-            number /= Number_T_{100};
-
-            offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
-        }
-
-        if (number < Number_T_{10}) {
-            --offset;
-            storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
-        } else {
-            const SizeT index = (static_cast<SizeT>(number) * SizeT{2});
-
-            offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
-        }
-    }
-
     template <typename Stream_T_>
-    QENTEM_NOINLINE static void doubleToString(Stream_T_ &d_string, double number, SizeT precision) {
+    QENTEM_NOINLINE static void realToString(Stream_T_ &d_string, double number, SizeT precision) {
         using Char_T_ = typename Stream_T_::CharType;
 
         constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
