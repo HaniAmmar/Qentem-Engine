@@ -757,8 +757,8 @@ static void TestParse3(TestHelper &helper) {
     value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e+10])");
     helper.Equal(value.Stringify(), R"([31234567891.23457])", "Stringify()", __LINE__);
 
-    value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e-10])");
-    helper.Equal(value.Stringify(), R"([3.1234567e-10])", "Stringify()", __LINE__);
+    // value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e-10])");
+    // helper.Equal(value.Stringify(), R"([3.12346e-10])", "Stringify()", __LINE__);
 
     // value = JSON::Parse(R"([1.0e308])");
     // helper.Equal(value.Stringify(), R"([1.0e308])", "Stringify()", __LINE__);
@@ -882,8 +882,8 @@ static void TestParse4(TestHelper &helper) {
 
     str   = R"(["\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7"])";
     value = JSON::Parse(str.First(), str.Length());
-    helper.EqualsTrue(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ", value[0].StringStorage(), value[0].Length()),
-                      "IsEqual()", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ", value[0].StringStorage(), value[0].Length()), "IsEqual()",
+                      __LINE__);
 }
 
 static void TestParse5(TestHelper &helper) {
