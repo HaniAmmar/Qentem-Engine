@@ -38,11 +38,13 @@ static const char DigitTable[] = {"000102030405060708091011121314151617181920212
 struct Digit {
     template <typename Stream_T_, typename Number_T_>
     inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
-        constexpr unsigned int max_number_of_digits = (((sizeof(number) * 8U * 30103U) / 100000U) + 1U);
-        using Char_T_                               = typename Stream_T_::CharType;
+        using Char_T_ = typename Stream_T_::CharType;
 
-        if (number < 0) {
-            number = -number;
+        constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
+        constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
+
+        if (is_signed && (number < 0)) {
+            number *= -1;
             stream += DigitChars::NegativeChar;
         }
 
