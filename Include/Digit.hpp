@@ -40,11 +40,11 @@ struct Digit {
     inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
         using Char_T_ = typename Stream_T_::CharType;
 
-        constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
-        constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
+        static constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
+        // static constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
 
-        if (is_signed && (number < 0)) {
-            number *= -1;
+        if (number < 0) {
+            number *= (Number_T_{0} - 1);
             stream += DigitChars::NegativeChar;
         }
 
