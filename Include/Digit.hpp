@@ -534,7 +534,7 @@ struct Digit {
     QENTEM_NOINLINE static void realToString(Stream_T_ &d_string, double number, SizeT precision) {
         using Char_T_ = typename Stream_T_::CharType;
 
-        constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
+        static constexpr SizeT max_end_offset = (Config::FloatMaxLength - 1U);
 
         Char_T_            tmp[max_end_offset];
         Char_T_            tmp2[Config::FloatMaxLength];

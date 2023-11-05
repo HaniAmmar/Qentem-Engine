@@ -254,11 +254,11 @@ static void TestEngine1(TestHelper &helper) {
 }
 
 static void TestEngine2(TestHelper &helper) {
-    SizeT           ret;
-    SizeT           content_len = 16;
-    constexpr SizeT find_len    = 3;
-    const char     *content     = "ABABABABABAAABAB";
-    const char     *find_       = "ABC";
+    SizeT                  ret;
+    SizeT                  content_len = 16;
+    static constexpr SizeT find_len    = 3;
+    const char            *content     = "ABABABABABAAABAB";
+    const char            *find_       = "ABC";
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
@@ -781,9 +781,9 @@ static void TestEngine5(TestHelper &helper) {
 }
 
 static void TestEngine6(TestHelper &helper) {
-    SizeT           ret;
-    constexpr SizeT content_len = 50;
-    const char     *content     = "{-{-{-     -}{-{-  -}{-   -}{- -}{- -}-}-}-}{- -}";
+    SizeT                  ret;
+    static constexpr SizeT content_len = 50;
+    const char            *content     = "{-{-{-     -}{-{-  -}{-   -}{- -}{- -}-}-}-}{- -}";
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);

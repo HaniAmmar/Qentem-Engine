@@ -468,7 +468,7 @@ static void TestHArray4(TestHelper &helper) {
         Digit::NumberToString(key, i);
         key2 = key;
 
-        numbers1.Insert(static_cast<String<char> &&>(key2), SizeT{i});
+        numbers1.Insert(static_cast<String<char> &&>(key2), static_cast<SizeT &&>(SizeT{i}));
         value = numbers1.GetValue(key);
         helper.NotEqual(value, nullptr, "value", "null", __LINE__);
         helper.Equal(*value, i, key.First(), __LINE__);
@@ -722,7 +722,7 @@ static void TestHArray7(TestHelper &helper) {
 }
 
 static void TestHArray8(TestHelper &helper) {
-    constexpr SizeT id = 100;
+    static constexpr SizeT id = 100;
 
     HArray<SizeT, char> list(id);
 
@@ -793,7 +793,7 @@ static void TestHArray8(TestHelper &helper) {
 }
 
 static void TestHArray9(TestHelper &helper) {
-    constexpr SizeT id = 10;
+    static constexpr SizeT id = 10;
 
     HArray<SizeT, char>                   list(id);
     const Qentem::HAItem_T_<SizeT, char> *item;
@@ -879,7 +879,7 @@ static void TestHArray9(TestHelper &helper) {
 }
 
 static void TestHArray10(TestHelper &helper) {
-    constexpr SizeT id = 10;
+    static constexpr SizeT id = 10;
 
     HArray<SizeT, char> list(id);
 

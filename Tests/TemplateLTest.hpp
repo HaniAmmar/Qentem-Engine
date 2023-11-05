@@ -2060,7 +2060,7 @@ static void TestLoopLTag2(TestHelper &helper) {
     content = LR"(<loop set="2020">{var:name}</loop>)";
     helper.Equal(Template::Render(content, value), LR"(some_valsome_valsome_val)", LR"(Render())", __LINE__);
 
-    constexpr unsigned int size_4 = (8 * 4);
+    static constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<wchar_t> content2;
     StringStream<wchar_t> output;
@@ -2434,7 +2434,7 @@ static void TestIfLTag2(TestHelper &helper) {
 }
 
 static void TestRenderL1(TestHelper &helper) {
-    constexpr unsigned int size_4 = (8 * 4);
+    static constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<wchar_t> content;
     StringStream<wchar_t> output;

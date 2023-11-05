@@ -2060,7 +2060,7 @@ static void TestLoopUTag2(TestHelper &helper) {
     content = uR"(<loop set="2020">{var:name}</loop>)";
     helper.Equal(Template::Render(content, value), uR"(some_valsome_valsome_val)", uR"(Render())", __LINE__);
 
-    constexpr unsigned int size_4 = (8 * 4);
+    static constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char16_t> content2;
     StringStream<char16_t> output;
@@ -2434,7 +2434,7 @@ static void TestIfUTag2(TestHelper &helper) {
 }
 
 static void TestRenderU1(TestHelper &helper) {
-    constexpr unsigned int size_4 = (8 * 4);
+    static constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char16_t> content;
     StringStream<char16_t> output;
