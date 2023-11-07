@@ -549,6 +549,10 @@ class HArray {
     }
 
     HAItem_ *allocate(SizeT new_capacity) {
+        if (new_capacity < SizeT{2}) {
+            new_capacity = SizeT{2};
+        }
+
         new_capacity = Memory::AlignSize(new_capacity);
         setCapacity(new_capacity);
 
