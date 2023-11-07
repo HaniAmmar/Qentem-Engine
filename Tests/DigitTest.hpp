@@ -894,6 +894,9 @@ static void TestNumberToString1(TestHelper &helper) {
     number_ulong = 1;
     IntToStreamEqual(helper, stream, number_ulong, "1", "return", __LINE__);
 
+    number_ulong = 5000000000000000;
+    IntToStreamEqual(helper, stream, number_ulong, "5000000000000000", "return", __LINE__);
+
     number_ulong = 4;
     IntToStreamEqual(helper, stream, number_ulong, "4", "return", __LINE__);
 
