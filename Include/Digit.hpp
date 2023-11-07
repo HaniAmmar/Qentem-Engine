@@ -283,24 +283,21 @@ struct Digit {
 
     template <typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
-        while (number >= Number_T_{100}) {
+        const SizeT o_offset = offset;
+
+        while (number >= Number_T_{10}) {
             const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
             number /= Number_T_{100};
 
-            offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
+            --offset;
+            storage[offset] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
+            --offset;
+            storage[offset] = static_cast<Char_T_>(DigitTable[index]);
         }
 
-        if (number < Number_T_{10}) {
+        if ((number != 0) || (o_offset == offset)) {
             --offset;
             storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
-        } else {
-            const SizeT index = (static_cast<SizeT>(number) * SizeT{2});
-
-            offset -= SizeT{2};
-            storage[offset]            = static_cast<Char_T_>(DigitTable[index]);
-            storage[offset + SizeT{1}] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
         }
     }
 
