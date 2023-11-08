@@ -36,7 +36,7 @@ static const char DigitTable[] = {"000102030405060708091011121314151617181920212
                                   "90919293949596979899"};
 
 struct Digit {
-    template <typename Stream_T_, typename Number_T_>
+    template <bool Reverse_V_ = false, typename Stream_T_, typename Number_T_>
     inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
         using Char_T_ = typename Stream_T_::CharType;
 
@@ -51,13 +51,18 @@ struct Digit {
         Char_T_ storage[max_number_of_digits];
         SizeT   offset = max_number_of_digits;
 
-        RawIntToString(&(storage[0]), offset, number);
-        stream.Write(&(storage[offset]), (max_number_of_digits - offset));
+        RawIntToString<Reverse_V_>(&(storage[0]), offset, number);
+
+        if (!Reverse_V_) {
+            stream.Write(&(storage[offset]), (max_number_of_digits - offset));
+        } else {
+            stream.Write(&(storage[0U]), offset);
+        }
     }
 
-    template <typename Char_T_, typename Number_T_>
+    template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
     static void RawIntToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
-        intToString(storage, offset, number);
+        intToString<Reverse_V_>(storage, offset, number);
     }
 
     template <typename Stream_T_>
@@ -281,23 +286,42 @@ struct Digit {
         static constexpr unsigned int OverFlow         = 16U;
     };
 
-    template <typename Char_T_, typename Number_T_>
+    template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
-        const SizeT o_offset = offset;
+        if (!Reverse_V_) {
+            const SizeT o_offset = offset;
 
-        while (number >= Number_T_{10}) {
-            const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
-            number /= Number_T_{100};
+            while (number >= Number_T_{10}) {
+                const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
+                number /= Number_T_{100};
 
-            --offset;
-            storage[offset] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
-            --offset;
-            storage[offset] = static_cast<Char_T_>(DigitTable[index]);
-        }
+                --offset;
+                storage[offset] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
+                --offset;
+                storage[offset] = static_cast<Char_T_>(DigitTable[index]);
+            }
 
-        if ((number != 0) || (o_offset == offset)) {
-            --offset;
-            storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
+            if ((number != 0) || (offset == o_offset)) {
+                --offset;
+                storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
+            }
+        } else {
+            offset = 0;
+
+            while (number >= Number_T_{10}) {
+                const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
+                number /= Number_T_{100};
+
+                storage[offset] = static_cast<Char_T_>(DigitTable[index + SizeT{1}]);
+                ++offset;
+                storage[offset] = static_cast<Char_T_>(DigitTable[index]);
+                ++offset;
+            }
+
+            if ((number != 0) || (offset == SizeT{0})) {
+                storage[offset] = (static_cast<Char_T_>(number) + DigitChars::ZeroChar);
+                ++offset;
+            }
         }
     }
 
