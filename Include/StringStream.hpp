@@ -153,22 +153,22 @@ class StringStream {
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &out, const StringStream &src) {
+    inline friend StringStream &operator<<(StringStream &out, const StringStream &src) {
         out.write(src.First(), src.Length());
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &out, const String<Char_T_> &src) {
+    inline friend StringStream &operator<<(StringStream &out, const String<Char_T_> &src) {
         out.write(src.First(), src.Length());
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &out, Char_T_ ch) {
+    inline friend StringStream &operator<<(StringStream &out, Char_T_ ch) {
         out += ch;
         return out;
     }
 
-    friend StringStream &operator<<(StringStream &out, const Char_T_ *str) {
+    inline friend StringStream &operator<<(StringStream &out, const Char_T_ *str) {
         out.write(str, StringUtils::Count(str));
         return out;
     }
