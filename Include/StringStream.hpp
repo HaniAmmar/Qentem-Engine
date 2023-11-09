@@ -244,12 +244,31 @@ class StringStream {
         SizeT end = Length();
 
         while (index < end) {
-            const Char_T_ tmp = storage_[index];
+            const Char_T_ tmp = Storage()[index];
 
             --end;
-            storage_[index] = storage_[end];
-            storage_[end]   = tmp;
+            Storage()[index] = Storage()[end];
+            Storage()[end]   = tmp;
             ++index;
+        }
+    }
+
+    void InsertAt(Char_T_ ch, SizeT index) noexcept {
+        if (index < Length()) {
+            Char_T_       *first  = (Storage() + index);
+            Char_T_       *second = first;
+            const Char_T_ *end    = End();
+
+            Char_T_ tmp = *first;
+            *first      = ch;
+
+            while (++second < end) {
+                ch      = *second;
+                *second = tmp;
+                tmp     = ch;
+            }
+
+            write(&tmp, SizeT{1});
         }
     }
 
