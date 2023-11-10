@@ -20,7 +20,8 @@
  * SOFTWARE.
  */
 
-#include "Tags.hpp"
+#include "VariableTag.hpp"
+#include "Array.hpp"
 
 #ifndef QENTEM_Q_EXPRESSION_H_
 #define QENTEM_Q_EXPRESSION_H_

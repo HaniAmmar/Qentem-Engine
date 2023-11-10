@@ -22,7 +22,7 @@
 
 #include "Engine.hpp"
 #include "Digit.hpp"
-#include "QExpression.hpp"
+#include "Tags.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_TEMPLATE_H_

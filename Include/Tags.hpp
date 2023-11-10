@@ -21,28 +21,18 @@
  * SOFTWARE.
  */
 
-#include "Array.hpp"
+#include "QExpression.hpp"
+#include "VariableTag.hpp"
 
 #ifndef QENTEM_TAGS_H_
 #define QENTEM_TAGS_H_
 
-namespace Qentem {
-struct QExpression;
-} // namespace Qentem
-
 namespace Qentem::Tags {
-
-struct TagBit;
-
-// VariableTag -------------------------------------------
-struct VariableTag {
-    SizeT          Offset;
-    unsigned short Length;
-    unsigned char  Level;
-    unsigned char  IsLoopValue;
-};
-
-// TagType -------------------------------------------
+struct MathTag;
+struct LoopTag;
+struct InLineIfTag;
+struct IfTagCase;
+//////////////////////
 enum class TagType : unsigned char {
     None = 0,
     Variable,    // {var:x}
@@ -54,48 +44,6 @@ enum class TagType : unsigned char {
     RawText
 };
 
-// MathTag -------------------------------------------
-struct MathTag {
-    Array<QExpression> Expressions;
-    SizeT              Offset;
-    SizeT              EndOffset;
-};
-
-// LoopTagOptions -------------------------------------------
-struct LoopTagOptions {
-    static constexpr unsigned char None           = 0;
-    static constexpr unsigned char SetIsLoopValue = 1;
-    static constexpr unsigned char SortAscend     = 2;
-    static constexpr unsigned char SortDescend    = 4;
-};
-
-// LoopTagOptions -------------------------------------------
-struct LoopTag {
-    Array<TagBit> SubTags;
-    SizeT         Offset;
-    unsigned char SetOffset;
-    unsigned char SetLength;
-    unsigned char SetLevel;
-    unsigned char ValueOffset;
-    unsigned char GroupOffset;
-    unsigned char ValueLength;
-    unsigned char GroupLength;
-    unsigned char Options;
-};
-
-// InLineIfTag -------------------------------------------
-struct InLineIfTag {
-    Array<TagBit>      SubTags;
-    Array<QExpression> Case;
-};
-
-// IfTag -------------------------------------------
-struct IfTagCase {
-    Array<TagBit>      SubTags;
-    Array<QExpression> Case;
-};
-
-// TagBit -------------------------------------------
 struct TagBit {
   public:
     TagBit()                          = delete;
@@ -211,6 +159,47 @@ struct TagBit {
     };
 
     TagType type_{TagType::None};
+};
+
+// MathTag -------------------------------------------
+struct MathTag {
+    Array<QExpression> Expressions;
+    SizeT              Offset;
+    SizeT              EndOffset;
+};
+
+// LoopTagOptions -------------------------------------------
+struct LoopTagOptions {
+    static constexpr unsigned char None           = 0;
+    static constexpr unsigned char SetIsLoopValue = 1;
+    static constexpr unsigned char SortAscend     = 2;
+    static constexpr unsigned char SortDescend    = 4;
+};
+
+// LoopTagOptions -------------------------------------------
+struct LoopTag {
+    Array<TagBit> SubTags;
+    SizeT         Offset;
+    unsigned char SetOffset;
+    unsigned char SetLength;
+    unsigned char SetLevel;
+    unsigned char ValueOffset;
+    unsigned char GroupOffset;
+    unsigned char ValueLength;
+    unsigned char GroupLength;
+    unsigned char Options;
+};
+
+// InLineIfTag -------------------------------------------
+struct InLineIfTag {
+    Array<TagBit>      SubTags;
+    Array<QExpression> Case;
+};
+
+// IfTag -------------------------------------------
+struct IfTagCase {
+    Array<TagBit>      SubTags;
+    Array<QExpression> Case;
 };
 
 template <typename Char_T_, int S>
