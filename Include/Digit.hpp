@@ -124,38 +124,18 @@ struct Digit {
         if (offset < end_offset) {
             Char_T_ digit = content[offset];
 
-            switch (digit) {
-                case DigitUtils::DigitChars::NegativeChar: {
-                    ++offset;
+            if (digit == DigitUtils::DigitChars::NegativeChar) {
+                ++offset;
+                flags |= stringToNumberFlags::Negative;
 
-                    if (offset < end_offset) {
-                        flags |= stringToNumberFlags::Negative;
-                        digit = content[offset];
-                        break;
-                    }
-
-                    return 0U;
-                }
-
-                case DigitUtils::DigitChars::PositiveChar: {
-                    ++offset;
-
-                    if (offset < end_offset) {
-                        digit = content[offset];
-                        break;
-                    }
-
-                    return 0U;
-                }
-
-                default: {
-                }
+            } else if (digit == DigitUtils::DigitChars::PositiveChar) {
+                ++offset;
             }
 
-            if ((end_offset - offset) < 19U) {
+            if ((end_offset - offset) < SizeT{19}) {
                 max_end_offset = end_offset;
             } else {
-                max_end_offset = offset + 19U;
+                max_end_offset = (offset + SizeT{19});
 
                 if ((flags & stringToNumberFlags::Negative) != 0) {
                     --max_end_offset;
@@ -165,8 +145,10 @@ struct Digit {
             }
 
             if (offset < max_end_offset) {
-                if ((digit == DigitUtils::DigitChars::ZeroChar) && ((max_end_offset - offset) > 1)) {
-                    digit = content[offset + 1];
+                digit = content[offset];
+
+                if ((digit == DigitUtils::DigitChars::ZeroChar) && ((max_end_offset - offset) > SizeT{1})) {
+                    digit = content[offset + SizeT{1}];
 
                     if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
                         return 0U; // Leading zero.
@@ -492,7 +474,7 @@ struct Digit {
                 powerOfTen(number.Real, exponent);
             }
 
-            if ((flags & stringToNumberFlags::Negative) != 0) {
+            if ((flags & stringToNumberFlags::Negative) != 0U) {
                 number.Real = -number.Real;
             }
 
