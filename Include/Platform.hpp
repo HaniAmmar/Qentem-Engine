@@ -113,7 +113,8 @@ inline static unsigned long CTZ(unsigned long long value) noexcept {
     return index;
 }
 
-inline static unsigned long CTZ(unsigned long value) noexcept {
+template <typename Number_T_>
+inline static unsigned long CTZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     unsigned long index = 0;
     _BitScanForward(&index, value);
@@ -130,7 +131,8 @@ inline static unsigned long CLZ(unsigned long long value) noexcept {
     return index;
 }
 
-inline static unsigned long CLZ(unsigned long value) noexcept {
+template <typename Number_T_>
+inline static unsigned long CLZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     unsigned long index = 0;
     _BitScanReverse(&index, value);
