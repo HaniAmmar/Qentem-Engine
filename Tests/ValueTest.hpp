@@ -4573,7 +4573,7 @@ static void TestStringify1(TestHelper &helper) {
     value.Reset();
     value += -8.9;
     value += "ABC";
-    helper.Equal(value.Stringify(), R"([-8.9,"ABC"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(2U), R"([-8.9,"ABC"])", "Stringify()", __LINE__);
 
     value.Reset();
     value += "a";
@@ -4959,7 +4959,7 @@ static void TestStringify2(TestHelper &helper) {
     value.Reset();
     value["s"] = -8.9;
     value["A"] = "ABC";
-    helper.Equal(value.Stringify(), R"({"s":-8.9,"A":"ABC"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(2U), R"({"s":-8.9,"A":"ABC"})", "Stringify()", __LINE__);
 
     value.Reset();
     value["-"] = "a";
@@ -5546,12 +5546,12 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(2U), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()", __LINE__);
 
     value = value2;
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(2U), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()", __LINE__);
 
     ///////////////////
 
