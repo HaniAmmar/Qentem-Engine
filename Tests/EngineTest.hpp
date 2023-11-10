@@ -21,7 +21,6 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "Array.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
@@ -30,8 +29,7 @@
 #ifndef QENTEM_ENGINE_TESTS_H_
 #define QENTEM_ENGINE_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestEngine1(TestHelper &helper) {
     SizeT       ret;
@@ -1075,7 +1073,6 @@ static int RunEngineTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

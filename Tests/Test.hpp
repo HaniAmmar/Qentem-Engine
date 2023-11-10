@@ -43,8 +43,7 @@
 #include "TemplateUTest.hpp"
 // clang-format on
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static int RunTests() {
     int passed = 0;
@@ -68,7 +67,7 @@ static int RunTests() {
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
     if (failed == 0) {
-        QENTEM_OUTPUT_STREAM << TestOutPut::GetColor(TestOutPut::Colors::PASS) << "All good."
+        QENTEM_OUTPUT_STREAM << TestOutPut::GetColor(TestOutPut::Colors::PASS) << "All good. (" << passed << ") tests"
                              << TestOutPut::GetColor(TestOutPut::Colors::END) << '\n';
         return 0;
     }
@@ -80,7 +79,6 @@ static int RunTests() {
     return 1;
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

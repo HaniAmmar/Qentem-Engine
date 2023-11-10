@@ -365,7 +365,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::VariablePrefixLength;
-                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
+                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
                                 parseVariableTag(offset, (v_end_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GetInfo());
                                 last_offset = v_end_offset;
@@ -390,7 +390,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::RawVariablePrefixLength;
-                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
+                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
                                 parseVariableTag(offset, (r_end_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GetInfo());
                                 last_offset = r_end_offset;
@@ -415,7 +415,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::MathPrefixLength;
-                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
+                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
                                 parseMathTag(offset, (m_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                                 last_offset = m_end_offset;
                                 offset      = m_end_offset;
@@ -439,7 +439,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::InLineIfPrefixLength;
-                                TagBit &tag = tags_cache.InsertGet(TagBit{TagType::InLineIf});
+                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::InLineIf});
                                 parseInLineIfTag(offset, (ii_end_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GetInfo());
                                 last_offset = ii_end_offset;
@@ -471,7 +471,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::InLineIfPrefixLength;
-                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Loop});
+                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Loop});
                             parseLoopTag(offset, (l_end_offset - TagPatterns::LoopSuffixLength), tag.GetInfo());
                             last_offset = l_end_offset;
                             offset      = l_end_offset;
@@ -491,7 +491,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::IfPrefixLength;
-                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::If});
+                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::If});
                             parseIfTag(offset, (i_end_offset - TagPatterns::IfSuffixLength), tag.GetInfo());
                             last_offset = i_end_offset;
                             offset      = i_end_offset;
@@ -531,7 +531,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::VariablePrefixLength;
-                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
+                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
                             parseVariableTag(offset, (v_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                             last_offset = v_end_offset;
                             offset      = v_end_offset;
@@ -553,7 +553,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::RawVariablePrefixLength;
-                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
+                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
                             parseVariableTag(offset, (r_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                             last_offset = r_end_offset;
                             offset      = r_end_offset;
@@ -575,7 +575,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::MathPrefixLength;
-                            TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
+                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
                             parseMathTag(offset, (m_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                             last_offset = m_end_offset;
                             offset      = m_end_offset;
@@ -916,8 +916,8 @@ struct TemplateSub {
         while ((offset2 != 0) && (offset < loop_content_offset)) {
             switch (content_[offset]) {
                 case TagPatterns::SetChar: {
-                    SizeT set_offset = last_offset;
-                    SizeT set_length = ((offset2 - 1) - last_offset);
+                    const SizeT set_offset = last_offset;
+                    const SizeT set_length = ((offset2 - 1) - last_offset);
 
                     VariableTag set_var{};
                     parseVariableTag(set_offset, (set_offset + set_length), &set_var);
@@ -1321,37 +1321,37 @@ struct TemplateSub {
             }
 
             case QOperation::Less: { // <
-                left.Number.Natural = (left < right);
+                left.Number.Natural = static_cast<unsigned long long>(left < right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::LessOrEqual: { // <=
-                left.Number.Natural = (left <= right);
+                left.Number.Natural = static_cast<unsigned long long>(left <= right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Greater: { // >
-                left.Number.Natural = (left > right);
+                left.Number.Natural = static_cast<unsigned long long>(left > right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::GreaterOrEqual: { // >=
-                left.Number.Natural = (left >= right);
+                left.Number.Natural = static_cast<unsigned long long>(left >= right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::And: { // &&
-                left.Number.Natural = ((left > 0U) && (right > 0U));
+                left.Number.Natural = static_cast<unsigned long long>((left > 0U) && (right > 0U));
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.Number.Natural = ((left > 0U) || (right > 0U));
+                left.Number.Natural = static_cast<unsigned long long>((left > 0U) || (right > 0U));
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
@@ -1366,7 +1366,7 @@ struct TemplateSub {
 
             case QOperation::NotEqual: { // !=
                 if (isEqual(left, right)) {
-                    left.Number.Natural = (left.Number.Natural ^ 1U);
+                    left.Number.Natural = (left.Number.Natural ^ 1ULL);
                     break;
                 }
 
@@ -1580,7 +1580,7 @@ struct TemplateSub {
                 }
             }
 
-            left.Number.Natural = (left == right);
+            left.Number.Natural = static_cast<unsigned long long>(left == right);
             left.Type           = ExpressionType::NaturalNumber;
             return true;
         }
@@ -1636,7 +1636,8 @@ struct TemplateSub {
                     --end_offset; // Drop )
 
                     if ((last_oper != oper) || (oper != QOperation::NoOp)) {
-                        QExpression &expr = exprs.InsertGet(QExpression{parseExpressions(offset, end_offset), oper});
+                        const QExpression &expr =
+                            exprs.InsertGet(QExpression{parseExpressions(offset, end_offset), oper});
                         return (expr.SubExpressions.Size() != 0);
                     }
 

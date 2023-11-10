@@ -21,14 +21,13 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "Value.hpp"
 
 #ifndef QENTEM_VALUE_TESTS_H_
 #define QENTEM_VALUE_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
+
 using VString       = String<char>;
 using ValueC        = Value<char>;
 using VStringStream = StringStream<char>;
@@ -1264,13 +1263,11 @@ static void TestObjectValue1(TestHelper &helper) {
 
 static void TestObjectValue2(TestHelper &helper) {
     ValueC value1;
-    ValueC value2;
 
     using ObjectItem_ = HAItem_T_<ValueC, char>;
 
     VHArray            h_arr_var;
     const ObjectItem_ *storage;
-    VStringStream      ss_var;
     VString            str_var;
     const char        *c_str_var;
 
@@ -1784,8 +1781,6 @@ static void TestMoveValue2(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray h_arr_var;
-
     ////////////////////////////////////////////
 
     value1 = VHArray(1);
@@ -2243,8 +2238,6 @@ static void TestMoveValue4(TestHelper &helper) {
 
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
-
-    VHArray h_arr_var;
 
     ////////////////////////////////////////////
 
@@ -5819,7 +5812,6 @@ static int RunValueTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

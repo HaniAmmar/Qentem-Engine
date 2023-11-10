@@ -327,7 +327,7 @@ struct Digit {
             }
 
             default: {
-                if ((digit < DigitUtils::DigitChars::ZeroChar) && (digit > DigitUtils::DigitChars::NineChar)) {
+                if ((digit < DigitUtils::DigitChars::ZeroChar) || (digit > DigitUtils::DigitChars::NineChar)) {
                     return false;
                 }
             }
@@ -553,15 +553,16 @@ struct Digit {
     static void realToString(Stream_T_ &stream, const Number_T_ number, const unsigned int precision) noexcept {
         using Char_T_ = typename Stream_T_::CharType;
         using Info_T  = DigitUtils::RealNumberInfo<Number_T_>;
-        Info_T info{number};
+        const Info_T info{number};
 
         using UNumber_T = decltype(info.NaturalNumber);
-        BigInt<UNumber_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3))> b_int{};
+        BigInt<UNumber_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3))> b_int{info.NaturalNumber &
+                                                                                      Info_T::MantissaMask};
 
         const UNumber_T bias = (info.NaturalNumber & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
-            UNumber_T &mantissa = (b_int.GetBucket(0U) = (info.NaturalNumber & Info_T::MantissaMask));
+            UNumber_T &mantissa = b_int.GetBucket(0U);
 
             if (info.NaturalNumber & Info_T::SignMask) {
                 stream += DigitUtils::DigitChars::NegativeChar;

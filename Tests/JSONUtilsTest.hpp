@@ -21,15 +21,13 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "JSONUtils.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_JSON_UTILS_TESTS_H_
 #define QENTEM_JSON_UTILS_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void escapeJSON(const char *str, StringStream<char> &buffer) {
     EscapeJSON(str, StringUtils::Count(str), buffer);
@@ -946,7 +944,6 @@ static int RunJSONUtilsTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

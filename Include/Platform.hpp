@@ -99,8 +99,7 @@ using QENTEM_SIMD_NUMBER_T = unsigned int;
 #endif
 #endif
 
-namespace Qentem {
-namespace Platform {
+namespace Qentem::Platform {
 
 #ifdef _MSC_VER
 
@@ -167,15 +166,11 @@ inline static unsigned int CTZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U);
 
-    switch (size) {
-        case 64U: {
-            return static_cast<unsigned int>(__builtin_ctzl(static_cast<unsigned long>(value)));
-        }
-
-        default: {
-            return static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
-        }
+    if (size == 64U) {
+        return static_cast<unsigned int>(__builtin_ctzl(static_cast<unsigned long>(value)));
     }
+
+    return static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
 }
 
 template <typename Number_T_>
@@ -183,15 +178,11 @@ inline static unsigned int CLZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U) - 1U;
 
-    switch (size) {
-        case 63U: {
-            return (size - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
-        }
-
-        default: {
-            return (size - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))));
-        }
+    if (size == 63U) {
+        return (size - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
     }
+
+    return (size - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))));
 }
 
 #else
@@ -308,7 +299,6 @@ inline constexpr Number_T_ SMIDNextOffset() noexcept {
 }
 #endif
 
-} // namespace Platform
-} // namespace Qentem
+} // namespace Qentem::Platform
 
 #endif

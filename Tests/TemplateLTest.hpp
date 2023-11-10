@@ -21,15 +21,13 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "JSON.hpp"
 #include "Template.hpp"
 
 #ifndef QENTEM_TEMPLATE_L_TESTS_H_
 #define QENTEM_TEMPLATE_L_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestVariableLTag1(TestHelper &helper) {
     const wchar_t *content;
@@ -37,7 +35,7 @@ static void TestVariableLTag1(TestHelper &helper) {
     Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5,
            [null, false, ["Qentem"]]])");
 
-    Value<wchar_t> sub_value =
+    const Value<wchar_t> sub_value =
         JSON::Parse(LR"({"key1": "a", "key2": "ABC", "key3": false, "key4": 100, "key5": 1.5, "key6": {"one": 1}
         ,"key7": [null, false, ["Qentem"]]})");
 
@@ -224,7 +222,7 @@ static void TestVariableLTag1(TestHelper &helper) {
 }
 
 static void TestVariableLTag2(TestHelper &helper) {
-    Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
+    const Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
     const wchar_t *content;
 
     content = LR"({var:0}{var:0})";
@@ -653,7 +651,7 @@ static void TestRawVariableLTag1(TestHelper &helper) {
     Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5,
            [null, false, ["Qentem"]]])");
 
-    Value<wchar_t> sub_value =
+    const Value<wchar_t> sub_value =
         JSON::Parse(LR"({"key1": "a", "key2": "ABC", "key3": false, "key4": 100, "key5": 1.5, "key6": {"one": 1}
         ,"key7": [null, false, ["Qentem"]]})");
 
@@ -840,7 +838,7 @@ static void TestRawVariableLTag1(TestHelper &helper) {
 }
 
 static void TestRawVariableLTag2(TestHelper &helper) {
-    Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
+    const Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
     const wchar_t *content;
 
     content = LR"({raw:0}{raw:0})";
@@ -1848,7 +1846,8 @@ static void TestLoopLTag1(TestHelper &helper) {
     //////////////////////
 
     value1                = JSON::Parse(LR"([100, -50, "A", true, false, null])");
-    Value<wchar_t> value2 = JSON::Parse(LR"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
+    const Value<wchar_t> value2 =
+        JSON::Parse(LR"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 
     //////////////////////
     value3[LR"(arr1)"] = value1;
@@ -2064,7 +2063,6 @@ static void TestLoopLTag2(TestHelper &helper) {
 
     StringStream<wchar_t> content2;
     StringStream<wchar_t> output;
-    String<wchar_t>       str;
     Value<wchar_t>        value2;
 
     for (unsigned int i = 0; i < size_4; i++) {
@@ -2082,10 +2080,8 @@ static void TestLoopLTag2(TestHelper &helper) {
 }
 
 static void TestLoopLTag3(TestHelper &helper) {
-    Value<wchar_t> value;
     const wchar_t *content;
-
-    value = JSON::Parse(LR"(
+    Value<wchar_t> value = JSON::Parse(LR"(
 [
     {
         "year": 2019,
@@ -2614,7 +2610,6 @@ static int RunTemplateLTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

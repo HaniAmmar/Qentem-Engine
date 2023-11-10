@@ -21,15 +21,13 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "JSON.hpp"
 #include "Template.hpp"
 
 #ifndef QENTEM_TEMPLATE_TESTS_H_
 #define QENTEM_TEMPLATE_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestVariableTag1(TestHelper &helper) {
     const char *content;
@@ -37,7 +35,7 @@ static void TestVariableTag1(TestHelper &helper) {
     Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5,
            [null, false, ["Qentem"]]])");
 
-    Value<char> sub_value =
+    const Value<char> sub_value =
         JSON::Parse(R"({"key1": "a", "key2": "ABC", "key3": false, "key4": 100, "key5": 1.5, "key6": {"one": 1}
         ,"key7": [null, false, ["Qentem"]]})");
 
@@ -224,7 +222,7 @@ static void TestVariableTag1(TestHelper &helper) {
 }
 
 static void TestVariableTag2(TestHelper &helper) {
-    Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
+    const Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
     const char *content;
 
     content = R"({var:0}{var:0})";
@@ -647,7 +645,7 @@ static void TestRawVariableTag1(TestHelper &helper) {
     Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5,
            [null, false, ["Qentem"]]])");
 
-    Value<char> sub_value =
+    const Value<char> sub_value =
         JSON::Parse(R"({"key1": "a", "key2": "ABC", "key3": false, "key4": 100, "key5": 1.5, "key6": {"one": 1}
         ,"key7": [null, false, ["Qentem"]]})");
 
@@ -834,7 +832,7 @@ static void TestRawVariableTag1(TestHelper &helper) {
 }
 
 static void TestRawVariableTag2(TestHelper &helper) {
-    Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
+    const Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
     const char *content;
 
     content = R"({raw:0}{raw:0})";
@@ -1839,7 +1837,8 @@ static void TestLoopTag1(TestHelper &helper) {
     //////////////////////
 
     value1             = JSON::Parse(R"([100, -50, "A", true, false, null])");
-    Value<char> value2 = JSON::Parse(R"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
+    const Value<char> value2 =
+        JSON::Parse(R"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 
     //////////////////////
     value3[R"(arr1)"] = value1;
@@ -2055,7 +2054,6 @@ static void TestLoopTag2(TestHelper &helper) {
 
     StringStream<char> content2;
     StringStream<char> output;
-    String<char>       str;
     Value<char>        value2;
 
     for (unsigned int i = 0; i < size_4; i++) {
@@ -2073,10 +2071,8 @@ static void TestLoopTag2(TestHelper &helper) {
 }
 
 static void TestLoopTag3(TestHelper &helper) {
-    Value<char> value;
     const char *content;
-
-    value = JSON::Parse(R"(
+    Value<char> value = JSON::Parse(R"(
 [
     {
         "year": 2019,
@@ -2601,7 +2597,6 @@ static int RunTemplateTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

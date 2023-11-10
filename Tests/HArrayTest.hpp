@@ -21,15 +21,13 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "Digit.hpp"
 #include "HArray.hpp"
 
 #ifndef QENTEM_HARRAY_TESTS_H_
 #define QENTEM_HARRAY_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 using HashArray = HArray<SizeT, char>;
 
@@ -220,6 +218,7 @@ static void TestHArray2(TestHelper &helper) {
     helper.NotEqual(numbers2.GetKey(6)->First(), str_c, "str_c", "GetKey(6)->First()", __LINE__);
 
     numbers2 = static_cast<HashArray &&>(numbers1);
+    helper.Equal(numbers1.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
     helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
@@ -480,7 +479,7 @@ static void TestHArray5(TestHelper &helper) {
     SizeT              *value;
 
     for (SizeT i = 1; i < 11; i++) {
-        String<char> key = "k-";
+        String<char> key{"k-", 2};
 
         Digit::NumberToString(key, i);
         numbers1[key] = i;
@@ -1032,7 +1031,6 @@ static int RunHArrayTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

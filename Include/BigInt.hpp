@@ -35,20 +35,22 @@ namespace Qentem {
 
 template <typename Number_T_, unsigned int Width_T_>
 struct BigInt {
-    BigInt()  = default;
-    ~BigInt() = default;
+    // BigInt()  = default;
+    // ~BigInt() = default;
 
-    BigInt(const Number_T_ number) noexcept {
+    explicit BigInt(const Number_T_ number) noexcept {
         big_int_[0U] = number;
     }
 
-    void operator=(const Number_T_ number) noexcept {
+    BigInt &operator=(const Number_T_ number) noexcept {
         big_int_[0U] = number;
 
         while (index_ != 0U) {
             big_int_[index_] = Number_T_{0};
             --index_;
         }
+
+        return *this;
     }
 
     inline friend bool operator<(const BigInt &out, const Number_T_ number) noexcept {
@@ -133,7 +135,7 @@ struct BigInt {
                 Add(Number_T_{1}, (index + 1U));
             }
 
-            index_ += (index > index_);
+            index_ += static_cast<unsigned int>(index > index_);
         }
     }
 
@@ -147,7 +149,7 @@ struct BigInt {
                 subtract(Number_T_{1}, (index + 1U));
             }
 
-            index_ -= ((index_ > 0U) && (big_int_[index_] == 0U));
+            index_ -= static_cast<unsigned int>((index_ > 0U) && (big_int_[index_] == 0U));
         }
     }
     ////////////////////////////////////////////////////

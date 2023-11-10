@@ -53,11 +53,9 @@ struct TestOutPut {
     TestOutPut &operator=(const TestOutPut &) = delete;
 
     template <typename... Values_T_>
-    QENTEM_NOINLINE static void Print(const Values_T_ &...values) {
+    inline static void Print(const Values_T_ &...values) {
         // (out) may copy the value but at that point it will not matter.
-        int dummy[sizeof...(Values_T_)] = {(QENTEM_OUTPUT_STREAM << static_cast<const Values_T_ &>(values), 0)...};
-        (void)dummy;
-        // (QENTEM_OUTPUT_STREAM << ... << static_cast<const Values_T_ &>(values)); // c++17
+        (QENTEM_OUTPUT_STREAM << ... << static_cast<const Values_T_ &>(values));
     }
 
     enum Colors { TITLE, ERROR, PASS, END };
@@ -84,10 +82,17 @@ struct TestOutPut {
     }
 
   private:
-    static bool coloredOutput_;
+    inline static bool coloredOutput_{true};
 };
 
-bool TestOutPut::coloredOutput_{true};
+struct Records {
+    SizeT  allocations{0};
+    SizeT  deallocations{0};
+    SizeT  subAllocations{0};
+    SizeT  subDeallocations{0};
+    size_t remainingSize{0};
+    size_t peakSize{0};
+};
 
 struct MemoryRecord {
     MemoryRecord()                                = delete;
@@ -97,21 +102,12 @@ struct MemoryRecord {
     MemoryRecord &operator=(MemoryRecord &&)      = delete;
     MemoryRecord &operator=(const MemoryRecord &) = delete;
 
-    struct Records {
-        SizeT  allocations{0};
-        SizeT  deallocations{0};
-        SizeT  subAllocations{0};
-        SizeT  subDeallocations{0};
-        size_t remainingSize{0};
-        size_t peakSize{0};
-    };
-
-    QENTEM_NOINLINE static void ResetSubMemory() noexcept {
+    inline static void ResetSubMemory() noexcept {
         records_.subAllocations   = 0;
         records_.subDeallocations = 0;
     }
 
-    QENTEM_NOINLINE static SizeT CheckSubMemory() noexcept {
+    inline static SizeT CheckSubMemory() noexcept {
         return (records_.subAllocations - records_.subDeallocations);
     }
 
@@ -151,7 +147,7 @@ struct MemoryRecord {
 
         TestOutPut::Print("Allocations: ", records_.allocations, ", Deallocations: ", records_.deallocations, ".\n");
 
-        SizeT remaining_deallocations = (records_.allocations - records_.deallocations);
+        const SizeT remaining_deallocations = (records_.allocations - records_.deallocations);
 
         if (remaining_deallocations != 0) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
@@ -161,16 +157,17 @@ struct MemoryRecord {
     }
 
   private:
-    static Records records_;
+    inline static Records records_{};
 };
 
-MemoryRecord::Records MemoryRecord::records_{};
-
 struct TestHelper {
-    TestHelper()  = delete;
-    ~TestHelper() = default;
+    TestHelper()                              = delete;
+    ~TestHelper()                             = default;
+    TestHelper(TestHelper &&)                 = delete;
+    TestHelper(const TestHelper &)            = delete;
+    TestHelper &operator=(TestHelper &&)      = delete;
+    TestHelper &operator=(const TestHelper &) = delete;
 
-    QENTEM_NOINLINE
     TestHelper(const char *name, const char *file_fullname) noexcept : test_name_{name}, file_fullname_{file_fullname} {
     }
 
@@ -191,7 +188,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename FUNC_T_>
-    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func) {
+    inline void Test(Char_T_ *name, FUNC_T_ func) {
         if (!error_ || continue_on_error_) {
             part_name_ = name;
             func(*this);
@@ -200,7 +197,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename FUNC_T_, typename... Values_T_>
-    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
+    inline void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
         if (!error_ || continue_on_error_) {
             part_name_ = name;
             func(*this, values...);
@@ -209,7 +206,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_>
-    QENTEM_NOINLINE void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
+    inline void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && !value) {
             error_ = true;
             TestHelper::PrintErrorMessage1(false, name, line);
@@ -217,7 +214,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_>
-    QENTEM_NOINLINE void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
+    inline void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && value) {
             error_ = true;
             TestHelper::PrintErrorMessage1(true, name, line);
@@ -225,8 +222,8 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
-                               const Value3_T_ &value, unsigned long line) {
+    inline void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, const Value3_T_ &value,
+                      unsigned long line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(false, name, left, value, line);
@@ -234,8 +231,8 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
-                                  const Value3_T_ &value, unsigned long line) {
+    inline void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, const Value3_T_ &value,
+                         unsigned long line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(true, name, left, value, line);
@@ -243,7 +240,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
+    inline void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(false, name, left, right, line);
@@ -251,8 +248,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
-                                  unsigned long line) {
+    inline void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(true, name, left, right, line);
@@ -352,7 +348,7 @@ struct TestHelper {
         }
     }
 
-    const char *part_name_;
+    const char *part_name_{nullptr};
     const char *test_name_;
     const char *file_fullname_;
     bool        error_{false};

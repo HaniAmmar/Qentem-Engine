@@ -21,14 +21,12 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "StringUtils.hpp"
 
 #ifndef QENTEM_STRING_UTILS_TESTS_H_
 #define QENTEM_STRING_UTILS_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestHash(TestHelper &helper) {
     SizeT hash;
@@ -814,7 +812,6 @@ static int RunStringUtilsTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

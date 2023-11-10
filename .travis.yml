@@ -28,7 +28,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_AVX2=1 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_AVX2=1 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -37,7 +37,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - g++ -g -O0 -Wall -Wextra -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -46,7 +46,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - g++ -g -O0 -Wall -Wextra -D QENTEM_POINTER_TAGGING=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - g++ -g -O0 -Wall -Wextra -D QENTEM_POINTER_TAGGING=0 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -56,7 +56,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - g++ -g -O0 -Wall -Wextra -D QENTEM_SSO=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - g++ -g -O0 -Wall -Wextra -D QENTEM_SSO=0 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -68,7 +68,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -78,7 +78,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - clang++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -87,7 +87,7 @@ jobs:
 
       before_script:
           - mkdir ./Build
-          - clang++ -g -O0 -Wall -Wextra -D QENTEM_AUTO_ESCAPE_HTML=0 ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+          - clang++ -g -O0 -Wall -Wextra -D QENTEM_AUTO_ESCAPE_HTML=0 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
       script:
           - ./Build/QTest.bin
 
@@ -97,7 +97,7 @@ jobs:
 
     #   before_script:
     #     - mkdir ./Build
-    #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+    #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
     #   script:
     #     - ./Build/QTest.bin
 
@@ -107,6 +107,6 @@ jobs:
 
     #   before_script:
     #     - mkdir ./Build
-    #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++11 -I ./Include -o ./Build/QTest.bin
+    #     - g++ -g -O0 -Wall -Wextra ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
     #   script:
     #     - ./Build/QTest.bin

@@ -25,8 +25,7 @@
 #ifndef QENTEM_DIGIT_UTILS_H_
 #define QENTEM_DIGIT_UTILS_H_
 
-namespace Qentem {
-namespace DigitUtils {
+namespace Qentem::DigitUtils {
 
 template <typename Char_T_, int S>
 struct DigitStrings {};
@@ -99,7 +98,7 @@ struct RealNumberInfo {};
 
 template <>
 struct RealNumberInfo<double> {
-    RealNumberInfo(double number) noexcept : RealNumber{number} {
+    explicit RealNumberInfo(double number) noexcept : RealNumber{number} {
     }
 
     static constexpr unsigned int       Bias                = 1023U;
@@ -137,7 +136,7 @@ struct RealNumberInfo<double> {
 
 template <>
 struct RealNumberInfo<float> {
-    RealNumberInfo(float number) noexcept : RealNumber{number} {
+    explicit RealNumberInfo(float number) noexcept : RealNumber{number} {
     }
 
     static constexpr unsigned int Bias                = 127U;
@@ -169,7 +168,7 @@ struct RealNumberInfo<float> {
         unsigned int NaturalNumber;
     };
 };
-} // namespace DigitUtils
-} // namespace Qentem
+
+} // namespace Qentem::DigitUtils
 
 #endif

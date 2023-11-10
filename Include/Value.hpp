@@ -180,7 +180,7 @@ class Value {
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            VNumber         tmp    = val.number_;
+            const VNumber   tmp    = val.number_;
             const ValueType t_type = val.Type();
 
             if (Config::PointerTagging) {
@@ -205,7 +205,7 @@ class Value {
 
     Value &operator=(const Value &val) {
         if (this != &val) {
-            ValueType type = Type();
+            const ValueType type = Type();
 
             if (type == val.Type()) {
                 switch (type) {
@@ -1756,6 +1756,7 @@ class Value {
     struct VNumber {
       public:
         VNumber() = default;
+        ~VNumber() = default;
 
         VNumber(VNumber &&v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
             v_num.number_.ull = 0;
@@ -1773,6 +1774,8 @@ class Value {
 
             return *this;
         }
+
+        VNumber &operator=(VNumber &&) = delete;
 
         template <typename Number_T_>
         explicit VNumber(const Number_T_ &num) noexcept : number_{num} {

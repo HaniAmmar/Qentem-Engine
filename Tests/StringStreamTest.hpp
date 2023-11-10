@@ -21,14 +21,12 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "StringStream.hpp"
 
 #ifndef QENTEM_STRINGSTREAM_TESTS_H_
 #define QENTEM_STRINGSTREAM_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestStringStream(TestHelper &helper) {
     StringStream<char> ss1;
@@ -80,7 +78,7 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss2.Length(), 3U, "Length", __LINE__);
     helper.EqualsTrue((ss2.Capacity() >= 3), "(ss2.Capacity() >= 3)", __LINE__);
     helper.Equal(ss2.GetString(), "abc", "GetString()", __LINE__);
-    String<char> sss;
+    const String<char> sss;
 
     ss2 += String<char>("abc");
     helper.Equal(ss2.Length(), 3U, "Length", __LINE__);
@@ -113,6 +111,7 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss1.Length(), 3U, "Length", __LINE__);
     helper.EqualsTrue((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)", __LINE__);
     helper.Equal(ss1, "abc", "StringStream", __LINE__);
+    helper.Equal(ss2.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(ss2.Length(), 0U, "Length", __LINE__);
     helper.Equal(ss2.Capacity(), 0U, "Capacity", __LINE__);
     helper.Equal(ss2.First(), nullptr, "First()", "null", __LINE__);
@@ -138,6 +137,7 @@ static void TestStringStream(TestHelper &helper) {
 
     ss1 += "efg";
     ss2 = StringStream<char>(static_cast<StringStream<char> &&>(ss1)); // Move
+    helper.Equal(ss1.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(ss1.Length(), 0U, "Length", __LINE__);
     helper.EqualsTrue((ss1.Capacity() == 0), "(ss1.Capacity() = 0)", __LINE__);
     helper.Equal(ss1.First(), nullptr, "First()", "null", __LINE__);
@@ -259,7 +259,7 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss1, "abcdefgh", "StringStream", __LINE__);
     helper.Equal(ss2, "abcdefgh", "StringStream", __LINE__);
 
-    String<char> n_str = String<char>("12345678");
+    const String<char> n_str = String<char>("12345678");
     ss1                = n_str;
     helper.Equal(ss1, "12345678", "StringStream", __LINE__);
 
@@ -316,7 +316,6 @@ static int RunStringStreamTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

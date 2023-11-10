@@ -21,9 +21,8 @@
  */
 
 #include "TestHelper.hpp"
-
-#include "StringStream.hpp"
 #include "Digit.hpp"
+#include "StringStream.hpp"
 
 // #define QENTEM_COMPARE_DIGIT_WITH_STL_ true
 #define QENTEM_TEST_DIGIT_SKIP_NAN_ true
@@ -38,8 +37,7 @@
 #ifndef QENTEM_DIGIT_TESTS_H_
 #define QENTEM_DIGIT_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static SizeT HexStringToNumber(const char *str) noexcept {
     return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
@@ -79,7 +77,7 @@ template <typename Number_T_>
 static bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
     QNumber number;
     SizeT   offset = 0;
-    SizeT   length = StringUtils::Count(str);
+    const SizeT   length = StringUtils::Count(str);
 
     switch (Digit::StringToNumber(number, str, offset, length)) {
         case 1: {
@@ -101,16 +99,12 @@ static bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
             return false;
     };
 
-    if (offset >= length) {
-        return true;
-    }
-
-    return false;
+    return (offset >= length);
 }
 
 static void TestStringToNumber1(TestHelper &helper) {
     SizeT       number = 0;
-    const char *str    = "";
+    const char *str    ;
     bool        valid;
 
     str   = "";
@@ -2087,8 +2081,8 @@ static void TestDoubleToString3(TestHelper &helper, Stream_T_ &stream) {
 
 template <typename Stream_T_>
 static void TestFloatToString1(TestHelper &helper, Stream_T_ &stream) {
-    RealToStreamEqual(helper, stream, -0.0f, 6U, "-0", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0f, 6U, "0", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.0F, 6U, "-0", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0F, 6U, "0", "return", __LINE__);
 
 #ifndef QENTEM_TEST_DIGIT_SKIP_INF_
     RealToStreamEqual(helper, stream, (3e+38f + 3e+38f), 6U, "inf", "return", __LINE__);
@@ -2100,576 +2094,576 @@ static void TestFloatToString1(TestHelper &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, (0.0f / 0.0f), 6U, "nan", "return", __LINE__);
 #endif
 
-    RealToStreamEqual(helper, stream, 1.0f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.0f, 6U, "2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.0f, 6U, "3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4.0f, 6U, "4", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.0f, 6U, "5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 6.0f, 6U, "6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7.0f, 6U, "7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 8.0f, 6U, "8", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.0f, 6U, "9", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 220.0f, 6U, "220", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1f, 6U, "0.1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.2f, 6U, "0.2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.3f, 6U, "0.3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.4f, 6U, "0.4", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.5f, 6U, "0.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.6f, 6U, "0.6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.7f, 6U, "0.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.8f, 6U, "0.8", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9f, 6U, "0.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.0F, 6U, "2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.0F, 6U, "3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4.0F, 6U, "4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.0F, 6U, "5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 6.0F, 6U, "6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7.0F, 6U, "7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 8.0F, 6U, "8", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.0F, 6U, "9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 220.0F, 6U, "220", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1F, 6U, "0.1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.2F, 6U, "0.2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.3F, 6U, "0.3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.4F, 6U, "0.4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.5F, 6U, "0.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.6F, 6U, "0.6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.7F, 6U, "0.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.8F, 6U, "0.8", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9F, 6U, "0.9", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.09f, 6U, "0.09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.009f, 6U, "0.009", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0009f, 6U, "0.0009", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00009f, 6U, "9e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000009f, 6U, "9e-06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000009f, 6U, "9e-07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000009f, 6U, "9e-08", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000009f, 6U, "9e-09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000009f, 6U, "9e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000000009f, 6U, "9e-11", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000009f, 6U, "9e-12", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000009f, 6U, "9e-13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000000000009f, 6U, "9e-14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000000009f, 6U, "9e-15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000000009f, 6U, "9e-16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.09F, 6U, "0.09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.009F, 6U, "0.009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0009F, 6U, "0.0009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00009F, 6U, "9e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000009F, 6U, "9e-06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000009F, 6U, "9e-07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000009F, 6U, "9e-08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000009F, 6U, "9e-09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000009F, 6U, "9e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000000009F, 6U, "9e-11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000009F, 6U, "9e-12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000009F, 6U, "9e-13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000000000009F, 6U, "9e-14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000000009F, 6U, "9e-15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000000009F, 6U, "9e-16", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.01f, 6U, "0.01", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.001f, 6U, "0.001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0001f, 6U, "0.0001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00001f, 6U, "1e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000001f, 6U, "1e-06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000001f, 6U, "1e-07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000001f, 6U, "1e-08", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000001f, 6U, "1e-09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000001f, 6U, "1e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000000001f, 6U, "1e-11", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000001f, 6U, "1e-12", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000001f, 6U, "1e-13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000000000001f, 6U, "1e-14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000000001f, 6U, "1e-15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000000001f, 6U, "1e-16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.01F, 6U, "0.01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.001F, 6U, "0.001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0001F, 6U, "0.0001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00001F, 6U, "1e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000001F, 6U, "1e-06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000001F, 6U, "1e-07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000001F, 6U, "1e-08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000001F, 6U, "1e-09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000001F, 6U, "1e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000000001F, 6U, "1e-11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000001F, 6U, "1e-12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000001F, 6U, "1e-13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000000000001F, 6U, "1e-14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000000001F, 6U, "1e-15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000000001F, 6U, "1e-16", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.02f, 6U, "0.02", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.002f, 6U, "0.002", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0002f, 6U, "0.0002", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00002f, 6U, "2e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000002f, 6U, "2e-06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000002f, 6U, "2e-07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000002f, 6U, "2e-08", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000002f, 6U, "2e-09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000002f, 6U, "2e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000000002f, 6U, "2e-11", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000002f, 6U, "2e-12", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000002f, 6U, "2e-13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000000000002f, 6U, "2e-14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000000002f, 6U, "2e-15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000000002f, 6U, "2e-16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.02F, 6U, "0.02", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.002F, 6U, "0.002", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0002F, 6U, "0.0002", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00002F, 6U, "2e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000002F, 6U, "2e-06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000002F, 6U, "2e-07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000002F, 6U, "2e-08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000002F, 6U, "2e-09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000002F, 6U, "2e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000000002F, 6U, "2e-11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000002F, 6U, "2e-12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000002F, 6U, "2e-13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000000000002F, 6U, "2e-14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000000002F, 6U, "2e-15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000000002F, 6U, "2e-16", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.5f, 6U, "1.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.05f, 6U, "1.05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.005f, 6U, "1.005", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0005f, 6U, "1.0005", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00005f, 6U, "1.00005", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000005f, 6U, "1.00001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000000000005f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000000000005f, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.5F, 6U, "1.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.05F, 6U, "1.05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.005F, 6U, "1.005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0005F, 6U, "1.0005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00005F, 6U, "1.00005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000005F, 6U, "1.00001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000000000005F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000000000005F, 6U, "1", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.9f, 6U, "1.9", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.09f, 6U, "1.09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.009f, 6U, "1.009", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0009f, 6U, "1.0009", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00009f, 6U, "1.00009", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000009f, 6U, "1.00001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000000000009f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000000000009f, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.9F, 6U, "1.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.09F, 6U, "1.09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.009F, 6U, "1.009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0009F, 6U, "1.0009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00009F, 6U, "1.00009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000009F, 6U, "1.00001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000000000009F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000000000009F, 6U, "1", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.1f, 6U, "1.1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.01f, 6U, "1.01", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.001f, 6U, "1.001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0001f, 6U, "1.0001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00001f, 6U, "1.00001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0000000000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00000000000001f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000000000000001f, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.1F, 6U, "1.1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.01F, 6U, "1.01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.001F, 6U, "1.001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0001F, 6U, "1.0001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00001F, 6U, "1.00001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0000000000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00000000000001F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000000000000001F, 6U, "1", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.1000000000000006f, 6U, "0.1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000000011f, 6U, "1.1e-14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1000000000000006F, 6U, "0.1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000000011F, 6U, "1.1e-14", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.02f, 6U, "0.02", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.002f, 6U, "0.002", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0002f, 6U, "0.0002", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.02F, 6U, "0.02", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.002F, 6U, "0.002", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0002F, 6U, "0.0002", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 123456789.0f, 6U, "1.23457e+08", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2147483647.0f, 6U, "2.14748e+09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4294967295.0f, 6U, "4.29497e+09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4294967295.625f, 6U, "4.29497e+09", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2251799813685247.0f, 6U, "2.2518e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4503599627370495.0f, 6U, "4.5036e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4611686018427387903.0f, 6U, "4.61169e+18", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9223372036854775806.0f, 6U, "9.22337e+18", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9223372036854775807.0f, 6U, "9.22337e+18", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18446744073709551615.0f, 6U, "1.84467e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18446744073709551616.0f, 6U, "1.84467e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 34028236692093846341.0f, 6U, "3.40282e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 340282366920938463412.0f, 6U, "3.40282e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3402823669209384634633746074317.0f, 6U, "3.40282e+30", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 340282366920938463426481119284341.0f, 6U, "3.40282e+32", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3402823669209384634264811192843414.0f, 6U, "3.40282e+33", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3689348814741910333.0f, 6U, "3.68935e+18", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 36893488147419103230.0f, 6U, "3.68935e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 36893488147419103333.0f, 6U, "3.68935e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 368934881474191033333.0f, 6U, "3.68935e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9007199254740992.0f, 6U, "9.0072e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18014398509481984.0f, 6U, "1.80144e+16", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 36028797018963968.0f, 6U, "3.60288e+16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 123456789.0F, 6U, "1.23457e+08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2147483647.0F, 6U, "2.14748e+09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4294967295.0F, 6U, "4.29497e+09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4294967295.625F, 6U, "4.29497e+09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2251799813685247.0F, 6U, "2.2518e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4503599627370495.0F, 6U, "4.5036e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4611686018427387903.0F, 6U, "4.61169e+18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9223372036854775806.0F, 6U, "9.22337e+18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9223372036854775807.0F, 6U, "9.22337e+18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551615.0F, 6U, "1.84467e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551616.0F, 6U, "1.84467e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 34028236692093846341.0F, 6U, "3.40282e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 340282366920938463412.0F, 6U, "3.40282e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3402823669209384634633746074317.0F, 6U, "3.40282e+30", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 340282366920938463426481119284341.0F, 6U, "3.40282e+32", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3402823669209384634264811192843414.0F, 6U, "3.40282e+33", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3689348814741910333.0F, 6U, "3.68935e+18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 36893488147419103230.0F, 6U, "3.68935e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 36893488147419103333.0F, 6U, "3.68935e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 368934881474191033333.0F, 6U, "3.68935e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9007199254740992.0F, 6U, "9.0072e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18014398509481984.0F, 6U, "1.80144e+16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 36028797018963968.0F, 6U, "3.60288e+16", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.9000000000000006f, 6U, "0.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9000000000000006F, 6U, "0.9", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9.999999999999999f, 6U, "10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1999999.0f, 6U, "2e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999999999999999.0f, 6U, "1e+16", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 999999999999999999.0f, 6U, "1e+18", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999999999999999999.0f, 6U, "1e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 99999999999999999999.0f, 6U, "1e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 99e10f, 6U, "9.9e+11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.999999999999999F, 6U, "10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1999999.0F, 6U, "2e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999999999999999.0F, 6U, "1e+16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 999999999999999999.0F, 6U, "1e+18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999999999999999999.0F, 6U, "1e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99999999999999999999.0F, 6U, "1e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99e10F, 6U, "9.9e+11", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.999999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9999999999999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.999f, 6U, "0.999", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.999999f, 6U, "0.999999", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.999999999999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9999999999999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9999999999999995f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9999999999999959f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9999999999999996f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.99999999999999959f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.99999999999999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.99999999999999999999999999999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.99999999999999999999999999999999999999999f, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.999999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999999999999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.999F, 6U, "0.999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.999999F, 6U, "0.999999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.999999999999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999999999999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999999999999995F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999999999999959F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999999999999996F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.99999999999999959F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.99999999999999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.99999999999999999999999999999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.99999999999999999999999999999999999999999F, 6U, "1", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 10000005.0f, 6U, "1e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 10000005.0f, 7U, "1e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 10000006.0f, 7U, "1.000001e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10000005.0F, 6U, "1e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10000005.0F, 7U, "1e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10000006.0F, 7U, "1.000001e+07", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 10000000.0f, 6U, "1e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999999.0f, 6U, "1e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 19999999.0f, 6U, "2e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 29999999.0f, 6U, "3e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 39999999.0f, 6U, "4e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 49999999.0f, 6U, "5e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 59999999.0f, 6U, "6e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 69999999.0f, 6U, "7e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 79999999.0f, 6U, "8e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 89999999.0f, 6U, "9e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 99999999.0f, 6U, "1e+08", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 999999999.0f, 6U, "1e+09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10000000.0F, 6U, "1e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999999.0F, 6U, "1e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 19999999.0F, 6U, "2e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 29999999.0F, 6U, "3e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 39999999.0F, 6U, "4e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 49999999.0F, 6U, "5e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 59999999.0F, 6U, "6e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 69999999.0F, 6U, "7e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 79999999.0F, 6U, "8e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 89999999.0F, 6U, "9e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99999999.0F, 6U, "1e+08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 999999999.0F, 6U, "1e+09", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.10000000f, 6U, "0.1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.19999999f, 6U, "0.2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.29999999f, 6U, "0.3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.39999999f, 6U, "0.4", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.49999999f, 6U, "0.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.59999999f, 6U, "0.6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.69999999f, 6U, "0.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.79999999f, 6U, "0.8", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.89999999f, 6U, "0.9", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.99999999f, 6U, "1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.99999999f, 6U, "2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.99999999f, 6U, "3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.99999999f, 6U, "4", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4.99999999f, 6U, "5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.99999999f, 6U, "6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 6.99999999f, 6U, "7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7.99999999f, 6U, "8", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 8.99999999f, 6U, "9", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.99999999f, 6U, "10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 99.99999999f, 6U, "100", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 999.99999999f, 6U, "1000", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 99999.89999999f, 6U, "99999.9", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 99999.99999999f, 6U, "100000", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 999999.99999999f, 6U, "1e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.10000000F, 6U, "0.1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.19999999F, 6U, "0.2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.29999999F, 6U, "0.3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.39999999F, 6U, "0.4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.49999999F, 6U, "0.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.59999999F, 6U, "0.6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.69999999F, 6U, "0.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.79999999F, 6U, "0.8", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.89999999F, 6U, "0.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.99999999F, 6U, "1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.99999999F, 6U, "2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.99999999F, 6U, "3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.99999999F, 6U, "4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4.99999999F, 6U, "5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.99999999F, 6U, "6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 6.99999999F, 6U, "7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7.99999999F, 6U, "8", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 8.99999999F, 6U, "9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.99999999F, 6U, "10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99.99999999F, 6U, "100", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 999.99999999F, 6U, "1000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99999.89999999F, 6U, "99999.9", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 99999.99999999F, 6U, "100000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 999999.99999999F, 6U, "1e+06", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1e1f, 6U, "10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e2f, 6U, "100", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e3f, 6U, "1000", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e4f, 6U, "10000", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e5f, 6U, "100000", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e10f, 6U, "1e+10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e13f, 6U, "1e+13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e14f, 6U, "1e+14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e15f, 6U, "1e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e1F, 6U, "10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e2F, 6U, "100", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e3F, 6U, "1000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e4F, 6U, "10000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e5F, 6U, "100000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e10F, 6U, "1e+10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e13F, 6U, "1e+13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e14F, 6U, "1e+14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e15F, 6U, "1e+15", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1e-1f, 6U, "0.1", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-2f, 6U, "0.01", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-3f, 6U, "0.001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-4f, 6U, "0.0001", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-5f, 6U, "1e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-10f, 6U, "1e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-13f, 6U, "1e-13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-14f, 6U, "1e-14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e-15f, 6U, "1e-15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-1F, 6U, "0.1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-2F, 6U, "0.01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-3F, 6U, "0.001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-4F, 6U, "0.0001", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-5F, 6U, "1e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-10F, 6U, "1e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-13F, 6U, "1e-13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-14F, 6U, "1e-14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e-15F, 6U, "1e-15", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.40129846e-45f, 6U, "1.4013e-45", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.40282347e+38f, 6U, "3.40282e+38", "return", __LINE__);
-    RealToStreamEqual(helper, stream, -1.40129846e-45f, 6U, "-1.4013e-45", "return", __LINE__);
-    RealToStreamEqual(helper, stream, -3.40282347e+38f, 6U, "-3.40282e+38", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.40129846e-45F, 6U, "1.4013e-45", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.40282347e+38F, 6U, "3.40282e+38", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -1.40129846e-45F, 6U, "-1.4013e-45", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -3.40282347e+38F, 6U, "-3.40282e+38", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.40129846e-45f, 45U, "1.40129846432481707092372958328991613128026194e-45",
+    RealToStreamEqual(helper, stream, 1.40129846e-45F, 45U, "1.40129846432481707092372958328991613128026194e-45",
                       "return", __LINE__);
-    RealToStreamEqual(helper, stream, -3.40282347e+38f, 39U, "-340282346638528859811704183484516925440", "return",
+    RealToStreamEqual(helper, stream, -3.40282347e+38F, 39U, "-340282346638528859811704183484516925440", "return",
                       __LINE__);
-    RealToStreamEqual(helper, stream, -3.40282347e+38f, 38U, "-3.4028234663852885981170418348451692544e+38", "return",
+    RealToStreamEqual(helper, stream, -3.40282347e+38F, 38U, "-3.4028234663852885981170418348451692544e+38", "return",
                       __LINE__);
 
-    RealToStreamEqual(helper, stream, -854534.5f, 6U, "-854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, -854534.05f, 6U, "-854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 854534.5f, 6U, "854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 854534.05f, 6U, "854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, -9765625.0f, 6U, "-9.76562e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, -0.2765625f, 6U, "-0.276563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -854534.5F, 6U, "-854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -854534.05F, 6U, "-854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 854534.5F, 6U, "854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 854534.05F, 6U, "854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -9765625.0F, 6U, "-9.76562e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -0.2765625F, 6U, "-0.276563", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9765625.0f, 6U, "9.76562e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765645.0f, 6U, "9.76564e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765665.0f, 6U, "9.76566e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765685.0f, 6U, "9.76568e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765605.0f, 6U, "9.7656e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765625.0F, 6U, "9.76562e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765645.0F, 6U, "9.76564e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765665.0F, 6U, "9.76566e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765685.0F, 6U, "9.76568e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765605.0F, 6U, "9.7656e+06", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9765615.0f, 6U, "9.76562e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765635.0f, 6U, "9.76564e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765655.0f, 6U, "9.76566e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765675.0f, 6U, "9.76568e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9765695.0f, 6U, "9.7657e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765615.0F, 6U, "9.76562e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765635.0F, 6U, "9.76564e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765655.0F, 6U, "9.76566e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765675.0F, 6U, "9.76568e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9765695.0F, 6U, "9.7657e+06", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9999425.0f, 6U, "9.99942e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999445.0f, 6U, "9.99944e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999465.0f, 6U, "9.99946e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999485.0f, 6U, "9.99948e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999405.0f, 6U, "9.9994e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999425.0F, 6U, "9.99942e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999445.0F, 6U, "9.99944e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999465.0F, 6U, "9.99946e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999485.0F, 6U, "9.99948e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999405.0F, 6U, "9.9994e+06", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9.999925f, 6U, "9.99992", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.999945f, 6U, "9.99994", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.999965f, 6U, "9.99996", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.999985f, 6U, "9.99998", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.999905f, 6U, "9.9999", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.999925F, 6U, "9.99992", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.999945F, 6U, "9.99994", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.999965F, 6U, "9.99996", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.999985F, 6U, "9.99998", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.999905F, 6U, "9.9999", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.765625f, 6U, "1.76562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1765625f, 6U, "0.176563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.2765625f, 6U, "0.276563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.3765625f, 6U, "0.376563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.4765625f, 6U, "0.476562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.5765625f, 6U, "0.576563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.6765625f, 6U, "0.676562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.7765625f, 6U, "0.776563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.8765625f, 6U, "0.876562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765625f, 6U, "0.976562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.765625F, 6U, "1.76562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1765625F, 6U, "0.176563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.2765625F, 6U, "0.276563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.3765625F, 6U, "0.376563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.4765625F, 6U, "0.476562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.5765625F, 6U, "0.576563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.6765625F, 6U, "0.676562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.7765625F, 6U, "0.776563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.8765625F, 6U, "0.876562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765625F, 6U, "0.976562", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 2.165625f, 6U, "2.16563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.265625f, 6U, "2.26562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.365625f, 6U, "2.36562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.465625f, 6U, "2.46563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.565625f, 6U, "2.56562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.665625f, 6U, "2.66563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.765625f, 6U, "2.76562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.865625f, 6U, "2.86562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.965625f, 6U, "2.96563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.165625F, 6U, "2.16563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.265625F, 6U, "2.26562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.365625F, 6U, "2.36562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.465625F, 6U, "2.46563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.565625F, 6U, "2.56562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.665625F, 6U, "2.66563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.765625F, 6U, "2.76562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.865625F, 6U, "2.86562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.965625F, 6U, "2.96563", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 5.165625f, 6U, "5.16563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.265625f, 6U, "5.26562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.365625f, 6U, "5.36562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.465625f, 6U, "5.46562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.565625f, 6U, "5.56563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.665625f, 6U, "5.66563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.765625f, 6U, "5.76562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.865625f, 6U, "5.86562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.965625f, 6U, "5.96562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.165625F, 6U, "5.16563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.265625F, 6U, "5.26562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.365625F, 6U, "5.36562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.465625F, 6U, "5.46562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.565625F, 6U, "5.56563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.665625F, 6U, "5.66563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.765625F, 6U, "5.76562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.865625F, 6U, "5.86562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.965625F, 6U, "5.96562", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9.765615f, 6U, "9.76562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625f, 6U, "9.76562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765635f, 6U, "9.76563", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765645f, 6U, "9.76565", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765655f, 6U, "9.76565", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765665f, 6U, "9.76567", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765675f, 6U, "9.76567", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765685f, 6U, "9.76569", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765695f, 6U, "9.76569", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765615f, 6U, "0.976561", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765625f, 6U, "0.976562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765635f, 6U, "0.976564", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765645f, 6U, "0.976565", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765655f, 6U, "0.976565", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765665f, 6U, "0.976566", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765675f, 6U, "0.976568", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765685f, 6U, "0.976569", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.9765695f, 6U, "0.976569", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-1f, 6U, "0.976562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-2f, 6U, "0.0976562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-3f, 6U, "0.00976562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-4f, 6U, "0.000976562", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-5f, 6U, "9.76563e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-10f, 6U, "9.76562e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-13f, 6U, "9.76562e-13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-14f, 6U, "9.76563e-14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.765625e-15f, 6U, "9.76562e-15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765615F, 6U, "9.76562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625F, 6U, "9.76562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765635F, 6U, "9.76563", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765645F, 6U, "9.76565", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765655F, 6U, "9.76565", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765665F, 6U, "9.76567", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765675F, 6U, "9.76567", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765685F, 6U, "9.76569", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765695F, 6U, "9.76569", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765615F, 6U, "0.976561", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765625F, 6U, "0.976562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765635F, 6U, "0.976564", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765645F, 6U, "0.976565", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765655F, 6U, "0.976565", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765665F, 6U, "0.976566", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765675F, 6U, "0.976568", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765685F, 6U, "0.976569", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.9765695F, 6U, "0.976569", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-1F, 6U, "0.976562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-2F, 6U, "0.0976562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-3F, 6U, "0.00976562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-4F, 6U, "0.000976562", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-5F, 6U, "9.76563e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-10F, 6U, "9.76562e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-13F, 6U, "9.76562e-13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-14F, 6U, "9.76563e-14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.765625e-15F, 6U, "9.76562e-15", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.00001844674407370955161500f, 6U, "1.84467e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0001844674407370955161500f, 6U, "0.000184467", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.001844674407370955161500f, 6U, "0.00184467", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.001844674407370955161500f, 6U, "5.00184", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.01844674407370955161500f, 6U, "0.0184467", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1844674407370955161500f, 6U, "0.184467", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00001844674407370955161500F, 6U, "1.84467e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0001844674407370955161500F, 6U, "0.000184467", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.001844674407370955161500F, 6U, "0.00184467", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.001844674407370955161500F, 6U, "5.00184", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.01844674407370955161500F, 6U, "0.0184467", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1844674407370955161500F, 6U, "0.184467", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 18446744073709551614.0f, 6U, "1.84467e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18446744073709551620.0f, 6U, "1.84467e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 184467440737095516150.0f, 6U, "1.84467e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1844674407370955161500.0f, 6U, "1.84467e+21", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 17446744073709551614.0f, 6U, "1.74467e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9923372036854775809.0f, 6U, "9.92337e+18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551614.0F, 6U, "1.84467e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551620.0F, 6U, "1.84467e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 184467440737095516150.0F, 6U, "1.84467e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1844674407370955161500.0F, 6U, "1.84467e+21", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 17446744073709551614.0F, 6U, "1.74467e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9923372036854775809.0F, 6U, "9.92337e+18", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.05f, 6U, "0.05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.005f, 6U, "0.005", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0005f, 6U, "0.0005", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00005f, 6U, "5e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000005f, 6U, "5e-06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.55f, 6U, "1.55", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0055f, 6U, "1.0055", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.005999f, 6U, "1.006", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.009999f, 6U, "1.01", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00055f, 6U, "0.00055", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00055f, 6U, "1.00055", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.50009f, 6U, "0.50009", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000000000050000000005f, 6U, "5e-11", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000005f, 6U, "5e-13", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000000000000000000000000005f, 6U, "5e-28", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.3125f, 6U, "5.3125", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.3f, 6U, "5.3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5.5f, 6U, "5.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.55f, 6U, "0.55", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.25f, 6U, "0.25", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.75f, 6U, "0.75", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.125f, 6U, "0.125", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.625f, 6U, "0.625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.3125f, 6U, "0.3125", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.95367431640625f, 6U, "0.953674", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.298023223876953125f, 6U, "0.298023", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1490116119384765625f, 6U, "0.149012", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.7450580596923828125f, 6U, "0.745058", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.37252902984619140625f, 6U, "0.372529", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.186264514923095703125f, 6U, "0.186265", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.05F, 6U, "0.05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.005F, 6U, "0.005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0005F, 6U, "0.0005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00005F, 6U, "5e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000005F, 6U, "5e-06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.55F, 6U, "1.55", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0055F, 6U, "1.0055", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.005999F, 6U, "1.006", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.009999F, 6U, "1.01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00055F, 6U, "0.00055", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00055F, 6U, "1.00055", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.50009F, 6U, "0.50009", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000000000050000000005F, 6U, "5e-11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000005F, 6U, "5e-13", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000000000000000000000000005F, 6U, "5e-28", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.3125F, 6U, "5.3125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.3F, 6U, "5.3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.5F, 6U, "5.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.55F, 6U, "0.55", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.25F, 6U, "0.25", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.75F, 6U, "0.75", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.125F, 6U, "0.125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.625F, 6U, "0.625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.3125F, 6U, "0.3125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.95367431640625F, 6U, "0.953674", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.298023223876953125F, 6U, "0.298023", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1490116119384765625F, 6U, "0.149012", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.7450580596923828125F, 6U, "0.745058", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.37252902984619140625F, 6U, "0.372529", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.186264514923095703125F, 6U, "0.186265", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.12345f, 6U, "1.12345", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.953674f, 6U, "1.95367", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.0953674f, 6U, "1.09537", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.00953674f, 6U, "1.00954", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.000953674f, 6U, "1.00095", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.953674f, 6U, "9.95367", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.0953674f, 6U, "9.09537", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.00953674f, 6U, "9.00954", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.000953674f, 6U, "9.00095", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.12345F, 6U, "1.12345", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.953674F, 6U, "1.95367", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.0953674F, 6U, "1.09537", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.00953674F, 6U, "1.00954", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.000953674F, 6U, "1.00095", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.953674F, 6U, "9.95367", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.0953674F, 6U, "9.09537", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.00953674F, 6U, "9.00954", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.000953674F, 6U, "9.00095", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.953674f, 6U, "0.953674", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0953674f, 6U, "0.0953674", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00953674f, 6U, "0.00953674", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000953674f, 6U, "0.000953674", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.123455f, 6U, "0.123455", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1123405f, 6U, "0.112341", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1123095f, 6U, "0.11231", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.78126f, 6U, "0.78126", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.300048828125f, 6U, "0.300049", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.953674F, 6U, "0.953674", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0953674F, 6U, "0.0953674", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00953674F, 6U, "0.00953674", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000953674F, 6U, "0.000953674", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.123455F, 6U, "0.123455", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1123405F, 6U, "0.112341", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1123095F, 6U, "0.11231", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.78126F, 6U, "0.78126", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.300048828125F, 6U, "0.300049", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.111f, 6U, "0.111", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.11111f, 6U, "0.11111", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1111111111111111f, 6U, "0.111111", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1111111111111115f, 6U, "0.111111", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.11111111111111159f, 6U, "0.111111", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1111111111111116f, 6U, "0.111111", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.111F, 6U, "0.111", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.11111F, 6U, "0.11111", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1111111111111111F, 6U, "0.111111", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1111111111111115F, 6U, "0.111111", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.11111111111111159F, 6U, "0.111111", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1111111111111116F, 6U, "0.111111", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 105.625f, 6U, "105.625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 25e20f, 6U, "2.5e+21", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.5e21f, 6U, "2.5e+21", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3814697265625.0f, 6U, "3.8147e+12", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 381469725.0f, 6U, "3.8147e+08", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.3814697265625f, 6U, "0.38147", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 10.5f, 6U, "10.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 10.0f, 6U, "10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 105.625F, 6U, "105.625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 25e20F, 6U, "2.5e+21", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.5e21F, 6U, "2.5e+21", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3814697265625.0F, 6U, "3.8147e+12", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 381469725.0F, 6U, "3.8147e+08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.3814697265625F, 6U, "0.38147", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10.5F, 6U, "10.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10.0F, 6U, "10", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 2097151.125f, 6U, "2.09715e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2097151.0f, 6U, "2.09715e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 16217975.0f, 6U, "1.6218e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 32995191.0f, 6U, "3.29952e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 444444444444444444444.0f, 6U, "4.44444e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 555555555555555555555.0f, 6U, "5.55556e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3668262915145728.0f, 6U, "3.66826e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7336525430291456.0f, 6U, "7.33653e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7336525830291456.0f, 6U, "7.33653e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7336535830291456.0f, 6U, "7.33654e+15", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 14673051660582912.0f, 6U, "1.46731e+16", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2097151.125F, 6U, "2.09715e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2097151.0F, 6U, "2.09715e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 16217975.0F, 6U, "1.6218e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 32995191.0F, 6U, "3.29952e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 444444444444444444444.0F, 6U, "4.44444e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 555555555555555555555.0F, 6U, "5.55556e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3668262915145728.0F, 6U, "3.66826e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7336525430291456.0F, 6U, "7.33653e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7336525830291456.0F, 6U, "7.33653e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7336535830291456.0F, 6U, "7.33654e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 14673051660582912.0F, 6U, "1.46731e+16", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1000000.390625f, 6U, "1e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1000009.590625f, 6U, "1.00001e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1000008.590625f, 6U, "1.00001e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7.3365258e-10f, 6U, "7.33653e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7.3365258e-10f, 8U, "7.3365258e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.3333f, 6U, "0.3333", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1000000.390625F, 6U, "1e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1000009.590625F, 6U, "1.00001e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1000008.590625F, 6U, "1.00001e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7.3365258e-10F, 6U, "7.33653e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7.3365258e-10F, 8U, "7.3365258e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.3333F, 6U, "0.3333", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 4554534.0f, 6U, "4.55453e+06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 854534.055f, 6U, "854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 854534.0055f, 6U, "854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 854534.000055f, 6U, "854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 854534.0000005f, 14U, "854534", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 8.0000005f, 6U, "8", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 8.000005f, 6U, "8", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 8.005f, 6U, "8.005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4554534.0F, 6U, "4.55453e+06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 854534.055F, 6U, "854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 854534.0055F, 6U, "854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 854534.000055F, 6U, "854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 854534.0000005F, 14U, "854534", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 8.0000005F, 6U, "8", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 8.000005F, 6U, "8", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 8.005F, 6U, "8.005", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 5.55f, 1U, "6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.996f, 5U, "9.996", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.996f, 4U, "9.996", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.996f, 3U, "10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.996f, 2U, "10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9.996f, 1U, "1e+01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.55F, 1U, "6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.996F, 5U, "9.996", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.996F, 4U, "9.996", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.996F, 3U, "10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.996F, 2U, "10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9.996F, 1U, "1e+01", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.5f, 1U, "0.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.5f, 1U, "2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.5f, 1U, "2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.5f, 1U, "4", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4.5f, 1U, "4", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.25f, 1U, "2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.75f, 1U, "3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.5F, 1U, "0.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.5F, 1U, "2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.5F, 1U, "2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.5F, 1U, "4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4.5F, 1U, "4", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.25F, 1U, "2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.75F, 1U, "3", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 2.625f, 2U, "2.6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.65f, 2U, "2.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.25f, 2U, "2.2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.25f, 2U, "3.2", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.625f, 2U, "2.6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.625F, 2U, "2.6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.65F, 2U, "2.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.25F, 2U, "2.2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.25F, 2U, "3.2", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.625F, 2U, "2.6", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 2.635f, 2U, "2.6", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.35f, 2U, "2.3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.35f, 2U, "3.3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 2.635f, 2U, "2.6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.635F, 2U, "2.6", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.35F, 2U, "2.3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.35F, 2U, "3.3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 2.635F, 2U, "2.6", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 91.0f, 1U, "9e+01", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 95.0f, 1U, "1e+02", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 91.0F, 1U, "9e+01", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 95.0F, 1U, "1e+02", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 95000000.0f, 1U, "1e+08", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 95000000.0F, 1U, "1e+08", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 3.0f, 15U, "3", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3.14f, 15U, "3.14000010490417", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.0F, 15U, "3", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3.14F, 15U, "3.14000010490417", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 140737488355327.953674f, 15U, "140737488355328", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 140737488355327.015625f, 15U, "140737488355328", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 140737488355327.953674F, 15U, "140737488355328", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 140737488355327.015625F, 15U, "140737488355328", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 140737458355327.953674f, 15U, "140737454800896", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 140737488355327.953674f, 6U, "1.40737e+14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 140737458355327.953674F, 15U, "140737454800896", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 140737488355327.953674F, 6U, "1.40737e+14", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.95367431640625f, 20U, "0.95367431640625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.298023223876953125f, 20U, "0.298023223876953125", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.1490116119384765625f, 20U, "0.1490116119384765625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.7450580596923828125f, 20U, "0.7450580596923828125", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.37252902984619140625f, 20U, "0.37252902984619140625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.186264514923095703125f, 20U, "0.18626451492309570312", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.186264514923095703125f, 21U, "0.186264514923095703125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.95367431640625F, 20U, "0.95367431640625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.298023223876953125F, 20U, "0.298023223876953125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.1490116119384765625F, 20U, "0.1490116119384765625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.7450580596923828125F, 20U, "0.7450580596923828125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.37252902984619140625F, 20U, "0.37252902984619140625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.186264514923095703125F, 20U, "0.18626451492309570312", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.186264514923095703125F, 21U, "0.186264514923095703125", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 18446744073709551614.0f, 20U, "18446744073709551616", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18446744073709551620.0f, 20U, "18446744073709551616", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 184467440737095516150.0f, 20U, "1.8446744073709551616e+20", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1844674407370955161500.0f, 20U, "1.8446744073709551616e+21", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 17446744073709551614.0f, 21U, "17446743745805418496", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 17446744073709551614.0f, 20U, "17446743745805418496", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9923372036854775809.0f, 21U, "9923371716631855104", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9923372036854775809.0f, 20U, "9923371716631855104", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551614.0F, 20U, "18446744073709551616", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551620.0F, 20U, "18446744073709551616", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 184467440737095516150.0F, 20U, "1.8446744073709551616e+20", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1844674407370955161500.0F, 20U, "1.8446744073709551616e+21", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 17446744073709551614.0F, 21U, "17446743745805418496", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 17446744073709551614.0F, 20U, "17446743745805418496", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9923372036854775809.0F, 21U, "9923371716631855104", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9923372036854775809.0F, 20U, "9923371716631855104", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 2251799813685247.0f, 21U, "2251799813685248", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4503599627370495.0f, 21U, "4503599627370496", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 4611686018427387903.0f, 21U, "4611686018427387904", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9223372036854775806.0f, 21U, "9223372036854775808", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9223372036854775807.0f, 21U, "9223372036854775808", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18446744073709551615.0f, 21U, "18446744073709551616", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 18446744073709551616.0f, 21U, "18446744073709551616", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 34028236692093846341.0f, 21U, "34028235612225536000", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 340282366920938463412.0f, 21U, "340282382510534426624", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3402823669209384634633746074317.0f, 34U, "3402823648528822565846915219456",
+    RealToStreamEqual(helper, stream, 2251799813685247.0F, 21U, "2251799813685248", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4503599627370495.0F, 21U, "4503599627370496", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 4611686018427387903.0F, 21U, "4611686018427387904", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9223372036854775806.0F, 21U, "9223372036854775808", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9223372036854775807.0F, 21U, "9223372036854775808", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551615.0F, 21U, "18446744073709551616", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551616.0F, 21U, "18446744073709551616", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 34028236692093846341.0F, 21U, "34028235612225536000", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 340282366920938463412.0F, 21U, "340282382510534426624", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 3402823669209384634633746074317.0F, 34U, "3402823648528822565846915219456",
                       "return", __LINE__);
-    RealToStreamEqual(helper, stream, 340282366920938463426481119284341.0f, 34U, "340282366061808076199320696651776",
+    RealToStreamEqual(helper, stream, 340282366920938463426481119284341.0F, 34U, "340282366061808076199320696651776",
                       "return", __LINE__);
-    RealToStreamEqual(helper, stream, 3402823669209384634264811192843414.0f, 34U, "3402823583246828306656939785322496",
+    RealToStreamEqual(helper, stream, 3402823669209384634264811192843414.0F, 34U, "3402823583246828306656939785322496",
                       "return", __LINE__);
 }
 
 template <typename Stream_T_>
 static void TestFloatToString2(TestHelper &helper, Stream_T_ &stream) {
-    RealToStreamEqual(helper, stream, -1.0f, 6U, "-1", "return", __LINE__);
+    RealToStreamEqual(helper, stream, -1.0F, 6U, "-1", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 70.0f, 6U, "70", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7e+10f, 6U, "7e+10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 75e+10f, 6U, "7.5e+11", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7e+30f, 6U, "7e+30", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5000000000000000.0f, 6U, "5e+15", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 70.0F, 6U, "70", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7e+10F, 6U, "7e+10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 75e+10F, 6U, "7.5e+11", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7e+30F, 6U, "7e+30", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5000000000000000.0F, 6U, "5e+15", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 9999998.0f, 6U, "1e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 9999998.9f, 6U, "1e+07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 999999999.999999999f, 6U, "1e+09", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999998.0F, 6U, "1e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 9999998.9F, 6U, "1e+07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 999999999.999999999F, 6U, "1e+09", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 111.5f, 6U, "111.5", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 999.625f, 6U, "999.625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1e+33f, 6U, "1e+33", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 111.5F, 6U, "111.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 999.625F, 6U, "999.625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1e+33F, 6U, "1e+33", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 18446744073709551615.0f, 2U, "1.8e+19", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.18446744073709551615f, 2U, "0.18", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 18446744073709551615.0F, 2U, "1.8e+19", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.18446744073709551615F, 2U, "0.18", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 10.7f, 6U, "10.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 20.7f, 6U, "20.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 30.7f, 6U, "30.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 40.7f, 6U, "40.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 50.7f, 6U, "50.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 60.7f, 6U, "60.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 70.7f, 6U, "70.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 80.7f, 6U, "80.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 90.7f, 6U, "90.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 50.25f, 6U, "50.25", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 500000000000000.25f, 6U, "5e+14", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7.7f, 6U, "7.7", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7.00007f, 7U, "7.00007", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 1.25f, 6U, "1.25", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 10.7F, 6U, "10.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 20.7F, 6U, "20.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 30.7F, 6U, "30.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 40.7F, 6U, "40.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 50.7F, 6U, "50.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 60.7F, 6U, "60.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 70.7F, 6U, "70.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 80.7F, 6U, "80.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 90.7F, 6U, "90.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 50.25F, 6U, "50.25", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 500000000000000.25F, 6U, "5e+14", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7.7F, 6U, "7.7", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7.00007F, 7U, "7.00007", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 1.25F, 6U, "1.25", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.07f, 6U, "0.07", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.3125f, 4U, "0.3125", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5e-4f, 6U, "0.0005", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 5e-10f, 6U, "5e-10", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 7e-24f, 6U, "7e-24", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.07F, 6U, "0.07", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.3125F, 4U, "0.3125", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5e-4F, 6U, "0.0005", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5e-10F, 6U, "5e-10", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 7e-24F, 6U, "7e-24", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 0.390625f, 6U, "0.390625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000390625f, 6U, "0.000390625", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.0000390625f, 6U, "3.90625e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.00000390625f, 6U, "3.90625e-06", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 0.000009999999f, 6U, "1e-05", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 505.3125f, 6U, "505.312", "return", __LINE__);
-    RealToStreamEqual(helper, stream, 505.003125f, 6U, "505.003", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.390625F, 6U, "0.390625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000390625F, 6U, "0.000390625", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.0000390625F, 6U, "3.90625e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.00000390625F, 6U, "3.90625e-06", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 0.000009999999F, 6U, "1e-05", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 505.3125F, 6U, "505.312", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 505.003125F, 6U, "505.003", "return", __LINE__);
 }
 
 static int RunDigitTests() {
@@ -2703,7 +2697,6 @@ static int RunDigitTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

@@ -21,14 +21,12 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "String.hpp"
 
 #ifndef QENTEM_STRING_TESTS_H_
 #define QENTEM_STRING_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 using String8 = String<char>;
 
@@ -77,6 +75,7 @@ static void TestString1(TestHelper &helper) {
     str1 = static_cast<String8 &&>(str2); // Move
     helper.Equal(str1.First(), str_ptr, "First()", __LINE__);
     helper.Equal(str1.Length(), length, "Length", __LINE__);
+    helper.Equal(str2.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(str2.Length(), 0U, "Length", __LINE__);
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
 
@@ -108,8 +107,9 @@ static void TestString1(TestHelper &helper) {
 
     length = str1.Length();
     str2   = String8(static_cast<String8 &&>(str1));
-    helper.Equal(str1.Length(), 0U, "Length", __LINE__);
+    helper.Equal(str1.Storage(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.Length(), 0U, "Length", __LINE__);
     helper.Equal(str2.Length(), length, "Length", __LINE__);
 
     str1 = "A";
@@ -118,8 +118,8 @@ static void TestString1(TestHelper &helper) {
     helper.Equal(str_ptr[0], 'A', "str_ptr[0]", "A", __LINE__);
     Memory::Deallocate(str_ptr);
 
-    char   *tmp_size_2 = Memory::Allocate<char>(2);
-    String8 str_size_2 = String8(tmp_size_2, 2U);
+    char         *tmp_size_2 = Memory::Allocate<char>(2);
+    const String8 str_size_2 = String8(tmp_size_2, 2U);
 
     if (Config::ShortStringOptimization) {
         helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
@@ -534,7 +534,6 @@ static int RunStringTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

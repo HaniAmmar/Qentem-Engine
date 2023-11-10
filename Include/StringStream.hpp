@@ -35,7 +35,7 @@ class StringStream {
     static constexpr SizeT initial_size = 4; // * 4 = 16
 
   public:
-    typedef Char_T_ CharType;
+    using CharType = Char_T_;
 
     StringStream() = default;
 

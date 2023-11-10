@@ -21,14 +21,12 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "JSON.hpp"
 
 #ifndef QENTEM_JSON_TESTS_H_
 #define QENTEM_JSON_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestParse1(TestHelper &helper) {
     Value<char> value;
@@ -1230,7 +1228,6 @@ static int RunJSONTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

@@ -21,15 +21,12 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "Memory.hpp"
 
 #ifndef QENTEM_MEMORY_TESTS_H_
 #define QENTEM_MEMORY_TESTS_H_
 
-namespace Qentem {
-namespace Test {
-
+namespace Qentem::Test {
 // No tests needed for now; if Memory.hpp has a bug, every thing else will break.
 
 static int RunMemoryTests() {
@@ -40,7 +37,6 @@ static int RunMemoryTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif

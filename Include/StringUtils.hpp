@@ -164,8 +164,8 @@ struct StringUtils {
     static SizeT Hash(const Char_T_ *key, SizeT length) noexcept {
         constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
 
-        SizeT hash   = 11U;
-        SizeT base   = 33U;
+        SizeT hash   = SizeT{11};
+        SizeT base   = SizeT{33};
         SizeT offset = 0;
 
         while (offset < length) {

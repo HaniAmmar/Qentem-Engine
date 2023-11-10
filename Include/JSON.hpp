@@ -287,6 +287,7 @@ struct JSON {
         }
     };
 };
+
 } // namespace Qentem
 
 #endif

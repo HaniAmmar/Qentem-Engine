@@ -48,7 +48,7 @@ int main() {
     //     Qentem::Test::RunTemplateLTests();
     // }
 
-    int ret = Qentem::Test::RunTests();
+    const int ret = Qentem::Test::RunTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;

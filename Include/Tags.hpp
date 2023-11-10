@@ -28,8 +28,9 @@
 
 namespace Qentem {
 struct QExpression;
+} // namespace Qentem
 
-namespace Tags {
+namespace Qentem::Tags {
 
 struct TagBit;
 
@@ -424,6 +425,5 @@ struct TPStrings<wchar_t, 2> {
     static constexpr const wchar_t *HTMLSingleQuote   = L"&apos;";
 };
 
-} // namespace Tags
-} // namespace Qentem
+} // namespace Qentem::Tags
 #endif

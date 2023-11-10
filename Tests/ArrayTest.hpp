@@ -21,15 +21,13 @@
  */
 
 #include "TestHelper.hpp"
-
 #include "Array.hpp"
 #include "String.hpp"
 
 #ifndef QENTEM_ARRAY_TESTS_H_
 #define QENTEM_ARRAY_TESTS_H_
 
-namespace Qentem {
-namespace Test {
+namespace Qentem::Test {
 
 static void TestArray1(TestHelper &helper) {
     const SizeT *storage;
@@ -135,6 +133,7 @@ static void TestArray1(TestHelper &helper) {
     helper.Equal(numbers2.Capacity(), 16U, "Capacity", __LINE__);
     helper.Equal(numbers2.First(), storage, "First()", __LINE__);
 
+    helper.Equal(numbers1.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
     helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
@@ -152,6 +151,7 @@ static void TestArray1(TestHelper &helper) {
     helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
     helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(numbers1.First(), storage, "First()", __LINE__);
+    helper.Equal(numbers2.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(numbers2.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, "Capacity", __LINE__);
     helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
@@ -567,7 +567,6 @@ static int RunArrayTests() {
     return helper.EndTests();
 }
 
-} // namespace Test
-} // namespace Qentem
+} // namespace Qentem::Test
 
 #endif
