@@ -125,31 +125,45 @@ struct BigInt {
         Subtract(number);
     }
     ////////////////////////////////////////////////////
-    void Add(const Number_T_ number, const unsigned int index = 0U) noexcept {
-        if ((number != 0U) && (index <= MaxIndex)) {
-            const Number_T_ tmp = big_int_[index];
-            big_int_[index] += number;
+    void Add(Number_T_ number, unsigned int index = 0U) noexcept {
+        if (number != 0) {
+            while (index <= MaxIndex) {
+                const Number_T_ tmp = big_int_[index];
+                big_int_[index] += number;
 
-            if (big_int_[index] < tmp) {
+                if (big_int_[index] > tmp) {
+                    break;
+                }
+
                 // Overflow.
-                Add(Number_T_{1}, (index + 1U));
+                number = Number_T_{1};
+                ++index;
             }
 
-            index_ += static_cast<unsigned int>(index > index_);
+            if ((index > index_) && (index <= MaxIndex)) {
+                ++index_;
+            }
         }
     }
 
-    inline void Subtract(const Number_T_ number, const unsigned int index = 0U) noexcept {
-        if ((number != 0U) && (index <= MaxIndex)) {
-            const Number_T_ tmp = big_int_[index];
-            big_int_[index] -= number;
+    inline void Subtract(Number_T_ number, unsigned int index = 0U) noexcept {
+        if (number != 0) {
+            while (index <= MaxIndex) {
+                const Number_T_ tmp = big_int_[index];
+                big_int_[index] -= number;
 
-            if (big_int_[index] > tmp) {
-                // Underflow.
-                subtract(Number_T_{1}, (index + 1U));
+                if (big_int_[index] < tmp) {
+                    break;
+                }
+
+                // Overflow.
+                number = Number_T_{1};
+                ++index;
             }
 
-            index_ -= static_cast<unsigned int>((index_ > 0U) && (big_int_[index_] == 0U));
+            if ((index > 0U) && (big_int_[index_] == 0U)) {
+                --index_;
+            }
         }
     }
     ////////////////////////////////////////////////////
