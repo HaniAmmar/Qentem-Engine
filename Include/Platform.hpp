@@ -105,42 +105,37 @@ namespace Platform {
 #ifdef _MSC_VER
 
 #ifdef QENTEM_64BIT_ARCH
-template <typename Number_T_>
-inline static unsigned int CTZ(Number_T_ value) noexcept {
+inline static unsigned long CTZ(unsigned long long value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
-    unsigned long          index = 0;
+    unsigned long index = 0;
+    _BitScanForward64(&index, value);
 
-    switch (size) {
-        case 64U: {
-            _BitScanForward64(&index, value);
-        }
-
-        default: {
-            _BitScanForward(&index, value);
-        }
-    }
-
-    return static_cast<unsigned int>(index);
+    return index;
 }
 
-template <typename Number_T_>
-inline static unsigned int CLZ(Number_T_ value) noexcept {
+inline static unsigned long CTZ(unsigned long value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
-    unsigned long          index = 0;
+    unsigned long index = 0;
+    _BitScanForward(&index, value);
 
-    switch (size) {
-        case 64U: {
-            _BitScanForward64(&index, value);
-        }
+    return index;
+}
 
-        default: {
-            _BitScanReverse(&index, value);
-        }
-    }
+inline static unsigned long CLZ(unsigned long long value) noexcept {
+    // 'value' should be bigger than zero.
+    unsigned long index = 0;
 
-    return static_cast<unsigned int>(index);
+    _BitScanForward64(&index, value);
+
+    return index;
+}
+
+inline static unsigned long CLZ(unsigned long value) noexcept {
+    // 'value' should be bigger than zero.
+    unsigned long index = 0;
+    _BitScanReverse(&index, value);
+
+    return index;
 }
 #else
 template <typename Number_T_>
