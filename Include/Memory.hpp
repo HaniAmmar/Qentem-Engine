@@ -182,6 +182,15 @@ inline static void Initialize(Type_ *pointer) noexcept {
     new (pointer) Type_{};
 }
 
+// Range copy initializer
+template <typename Type_>
+inline static void Initialize(Type_ *pointer, const Type_ *end) noexcept {
+    while (pointer < end) {
+        new (pointer) Type_{};
+        ++pointer;
+    }
+}
+
 // Move initializer
 template <typename Type_>
 inline static void Initialize(Type_ *pointer, Type_ &&value) noexcept {
