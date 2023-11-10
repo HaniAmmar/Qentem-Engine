@@ -7,3 +7,8 @@
 /.vs
 /x64
 /*.sh
+/*.vcxproj.filters
+/*.vcxproj.user
+/*.vcxproj
+/*.sln
+/Debug
