@@ -341,6 +341,44 @@ class String {
         return String((str + offset), length);
     }
 
+    inline void StepBack(const SizeT len) noexcept {
+        if (len <= Length()) {
+            length_ -= len;
+        }
+    }
+
+    inline void Reverse(SizeT index = 0) noexcept {
+        SizeT end = Length();
+
+        while (index < end) {
+            const Char_T_ tmp = Storage()[index];
+
+            --end;
+            Storage()[index] = Storage()[end];
+            Storage()[end]   = tmp;
+            ++index;
+        }
+    }
+
+    void InsertAt(Char_T_ ch, SizeT index) noexcept {
+        if (index < Length()) {
+            Char_T_       *first  = (Storage() + index);
+            Char_T_       *second = first;
+            const Char_T_ *end    = End();
+
+            Char_T_ tmp = *first;
+            *first      = ch;
+
+            while (++second < end) {
+                ch      = *second;
+                *second = tmp;
+                tmp     = ch;
+            }
+
+            Write(&tmp, SizeT{1});
+        }
+    }
+
     inline const Char_T_ *First() const noexcept {
         return Storage();
     }
