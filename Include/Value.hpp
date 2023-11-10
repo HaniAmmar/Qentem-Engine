@@ -1071,7 +1071,7 @@ class Value {
         }
     }
 
-    bool SetString(VString &value) const {
+    bool SetString(VString &value, unsigned int precision = Config::FloatDoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 value = string_;
@@ -1092,7 +1092,7 @@ class Value {
 
             case ValueType::Double: {
                 value.Reset();
-                Digit::NumberToString(value, number_.GetDouble(), Config::FloatDoublePrecision);
+                Digit::NumberToString(value, number_.GetDouble(), precision);
                 break;
             }
 
@@ -1120,7 +1120,7 @@ class Value {
     }
 
     template <typename StringStream_T_>
-    bool CopyStringValueTo(StringStream_T_ &stream) const {
+    bool CopyStringValueTo(StringStream_T_ &stream, unsigned int precision = Config::FloatDoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 stream.Write(string_.First(), string_.Length());
@@ -1138,7 +1138,7 @@ class Value {
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, number_.GetDouble(), Config::FloatDoublePrecision);
+                Digit::NumberToString(stream, number_.GetDouble(), precision);
                 break;
             }
 
@@ -1493,27 +1493,27 @@ class Value {
     }
 
     template <typename Stream_T_>
-    inline void Stringify(Stream_T_ &stream) const {
+    inline void Stringify(Stream_T_ &stream, unsigned int precision = Config::FloatDoublePrecision) const {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            stringifyObject(object_, stream);
+            stringifyObject(object_, stream, precision);
         } else if (type == ValueType::Array) {
-            stringifyArray(array_, stream);
+            stringifyArray(array_, stream, precision);
         }
     }
 
-    VString Stringify() const {
+    VString Stringify(unsigned int precision = Config::FloatDoublePrecision) const {
         StringStream<Char_T_> stream;
 
-        Stringify(stream);
+        Stringify(stream, precision);
 
         return stream.GetString();
     }
 
   private:
     template <typename Stream_T_>
-    static void stringifyObject(const VObject &obj, Stream_T_ &stream) {
+    static void stringifyObject(const VObject &obj, Stream_T_ &stream, unsigned int precision) {
         using V_item_ = HAItem_T_<Value, Char_T_>;
 
         stream += JSONotation::SCurlyChar;
@@ -1525,7 +1525,7 @@ class Value {
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 
-                stringifyValue(h_item->Value, stream);
+                stringifyValue(h_item->Value, stream, precision);
                 stream += JSONotation::CommaChar;
             }
         }
@@ -1540,12 +1540,12 @@ class Value {
     }
 
     template <typename Stream_T_>
-    static void stringifyArray(const VArray &arr, Stream_T_ &stream) {
+    static void stringifyArray(const VArray &arr, Stream_T_ &stream, unsigned int precision) {
         stream += JSONotation::SSquareChar;
 
         for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
             if (!(item->IsUndefined())) {
-                stringifyValue(*item, stream);
+                stringifyValue(*item, stream, precision);
                 stream += JSONotation::CommaChar;
             }
         }
@@ -1560,15 +1560,15 @@ class Value {
     }
 
     template <typename Stream_T_>
-    static void stringifyValue(const Value &val, Stream_T_ &stream) {
+    static void stringifyValue(const Value &val, Stream_T_ &stream, unsigned int precision) {
         switch (val.Type()) {
             case ValueType::Object: {
-                stringifyObject(val.object_, stream);
+                stringifyObject(val.object_, stream, precision);
                 break;
             }
 
             case ValueType::Array: {
-                stringifyArray(val.array_, stream);
+                stringifyArray(val.array_, stream, precision);
                 break;
             }
 
@@ -1590,7 +1590,7 @@ class Value {
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, val.number_.GetDouble());
+                Digit::NumberToString(stream, val.number_.GetDouble(), precision);
                 break;
             }
 
