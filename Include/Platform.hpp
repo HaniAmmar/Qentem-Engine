@@ -227,11 +227,11 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 2> {
     inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         QENTEM_SIMD_NUMBER_T bits16 = QENTEM_SIMD_COMPARE_16_MASK(val1, val2);
         QENTEM_SIMD_NUMBER_T bits   = 0;
-        unsigned int         count  = 0;
+        unsigned int         count  = 0U;
         const unsigned int   shift  = 2U;
 
         while (bits16 != 0) {
-            bits |= ((bits16 & 1U) << count);
+            bits |= ((bits16 & QENTEM_SIMD_NUMBER_T{1}) << count);
             bits16 >>= shift;
             ++count;
         }
@@ -246,11 +246,11 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 4> {
     inline static QENTEM_SIMD_NUMBER_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         QENTEM_SIMD_NUMBER_T bits32 = QENTEM_SIMD_COMPARE_32_MASK(val1, val2);
         QENTEM_SIMD_NUMBER_T bits   = 0;
-        unsigned int         count  = 0;
+        unsigned int         count  = 0U;
         const unsigned int   shift  = 4U;
 
         while (bits32 != 0) {
-            bits |= ((bits32 & 1U) << count);
+            bits |= ((bits32 & QENTEM_SIMD_NUMBER_T{1}) << count);
             bits32 >>= shift;
             ++count;
         }
