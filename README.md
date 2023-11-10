@@ -298,22 +298,13 @@ There are over 15k lines of code for testing; 5 times the size of the library, a
 
 -   cmake
 
-    -   Linux
-        ```shell
-        mkdir Build
-        cd Build
-        cmake ..
-        cmake --build .
-        ctest
-        ```
-    -   Windows
-        ```shell
-        mkdir Build
-        cd Build
-        cmake -D CMAKE_BUILD_TYPE=Debug ..
-        cmake --build .
-        ctest -C Debug
-        ```
+    ```shell
+    mkdir Build
+    cd Build
+    cmake ..
+    cmake --build .
+    ctest
+    ```
 
 -   gcc/clang
     ```shell
@@ -326,7 +317,7 @@ There are over 15k lines of code for testing; 5 times the size of the library, a
 
 > MIT License
 >
-> Copyright (c) 2020 Hani Ammar
+> Copyright (c) 2023 Hani Ammar
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
