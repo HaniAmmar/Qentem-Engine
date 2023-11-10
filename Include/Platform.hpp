@@ -125,8 +125,7 @@ inline static unsigned long CTZ(Number_T_ value) noexcept {
 inline static unsigned long CLZ(unsigned long long value) noexcept {
     // 'value' should be bigger than zero.
     unsigned long index = 0;
-
-    _BitScanForward64(&index, value);
+    _BitScanReverse64(&index, value);
 
     return index;
 }
@@ -145,6 +144,7 @@ inline static unsigned int CTZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     unsigned long index = 0;
     _BitScanForward(&index, value);
+
     return static_cast<unsigned int>(index);
 }
 
@@ -153,6 +153,7 @@ inline static unsigned int CLZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     unsigned long index = 0;
     _BitScanReverse(&index, value);
+
     return static_cast<unsigned int>(index);
 }
 #endif
