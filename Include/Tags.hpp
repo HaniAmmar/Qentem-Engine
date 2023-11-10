@@ -56,7 +56,7 @@ struct TagBit {
         tag.type_ = TagType::None;
     }
 
-    TagBit(TagType type) : type_{type} {
+    explicit TagBit(TagType type) : type_{type} {
         switch (type) {
             case TagType::Variable:
             case TagType::RawVariable: {
