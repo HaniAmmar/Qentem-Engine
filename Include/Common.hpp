@@ -89,9 +89,7 @@ struct Config {
     static constexpr bool AutoEscapeHTML          = false;
 #endif
 
-    static constexpr unsigned int FloatMaxLength       = 22;
-    static constexpr unsigned int ExponentMaxLength    = 5;
-    static constexpr unsigned int FloatDoublePrecision = 15;
+    static constexpr unsigned int FloatDoublePrecision = 17;
 };
 ///////////////////////////////////////////////
 
