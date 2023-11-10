@@ -1663,17 +1663,17 @@ class Value {
     }
 
     inline void initObject() noexcept {
-        Memory::Initialize(&object_, VObject{});
+        Memory::Initialize(&object_);
         setTypeToObject();
     }
 
     inline void initArray() noexcept {
-        Memory::Initialize(&array_, VArray{});
+        Memory::Initialize(&array_);
         setTypeToArray();
     }
 
     inline void initString() noexcept {
-        Memory::Initialize(&string_, VString{});
+        Memory::Initialize(&string_);
         setTypeToString();
     }
 

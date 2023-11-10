@@ -253,7 +253,7 @@ class Array {
 
         if (new_size > Size()) {
             Type_ *current = Storage();
-            Memory::Initialize((current + Size()), (current + new_size), Type_{});
+            Memory::Initialize((current + Size()), (current + new_size));
         }
 
         setSize(Capacity());

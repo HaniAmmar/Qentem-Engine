@@ -589,7 +589,7 @@ class HArray {
         item->Next = 0;
         item->Hash = hash;
         Memory::Initialize(&(item->Key), static_cast<Key_ &&>(key));
-        Memory::Initialize(&(item->Value), Value_());
+        Memory::Initialize(&(item->Value));
 
         return item;
     }
