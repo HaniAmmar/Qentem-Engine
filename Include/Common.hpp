@@ -28,7 +28,7 @@ namespace Qentem {
 struct Config {
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__powerpc64__) ||  \
     defined(__s390__)
-#define QENTEM_64BIT_ARCH
+#define QENTEM_64BIT_ARCH = 1
     // static constexpr bool Is64bit = (sizeof(void *) == 8);
     static constexpr bool Is64bit = true;
 #else
@@ -121,10 +121,10 @@ struct Config {
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
-#ifdef QENTEM_64BIT_ARCH
-using SizeT = unsigned int;
-#else
+#if defined(QENTEM_64BIT_ARCH) != 1 || defined(_MSC_VER)
 using SizeT = unsigned long;
+#else
+using SizeT = unsigned int;
 #endif
 #endif
 
