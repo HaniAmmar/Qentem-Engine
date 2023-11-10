@@ -694,8 +694,8 @@ struct Digit {
         }
     }
 
-    template <typename Stream_T_>
-    static void insertPowerOfTen(Stream_T_ &stream, unsigned int power_of_ten, bool positive) {
+    template <typename Stream_T_, typename Number_T_>
+    static void insertPowerOfTen(Stream_T_ &stream, Number_T_ power_of_ten, bool positive) {
         stream += DigitUtils::DigitChars::E_Char;
         stream += (positive ? DigitUtils::DigitChars::PositiveChar : DigitUtils::DigitChars::NegativeChar);
 
@@ -707,8 +707,8 @@ struct Digit {
         NumberToString(stream, power_of_ten);
     }
 
-    template <typename Stream_T_>
-    static void insertZeros(Stream_T_ &stream, const unsigned int length) noexcept {
+    template <typename Stream_T_, typename Number_T_>
+    static void insertZeros(Stream_T_ &stream, const Number_T_ length) noexcept {
         using Char_T_             = typename Stream_T_::CharType;
         static constexpr int size = static_cast<int>(sizeof(Char_T_));
         stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
@@ -749,22 +749,21 @@ struct Digit {
     static void formatStringNumber(Stream_T_ &stream, const SizeT started_at, const unsigned int precision,
                                    const unsigned int calculated_digits, unsigned int fraction_length,
                                    const bool is_positive_exp, const bool round_up) noexcept {
-        using Char_T_                         = typename Stream_T_::CharType;
-        const SizeT        stream_length      = (stream.Length() - started_at);
-        SizeT              index              = started_at;
+        using Char_T_                    = typename Stream_T_::CharType;
+        const SizeT        stream_length = (stream.Length() - started_at);
+        SizeT              index         = started_at;
+        SizeT              power;
+        SizeT              length;
         const unsigned int precision_plus_one = (precision + 1U);
-
-        unsigned int power;
-        unsigned int length;
 
         if (is_positive_exp) {
             length = stream_length +
                      ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : 0) -
                      fraction_length;
-            power = (length - 1U);
+            power = (length - SizeT{1});
         } else {
             length = stream_length;
-            power  = (((fraction_length > stream_length) ? (fraction_length - stream_length) : 0U) + 1U);
+            power  = (((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT{0}) + SizeT{1});
         }
 
         if (stream_length > precision_plus_one) {
@@ -783,7 +782,7 @@ struct Digit {
                     ++power;
 
                     if (power < precision) {
-                        unsigned int tmp = power;
+                        SizeT tmp = power;
 
                         do {
                             --index;
