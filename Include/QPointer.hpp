@@ -53,8 +53,15 @@ class QPointer {
 
     void SetPointer(Type_T_ *pointer) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
+        union {
+            Type_T_           *M_PTR;
+            unsigned long long M_NUM{0};
+        } static pn{};
+
+        pn.M_PTR = pointer;
+        pn.M_NUM &= 0x0000FFFFFFFFFFFFULL;
         p_number_ &= 0xFFFF000000000000ULL;
-        p_number_ |= (reinterpret_cast<unsigned long long>(pointer) & 0x0000FFFFFFFFFFFFULL);
+        p_number_ |= pn.M_NUM;
 #else
         pointer_ = pointer;
 #endif
@@ -62,7 +69,14 @@ class QPointer {
 
     Type_T_ *GetPointer() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
+        union {
+            Type_T_           *M_PTR;
+            unsigned long long M_NUM{0};
+        } static pn{};
+
+        pn.M_NUM = bits_.number_;
+        return pn.M_PTR;
+        // return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
 #else
         return pointer_;
 #endif
