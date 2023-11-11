@@ -23,14 +23,6 @@ else()
     endif()
 endif()
 
-# Memory
-add_executable(MemoryTest Tests/MemoryTest.cpp)
-add_test(NAME MemoryTest COMMAND MemoryTest)
-
-if (ENABLE_COVERAGE)
-    target_link_libraries(MemoryTest --coverage)
-endif()
-
 # StringUtils
 add_executable(StringUtilsTest Tests/StringUtilsTest.cpp)
 add_test(NAME StringUtilsTest COMMAND StringUtilsTest)

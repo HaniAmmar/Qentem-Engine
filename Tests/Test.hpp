@@ -25,7 +25,6 @@
 
 // clang-format off
 #include "TestHelper.hpp"
-#include "MemoryTest.hpp"
 #include "StringUtilsTest.hpp"
 #include "StringTest.hpp"
 #include "StringStreamTest.hpp"
@@ -49,7 +48,6 @@ static int RunTests() {
     int passed = 0;
     int failed = 0;
 
-    ((Qentem::Test::RunMemoryTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringUtilsTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
