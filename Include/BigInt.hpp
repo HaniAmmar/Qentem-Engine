@@ -327,7 +327,7 @@ struct BigInt {
 
         big_int_[0U] = static_cast<Number_T_>(number);
 
-        if (b_size > 1U) {
+        if constexpr (b_size > 1U) {
             number >>= Size;
 
             while (number != N_Number_T_{0}) {
