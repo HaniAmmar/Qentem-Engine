@@ -44,16 +44,17 @@ static SizeT HexStringToNumber(const char *str) noexcept {
 }
 
 template <typename Number_T_>
-static void IntToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number, const char *expected,
-                             const char *name, unsigned long line) {
+QENTEM_NOINLINE static void IntToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number,
+                                             const char *expected, const char *name, unsigned long line) {
     Digit::NumberToString(stream, number);
     helper.Equal(stream, expected, name, line);
     stream.Clear();
 }
 
 template <typename Stream_T_, typename Number_T_>
-static void RealToStreamEqual(TestHelper &helper, Stream_T_ &stream, Number_T_ number, unsigned int precision,
-                              const char *expected, const char *name, unsigned long line) {
+QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &stream, Number_T_ number,
+                                              unsigned int precision, const char *expected, const char *name,
+                                              unsigned long line) {
     if (!helper.HasError() || helper.IsContinueOnError()) {
 #ifdef QENTEM_COMPARE_DIGIT_WITH_STL_
         std::ostringstream out;

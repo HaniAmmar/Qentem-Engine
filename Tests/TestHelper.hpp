@@ -111,7 +111,7 @@ struct MemoryRecord {
         return (records_.subAllocations - records_.subDeallocations);
     }
 
-    QENTEM_NOINLINE static void AddAllocation(void *pointer) noexcept {
+    inline static void AddAllocation(void *pointer) noexcept {
         ++(records_.allocations);
         ++(records_.subAllocations);
 
@@ -188,7 +188,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename FUNC_T_>
-    inline void Test(Char_T_ *name, FUNC_T_ func) {
+    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func) {
         if (!error_ || continue_on_error_) {
             part_name_ = name;
             func(*this);
@@ -197,7 +197,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename FUNC_T_, typename... Values_T_>
-    inline void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
+    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
         if (!error_ || continue_on_error_) {
             part_name_ = name;
             func(*this, values...);
@@ -206,7 +206,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_>
-    inline void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
+    QENTEM_NOINLINE void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && !value) {
             error_ = true;
             TestHelper::PrintErrorMessage1(false, name, line);
@@ -214,7 +214,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_>
-    inline void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
+    QENTEM_NOINLINE void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && value) {
             error_ = true;
             TestHelper::PrintErrorMessage1(true, name, line);
@@ -222,8 +222,8 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    inline void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, const Value3_T_ &value,
-                      unsigned long line) {
+    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
+                               const Value3_T_ &value, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(false, name, left, value, line);
@@ -231,8 +231,8 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    inline void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, const Value3_T_ &value,
-                         unsigned long line) {
+    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
+                                  const Value3_T_ &value, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(true, name, left, value, line);
@@ -240,7 +240,7 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    inline void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
+    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(false, name, left, right, line);
@@ -248,7 +248,8 @@ struct TestHelper {
     }
 
     template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    inline void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
+    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
+                                  unsigned long line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
             TestHelper::PrintErrorMessage2(true, name, left, right, line);
