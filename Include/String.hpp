@@ -63,7 +63,7 @@ class String {
     }
 
     String(Char_T_ *str, SizeT len) {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             if (len < ShortStringMax) {
                 copyString(str, len);
                 Memory::Deallocate(str);
@@ -93,7 +93,7 @@ class String {
             padding_ = src.padding_;
             length_  = src.length_;
 
-            if (Config::ShortStringOptimization) {
+            if constexpr (Config::ShortStringOptimization) {
                 storage_.SetLowByte(src.storage_.GetLowByte());
             }
 
@@ -244,7 +244,7 @@ class String {
     Char_T_ *Detach() {
         Char_T_ *str;
 
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             Char_T_    *src = Storage();
             const SizeT len = Length();
 
@@ -267,7 +267,7 @@ class String {
     }
 
     inline SizeT Length() const noexcept {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             const unsigned char len = storage_.GetLowByte();
             return ((len != 0) ? len : length_);
         }
@@ -276,7 +276,7 @@ class String {
     }
 
     inline Char_T_ *Storage() const noexcept {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != 0) && (len < ShortStringMax)) {
 #ifndef QENTEM_BIG_ENDIAN
@@ -302,7 +302,7 @@ class String {
             Char_T_    *src     = Storage();
             Char_T_    *ns;
 
-            if (Config::ShortStringOptimization) {
+            if constexpr (Config::ShortStringOptimization) {
                 if (new_len > ShortStringMax) {
                     ns = Memory::Allocate<Char_T_>(new_len);
 
@@ -424,7 +424,7 @@ class String {
 
   private:
     void clearLength() noexcept {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             storage_.SetLowByte(0);
         }
 
@@ -432,7 +432,7 @@ class String {
     }
 
     void setLength(SizeT new_length) noexcept {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             if (new_length < ShortStringMax) {
                 storage_.SetLowByte(static_cast<unsigned char>(new_length));
             } else {
@@ -449,7 +449,7 @@ class String {
     }
 
     Char_T_ *allocate(SizeT new_size) {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             if (new_size <= ShortStringMax) {
 #ifndef QENTEM_BIG_ENDIAN
                 return reinterpret_cast<Char_T_ *>(&padding_);
@@ -466,7 +466,7 @@ class String {
     }
 
     void deallocate(Char_T_ *old_storage) noexcept {
-        if (Config::ShortStringOptimization) {
+        if constexpr (Config::ShortStringOptimization) {
             if (Length() >= ShortStringMax) {
                 Memory::Deallocate(old_storage);
             }

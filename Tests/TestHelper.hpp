@@ -286,13 +286,13 @@ struct TestHelper {
     QENTEM_NOINLINE static void PrintInfo() {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
-        if (Config::Is64bit) {
+        if constexpr (Config::Is64bit) {
             TestOutPut::Print("Arch: 64Bit\n");
 
-            if (Config::PointerTagging) {
+            if constexpr (Config::PointerTagging) {
                 TestOutPut::Print("Tagged Pointers: On\n");
 
-                if (Config::ShortStringOptimization) {
+                if constexpr (Config::ShortStringOptimization) {
                     TestOutPut::Print("Short String Optimization: On\n");
                 } else {
                     TestOutPut::Print("Short String Optimization: Off\n");
@@ -307,13 +307,13 @@ struct TestHelper {
             TestOutPut::Print("Short String Optimization: Off\n");
         }
 
-        if (Config::BigEndian) {
+        if constexpr (Config::BigEndian) {
             TestOutPut::Print("Endianness: Big-Endian\n");
         } else {
             TestOutPut::Print("Endianness: Little-Endian\n");
         }
 
-        if (Config::AutoEscapeHTML) {
+        if constexpr (Config::AutoEscapeHTML) {
             TestOutPut::Print("Auto Escape HTML: On\n");
         } else {
             TestOutPut::Print("Auto Escape HTML: Off\n");

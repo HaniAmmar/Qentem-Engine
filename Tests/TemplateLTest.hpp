@@ -519,7 +519,7 @@ static void TestVariableLTag4(TestHelper &helper) {
     value += LR"("ABC'DEF<GHI>GK<)";
     value += LR"(A""BC<<DE>>FG''HI&&GK)";
 
-    if (Config::AutoEscapeHTML) {
+    if constexpr (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(LR"({var:0})", value), LR"(&lt;)", LR"(Render())", __LINE__);
         helper.Equal(Template::Render(LR"({var:1})", value), LR"(&gt;)", LR"(Render())", __LINE__);
         helper.Equal(Template::Render(LR"({var:2})", value), LR"(&amp;)", LR"(Render())", __LINE__);
@@ -1766,7 +1766,7 @@ static void TestInlineIfLTag(TestHelper &helper) {
 
     content = LR"({if case="1" true="{var:0}" false="{var:1}"})";
 
-    if (Config::AutoEscapeHTML) {
+    if constexpr (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2), LR"(&amp;)", LR"(Render())", __LINE__);
     } else {
         helper.Equal(Template::Render(content, value2), LR"(&)", LR"(Render())", __LINE__);
@@ -1777,7 +1777,7 @@ static void TestInlineIfLTag(TestHelper &helper) {
 
     content = LR"({if case="0" true="{var:0}" false="{var:1}"})";
 
-    if (Config::AutoEscapeHTML) {
+    if constexpr (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2), LR"(&quot;)", LR"(Render())", __LINE__);
     } else {
         helper.Equal(Template::Render(content, value2), LR"(")", LR"(Render())", __LINE__);

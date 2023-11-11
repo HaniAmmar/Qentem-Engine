@@ -519,7 +519,7 @@ static void TestVariableUTag4(TestHelper &helper) {
     value += uR"("ABC'DEF<GHI>GK<)";
     value += uR"(A""BC<<DE>>FG''HI&&GK)";
 
-    if (Config::AutoEscapeHTML) {
+    if constexpr (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(uR"({var:0})", value), uR"(&lt;)", uR"(Render())", __LINE__);
         helper.Equal(Template::Render(uR"({var:1})", value), uR"(&gt;)", uR"(Render())", __LINE__);
         helper.Equal(Template::Render(uR"({var:2})", value), uR"(&amp;)", uR"(Render())", __LINE__);
@@ -1766,7 +1766,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="1" true="{var:0}" false="{var:1}"})";
 
-    if (Config::AutoEscapeHTML) {
+    if constexpr (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2), uR"(&amp;)", uR"(Render())", __LINE__);
     } else {
         helper.Equal(Template::Render(content, value2), uR"(&)", uR"(Render())", __LINE__);
@@ -1777,7 +1777,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="0" true="{var:0}" false="{var:1}"})";
 
-    if (Config::AutoEscapeHTML) {
+    if constexpr (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2), uR"(&quot;)", uR"(Render())", __LINE__);
     } else {
         helper.Equal(Template::Render(content, value2), uR"(")", uR"(Render())", __LINE__);

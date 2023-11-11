@@ -183,7 +183,7 @@ class Value {
             const VNumber   tmp    = val.number_;
             const ValueType t_type = val.Type();
 
-            if (Config::PointerTagging) {
+            if constexpr (Config::PointerTagging) {
                 val.number_.ClearAll();
             } else {
                 val.setTypeToUndefined();
@@ -237,7 +237,7 @@ class Value {
             } else {
                 reset();
 
-                if (Config::PointerTagging) {
+                if constexpr (Config::PointerTagging) {
                     number_.ClearAll();
                 } else {
                     setTypeToUndefined();
@@ -1372,7 +1372,7 @@ class Value {
     void Reset() noexcept {
         reset();
 
-        if (Config::PointerTagging) {
+        if constexpr (Config::PointerTagging) {
             number_.ClearAll();
         } else {
             setTypeToUndefined();
@@ -1397,7 +1397,7 @@ class Value {
                 if (size == 0) {
                     array_.Reset();
 
-                    if (Config::PointerTagging) {
+                    if constexpr (Config::PointerTagging) {
                         setTypeToArray();
                     }
 
@@ -1806,7 +1806,7 @@ class Value {
         }
 
         inline void ClearAll() noexcept {
-            if (Config::PointerTagging) {
+            if constexpr (Config::PointerTagging) {
                 number_.ull = 0;
                 p_number_   = 0;
             }

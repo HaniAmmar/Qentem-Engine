@@ -121,7 +121,7 @@ static void TestString1(TestHelper &helper) {
     char         *tmp_size_2 = Memory::Allocate<char>(2);
     const String8 str_size_2 = String8(tmp_size_2, 2U);
 
-    if (Config::ShortStringOptimization) {
+    if constexpr (Config::ShortStringOptimization) {
         helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
     } else {
         helper.Equal(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
