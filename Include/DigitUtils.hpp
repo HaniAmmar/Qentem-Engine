@@ -93,6 +93,44 @@ static const char DigitTable[] = {"000102030405060708091011121314151617181920212
                                   "606162636465666768697071727374757677787980818283848586878889"
                                   "90919293949596979899"};
 ///////////////////////////////////////////////////
+template <typename Number_T_, unsigned int Size_>
+struct DigitLimit {};
+
+// uint32_t
+template <typename Number_T_>
+struct DigitLimit<Number_T_, 4> {
+    static constexpr unsigned int MaxPowerOfFiveDrop  = 13U;
+    static constexpr unsigned int MaxPowerOfFiveShift = 32U;
+    static constexpr unsigned int MaxPowerOfTenValue  = 1000000000ULL;
+    static constexpr unsigned int PowerOfTenDigits    = 9U;
+
+    static constexpr unsigned int PowerOfFive[] = {
+        // clang-format off
+            1U,5U,25U,125U,625U,3125U,15625U,78125U,390625U,
+            1953125U,9765625U,48828125U,244140625U,1220703125U
+        // clang-format on
+    };
+};
+
+// uint64_t
+template <typename Number_T_>
+struct DigitLimit<Number_T_, 8> {
+    static constexpr unsigned int       MaxPowerOfFiveDrop  = 27U;
+    static constexpr unsigned int       MaxPowerOfFiveShift = 64U;
+    static constexpr unsigned long long MaxPowerOfTenValue  = 10000000000000000000ULL;
+    static constexpr unsigned int       PowerOfTenDigits    = 19U;
+
+    static constexpr unsigned long long PowerOfFive[] = {
+        // clang-format off
+            1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
+            9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
+            152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
+            476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
+            298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
+        // clang-format on
+    };
+};
+///////////////////////////////////////////////////
 template <typename>
 struct RealNumberInfo {};
 
@@ -108,25 +146,7 @@ struct RealNumberInfo<double> {
     static constexpr unsigned long long ExponentMask        = 0x7FF0000000000000ULL;
     static constexpr unsigned long long MantissaMask        = 0xFFFFFFFFFFFFFULL;
     static constexpr unsigned long long LeadingBit          = 0x10000000000000ULL;
-    static constexpr unsigned int       MaxPowerOfFiveDrop  = 27U;
-    static constexpr unsigned int       MaxPowerOfFiveShift = 64U;
-    static constexpr unsigned long long MaxPowerOfTenValue  = 10000000000000000000ULL;
-    static constexpr unsigned int       PowerOfTenDigits    = 19U;
     static constexpr unsigned int       MaxCut              = 300U;
-
-    static unsigned long long GetPowerOfFive(unsigned int power) noexcept {
-        static const unsigned long long table[] = {
-            // clang-format off
-            1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
-            9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
-            152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
-            476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
-            298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
-            // clang-format on
-        };
-
-        return table[power];
-    }
 
     union {
         double             RealNumber;
@@ -146,22 +166,7 @@ struct RealNumberInfo<float> {
     static constexpr unsigned int ExponentMask        = 0x7F800000U;
     static constexpr unsigned int LeadingBit          = 0x800000U;
     static constexpr unsigned int MantissaMask        = 0x7FFFFFU;
-    static constexpr unsigned int MaxPowerOfFiveDrop  = 13U;
-    static constexpr unsigned int MaxPowerOfFiveShift = 32U;
-    static constexpr unsigned int MaxPowerOfTenValue  = 1000000000ULL;
-    static constexpr unsigned int PowerOfTenDigits    = 9U;
     static constexpr unsigned int MaxCut              = 30U;
-
-    static unsigned int GetPowerOfFive(unsigned int power) noexcept {
-        static const unsigned int table[] = {
-            // clang-format off
-            1U,5U,25U,125U,625U,3125U,15625U,78125U,390625U,
-            1953125U,9765625U,48828125U,244140625U,1220703125U
-            // clang-format on
-        };
-
-        return table[power];
-    }
 
     union {
         float        RealNumber;

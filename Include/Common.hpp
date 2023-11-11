@@ -121,11 +121,7 @@ struct Config {
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
-#if defined(QENTEM_64BIT_ARCH) != 1 || defined(_MSC_VER)
-using SizeT = unsigned long;
-#else
 using SizeT = unsigned int;
-#endif
 #endif
 
 using NullType = decltype(nullptr);

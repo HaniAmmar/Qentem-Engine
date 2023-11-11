@@ -447,7 +447,7 @@ struct QExpression {
 
         if (num_left != 0) {
             if (num_right != 0) {
-                const bool right_odd = static_cast<const bool>(num_right & 1U);
+                const bool right_odd = static_cast<bool>(num_right & 1U);
 
                 PowerOf(num_left, num_right);
 

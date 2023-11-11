@@ -137,23 +137,56 @@ inline static unsigned long CLZ(Number_T_ value) noexcept {
 
     return index;
 }
+
 #else
 template <typename Number_T_>
 inline static unsigned int CTZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    unsigned long index = 0;
-    _BitScanForward(&index, value);
+    constexpr unsigned int size     = (sizeof(Number_T_) * 8U);
+    constexpr unsigned int int_size = 32U;
+    unsigned long          index    = 0;
 
-    return static_cast<unsigned int>(index);
+    if constexpr (size == 64U) {
+        /// 01010101 <---
+        const unsigned long lower_bits = static_cast<unsigned long>(value);
+
+        if (lower_bits != 0U) {
+            _BitScanForward(&index, lower_bits);
+            return static_cast<unsigned int>(index);
+        }
+
+        value >>= int_size;
+        _BitScanForward(&index, static_cast<unsigned long>(value));
+        return (static_cast<unsigned int>(index) + int_size);
+    } else {
+        _BitScanForward(&index, static_cast<unsigned long>(value));
+        return static_cast<unsigned int>(index);
+    }
 }
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    unsigned long index = 0;
-    _BitScanReverse(&index, value);
+    constexpr unsigned int size     = (sizeof(Number_T_) * 8U);
+    constexpr unsigned int int_size = 32U;
+    unsigned long          index    = 0;
 
-    return static_cast<unsigned int>(index);
+    if constexpr (size == 64U) {
+        /// 01010101 <---
+        const unsigned long lower_bits = static_cast<unsigned long>(value);
+        value >>= int_size;
+
+        if (value == Number_T_{0}) {
+            _BitScanReverse(&index, lower_bits);
+            return static_cast<unsigned int>(index);
+        }
+
+        _BitScanReverse(&index, static_cast<unsigned long>(value));
+        return (static_cast<unsigned int>(index) + int_size);
+    } else {
+        _BitScanReverse(&index, static_cast<unsigned long>(value));
+        return static_cast<unsigned int>(index);
+    }
 }
 #endif
 ///////////////////////////////////////
@@ -175,8 +208,8 @@ inline static unsigned int CTZ(Number_T_ value) noexcept {
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U) - 1U;
+    // 'value' should be bigger than zero.
 
     if (size == 63U) {
         return (size - static_cast<unsigned int>(__builtin_clzl(static_cast<unsigned long>(value))));
@@ -190,14 +223,44 @@ inline static unsigned int CLZ(Number_T_ value) noexcept {
 template <typename Number_T_>
 inline static unsigned int CTZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
+    constexpr unsigned int size     = (sizeof(Number_T_) * 8U);
+    constexpr unsigned int int_size = 32U;
+
+    if (size == 64U) {
+        /// 01010101 <---
+        const unsigned int lower_bits = static_cast<unsigned int>(value);
+
+        if (lower_bits != 0U) {
+            return static_cast<unsigned int>(__builtin_ctz(lower_bits));
+        }
+
+        value >>= int_size;
+        return (static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value))) + int_size);
+    }
+
     return static_cast<unsigned int>(__builtin_ctz(static_cast<unsigned int>(value)));
 }
 
 template <typename Number_T_>
 inline static unsigned int CLZ(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size = (sizeof(int) * 8U) - 1U;
-    return (size - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))));
+    constexpr unsigned int size       = (sizeof(Number_T_) * 8U);
+    constexpr unsigned int int_size   = 32U;
+    constexpr unsigned int taken_size = (int_size - 1U);
+
+    if (size == 64U) {
+        /// ---> 01010101
+        const unsigned int lower_bits = static_cast<unsigned int>(value);
+        value >>= int_size;
+
+        if (value == Number_T_{0}) {
+            return (taken_size - static_cast<unsigned int>(__builtin_clz(lower_bits)));
+        }
+
+        return ((taken_size - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value)))) + int_size);
+    }
+
+    return (taken_size - static_cast<unsigned int>(__builtin_clz(static_cast<unsigned int>(value))));
 }
 
 #endif

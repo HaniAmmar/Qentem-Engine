@@ -2685,11 +2685,9 @@ static int RunDigitTests() {
 
     helper.Test("NumberToString Test 1", TestNumberToString1<SStream>, false, stream);
 
-#ifdef QENTEM_64BIT_ARCH
     helper.Test("DoubleToString Test 1", TestDoubleToString1<SStream>, false, stream);
     helper.Test("DoubleToString Test 2", TestDoubleToString2<SStream>, false, stream);
     helper.Test("DoubleToString Test 3", TestDoubleToString3<SStream>, false, stream);
-#endif
 
     helper.Test("FloatToString Test 1", TestFloatToString1<SStream>, false, stream);
     helper.Test("FloatToString Test 1", TestFloatToString2<SStream>, false, stream);

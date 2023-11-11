@@ -33,22 +33,27 @@ namespace Qentem {
 // 16 64bit int = 1024 bits
 // (number of variables) * sizeof(variable) * 8 = Width_T_
 
+template <typename Number_T_, unsigned int Size_>
+struct DoubleSize {};
+
 template <typename Number_T_, unsigned int Width_T_>
 struct BigInt {
-    // BigInt()  = default;
-    // ~BigInt() = default;
+    BigInt()  = default;
+    ~BigInt() = default;
 
-    explicit BigInt(const Number_T_ number) noexcept {
-        big_int_[0U] = number;
+    template <typename N_Number_T_>
+    BigInt(const N_Number_T_ number) noexcept {
+        set(number);
     }
 
+    template <typename N_Number_T_>
     BigInt &operator=(const Number_T_ number) noexcept {
-        big_int_[0U] = number;
-
         while (index_ != 0U) {
             big_int_[index_] = Number_T_{0};
             --index_;
         }
+
+        set(number);
 
         return *this;
     }
@@ -167,38 +172,6 @@ struct BigInt {
         }
     }
     ////////////////////////////////////////////////////
-    template <typename Number_T2>
-    inline static Number_T_ DoubleSizeMultiply(Number_T_ &number, const Number_T2 multiplier) noexcept {
-        static constexpr unsigned int shift_size = (sizeof(Number_T_) * 8U);
-
-        unsigned long long number64 = number;
-        number64 *= multiplier;
-        number = static_cast<Number_T_>(number64 & 0xFFFFFFFFU);
-
-        return static_cast<Number_T_>((number64 >> shift_size) & 0xFFFFFFFFU);
-    }
-
-#ifdef QENTEM_64BIT_ARCH
-    inline static unsigned long long DoubleSizeMultiply(unsigned long long      &number,
-                                                        const unsigned long long multiplier) noexcept {
-#ifdef _MSC_VER
-        unsigned long long carry = 0;
-
-        number = _umul128(multiplier, number, &carry);
-
-        return carry;
-#else
-        static constexpr unsigned int shift_size = (sizeof(long long) * 8U);
-
-        __uint128_t number128 = number;
-        number128 *= multiplier;
-        number = static_cast<unsigned long long>(number128 & 0xFFFFFFFFFFFFFFFFULL);
-
-        return static_cast<unsigned long long>((number128 >> shift_size) & 0xFFFFFFFFFFFFFFFFULL);
-#endif
-    }
-#endif
-
     inline void MultiplyBy(Number_T_ multiplier) noexcept {
         unsigned int index = (index_ + 1U);
 
@@ -206,42 +179,11 @@ struct BigInt {
             --index;
 
             if (big_int_[index] != 0U) {
-                Add(DoubleSizeMultiply(big_int_[index], multiplier), (index + 1U));
+                Add(DoubleSize<Number_T_, Size>::Multiply(big_int_[index], multiplier), (index + 1U));
             }
         } while (index != 0U);
     }
     ////////////////////////////////////////////////////
-    template <typename Number_T2>
-    static inline void DoubleSizeDivide(Number_T_ &dividend_high, Number_T_ &dividend_low,
-                                        const Number_T2 divisor) noexcept {
-        static constexpr unsigned int shift_size = (sizeof(Number_T_) * 8U);
-
-        unsigned long long dividend64 = dividend_high;
-        dividend64 <<= shift_size;
-        dividend64 |= dividend_low;
-        dividend_high = static_cast<Number_T_>(dividend64 % divisor);
-        dividend64 /= divisor;
-        dividend_low = static_cast<Number_T_>(dividend64 & 0xFFFFFFFFU);
-    }
-
-#ifdef QENTEM_64BIT_ARCH
-    static inline void DoubleSizeDivide(unsigned long long &dividend_high, unsigned long long &dividend_low,
-                                        const unsigned long long divisor) noexcept {
-#ifdef _MSC_VER
-        dividend_low = _udiv128(dividend_high, dividend_low, divisor, &dividend_high);
-#else
-        static constexpr unsigned int shift_size = (sizeof(long long) * 8U);
-
-        __uint128_t dividend128 = dividend_high;
-        dividend128 <<= shift_size;
-        dividend128 |= dividend_low;
-        dividend_high = static_cast<unsigned long long>(dividend128 % divisor);
-        dividend128 /= divisor;
-        dividend_low = static_cast<unsigned long long>(dividend128 & 0xFFFFFFFFFFFFFFFFULL);
-#endif
-    }
-#endif
-
     inline Number_T_ DivideBy(const Number_T_ divisor) noexcept {
         Number_T_    remainder = 0;
         unsigned int index     = (index_ + 1U);
@@ -250,7 +192,7 @@ struct BigInt {
             --index;
 
             if ((remainder != Number_T_{0}) || (big_int_[index] != Number_T_{0})) {
-                DoubleSizeDivide(remainder, big_int_[index], divisor);
+                DoubleSize<Number_T_, Size>::Divide(remainder, big_int_[index], divisor);
             }
         } while (index != 0U);
 
@@ -375,9 +317,124 @@ struct BigInt {
         }
     }
 
+    void set(const Number_T_ number) noexcept {
+        big_int_[0U] = number;
+    }
+
+    template <typename N_Number_T_>
+    void set(N_Number_T_ number) noexcept {
+        static constexpr unsigned int b_size = ((sizeof(N_Number_T_) * 8U) / Size);
+
+        big_int_[0U] = static_cast<Number_T_>(number);
+
+        if (b_size > 1U) {
+            number >>= Size;
+
+            while (number != N_Number_T_{0}) {
+                ++index_;
+                big_int_[index_] = static_cast<Number_T_>(number);
+                number >>= Size;
+            }
+        }
+    }
+
     Number_T_    big_int_[MaxIndex + 1U]{Number_T_{0}};
     unsigned int index_{0};
 };
+////////////////////////////////////////////////////
+template <typename Number_T_>
+struct DoubleSize<Number_T_, 8U> {
+    static inline void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+        unsigned short dividend64 = dividend_high;
+        dividend64 <<= 8U;
+        dividend64 |= dividend_low;
+        dividend_high = static_cast<Number_T_>(dividend64 % divisor);
+        dividend64 /= divisor;
+        dividend_low = static_cast<Number_T_>(dividend64);
+    }
+
+    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+        unsigned short number64 = number;
+        number64 *= multiplier;
+        number = static_cast<Number_T_>(number64);
+
+        return static_cast<Number_T_>(number64 >> 8U);
+    }
+};
+////////////////////////////////////////////////////
+template <typename Number_T_>
+struct DoubleSize<Number_T_, 16U> {
+    static inline void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+        unsigned int dividend64 = dividend_high;
+        dividend64 <<= 16U;
+        dividend64 |= dividend_low;
+        dividend_high = static_cast<Number_T_>(dividend64 % divisor);
+        dividend64 /= divisor;
+        dividend_low = static_cast<Number_T_>(dividend64);
+    }
+
+    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+        unsigned int number64 = number;
+        number64 *= multiplier;
+        number = static_cast<Number_T_>(number64);
+
+        return static_cast<Number_T_>(number64 >> 16U);
+    }
+};
+////////////////////////////////////////////////////
+template <typename Number_T_>
+struct DoubleSize<Number_T_, 32U> {
+    static inline void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+        unsigned long long dividend64 = dividend_high;
+        dividend64 <<= 32U;
+        dividend64 |= dividend_low;
+        dividend_high = static_cast<Number_T_>(dividend64 % divisor);
+        dividend64 /= divisor;
+        dividend_low = static_cast<Number_T_>(dividend64);
+    }
+
+    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+        unsigned long long number64 = number;
+        number64 *= multiplier;
+        number = static_cast<Number_T_>(number64);
+
+        return static_cast<Number_T_>(number64 >> 32U);
+    }
+};
+////////////////////////////////////////////////////
+#ifdef QENTEM_64BIT_ARCH
+template <typename Number_T_>
+struct DoubleSize<Number_T_, 64U> {
+    static inline void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+#ifdef _MSC_VER
+        dividend_low = _udiv128(dividend_high, dividend_low, divisor, &dividend_high);
+#else
+        __uint128_t dividend128 = dividend_high;
+        dividend128 <<= 64U;
+        dividend128 |= dividend_low;
+        dividend_high = static_cast<Number_T_>(dividend128 % divisor);
+        dividend128 /= divisor;
+
+        dividend_low          = static_cast<Number_T_>(dividend128);
+#endif
+    }
+
+    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+#ifdef _MSC_VER
+        Number_T_ carry = 0;
+        number          = _umul128(multiplier, number, &carry);
+
+        return carry;
+#else
+        __uint128_t number128 = number;
+        number128 *= multiplier;
+        number = static_cast<Number_T_>(number128);
+
+        return static_cast<Number_T_>(number128 >> 64U);
+#endif
+    }
+};
+#endif
 
 } // namespace Qentem
 

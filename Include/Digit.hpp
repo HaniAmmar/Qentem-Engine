@@ -66,8 +66,8 @@ struct Digit {
     }
 
     template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, float f_number, unsigned int precision = 15U) {
-        realToString(stream, static_cast<double>(f_number), precision);
+    inline static void NumberToString(Stream_T_ &stream, float number, unsigned int precision = 15U) {
+        realToString(stream, number, precision);
     }
     /////////////////////////////////////////////////////////////////
     template <typename Char_T_>
@@ -554,19 +554,26 @@ struct Digit {
         using Char_T_ = typename Stream_T_::CharType;
         using Info_T  = DigitUtils::RealNumberInfo<Number_T_>;
         const Info_T info{number};
-
         using UNumber_T = decltype(info.NaturalNumber);
-        BigInt<UNumber_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3))> b_int{info.NaturalNumber &
-                                                                                      Info_T::MantissaMask};
+
+#ifdef QENTEM_64BIT_ARCH
+        using Bucket_T = UNumber_T;
+#else
+        using Bucket_T = unsigned int;
+#endif
+
+        using DigitLimit = DigitUtils::DigitLimit<Bucket_T, sizeof(Bucket_T)>;
+
+        BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3U))> b_int{};
 
         const UNumber_T bias = (info.NaturalNumber & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
-            UNumber_T &mantissa = b_int.GetBucket(0U);
-
             if (info.NaturalNumber & Info_T::SignMask) {
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
+
+            UNumber_T mantissa = (info.NaturalNumber & Info_T::MantissaMask);
 
             if ((mantissa != UNumber_T{0}) || (bias != UNumber_T{0})) {
                 if (bias != UNumber_T{0}) {
@@ -593,14 +600,16 @@ struct Digit {
                     const unsigned int m_shift = (Info_T::MantissaSize + drop);
 
                     if (m_shift < positive_exp) {
+                        b_int = mantissa;
                         b_int <<= (positive_exp - m_shift);
                     } else {
                         mantissa >>= (m_shift - positive_exp);
+                        b_int = mantissa;
                     }
 
                     if (drop != 0U) {
                         round_up = true;
-                        bigIntDropDigits<Number_T_>(b_int, drop);
+                        bigIntDropDigits<Bucket_T>(b_int, drop);
                     }
                 } else {
                     unsigned int shift  = 0U;
@@ -630,34 +639,35 @@ struct Digit {
                     }
 
                     mantissa >>= first_shift;
+                    b_int = mantissa;
 
                     unsigned int times = fraction_length;
 
-                    if (times >= Info_T::MaxPowerOfFiveDrop) {
+                    if (times >= DigitLimit::MaxPowerOfFiveDrop) {
                         const unsigned int max_index = (precision < Info_T::MaxCut)
-                                                           ? ((precision / Info_T::PowerOfTenDigits) + 2U)
+                                                           ? ((precision / DigitLimit::PowerOfTenDigits) + 2U)
                                                            : b_int.MaxIndex;
 
                         do {
-                            b_int.MultiplyBy(Info_T::GetPowerOfFive(Info_T::MaxPowerOfFiveDrop));
-                            times -= Info_T::MaxPowerOfFiveDrop;
+                            b_int.MultiplyBy(DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFiveDrop]);
+                            times -= DigitLimit::MaxPowerOfFiveDrop;
 
-                            if ((b_int.GetIndex() >= max_index) && (shift >= Info_T::MaxPowerOfFiveShift)) {
-                                b_int.ShiftRight(Info_T::MaxPowerOfFiveShift);
-                                shift -= Info_T::MaxPowerOfFiveShift;
+                            if ((b_int.GetIndex() >= max_index) && (shift >= DigitLimit::MaxPowerOfFiveShift)) {
+                                b_int.ShiftRight(DigitLimit::MaxPowerOfFiveShift);
+                                shift -= DigitLimit::MaxPowerOfFiveShift;
                             }
-                        } while (times >= Info_T::MaxPowerOfFiveDrop);
+                        } while (times >= DigitLimit::MaxPowerOfFiveDrop);
                     }
 
                     if (times != 0U) {
-                        b_int.MultiplyBy(Info_T::GetPowerOfFive(times));
+                        b_int.MultiplyBy(DigitLimit::PowerOfFive[times]);
                     }
 
                     b_int.ShiftRight(shift);
                 }
 
                 const SizeT start_at = stream.Length();
-                bigIntToString<Number_T_>(stream, b_int);
+                bigIntToString<Bucket_T>(stream, b_int);
                 formatStringNumber(stream, start_at, precision, digits, fraction_length, is_positive_exp, round_up);
             } else {
                 stream += DigitUtils::DigitChars::ZeroChar;
@@ -699,14 +709,14 @@ struct Digit {
 
     template <typename Number_T_, typename Stream_T_, typename BigInt_T_>
     static void bigIntToString(Stream_T_ &stream, BigInt_T_ &b_int) noexcept {
-        using Info_T = DigitUtils::RealNumberInfo<Number_T_>;
+        using DigitLimit = DigitUtils::DigitLimit<Number_T_, sizeof(Number_T_)>;
 
         while (b_int.IsBig()) {
             const SizeT length = stream.Length();
-            NumberToString<true>(stream, b_int.DivideBy(Info_T::MaxPowerOfTenValue));
+            NumberToString<true>(stream, b_int.DivideBy(DigitLimit::MaxPowerOfTenValue));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            insertZeros(stream, (Info_T::PowerOfTenDigits - (stream.Length() - length)));
+            insertZeros(stream, (DigitLimit::PowerOfTenDigits - (stream.Length() - length)));
         }
 
         if (b_int.NotZero()) {
@@ -716,15 +726,15 @@ struct Digit {
 
     template <typename Number_T_, typename BigInt_T_>
     static void bigIntDropDigits(BigInt_T_ &b_int, unsigned int drop) noexcept {
-        using Info_T = DigitUtils::RealNumberInfo<Number_T_>;
+        using DigitLimit = DigitUtils::DigitLimit<Number_T_, sizeof(Number_T_)>;
 
-        while (drop >= Info_T::MaxPowerOfFiveDrop) {
-            b_int.DivideBy(Info_T::GetPowerOfFive(Info_T::MaxPowerOfFiveDrop));
-            drop -= Info_T::MaxPowerOfFiveDrop;
+        while (drop >= DigitLimit::MaxPowerOfFiveDrop) {
+            b_int.DivideBy(DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFiveDrop]);
+            drop -= DigitLimit::MaxPowerOfFiveDrop;
         }
 
         if (drop != 0U) {
-            b_int.DivideBy(Info_T::GetPowerOfFive(drop));
+            b_int.DivideBy(DigitLimit::PowerOfFive[drop]);
         }
     }
 
