@@ -662,7 +662,7 @@ struct TemplateSub {
                 }
             }
 
-            if (value->CopyStringValueTo(*stream_)) {
+            if (value->CopyStringValueTo(*stream_, Config::TemplatePrecision)) {
                 return;
             }
 
@@ -685,7 +685,7 @@ struct TemplateSub {
         const VariableTag &i_tag = *(static_cast<const VariableTag *>(tag->GetInfo()));
         const Value_T_    *value = getValue(i_tag);
 
-        if ((value != nullptr) && value->CopyStringValueTo(*stream_)) {
+        if ((value != nullptr) && value->CopyStringValueTo(*stream_, Config::TemplatePrecision)) {
             return;
         }
 
@@ -711,7 +711,7 @@ struct TemplateSub {
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit::NumberToString(*stream_, result.Number.Real, 3);
+                    Digit::NumberToString(*stream_, result.Number.Real, Config::TemplatePrecision);
                     break;
                 }
 

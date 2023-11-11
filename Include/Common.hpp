@@ -90,6 +90,7 @@ struct Config {
 #endif
 
     static constexpr unsigned int FloatDoublePrecision = 15U;
+    static constexpr unsigned int TemplatePrecision    = 3U;
 };
 ///////////////////////////////////////////////
 
