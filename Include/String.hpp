@@ -270,9 +270,9 @@ class String {
         if constexpr (Config::ShortStringOptimization) {
             const unsigned char len = storage_.GetLowByte();
             return ((len != 0) ? len : length_);
+        } else {
+            return length_;
         }
-
-        return length_;
     }
 
     inline Char_T_ *Storage() const noexcept {
