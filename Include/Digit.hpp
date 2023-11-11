@@ -48,7 +48,7 @@ struct Digit {
 
         RawIntToString<Reverse_V_>(&(storage[0]), offset, number);
 
-        if (!Reverse_V_) {
+        if constexpr (!Reverse_V_) {
             stream.Write(&(storage[offset]), (max_number_of_digits - offset));
         } else {
             stream.Write(&(storage[0U]), offset);
@@ -268,7 +268,7 @@ struct Digit {
 
     template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
-        if (!Reverse_V_) {
+        if constexpr (!Reverse_V_) {
             const SizeT o_offset = offset;
 
             while (number >= Number_T_{10}) {
