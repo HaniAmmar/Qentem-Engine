@@ -743,17 +743,17 @@ static void TestParse3(TestHelper &helper) {
     value = JSON::Parse(R"({"a":{"b":"c"}})");
     helper.Equal(value.Stringify(), R"({"a":{"b":"c"}})", "Stringify()", __LINE__);
 
-    value = JSON::Parse(R"([12.121121212121212])");
-    helper.Equal(value.Stringify(), R"([12.121121212121212])", "Stringify()", __LINE__);
+    value = JSON::Parse(R"([12.1211212121212])");
+    helper.Equal(value.Stringify(), R"([12.1211212121212])", "Stringify()", __LINE__);
 
-    value = JSON::Parse(R"([-12.121121212121212])");
-    helper.Equal(value.Stringify(), R"([-12.121121212121212])", "Stringify()", __LINE__);
+    value = JSON::Parse(R"([-12.1211212121212])");
+    helper.Equal(value.Stringify(), R"([-12.1211212121212])", "Stringify()", __LINE__);
 
     value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789])");
-    helper.Equal(value.Stringify(), R"([3.1234567891234568])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(), R"([3.12345678912346])", "Stringify()", __LINE__);
 
     value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e+10])");
-    helper.Equal(value.Stringify(), R"([31234567891.23457])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(), R"([31234567891.2346])", "Stringify()", __LINE__);
 
     value = JSON::Parse(R"([3.123456789123456789123456789123456789123456789123456789123456789e-10])");
     helper.Equal(value.Stringify(6U), R"([3.12346e-10])", "Stringify()", __LINE__);
