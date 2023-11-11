@@ -89,7 +89,7 @@ struct Config {
     static constexpr bool AutoEscapeHTML          = false;
 #endif
 
-    static constexpr unsigned int FloatDoublePrecision = 17;
+    static constexpr unsigned int FloatDoublePrecision = 15U;
 };
 ///////////////////////////////////////////////
 
