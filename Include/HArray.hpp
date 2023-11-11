@@ -657,11 +657,10 @@ class HArray {
         SizeT   *ht      = getHashTable();
         HAItem_ *storage = reinterpret_cast<HAItem_ *>(ht + Capacity());
         HAItem_ *item;
-        index     = (ht + (hash & getBase()));
-        SizeT tmp = *index;
+        index = (ht + (hash & getBase()));
 
-        while (tmp != 0) {
-            item = (storage + tmp);
+        while (*index != 0) {
+            item = (storage + *index);
             --item;
 
             if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
@@ -669,7 +668,7 @@ class HArray {
             }
 
             index = &(item->Next);
-            tmp   = *index;
+            *index = *index;
         }
 
         return nullptr;
@@ -683,16 +682,13 @@ class HArray {
         SizeT         *index;
         SizeT          i    = 1;
         const SizeT    base = getBase();
-        SizeT          tmp;
 
         while (item < end) {
             item->Next = 0;
             index      = (ht + (item->Hash & base));
-            tmp        = *index;
 
-            while (tmp != 0) {
-                index = &((src + (tmp - 1))->Next);
-                tmp   = *index;
+            while (*index != 0) {
+                index = &((src + (*index - SizeT{1}))->Next);
             }
 
             *index = i;

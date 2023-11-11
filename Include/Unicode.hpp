@@ -70,7 +70,7 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
         if (unicode < 0x10000U) {
             stream += static_cast<Char_T_>(unicode);
         } else {
-            unicode -= 0x10000;
+            unicode -= 0x10000U;
             stream += static_cast<Char_T_>(0xD800U | (unicode >> 10U));
             stream += static_cast<Char_T_>(0xDC00U | (unicode & 0x3FFU));
         }
