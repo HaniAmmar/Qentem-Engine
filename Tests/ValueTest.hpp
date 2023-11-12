@@ -3391,8 +3391,8 @@ static void TestIndexOperator1(TestHelper &helper) {
     using vu_long_long = unsigned long long;
 
     ValueC  value;
-    VString str1("D");
-    VString str2("DEFG");
+    const VString str1("D");
+    const VString str2("DEFG");
 
     value = VHArray(1); // Test changing type
 
@@ -3573,8 +3573,8 @@ static void TestAddition1(TestHelper &helper) {
     using vu_long_long = unsigned long long;
 
     ValueC  value;
-    VString str1("D");
-    VString str2("DEFG");
+    const VString str1("D");
+    const VString str2("DEFG");
 
     value += 20;
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
@@ -3617,7 +3617,6 @@ static void TestAddition1(TestHelper &helper) {
 
 static void TestAddition2(TestHelper &helper) {
     ValueC  value;
-    VArray  arr_var;
     VString str;
 
     /////////////////
@@ -3753,7 +3752,6 @@ static void TestAddition3(TestHelper &helper) {
     ValueC        value;
     VArray        arr_var;
     const ValueC *arr_storage;
-    VString       str;
     const char   *c_str;
     const char   *c_str2;
     /////////////////
@@ -4491,7 +4489,7 @@ static void TestStringify1(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"(["a",false])", "Stringify()", __LINE__);
 
     value.Reset();
-    VString str("ABC");
+    const VString str("ABC");
     value += str;
     value += false;
     helper.Equal(value.Stringify(), R"(["ABC",false])", "Stringify()", __LINE__);
@@ -4877,7 +4875,7 @@ static void TestStringify2(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"({"A":"a","B":false})", "Stringify()", __LINE__);
 
     value.Reset();
-    VString str("ABC");
+    const VString str("ABC");
     value["A"] = str;
     value["B"] = false;
     helper.Equal(value.Stringify(), R"({"A":"ABC","B":false})", "Stringify()", __LINE__);
