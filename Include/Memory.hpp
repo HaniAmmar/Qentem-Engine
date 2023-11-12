@@ -88,6 +88,16 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
+static constexpr Type_ *ChangePointer(void *value) noexcept {
+    return static_cast<Type_ *>(value);
+}
+
+template <typename Type_>
+static constexpr Type_ *ChangePointer(const void *value) noexcept {
+    return static_cast<Type_ *>(value);
+}
+/////////////////////////////////////////////////////////////////////
+template <typename Type_>
 static constexpr Type_ &&Move(Type_ &value) noexcept {
     return static_cast<Type_ &&>(value);
 }
