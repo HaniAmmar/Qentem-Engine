@@ -72,7 +72,7 @@ static void TestString1(TestHelper &helper) {
     helper.Equal(str2.First(), str_ptr, "First()", "str_ptr", __LINE__);
     helper.Equal(str2.Length(), length, "Length", __LINE__);
 
-    str1 = static_cast<String8 &&>(str2); // Move
+    str1 = Memory::Move(str2); // Move
     helper.Equal(str1.First(), str_ptr, "First()", __LINE__);
     helper.Equal(str1.Length(), length, "Length", __LINE__);
     helper.Equal(str2.Storage(), nullptr, "Storage()", "null", __LINE__);
@@ -106,7 +106,7 @@ static void TestString1(TestHelper &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual", __LINE__);
 
     length = str1.Length();
-    str2   = String8(static_cast<String8 &&>(str1));
+    str2   = String8(Memory::Move(str1));
     helper.Equal(str1.Storage(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.Length(), 0U, "Length", __LINE__);
@@ -348,7 +348,7 @@ static void TestString2(TestHelper &helper) {
     helper.Equal(str1, "abcdef", "str1", __LINE__);
 
     str2 = "ghi";
-    str1 += static_cast<String8 &&>(str2);
+    str1 += Memory::Move(str2);
     helper.Equal(str1.Length(), 9U, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
@@ -385,7 +385,7 @@ static void TestString2(TestHelper &helper) {
     str1.Reset();
     str1 = "1234";
     str2 = "5678";
-    str1 = str1 + static_cast<String8 &&>(str2);
+    str1 = str1 + Memory::Move(str2);
     helper.Equal(str1.Length(), 8U, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);

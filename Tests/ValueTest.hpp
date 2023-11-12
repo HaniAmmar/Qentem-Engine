@@ -197,12 +197,12 @@ static void TestTrueValue(TestHelper &helper) {
     helper.EqualsTrue(value2.IsTrue(), "IsTrue()", __LINE__);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
     helper.EqualsTrue(value2.IsTrue(), "IsTrue()", __LINE__);
 
     value1 = true;
-    ValueC value3(static_cast<ValueC &&>(value1));
+    ValueC value3(Memory::Move(value1));
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
@@ -266,12 +266,12 @@ static void TestFalseValue(TestHelper &helper) {
     helper.EqualsTrue(value2.IsFalse(), "IsFalse()", __LINE__);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
     helper.EqualsTrue(value2.IsFalse(), "IsFalse()", __LINE__);
 
     value1 = false;
-    ValueC value3(static_cast<ValueC &&>(value1));
+    ValueC value3(Memory::Move(value1));
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     helper.EqualsTrue(value3.IsFalse(), "IsFalse()", __LINE__);
@@ -335,12 +335,12 @@ static void TestNullValue(TestHelper &helper) {
     helper.EqualsTrue(value2.IsNull(), "IsNull()", __LINE__);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
     helper.EqualsTrue(value2.IsNull(), "IsNull()", __LINE__);
 
     value1 = nullptr;
-    ValueC value3(static_cast<ValueC &&>(value1));
+    ValueC value3(Memory::Move(value1));
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     helper.EqualsTrue(value3.IsNull(), "IsNull()", __LINE__);
@@ -415,7 +415,7 @@ static void TestNumberValue1(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
     helper.Equal(value2.GetNumber(), 10.0, "GetNumber()", __LINE__);
 
@@ -864,14 +864,14 @@ static void TestStringValue(TestHelper &helper) {
     helper.Equal(str_var, "true", "str_var", __LINE__);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.EqualsTrue(value2.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "true", "str_var", __LINE__);
 
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     value1 = "false";
-    ValueC value3(static_cast<ValueC &&>(value1));
+    ValueC value3(Memory::Move(value1));
     helper.Equal(value3.Length(), 5U, "Length()", __LINE__);
     helper.EqualsTrue(value3.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "false", "str_var", __LINE__);
@@ -955,8 +955,8 @@ static void TestArrayValue(TestHelper &helper) {
     VArray arr_var2;
     arr_var2.ResizeAndInitialize(10);
 
-    value1 = static_cast<VArray &&>(arr_var); // Move
-    value2 = static_cast<VArray &&>(arr_var2);
+    value1 = Memory::Move(arr_var); // Move
+    value2 = Memory::Move(arr_var2);
     value2 = value1;
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 10U, "Size()", __LINE__);
@@ -974,7 +974,7 @@ static void TestArrayValue(TestHelper &helper) {
     arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
     storage = arr_var.First();
-    value1  = static_cast<VArray &&>(arr_var);
+    value1  = Memory::Move(arr_var);
 
     value2 = ValueC{value1};
     helper.EqualsTrue(value2.IsArray(), "IsArray()", __LINE__);
@@ -988,7 +988,7 @@ static void TestArrayValue(TestHelper &helper) {
     helper.Equal(value1.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.Equal(value2.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
@@ -997,9 +997,9 @@ static void TestArrayValue(TestHelper &helper) {
     arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
     storage = arr_var.First();
-    value1  = static_cast<VArray &&>(arr_var);
+    value1  = Memory::Move(arr_var);
 
-    ValueC value3(static_cast<ValueC &&>(value1));
+    ValueC value3(Memory::Move(value1));
     helper.NotEqual(value3.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.Equal(value3.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
@@ -1016,7 +1016,7 @@ static void TestArrayValue(TestHelper &helper) {
     arr_var.Reset();
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
-    value3  = static_cast<VArray &&>(arr_var); // Move
+    value3  = Memory::Move(arr_var); // Move
     helper.NotEqual(value3.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.Equal(value3.GetArray()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
@@ -1050,7 +1050,7 @@ static void TestArrayValue(TestHelper &helper) {
     value1[1] = 22;
     str_var   = "Qen";
     c_str_var = str_var.First();
-    value1[2] = static_cast<VString &&>(str_var);
+    value1[2] = Memory::Move(str_var);
 
     value2 = value1;
     helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
@@ -1091,7 +1091,7 @@ static void TestArrayValue(TestHelper &helper) {
     val_ptr[0] = 10;
     val_ptr[1] = 20;
     val_ptr[2] = 30;
-    val_ptr[3] = static_cast<VString &&>(str_var);
+    val_ptr[3] = Memory::Move(str_var);
 
     value2 = arr_var;
     helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
@@ -1107,7 +1107,7 @@ static void TestArrayValue(TestHelper &helper) {
 
     arr_var.Clear();
     arr_var.Resize(5);
-    value2 = static_cast<VArray &&>(arr_var);
+    value2 = Memory::Move(arr_var);
     helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.Equal(value2.GetArray()->Capacity(), 5U, "value2.Size()", __LINE__);
 
@@ -1120,7 +1120,7 @@ static void TestArrayValue(TestHelper &helper) {
 
     arr_var.Reset();
     arr_var.Reserve(10);
-    value2 = static_cast<VArray &&>(arr_var);
+    value2 = Memory::Move(arr_var);
     value2.Compress();
     helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.Equal(value2.GetArray()->Capacity(), 0U, "Capacity()", __LINE__);
@@ -1192,7 +1192,7 @@ static void TestObjectValue1(TestHelper &helper) {
 
     storage = h_arr_var.First();
 
-    value1 = static_cast<VHArray &&>(h_arr_var); // Move
+    value1 = Memory::Move(h_arr_var); // Move
     value2 = value1;
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.Equal(value1.Size(), 10U, "Size()", __LINE__);
@@ -1224,7 +1224,7 @@ static void TestObjectValue1(TestHelper &helper) {
     }
 
     storage = h_arr_var.First();
-    value1  = static_cast<VHArray &&>(h_arr_var);
+    value1  = Memory::Move(h_arr_var);
 
     value2 = ValueC{value1};
     helper.EqualsTrue(value2.IsObject(), "IsObject()", __LINE__);
@@ -1248,10 +1248,10 @@ static void TestObjectValue1(TestHelper &helper) {
     }
 
     storage = h_arr_var.First();
-    value1  = static_cast<VHArray &&>(h_arr_var);
+    value1  = Memory::Move(h_arr_var);
 
     value2.Reset();
-    value2 = static_cast<ValueC &&>(value1);
+    value2 = Memory::Move(value1);
     helper.EqualsTrue(value2.IsObject(), "IsObject()", __LINE__);
     helper.Equal(value2.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
@@ -1279,9 +1279,9 @@ static void TestObjectValue2(TestHelper &helper) {
     }
 
     storage = h_arr_var.First();
-    value1  = static_cast<VHArray &&>(h_arr_var);
+    value1  = Memory::Move(h_arr_var);
 
-    ValueC value3(static_cast<ValueC &&>(value1));
+    ValueC value3(Memory::Move(value1));
     helper.EqualsTrue(value3.IsObject(), "IsObject()", __LINE__);
     helper.Equal(value3.Size(), 7U, "Size()", __LINE__);
     helper.Equal(value3.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
@@ -1312,7 +1312,7 @@ static void TestObjectValue2(TestHelper &helper) {
     }
 
     storage = h_arr_var.First();
-    value3  = static_cast<VHArray &&>(h_arr_var); // Move
+    value3  = Memory::Move(h_arr_var); // Move
     helper.EqualsTrue(value3.IsObject(), "IsObject()", __LINE__);
     helper.Equal(value3.Size(), 13U, "Size()", __LINE__);
     helper.NotEqual(value3.GetObject(), nullptr, "GetArray()", "null", __LINE__);
@@ -1350,7 +1350,7 @@ static void TestObjectValue2(TestHelper &helper) {
     value1["k2"] = 22;
     str_var      = "Qen";
     c_str_var    = str_var.First();
-    value1["k3"] = static_cast<VString &&>(str_var);
+    value1["k3"] = Memory::Move(str_var);
 
     value3 = value1;
     helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
@@ -1388,7 +1388,7 @@ static void TestObjectValue2(TestHelper &helper) {
     h_arr_var[VString("w3")] = 30;
     str_var                  = "-ABCDEF0123456789ABCDEF0123456789-";
     c_str_var                = str_var.First();
-    h_arr_var[VString("w4")] = static_cast<VString &&>(str_var);
+    h_arr_var[VString("w4")] = Memory::Move(str_var);
 
     value3 = h_arr_var;
     helper.Equal(value3.Size(), 4U, "value3.Size()", __LINE__);
@@ -1407,7 +1407,7 @@ static void TestObjectValue2(TestHelper &helper) {
     h_arr_var[VString("w2")] = 20;
     h_arr_var[VString("w3")] = 30;
 
-    value3 = static_cast<VHArray &&>(h_arr_var);
+    value3 = Memory::Move(h_arr_var);
     helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
 
     value3.Compress();
@@ -1460,7 +1460,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = static_cast<VString &&>(str_var);
+    value1    = Memory::Move(str_var);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1470,7 +1470,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = static_cast<VArray &&>(arr_var);
+    value1      = Memory::Move(arr_var);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1482,7 +1482,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = static_cast<VHArray &&>(h_arr_var);
+    value1        = Memory::Move(h_arr_var);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1517,7 +1517,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = static_cast<VString &&>(str_var);
+    value1    = Memory::Move(str_var);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1527,7 +1527,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = static_cast<VArray &&>(arr_var);
+    value1      = Memory::Move(arr_var);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1539,7 +1539,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = static_cast<VHArray &&>(h_arr_var);
+    value1        = Memory::Move(h_arr_var);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1574,7 +1574,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = static_cast<VString &&>(str_var);
+    value1    = Memory::Move(str_var);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1584,7 +1584,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = static_cast<VArray &&>(arr_var);
+    value1      = Memory::Move(arr_var);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1596,7 +1596,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = static_cast<VHArray &&>(h_arr_var);
+    value1        = Memory::Move(h_arr_var);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1630,7 +1630,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = static_cast<VString &&>(str_var);
+    value1    = Memory::Move(str_var);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1640,7 +1640,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = static_cast<VArray &&>(arr_var);
+    value1      = Memory::Move(arr_var);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1652,7 +1652,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = static_cast<VHArray &&>(h_arr_var);
+    value1        = Memory::Move(h_arr_var);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1694,7 +1694,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = static_cast<VArray &&>(arr_var);
+    value1      = Memory::Move(arr_var);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1706,7 +1706,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = static_cast<VHArray &&>(h_arr_var);
+    value1        = Memory::Move(h_arr_var);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1748,7 +1748,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = static_cast<VString &&>(str_var);
+    value1    = Memory::Move(str_var);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1758,7 +1758,7 @@ static void TestMoveValue1(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value1        = static_cast<VHArray &&>(h_arr_var);
+    value1        = Memory::Move(h_arr_var);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1816,7 +1816,7 @@ static void TestMoveValue2(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value1    = static_cast<VString &&>(str_var);
+    value1    = Memory::Move(str_var);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1826,7 +1826,7 @@ static void TestMoveValue2(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value1      = static_cast<VArray &&>(arr_var);
+    value1      = Memory::Move(arr_var);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1858,7 +1858,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = true;
 
     value2 = false;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
@@ -1866,7 +1866,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = true;
 
     value2 = nullptr;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
@@ -1874,7 +1874,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = true;
 
     value2 = 11;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), 11.0, "GetNumber()", __LINE__);
     value1.Reset();
@@ -1884,8 +1884,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
-    value1    = static_cast<ValueC &&>(value2);
+    value2    = Memory::Move(str_var);
+    value1    = Memory::Move(value2);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1895,8 +1895,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
-    value1      = static_cast<ValueC &&>(value2);
+    value2      = Memory::Move(arr_var);
+    value1      = Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1908,8 +1908,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
-    value1        = static_cast<ValueC &&>(value2);
+    value2        = Memory::Move(h_arr_var);
+    value1        = Memory::Move(value2);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1921,7 +1921,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = false;
 
     value2 = true;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
@@ -1929,7 +1929,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = false;
 
     value2 = nullptr;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
@@ -1937,7 +1937,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = false;
 
     value2 = -90;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), -90.0, "GetNumber()", __LINE__);
     value1.Reset();
@@ -1947,8 +1947,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
-    value1    = static_cast<ValueC &&>(value2);
+    value2    = Memory::Move(str_var);
+    value1    = Memory::Move(value2);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -1958,8 +1958,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
-    value1      = static_cast<ValueC &&>(value2);
+    value2      = Memory::Move(arr_var);
+    value1      = Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -1971,8 +1971,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
-    value1        = static_cast<ValueC &&>(value2);
+    value2        = Memory::Move(h_arr_var);
+    value1        = Memory::Move(value2);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -1984,7 +1984,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = nullptr;
 
     value2 = true;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
@@ -1992,7 +1992,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = nullptr;
 
     value2 = false;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
@@ -2000,7 +2000,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = nullptr;
 
     value2 = 7.5;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), 7.5, "GetNumber()", __LINE__);
     value1.Reset();
@@ -2010,8 +2010,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
-    value1    = static_cast<ValueC &&>(value2);
+    value2    = Memory::Move(str_var);
+    value1    = Memory::Move(value2);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -2021,8 +2021,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
-    value1      = static_cast<ValueC &&>(value2);
+    value2      = Memory::Move(arr_var);
+    value1      = Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -2034,8 +2034,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
-    value1        = static_cast<ValueC &&>(value2);
+    value2        = Memory::Move(h_arr_var);
+    value1        = Memory::Move(value2);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -2047,7 +2047,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = 13;
 
     value2 = true;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
@@ -2055,7 +2055,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = 40;
 
     value2 = false;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
@@ -2063,7 +2063,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = 33;
 
     value2 = nullptr;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
@@ -2072,8 +2072,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
-    value1    = static_cast<ValueC &&>(value2);
+    value2    = Memory::Move(str_var);
+    value1    = Memory::Move(value2);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -2083,8 +2083,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
-    value1      = static_cast<ValueC &&>(value2);
+    value2      = Memory::Move(arr_var);
+    value1      = Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -2096,8 +2096,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
-    value1        = static_cast<ValueC &&>(value2);
+    value2        = Memory::Move(h_arr_var);
+    value1        = Memory::Move(value2);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -2109,7 +2109,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = true;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
@@ -2117,7 +2117,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = false;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
@@ -2125,7 +2125,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = nullptr;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
@@ -2133,7 +2133,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value2 = 4;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), 4.0, "GetNumber()", __LINE__);
     value1.Reset();
@@ -2143,8 +2143,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
-    value1      = static_cast<ValueC &&>(value2);
+    value2      = Memory::Move(arr_var);
+    value1      = Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -2156,8 +2156,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
-    value1        = static_cast<ValueC &&>(value2);
+    value2        = Memory::Move(h_arr_var);
+    value1        = Memory::Move(value2);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -2169,7 +2169,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VArray(1);
 
     value2 = true;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
@@ -2177,7 +2177,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VArray(1);
 
     value2 = false;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
@@ -2185,7 +2185,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VArray(1);
 
     value2 = nullptr;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
@@ -2193,7 +2193,7 @@ static void TestMoveValue3(TestHelper &helper) {
     value1 = VArray(1);
 
     value2 = 33;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, "GetNumber()", __LINE__);
     value1.Reset();
@@ -2203,8 +2203,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
-    value1    = static_cast<ValueC &&>(value2);
+    value2    = Memory::Move(str_var);
+    value1    = Memory::Move(value2);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -2214,8 +2214,8 @@ static void TestMoveValue3(TestHelper &helper) {
 
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
-    value1        = static_cast<ValueC &&>(value2);
+    value2        = Memory::Move(h_arr_var);
+    value1        = Memory::Move(value2);
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.NotEqual(value1.GetObject(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetObject()->First(), nullptr, "GetObject()->First()", "null", __LINE__);
@@ -2244,7 +2244,7 @@ static void TestMoveValue4(TestHelper &helper) {
     value1 = VHArray(1);
 
     value2 = true;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     value1.Reset();
 
@@ -2252,7 +2252,7 @@ static void TestMoveValue4(TestHelper &helper) {
     value1 = VHArray(1);
 
     value2 = false;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     value1.Reset();
 
@@ -2260,7 +2260,7 @@ static void TestMoveValue4(TestHelper &helper) {
     value1 = VHArray(1);
 
     value2 = nullptr;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     value1.Reset();
 
@@ -2268,7 +2268,7 @@ static void TestMoveValue4(TestHelper &helper) {
     value1 = VHArray(1);
 
     value2 = 33;
-    value1 = static_cast<ValueC &&>(value2);
+    value1 = Memory::Move(value2);
     helper.EqualsTrue(value1.IsNumber(), "IsNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, "GetNumber()", __LINE__);
     value1.Reset();
@@ -2278,8 +2278,8 @@ static void TestMoveValue4(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
-    value1    = static_cast<ValueC &&>(value2);
+    value2    = Memory::Move(str_var);
+    value1    = Memory::Move(value2);
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
     value1.Reset();
@@ -2289,8 +2289,8 @@ static void TestMoveValue4(TestHelper &helper) {
 
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
-    value1      = static_cast<ValueC &&>(value2);
+    value2      = Memory::Move(arr_var);
+    value1      = Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
     helper.NotEqual(value1.GetArray()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
@@ -2769,7 +2769,7 @@ static void TestCopyValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
+    value2    = Memory::Move(str_var);
     value1    = value2;
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
@@ -2792,7 +2792,7 @@ static void TestCopyValue3(TestHelper &helper) {
     arr_var = VArray();
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
     value1      = value2;
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -2825,7 +2825,7 @@ static void TestCopyValue3(TestHelper &helper) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
+    value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
@@ -2865,7 +2865,7 @@ static void TestCopyValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
+    value2    = Memory::Move(str_var);
     value1    = value2;
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
@@ -2888,7 +2888,7 @@ static void TestCopyValue3(TestHelper &helper) {
     arr_var = VArray();
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
     value1      = value2;
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -2921,7 +2921,7 @@ static void TestCopyValue3(TestHelper &helper) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
+    value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
@@ -2961,7 +2961,7 @@ static void TestCopyValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
+    value2    = Memory::Move(str_var);
     value1    = value2;
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
@@ -2984,7 +2984,7 @@ static void TestCopyValue3(TestHelper &helper) {
     arr_var = VArray();
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
     value1      = value2;
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -3017,7 +3017,7 @@ static void TestCopyValue3(TestHelper &helper) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
+    value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
@@ -3056,7 +3056,7 @@ static void TestCopyValue3(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
+    value2    = Memory::Move(str_var);
     value1    = value2;
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
@@ -3079,7 +3079,7 @@ static void TestCopyValue3(TestHelper &helper) {
     arr_var = VArray();
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
     value1      = value2;
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -3112,7 +3112,7 @@ static void TestCopyValue3(TestHelper &helper) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
+    value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
@@ -3192,7 +3192,7 @@ static void TestCopyValue4(TestHelper &helper) {
     arr_var = VArray();
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
     value1      = value2;
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -3225,7 +3225,7 @@ static void TestCopyValue4(TestHelper &helper) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
+    value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
@@ -3273,7 +3273,7 @@ static void TestCopyValue4(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
+    value2    = Memory::Move(str_var);
     value1    = value2;
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
@@ -3303,7 +3303,7 @@ static void TestCopyValue4(TestHelper &helper) {
     }
 
     h_arr_storage = h_arr_var.First();
-    value2        = static_cast<VHArray &&>(h_arr_var);
+    value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
@@ -3351,7 +3351,7 @@ static void TestCopyValue4(TestHelper &helper) {
 
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
-    value2    = static_cast<VString &&>(str_var);
+    value2    = Memory::Move(str_var);
     value1    = value2;
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, "value1.StringStorage()", "c_str_var", __LINE__);
@@ -3374,7 +3374,7 @@ static void TestCopyValue4(TestHelper &helper) {
     arr_var = VArray();
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
     value1      = value2;
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -3683,7 +3683,7 @@ static void TestAddition2(TestHelper &helper) {
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
-    value += static_cast<VString &&>(str);
+    value += Memory::Move(str);
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value.Size(), 1U, "Size()", __LINE__);
     helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
@@ -3693,7 +3693,7 @@ static void TestAddition2(TestHelper &helper) {
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
-    value += static_cast<VString &&>(str);
+    value += Memory::Move(str);
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value.Size(), 2U, "Size()", __LINE__);
     helper.EqualsTrue(value[0].IsString(), "value[0].IsString()", __LINE__);
@@ -3845,7 +3845,7 @@ static void TestAddition3(TestHelper &helper) {
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
 
-    value += static_cast<VArray &&>(arr_var);
+    value += Memory::Move(arr_var);
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value.Size(), 3U, "Size()", __LINE__);
     helper.NotEqual(value.GetArray(), nullptr, "GetArray()", "null", __LINE__);
@@ -3864,7 +3864,7 @@ static void TestAddition3(TestHelper &helper) {
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
 
-    value += static_cast<VArray &&>(arr_var);
+    value += Memory::Move(arr_var);
     helper.Equal(arr_var.First(), nullptr, "arr_var.First()", "null", __LINE__);
 
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
@@ -3946,7 +3946,7 @@ static void TestAddition4(TestHelper &helper) {
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
-    value2            = static_cast<VString &&>(str);
+    value2            = Memory::Move(str);
 
     value1 += value2;
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -3958,7 +3958,7 @@ static void TestAddition4(TestHelper &helper) {
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
-    value2             = static_cast<VString &&>(str);
+    value2             = Memory::Move(str);
 
     value1 += value2;
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -3997,7 +3997,7 @@ static void TestAddition4(TestHelper &helper) {
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value2 = VArray(10);
-    value1.Merge(static_cast<ValueC &&>(value2));
+    value1.Merge(Memory::Move(value2));
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
@@ -4010,9 +4010,9 @@ static void TestAddition4(TestHelper &helper) {
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
 
-    value1.Merge(static_cast<ValueC &&>(value2));
+    value1.Merge(Memory::Move(value2));
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 3U, "Size()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
@@ -4031,7 +4031,7 @@ static void TestAddition4(TestHelper &helper) {
     arr_var += ValueC{VString("^ABCDEF0123456789ABCDEF0123456789^")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
 
     value1.Merge(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
@@ -4070,7 +4070,7 @@ static void TestAddition5(TestHelper &helper) {
     value2 = true;
     helper.EqualsTrue(value2.IsTrue(), "value2.IsTrue()", __LINE__);
 
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
 
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
@@ -4085,7 +4085,7 @@ static void TestAddition5(TestHelper &helper) {
     value2 += VHArray(1);
 
     value2 = true;
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsTrue(), "value1[0].IsTrue()", __LINE__);
@@ -4096,13 +4096,13 @@ static void TestAddition5(TestHelper &helper) {
 
     value2 = false;
 
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
 
     value2 = false;
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsFalse(), "value1[0].IsFalse()", __LINE__);
@@ -4112,13 +4112,13 @@ static void TestAddition5(TestHelper &helper) {
     /////////////////
 
     value2 = nullptr;
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsNull(), "value1[0].IsNull()", __LINE__);
 
     value2 = nullptr;
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsNull(), "value1[0].IsNull()", __LINE__);
@@ -4128,9 +4128,9 @@ static void TestAddition5(TestHelper &helper) {
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
-    value2            = static_cast<VString &&>(str);
+    value2            = Memory::Move(str);
 
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 1U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsString(), "value1[0].IsString()", __LINE__);
@@ -4140,9 +4140,9 @@ static void TestAddition5(TestHelper &helper) {
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
-    value2             = static_cast<VString &&>(str);
+    value2             = Memory::Move(str);
 
-    value1 += static_cast<ValueC &&>(value2);
+    value1 += Memory::Move(value2);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 2U, "Size()", __LINE__);
     helper.EqualsTrue(value1[0].IsString(), "value1[0].IsString()", __LINE__);
@@ -4164,7 +4164,7 @@ static void TestAddition5(TestHelper &helper) {
     helper.NotEqual(value2.GetArray(), nullptr, "GetArray()", "null", __LINE__);
 
     value2 = VArray(1);
-    value1.Merge(static_cast<ValueC &&>(value2));
+    value1.Merge(Memory::Move(value2));
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
@@ -4178,9 +4178,9 @@ static void TestAddition5(TestHelper &helper) {
     arr_var += ValueC{VString("-ABCDEF0123456789ABCDEF0123456789-")};
     arr_storage = arr_var.First();
     c_str       = arr_storage[2].StringStorage();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
 
-    value1.Merge(static_cast<ValueC &&>(value2));
+    value1.Merge(Memory::Move(value2));
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 3U, "Size()", __LINE__);
     helper.NotEqual(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
@@ -4199,9 +4199,9 @@ static void TestAddition5(TestHelper &helper) {
     arr_var += ValueC{VString("#0123456789ABCDEF0123456789ABCDEF#")};
     arr_storage = arr_var.First();
     c_str2      = arr_storage[2].StringStorage();
-    value2      = static_cast<VArray &&>(arr_var);
+    value2      = Memory::Move(arr_var);
 
-    value1.Merge(static_cast<ValueC &&>(value2));
+    value1.Merge(Memory::Move(value2));
     helper.EqualsTrue(value2.IsUndefined(), "value2.IsUndefined()", __LINE__);
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.Size(), 6U, "Size()", __LINE__);
@@ -4239,7 +4239,7 @@ static void TestAddition6(TestHelper &helper) {
     value1["k2"] = 22;
     str_var      = "*ABCDEF0123456789ABCDEF0123456789*";
     str_c1       = str_var.First();
-    value1["k3"] = static_cast<VString &&>(str_var);
+    value1["k3"] = Memory::Move(str_var);
 
     if (value1.GetObject() != nullptr) {
         h_arr_storage1 = value1.GetObject()->First();
@@ -4250,7 +4250,7 @@ static void TestAddition6(TestHelper &helper) {
     h_arr_var[VString("w3")] = 30;
     str_var                  = "-ABCDEF0123456789ABCDEF0123456789-";
     str_c2                   = str_var.First();
-    h_arr_var[VString("w4")] = static_cast<VString &&>(str_var);
+    h_arr_var[VString("w4")] = Memory::Move(str_var);
     h_arr_storage2           = h_arr_var.First();
 
     value2 = VHArray();   // Setting to object type.
@@ -4279,8 +4279,8 @@ static void TestAddition6(TestHelper &helper) {
 
     ////
 
-    value2 = VHArray();                           // Clearing and  Setting to object type.
-    value2.Merge(static_cast<ValueC &&>(value1)); // Move
+    value2 = VHArray();                 // Clearing and  Setting to object type.
+    value2.Merge(Memory::Move(value1)); // Move
     helper.EqualsTrue(value1.IsUndefined(), "value1.IsUndefined()", __LINE__);
     helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
     helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
@@ -4294,8 +4294,8 @@ static void TestAddition6(TestHelper &helper) {
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
 
-    value2 = VHArray();                           // Clearing and  Setting to object type.
-    value2 += static_cast<VHArray &&>(h_arr_var); // Move
+    value2 = VHArray();                // Clearing and  Setting to object type.
+    value2 += Memory::Move(h_arr_var); // Move
     helper.Equal(h_arr_var.First(), nullptr, "h_arr_var.First()", "null", __LINE__);
     helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
     helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
@@ -4363,8 +4363,8 @@ static void TestAddition6(TestHelper &helper) {
     value2["w4"] = 400;
     value2["w5"] = 500;
     value2["w6"] = 600;
-    value2.Merge(static_cast<ValueC &&>(value1)); // Move
-    value2 += static_cast<VHArray &&>(h_arr_var); // Move
+    value2.Merge(Memory::Move(value1)); // Move
+    value2 += Memory::Move(h_arr_var);  // Move
     helper.Equal(value2["w0"].GetNumber(), 5.0, "[\"w0\"].GetNumber()", __LINE__);
     helper.Equal(value2["w1"].GetNumber(), 10.0, "[\"w1\"].GetNumber()", __LINE__);
     helper.Equal(value2["w2"].GetNumber(), 20.0, "[\"w2\"].GetNumber()", __LINE__);

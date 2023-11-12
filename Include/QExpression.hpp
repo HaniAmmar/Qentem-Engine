@@ -82,8 +82,7 @@ struct QExpression {
     }
 
     QExpression(Array<QExpression> &&subExpressions, QOperation operation) noexcept
-        : SubExpressions{static_cast<Array<QExpression> &&>(subExpressions)}, Type{ExpressionType::SubOperation},
-          Operation{operation} {
+        : SubExpressions{Memory::Move(subExpressions)}, Type{ExpressionType::SubOperation}, Operation{operation} {
     }
 
     ~QExpression() {

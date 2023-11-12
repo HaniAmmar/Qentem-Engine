@@ -1011,7 +1011,7 @@ static void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag
                            (e_tag_offset - r_tag_len));
         }
 
-        items += static_cast<Item2Engine &&>(item);
+        items += Memory::Move(item);
 
         offset = e_tag_offset;
     }

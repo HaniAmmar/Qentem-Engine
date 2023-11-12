@@ -86,14 +86,17 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
         ++offset;
     }
 }
-
 /////////////////////////////////////////////////////////////////////
-
+template <typename Type_>
+static constexpr Type_ &&Move(Type_ &value) noexcept {
+    return static_cast<Type_ &&>(value);
+}
+/////////////////////////////////////////////////////////////////////
 template <typename Type_>
 inline static void Swap(Type_ &item1, Type_ &item2) noexcept {
-    Type_ item = static_cast<Type_ &&>(item1);
-    item1      = static_cast<Type_ &&>(item2);
-    item2      = static_cast<Type_ &&>(item);
+    Type_ item = Move(item1);
+    item1      = Move(item2);
+    item2      = Move(item);
 }
 
 template <typename Type_, typename Number_T_>
@@ -194,7 +197,7 @@ inline static void Initialize(Type_ *pointer, const Type_ *end) noexcept {
 // Move initializer
 template <typename Type_>
 inline static void Initialize(Type_ *pointer, Type_ &&value) noexcept {
-    new (pointer) Type_{static_cast<Type_ &&>(value)};
+    new (pointer) Type_{Move(value)};
 }
 
 // Copy initializer
@@ -214,7 +217,7 @@ inline static void Initialize(Type_ *pointer, const Type_ *end, const Type_ &val
 
 template <typename Type_, typename... Values_T_>
 inline static void InitializeValues(Type_ *pointer, Values_T_ &&...values) noexcept {
-    new (pointer) Type_{static_cast<Values_T_ &&>(values)...};
+    new (pointer) Type_{Move(values)...};
 }
 
 template <typename Type_, typename... Values_T_>
@@ -234,7 +237,7 @@ inline static Type_ *AllocateInit() {
 template <typename Type_, typename... Values_T_>
 inline static Type_ *AllocateInit(Values_T_ &&...values) noexcept {
     Type_ *pointer = Allocate<Type_>(1);
-    InitializeValues(pointer, static_cast<Values_T_ &&>(values)...);
+    InitializeValues(pointer, Move(values)...);
     return pointer;
     // return new Type_{static_cast<Values_T_ &&>(values)...};
 }

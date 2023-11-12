@@ -128,7 +128,7 @@ static void TestArray1(TestHelper &helper) {
     helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
     helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
 
-    numbers2 = static_cast<Array<SizeT> &&>(numbers1);
+    numbers2 = Memory::Move(numbers1);
     helper.Equal(numbers2.Size(), 16U, "Size", __LINE__);
     helper.Equal(numbers2.Capacity(), 16U, "Capacity", __LINE__);
     helper.Equal(numbers2.First(), storage, "First()", __LINE__);
@@ -146,7 +146,7 @@ static void TestArray1(TestHelper &helper) {
     helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
 
     storage  = numbers2.First();
-    numbers1 = Array<SizeT>(static_cast<Array<SizeT> &&>(numbers2));
+    numbers1 = Array<SizeT>(Memory::Move(numbers2));
     helper.Equal(numbers1.Size(), 16U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 16U, "Capacity", __LINE__);
     helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
@@ -172,7 +172,7 @@ static void TestArray1(TestHelper &helper) {
     helper.NotEqual(numbers1.First(), storage, "First()", "storage", __LINE__);
 
     storage = numbers1.First();
-    numbers1 += static_cast<Array<SizeT> &&>(numbers2);
+    numbers1 += Memory::Move(numbers2);
     helper.Equal(numbers1.Size(), 13U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 13U, "Capacity", __LINE__);
     helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
@@ -184,14 +184,14 @@ static void TestArray1(TestHelper &helper) {
     numbers2.ResizeAndInitialize(5);
     numbers1.Resize(18);
     storage = numbers1.First();
-    numbers1 += static_cast<Array<SizeT> &&>(numbers2);
+    numbers1 += Memory::Move(numbers2);
     helper.Equal(numbers1.Size(), 18U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 18U, "Capacity", __LINE__);
     helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(numbers1.First(), storage, "First()", __LINE__);
 
     storage = numbers1.First();
-    numbers2 += static_cast<Array<SizeT> &&>(numbers1);
+    numbers2 += Memory::Move(numbers1);
     helper.Equal(numbers2.Size(), 18U, "Size", __LINE__);
     helper.Equal(numbers2.Capacity(), 18U, "Capacity", __LINE__);
     helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
@@ -236,7 +236,7 @@ static void TestArray2(TestHelper &helper) {
     helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
 
     storage = numbers1.First();
-    numbers2.Insert(static_cast<Array<SizeT> &&>(numbers1));
+    numbers2.Insert(Memory::Move(numbers1));
     helper.Equal(numbers2.Size(), 12U, "Size", __LINE__);
     helper.Equal(numbers2.Capacity(), 12U, "Capacity", __LINE__);
     helper.NotEqual(numbers2.First(), nullptr, "First()", "null", __LINE__);
@@ -292,11 +292,11 @@ static void TestArray3(TestHelper &helper) {
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
 
-    strings += static_cast<String<char> &&>(str1);
+    strings += Memory::Move(str1);
 
     helper.Equal(strings.Storage()[0].First(), str1_cstr, "storage_str[0].First()", "str1_cstr", __LINE__);
 
-    strings.Insert(static_cast<String<char> &&>(str2));
+    strings.Insert(Memory::Move(str2));
     helper.Equal(strings.Storage()[1].First(), str2_cstr, "storage_str[1].First()", "str2_cstr", __LINE__);
 
     strings += str1;
@@ -341,8 +341,8 @@ static void TestArray4(TestHelper &helper) {
     const char *str1_cstr = str1.First();
     const char *str2_cstr = str2.First();
 
-    strings1 += static_cast<String<char> &&>(str1);
-    strings1 += static_cast<String<char> &&>(str2);
+    strings1 += Memory::Move(str1);
+    strings1 += Memory::Move(str2);
 
     strings2 += strings1;
     String<char> *storage2 = strings2.Storage();
@@ -353,7 +353,7 @@ static void TestArray4(TestHelper &helper) {
     helper.NotEqual(storage2[1].First(), str2_cstr, "storage2[1].First()", "str2_cstr", __LINE__);
 
     strings2.Reserve(2);
-    strings2 += static_cast<Array<String<char>> &&>(strings1);
+    strings2 += Memory::Move(strings1);
     storage2 = strings2.Storage();
 
     helper.Equal(strings2.Size(), 2U, "Size", __LINE__);

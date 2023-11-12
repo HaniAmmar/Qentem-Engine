@@ -107,7 +107,7 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss1.Capacity(), lss, "Capacity", __LINE__);
 
     ss1.Reset();
-    ss1 = static_cast<StringStream<char> &&>(ss2); // Move
+    ss1 = Memory::Move(ss2); // Move
     helper.Equal(ss1.Length(), 3U, "Length", __LINE__);
     helper.EqualsTrue((ss1.Capacity() >= 3), "(ss1.Capacity() >= 3)", __LINE__);
     helper.Equal(ss1, "abc", "StringStream", __LINE__);
@@ -118,7 +118,7 @@ static void TestStringStream(TestHelper &helper) {
 
     ss2 += 'a';
     ss1.Reset();
-    ss1 = static_cast<StringStream<char> &&>(ss2); // Move
+    ss1 = Memory::Move(ss2); // Move
     helper.Equal(ss1.Length(), 1U, "Length", __LINE__);
     helper.EqualsTrue((ss1.Capacity() >= 8), "(ss1.Capacity() >= 1)", __LINE__);
     helper.Equal(ss1, "a", "StringStream", __LINE__);
@@ -136,7 +136,7 @@ static void TestStringStream(TestHelper &helper) {
     ss2.Reset();
 
     ss1 += "efg";
-    ss2 = StringStream<char>(static_cast<StringStream<char> &&>(ss1)); // Move
+    ss2 = StringStream<char>(Memory::Move(ss1)); // Move
     helper.Equal(ss1.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(ss1.Length(), 0U, "Length", __LINE__);
     helper.EqualsTrue((ss1.Capacity() == 0), "(ss1.Capacity() = 0)", __LINE__);

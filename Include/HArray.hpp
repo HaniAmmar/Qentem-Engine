@@ -79,7 +79,7 @@ class HArray {
     }
 
     HArray(HArray &&src) noexcept
-        : index_{src.Size()}, capacity_{src.Capacity()}, hashTable_{static_cast<QPointer<SizeT> &&>(src.hashTable_)} {
+        : index_{src.Size()}, capacity_{src.Capacity()}, hashTable_{Memory::Move(src.hashTable_)} {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -140,12 +140,12 @@ class HArray {
                 HAItem_ *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
-                    storage_item = insert(index, static_cast<Key_ &&>(src_item->Key), src_item->Hash);
+                    storage_item = insert(index, Memory::Move(src_item->Key), src_item->Hash);
                 } else {
                     Memory::Dispose(&(src_item->Key));
                 }
 
-                storage_item->Value = static_cast<Value_ &&>(src_item->Value);
+                storage_item->Value = Memory::Move(src_item->Value);
             }
 
             ++src_item;
@@ -202,7 +202,7 @@ class HArray {
             return item->Value;
         }
 
-        return insert(index, static_cast<Key_ &&>(key), hash)->Value;
+        return insert(index, Memory::Move(key), hash)->Value;
     }
 
     Value_ &operator[](const Key_ &key) {
@@ -253,10 +253,10 @@ class HArray {
         HAItem_    *item = find(index, str, len, hash);
 
         if (item == nullptr) {
-            item = insert(index, static_cast<Key_ &&>(key), hash);
+            item = insert(index, Memory::Move(key), hash);
         }
 
-        item->Value = static_cast<Value_ &&>(val);
+        item->Value = Memory::Move(val);
     }
 
     inline Value_ *GetValue(const Key_ &key) const noexcept {
@@ -396,7 +396,7 @@ class HArray {
                     item->Next   = 0;
                     item->Hash   = to_hash;
 
-                    item->Key = static_cast<Key_ &&>(to);
+                    item->Key = Memory::Move(to);
                     return true;
                 }
             }
@@ -588,7 +588,7 @@ class HArray {
 
         item->Next = 0;
         item->Hash = hash;
-        Memory::Initialize(&(item->Key), static_cast<Key_ &&>(key));
+        Memory::Initialize(&(item->Key), Memory::Move(key));
         Memory::Initialize(&(item->Value));
 
         return item;
@@ -641,7 +641,7 @@ class HArray {
 
         while (item < end) {
             if (item->Hash != 0) {
-                Memory::Initialize(storage_item, static_cast<HAItem_ &&>(*item));
+                Memory::Initialize(storage_item, Memory::Move(*item));
                 ++storage_item;
             }
 

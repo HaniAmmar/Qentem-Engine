@@ -127,7 +127,7 @@ struct JSON {
 
                     if (c == JSONotation::ECurlyChar) {
                         ++offset;
-                        value = static_cast<VObject &&>(obj);
+                        value = Memory::Move(obj);
                         break;
                     }
 
@@ -153,7 +153,7 @@ struct JSON {
 
                 while (offset < length) {
                     parseValue(value, stream, content, offset, length);
-                    arr += static_cast<VValue &&>(value);
+                    arr += Memory::Move(value);
                     StringUtils::TrimLeft(content, offset, length);
 
                     const Char_T_ c = content[offset];
@@ -161,7 +161,7 @@ struct JSON {
                     if (c == JSONotation::ESquareChar) {
                         ++offset;
                         // arr.Compress();
-                        value = static_cast<VArray &&>(arr);
+                        value = Memory::Move(arr);
                         break;
                     }
 

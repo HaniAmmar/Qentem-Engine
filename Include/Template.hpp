@@ -1074,13 +1074,13 @@ struct TemplateSub {
                 if (else_offset == 0) {
                     parse(sub_tags, content_offset, end_offset);
                     i_tag +=
-                        IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), parseExpressions(offset, case_end_offset)};
+                        IfTagCase{Memory::Move(sub_tags), parseExpressions(offset, case_end_offset)};
 
                     break;
                 }
 
                 parse(sub_tags, content_offset, (else_offset - TagPatterns::ElsePrefixLength));
-                i_tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), parseExpressions(offset, case_end_offset)};
+                i_tag += IfTagCase{Memory::Move(sub_tags), parseExpressions(offset, case_end_offset)};
 
                 if ((content_[else_offset] != TagPatterns::ElseIfChar)) {
                     else_offset = Engine::FindOne<Char_T_>(TagPatterns::MultiLineSuffix, content_, else_offset,
@@ -1088,7 +1088,7 @@ struct TemplateSub {
 
                     if (else_offset != 0) {
                         parse(sub_tags, else_offset, end_offset);
-                        i_tag += IfTagCase{static_cast<Array<TagBit> &&>(sub_tags), QExpressions{}}; // else without if
+                        i_tag += IfTagCase{Memory::Move(sub_tags), QExpressions{}}; // else without if
                     }
 
                     break;
@@ -1717,7 +1717,7 @@ struct TemplateSub {
                         expr.Type          = ExpressionType::NotANumber;
                     }
 
-                    exprs += static_cast<QExpression &&>(expr);
+                    exprs += Memory::Move(expr);
 
                     return true;
                 }

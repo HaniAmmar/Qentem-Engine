@@ -42,8 +42,7 @@ class Array {
         }
     }
 
-    Array(Array &&src) noexcept
-        : index_{src.Size()}, capacity_{src.Capacity()}, storage_{static_cast<QPointer<Type_> &&>(src.storage_)} {
+    Array(Array &&src) noexcept : index_{src.Size()}, capacity_{src.Capacity()}, storage_{Memory::Move(src.storage_)} {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -148,16 +147,16 @@ class Array {
             resize(Capacity() * SizeT{2});
         }
 
-        Memory::Initialize((Storage() + Size()), static_cast<Type_ &&>(item));
+        Memory::Initialize((Storage() + Size()), Memory::Move(item));
         ++index_;
     }
 
     inline void operator+=(const Type_ &item) {
-        *this += static_cast<Type_ &&>(Type_{item});
+        *this += Type_{item};
     }
 
     inline void Insert(Array &&src) {
-        *this += static_cast<Array &&>(src);
+        *this += Memory::Move(src);
     }
 
     inline void Insert(const Array &src) {
@@ -165,15 +164,15 @@ class Array {
     }
 
     inline void Insert(Type_ &&item) {
-        *this += static_cast<Type_ &&>(item);
+        *this += Memory::Move(item);
     }
 
     inline void Insert(const Type_ &item) {
-        *this += static_cast<Type_ &&>(Type_{item});
+        *this += Type_{item};
     }
 
     inline Type_ &InsertGet(Type_ &&item) {
-        *this += static_cast<Type_ &&>(item);
+        *this += Memory::Move(item);
         return *(Storage() + (Size() - 1));
     }
 

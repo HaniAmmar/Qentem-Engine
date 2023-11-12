@@ -54,7 +54,7 @@ class Value {
     Value() noexcept : number_{} {
     }
 
-    Value(Value &&val) noexcept : number_{static_cast<VNumber &&>(val.number_)} {
+    Value(Value &&val) noexcept : number_{Memory::Move(val.number_)} {
         if (!Config::PointerTagging) {
             setType(val.Type());
             val.setTypeToUndefined();
@@ -110,15 +110,15 @@ class Value {
         }
     }
 
-    explicit Value(VObject &&obj) noexcept : object_{static_cast<VObject &&>(obj)} {
+    explicit Value(VObject &&obj) noexcept : object_{Memory::Move(obj)} {
         setTypeToObject();
     }
 
-    explicit Value(VArray &&arr) noexcept : array_{static_cast<VArray &&>(arr)} {
+    explicit Value(VArray &&arr) noexcept : array_{Memory::Move(arr)} {
         setTypeToArray();
     }
 
-    explicit Value(VString &&str) noexcept : string_{static_cast<VString &&>(str)} {
+    explicit Value(VString &&str) noexcept : string_{Memory::Move(str)} {
         setTypeToString();
     }
 
@@ -254,7 +254,7 @@ class Value {
 
     Value &operator=(VObject &&obj) noexcept {
         if (IsObject()) {
-            object_ = static_cast<VObject &&>(obj);
+            object_ = Memory::Move(obj);
             return *this;
         }
 
@@ -262,7 +262,7 @@ class Value {
             reset();
         }
 
-        initValue(static_cast<VObject &&>(obj));
+        initValue(Memory::Move(obj));
         return *this;
     }
 
@@ -282,7 +282,7 @@ class Value {
 
     Value &operator=(VArray &&arr) noexcept {
         if (IsArray()) {
-            array_ = static_cast<VArray &&>(arr);
+            array_ = Memory::Move(arr);
             return *this;
         }
 
@@ -290,7 +290,7 @@ class Value {
             reset();
         }
 
-        initValue(static_cast<VArray &&>(arr));
+        initValue(Memory::Move(arr));
         return *this;
     }
 
@@ -310,7 +310,7 @@ class Value {
 
     Value &operator=(VString &&str) noexcept {
         if (IsString()) {
-            string_ = static_cast<VString &&>(str);
+            string_ = Memory::Move(str);
             return *this;
         }
 
@@ -318,7 +318,7 @@ class Value {
             reset();
         }
 
-        initValue(static_cast<VString &&>(str));
+        initValue(Memory::Move(str));
         return *this;
     }
 
@@ -402,7 +402,7 @@ class Value {
             initArray();
         }
 
-        array_ += static_cast<Value &&>(val);
+        array_ += Memory::Move(val);
 
         val.Reset();
     }
@@ -418,19 +418,19 @@ class Value {
 
     void operator+=(VObject &&obj) {
         if (IsObject()) {
-            object_ += static_cast<VObject &&>(obj);
+            object_ += Memory::Move(obj);
         } else {
             if (!IsArray()) {
                 Reset();
                 initArray();
             }
 
-            array_ += static_cast<Value &&>(Value{static_cast<VObject &&>(obj)});
+            array_ += Value{Memory::Move(obj)};
         }
     }
 
     void operator+=(const VObject &obj) {
-        *this += static_cast<VObject &&>(VObject(obj));
+        *this += VObject(obj);
     }
 
     void operator+=(VArray &&arr) {
@@ -440,14 +440,14 @@ class Value {
         }
 
         if (arr.Size() != 0) {
-            array_ += static_cast<VArray &&>(arr);
+            array_ += Memory::Move(arr);
         } else {
-            array_ += static_cast<Value &&>(Value{static_cast<VArray &&>(arr)});
+            array_ += Value{Memory::Move(arr)};
         }
     }
 
     void operator+=(const VArray &arr) {
-        (*this) += static_cast<VArray &&>(VArray(arr));
+        (*this) += VArray(arr);
     }
 
     void operator+=(VString &&str) {
@@ -456,15 +456,15 @@ class Value {
             initArray();
         }
 
-        array_ += Value{static_cast<VString &&>(str)};
+        array_ += Value{Memory::Move(str)};
     }
 
     void operator+=(const VString &str) {
-        *this += static_cast<VString &&>(VString(str));
+        *this += VString(str);
     }
 
     void operator+=(const Char_T_ *str) {
-        *this += static_cast<VString &&>(VString(str));
+        *this += VString(str);
     }
 
     template <typename Number_T_>
@@ -474,7 +474,7 @@ class Value {
             initArray();
         }
 
-        array_ += static_cast<Value &&>(Value{num});
+        array_ += Value{num};
     }
 
     void operator+=(NullType) {
@@ -483,7 +483,7 @@ class Value {
             initArray();
         }
 
-        array_ += static_cast<Value &&>(Value{nullptr});
+        array_ += Value{nullptr};
     }
 
     void operator+=(bool is_true) {
@@ -492,7 +492,7 @@ class Value {
             initArray();
         }
 
-        array_ += static_cast<Value &&>(Value{is_true});
+        array_ += Value{is_true};
     }
 
     Value &operator[](const Char_T_ *key) {
@@ -510,7 +510,7 @@ class Value {
             initObject();
         }
 
-        return object_[static_cast<VString &&>(key)];
+        return object_[Memory::Move(key)];
     }
 
     Value &operator[](const VString &key) {
@@ -866,13 +866,13 @@ class Value {
 
             while (src_val < end) {
                 if (!(src_val->IsUndefined())) {
-                    array_ += static_cast<Value &&>(*src_val);
+                    array_ += Memory::Move(*src_val);
                 }
 
                 ++src_val;
             }
         } else if (IsObject() && val.IsObject()) {
-            object_ += static_cast<VObject &&>(val.object_);
+            object_ += Memory::Move(val.object_);
         }
 
         val.Reset();
@@ -1406,13 +1406,13 @@ class Value {
 
                 do {
                     if (!(src_val->IsUndefined())) {
-                        new_array += static_cast<Value &&>(*src_val);
+                        new_array += Memory::Move(*src_val);
                     }
 
                     ++src_val;
                 } while (src_val < src_end);
 
-                array_ = static_cast<VArray &&>(new_array);
+                array_ = Memory::Move(new_array);
             }
         } else if (IsObject()) {
             object_.Compress();
@@ -1465,7 +1465,7 @@ class Value {
                     ++count;
                 }
 
-                groupedValue.object_[static_cast<VString &&>(grouped_key)] += static_cast<VObject &&>(new_sub_obj);
+                groupedValue.object_[Memory::Move(grouped_key)] += Memory::Move(new_sub_obj);
             }
 
             return true;
@@ -1674,7 +1674,7 @@ class Value {
     }
 
     inline void initValue(VObject &&obj) noexcept {
-        Memory::Initialize(&object_, static_cast<VObject &&>(obj));
+        Memory::Initialize(&object_, Memory::Move(obj));
         setTypeToObject();
     }
 
@@ -1684,7 +1684,7 @@ class Value {
     }
 
     inline void initValue(VArray &&arr) noexcept {
-        Memory::Initialize(&array_, static_cast<VArray &&>(arr));
+        Memory::Initialize(&array_, Memory::Move(arr));
         setTypeToArray();
     }
 
@@ -1694,7 +1694,7 @@ class Value {
     }
 
     inline void initValue(VString &&str) noexcept {
-        Memory::Initialize(&string_, static_cast<VString &&>(str));
+        Memory::Initialize(&string_, Memory::Move(str));
         setTypeToString();
     }
 

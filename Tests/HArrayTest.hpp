@@ -217,7 +217,7 @@ static void TestHArray2(TestHelper &helper) {
     helper.NotEqual(numbers1.GetKey(6), numbers2.GetKey(6), "numbers1.GetKey(6)", "numbers2.GetKey(6)", __LINE__);
     helper.NotEqual(numbers2.GetKey(6)->First(), str_c, "str_c", "GetKey(6)->First()", __LINE__);
 
-    numbers2 = static_cast<HashArray &&>(numbers1);
+    numbers2 = Memory::Move(numbers1);
     helper.Equal(numbers1.Storage(), nullptr, "Storage()", "null", __LINE__);
     helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
@@ -278,7 +278,7 @@ static void TestHArray3(TestHelper &helper) {
     str_c = key->First();
 
     storage  = numbers2.First();
-    numbers1 = static_cast<HashArray &&>(numbers2);
+    numbers1 = Memory::Move(numbers2);
 
     helper.Equal(numbers1.Size(), 9U, "Size", __LINE__);
     helper.EqualsTrue((numbers1.Capacity() >= 9), "(numbers1.Capacity() >= 9)", __LINE__);
@@ -426,7 +426,7 @@ static void TestHArray4(TestHelper &helper) {
     numbers3 = numbers1; // Backup
 
     storage = numbers1.First();
-    numbers2 += static_cast<HashArray &&>(numbers1);
+    numbers2 += Memory::Move(numbers1);
     helper.Equal(numbers1.Size(), 0U, "Size", __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, "Capacity", __LINE__);
     helper.Equal(numbers1.First(), nullptr, "First()", "null", __LINE__);
@@ -467,7 +467,7 @@ static void TestHArray4(TestHelper &helper) {
         Digit::NumberToString(key, i);
         key2 = key;
 
-        numbers1.Insert(static_cast<String<char> &&>(key2), static_cast<SizeT &&>(SizeT{i}));
+        numbers1.Insert(Memory::Move(key2), SizeT{i});
         value = numbers1.GetValue(key);
         helper.NotEqual(value, nullptr, "value", "null", __LINE__);
         helper.Equal(*value, i, key.First(), __LINE__);
@@ -607,8 +607,8 @@ static void TestHArray6(TestHelper &helper) {
     const char *c_str1 = str1.First();
     const char *c_str2 = str2.First();
 
-    strings1[static_cast<String<char> &&>(key1)] = static_cast<String<char> &&>(str1);
-    strings1[static_cast<String<char> &&>(key2)] = static_cast<String<char> &&>(str2);
+    strings1[Memory::Move(key1)] = Memory::Move(str1);
+    strings1[Memory::Move(key2)] = Memory::Move(str2);
 
     helper.Equal(strings1.Size(), 2U, "Size", __LINE__);
     helper.NotEqual(strings1.First(), nullptr, "First()", "null", __LINE__);
@@ -639,7 +639,7 @@ static void TestHArray6(TestHelper &helper) {
 
     strings2.Reserve(2);
     storage = strings1.First();
-    strings2 += static_cast<HArray<String<char>, char> &&>(strings1);
+    strings2 += Memory::Move(strings1);
     helper.Equal(strings2.Size(), 2U, "Size()", __LINE__);
     helper.Equal(strings2.Capacity(), 2U, "Capacity()", __LINE__);
     helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);
@@ -655,11 +655,11 @@ static void TestHArray6(TestHelper &helper) {
     helper.Equal(strings2.GetValue(id)->First(), c_str1, "strings[0].First()", "c_str1", __LINE__);
     helper.Equal(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 
-    strings1 += static_cast<HArray<String<char>, char> &&>(strings2);
+    strings1 += Memory::Move(strings2);
     strings1.Resize(10);
     storage = strings1.First();
     strings2.Reset();
-    strings2 += static_cast<HArray<String<char>, char> &&>(strings1);
+    strings2 += Memory::Move(strings1);
     helper.Equal(strings2.Size(), 2U, "Size", __LINE__);
     helper.Equal(strings2.Capacity(), 2U, "Capacity()", __LINE__);
     helper.NotEqual(strings2.First(), nullptr, "First()", "null", __LINE__);

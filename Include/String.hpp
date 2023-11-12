@@ -45,8 +45,7 @@ class String {
 
     String() = default;
 
-    String(String &&src) noexcept
-        : padding_(src.padding_), length_(src.length_), storage_{static_cast<QPointer<Char_T_> &&>(src.storage_)} {
+    String(String &&src) noexcept : padding_(src.padding_), length_(src.length_), storage_{Memory::Move(src.storage_)} {
         src.clearLength();
     }
 
