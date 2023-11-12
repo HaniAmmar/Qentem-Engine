@@ -402,13 +402,13 @@ class String {
         return Storage();
     }
 
-    inline Char_T_ *Last() noexcept {
-        if (IsNotEmpty()) {
-            return (Storage() + (Length() - 1));
-        }
+    // inline Char_T_ *Last() noexcept {
+    //     if (IsNotEmpty()) {
+    //         return (Storage() + (Length() - 1));
+    //     }
 
-        return nullptr;
-    }
+    //     return nullptr;
+    // }
 
     inline const Char_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
