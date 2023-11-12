@@ -78,8 +78,8 @@ static void TestToUTF8(TestHelper &helper) {
     helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
     helper.Equal(*(stream.First()), QChar{194}, "stream.First()", __LINE__);
     helper.Equal(*(stream.First() + 1), QChar{161}, "*(stream.First()+1)", __LINE__);
-    const auto *v00A1 = "¡";
-    helper.Equal(stream, reinterpret_cast<const QChar *>(v00A1), "stream == v00A1", __LINE__);
+    const unsigned char v00A1[] = "¡";
+    helper.Equal(stream, &(v00A1[0]), "stream == v00A1", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x07FF, stream);
@@ -100,8 +100,8 @@ static void TestToUTF8(TestHelper &helper) {
     helper.Equal(*(stream.First()), QChar{224}, "stream.First()", __LINE__);
     helper.Equal(*(stream.First() + 1), QChar{162}, "*(stream.First()+1)", __LINE__);
     helper.Equal(*(stream.First() + 2), QChar{167}, "*(stream.First() + 2)", __LINE__);
-    const auto *v08A7 = "ࢧ";
-    helper.Equal(stream, reinterpret_cast<const QChar *>(v08A7), "stream == v08A7", __LINE__);
+    const unsigned char v08A7[] = "ࢧ";
+    helper.Equal(stream, &(v08A7[0]), "stream == v08A7", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xFFFF, stream);
@@ -117,8 +117,8 @@ static void TestToUTF8(TestHelper &helper) {
     helper.Equal(*(stream.First() + 1), QChar{144}, "*(stream.First()+1)", __LINE__);
     helper.Equal(*(stream.First() + 2), QChar{128}, "*(stream.First() + 2)", __LINE__);
     helper.Equal(*(stream.First() + 3), QChar{128}, "*(stream.First() + 3)", __LINE__);
-    const auto *v10000 = "𐀀";
-    helper.Equal(stream, reinterpret_cast<const QChar *>(v10000), "stream == v10000", __LINE__);
+    const unsigned char v10000[] = "𐀀";
+    helper.Equal(stream, &(v10000[0]), "stream == v10000", __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10A7B, stream);

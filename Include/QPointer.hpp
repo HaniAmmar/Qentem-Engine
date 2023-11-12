@@ -76,7 +76,6 @@ class QPointer {
 
         pn.M_NUM = bits_.number_;
         return pn.M_PTR;
-        // return reinterpret_cast<Type_T_ *>((p_number_ & 0x0000FFFFFFFFFFFFULL));
 #else
         return pointer_;
 #endif

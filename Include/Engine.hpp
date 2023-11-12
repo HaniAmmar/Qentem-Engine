@@ -56,7 +56,7 @@ class Engine {
 
                 do {
                     const QENTEM_SIMD_VAR m_content =
-                        QENTEM_SIMD_LOAD(reinterpret_cast<const QENTEM_SIMD_VAR *>(content + offset));
+                        QENTEM_SIMD_LOAD(Memory::ChangePointer<const QENTEM_SIMD_VAR>(content + offset));
                     const QENTEM_SIMD_NUMBER_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
 
                     if (bits != 0) {
@@ -106,10 +106,11 @@ class Engine {
 
                 do {
                     QENTEM_SIMD_VAR m_content =
-                        QENTEM_SIMD_LOAD(reinterpret_cast<const QENTEM_SIMD_VAR *>(content_ofs));
+                        QENTEM_SIMD_LOAD(Memory::ChangePointer<const QENTEM_SIMD_VAR>(content_ofs));
                     QENTEM_SIMD_NUMBER_T bits = Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
 
-                    m_content = QENTEM_SIMD_LOAD(reinterpret_cast<const QENTEM_SIMD_VAR *>(content_ofs + len_one_less));
+                    m_content =
+                        QENTEM_SIMD_LOAD(Memory::ChangePointer<const QENTEM_SIMD_VAR>(content_ofs + len_one_less));
                     bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
 
                     while (bits != 0) {

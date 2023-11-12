@@ -54,8 +54,7 @@ struct TestOutPut {
 
     template <typename... Values_T_>
     inline static void Print(const Values_T_ &...values) {
-        // (out) may copy the value but at that point it will not matter.
-        (QENTEM_OUTPUT_STREAM << ... << static_cast<const Values_T_ &>(values));
+        (QENTEM_OUTPUT_STREAM << ... << values);
     }
 
     enum Colors { TITLE, ERROR, PASS, END };

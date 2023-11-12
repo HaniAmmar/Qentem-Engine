@@ -274,15 +274,35 @@ class String {
         }
     }
 
-    inline Char_T_ *Storage() const noexcept {
+    inline Char_T_ *Storage() noexcept {
         if constexpr (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != 0) && (len < ShortStringMax)) {
 #ifndef QENTEM_BIG_ENDIAN
-                return const_cast<Char_T_ *>(reinterpret_cast<const Char_T_ *>(&padding_));
+                return Memory::ChangePointer<Char_T_>(&padding_);
 #else
                 // Two tags at the start
-                return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) + 2));
+                return Memory::ChangePointer<Char_T_>(Memory::ChangePointer<char>(&storage_) + 2);
+                // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) +
+                // 2));
+#endif
+            }
+        }
+
+        return storage_.GetPointer();
+    }
+
+    inline const Char_T_ *Storage() const noexcept {
+        if constexpr (Config::ShortStringOptimization) {
+            const SizeT len = Length();
+            if ((len != 0) && (len < ShortStringMax)) {
+#ifndef QENTEM_BIG_ENDIAN
+                return Memory::ChangePointer<const Char_T_>(&padding_);
+#else
+                // Two tags at the start
+                return Memory::ChangePointer<const Char_T_>(Memory::ChangePointer<const char>(&storage_) + 2);
+                // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) +
+                // 2));
 #endif
             }
         }
@@ -313,7 +333,7 @@ class String {
                     setStorage(ns);
 
                 } else {
-                    ns = reinterpret_cast<Char_T_ *>(&padding_);
+                    ns = Memory::ChangePointer<Char_T_>(&padding_);
                 }
             } else {
                 ns = allocate(new_len);
@@ -382,7 +402,15 @@ class String {
         return Storage();
     }
 
-    inline Char_T_ *Last() const noexcept {
+    inline Char_T_ *Last() noexcept {
+        if (IsNotEmpty()) {
+            return (Storage() + (Length() - 1));
+        }
+
+        return nullptr;
+    }
+
+    inline const Char_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Length() - 1));
         }
@@ -451,10 +479,10 @@ class String {
         if constexpr (Config::ShortStringOptimization) {
             if (new_size <= ShortStringMax) {
 #ifndef QENTEM_BIG_ENDIAN
-                return reinterpret_cast<Char_T_ *>(&padding_);
+                return Memory::ChangePointer<Char_T_>(&padding_);
 #else
                 // Two tags at the start
-                return reinterpret_cast<Char_T_ *>((reinterpret_cast<char *>(&storage_) + 2));
+                return Memory::ChangePointer<Char_T_>((Memory::ChangePointer<char>(&storage_) + 2));
 #endif
             }
         }

@@ -489,7 +489,7 @@ class HArray {
     }
 
     inline HAItem_ *Storage() const noexcept {
-        return reinterpret_cast<HAItem_ *>(getHashTable() + Capacity());
+        return Memory::ChangePointer<HAItem_>(getHashTable() + Capacity());
     }
 
     inline const HAItem_ *First() const noexcept {
@@ -536,15 +536,19 @@ class HArray {
     //////////// Private ////////////
 
   private:
-    SizeT getBase() const noexcept {
+    inline SizeT getBase() const noexcept {
         return (Capacity() - 1);
     }
 
-    SizeT *getHashTable() const noexcept {
+    // inline void *geStorage(SizeT *ptr) const noexcept {
+    //     return static_cast<void *>(ptr + Capacity());
+    // }
+
+    inline SizeT *getHashTable() const noexcept {
         return hashTable_.GetPointer();
     }
 
-    void setHashTable(SizeT *ptr) noexcept {
+    inline void setHashTable(SizeT *ptr) noexcept {
         hashTable_.SetPointer(ptr);
     }
 
@@ -557,27 +561,27 @@ class HArray {
         setCapacity(new_capacity);
 
         const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_)) * new_capacity);
-        SizeT      *ht   = reinterpret_cast<SizeT *>(Memory::Allocate<char>(size));
+        SizeT      *ht   = static_cast<SizeT *>(static_cast<void *>(Memory::Allocate<char>(size)));
 
         setHashTable(ht);
         Memory::SetToZero(ht, (sizeof(SizeT) * new_capacity));
 
-        return reinterpret_cast<HAItem_ *>(ht + Capacity());
+        return Memory::ChangePointer<HAItem_>(ht + Capacity());
     }
 
-    void clearHashTable() noexcept {
+    inline void clearHashTable() noexcept {
         hashTable_.Reset();
     }
 
-    void setSize(const SizeT new_size) noexcept {
+    inline void setSize(const SizeT new_size) noexcept {
         index_ = new_size;
     }
 
-    void setCapacity(const SizeT new_capacity) noexcept {
+    inline void setCapacity(const SizeT new_capacity) noexcept {
         capacity_ = new_capacity;
     }
 
-    void expand() {
+    inline void expand() {
         resize(((Capacity() != 0) ? (Capacity() * SizeT{2}) : SizeT{2}));
     }
 
@@ -655,7 +659,7 @@ class HArray {
 
     HAItem_ *find(SizeT *&index, const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT   *ht      = getHashTable();
-        HAItem_ *storage = reinterpret_cast<HAItem_ *>(ht + Capacity());
+        HAItem_ *storage = Memory::ChangePointer<HAItem_>(ht + Capacity());
         HAItem_ *item;
         index = (ht + (hash & getBase()));
 
