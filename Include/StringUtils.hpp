@@ -38,15 +38,16 @@ struct StringUtils {
 
     template <typename Char_T_, typename Number_T_ = SizeT>
     static Number_T_ Count(const Char_T_ *str) noexcept {
-        const Char_T_ *str_2 = str;
+        Number_T_ len = 0;
 
-        if (str_2 != nullptr) {
-            while (*str_2 != '\0') {
-                ++str_2;
+        if (str != nullptr) {
+            while (*str != '\0') {
+                ++str;
+                ++len;
             }
         }
 
-        return static_cast<Number_T_>(str_2 - str);
+        return len;
     }
 
     template <typename Char_T_, typename Number_T_ = SizeT>
@@ -189,7 +190,7 @@ struct StringUtils {
                 hash *= (length ^ offset);
                 base += offset;
                 --length;
-                hash += static_cast<SizeT>(key[length]);
+                hash += SizeT(key[length]);
             }
 
             ++offset;

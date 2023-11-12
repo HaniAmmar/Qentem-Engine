@@ -461,7 +461,7 @@ class String {
     void setLength(SizeT new_length) noexcept {
         if constexpr (Config::ShortStringOptimization) {
             if (new_length < ShortStringMax) {
-                storage_.SetLowByte(static_cast<unsigned char>(new_length));
+                storage_.SetLowByte((unsigned char)(new_length));
             } else {
                 storage_.SetLowByte(0);
                 length_ = new_length;

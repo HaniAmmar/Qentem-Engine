@@ -825,7 +825,7 @@ struct TemplateSub {
             SizeT         true_size = 0;
 
             if (++expr != i_tag.Case.End()) {
-                true_size = static_cast<SizeT>(expr->Number.Natural);
+                true_size = SizeT(expr->Number.Natural);
             }
 
             if (result > 0U) {
@@ -874,7 +874,7 @@ struct TemplateSub {
     void parseVariableTag(SizeT offset, SizeT end_offset, void *tag) const noexcept {
         VariableTag &i_tag = *(static_cast<VariableTag *>(tag));
         i_tag.Offset       = offset;
-        i_tag.Length       = static_cast<unsigned char>(end_offset - offset);
+        i_tag.Length       = ((end_offset - offset) & 0xFFU);
 
         if (loop_value_length_ != 0) {
             const TemplateSub *temp = this;
@@ -889,7 +889,7 @@ struct TemplateSub {
 
                 if (StringUtils::IsEqual((content_ + offset), (content_ + l_offset), length)) {
                     i_tag.IsLoopValue = 1;
-                    i_tag.Level       = static_cast<unsigned char>(level);
+                    i_tag.Level       = (level & 0xFFU);
                     break;
                 }
 
@@ -937,8 +937,8 @@ struct TemplateSub {
 
                     VariableTag set_var{};
                     parseVariableTag(set_offset, (set_offset + set_length), &set_var);
-                    i_tag.SetOffset = static_cast<unsigned char>(set_var.Offset - i_tag.Offset);
-                    i_tag.SetLength = static_cast<unsigned char>(set_var.Length);
+                    i_tag.SetOffset = (unsigned char)(set_var.Offset - i_tag.Offset);
+                    i_tag.SetLength = (unsigned char)(set_var.Length);
                     i_tag.SetLevel  = set_var.Level;
                     i_tag.Options |= set_var.IsLoopValue;
 
@@ -950,8 +950,8 @@ struct TemplateSub {
                 }
 
                 case TagPatterns::ValueChar: {
-                    i_tag.ValueOffset = static_cast<unsigned char>(last_offset - i_tag.Offset);
-                    i_tag.ValueLength = static_cast<unsigned char>((offset2 - 1U) - last_offset);
+                    i_tag.ValueOffset = (unsigned char)(last_offset - i_tag.Offset);
+                    i_tag.ValueLength = (unsigned char)((offset2 - 1U) - last_offset);
                     offset            = offset2;
                     offset2           = getQuotedValue(offset, loop_content_offset);
                     last_offset       = offset;
@@ -970,8 +970,8 @@ struct TemplateSub {
                 }
 
                 case TagPatterns::GroupChar: {
-                    i_tag.GroupOffset = static_cast<unsigned char>(last_offset - i_tag.Offset);
-                    i_tag.GroupLength = static_cast<unsigned char>((offset2 - 1) - last_offset);
+                    i_tag.GroupOffset = (unsigned char)(last_offset - i_tag.Offset);
+                    i_tag.GroupLength = (unsigned char)((offset2 - 1) - last_offset);
                     offset            = offset2;
                     offset2           = getQuotedValue(offset, loop_content_offset);
                     last_offset       = offset;
@@ -1073,8 +1073,7 @@ struct TemplateSub {
 
                 if (else_offset == 0) {
                     parse(sub_tags, content_offset, end_offset);
-                    i_tag +=
-                        IfTagCase{Memory::Move(sub_tags), parseExpressions(offset, case_end_offset)};
+                    i_tag += IfTagCase{Memory::Move(sub_tags), parseExpressions(offset, case_end_offset)};
 
                     break;
                 }

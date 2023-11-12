@@ -74,6 +74,7 @@ struct Digit {
     /////////////////////////////////////////////////////////////////
     template <typename Char_T_>
     static unsigned int HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
+        using Uint_Char_T   = unsigned int;
         unsigned int number = 0;
         unsigned int offset = 0;
 
@@ -83,12 +84,12 @@ struct Digit {
 
             if ((digit >= DigitUtils::DigitChars::OneChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
                 // No need for 0
-                number |= (static_cast<unsigned int>(digit - DigitUtils::DigitChars::ZeroChar)); // 1-9
+                number |= Uint_Char_T(digit - DigitUtils::DigitChars::ZeroChar); // 1-9
             } else if ((digit >= DigitUtils::DigitChars::UA_Char) &&
                        (digit <= DigitUtils::DigitChars::UF_Char)) { // A-F
-                number |= (static_cast<unsigned int>(digit - DigitUtils::DigitChars::SevenChar));
+                number |= Uint_Char_T(digit - DigitUtils::DigitChars::SevenChar);
             } else if ((digit >= DigitUtils::DigitChars::A_Char) && (digit <= DigitUtils::DigitChars::F_Char)) { // a-f
-                number |= (static_cast<unsigned int>(digit - DigitUtils::DigitChars::UW_Char));
+                number |= Uint_Char_T(digit - DigitUtils::DigitChars::UW_Char);
             }
 
             ++offset;
@@ -103,12 +104,12 @@ struct Digit {
         number       = 0;
 
         if (offset < length) {
-            number += (static_cast<Number_T_>(content[offset] - DigitUtils::DigitChars::ZeroChar));
+            number += (Number_T_(content[offset]) - DigitUtils::DigitChars::ZeroChar);
             ++offset;
 
             while (offset < length) {
                 number *= Number_T_{10};
-                number += (static_cast<Number_T_>(content[offset] - DigitUtils::DigitChars::ZeroChar));
+                number += (Number_T_(content[offset]) - DigitUtils::DigitChars::ZeroChar);
                 ++offset;
             }
         }
@@ -164,8 +165,7 @@ struct Digit {
                         if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
                             (digit <= DigitUtils::DigitChars::NineChar)) {
                             number.Natural *= 10ULL;
-                            number.Natural +=
-                                (static_cast<unsigned long long>(digit - DigitUtils::DigitChars::ZeroChar));
+                            number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
                             ++offset;
                             continue;
                         }
@@ -180,7 +180,7 @@ struct Digit {
                                 ++offset;
                                 ++o_offset;
 
-                                exponent = static_cast<unsigned int>(offset);
+                                exponent = (unsigned int)(offset);
 
                                 if (offset == max_end_offset) {
                                     digit = 0;
@@ -196,7 +196,7 @@ struct Digit {
                         case DigitUtils::DigitChars::E_Char: {
                             if (number.Natural != 0) {
                                 if ((flags & stringToNumberFlags::Real) != 0U) {
-                                    exponent = (static_cast<unsigned int>(offset) - exponent);
+                                    exponent = ((unsigned int)(offset)-exponent);
                                 }
 
                                 if ((offset < end_offset) &&
@@ -227,7 +227,7 @@ struct Digit {
                                     number.Real = static_cast<double>(number.Natural);
 
                                     if ((flags & stringToNumberFlags::MergedExponent) == 0U) {
-                                        exponent = (static_cast<unsigned int>(offset) - exponent);
+                                        exponent = (unsigned int)(offset)-exponent;
                                         flags |= stringToNumberFlags::NegativeExponent;
                                     }
 
@@ -274,34 +274,34 @@ struct Digit {
             const SizeT o_offset = offset;
 
             while (number >= Number_T_{10}) {
-                const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
+                const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
                 number /= Number_T_{100};
 
                 --offset;
-                storage[offset] = static_cast<Char_T_>(DigitUtils::DigitTable[index + SizeT{1}]);
+                storage[offset] = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
                 --offset;
-                storage[offset] = static_cast<Char_T_>(DigitUtils::DigitTable[index]);
+                storage[offset] = Char_T_(DigitUtils::DigitTable[index]);
             }
 
             if ((number != 0) || (offset == o_offset)) {
                 --offset;
-                storage[offset] = (static_cast<Char_T_>(number) + DigitUtils::DigitChars::ZeroChar);
+                storage[offset] = (Char_T_(number) + DigitUtils::DigitChars::ZeroChar);
             }
         } else {
             offset = 0;
 
             while (number >= Number_T_{10}) {
-                const SizeT index = (static_cast<SizeT>(number % Number_T_{100}) * SizeT{2});
+                const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
                 number /= Number_T_{100};
 
-                storage[offset] = static_cast<Char_T_>(DigitUtils::DigitTable[index + SizeT{1}]);
+                storage[offset] = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
                 ++offset;
-                storage[offset] = static_cast<Char_T_>(DigitUtils::DigitTable[index]);
+                storage[offset] = Char_T_(DigitUtils::DigitTable[index]);
                 ++offset;
             }
 
             if ((number != 0) || (offset == SizeT{0})) {
-                storage[offset] = (static_cast<Char_T_>(number) + DigitUtils::DigitChars::ZeroChar);
+                storage[offset] = (Char_T_(number) + DigitUtils::DigitChars::ZeroChar);
                 ++offset;
             }
         }
@@ -343,7 +343,7 @@ struct Digit {
 
             if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
                 sci_exponent *= 10ULL;
-                sci_exponent += (static_cast<unsigned int>(digit - DigitUtils::DigitChars::ZeroChar));
+                sci_exponent += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
                 ++offset;
                 continue;
             }
@@ -388,7 +388,7 @@ struct Digit {
 
             switch (digit) {
                 case DigitUtils::DigitChars::DotChar: {
-                    exponent_diff = static_cast<unsigned int>(offset - last_offset);
+                    exponent_diff = (unsigned int)(offset - last_offset);
                     is_diff_set   = true;
 
                     ++offset;
@@ -401,10 +401,10 @@ struct Digit {
                         flags |= stringToNumberFlags::Real;
 
                         if (!is_diff_set) {
-                            exponent_diff = static_cast<unsigned int>(offset - last_offset);
+                            exponent_diff = (unsigned int)(offset - last_offset);
                         }
                     } else {
-                        exponent = (static_cast<unsigned int>(last_offset) - exponent);
+                        exponent = ((unsigned int)(last_offset)-exponent);
                     }
 
                     if ((offset < end_offset) && exponentToNumber(exponent, flags, content, offset, end_offset)) {
@@ -417,7 +417,8 @@ struct Digit {
 
                 default: {
                     if (((flags & stringToNumberFlags::Real) == 0U) && !is_diff_set) {
-                        exponent_diff = static_cast<unsigned int>(offset - last_offset);
+                        exponent_diff = (unsigned int)(offset);
+                        exponent_diff -= last_offset;
                     }
 
                     keep_on = false;
@@ -432,7 +433,7 @@ struct Digit {
 
                 if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
                     tmp *= 10U;
-                    tmp += (static_cast<unsigned long long>(digit - DigitUtils::DigitChars::ZeroChar));
+                    tmp += ((unsigned long long)(digit)-DigitUtils::DigitChars::ZeroChar);
 
                     if ((flags & stringToNumberFlags::Negative) != 0) {
                         tmp &= 0x7FFFFFFFFFFFFFFFULL;
@@ -451,7 +452,7 @@ struct Digit {
 
         if ((flags & stringToNumberFlags::Real) != 0U) {
             if (exponent != 0 && ((flags & stringToNumberFlags::MergedExponent) == 0U)) {
-                exponent = (static_cast<unsigned int>(last_offset) - exponent);
+                exponent = ((unsigned int)(last_offset)-exponent);
                 flags |= stringToNumberFlags::NegativeExponent;
             }
 
@@ -460,7 +461,7 @@ struct Digit {
                     exponent += exponent_diff;
                 } else {
                     if (exponent < exponent_diff) {
-                        exponent = static_cast<unsigned int>(exponent_diff - exponent);
+                        exponent = (exponent_diff - exponent);
                         flags ^= stringToNumberFlags::NegativeExponent;
                     } else {
                         exponent -= exponent_diff;
@@ -584,9 +585,9 @@ struct Digit {
                 BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3U))> b_int{mantissa};
                 /////////////////////////////////////
                 const unsigned int first_shift      = Platform::CTZ(mantissa);
-                const int          exponent         = static_cast<int>((bias >> Info_T::MantissaSize) - Info_T::Bias);
+                const int          exponent         = (int)((bias >> Info_T::MantissaSize) - Info_T::Bias);
                 const bool         is_positive_exp  = (exponent >= 0);
-                const unsigned int positive_exp     = static_cast<unsigned int>(is_positive_exp ? exponent : -exponent);
+                const unsigned int positive_exp     = (unsigned int)(is_positive_exp ? exponent : -exponent);
                 const unsigned int first_bit        = (Info_T::MantissaSize - first_shift);
                 const unsigned int exp_actual_value = (positive_exp + ((bias == UNumber_T{0}) * first_bit));
                 const unsigned int digits           = (((exp_actual_value * 30103U) / 100000U) + 1U);
@@ -671,7 +672,7 @@ struct Digit {
                 stream += DigitUtils::DigitChars::ZeroChar;
             }
         } else {
-            static constexpr int size = static_cast<int>(sizeof(Char_T_));
+            static constexpr unsigned int size = sizeof(Char_T_);
 
             if ((info.NaturalNumber & Info_T::MantissaMask) == UNumber_T{0}) {
                 if (info.NaturalNumber & Info_T::SignMask) {
@@ -700,8 +701,8 @@ struct Digit {
 
     template <typename Stream_T_, typename Number_T_>
     static void insertZeros(Stream_T_ &stream, const Number_T_ length) {
-        using Char_T_             = typename Stream_T_::CharType;
-        static constexpr int size = static_cast<int>(sizeof(Char_T_));
+        using Char_T_                      = typename Stream_T_::CharType;
+        static constexpr unsigned int size = sizeof(Char_T_);
         stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
     }
 
@@ -836,8 +837,7 @@ struct Digit {
             ((number < last) &&
              ((*number > DigitUtils::DigitChars::FiveChar) ||
               ((*number == DigitUtils::DigitChars::FiveChar) &&
-               (round_up ||
-                (static_cast<unsigned int>(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U)))));
+               (round_up || ((unsigned int)(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U)))));
 
         if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChars::NineChar)) {

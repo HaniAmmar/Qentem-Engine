@@ -392,9 +392,9 @@ struct DoubleSize<Number_T_, 32U> {
         unsigned long long dividend64 = dividend_high;
         dividend64 <<= 32U;
         dividend64 |= dividend_low;
-        dividend_high = ((dividend64 % divisor) & 0xFFFFFFFF);
+        dividend_high = ((dividend64 % divisor) & 0xFFFFFFFFU);
         dividend64 /= divisor;
-        dividend_low = (dividend64 & 0xFFFFFFFF);
+        dividend_low = (dividend64 & 0xFFFFFFFFU);
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {

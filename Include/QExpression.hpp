@@ -703,15 +703,15 @@ struct QExpression {
     bool operator!=(const Number_T_ number) const noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
-                return (Number.Natural != static_cast<unsigned long long>(number));
+                return (Number.Natural != (unsigned long long)(number));
             }
 
             case ExpressionType::IntegerNumber: {
-                return (Number.Integer != static_cast<long long>(number));
+                return (Number.Integer != (long long)(number));
             }
 
             default: {
-                return (Number.Real != static_cast<double>(number));
+                return (Number.Real != double(number));
             }
         }
     }

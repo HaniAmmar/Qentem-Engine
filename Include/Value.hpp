@@ -156,13 +156,13 @@ class Value {
         static constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
 
         if constexpr (is_unsigned) {
-            number_.SetNumber(static_cast<unsigned long long>(num));
+            number_.SetNumber((unsigned long long)(num));
             setTypeToUInt64();
         } else if constexpr (!is_float) {
-            number_.SetNumber(static_cast<long long>(num));
+            number_.SetNumber((long long)(num));
             setTypeToInt64();
         } else {
-            number_.SetNumber(static_cast<double>(num));
+            number_.SetNumber(double(num));
             setTypeToDouble();
         }
     }
@@ -360,13 +360,13 @@ class Value {
         }
 
         if constexpr (is_unsigned) {
-            number_.SetNumber(static_cast<unsigned long long>(num));
+            number_.SetNumber((unsigned long long)(num));
             setTypeToUInt64();
         } else if constexpr (!is_float) {
-            number_.SetNumber(static_cast<long long>(num));
+            number_.SetNumber((long long)(num));
             setTypeToInt64();
         } else {
-            number_.SetNumber(static_cast<double>(num));
+            number_.SetNumber(double(num));
             setTypeToDouble();
         }
 
@@ -557,7 +557,7 @@ class Value {
 
     template <typename Type_T_>
     Value &operator[](Type_T_ index) {
-        return (*this)[static_cast<SizeT>(index)];
+        return (*this)[SizeT(index)];
     }
 
     inline bool operator<(const Value &val) const noexcept {
@@ -1032,7 +1032,7 @@ class Value {
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
                 value  = &(item->Value);
                 key    = item->Key.First();
-                length = static_cast<Number_T_>(item->Key.Length());
+                length = Number_T_(item->Key.Length());
             }
         }
     }
@@ -1043,7 +1043,7 @@ class Value {
         switch (Type()) {
             case ValueType::String: {
                 key    = string_.First();
-                length = static_cast<Number_T_>(string_.Length());
+                length = Number_T_{string_.Length()};
                 return true;
             }
 
@@ -1360,7 +1360,7 @@ class Value {
 
     template <typename Number_T_>
     inline void RemoveIndex(Number_T_ index) const noexcept {
-        RemoveIndex(static_cast<SizeT>(index));
+        RemoveIndex(SizeT(index));
     }
 
     void Reset() noexcept {
@@ -1609,7 +1609,7 @@ class Value {
 
     inline void setType(ValueType new_type) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        type_.Storage_.SetHighByte(static_cast<unsigned char>(new_type));
+        type_.Storage_.SetHighByte((unsigned char)(new_type));
 #else
         type_ = new_type;
 #endif

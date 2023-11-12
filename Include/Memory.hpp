@@ -89,17 +89,17 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
 static constexpr Type_ *ChangePointer(void *value) noexcept {
-    return static_cast<Type_ *>(value);
+    return (Type_ *)(value);
 }
 
 template <typename Type_>
 static constexpr Type_ *ChangePointer(const void *value) noexcept {
-    return static_cast<Type_ *>(value);
+    return (Type_ *)(value);
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
 static constexpr Type_ &&Move(Type_ &value) noexcept {
-    return static_cast<Type_ &&>(value);
+    return (Type_ &&)(value);
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
@@ -180,7 +180,7 @@ inline static SizeT AlignSize(SizeT n_size) noexcept {
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
-    Type_ *pointer = static_cast<Type_ *>(::operator new(size * sizeof(Type_)));
+    Type_ *pointer = ChangePointer<Type_>(::operator new(size * sizeof(Type_)));
 
 #ifdef QENTEM_TEST_HELPER_H_
     MemoryRecord::AddAllocation(pointer);

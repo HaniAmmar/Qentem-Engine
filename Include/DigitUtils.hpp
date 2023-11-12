@@ -27,7 +27,7 @@
 
 namespace Qentem::DigitUtils {
 
-template <typename Char_T_, int S>
+template <typename Char_T_, unsigned int Size_>
 struct DigitStrings {};
 
 // char
@@ -139,14 +139,14 @@ struct RealNumberInfo<double> {
     explicit RealNumberInfo(double number) noexcept : RealNumber{number} {
     }
 
-    static constexpr unsigned int       Bias                = 1023U;
-    static constexpr unsigned int       ExponentSize        = 11U;
-    static constexpr unsigned int       MantissaSize        = 52U;
-    static constexpr unsigned long long SignMask            = 0x8000000000000000ULL;
-    static constexpr unsigned long long ExponentMask        = 0x7FF0000000000000ULL;
-    static constexpr unsigned long long MantissaMask        = 0xFFFFFFFFFFFFFULL;
-    static constexpr unsigned long long LeadingBit          = 0x10000000000000ULL;
-    static constexpr unsigned int       MaxCut              = 300U;
+    static constexpr unsigned int       Bias         = 1023U;
+    static constexpr unsigned int       ExponentSize = 11U;
+    static constexpr unsigned int       MantissaSize = 52U;
+    static constexpr unsigned long long SignMask     = 0x8000000000000000ULL;
+    static constexpr unsigned long long ExponentMask = 0x7FF0000000000000ULL;
+    static constexpr unsigned long long MantissaMask = 0xFFFFFFFFFFFFFULL;
+    static constexpr unsigned long long LeadingBit   = 0x10000000000000ULL;
+    static constexpr unsigned int       MaxCut       = 300U;
 
     union {
         double             RealNumber;
@@ -159,14 +159,14 @@ struct RealNumberInfo<float> {
     explicit RealNumberInfo(float number) noexcept : RealNumber{number} {
     }
 
-    static constexpr unsigned int Bias                = 127U;
-    static constexpr unsigned int ExponentSize        = 8U;
-    static constexpr unsigned int MantissaSize        = 23U;
-    static constexpr unsigned int SignMask            = 0x80000000U;
-    static constexpr unsigned int ExponentMask        = 0x7F800000U;
-    static constexpr unsigned int LeadingBit          = 0x800000U;
-    static constexpr unsigned int MantissaMask        = 0x7FFFFFU;
-    static constexpr unsigned int MaxCut              = 30U;
+    static constexpr unsigned int Bias         = 127U;
+    static constexpr unsigned int ExponentSize = 8U;
+    static constexpr unsigned int MantissaSize = 23U;
+    static constexpr unsigned int SignMask     = 0x80000000U;
+    static constexpr unsigned int ExponentMask = 0x7F800000U;
+    static constexpr unsigned int LeadingBit   = 0x800000U;
+    static constexpr unsigned int MantissaMask = 0x7FFFFFU;
+    static constexpr unsigned int MaxCut       = 30U;
 
     union {
         float        RealNumber;

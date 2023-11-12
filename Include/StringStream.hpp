@@ -146,7 +146,7 @@ class StringStream {
             out << src.First();
         } else {
             StringStream n_src = src;
-            n_src += static_cast<Char_T_>('\0');
+            n_src += '\0';
             out << n_src.First();
         }
 

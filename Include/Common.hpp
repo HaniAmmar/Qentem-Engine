@@ -124,7 +124,7 @@ struct Config {
 #define QENTEM_SIZE_T
 using SizeT = unsigned int;
 
-// inline static constexpr SizeT SizeTMax = (SizeT{0} - SizeT{1});
+// inline static constexpr SizeT SizeTMax = SizeT(-1);
 #endif
 
 using NullType = decltype(nullptr);

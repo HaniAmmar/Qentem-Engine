@@ -616,43 +616,45 @@ class HArray {
 
     void copyTable(const HArray &src) {
         if (src.Size() != 0) {
-            const HAItem_ *src_item     = src.First();
-            const HAItem_ *src_end      = (src_item + src.Size());
-            HAItem_       *storage_item = allocate(src.Size());
-            const HAItem_ *storage_src  = storage_item;
+            const HAItem_ *src_item = src.First();
+            const HAItem_ *src_end  = (src_item + src.Size());
+            HAItem_       *storage  = allocate(src.Size());
+            SizeT          len      = 0;
 
             do {
                 if (src_item->Hash != 0) {
-                    Memory::Initialize(storage_item, *src_item);
-                    ++storage_item;
+                    Memory::Initialize(storage, *src_item);
+                    ++storage;
+                    ++len;
                 }
 
                 ++src_item;
             } while (src_item < src_end);
 
-            setSize(static_cast<SizeT>(storage_item - storage_src));
+            setSize(len);
             generateHash();
         }
     }
 
     void resize(const SizeT new_size) {
-        SizeT         *ht           = getHashTable();
-        HAItem_       *src          = Storage();
-        HAItem_       *storage      = allocate(new_size);
-        HAItem_       *storage_item = storage;
-        HAItem_       *item         = src;
-        const HAItem_ *end          = (item + Size());
+        SizeT         *ht      = getHashTable();
+        HAItem_       *src     = Storage();
+        HAItem_       *storage = allocate(new_size);
+        HAItem_       *item    = src;
+        const HAItem_ *end     = (item + Size());
+        SizeT          len     = 0;
 
         while (item < end) {
             if (item->Hash != 0) {
-                Memory::Initialize(storage_item, Memory::Move(*item));
-                ++storage_item;
+                Memory::Initialize(storage, Memory::Move(*item));
+                ++storage;
+                ++len;
             }
 
             ++item;
         }
 
-        setSize(static_cast<SizeT>(storage_item - storage));
+        setSize(len);
         Memory::Deallocate(ht);
         generateHash();
     }

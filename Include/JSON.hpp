@@ -32,13 +32,13 @@ struct JSON {
 
     template <typename Char_T_, typename Number_T_, typename Stream_T_>
     inline static Value<Char_T_> Parse(Stream_T_ &stream, const Char_T_ *content, Number_T_ length) {
-        return JSONParser<Char_T_, Stream_T_>::Parse(stream, content, static_cast<SizeT>(length));
+        return JSONParser<Char_T_, Stream_T_>::Parse(stream, content, SizeT(length));
     }
 
     template <typename Char_T_, typename Number_T_>
     inline static Value<Char_T_> Parse(const Char_T_ *content, Number_T_ length) {
         StringStream<Char_T_> stream{};
-        return Parse(stream, content, static_cast<SizeT>(length));
+        return Parse(stream, content, SizeT(length));
     }
 
     template <typename Char_T_>

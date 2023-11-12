@@ -25,12 +25,12 @@
 
 namespace Qentem::Unicode {
 
-template <typename, typename, int>
+template <typename, typename, unsigned int>
 struct UnicodeToUTF {};
 
 template <typename Char_T_, typename Stream_T_>
 static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
-    UnicodeToUTF<Char_T_, Stream_T_, static_cast<int>(sizeof(Char_T_))>::ToUTF(unicode, stream);
+    UnicodeToUTF<Char_T_, Stream_T_, static_cast<unsigned int>(sizeof(Char_T_))>::ToUTF(unicode, stream);
 }
 
 // UTF8
@@ -45,20 +45,20 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 1> {
          */
 
         if (unicode < 0x80U) {
-            stream += static_cast<Char_T_>(unicode);
+            stream += Char_T_(unicode);
         } else {
             if (unicode < 0x800U) {
-                stream += static_cast<Char_T_>(0xC0U | (unicode >> 6U));
+                stream += Char_T_(0xC0U | (unicode >> 6U));
             } else if (unicode < 0x10000U) {
-                stream += static_cast<Char_T_>(0xE0U | (unicode >> 12U));
-                stream += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
+                stream += Char_T_(0xE0U | (unicode >> 12U));
+                stream += Char_T_(0x80U | ((unicode >> 6U) & 0x3FU));
             } else {
-                stream += static_cast<Char_T_>(0xF0U | (unicode >> 18U));
-                stream += static_cast<Char_T_>(0x80U | ((unicode >> 12U) & 0x3FU));
-                stream += static_cast<Char_T_>(0x80U | ((unicode >> 6U) & 0x3FU));
+                stream += Char_T_(0xF0U | (unicode >> 18U));
+                stream += Char_T_(0x80U | ((unicode >> 12U) & 0x3FU));
+                stream += Char_T_(0x80U | ((unicode >> 6U) & 0x3FU));
             }
 
-            stream += static_cast<Char_T_>(0x80U | (unicode & 0x3FU));
+            stream += Char_T_(0x80U | (unicode & 0x3FU));
         }
     }
 };
@@ -68,11 +68,11 @@ template <typename Char_T_, typename Stream_T_>
 struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
     static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
         if (unicode < 0x10000U) {
-            stream += static_cast<Char_T_>(unicode);
+            stream += Char_T_(unicode);
         } else {
             unicode -= 0x10000U;
-            stream += static_cast<Char_T_>(0xD800U | (unicode >> 10U));
-            stream += static_cast<Char_T_>(0xDC00U | (unicode & 0x3FFU));
+            stream += Char_T_(0xD800U | (unicode >> 10U));
+            stream += Char_T_(0xDC00U | (unicode & 0x3FFU));
         }
     }
 };
@@ -81,7 +81,7 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
 template <typename Char_T_, typename Stream_T_>
 struct UnicodeToUTF<Char_T_, Stream_T_, 4> {
     static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
-        stream += static_cast<Char_T_>(unicode);
+        stream += Char_T_(unicode);
     }
 };
 
