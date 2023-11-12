@@ -139,13 +139,13 @@ union QNumber {
     QNumber &operator=(const QNumber &) noexcept = default;
     ~QNumber() noexcept                          = default;
 
-    QNumber(unsigned long long number) noexcept : Natural{number} {
+    explicit QNumber(unsigned long long number) noexcept : Natural{number} {
     }
 
-    QNumber(long long number) noexcept : Integer{number} {
+    explicit QNumber(long long number) noexcept : Integer{number} {
     }
 
-    QNumber(double number) noexcept : Real{number} {
+    explicit QNumber(double number) noexcept : Real{number} {
     }
 
     unsigned long long Natural{0};
