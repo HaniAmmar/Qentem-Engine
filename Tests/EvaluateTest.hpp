@@ -65,7 +65,7 @@ QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, co
     return false;
 }
 
-QENTEM_NOINLINE static double TestEvaluate(const char *content, const Value<char> &value) noexcept {
+QENTEM_NOINLINE static double TestEvaluate(const char *content, const Value<char> &value) {
     double number;
     TestEvaluate(number, content, value);
     return number;

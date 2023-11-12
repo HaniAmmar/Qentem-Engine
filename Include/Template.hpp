@@ -1318,7 +1318,7 @@ struct TemplateSub {
             }
 
             case QOperation::Division: { // /
-                if (right != 0) {
+                if (right != 0ULL) {
                     left /= right;
                     break;
                 }

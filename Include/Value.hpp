@@ -1184,10 +1184,7 @@ class Value {
         QNumber number;
 
         switch (SetNumber(number)) {
-            case 1: {
-                return number.Natural;
-            }
-
+            case 1:
             case 2: {
                 return static_cast<unsigned long long>(number.Integer);
             }
