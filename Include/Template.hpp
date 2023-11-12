@@ -23,7 +23,6 @@
 #include "Engine.hpp"
 #include "Digit.hpp"
 #include "Tags.hpp"
-#include "StringStream.hpp"
 
 #ifndef QENTEM_TEMPLATE_H_
 #define QENTEM_TEMPLATE_H_
@@ -242,24 +241,31 @@ struct Template {
         return stream;
     }
 
-    template <typename Char_T_, typename Value_T_>
-    inline static StringStream<Char_T_> &Render(const Char_T_ *content, const Value_T_ &value,
-                                                StringStream<Char_T_> &stream) {
+    template <typename Char_T_, typename Value_T_, typename StringStream_T_>
+    inline static StringStream_T_ &Render(const Char_T_ *content, const Value_T_ &value, StringStream_T_ &stream) {
         Array<Tags::TagBit> tags_cache;
         Render(content, StringUtils::Count(content), value, stream, tags_cache);
         return stream;
     }
 
-    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
+    // template <typename Char_T_, typename Value_T_>
+    // inline static StringStream<Char_T_> &Render(const Char_T_ *content, const Value_T_ &value,
+    //                                             StringStream<Char_T_> &stream) {
+    //     Array<Tags::TagBit> tags_cache;
+    //     Render(content, StringUtils::Count(content), value, stream, tags_cache);
+    //     return stream;
+    // }
+
+    template <typename StringStream_T_, typename Char_T_, typename Value_T_>
     inline static StringStream_T_ Render(const Char_T_ *content, const SizeT length, const Value_T_ &value) {
         StringStream_T_ stream;
         Render(content, length, value, stream);
         return stream;
     }
 
-    template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
+    template <typename StringStream_T_, typename Char_T_, typename Value_T_>
     inline static StringStream_T_ Render(const Char_T_ *content, const Value_T_ &value) {
-        return Render(content, StringUtils::Count(content), value);
+        return Render<StringStream_T_>(content, StringUtils::Count(content), value);
     }
 };
 
