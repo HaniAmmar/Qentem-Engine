@@ -49,6 +49,19 @@ struct StringUtils {
         return static_cast<Number_T_>(str_2 - str);
     }
 
+    template <typename Char_T_, typename Number_T_ = SizeT>
+    static constexpr Number_T_ ConstCount(const Char_T_ *str) noexcept {
+        const Char_T_ *str_2 = str;
+
+        if (str_2 != nullptr) {
+            while (*str_2 != '\0') {
+                ++str_2;
+            }
+        }
+
+        return static_cast<Number_T_>(str_2 - str);
+    }
+
     template <typename Char_T_, typename Number_T_>
     static void TrimLeft(const Char_T_ *str, Number_T_ &offset, const Number_T_ end_offset) noexcept {
         using WhiteSpaceChars = WhiteSpaceChars_T_<Char_T_>;
