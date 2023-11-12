@@ -1186,11 +1186,11 @@ class Value {
         switch (SetNumber(number)) {
             case 1:
             case 2: {
-                return static_cast<unsigned long long>(number.Integer);
+                return number.Natural;
             }
 
             case 3: {
-                return static_cast<unsigned long long>(number.Real);
+                return QNumber{static_cast<long long>(number.Real)}.Natural;
             }
 
             default: {
