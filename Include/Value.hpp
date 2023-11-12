@@ -1755,7 +1755,7 @@ class Value {
 
     struct VNumber {
       public:
-        VNumber() = default;
+        VNumber()  = default;
         ~VNumber() = default;
 
         VNumber(VNumber &&v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
