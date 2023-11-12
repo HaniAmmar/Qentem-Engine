@@ -4383,368 +4383,437 @@ static void TestAddition6(TestHelper &helper) {
 }
 
 static void TestStringify1(TestHelper &helper) {
-    ValueC value;
+    StringStream<char> ss;
+    ValueC             value;
 
     ///////////
     value = VArray();
-    helper.Equal(value.Stringify(), "[]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += true;
-    helper.Equal(value.Stringify(), "[true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
-    helper.Equal(value.Stringify(), "[false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
-    helper.Equal(value.Stringify(), "[null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += 0;
-    helper.Equal(value.Stringify(), "[0]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[0]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "a";
-    helper.Equal(value.Stringify(), R"(["a"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
-    helper.Equal(value.Stringify(), R"(["ABC"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
-    helper.Equal(value.Stringify(), "[[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
-    helper.Equal(value.Stringify(), "[{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{}]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += true;
-    helper.Equal(value.Stringify(), "[true,true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += true;
-    helper.Equal(value.Stringify(), "[false,true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += true;
-    helper.Equal(value.Stringify(), "[null,true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[null,true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += -3;
     value += true;
-    helper.Equal(value.Stringify(), "[-3,true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[-3,true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "a";
     value += true;
-    helper.Equal(value.Stringify(), R"(["a",true])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a",true])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += true;
-    helper.Equal(value.Stringify(), R"(["ABC",true])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",true])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += true;
-    helper.Equal(value.Stringify(), "[[],true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += true;
-    helper.Equal(value.Stringify(), "[{},true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{},true]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += false;
-    helper.Equal(value.Stringify(), "[true,false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += false;
-    helper.Equal(value.Stringify(), "[false,false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += false;
-    helper.Equal(value.Stringify(), "[null,false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[null,false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += 500;
     value += false;
-    helper.Equal(value.Stringify(), "[500,false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[500,false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VString("a");
     value += false;
-    helper.Equal(value.Stringify(), R"(["a",false])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a",false])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     const VString str("ABC");
     value += str;
     value += false;
-    helper.Equal(value.Stringify(), R"(["ABC",false])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",false])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += false;
-    helper.Equal(value.Stringify(), "[[],false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += false;
-    helper.Equal(value.Stringify(), "[{},false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{},false]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += nullptr;
-    helper.Equal(value.Stringify(), "[true,null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += nullptr;
-    helper.Equal(value.Stringify(), "[false,null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += nullptr;
-    helper.Equal(value.Stringify(), "[null,null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[null,null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += 456.5;
     value += nullptr;
-    helper.Equal(value.Stringify(), "[456.5,null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[456.5,null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "a";
     value += nullptr;
-    helper.Equal(value.Stringify(), R"(["a",null])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a",null])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += nullptr;
-    helper.Equal(value.Stringify(), R"(["ABC",null])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",null])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += nullptr;
-    helper.Equal(value.Stringify(), "[[],null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += nullptr;
-    helper.Equal(value.Stringify(), "[{},null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{},null]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += "A";
-    helper.Equal(value.Stringify(), R"([true,"A"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([true,"A"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += "AB";
-    helper.Equal(value.Stringify(), R"([false,"AB"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([false,"AB"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += "ABC";
-    helper.Equal(value.Stringify(), R"([null,"ABC"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null,"ABC"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += -8.9;
     value += "ABC";
-    helper.Equal(value.Stringify(2U), R"([-8.9,"ABC"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss, 2U), R"([-8.9,"ABC"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "a";
     value += "ABCD";
-    helper.Equal(value.Stringify(), R"(["a","ABCD"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a","ABCD"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += "ABCDE";
-    helper.Equal(value.Stringify(), R"(["ABC","ABCDE"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC","ABCDE"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += "ABCDEF";
-    helper.Equal(value.Stringify(), R"([[],"ABCDEF"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([[],"ABCDEF"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += "ABCDEFG";
-    helper.Equal(value.Stringify(), R"([{},"ABCDEFG"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([{},"ABCDEFG"])", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += VArray();
-    helper.Equal(value.Stringify(), "[true,[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += VArray();
-    helper.Equal(value.Stringify(), "[false,[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += VArray();
-    helper.Equal(value.Stringify(), "[null,[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[null,[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += 10000;
     value += VArray();
-    helper.Equal(value.Stringify(), "[10000,[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[10000,[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += VArray();
-    helper.Equal(value.Stringify(), R"(["ABC",[]])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",[]])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += VArray();
-    helper.Equal(value.Stringify(), "[[],[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += VArray();
-    helper.Equal(value.Stringify(), "[{},[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{},[]]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += VHArray();
-    helper.Equal(value.Stringify(), "[true,{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,{}]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += VHArray();
-    helper.Equal(value.Stringify(), "[false,{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,{}]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += VHArray();
-    helper.Equal(value.Stringify(), "[null,{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[null,{}]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += -1000;
     value += VHArray();
-    helper.Equal(value.Stringify(), "[-1000,{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[-1000,{}]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += VHArray();
-    helper.Equal(value.Stringify(), R"(["ABC",{}])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",{}])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += VHArray();
-    helper.Equal(value.Stringify(), "[[],{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],{}]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += VHArray();
-    helper.Equal(value.Stringify(), "[{},{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{},{}]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
     value += VHArray();
     value += false;
-    helper.Equal(value.Stringify(), "[true,{},false]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,{},false]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += VArray();
     value += nullptr;
-    helper.Equal(value.Stringify(), "[false,[],null]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,[],null]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += VHArray();
     value += "ABC";
-    helper.Equal(value.Stringify(), R"([null,{},"ABC"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null,{},"ABC"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += 789;
     value += "ABC";
-    helper.Equal(value.Stringify(), R"([null,789,"ABC"])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null,789,"ABC"])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += VArray();
     value += VHArray();
-    helper.Equal(value.Stringify(), R"(["ABC",[],{}])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",[],{}])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += VHArray();
     value[2] = 498;
-    helper.Equal(value.Stringify(), "[[],{},498]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],{},498]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += VArray();
     value += true;
-    helper.Equal(value.Stringify(), "[{},[],true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[{},[],true]", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value += true;
     value += VHArray();
     value += 0;
     value += VArray();
-    helper.Equal(value.Stringify(), "[true,{},0,[]]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[true,{},0,[]]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += false;
     value += VArray();
     value += nullptr;
     value += VHArray();
-    helper.Equal(value.Stringify(), "[false,[],null,{}]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[false,[],null,{}]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += nullptr;
     value += VHArray();
     value += "ABC";
     value += VArray();
-    helper.Equal(value.Stringify(), R"([null,{},"ABC",[]])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null,{},"ABC",[]])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "ABC";
     value += VArray();
     value += VHArray();
     value += nullptr;
-    helper.Equal(value.Stringify(), R"(["ABC",[],{},null])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["ABC",[],{},null])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VArray();
     value += false;
     value += VHArray();
     value += true;
-    helper.Equal(value.Stringify(), "[[],false,{},true]", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), "[[],false,{},true]", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += VHArray();
     value += nullptr;
     value += VArray();
     value += VArray();
-    helper.Equal(value.Stringify(), "[{},null,[],[]]", "Stringify()", __LINE__);
-
+    helper.Equal(value.Stringify(ss), "[{},null,[],[]]", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
+
     value.Reset();
     value += true;
     value += false;
@@ -4753,9 +4822,10 @@ static void TestStringify1(TestHelper &helper) {
     value += "ABC";
     value += VArray();
     value += VHArray();
-    helper.Equal(value.Stringify(), R"([true,false,null,123,"ABC",[],{}])", "Stringify()", __LINE__);
-
+    helper.Equal(value.Stringify(ss), R"([true,false,null,123,"ABC",[],{}])", "Stringify()", __LINE__);
+    ss.Clear();
     ///////////
+
     value.Reset();
     value += VHArray();
     value += VArray();
@@ -4764,373 +4834,443 @@ static void TestStringify1(TestHelper &helper) {
     value += nullptr;
     value += false;
     value += true;
-    helper.Equal(value.Stringify(), R"([{},[],"a",1.5,null,false,true])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([{},[],"a",1.5,null,false,true])", "Stringify()", __LINE__);
     ///////////////////////////////////////
 }
 
 static void TestStringify2(TestHelper &helper) {
-    ValueC value;
+    StringStream<char> ss;
+    ValueC             value;
 
     ///////////
     value = VHArray();
-    helper.Equal(value.Stringify(), R"({})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = true;
-    helper.Equal(value.Stringify(), R"({"A":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["B"] = false;
-    helper.Equal(value.Stringify(), R"({"B":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"B":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["AA"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"AA":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"AA":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["a"] = 0;
-    helper.Equal(value.Stringify(), R"({"a":0})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"a":0})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["abc"] = "a";
-    helper.Equal(value.Stringify(), R"({"abc":"a"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"abc":"a"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["ab"] = "ABC";
-    helper.Equal(value.Stringify(), R"({"ab":"ABC"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"ab":"ABC"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["ABC"] = VArray();
-    helper.Equal(value.Stringify(), R"({"ABC":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"ABC":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["5vn7b83y98t3wrupwmwa4ataw"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["A"] = true;
     value["B"] = true;
-    helper.Equal(value.Stringify(), R"({"A":true,"B":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":true,"B":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = false;
     value["b"] = true;
-    helper.Equal(value.Stringify(), R"({"A":false,"b":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":false,"b":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"]  = nullptr;
     value["BC"] = true;
-    helper.Equal(value.Stringify(), R"({"A":null,"BC":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":null,"BC":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"]  = -3;
     value["AB"] = true;
-    helper.Equal(value.Stringify(), R"({"A":-3,"AB":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":-3,"AB":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"]   = "a";
     value["ABC"] = true;
-    helper.Equal(value.Stringify(), R"({"A":"a","ABC":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a","ABC":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
     value["1"] = true;
-    helper.Equal(value.Stringify(), R"({"A":"ABC","1":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"ABC","1":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"]   = VArray();
     value["123"] = true;
-    helper.Equal(value.Stringify(), R"({"X":[],"123":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":[],"123":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["x"] = VHArray();
     value["A"] = true;
-    helper.Equal(value.Stringify(), R"({"x":{},"A":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"x":{},"A":true})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["A2"] = true;
     value["A1"] = false;
-    helper.Equal(value.Stringify(), R"({"A2":true,"A1":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A2":true,"A1":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A-"]   = false;
     value["A123"] = false;
-    helper.Equal(value.Stringify(), R"({"A-":false,"A123":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A-":false,"A123":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
     value["B"] = false;
-    helper.Equal(value.Stringify(), R"({"A":null,"B":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":null,"B":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = 500;
     value["B"] = false;
-    helper.Equal(value.Stringify(), R"({"A":500,"B":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":500,"B":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = VString("a");
     value["B"] = false;
-    helper.Equal(value.Stringify(), R"({"A":"a","B":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a","B":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     const VString str("ABC");
     value["A"] = str;
     value["B"] = false;
-    helper.Equal(value.Stringify(), R"({"A":"ABC","B":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"ABC","B":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"] = VArray();
     value["A"] = false;
-    helper.Equal(value.Stringify(), R"({"X":[],"A":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":[],"A":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"] = VHArray();
     value["A"] = false;
-    helper.Equal(value.Stringify(), R"({"X":{},"A":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":{},"A":false})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["A"] = true;
     value["W"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":true,"W":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":true,"W":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = false;
     value["@"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":false,"@":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":false,"@":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
     value["#"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":null,"#":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":null,"#":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = 456.5;
     value["H"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":456.5,"H":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":456.5,"H":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = "a";
     value["Q"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":"a","Q":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a","Q":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
     value["e"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":"ABC","e":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"ABC","e":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"] = VArray();
     value["n"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"X":[],"n":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":[],"n":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["t"] = VHArray();
     value["A"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"t":{},"A":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"t":{},"A":null})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["e"] = true;
     value["A"] = "A";
-    helper.Equal(value.Stringify(), R"({"e":true,"A":"A"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"e":true,"A":"A"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["m"] = false;
     value["A"] = "AB";
-    helper.Equal(value.Stringify(), R"({"m":false,"A":"AB"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"m":false,"A":"AB"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["i"] = nullptr;
     value["A"] = "ABC";
-    helper.Equal(value.Stringify(), R"({"i":null,"A":"ABC"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"i":null,"A":"ABC"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["s"] = -8.9;
     value["A"] = "ABC";
-    helper.Equal(value.Stringify(2U), R"({"s":-8.9,"A":"ABC"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss, 2U), R"({"s":-8.9,"A":"ABC"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["-"] = "a";
     value["A"] = "ABCD";
-    helper.Equal(value.Stringify(), R"({"-":"a","A":"ABCD"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"-":"a","A":"ABCD"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["g"] = "ABC";
     value["A"] = "ABCDE";
-    helper.Equal(value.Stringify(), R"({"g":"ABC","A":"ABCDE"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"g":"ABC","A":"ABCDE"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["o"] = VArray();
     value["A"] = "ABCDEF";
-    helper.Equal(value.Stringify(), R"({"o":[],"A":"ABCDEF"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"o":[],"A":"ABCDEF"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = VHArray();
     value["o"] = "ABCDEFG";
-    helper.Equal(value.Stringify(), R"({"A":{},"o":"ABCDEFG"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":{},"o":"ABCDEFG"})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["d"] = true;
     value["y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"d":true,"y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"d":true,"y":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = false;
     value["y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"A":false,"y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":false,"y":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
     value["y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"A":null,"y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":null,"y":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = 10000;
     value["y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"A":10000,"y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":10000,"y":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
     value["y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"A":"ABC","y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"ABC","y":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"] = VArray();
     value["y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"X":[],"y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":[],"y":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"] = VHArray();
     value["Y"] = VArray();
-    helper.Equal(value.Stringify(), R"({"X":{},"Y":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":{},"Y":[]})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["A"] = true;
     value["y"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":true,"y":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":true,"y":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = false;
     value["y"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":false,"y":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":false,"y":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
     value["y"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":null,"y":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":null,"y":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = -1000;
     value["y"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":-1000,"y":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":-1000,"y":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
     value["y"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":"ABC","y":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"ABC","y":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["C"] = VArray();
     value["R"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"C":[],"R":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"C":[],"R":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["cc"] = VHArray();
     value["rr"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"cc":{},"rr":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"cc":{},"rr":{}})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["A"]  = true;
     value["y"]  = VHArray();
     value["AA"] = false;
-    helper.Equal(value.Stringify(), R"({"A":true,"y":{},"AA":false})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":true,"y":{},"AA":false})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"] = false;
     value["y"] = VArray();
     value["B"] = nullptr;
-    helper.Equal(value.Stringify(), R"({"A":false,"y":[],"B":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":false,"y":[],"B":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"]   = nullptr;
     value["y"]   = VHArray();
     value["ABC"] = "ABC";
-    helper.Equal(value.Stringify(), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["t"] = nullptr;
     value["Y"] = 789;
     value["A"] = "ABC";
-    helper.Equal(value.Stringify(), R"({"t":null,"Y":789,"A":"ABC"})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"t":null,"Y":789,"A":"ABC"})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"]     = "ABC";
     value["y"]     = VArray();
     value["key-u"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"]     = VArray();
     value["Y"]     = VHArray();
     value["key-u"] = 498;
-    helper.Equal(value.Stringify(), R"({"X":[],"Y":{},"key-u":498})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":[],"Y":{},"key-u":498})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"] = VHArray();
     value["y"] = VArray();
     value["A"] = true;
-    helper.Equal(value.Stringify(), R"({"X":{},"y":[],"A":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":{},"y":[],"A":true})", "Stringify()", __LINE__);
     ///////////
+    ss.Clear();
 
     value.Reset();
     value["{}}"]   = true;
     value["y"]     = VHArray();
     value["AA"]    = 0;
     value["k-300"] = VArray();
-    helper.Equal(value.Stringify(), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["B1"]    = false;
     value["y"]     = VArray();
     value["[A]"]   = nullptr;
     value["k-300"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["{A}"]   = nullptr;
     value["y"]     = VHArray();
     value["AA"]    = "ABC";
     value["k-300"] = VArray();
-    helper.Equal(value.Stringify(), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["x"]     = "ABC";
     value["[]]"]   = VArray();
     value["key-u"] = VHArray();
     value["A"]     = nullptr;
-    helper.Equal(value.Stringify(), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"]       = VArray();
     value["CCCCccc"] = false;
     value["key-u"]   = VHArray();
     value["A"]       = true;
-    helper.Equal(value.Stringify(), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["X"]     = VHArray();
     value["A"]     = nullptr;
     value["key-u"] = VArray();
     value["k-300"] = VArray();
-    helper.Equal(value.Stringify(), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()", __LINE__);
 
     ///////////
+    ss.Clear();
+
     value.Reset();
     value["A"] = true;
     value["B"] = false;
@@ -5139,10 +5279,12 @@ static void TestStringify2(TestHelper &helper) {
     value["E"] = "ABC";
     value["F"] = VArray();
     value["G"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()",
+    helper.Equal(value.Stringify(ss), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()",
                  __LINE__);
 
     ///////////
+    ss.Clear();
+
     value.Reset();
     value["A"]       = VHArray();
     value["BB"]      = VArray();
@@ -5151,14 +5293,15 @@ static void TestStringify2(TestHelper &helper) {
     value["EEEEE"]   = nullptr;
     value["FFFFFF"]  = false;
     value["GGGGGGG"] = true;
-    helper.Equal(value.Stringify(),
+    helper.Equal(value.Stringify(ss),
                  R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})", "Stringify()",
                  __LINE__);
     ///////////////////////////////////////
 }
 
 static void TestStringify3(TestHelper &helper) {
-    ValueC value;
+    StringStream<char> ss;
+    ValueC             value;
 
     value[0] += true;
     value[0] += false;
@@ -5167,7 +5310,8 @@ static void TestStringify3(TestHelper &helper) {
     value[0] += "ABC";
     value[0] += VArray();
     value[0] += VHArray();
-    helper.Equal(value.Stringify(), R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()", __LINE__);
+    ss.Clear();
 
     value         = VArray();
     value[0]["a"] = true;
@@ -5177,8 +5321,9 @@ static void TestStringify3(TestHelper &helper) {
     value[0]["B"] = "a";
     value[0]["2"] = VArray();
     value[0]["6"] = VHArray();
-    helper.Equal(value.Stringify(), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", "Stringify()",
+    helper.Equal(value.Stringify(ss), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", "Stringify()",
                  __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["o"] += true;
@@ -5188,7 +5333,8 @@ static void TestStringify3(TestHelper &helper) {
     value["o"] += "ABC";
     value["o"] += VArray();
     value["o"] += VHArray();
-    helper.Equal(value.Stringify(), R"({"o":[true,false,null,0,"ABC",[],{}]})", "Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"o":[true,false,null,0,"ABC",[],{}]})", "Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["i"]["a"] = true;
@@ -5198,24 +5344,25 @@ static void TestStringify3(TestHelper &helper) {
     value["i"]["B"] = "a";
     value["i"]["2"] = VArray();
     value["i"]["6"] = VHArray();
-    helper.Equal(value.Stringify(), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})", "Stringify()",
-                 __LINE__);
-
-    ////
+    helper.Equal(value.Stringify(ss), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})",
+                 "Stringify()", __LINE__);
 }
 
 static void TestStringify4(TestHelper &helper) {
-    ValueC value;
+    StringStream<char> ss;
+    ValueC             value;
 
     value["\"\\/\b\f\n\r\t"] = "\t\r\n\f\b/\\\"";
-    helper.Equal(value.Stringify(), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"\"\\\/\b\f\n\r\t":"\t\r\n\f\b\/\\\""})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value += "\"\\/\b\f\n\r\t";
-    helper.Equal(value.Stringify(), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()", __LINE__);
 }
 
 static void TestDeleteValue(TestHelper &helper) {
+    StringStream<char> ss;
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
@@ -5224,78 +5371,97 @@ static void TestDeleteValue(TestHelper &helper) {
     value[0] = 1;
     value.RemoveIndex(int{0});
     helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = "c";
     value.RemoveIndex(vu_int{0});
     helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = VArray();
     value.RemoveIndex(vu_long_long{0});
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = false;
     value[1] = true;
     value.RemoveIndex(0);
-    helper.Equal(value.Stringify(), R"([true])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([true])", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.RemoveIndex(1);
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = "abc";
     value[1] = nullptr;
     value.RemoveIndex(1);
-    helper.Equal(value.Stringify(), R"(["abc"])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["abc"])", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.RemoveIndex(0);
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
     value.RemoveIndex(1);
-    helper.Equal(value.Stringify(), R"([false,null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([false,null])", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.RemoveIndex(0);
-    helper.Equal(value.Stringify(), R"([null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.RemoveIndex(2);
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = false;
     value[1] = true;
     value[2] = nullptr;
     value[1].Reset();
-    helper.Equal(value.Stringify(), R"([false,null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([false,null])", "value.Stringify()", __LINE__);
+    ss.Clear();
     value[0].Reset();
-    helper.Equal(value.Stringify(), R"([null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[2].Reset();
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0] = "a";
     value[1] = VArray();
     value[2] = VHArray();
     value.RemoveIndex(2);
-    helper.Equal(value.Stringify(), R"(["a",[]])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a",[]])", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.RemoveIndex(1);
-    helper.Equal(value.Stringify(), R"(["a"])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a"])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.RemoveIndex(0);
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
-
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
     /////////
+
     value.Reset();
 
     value["A"] = 1;
     value.RemoveIndex(0);
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"] = "c";
     value.Remove("A");
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"] = VArray();
     value.Remove("A");
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value["A"]  = false;
@@ -5303,55 +5469,68 @@ static void TestDeleteValue(TestHelper &helper) {
     value.Remove("A");
     helper.Equal(value.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
     helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
-    helper.Equal(value.Stringify(), R"({"bb":true})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"bb":true})", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.RemoveIndex(1);
     helper.Equal(value.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
     helper.Equal(value.GetValue(1), nullptr, "GetValue(1)", "null", __LINE__);
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"]  = "abc";
     value["bb"] = nullptr;
     value.Remove("bb");
-    helper.Equal(value.Stringify(), R"({"A":"abc"})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"abc"})", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.Remove("A");
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"]   = false;
     value["bb"]  = true;
     value["AAA"] = nullptr;
     value.Remove("bb");
-    helper.Equal(value.Stringify(), R"({"A":false,"AAA":null})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":false,"AAA":null})", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.Remove("A");
-    helper.Equal(value.Stringify(), R"({"AAA":null})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"AAA":null})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Remove("AAA");
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"]   = "a";
     value["bb"]  = VHArray();
     value["AAA"] = VArray();
     value.Remove("AAA");
-    helper.Equal(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
+    ss.Clear();
     value.Remove("bb");
-    helper.Equal(value.Stringify(), R"({"A":"a"})", value.Stringify().First(), __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a"})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Remove("A");
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"]   = "a";
     value["bb"]  = VHArray();
     value["AAA"] = VArray();
     value["AAA"].Reset();
-    helper.Equal(value.Stringify(), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
+    ss.Clear();
     value["bb"].Reset();
-    helper.Equal(value.Stringify(), R"({"A":"a"})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({"A":"a"})", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value["A"].Reset();
-    helper.Equal(value.Stringify(), R"({})", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
 }
 
 static void TestSortValue(TestHelper &helper) {
-    ValueC value;
+    StringStream<char> ss;
+    ValueC             value;
 
     value["2019"] = 0;
     value["2016"] = 0;
@@ -5363,8 +5542,9 @@ static void TestSortValue(TestHelper &helper) {
 
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
+    helper.Equal(value.Stringify(ss), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
                  "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
 
@@ -5378,8 +5558,9 @@ static void TestSortValue(TestHelper &helper) {
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
+    helper.Equal(value.Stringify(ss), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
                  "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
 
@@ -5392,8 +5573,9 @@ static void TestSortValue(TestHelper &helper) {
 
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})", "value.Stringify()",
+    helper.Equal(value.Stringify(ss), R"({"2015":0,"2016":0,"2017":0,"2019":0,"2020":0,"2021":0})", "value.Stringify()",
                  __LINE__);
+    ss.Clear();
 
     value.Reset();
 
@@ -5406,12 +5588,13 @@ static void TestSortValue(TestHelper &helper) {
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})", "value.Stringify()",
+    helper.Equal(value.Stringify(ss), R"({"2021":0,"2020":0,"2019":0,"2017":0,"2016":0,"2015":0})", "value.Stringify()",
                  __LINE__);
 }
 
 static void TestGroupValue(TestHelper &helper) {
-    ValueC value;
+    StringStream<char> ss;
+    ValueC             value;
 
     value += VHArray();
     value += VHArray();
@@ -5442,21 +5625,24 @@ static void TestGroupValue(TestHelper &helper) {
     value2.Sort();
 
     helper.Equal(
-        value2.Stringify(),
+        value2.Stringify(ss),
         R"({"2017":[{"month":1}],"2018":[{"month":2},{"month":3}],"2019":[{"month":4}],"2020":[{"month":5},{"month":6},{"month":7}]})",
         "value2.Stringify()", __LINE__);
+    ss.Clear();
 
     value2.Sort(false);
 
     helper.Equal(
-        value2.Stringify(),
+        value2.Stringify(ss),
         R"({"2020":[{"month":5},{"month":6},{"month":7}],"2019":[{"month":4}],"2018":[{"month":2},{"month":3}],"2017":[{"month":1}]})",
         "value2.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value2.Reset();
     value.GroupBy(value2, "year");
-    helper.Equal(value2.Stringify(), R"()", "value2.Stringify()", __LINE__);
+    helper.Equal(value2.Stringify(ss), R"()", "value2.Stringify()", __LINE__);
+    ss.Clear();
 
     value[0]["year1"] = 2019;
     value[1]["year1"] = 2020;
@@ -5475,9 +5661,10 @@ static void TestGroupValue(TestHelper &helper) {
     value[6]["month"] = 3;
 
     value.GroupBy(value2, "year");
-    helper.Equal(value2.Stringify(), R"({})", "value2.Stringify()", __LINE__);
-
+    helper.Equal(value2.Stringify(ss), R"({})", "value2.Stringify()", __LINE__);
+    ss.Clear();
     ////
+
     value.Reset();
 
     value[0]["year"] = 2019;
@@ -5498,6 +5685,7 @@ static void TestGroupValue(TestHelper &helper) {
     helper.EqualsFalse(value.GroupBy(value2, "year"), "value2.Stringify()", __LINE__);
 
     ///////////////////
+    ss.Clear();
 
     value.Reset();
     value2.Reset();
@@ -5513,13 +5701,15 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([1,2,3,4,5,6,7])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([1,2,3,4,5,6,7])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([7,6,5,4,3,2,1])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([7,6,5,4,3,2,1])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     //////////////////////
 
@@ -5537,12 +5727,14 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(2U), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss, 2U), R"([{},[],"str",5.4,true,false,null])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
     value.Sort(false);
 
-    helper.Equal(value.Stringify(2U), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss, 2U), R"([null,false,true,5.4,"str",[],{}])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     ///////////////////
 
@@ -5560,13 +5752,15 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([-7,-6,-5,-4,-3,-2,-1])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([-7,-6,-5,-4,-3,-2,-1])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([-1,-2,-3,-4,-5,-6,-7])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([-1,-2,-3,-4,-5,-6,-7])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     ///////////////////
 
@@ -5584,16 +5778,17 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([1.5,2.5,3.5,4.5,5.5,6.5,7.5])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([7.5,6.5,5.5,4.5,3.5,2.5,1.5])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     ///////////////////
-
     value.Reset();
     value2.Reset();
 
@@ -5608,13 +5803,15 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"(["a","b","c","d","e","f","g"])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["a","b","c","d","e","f","g"])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"(["g","f","e","d","c","b","a"])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"(["g","f","e","d","c","b","a"])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     ///////////////////
 
@@ -5632,7 +5829,8 @@ static void TestGroupValue(TestHelper &helper) {
 
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([[0,0,0],[0,0,0,0,0]])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([[0,0,0],[0,0,0,0,0]])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Reset();
     value2.Reset();
@@ -5648,9 +5846,10 @@ static void TestGroupValue(TestHelper &helper) {
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([[0,0,0,0,0],[0,0,0]])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([[0,0,0,0,0],[0,0,0]])", "value.Stringify()", __LINE__);
 
     ///////////////////
+    ss.Clear();
 
     value.Reset();
     value2.Reset();
@@ -5666,8 +5865,9 @@ static void TestGroupValue(TestHelper &helper) {
 
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])", "value.Stringify()",
+    helper.Equal(value.Stringify(ss), R"([{"a":0,"b":0,"c":0},{"a":0,"b":0,"c":0,"d":0,"e":0}])", "value.Stringify()",
                  __LINE__);
+    ss.Clear();
 
     value.Reset();
     value2.Reset();
@@ -5683,12 +5883,13 @@ static void TestGroupValue(TestHelper &helper) {
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])", "value.Stringify()",
+    helper.Equal(value.Stringify(ss), R"([{"a":0,"b":0,"c":0,"d":0,"e":0},{"a":0,"b":0,"c":0}])", "value.Stringify()",
                  __LINE__);
 
     //////////////////////
 
     ///////////////////
+    ss.Clear();
 
     value.Reset();
     value2.Reset();
@@ -5699,15 +5900,18 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([true,true])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([true,true])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([true,true])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([true,true])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     //////////
+
     value.Reset();
     value2.Reset();
 
@@ -5717,14 +5921,17 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([false,false])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([false,false])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([false,false])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([false,false])", "value.Stringify()", __LINE__);
     ///////////
+    ss.Clear();
+
     value.Reset();
     value2.Reset();
 
@@ -5734,24 +5941,27 @@ static void TestGroupValue(TestHelper &helper) {
     value = value2;
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([null,null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null,null])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value = value2;
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([null,null])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([null,null])", "value.Stringify()", __LINE__);
+    ss.Clear();
     ///////////
     value.RemoveIndex(0);
     value.RemoveIndex(1);
 
     value.Sort();
 
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
+    ss.Clear();
 
     value.Sort(false);
 
-    helper.Equal(value.Stringify(), R"([])", "value.Stringify()", __LINE__);
+    helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
     ///////////////////
 }
 

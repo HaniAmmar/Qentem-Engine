@@ -1493,7 +1493,7 @@ class Value {
     }
 
     template <typename Stream_T_>
-    inline void Stringify(Stream_T_ &stream, unsigned int precision = Config::FloatDoublePrecision) const {
+    inline Stream_T_ &Stringify(Stream_T_ &stream, unsigned int precision = Config::FloatDoublePrecision) const {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -1501,14 +1501,13 @@ class Value {
         } else if (type == ValueType::Array) {
             stringifyArray(array_, stream, precision);
         }
+
+        return stream;
     }
 
-    VString Stringify(unsigned int precision = Config::FloatDoublePrecision) const {
+    inline VString Stringify(unsigned int precision = Config::FloatDoublePrecision) const {
         StringStream<Char_T_> stream;
-
-        Stringify(stream, precision);
-
-        return stream.GetString();
+        return Stringify(stream, precision).GetString();
     }
 
   private:
