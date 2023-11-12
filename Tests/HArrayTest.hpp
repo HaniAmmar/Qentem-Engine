@@ -467,7 +467,7 @@ static void TestHArray4(TestHelper &helper) {
         Digit::NumberToString(key, i);
         key2 = key;
 
-        numbers1.Insert(Memory::Move(key2), SizeT{i});
+        numbers1.Insert(Memory::Move(key2), Memory::Move(SizeT{i}));
         value = numbers1.GetValue(key);
         helper.NotEqual(value, nullptr, "value", "null", __LINE__);
         helper.Equal(*value, i, key.First(), __LINE__);

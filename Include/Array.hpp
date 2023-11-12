@@ -152,7 +152,7 @@ class Array {
     }
 
     inline void operator+=(const Type_ &item) {
-        *this += Type_{item};
+        *this += Memory::Move(Type_{item});
     }
 
     inline void Insert(Array &&src) {
@@ -168,7 +168,7 @@ class Array {
     }
 
     inline void Insert(const Type_ &item) {
-        *this += Type_{item};
+        *this += Memory::Move(Type_{item});
     }
 
     inline Type_ &InsertGet(Type_ &&item) {
