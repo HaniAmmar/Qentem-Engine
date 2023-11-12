@@ -219,8 +219,8 @@ struct Template {
     // }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, SizeT length, const Value_T_ &value, StringStream_T_ &stream,
-                              Array<Tags::TagBit> &tags_cache) {
+    inline static StringStream_T_ &Render(const Char_T_ *content, SizeT length, const Value_T_ &value,
+                                          StringStream_T_ &stream, Array<Tags::TagBit> &tags_cache) {
         using TemplateSubCV = TemplateSub<Char_T_, Value_T_, StringStream_T_>;
         const TemplateSubCV temp{content, length, &stream, &value};
 
@@ -231,13 +231,23 @@ struct Template {
         const Tags::TagBit *tag = tags_cache.First();
         const Tags::TagBit *end = (tag + tags_cache.Size());
         temp.Render(tag, end);
+        return stream;
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_>
-    inline static void Render(const Char_T_ *content, const SizeT length, const Value_T_ &value,
-                              StringStream_T_ &stream) {
+    inline static StringStream_T_ &Render(const Char_T_ *content, const SizeT length, const Value_T_ &value,
+                                          StringStream_T_ &stream) {
         Array<Tags::TagBit> tags_cache;
         Render(content, length, value, stream, tags_cache);
+        return stream;
+    }
+
+    template <typename Char_T_, typename Value_T_>
+    inline static StringStream<Char_T_> &Render(const Char_T_ *content, const Value_T_ &value,
+                                                StringStream<Char_T_> &stream) {
+        Array<Tags::TagBit> tags_cache;
+        Render(content, StringUtils::Count(content), value, stream, tags_cache);
+        return stream;
     }
 
     template <typename Char_T_, typename Value_T_, typename StringStream_T_ = StringStream<Char_T_>>
