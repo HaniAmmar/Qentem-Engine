@@ -31,11 +31,11 @@
 namespace Qentem::Test {
 
 QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, const Value<char> &value) {
-    using TemplateSubCV        = TemplateSub<char, Value<char>, StringStream<char>>;
-    const SizeT         length = StringUtils::Count(content);
-    const TemplateSubCV temp{content, length, nullptr, &value};
+    using TemplateSubCV             = TemplateSub<char, Value<char>, StringStream<char>>;
+    const SizeT              length = StringUtils::Count(content);
+    const TemplateSubCV      temp{content, length, nullptr, &value};
     const Array<QExpression> exprs = temp.ParseExpressions(0, length);
-    QExpression         result;
+    QExpression              result;
 
     if (temp.Evaluate(result, exprs)) {
         switch (result.Type) {
@@ -73,9 +73,9 @@ QENTEM_NOINLINE static double TestEvaluate(const char *content, const Value<char
 
 static void TestEvaluate1(TestHelper &helper) {
     const Value<char> value;
-    double      number;
-    const char *content;
-    bool        is_valid;
+    double            number;
+    const char       *content;
+    bool              is_valid;
 
     content  = "";
     is_valid = TestEvaluate(number, content, value);
@@ -272,9 +272,9 @@ static void TestEvaluate1(TestHelper &helper) {
 
 static void TestEvaluate2(TestHelper &helper) {
     const Value<char> value;
-    double      number = -99;
-    const char *content;
-    bool        is_valid;
+    double            number = -99;
+    const char       *content;
+    bool              is_valid;
 
     content  = "1";
     is_valid = TestEvaluate(number, content, value);
@@ -441,9 +441,9 @@ static void TestEvaluate2(TestHelper &helper) {
 
 static void TestEvaluate3(TestHelper &helper) {
     const Value<char> value;
-    double      number;
-    const char *content;
-    bool        is_valid;
+    double            number;
+    const char       *content;
+    bool              is_valid;
 
     content = "3^2";
     number  = TestEvaluate(content, value);
@@ -709,9 +709,9 @@ static void TestEvaluate3(TestHelper &helper) {
 
 static void TestEvaluate4(TestHelper &helper) {
     const Value<char> value;
-    double      number;
-    const char *content;
-    bool        is_valid;
+    double            number;
+    const char       *content;
+    bool              is_valid;
 
     content = "2 ^ -2";
     number  = TestEvaluate(content, value);
@@ -954,9 +954,9 @@ static void TestEvaluate4(TestHelper &helper) {
 
 static void TestEvaluate5(TestHelper &helper) {
     const Value<char> value;
-    double      number;
-    const char *content;
-    bool        is_valid;
+    double            number;
+    const char       *content;
+    bool              is_valid;
 
     content = "16 ^ +2";
     number  = TestEvaluate(content, value);
@@ -1200,9 +1200,9 @@ static void TestEvaluate5(TestHelper &helper) {
 
 static void TestEvaluate6(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content  = "(0)";
     is_valid = TestEvaluate(number, content, value);
@@ -1406,9 +1406,9 @@ static void TestEvaluate6(TestHelper &helper) {
 
 static void TestEvaluate7(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content = "6^(8/2)";
     number  = TestEvaluate(content, value);
@@ -1681,9 +1681,9 @@ static void TestEvaluate7(TestHelper &helper) {
 
 static void TestEvaluate8(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content = "3*2^3";
     number  = TestEvaluate(content, value);
@@ -1958,9 +1958,9 @@ static void TestEvaluate8(TestHelper &helper) {
 
 static void TestEvaluate9(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content = "(3*2^3)";
     number  = TestEvaluate(content, value);
@@ -2231,9 +2231,9 @@ static void TestEvaluate9(TestHelper &helper) {
 
 static void TestEvaluate10(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content = "3*(2)^3";
     number  = TestEvaluate(content, value);
@@ -2504,9 +2504,9 @@ static void TestEvaluate10(TestHelper &helper) {
 
 static void TestEvaluate11(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content = "(3*(2)^3)";
     number  = TestEvaluate(content, value);
@@ -2865,9 +2865,9 @@ static void TestEvaluate11(TestHelper &helper) {
 
 static void TestEvaluate12(TestHelper &helper) {
     const Value<char> value;
-    double      number = -1;
-    const char *content;
-    bool        is_valid;
+    double            number = -1;
+    const char       *content;
+    bool              is_valid;
 
     content = "a==a";
     number  = TestEvaluate(content, value);
@@ -4623,7 +4623,7 @@ static void TestEvaluate19(TestHelper &helper) {
     value += -4.0F;
     value += 0.25F;
 
-    content       = "{var:6}^{var:1}";
+    content = "{var:6}^{var:1}";
     helper.EqualsFalse(TestEvaluate(number, content, value), "is_valid", __LINE__);
 
     content = "{var:0}^{var:0}";

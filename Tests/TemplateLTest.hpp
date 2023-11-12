@@ -223,7 +223,7 @@ static void TestVariableLTag1(TestHelper &helper) {
 
 static void TestVariableLTag2(TestHelper &helper) {
     const Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
-    const wchar_t *content;
+    const wchar_t       *content;
 
     content = LR"({var:0}{var:0})";
     helper.Equal(Template::Render(content, value), LR"(AA)", LR"(Render())", __LINE__);
@@ -839,7 +839,7 @@ static void TestRawVariableLTag1(TestHelper &helper) {
 
 static void TestRawVariableLTag2(TestHelper &helper) {
     const Value<wchar_t> value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
-    const wchar_t *content;
+    const wchar_t       *content;
 
     content = LR"({raw:0}{raw:0})";
     helper.Equal(Template::Render(content, value), LR"(AA)", LR"(Render())", __LINE__);
@@ -1845,7 +1845,7 @@ static void TestLoopLTag1(TestHelper &helper) {
 
     //////////////////////
 
-    value1                = JSON::Parse(LR"([100, -50, "A", true, false, null])");
+    value1 = JSON::Parse(LR"([100, -50, "A", true, false, null])");
     const Value<wchar_t> value2 =
         JSON::Parse(LR"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 

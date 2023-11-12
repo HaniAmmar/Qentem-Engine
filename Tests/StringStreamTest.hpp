@@ -260,7 +260,7 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss2, "abcdefgh", "StringStream", __LINE__);
 
     const String<char> n_str = String<char>("12345678");
-    ss1                = n_str;
+    ss1                      = n_str;
     helper.Equal(ss1, "12345678", "StringStream", __LINE__);
 
     ss2.Reset();

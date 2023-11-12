@@ -223,7 +223,7 @@ static void TestVariableTag1(TestHelper &helper) {
 
 static void TestVariableTag2(TestHelper &helper) {
     const Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
-    const char *content;
+    const char       *content;
 
     content = R"({var:0}{var:0})";
     helper.Equal(Template::Render(content, value), R"(AA)", R"(Render())", __LINE__);
@@ -833,7 +833,7 @@ static void TestRawVariableTag1(TestHelper &helper) {
 
 static void TestRawVariableTag2(TestHelper &helper) {
     const Value<char> value = JSON::Parse(R"(["A", "abc", true, 456, 1.5])");
-    const char *content;
+    const char       *content;
 
     content = R"({raw:0}{raw:0})";
     helper.Equal(Template::Render(content, value), R"(AA)", R"(Render())", __LINE__);
@@ -1836,7 +1836,7 @@ static void TestLoopTag1(TestHelper &helper) {
 
     //////////////////////
 
-    value1             = JSON::Parse(R"([100, -50, "A", true, false, null])");
+    value1 = JSON::Parse(R"([100, -50, "A", true, false, null])");
     const Value<char> value2 =
         JSON::Parse(R"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 

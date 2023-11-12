@@ -3390,7 +3390,7 @@ static void TestIndexOperator1(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
-    ValueC  value;
+    ValueC        value;
     const VString str1("D");
     const VString str2("DEFG");
 
@@ -3572,7 +3572,7 @@ static void TestAddition1(TestHelper &helper) {
     using vu_int       = unsigned int;
     using vu_long_long = unsigned long long;
 
-    ValueC  value;
+    ValueC        value;
     const VString str1("D");
     const VString str2("DEFG");
 

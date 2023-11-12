@@ -76,9 +76,9 @@ QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &str
 
 template <typename Number_T_>
 static bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
-    QNumber number;
-    SizeT   offset = 0;
-    const SizeT   length = StringUtils::Count(str);
+    QNumber     number;
+    SizeT       offset = 0;
+    const SizeT length = StringUtils::Count(str);
 
     switch (Digit::StringToNumber(number, str, offset, length)) {
         case 1: {
@@ -105,7 +105,7 @@ static bool StringToNumberCount(Number_T_ &num, const char *str) noexcept {
 
 static void TestStringToNumber1(TestHelper &helper) {
     SizeT       number = 0;
-    const char *str    ;
+    const char *str;
     bool        valid;
 
     str   = "";

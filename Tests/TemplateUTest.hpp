@@ -223,7 +223,7 @@ static void TestVariableUTag1(TestHelper &helper) {
 
 static void TestVariableUTag2(TestHelper &helper) {
     const Value<char16_t> value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5])");
-    const char16_t *content;
+    const char16_t       *content;
 
     content = uR"({var:0}{var:0})";
     helper.Equal(Template::Render(content, value), uR"(AA)", uR"(Render())", __LINE__);
@@ -839,7 +839,7 @@ static void TestRawVariableUTag1(TestHelper &helper) {
 
 static void TestRawVariableUTag2(TestHelper &helper) {
     const Value<char16_t> value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5])");
-    const char16_t *content;
+    const char16_t       *content;
 
     content = uR"({raw:0}{raw:0})";
     helper.Equal(Template::Render(content, value), uR"(AA)", uR"(Render())", __LINE__);
@@ -1845,7 +1845,7 @@ static void TestLoopUTag1(TestHelper &helper) {
 
     //////////////////////
 
-    value1                 = JSON::Parse(uR"([100, -50, "A", true, false, null])");
+    value1 = JSON::Parse(uR"([100, -50, "A", true, false, null])");
     const Value<char16_t> value2 =
         JSON::Parse(uR"({"k-1": 4, "k-2":1.5, "k-3":"ABC", "k-4":true, "k-5":false, "k-6":null})");
 
