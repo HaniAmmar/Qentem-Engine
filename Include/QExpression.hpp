@@ -381,7 +381,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_left = static_cast<unsigned long long>(Number.Real);
+                num_left = QNumber{static_cast<unsigned long long>(Number.Real)}.Natural;
                 break;
             }
 
@@ -400,9 +400,7 @@ struct QExpression {
                 right_negative = (right.Number.Integer < 0);
 
                 if (right_negative) {
-                    QNumber qn;
-                    qn.Integer = -right.Number.Integer;
-                    num_right  = qn.Natural;
+                    num_right = QNumber{-right.Number.Integer}.Natural;
                 } else {
                     num_right = right.Number.Natural;
                 }
@@ -425,7 +423,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_right = static_cast<unsigned long long>(right_real);
+                num_right = QNumber{static_cast<long long>(right_real)}.Natural;
             }
 
             default: {

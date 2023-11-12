@@ -132,6 +132,22 @@ using Size32T  = decltype(nullptr);
 using Size64T  = decltype(nullptr);
 
 union QNumber {
+    QNumber() noexcept                           = default;
+    QNumber(QNumber &&) noexcept                 = default;
+    QNumber(const QNumber &) noexcept            = default;
+    QNumber &operator=(QNumber &&) noexcept      = default;
+    QNumber &operator=(const QNumber &) noexcept = default;
+    ~QNumber() noexcept                          = default;
+
+    QNumber(unsigned long long number) noexcept : Natural{number} {
+    }
+
+    QNumber(long long number) noexcept : Integer{number} {
+    }
+
+    QNumber(double number) noexcept : Real{number} {
+    }
+
     unsigned long long Natural{0};
     long long          Integer;
     double             Real;
