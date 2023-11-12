@@ -355,7 +355,7 @@ struct TemplateSub {
         return false;
     }
 
-    inline QExpressions ParseExpressions(SizeT offset, const SizeT end_offset) const noexcept {
+    inline QExpressions ParseExpressions(SizeT offset, const SizeT end_offset) const {
         return parseExpressions(offset, end_offset);
     }
 
@@ -871,7 +871,7 @@ struct TemplateSub {
         stream_->Write((content_ + tag->GetOffset()), tag->GetLength());
     }
 
-    void parseVariableTag(SizeT offset, SizeT end_offset, void *tag) const {
+    void parseVariableTag(SizeT offset, SizeT end_offset, void *tag) const noexcept {
         VariableTag &i_tag = *(static_cast<VariableTag *>(tag));
         i_tag.Offset       = offset;
         i_tag.Length       = static_cast<unsigned char>(end_offset - offset);
@@ -1608,7 +1608,7 @@ struct TemplateSub {
         return true;
     }
 
-    QExpressions parseExpressions(SizeT offset, const SizeT end_offset) const noexcept {
+    QExpressions parseExpressions(SizeT offset, const SizeT end_offset) const {
         QExpressions exprs;
         QOperation   last_oper = QOperation::NoOp;
 
@@ -1639,7 +1639,7 @@ struct TemplateSub {
     }
 
     bool parseValue(QExpressions &exprs, const QOperation oper, const QOperation last_oper, SizeT offset,
-                    SizeT end_offset) const noexcept {
+                    SizeT end_offset) const {
         using QOperationSymbol = QOperationSymbol_T_<Char_T_>;
 
         StringUtils::TrimLeft(content_, offset, end_offset);

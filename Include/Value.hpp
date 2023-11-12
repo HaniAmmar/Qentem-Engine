@@ -155,10 +155,10 @@ class Value {
         static constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
         static constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
 
-        if (is_unsigned) {
+        if constexpr (is_unsigned) {
             number_.SetNumber(static_cast<unsigned long long>(num));
             setTypeToUInt64();
-        } else if (!is_float) {
+        } else if constexpr (!is_float) {
             number_.SetNumber(static_cast<long long>(num));
             setTypeToInt64();
         } else {
@@ -359,10 +359,10 @@ class Value {
             reset();
         }
 
-        if (is_unsigned) {
+        if constexpr (is_unsigned) {
             number_.SetNumber(static_cast<unsigned long long>(num));
             setTypeToUInt64();
-        } else if (!is_float) {
+        } else if constexpr (!is_float) {
             number_.SetNumber(static_cast<long long>(num));
             setTypeToInt64();
         } else {
@@ -1765,7 +1765,7 @@ class Value {
         VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
         }
 
-        VNumber &operator=(const VNumber &v_num) {
+        VNumber &operator=(const VNumber &v_num) noexcept {
             if (this != &v_num) {
                 number_   = v_num.number_;
                 p_number_ = v_num.p_number_;

@@ -199,13 +199,13 @@ inline static void Initialize(Type_ *pointer, Type_ &&value) noexcept {
 
 // Copy initializer
 template <typename Type_>
-inline static void Initialize(Type_ *pointer, const Type_ &value) noexcept {
+inline static void Initialize(Type_ *pointer, const Type_ &value) {
     new (pointer) Type_{value};
 }
 
 // Range copy initializer
 template <typename Type_>
-inline static void Initialize(Type_ *pointer, const Type_ *end, const Type_ &value) noexcept {
+inline static void Initialize(Type_ *pointer, const Type_ *end, const Type_ &value) {
     while (pointer < end) {
         new (pointer) Type_{value};
         ++pointer;
@@ -248,7 +248,7 @@ inline static Type_ *AllocateInit(const Values_T_ &...values) {
     // return new Type_{values...};
 }
 
-inline static void Deallocate(void *pointer) {
+inline static void Deallocate(void *pointer) noexcept {
 #ifdef QENTEM_TEST_HELPER_H_
     if (pointer != nullptr) {
         MemoryRecord::RemoveAllocation(pointer);

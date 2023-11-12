@@ -107,8 +107,8 @@ struct QExpression {
                     }
 
                     case ExpressionType::IntegerNumber: {
-                        Number.Integer = (static_cast<long long>(Number.Natural) + right.Number.Integer);
-                        Type           = ExpressionType::IntegerNumber;
+                        Number.Integer += right.Number.Integer;
+                        Type = ExpressionType::IntegerNumber;
                         break;
                     }
 
@@ -127,11 +127,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 switch (right.Type) {
-                    case ExpressionType::NaturalNumber: {
-                        Number.Integer += static_cast<long long>(right.Number.Natural);
-                        break;
-                    }
-
+                    case ExpressionType::NaturalNumber:
                     case ExpressionType::IntegerNumber: {
                         Number.Integer += right.Number.Integer;
                         break;
@@ -191,8 +187,8 @@ struct QExpression {
                     }
 
                     case ExpressionType::IntegerNumber: {
-                        Number.Integer = (static_cast<long long>(Number.Natural) - right.Number.Integer);
-                        Type           = ExpressionType::IntegerNumber;
+                        Number.Integer -= right.Number.Integer;
+                        Type = ExpressionType::IntegerNumber;
 
                         break;
                     }
@@ -212,11 +208,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 switch (right.Type) {
-                    case ExpressionType::NaturalNumber: {
-                        Number.Integer -= static_cast<long long>(right.Number.Natural);
-                        break;
-                    }
-
+                    case ExpressionType::NaturalNumber:
                     case ExpressionType::IntegerNumber: {
                         Number.Integer -= right.Number.Integer;
                         break;
@@ -249,7 +241,6 @@ struct QExpression {
 
                     case ExpressionType::RealNumber: {
                         Number.Real -= right.Number.Real;
-                        break;
                     }
 
                     default: {
@@ -272,8 +263,8 @@ struct QExpression {
                     }
 
                     case ExpressionType::IntegerNumber: {
-                        Number.Integer = (static_cast<long long>(Number.Natural) * right.Number.Integer);
-                        Type           = ExpressionType::IntegerNumber;
+                        Number.Integer *= right.Number.Integer;
+                        Type = ExpressionType::IntegerNumber;
                         break;
                     }
 
@@ -292,11 +283,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 switch (right.Type) {
-                    case ExpressionType::NaturalNumber: {
-                        Number.Integer *= static_cast<long long>(right.Number.Natural);
-                        break;
-                    }
-
+                    case ExpressionType::NaturalNumber:
                     case ExpressionType::IntegerNumber: {
                         Number.Integer *= right.Number.Integer;
                         break;
@@ -329,7 +316,6 @@ struct QExpression {
 
                     case ExpressionType::RealNumber: {
                         Number.Real *= right.Number.Real;
-                        break;
                     }
 
                     default: {
@@ -377,7 +363,7 @@ struct QExpression {
                     Number.Integer = -Number.Integer;
                 }
 
-                num_left = static_cast<unsigned long long>(Number.Integer);
+                num_left = Number.Natural;
                 break;
             }
 
@@ -414,9 +400,11 @@ struct QExpression {
                 right_negative = (right.Number.Integer < 0);
 
                 if (right_negative) {
-                    num_right = static_cast<unsigned long long>(-right.Number.Integer);
+                    QNumber qn;
+                    qn.Integer = -right.Number.Integer;
+                    num_right  = qn.Natural;
                 } else {
-                    num_right = static_cast<unsigned long long>(right.Number.Integer);
+                    num_right = right.Number.Natural;
                 }
 
                 break;
@@ -438,7 +426,6 @@ struct QExpression {
                 }
 
                 num_right = static_cast<unsigned long long>(right_real);
-                break;
             }
 
             default: {
@@ -447,7 +434,7 @@ struct QExpression {
 
         if (num_left != 0) {
             if (num_right != 0) {
-                const bool right_odd = static_cast<bool>(num_right & 1U);
+                const bool right_odd = (num_right & 1U) == 0x1;
 
                 PowerOf(num_left, num_right);
 
@@ -592,7 +579,6 @@ struct QExpression {
 
                     case ExpressionType::RealNumber: {
                         result %= static_cast<long long>(right.Number.Real);
-                        break;
                     }
 
                     default: {

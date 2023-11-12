@@ -360,7 +360,7 @@ class String {
         }
     }
 
-    void InsertAt(Char_T_ ch, SizeT index) noexcept {
+    void InsertAt(Char_T_ ch, SizeT index) {
         if (index < Length()) {
             Char_T_       *first  = (Storage() + index);
             Char_T_       *second = first;

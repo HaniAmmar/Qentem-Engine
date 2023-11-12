@@ -306,8 +306,8 @@ class HArray {
     }
 
     const HAItem_ *GetItem(const Char_T_ *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT   *index;
-        HAItem_ *item = find(index, key, length, hash);
+        SizeT         *index;
+        const HAItem_ *item = find(index, key, length, hash);
 
         if (item != nullptr) {
             return item;
@@ -667,7 +667,7 @@ class HArray {
                 return item;
             }
 
-            index = &(item->Next);
+            index  = &(item->Next);
             *index = *index;
         }
 

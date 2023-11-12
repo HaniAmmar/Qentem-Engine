@@ -36,11 +36,13 @@ struct Digit {
         using Char_T_ = typename Stream_T_::CharType;
 
         static constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
-        // static constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
+        static constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
 
-        if (number < 0) {
-            number *= (Number_T_{0} - 1);
-            stream += DigitUtils::DigitChars::NegativeChar;
+        if constexpr (is_signed) {
+            if (number < 0) {
+                number = -number;
+                stream += DigitUtils::DigitChars::NegativeChar;
+            }
         }
 
         Char_T_ storage[max_number_of_digits];
@@ -56,7 +58,7 @@ struct Digit {
     }
 
     template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
-    static void RawIntToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+    static void RawIntToString(Char_T_ *storage, SizeT &offset, Number_T_ number) noexcept {
         intToString<Reverse_V_>(storage, offset, number);
     }
 
@@ -267,7 +269,7 @@ struct Digit {
     };
 
     template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
-    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) {
+    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) noexcept {
         if constexpr (!Reverse_V_) {
             const SizeT o_offset = offset;
 
@@ -365,7 +367,7 @@ struct Digit {
 
     template <typename Char_T_>
     QENTEM_NOINLINE static unsigned int roundNumber(QNumber &number, unsigned int &exponent, unsigned int &flags,
-                                                    const Char_T_ *content, SizeT &offset, SizeT end_offset) {
+                                                    const Char_T_ *content, SizeT &offset, SizeT end_offset) noexcept {
         const SizeT  last_offset   = offset;
         unsigned int exponent_diff = 0U;
         Char_T_      digit         = 0;
@@ -497,7 +499,7 @@ struct Digit {
         return 0U;
     }
 
-    static void powerOfTen(double &number, unsigned int exponent) {
+    static void powerOfTen(double &number, unsigned int exponent) noexcept {
         while (exponent >= 100U) {
             number *= 1e100;
             exponent -= 100U;
@@ -514,7 +516,7 @@ struct Digit {
         }
     }
 
-    static void powerOfNegativeTen(double &number, unsigned int exponent) {
+    static void powerOfNegativeTen(double &number, unsigned int exponent) noexcept {
         while (exponent >= 100U) {
             number /= 1e100;
             exponent -= 100U;
@@ -550,7 +552,7 @@ struct Digit {
     // };
 
     template <typename Stream_T_, typename Number_T_>
-    static void realToString(Stream_T_ &stream, const Number_T_ number, const unsigned int precision) noexcept {
+    static void realToString(Stream_T_ &stream, const Number_T_ number, const unsigned int precision) {
         using Char_T_ = typename Stream_T_::CharType;
         using Info_T  = DigitUtils::RealNumberInfo<Number_T_>;
         const Info_T info{number};
@@ -562,10 +564,7 @@ struct Digit {
         using Bucket_T = unsigned int;
 #endif
 
-        using DigitLimit = DigitUtils::DigitLimit<Bucket_T, sizeof(Bucket_T)>;
-
-        BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3U))> b_int{};
-
+        using DigitLimit     = DigitUtils::DigitLimit<Bucket_T, sizeof(Bucket_T)>;
         const UNumber_T bias = (info.NaturalNumber & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
@@ -581,6 +580,8 @@ struct Digit {
                 } else {
                     mantissa <<= 1U;
                 }
+
+                BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3U))> b_int{mantissa};
                 /////////////////////////////////////
                 const unsigned int first_shift      = Platform::CTZ(mantissa);
                 const int          exponent         = static_cast<int>((bias >> Info_T::MantissaSize) - Info_T::Bias);
@@ -600,11 +601,9 @@ struct Digit {
                     const unsigned int m_shift = (Info_T::MantissaSize + drop);
 
                     if (m_shift < positive_exp) {
-                        b_int = mantissa;
                         b_int <<= (positive_exp - m_shift);
                     } else {
-                        mantissa >>= (m_shift - positive_exp);
-                        b_int = mantissa;
+                        b_int >>= (m_shift - positive_exp);
                     }
 
                     if (drop != 0U) {
@@ -638,8 +637,7 @@ struct Digit {
                         round_up        = true;
                     }
 
-                    mantissa >>= first_shift;
-                    b_int = mantissa;
+                    b_int >>= first_shift;
 
                     unsigned int times = fraction_length;
 
@@ -701,14 +699,14 @@ struct Digit {
     }
 
     template <typename Stream_T_, typename Number_T_>
-    static void insertZeros(Stream_T_ &stream, const Number_T_ length) noexcept {
+    static void insertZeros(Stream_T_ &stream, const Number_T_ length) {
         using Char_T_             = typename Stream_T_::CharType;
         static constexpr int size = static_cast<int>(sizeof(Char_T_));
         stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
     }
 
     template <typename Number_T_, typename Stream_T_, typename BigInt_T_>
-    static void bigIntToString(Stream_T_ &stream, BigInt_T_ &b_int) noexcept {
+    static void bigIntToString(Stream_T_ &stream, BigInt_T_ &b_int) {
         using DigitLimit = DigitUtils::DigitLimit<Number_T_, sizeof(Number_T_)>;
 
         while (b_int.IsBig()) {
@@ -741,7 +739,7 @@ struct Digit {
     template <typename Stream_T_>
     static void formatStringNumber(Stream_T_ &stream, const SizeT started_at, const unsigned int precision,
                                    const unsigned int calculated_digits, unsigned int fraction_length,
-                                   const bool is_positive_exp, const bool round_up) noexcept {
+                                   const bool is_positive_exp, const bool round_up) {
         using Char_T_                    = typename Stream_T_::CharType;
         const SizeT        stream_length = (stream.Length() - started_at);
         SizeT              index         = started_at;

@@ -65,7 +65,7 @@ QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, co
     return false;
 }
 
-QENTEM_NOINLINE static double TestEvaluate(const char *content, const Value<char> &value) {
+QENTEM_NOINLINE static double TestEvaluate(const char *content, const Value<char> &value) noexcept {
     double number;
     TestEvaluate(number, content, value);
     return number;
@@ -3957,7 +3957,7 @@ static void TestEvaluate17(TestHelper &helper) {
     value += -3;
     value += 5U;
     value += 8.5;
-    value += int(3);
+    value += int{3};
 
     content = "{var:0}+{var:0}";
     number  = TestEvaluate(content, value);
@@ -4618,7 +4618,7 @@ static void TestEvaluate19(TestHelper &helper) {
     value += 2U;
     value += 3U;
     value += -2;
-    value += int(2);
+    value += int{2};
     value += 4.0F;
     value += -4.0F;
     value += 0.25F;

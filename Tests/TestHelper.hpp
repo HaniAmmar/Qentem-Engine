@@ -77,7 +77,7 @@ struct TestOutPut {
         return "";
     }
 
-    void static SetColoredOutput(bool value) {
+    void static SetColoredOutput(bool value) noexcept {
         coloredOutput_ = value;
     }
 
@@ -141,7 +141,7 @@ struct MemoryRecord {
 #endif
     }
 
-    QENTEM_NOINLINE static void PrintMemoryStatus() noexcept {
+    QENTEM_NOINLINE static void PrintMemoryStatus() {
         TestOutPut::Print("\nMemory: ", (static_cast<double>(records_.remainingSize) / 1024),
                           " KB, Peak: ", (static_cast<double>(records_.peakSize) / 1024), " KB.\n");
 
@@ -171,12 +171,12 @@ struct TestHelper {
     TestHelper(const char *name, const char *file_fullname) noexcept : test_name_{name}, file_fullname_{file_fullname} {
     }
 
-    QENTEM_NOINLINE void PrintGroupName() const noexcept {
+    QENTEM_NOINLINE void PrintGroupName() const {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
     }
 
-    QENTEM_NOINLINE int EndTests() noexcept {
+    QENTEM_NOINLINE int EndTests() {
         if (!error_) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
                               TestOutPut::GetColor(TestOutPut::Colors::PASS), " Passed all tests",

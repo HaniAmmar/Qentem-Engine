@@ -123,9 +123,13 @@ struct Config {
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
 using SizeT = unsigned int;
+
+// inline static constexpr SizeT SizeTMax = (SizeT{0} - SizeT{1});
 #endif
 
 using NullType = decltype(nullptr);
+using Size32T  = decltype(nullptr);
+using Size64T  = decltype(nullptr);
 
 union QNumber {
     unsigned long long Natural{0};

@@ -182,8 +182,7 @@ struct StringUtils {
         SizeT offset = 0;
 
         while (offset < length) {
-            const SizeT num = static_cast<SizeT>(key[offset]);
-            hash += (base * offset * num);
+            hash += (base * offset * SizeT(key[offset]));
             base += offset;
 
             if (offset != length) {

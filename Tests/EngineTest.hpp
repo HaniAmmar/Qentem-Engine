@@ -317,7 +317,7 @@ static void TestEngine3(TestHelper &helper) {
     SizeT       content_len = 0;
     const char *content     = "";
 
-    ret = Engine::SkipInnerPatterns(char(0), char(0), content, SizeT{0}, SizeT{0});
+    ret = Engine::SkipInnerPatterns(char{0}, char{0}, content, SizeT{0}, SizeT{0});
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "   (  ";
