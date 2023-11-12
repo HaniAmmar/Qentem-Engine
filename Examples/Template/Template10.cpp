@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -44,7 +45,7 @@ Not zero or one or two.
 </if>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:

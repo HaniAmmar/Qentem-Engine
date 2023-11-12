@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -15,7 +16,7 @@ int main() {
     const char *content =
         R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:

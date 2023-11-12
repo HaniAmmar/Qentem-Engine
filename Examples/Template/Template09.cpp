@@ -4,6 +4,7 @@
 #include <iostream>
 
 using Qentem::JSON;
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -48,7 +49,7 @@ int main() {
 {var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]}</loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:

@@ -4,6 +4,7 @@
 #include <iostream>
 
 using Qentem::JSON;
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -22,7 +23,7 @@ Zero!
 </if>
 )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:

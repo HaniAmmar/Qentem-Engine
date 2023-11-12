@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -13,7 +14,7 @@ int main() {
     value["version"]    = 3.0;
     const char *content = R"({var:name}, {var:version})";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:

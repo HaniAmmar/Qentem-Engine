@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -20,7 +21,7 @@ int main() {
 {if case="{var:0} + {var:1} != 10" false="{var:3}"}
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
     /*
         Output:
             16

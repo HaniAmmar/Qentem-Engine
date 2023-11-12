@@ -96,6 +96,7 @@ Mixed of both:
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -106,7 +107,7 @@ int main() {
     value["version"]    = 3.0;
     const char *content = R"({var:name}, {var:version})";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -155,6 +156,7 @@ Raw variable tag is the same as Variable tag, except it does not escape HTML spe
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -173,7 +175,7 @@ int main() {
 9 % 5 = {math:9 % 5}
 )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -291,6 +293,7 @@ Similar to `{if case="..." ...}`, but capable of branching, and nesting.
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -332,7 +335,7 @@ Not zero or one or two.
 </if>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -355,6 +358,7 @@ Not zero or one or two.
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 using Qentem::JSON;
@@ -374,7 +378,7 @@ Zero!
 </if>
 )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -424,6 +428,7 @@ Loops over a set and replaces the values with the string inside `value`. The siz
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 using Qentem::JSON;
@@ -451,7 +456,7 @@ int main() {
 {var:loop1-value[name]}: {var:loop1-value[value]}</loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -470,6 +475,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -485,7 +491,7 @@ int main() {
 {var:loop1-value}</loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -504,6 +510,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -519,7 +526,7 @@ int main() {
 {var:loop1-value}</loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -538,6 +545,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::JSON;
 using Qentem::Value;
@@ -559,7 +567,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -598,6 +606,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -610,7 +619,7 @@ int main() {
     const char *content =
         R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -627,6 +636,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -641,7 +651,7 @@ int main() {
 
     const char *content = R"(<loop set="list" value="loop1-value">{var:loop1-value}</loop>)";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -658,6 +668,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 using Qentem::JSON;
@@ -703,7 +714,7 @@ int main() {
 {var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]}</loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 
     /*
         Output:
@@ -725,6 +736,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -743,7 +755,7 @@ int main() {
 <loop value="val1_" sort="ascend">{var:val1_} </loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
     /*
         Output: 1 2 3 4 5 6 7
     */
@@ -752,7 +764,7 @@ int main() {
 <loop value="val1_" sort="descend">{var:val1_} </loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
     /*
         Output: 7 6 5 4 3 2 1
     */
@@ -767,6 +779,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 using Qentem::JSON;
@@ -782,7 +795,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
     /*
         Output:
             Year(2017):
@@ -809,7 +822,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render(content2, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content2, value) << '\n';
 }
 ```
 
@@ -821,6 +834,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 using Qentem::JSON;
@@ -883,7 +897,7 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 }
 ```
 
@@ -895,6 +909,7 @@ int main() {
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 using Qentem::JSON;
@@ -1022,6 +1037,6 @@ int main() {
 </html>
 )HTML";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
 }
 ```

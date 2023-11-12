@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
@@ -21,7 +22,7 @@ int main() {
 <loop value="val1_" sort="ascend">{var:val1_} </loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
     /*
         Output: 1 2 3 4 5 6 7
     */
@@ -30,7 +31,7 @@ int main() {
 <loop value="val1_" sort="descend">{var:val1_} </loop>
     )";
 
-    std::cout << Template::Render(content, value) << '\n';
+    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
     /*
         Output: 7 6 5 4 3 2 1
     */
