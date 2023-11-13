@@ -2925,7 +2925,7 @@ static void TestLoopUTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, value, ss), uR"(some_valsome_valsome_val)", uR"(Render())", __LINE__);
     ss.Clear();
 
-    static constexpr unsigned int size_4 = (8 * 4);
+    constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char16_t> content2;
     StringStream<char16_t> output;
@@ -3349,7 +3349,7 @@ static void TestIfUTag2(TestHelper &helper) {
 }
 
 static void TestRenderU1(TestHelper &helper) {
-    static constexpr unsigned int size_4 = (8 * 4);
+    constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char16_t> ss;
     StringStream<char16_t> content;

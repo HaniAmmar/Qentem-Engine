@@ -32,8 +32,6 @@ namespace Qentem {
  */
 template <typename Char_T_>
 class StringStream {
-    static constexpr SizeT initial_size = 4; // * 4 = 16
-
   public:
     using CharType = Char_T_;
 
@@ -115,7 +113,7 @@ class StringStream {
             SizeT n_size = Capacity();
 
             if (n_size == 0) {
-                n_size = initial_size;
+                n_size = initial_size_;
             }
 
             expand(n_size * SizeT{4});
@@ -413,6 +411,8 @@ class StringStream {
         Memory::Copy(Storage(), src, (src_cap * sizeof(Char_T_)));
         Memory::Deallocate(src);
     }
+
+    static constexpr SizeT initial_size_ = 4; // * 4 = 16
 
     Char_T_ *storage_{nullptr};
     SizeT    length_{0};

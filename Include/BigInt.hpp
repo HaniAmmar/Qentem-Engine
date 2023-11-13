@@ -327,7 +327,7 @@ struct BigInt {
 
     template <typename N_Number_T_>
     void set(N_Number_T_ number) noexcept {
-        static constexpr unsigned int b_size = ((sizeof(N_Number_T_) * 8U) / Size);
+        constexpr unsigned int b_size = ((sizeof(N_Number_T_) * 8U) / Size);
 
         big_int_[0U] = Number_T_(number);
 

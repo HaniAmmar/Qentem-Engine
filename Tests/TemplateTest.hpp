@@ -2901,7 +2901,7 @@ static void TestLoopTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, value, ss), R"(some_valsome_valsome_val)", R"(Render())", __LINE__);
     ss.Clear();
 
-    static constexpr unsigned int size_4 = (8 * 4);
+    constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char> content2;
     StringStream<char> output;
@@ -3321,7 +3321,7 @@ static void TestIfTag2(TestHelper &helper) {
 }
 
 static void TestRender1(TestHelper &helper) {
-    static constexpr unsigned int size_4 = (8 * 4);
+    constexpr unsigned int size_4 = (8 * 4);
 
     StringStream<char> ss;
     StringStream<char> content;

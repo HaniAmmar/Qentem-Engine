@@ -152,8 +152,8 @@ class Value {
 
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
-        static constexpr bool is_unsigned = (Number_T_(-1) > 0);
-        static constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
+        constexpr bool is_unsigned = (Number_T_(-1) > 0);
+        constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
 
         if constexpr (is_unsigned) {
             number_.SetNumber((unsigned long long)(num));
@@ -352,8 +352,8 @@ class Value {
 
     template <typename Number_T_>
     inline Value &operator=(Number_T_ num) noexcept {
-        static constexpr bool is_unsigned = (Number_T_(-1) > 0);
-        static constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
+        constexpr bool is_unsigned = (Number_T_(-1) > 0);
+        constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
 
         if (!IsNumber()) {
             reset();

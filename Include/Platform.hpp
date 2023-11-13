@@ -325,14 +325,14 @@ template <typename, unsigned int S>
 struct SMIDSetToOne_T {};
 
 template <typename Char_T_>
-inline constexpr static QENTEM_SIMD_VAR SMIDSetToOne(const Char_T_ value) noexcept {
+inline static constexpr QENTEM_SIMD_VAR SMIDSetToOne(const Char_T_ value) noexcept {
     return SMIDSetToOne_T<Char_T_, sizeof(Char_T_)>::Set(value);
 }
 
 // char
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 1U> {
-    inline constexpr static QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {
+    inline static constexpr QENTEM_SIMD_VAR Set(const Char_T_ value) noexcept {
         return QENTEM_SIMD_SET_TO_ONE_8(value);
     }
 };
@@ -354,7 +354,7 @@ struct SMIDSetToOne_T<Char_T_, 4U> {
 };
 
 template <typename Char_T_, typename Number_T_>
-inline constexpr Number_T_ SMIDNextOffset() noexcept {
+inline static constexpr Number_T_ SMIDNextOffset() noexcept {
     return Number_T_(QENTEM_SIMD_SIZE / sizeof(Char_T_));
 }
 #endif

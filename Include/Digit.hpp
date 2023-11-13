@@ -33,10 +33,10 @@ namespace Qentem {
 struct Digit {
     template <bool Reverse_V_ = false, typename Stream_T_, typename Number_T_>
     inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
-        using Char_T_                                      = typename Stream_T_::CharType;
-        static constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
-        static constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
-        Char_T_                       storage[max_number_of_digits];
+        using Char_T_                               = typename Stream_T_::CharType;
+        constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
+        constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
+        Char_T_                storage[max_number_of_digits];
 
         if constexpr (is_signed) {
             if (number < 0) {
@@ -665,7 +665,7 @@ struct Digit {
                 stream += DigitUtils::DigitChars::ZeroChar;
             }
         } else {
-            static constexpr unsigned int size = sizeof(Char_T_);
+            constexpr unsigned int size = sizeof(Char_T_);
 
             if ((info.NaturalNumber & Info_T::MantissaMask) == UNumber_T{0}) {
                 if (info.NaturalNumber & Info_T::SignMask) {
@@ -694,8 +694,8 @@ struct Digit {
 
     template <typename Stream_T_, typename Number_T_>
     static void insertZeros(Stream_T_ &stream, const Number_T_ length) {
-        using Char_T_                      = typename Stream_T_::CharType;
-        static constexpr unsigned int size = sizeof(Char_T_);
+        using Char_T_               = typename Stream_T_::CharType;
+        constexpr unsigned int size = sizeof(Char_T_);
         stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
     }
 

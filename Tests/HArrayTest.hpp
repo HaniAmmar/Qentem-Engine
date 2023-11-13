@@ -721,7 +721,7 @@ static void TestHArray7(TestHelper &helper) {
 }
 
 static void TestHArray8(TestHelper &helper) {
-    static constexpr SizeT id = 100;
+    constexpr SizeT id = 100;
 
     HArray<SizeT, char> list(id);
 
@@ -792,7 +792,7 @@ static void TestHArray8(TestHelper &helper) {
 }
 
 static void TestHArray9(TestHelper &helper) {
-    static constexpr SizeT id = 10;
+    constexpr SizeT id = 10;
 
     HArray<SizeT, char>                   list(id);
     const Qentem::HAItem_T_<SizeT, char> *item;
@@ -878,7 +878,7 @@ static void TestHArray9(TestHelper &helper) {
 }
 
 static void TestHArray10(TestHelper &helper) {
-    static constexpr SizeT id = 10;
+    constexpr SizeT id = 10;
 
     HArray<SizeT, char> list(id);
 
