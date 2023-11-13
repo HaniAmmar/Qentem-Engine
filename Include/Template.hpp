@@ -1258,19 +1258,19 @@ struct TemplateSub {
                         QNumber val_number;
 
                         switch (val->SetNumber(val_number)) {
-                            case 1U: {
+                            case QNumberType::Natural: {
                                 number.Number.Natural = val_number.Natural;
                                 number.Type           = ExpressionType::NaturalNumber;
                                 return true;
                             }
 
-                            case 2U: {
+                            case QNumberType::Integer: {
                                 number.Number.Integer = val_number.Integer;
                                 number.Type           = ExpressionType::IntegerNumber;
                                 return true;
                             }
 
-                            case 3U: {
+                            case QNumberType::Real: {
                                 number.Number.Real = val_number.Real;
                                 number.Type        = ExpressionType::RealNumber;
                                 return true;
@@ -1426,19 +1426,19 @@ struct TemplateSub {
                             left_is_a_number = true;
 
                             switch (left_value->SetNumber(val_number)) {
-                                case 1U: {
+                                case QNumberType::Natural: {
                                     left.Number.Natural = val_number.Natural;
                                     left.Type           = ExpressionType::NaturalNumber;
                                     break;
                                 }
 
-                                case 2U: {
+                                case QNumberType::Integer: {
                                     left.Number.Integer = val_number.Integer;
                                     left.Type           = ExpressionType::IntegerNumber;
                                     break;
                                 }
 
-                                case 3U: {
+                                case QNumberType::Real: {
                                     left.Number.Real = val_number.Real;
                                     left.Type        = ExpressionType::RealNumber;
                                     break;
@@ -1489,19 +1489,19 @@ struct TemplateSub {
                             right_is_a_number = true;
 
                             switch (right_value->SetNumber(val_number)) {
-                                case 1U: {
+                                case QNumberType::Natural: {
                                     right.Number.Natural = val_number.Natural;
                                     right.Type           = ExpressionType::NaturalNumber;
                                     break;
                                 }
 
-                                case 2U: {
+                                case QNumberType::Integer: {
                                     right.Number.Integer = val_number.Integer;
                                     right.Type           = ExpressionType::IntegerNumber;
                                     break;
                                 }
 
-                                case 3U: {
+                                case QNumberType::Real: {
                                     right.Number.Real = val_number.Real;
                                     right.Type        = ExpressionType::RealNumber;
                                     break;
@@ -1538,19 +1538,19 @@ struct TemplateSub {
             if (!left_is_a_number) {
                 if (left_value != nullptr) {
                     switch (left_value->SetNumber(val_number)) {
-                        case 1U: {
+                        case QNumberType::Natural: {
                             left.Number.Natural = val_number.Natural;
                             left.Type           = ExpressionType::NaturalNumber;
                             break;
                         }
 
-                        case 2U: {
+                        case QNumberType::Integer: {
                             left.Number.Integer = val_number.Integer;
                             left.Type           = ExpressionType::IntegerNumber;
                             break;
                         }
 
-                        case 3U: {
+                        case QNumberType::Real: {
                             left.Number.Real = val_number.Real;
                             left.Type        = ExpressionType::RealNumber;
                             break;
@@ -1568,19 +1568,19 @@ struct TemplateSub {
             if (!right_is_a_number) {
                 if (right_value != nullptr) {
                     switch (right_value->SetNumber(val_number)) {
-                        case 1U: {
+                        case QNumberType::Natural: {
                             right.Number.Natural = val_number.Natural;
                             right.Type           = ExpressionType::NaturalNumber;
                             break;
                         }
 
-                        case 2U: {
+                        case QNumberType::Integer: {
                             right.Number.Integer = val_number.Integer;
                             right.Type           = ExpressionType::IntegerNumber;
                             break;
                         }
 
-                        case 3U: {
+                        case QNumberType::Real: {
                             right.Number.Real = val_number.Real;
                             right.Type        = ExpressionType::RealNumber;
                             break;
@@ -1680,23 +1680,23 @@ struct TemplateSub {
                     QNumber     number;
                     expr.Operation = oper;
 
-                    const unsigned int n_type = Digit::StringToNumber(number, content_, offset, end_offset);
+                    const QNumberType n_type = Digit::StringToNumber(number, content_, offset, end_offset);
 
-                    if ((n_type != 0) && (offset == end_offset)) {
+                    if ((n_type != QNumberType::NotANumber) && (offset == end_offset)) {
                         switch (n_type) {
-                            case 1U: {
+                            case QNumberType::Natural: {
                                 expr.Number.Natural = number.Natural;
                                 expr.Type           = ExpressionType::NaturalNumber;
                                 break;
                             }
 
-                            case 2U: {
+                            case QNumberType::Integer: {
                                 expr.Number.Integer = number.Integer;
                                 expr.Type           = ExpressionType::IntegerNumber;
                                 break;
                             }
 
-                            case 3U: {
+                            case QNumberType::Real: {
                                 expr.Number.Real = number.Real;
                                 expr.Type        = ExpressionType::RealNumber;
                                 break;

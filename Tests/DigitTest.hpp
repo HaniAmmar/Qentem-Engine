@@ -81,17 +81,17 @@ static bool StringToNumber(Number_T_ &num, const char *str) noexcept {
     const SizeT length = StringUtils::Count(str);
 
     switch (Digit::StringToNumber(number, str, offset, length)) {
-        case 1: {
+        case QNumberType::Natural: {
             num = Number_T_(number.Natural);
             break;
         }
 
-        case 2: {
+        case QNumberType::Integer: {
             num = Number_T_(number.Integer);
             break;
         }
 
-        case 3: {
+        case QNumberType::Real: {
             num = Number_T_(number.Real);
             break;
         }
@@ -785,104 +785,104 @@ static void TestStringToNumber4(TestHelper &helper) {
 }
 
 static void TestStringToNumber5(TestHelper &helper) {
-    const char  *content = nullptr;
-    QNumber      number;
-    unsigned int type   = 0;
-    SizeT        offset = 0;
+    const char *content = nullptr;
+    QNumber     number;
+    QNumberType type   = QNumberType::NotANumber;
+    SizeT       offset = 0;
 
     content = "0]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 1U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(number.Natural, 0U, "number", __LINE__);
 
     offset  = 0;
     content = ".0]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, 0.0, "number", __LINE__);
 
     offset  = 0;
     content = "0.]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, 0.0, "number", __LINE__);
 
     offset  = 0;
     content = "0.0]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-0]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-.0]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-0.]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "-0.0]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -0.0, "number", __LINE__);
 
     offset  = 0;
     content = "1]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 1U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(number.Natural, 1U, "number", __LINE__);
 
     offset  = 0;
     content = ".2]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, 0.2, "number", __LINE__);
 
     offset  = 0;
     content = "3.]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, 3.0, "number", __LINE__);
 
     offset  = 0;
     content = "4.5]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, 4.5, "number", __LINE__);
 
     offset  = 0;
     content = "-1]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 2U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(number.Integer, -1, "number", __LINE__);
 
     offset  = 0;
     content = "-.2]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -0.2, "number", __LINE__);
 
     offset  = 0;
     content = "-3.]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -3.0, "number", __LINE__);
 
     offset  = 0;
     content = "-4.5]";
     type    = Digit::StringToNumber(number, content, offset, StringUtils::Count(content));
-    helper.Equal(type, 3U, "type", __LINE__);
+    helper.EqualsTrue(type == QNumberType::Real, "Real", __LINE__);
     helper.Equal(number.Real, -4.5, "number", __LINE__);
 }
 

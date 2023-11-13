@@ -128,8 +128,10 @@ using SizeT = unsigned int;
 #endif
 
 using NullType = decltype(nullptr);
-using Size32T  = decltype(nullptr);
-using Size64T  = decltype(nullptr);
+using Size32T  = unsigned int;
+using Size64T  = unsigned long long;
+
+enum class QNumberType : unsigned char { NotANumber = 0, Real = 1, Natural = 2, Integer = 3 };
 
 union QNumber {
     QNumber() noexcept                           = default;

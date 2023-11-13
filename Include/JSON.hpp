@@ -262,17 +262,17 @@ struct JSON {
                     QNumber number;
 
                     switch (Digit::StringToNumber(number, content, offset, length)) {
-                        case 1: {
+                        case QNumberType::Natural: {
                             value = number.Natural;
                             return;
                         }
 
-                        case 2: {
+                        case QNumberType::Integer: {
                             value = number.Integer;
                             return;
                         }
 
-                        case 3: {
+                        case QNumberType::Real: {
                             value = number.Real;
                             return;
                         }

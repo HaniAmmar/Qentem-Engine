@@ -107,8 +107,8 @@ struct Digit {
     }
 
     template <typename Char_T_>
-    static unsigned int StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
-                                       SizeT end_offset) noexcept {
+    static QNumberType StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
+                                      SizeT end_offset) noexcept {
         SizeT        o_offset = offset;
         SizeT        max_end_offset;
         unsigned int flags    = 0;
@@ -141,27 +141,26 @@ struct Digit {
             if (offset < max_end_offset) {
                 digit = content[offset];
 
-                if ((digit == DigitUtils::DigitChars::ZeroChar) && ((max_end_offset - offset) > SizeT{1})) {
-                    digit = content[offset + SizeT{1}];
+                if ((digit > DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
+                    number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                    ++offset;
+                    digit = content[offset];
+                } else if ((digit == DigitUtils::DigitChars::ZeroChar) && ((max_end_offset - offset) > SizeT{1})) {
+                    ++offset;
+                    digit = content[offset];
 
                     if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
-                        return 0U; // Leading zero.
+                        return QNumberType::NotANumber; // Leading zero.
                     }
                 }
 
                 while (true) {
-                    while (offset < max_end_offset) {
+                    while ((offset < max_end_offset) && (digit >= DigitUtils::DigitChars::ZeroChar) &&
+                           (digit <= DigitUtils::DigitChars::NineChar)) {
+                        number.Natural *= 10ULL;
+                        number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                        ++offset;
                         digit = content[offset];
-
-                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                            (digit <= DigitUtils::DigitChars::NineChar)) {
-                            number.Natural *= 10ULL;
-                            number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
-                            ++offset;
-                            continue;
-                        }
-
-                        break;
                     }
 
                     switch (digit) {
@@ -175,12 +174,14 @@ struct Digit {
 
                                 if (offset == max_end_offset) {
                                     digit = 0;
+                                } else {
+                                    digit = content[offset];
                                 }
 
                                 continue;
                             }
 
-                            return 0;
+                            return QNumberType::NotANumber;
                         }
 
                         case DigitUtils::DigitChars::UE_Char:
@@ -198,7 +199,7 @@ struct Digit {
                                 }
                             }
 
-                            return 0;
+                            return QNumberType::NotANumber;
                         }
 
                         default: {
@@ -206,12 +207,12 @@ struct Digit {
                                 if ((offset < max_end_offset) || ((flags & stringToNumberFlags::OverFlow) == 0U)) {
                                     if ((flags & stringToNumberFlags::Real) == 0U) {
                                         if ((flags & stringToNumberFlags::Negative) == 0U) {
-                                            return 1U;
+                                            return QNumberType::Natural;
                                         }
 
                                         if (number.Integer != 0) {
                                             number.Integer = -number.Integer;
-                                            return 2U;
+                                            return QNumberType::Integer;
                                         }
                                     }
 
@@ -232,20 +233,20 @@ struct Digit {
                                         number.Real = -number.Real;
                                     }
 
-                                    return 3U;
+                                    return QNumberType::Real;
                                 }
 
                                 return roundNumber(number, exponent, flags, content, offset, end_offset);
                             }
 
-                            return 0U;
+                            return QNumberType::NotANumber;
                         }
                     }
                 }
             }
         }
 
-        return 0U;
+        return QNumberType::NotANumber;
     }
 
   private:
@@ -359,8 +360,8 @@ struct Digit {
     }
 
     template <typename Char_T_>
-    QENTEM_NOINLINE static unsigned int roundNumber(QNumber &number, unsigned int &exponent, unsigned int &flags,
-                                                    const Char_T_ *content, SizeT &offset, SizeT end_offset) noexcept {
+    QENTEM_NOINLINE static QNumberType roundNumber(QNumber &number, unsigned int &exponent, unsigned int &flags,
+                                                   const Char_T_ *content, SizeT &offset, SizeT end_offset) noexcept {
         const SizeT  last_offset   = offset;
         unsigned int exponent_diff = 0U;
         Char_T_      digit         = 0;
@@ -405,7 +406,7 @@ struct Digit {
                         continue;
                     }
 
-                    return 0U;
+                    return QNumberType::NotANumber;
                 }
 
                 default: {
@@ -475,22 +476,22 @@ struct Digit {
             }
 
             if (number.Natural != 9218868437227405312ULL) {
-                return 3U;
+                return QNumberType::Real;
             }
 
-            return 0U;
+            return QNumberType::NotANumber;
         }
 
         if ((flags & stringToNumberFlags::Negative) == 0U) {
-            return 1U;
+            return QNumberType::Natural;
         }
 
         if (number.Integer != 0) {
             number.Integer = -number.Integer;
-            return 2U;
+            return QNumberType::Integer;
         }
 
-        return 0U;
+        return QNumberType::NotANumber;
     }
 
     static void powerOfTen(double &number, unsigned int exponent) noexcept {

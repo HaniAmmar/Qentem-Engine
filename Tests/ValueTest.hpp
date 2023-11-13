@@ -34,53 +34,6 @@ using VStringStream = StringStream<char>;
 using VHArray       = HArray<ValueC, char>;
 using VArray        = Array<ValueC>;
 
-static const char *GetTypeString(ValueType type) noexcept {
-    switch (type) {
-        case ValueType::Object:
-            return "Object";
-
-        case ValueType::Array:
-            return "Array";
-
-        case ValueType::String:
-            return "String";
-
-        case ValueType::UIntLong:
-            return "UIntLong";
-
-        case ValueType::IntLong:
-            return "IntLong";
-
-        case ValueType::Double:
-            return "Double";
-
-        case ValueType::True:
-            return "True";
-
-        case ValueType::False:
-            return "False";
-
-        case ValueType::Null:
-            return "Null";
-
-        default:
-            return "Undefined";
-    }
-}
-
-static void TestGetTypeString(TestHelper &helper) {
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Undefined), "Undefined", 9), "Undefined", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Object), "Object", 6), "Object", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Array), "Array", 5), "Array", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::String), "String", 6), "String", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::UIntLong), "UIntLong", 6), "UIntLong", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::IntLong), "IntLong", 5), "IntLong", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Double), "Double", 6), "Double", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::True), "True", 4), "True", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::False), "False", 5), "False", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(GetTypeString(ValueType::Null), "Null", 4), "Null", __LINE__);
-}
-
 static void TestEmptyValue(TestHelper &helper) {
     ValueC value1;
 
@@ -100,7 +53,7 @@ static void TestEmptyValue(TestHelper &helper) {
     helper.EqualsFalse(value1.IsTrue(), "IsTrue()", __LINE__);
     helper.EqualsFalse(value1.IsFalse(), "IsFalse()", __LINE__);
     helper.EqualsFalse(value1.IsNull(), "IsNull()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Undefined), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::Undefined, "Undefined", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetValue(10), nullptr, "GetValue(10)", "null", __LINE__);
@@ -119,7 +72,7 @@ static void TestEmptyValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsFalse(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 0U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, "NotANumber", __LINE__);
     helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
 
@@ -159,7 +112,7 @@ static void TestTrueValue(TestHelper &helper) {
     value1 = true;
     helper.EqualsTrue(value1.IsTrue(), "IsTrue()", __LINE__);
     helper.Equal(value1.GetNumberType(), 0U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::True), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::True, "True", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -176,7 +129,7 @@ static void TestTrueValue(TestHelper &helper) {
     helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
     helper.Equal(ss_var, "true", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 1.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 1U, "num_var", __LINE__);
     helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.EqualsTrue(bool_var, "bool_var", __LINE__);
@@ -228,7 +181,7 @@ static void TestFalseValue(TestHelper &helper) {
     value1 = false;
     helper.EqualsTrue(value1.IsFalse(), "IsFalse()", __LINE__);
     helper.Equal(value1.GetNumberType(), 0U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::False), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::False, "False", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -245,7 +198,7 @@ static void TestFalseValue(TestHelper &helper) {
     helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
     helper.Equal(ss_var, "false", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 0U, "num_var", __LINE__);
     helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.EqualsFalse(bool_var, "bool_var", __LINE__);
@@ -297,7 +250,7 @@ static void TestNullValue(TestHelper &helper) {
     value1 = nullptr;
     helper.EqualsTrue(value1.IsNull(), "IsNull()", __LINE__);
     helper.Equal(value1.GetNumberType(), 0U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Null), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::Null, "Null", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -314,7 +267,7 @@ static void TestNullValue(TestHelper &helper) {
     helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
     helper.Equal(ss_var, "null", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 0U, "num_var", __LINE__);
     helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.EqualsFalse(bool_var, "bool_var", __LINE__);
@@ -383,7 +336,7 @@ static void TestNumberValue1(TestHelper &helper) {
     helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
     helper.Equal(ss_var, "33", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, 33, "num_var", __LINE__);
     helper.EqualsTrue(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.EqualsTrue(bool_var, "bool_var", __LINE__);
@@ -401,7 +354,7 @@ static void TestNumberValue1(TestHelper &helper) {
     helper.EqualsTrue(value2.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "45", "str_var", __LINE__);
     helper.Equal(value2.GetNumber(), 45.0, "GetNumber()", __LINE__);
-    helper.Equal(value2.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value2.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, 45, "num_var", __LINE__);
     helper.EqualsTrue(value2.GetBool(bool_var), "GetBool()", __LINE__);
     helper.EqualsTrue(bool_var, "bool_var", __LINE__);
@@ -454,7 +407,7 @@ static void TestNumberValue2(TestHelper &helper) {
 
     value1 = ValueC{vu_short{10}};
     helper.Equal(value1.GetNumberType(), 1U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::UIntLong), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::UIntLong, "UIntLong", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
@@ -462,7 +415,7 @@ static void TestNumberValue2(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 10U, "ulong_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10", "str_var", __LINE__);
@@ -477,7 +430,7 @@ static void TestNumberValue2(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 10U, "ulong_var", __LINE__);
     value1.Reset();
 
@@ -488,7 +441,7 @@ static void TestNumberValue2(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 10U, "num_var", __LINE__);
     value1.Reset();
 
@@ -499,7 +452,7 @@ static void TestNumberValue2(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 10U, "num_var", __LINE__);
     value1.Reset();
 }
@@ -516,14 +469,14 @@ static void TestNumberValue3(TestHelper &helper) {
 
     value1 = ValueC{short{-10}};
     helper.Equal(value1.GetNumberType(), 2U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::IntLong), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::IntLong, "IntLong", __LINE__);
     helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsFalse(value1.IsDouble(), "IsDouble()", __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, -10, "num_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "-10", "str_var", __LINE__);
@@ -538,7 +491,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, 10, "num_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10", "str_var", __LINE__);
@@ -550,7 +503,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, -10, "num_var", __LINE__);
     value1.Reset();
 
@@ -561,7 +514,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, 10U, "num_var", __LINE__);
     value1.Reset();
 
@@ -571,7 +524,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, -10, "num_var", __LINE__);
     value1.Reset();
 
@@ -582,7 +535,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, 10U, "num_var", __LINE__);
     value1.Reset();
 
@@ -592,7 +545,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, -10, "num_var", __LINE__);
     value1.Reset();
 
@@ -603,7 +556,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, 10U, "num_var", __LINE__);
     value1.Reset();
 }
@@ -618,7 +571,7 @@ static void TestNumberValue4(TestHelper &helper) {
 
     value1 = ValueC{float{10.5}};
     helper.Equal(value1.GetNumberType(), 3U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Double), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::Double, "Double", __LINE__);
     helper.EqualsFalse(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.EqualsFalse(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
@@ -626,7 +579,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.5, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, 10.5, "num_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10.5", "str_var", __LINE__);
@@ -640,7 +593,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.5, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.5, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, -10.5, "num_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "-10.5", "str_var", __LINE__);
@@ -655,7 +608,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, 10U, "num_var", __LINE__);
     value1.Reset();
 
@@ -665,7 +618,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, -10, "num_var", __LINE__);
     value1.Reset();
 
@@ -676,7 +629,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.5, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, 10.5, "num_var", __LINE__);
     value1.Reset();
 
@@ -686,7 +639,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.5, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.5, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, -10.5, "num_var", __LINE__);
     value1.Reset();
 
@@ -697,7 +650,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetDouble(), 10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), 10, "GetInt64()", __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, "GetUInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, 10.0, "num_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "10", "str_var", __LINE__);
@@ -711,7 +664,7 @@ static void TestNumberValue4(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, "GetDouble()", __LINE__);
     helper.Equal(value1.GetInt64(), -10, "GetInt64()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 3U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, "Real", __LINE__);
     helper.Equal(num_var.Real, -10, "num_var", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "-10", "str_var", __LINE__);
@@ -800,7 +753,7 @@ static void TestStringValue(TestHelper &helper) {
     value1 = "-ABCDEF0123456789ABCDEF0123456789-";
     helper.EqualsTrue(value1.IsString(), "IsString()", __LINE__);
     helper.Equal(value1.GetNumberType(), 0U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::String), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::String, "String", __LINE__);
     helper.Equal(value1.Size(), 0U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetKey(0), nullptr, "GetKey(0)", "null", __LINE__);
@@ -821,7 +774,7 @@ static void TestStringValue(TestHelper &helper) {
     helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
     helper.Equal(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 0U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, "NotANumber", __LINE__);
     helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.Equal(value1.Stringify(), "", "Stringify()", __LINE__);
     ss_var.Reset();
@@ -831,7 +784,7 @@ static void TestStringValue(TestHelper &helper) {
 
     value1 = "45";
     value2 = "-50";
-    helper.Equal(value2.SetNumber(num_var), 2U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value2.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
     helper.Equal(num_var.Integer, -50, "num_var", __LINE__);
     helper.Equal(value2.GetNumber(), -50.0, "GetNumber()", __LINE__);
 
@@ -844,7 +797,7 @@ static void TestStringValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 2U, "Length()", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "45", "str_var", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 1U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
     helper.Equal(num_var.Natural, 45U, "num_var", __LINE__);
     helper.Equal(value1.GetNumber(), 45.0, "GetNumber()", __LINE__);
     helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
@@ -921,7 +874,7 @@ static void TestArrayValue(TestHelper &helper) {
     value1 = arr_var; // Copy.
     helper.EqualsTrue(value1.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value1.GetNumberType(), 0U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Array), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::Array, "Array", __LINE__);
     helper.Equal(value1.Size(), 5U, "Size()", __LINE__);
     helper.Equal(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value1.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
@@ -937,7 +890,7 @@ static void TestArrayValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsFalse(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 0U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, "NotANumber", __LINE__);
     helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
     helper.Equal(value1.Stringify(), "[]", "Stringify()", __LINE__);
 
@@ -1153,7 +1106,7 @@ static void TestObjectValue1(TestHelper &helper) {
     value1 = h_arr_var; // Copy.
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
     helper.Equal(value1.GetNumberType(), 0U, "GetNumberType()", __LINE__);
-    helper.Equal(GetTypeString(value1.Type()), GetTypeString(ValueType::Object), "Type()", __LINE__);
+    helper.EqualsTrue(value1.Type() == ValueType::Object, "Object", __LINE__);
     helper.Equal(value1.Size(), 5U, "Size()", __LINE__);
     helper.NotEqual(value1.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.NotEqual(value1.GetValue(4), nullptr, "GetValue(4)", "null", __LINE__);
@@ -1171,7 +1124,7 @@ static void TestObjectValue1(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsFalse(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
-    helper.Equal(value1.SetNumber(num_var), 0U, "SetNumber()", __LINE__);
+    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, "NotANumber", __LINE__);
     helper.EqualsFalse(value1.GetBool(bool_var), "GetBool()", __LINE__);
 
     h_arr_var.Reset();
@@ -5969,8 +5922,6 @@ static int RunValueTests() {
     TestHelper helper{"Value.hpp", __FILE__};
 
     helper.PrintGroupName();
-
-    helper.Test("GetType Sting Test", TestGetTypeString);
 
     helper.Test("Empty Value Test", TestEmptyValue);
     helper.Test("True Value Test", TestTrueValue);

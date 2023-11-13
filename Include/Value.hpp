@@ -1184,12 +1184,12 @@ class Value {
         QNumber number;
 
         switch (SetNumber(number)) {
-            case 1:
-            case 2: {
+            case QNumberType::Natural:
+            case QNumberType::Integer: {
                 return number.Natural;
             }
 
-            case 3: {
+            case QNumberType::Real: {
                 return QNumber{(long long)(number.Real)}.Natural;
             }
 
@@ -1203,12 +1203,12 @@ class Value {
         QNumber number;
 
         switch (SetNumber(number)) {
-            case 1:
-            case 2: {
+            case QNumberType::Natural:
+            case QNumberType::Integer: {
                 return number.Integer;
             }
 
-            case 3: {
+            case QNumberType::Real: {
                 return (long long)(number.Real);
             }
 
@@ -1222,15 +1222,15 @@ class Value {
         QNumber number;
 
         switch (SetNumber(number)) {
-            case 1: {
+            case QNumberType::Natural: {
                 return double(number.Natural);
             }
 
-            case 2: {
+            case QNumberType::Integer: {
                 return double(number.Integer);
             }
 
-            case 3: {
+            case QNumberType::Real: {
                 return number.Real;
             }
 
@@ -1244,38 +1244,38 @@ class Value {
         return GetDouble();
     }
 
-    unsigned int SetNumber(QNumber &number) const noexcept {
+    QNumberType SetNumber(QNumber &number) const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
                 number.Natural = number_.GetUInt64();
-                return 1;
+                return QNumberType::Natural;
             }
 
             case ValueType::IntLong: {
                 number.Integer = number_.GetInt64();
-                return 2;
+                return QNumberType::Integer;
             }
 
             case ValueType::Double: {
                 number.Real = number_.GetDouble();
-                return 3;
+                return QNumberType::Real;
             }
 
             case ValueType::True: {
                 number.Natural = 1;
-                return 1;
+                return QNumberType::Natural;
             }
 
             case ValueType::False:
             case ValueType::Null: {
                 number.Natural = 0;
-                return 1;
+                return QNumberType::Natural;
             }
 
             case ValueType::String: {
-                SizeT              offset = 0;
-                const SizeT        length = string_.Length();
-                const unsigned int n_type = Digit::StringToNumber(number, string_.First(), offset, string_.Length());
+                SizeT             offset = 0;
+                const SizeT       length = string_.Length();
+                const QNumberType n_type = Digit::StringToNumber(number, string_.First(), offset, string_.Length());
 
                 if (offset == length) {
                     return n_type;
@@ -1286,7 +1286,7 @@ class Value {
             }
         }
 
-        return 0;
+        return QNumberType::NotANumber;
     }
 
     bool GetBool(bool &value) const noexcept {
