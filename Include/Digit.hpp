@@ -793,7 +793,7 @@ struct Digit {
             }
         }
 
-        const auto index2 = (index - started_at);
+        const SizeT index2 = (index - started_at);
 
         if (!display_exp) {
             if ((fraction_length != 0) && (fraction_length > index2)) {
