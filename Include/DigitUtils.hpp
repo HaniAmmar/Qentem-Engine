@@ -27,12 +27,12 @@
 
 namespace Qentem::DigitUtils {
 
-template <typename Char_T_, unsigned int Size_>
+template <typename, unsigned int S>
 struct DigitStrings {};
 
 // char
 template <typename Char_T_>
-struct DigitStrings<Char_T_, 1> {
+struct DigitStrings<Char_T_, 1U> {
     static constexpr const Char_T_ *InfinityString = "inf";
     static constexpr const Char_T_ *NANString      = "nan";
     static constexpr const Char_T_ *ZeroesString   = "0000000000000000000";
@@ -40,7 +40,7 @@ struct DigitStrings<Char_T_, 1> {
 
 // char16_t
 template <typename Char_T_>
-struct DigitStrings<Char_T_, 2> {
+struct DigitStrings<Char_T_, 2U> {
     static constexpr const Char_T_ *InfinityString = u"inf";
     static constexpr const Char_T_ *NANString      = u"nan";
     static constexpr const Char_T_ *ZeroesString   = u"0000000000000000000";
@@ -48,7 +48,7 @@ struct DigitStrings<Char_T_, 2> {
 
 // char32_t
 template <typename Char_T_>
-struct DigitStrings<Char_T_, 4> {
+struct DigitStrings<Char_T_, 4U> {
     static constexpr const Char_T_ *InfinityString = U"inf";
     static constexpr const Char_T_ *NANString      = U"nan";
     static constexpr const Char_T_ *ZeroesString   = U"0000000000000000000";
@@ -56,7 +56,7 @@ struct DigitStrings<Char_T_, 4> {
 
 // wchar_t size = 4
 template <>
-struct DigitStrings<wchar_t, 4> {
+struct DigitStrings<wchar_t, 4U> {
     static constexpr const wchar_t *InfinityString = L"inf";
     static constexpr const wchar_t *NANString      = L"nan";
     static constexpr const wchar_t *ZeroesString   = L"0000000000000000000";
@@ -64,7 +64,7 @@ struct DigitStrings<wchar_t, 4> {
 
 // wchar_t size = 2
 template <>
-struct DigitStrings<wchar_t, 2> {
+struct DigitStrings<wchar_t, 2U> {
     static constexpr const wchar_t *InfinityString = L"inf";
     static constexpr const wchar_t *NANString      = L"nan";
     static constexpr const wchar_t *ZeroesString   = L"0000000000000000000";
@@ -93,12 +93,12 @@ static const char DigitTable[] = {"000102030405060708091011121314151617181920212
                                   "606162636465666768697071727374757677787980818283848586878889"
                                   "90919293949596979899"};
 ///////////////////////////////////////////////////
-template <typename Number_T_, unsigned int Size_>
+template <typename, unsigned int S>
 struct DigitLimit {};
 
 // uint32_t
 template <typename Number_T_>
-struct DigitLimit<Number_T_, 4> {
+struct DigitLimit<Number_T_, 4U> {
     static constexpr unsigned int MaxPowerOfFiveDrop  = 13U;
     static constexpr unsigned int MaxPowerOfFiveShift = 32U;
     static constexpr unsigned int MaxPowerOfTenValue  = 1000000000ULL;
@@ -106,15 +106,15 @@ struct DigitLimit<Number_T_, 4> {
 
     static constexpr unsigned int PowerOfFive[] = {
         // clang-format off
-            1U,5U,25U,125U,625U,3125U,15625U,78125U,390625U,
-            1953125U,9765625U,48828125U,244140625U,1220703125U
+        1U,5U,25U,125U,625U,3125U,15625U,78125U,390625U,
+        1953125U,9765625U,48828125U,244140625U,1220703125U
         // clang-format on
     };
 };
 
 // uint64_t
 template <typename Number_T_>
-struct DigitLimit<Number_T_, 8> {
+struct DigitLimit<Number_T_, 8U> {
     static constexpr unsigned int       MaxPowerOfFiveDrop  = 27U;
     static constexpr unsigned int       MaxPowerOfFiveShift = 64U;
     static constexpr unsigned long long MaxPowerOfTenValue  = 10000000000000000000ULL;
@@ -122,11 +122,11 @@ struct DigitLimit<Number_T_, 8> {
 
     static constexpr unsigned long long PowerOfFive[] = {
         // clang-format off
-            1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
-            9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
-            152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
-            476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
-            298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
+        1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
+        9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
+        152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
+        476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
+        298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
         // clang-format on
     };
 };

@@ -314,7 +314,7 @@ struct TagPatterns_T_ {
 
 // char
 template <typename Char_T_>
-struct TPStrings<Char_T_, 1> {
+struct TPStrings<Char_T_, 1U> {
     static constexpr const Char_T_ *VariablePrefix    = "{var:";
     static constexpr const Char_T_ *RawVariablePrefix = "{raw:";
     static constexpr const Char_T_ *MathPrefix        = "{math:";
@@ -334,7 +334,7 @@ struct TPStrings<Char_T_, 1> {
 
 // char16_t
 template <typename Char_T_>
-struct TPStrings<Char_T_, 2> {
+struct TPStrings<Char_T_, 2U> {
     static constexpr const Char_T_ *VariablePrefix    = u"{var:";
     static constexpr const Char_T_ *RawVariablePrefix = u"{raw:";
     static constexpr const Char_T_ *MathPrefix        = u"{math:";
@@ -354,7 +354,7 @@ struct TPStrings<Char_T_, 2> {
 
 // char32_t
 template <typename Char_T_>
-struct TPStrings<Char_T_, 4> {
+struct TPStrings<Char_T_, 4U> {
     static constexpr const Char_T_ *VariablePrefix    = U"{var:";
     static constexpr const Char_T_ *RawVariablePrefix = U"{raw:";
     static constexpr const Char_T_ *MathPrefix        = U"{math:";
@@ -374,7 +374,7 @@ struct TPStrings<Char_T_, 4> {
 
 // wchar_t size = 4
 template <>
-struct TPStrings<wchar_t, 4> {
+struct TPStrings<wchar_t, 4U> {
     static constexpr const wchar_t *VariablePrefix    = L"{var:";
     static constexpr const wchar_t *RawVariablePrefix = L"{raw:";
     static constexpr const wchar_t *MathPrefix        = L"{math:";
@@ -394,7 +394,7 @@ struct TPStrings<wchar_t, 4> {
 
 // wchar_t size = 2
 template <>
-struct TPStrings<wchar_t, 2> {
+struct TPStrings<wchar_t, 2U> {
     static constexpr const wchar_t *VariablePrefix    = L"{var:";
     static constexpr const wchar_t *RawVariablePrefix = L"{raw:";
     static constexpr const wchar_t *MathPrefix        = L"{math:";

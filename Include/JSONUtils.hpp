@@ -232,13 +232,13 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) 
     stream.Write((content + offset2), (offset - offset2));
 }
 
-template <typename Char_T_, int S>
+template <typename, unsigned int S>
 struct JSONotationStrings {};
 
 template <typename Char_T_>
 struct JSONotation_T_ {
   private:
-    static constexpr int size_ = static_cast<int>(sizeof(Char_T_));
+    static constexpr int size_ = sizeof(Char_T_);
 
   public:
     static constexpr Char_T_ QuoteChar    = '"';
@@ -282,7 +282,7 @@ struct JSONotation_T_ {
 
 // char
 template <typename Char_T_>
-struct JSONotationStrings<Char_T_, 1> {
+struct JSONotationStrings<Char_T_, 1U> {
     static constexpr const Char_T_ *FalseString = "false";
     static constexpr const Char_T_ *TrueString  = "true";
     static constexpr const Char_T_ *NullString  = "null";
@@ -290,7 +290,7 @@ struct JSONotationStrings<Char_T_, 1> {
 
 // char16_t
 template <typename Char_T_>
-struct JSONotationStrings<Char_T_, 2> {
+struct JSONotationStrings<Char_T_, 2U> {
     static constexpr const Char_T_ *FalseString = u"false";
     static constexpr const Char_T_ *TrueString  = u"true";
     static constexpr const Char_T_ *NullString  = u"null";
@@ -298,7 +298,7 @@ struct JSONotationStrings<Char_T_, 2> {
 
 // char32_t
 template <typename Char_T_>
-struct JSONotationStrings<Char_T_, 4> {
+struct JSONotationStrings<Char_T_, 4U> {
     static constexpr const Char_T_ *FalseString = U"false";
     static constexpr const Char_T_ *TrueString  = U"true";
     static constexpr const Char_T_ *NullString  = U"null";
@@ -306,7 +306,7 @@ struct JSONotationStrings<Char_T_, 4> {
 
 // wchar_t size = 4
 template <>
-struct JSONotationStrings<wchar_t, 4> {
+struct JSONotationStrings<wchar_t, 4U> {
     static constexpr const wchar_t *FalseString = L"false";
     static constexpr const wchar_t *TrueString  = L"true";
     static constexpr const wchar_t *NullString  = L"null";
@@ -314,7 +314,7 @@ struct JSONotationStrings<wchar_t, 4> {
 
 // wchar_t size = 2
 template <>
-struct JSONotationStrings<wchar_t, 2> {
+struct JSONotationStrings<wchar_t, 2U> {
     static constexpr const wchar_t *FalseString = L"false";
     static constexpr const wchar_t *TrueString  = L"true";
     static constexpr const wchar_t *NullString  = L"null";

@@ -25,17 +25,17 @@
 
 namespace Qentem::Unicode {
 
-template <typename, typename, unsigned int>
+template <typename, typename, unsigned int S>
 struct UnicodeToUTF {};
 
 template <typename Char_T_, typename Stream_T_>
-static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
-    UnicodeToUTF<Char_T_, Stream_T_, static_cast<unsigned int>(sizeof(Char_T_))>::ToUTF(unicode, stream);
+static constexpr void ToUTF(unsigned int unicode, Stream_T_ &stream) {
+    UnicodeToUTF<Char_T_, Stream_T_, sizeof(Char_T_)>::ToUTF(unicode, stream);
 }
 
 // UTF8
 template <typename Char_T_, typename Stream_T_>
-struct UnicodeToUTF<Char_T_, Stream_T_, 1> {
+struct UnicodeToUTF<Char_T_, Stream_T_, 1U> {
     static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
         /*
          * ToUTF(0xC3D, stream);
@@ -65,7 +65,7 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 1> {
 
 // UTF16
 template <typename Char_T_, typename Stream_T_>
-struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
+struct UnicodeToUTF<Char_T_, Stream_T_, 2U> {
     static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
         if (unicode < 0x10000U) {
             stream += Char_T_(unicode);
@@ -79,7 +79,7 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 2> {
 
 // UTF32
 template <typename Char_T_, typename Stream_T_>
-struct UnicodeToUTF<Char_T_, Stream_T_, 4> {
+struct UnicodeToUTF<Char_T_, Stream_T_, 4U> {
     static void ToUTF(unsigned int unicode, Stream_T_ &stream) {
         stream += Char_T_(unicode);
     }
