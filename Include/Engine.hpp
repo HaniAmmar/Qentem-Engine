@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+#include "Memory.hpp"
 #include "Platform.hpp"
 #include "StringUtils.hpp"
 
