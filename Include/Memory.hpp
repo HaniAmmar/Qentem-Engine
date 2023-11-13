@@ -93,8 +93,8 @@ static constexpr Type_ *ChangePointer(void *value) noexcept {
 }
 
 template <typename Type_>
-static constexpr Type_ *ChangePointer(const void *value) noexcept {
-    return (Type_ *)(value);
+static constexpr const Type_ *ChangePointer(const void *value) noexcept {
+    return (const Type_ *)(value);
 }
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
