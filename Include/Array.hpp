@@ -160,7 +160,7 @@ class Array {
     }
 
     inline void Insert(const Array &src) {
-        *this += static_cast<const Array &>(src);
+        *this += src;
     }
 
     inline void Insert(Type_ &&item) {

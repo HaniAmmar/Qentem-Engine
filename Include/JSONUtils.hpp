@@ -238,7 +238,7 @@ struct JSONotationStrings {};
 template <typename Char_T_>
 struct JSONotation_T_ {
   private:
-    static constexpr int size_ = sizeof(Char_T_);
+    static constexpr unsigned int size_ = sizeof(Char_T_);
 
   public:
     static constexpr Char_T_ QuoteChar    = '"';

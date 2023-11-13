@@ -40,12 +40,12 @@ QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, co
     if (temp.Evaluate(result, exprs)) {
         switch (result.Type) {
             case QExpression::ExpressionType::NaturalNumber: {
-                number = static_cast<double>(result.Number.Natural);
+                number = double(result.Number.Natural);
                 break;
             }
 
             case QExpression::ExpressionType::IntegerNumber: {
-                number = static_cast<double>(result.Number.Integer);
+                number = double(result.Number.Integer);
                 break;
             }
 

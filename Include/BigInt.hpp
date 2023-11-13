@@ -329,14 +329,14 @@ struct BigInt {
     void set(N_Number_T_ number) noexcept {
         static constexpr unsigned int b_size = ((sizeof(N_Number_T_) * 8U) / Size);
 
-        big_int_[0U] = static_cast<Number_T_>(number);
+        big_int_[0U] = Number_T_(number);
 
         if constexpr (b_size > 1U) {
             number >>= Size;
 
             while (number != N_Number_T_{0}) {
                 ++index_;
-                big_int_[index_] = static_cast<Number_T_>(number);
+                big_int_[index_] = Number_T_(number);
                 number >>= Size;
             }
         }
@@ -352,17 +352,17 @@ struct DoubleSize<Number_T_, 8U> {
         unsigned short dividend16 = dividend_high;
         dividend16 <<= 8U;
         dividend16 |= dividend_low;
-        dividend_high = ((dividend16 % divisor) & 0xFFU);
+        dividend_high = Number_T_(dividend16 % divisor);
         dividend16 /= divisor;
-        dividend_low = (dividend16 & 0xFFU);
+        dividend_low = Number_T_(dividend16);
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
         unsigned short number16 = number;
         number16 *= multiplier;
-        number = (number16 & 0xFFU);
+        number = Number_T_(number16);
 
-        return (number16 >> 8U);
+        return Number_T_(number16 >> 8U);
     }
 };
 ////////////////////////////////////////////////////
@@ -372,17 +372,17 @@ struct DoubleSize<Number_T_, 16U> {
         unsigned int dividend32 = dividend_high;
         dividend32 <<= 16U;
         dividend32 |= dividend_low;
-        dividend_high = ((dividend32 % divisor) & 0xFFFFU);
+        dividend_high = Number_T_(dividend32 % divisor);
         dividend32 /= divisor;
-        dividend_low = (dividend32 & 0xFFFFU);
+        dividend_low = Number_T_(dividend32);
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
         unsigned int number32 = number;
         number32 *= multiplier;
-        number = (number32 & 0xFFFFU);
+        number = Number_T_(number32);
 
-        return ((number32 >> 16U) & 0xFFFFU);
+        return Number_T_(number32 >> 16U);
     }
 };
 ////////////////////////////////////////////////////
@@ -392,17 +392,17 @@ struct DoubleSize<Number_T_, 32U> {
         unsigned long long dividend64 = dividend_high;
         dividend64 <<= 32U;
         dividend64 |= dividend_low;
-        dividend_high = ((dividend64 % divisor) & 0xFFFFFFFFU);
+        dividend_high = Number_T_(dividend64 % divisor);
         dividend64 /= divisor;
-        dividend_low = (dividend64 & 0xFFFFFFFFU);
+        dividend_low = Number_T_(dividend64);
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
         unsigned long long number64 = number;
         number64 *= multiplier;
-        number = (number64 & 0xFFFFFFFFU);
+        number = Number_T_(number64);
 
-        return ((number64 >> 32U) & 0xFFFFFFFFU);
+        return Number_T_(number64 >> 32U);
     }
 };
 ////////////////////////////////////////////////////
@@ -416,9 +416,9 @@ struct DoubleSize<Number_T_, 64U> {
         __uint128_t dividend128 = dividend_high;
         dividend128 <<= 64U;
         dividend128 |= dividend_low;
-        dividend_high = ((dividend128 % divisor) & 0xFFFFFFFFFFFFFFFFULL);
+        dividend_high = Number_T_(dividend128 % divisor);
         dividend128 /= divisor;
-        dividend_low          = (dividend128 & 0xFFFFFFFFFFFFFFFFULL);
+        dividend_low          = Number_T_(dividend128);
 #endif
     }
 
@@ -431,9 +431,9 @@ struct DoubleSize<Number_T_, 64U> {
 #else
         __uint128_t number128 = number;
         number128 *= multiplier;
-        number = (number128 & 0xFFFFFFFFFFFFFFFFULL);
+        number = Number_T_(number128);
 
-        return ((number128 >> 64U) & 0xFFFFFFFFFFFFFFFFULL);
+        return Number_T_(number128 >> 64U);
 #endif
     }
 };

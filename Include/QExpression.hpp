@@ -112,7 +112,7 @@ struct QExpression {
                     }
 
                     case ExpressionType::RealNumber: {
-                        Number.Real = (static_cast<double>(Number.Natural) + right.Number.Real);
+                        Number.Real = (double(Number.Natural) + right.Number.Real);
                         Type        = ExpressionType::RealNumber;
                         break;
                     }
@@ -133,7 +133,7 @@ struct QExpression {
                     }
 
                     case ExpressionType::RealNumber: {
-                        Number.Real = (static_cast<double>(Number.Integer) + right.Number.Real);
+                        Number.Real = (double(Number.Integer) + right.Number.Real);
                         Type        = ExpressionType::RealNumber;
                         break;
                     }
@@ -148,12 +148,12 @@ struct QExpression {
             case ExpressionType::RealNumber: {
                 switch (right.Type) {
                     case ExpressionType::NaturalNumber: {
-                        Number.Real += static_cast<double>(right.Number.Natural);
+                        Number.Real += double(right.Number.Natural);
                         break;
                     }
 
                     case ExpressionType::IntegerNumber: {
-                        Number.Real += static_cast<double>(right.Number.Integer);
+                        Number.Real += double(right.Number.Integer);
                         break;
                     }
 
@@ -193,7 +193,7 @@ struct QExpression {
                     }
 
                     case ExpressionType::RealNumber: {
-                        Number.Real = (static_cast<double>(Number.Natural) - right.Number.Real);
+                        Number.Real = (double(Number.Natural) - right.Number.Real);
                         Type        = ExpressionType::RealNumber;
                         break;
                     }
@@ -214,7 +214,7 @@ struct QExpression {
                     }
 
                     case ExpressionType::RealNumber: {
-                        Number.Real = (static_cast<double>(Number.Integer) - right.Number.Real);
+                        Number.Real = (double(Number.Integer) - right.Number.Real);
                         Type        = ExpressionType::RealNumber;
                         break;
                     }
@@ -229,12 +229,12 @@ struct QExpression {
             case ExpressionType::RealNumber: {
                 switch (right.Type) {
                     case ExpressionType::NaturalNumber: {
-                        Number.Real -= static_cast<double>(right.Number.Natural);
+                        Number.Real -= double(right.Number.Natural);
                         break;
                     }
 
                     case ExpressionType::IntegerNumber: {
-                        Number.Real -= static_cast<double>(right.Number.Integer);
+                        Number.Real -= double(right.Number.Integer);
                         break;
                     }
 
@@ -268,7 +268,7 @@ struct QExpression {
                     }
 
                     case ExpressionType::RealNumber: {
-                        Number.Real = (static_cast<double>(Number.Natural) * right.Number.Real);
+                        Number.Real = (double(Number.Natural) * right.Number.Real);
                         Type        = ExpressionType::RealNumber;
                         break;
                     }
@@ -282,7 +282,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    Number.Real = (static_cast<double>(Number.Integer) * right.Number.Real);
+                    Number.Real = (double(Number.Integer) * right.Number.Real);
                     Type        = ExpressionType::RealNumber;
                 } else {
                     Number.Integer *= right.Number.Integer;
@@ -294,12 +294,12 @@ struct QExpression {
             case ExpressionType::RealNumber: {
                 switch (right.Type) {
                     case ExpressionType::NaturalNumber: {
-                        Number.Real *= static_cast<double>(right.Number.Natural);
+                        Number.Real *= double(right.Number.Natural);
                         break;
                     }
 
                     case ExpressionType::IntegerNumber: {
-                        Number.Real *= static_cast<double>(right.Number.Integer);
+                        Number.Real *= double(right.Number.Integer);
                         break;
                     }
 
@@ -370,7 +370,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_left = QNumber{static_cast<long long>(Number.Real)}.Natural;
+                num_left = QNumber{(long long)(Number.Real)}.Natural;
                 break;
             }
 
@@ -412,7 +412,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_right = QNumber{static_cast<long long>(right_real)}.Natural;
+                num_right = QNumber{(long long)(right_real)}.Natural;
             }
 
             default: {
@@ -426,7 +426,7 @@ struct QExpression {
                 PowerOf(num_left, num_right);
 
                 if (right_negative) {
-                    Number.Real = static_cast<double>(num_left);
+                    Number.Real = double(num_left);
                     Number.Real = 1 / Number.Real;
                     Type        = ExpressionType::RealNumber;
 
@@ -460,13 +460,13 @@ struct QExpression {
     void operator/=(const QExpression &right) noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
-                Number.Real = static_cast<double>(Number.Natural);
+                Number.Real = double(Number.Natural);
                 Type        = ExpressionType::RealNumber;
                 break;
             }
 
             case ExpressionType::IntegerNumber: {
-                Number.Real = static_cast<double>(Number.Integer);
+                Number.Real = double(Number.Integer);
                 Type        = ExpressionType::RealNumber;
                 break;
             }
@@ -477,12 +477,12 @@ struct QExpression {
 
         switch (right.Type) {
             case ExpressionType::NaturalNumber: {
-                Number.Real /= static_cast<double>(right.Number.Natural);
+                Number.Real /= double(right.Number.Natural);
                 break;
             }
 
             case ExpressionType::IntegerNumber: {
-                Number.Real /= static_cast<double>(right.Number.Integer);
+                Number.Real /= double(right.Number.Integer);
                 break;
             }
 
@@ -503,7 +503,7 @@ struct QExpression {
             case ExpressionType::NaturalNumber:
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    result = (Number.Integer % static_cast<long long>(right.Number.Real));
+                    result = (Number.Integer % (long long)(right.Number.Real));
                 } else {
                     result = (Number.Integer % right.Number.Integer);
                 }
@@ -512,9 +512,9 @@ struct QExpression {
             }
 
             case ExpressionType::RealNumber: {
-                result = static_cast<long long>(Number.Real);
+                result = (long long)(Number.Real);
                 if (right.Type == ExpressionType::RealNumber) {
-                    result %= static_cast<long long>(right.Number.Real);
+                    result %= (long long)(right.Number.Real);
                 } else {
                     result %= right.Number.Integer;
                 }
@@ -531,15 +531,15 @@ struct QExpression {
     bool operator>(const Number_T_ number) const noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
-                return (Number.Natural > static_cast<unsigned long long>(number));
+                return (Number.Natural > (unsigned long long)(number));
             }
 
             case ExpressionType::IntegerNumber: {
-                return (Number.Integer > static_cast<long long>(number));
+                return (Number.Integer > (long long)(number));
             }
 
             default: {
-                return (Number.Real > static_cast<double>(number));
+                return (Number.Real > double(number));
             }
         }
     }
@@ -548,7 +548,7 @@ struct QExpression {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Natural) >= right.Number.Real);
+                    return (double(Number.Natural) >= right.Number.Real);
                 }
 
                 return (Number.Integer >= right.Number.Integer);
@@ -556,7 +556,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Integer) >= right.Number.Real);
+                    return (double(Number.Integer) >= right.Number.Real);
                 }
 
                 return (Number.Integer >= right.Number.Integer);
@@ -564,7 +564,7 @@ struct QExpression {
 
             case ExpressionType::RealNumber: {
                 if (right.Type != ExpressionType::RealNumber) {
-                    return (Number.Real >= static_cast<double>(right.Number.Integer));
+                    return (Number.Real >= double(right.Number.Integer));
                 }
             }
 
@@ -579,7 +579,7 @@ struct QExpression {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Natural) > right.Number.Real);
+                    return (double(Number.Natural) > right.Number.Real);
                 }
 
                 return (Number.Integer > right.Number.Integer);
@@ -587,7 +587,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Integer) > right.Number.Real);
+                    return (double(Number.Integer) > right.Number.Real);
                 }
 
                 return (Number.Integer > right.Number.Integer);
@@ -595,7 +595,7 @@ struct QExpression {
 
             case ExpressionType::RealNumber: {
                 if (right.Type != ExpressionType::RealNumber) {
-                    return (Number.Real > static_cast<double>(right.Number.Integer));
+                    return (Number.Real > double(right.Number.Integer));
                 }
             }
 
@@ -610,7 +610,7 @@ struct QExpression {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Natural) <= right.Number.Real);
+                    return (double(Number.Natural) <= right.Number.Real);
                 }
 
                 return (Number.Integer <= right.Number.Integer);
@@ -618,7 +618,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Integer) <= right.Number.Real);
+                    return (double(Number.Integer) <= right.Number.Real);
                 }
 
                 return (Number.Integer <= right.Number.Integer);
@@ -626,7 +626,7 @@ struct QExpression {
 
             case ExpressionType::RealNumber: {
                 if (right.Type != ExpressionType::RealNumber) {
-                    return (Number.Real <= static_cast<double>(right.Number.Integer));
+                    return (Number.Real <= double(right.Number.Integer));
                 }
             }
 
@@ -641,7 +641,7 @@ struct QExpression {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Natural) < right.Number.Real);
+                    return (double(Number.Natural) < right.Number.Real);
                 }
 
                 return (Number.Integer < right.Number.Integer);
@@ -649,7 +649,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Integer) < right.Number.Real);
+                    return (double(Number.Integer) < right.Number.Real);
                 }
 
                 return (Number.Integer < right.Number.Integer);
@@ -657,7 +657,7 @@ struct QExpression {
 
             case ExpressionType::RealNumber: {
                 if (right.Type != ExpressionType::RealNumber) {
-                    return (Number.Real < static_cast<double>(right.Number.Integer));
+                    return (Number.Real < double(right.Number.Integer));
                 }
             }
 
@@ -672,7 +672,7 @@ struct QExpression {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Natural) == right.Number.Real);
+                    return (double(Number.Natural) == right.Number.Real);
                 }
 
                 return (Number.Integer == right.Number.Integer);
@@ -680,7 +680,7 @@ struct QExpression {
 
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    return (static_cast<double>(Number.Integer) == right.Number.Real);
+                    return (double(Number.Integer) == right.Number.Real);
                 }
 
                 return (Number.Integer == right.Number.Integer);
@@ -688,7 +688,7 @@ struct QExpression {
 
             case ExpressionType::RealNumber: {
                 if (right.Type != ExpressionType::RealNumber) {
-                    return (Number.Real == static_cast<double>(right.Number.Integer));
+                    return (Number.Real == double(right.Number.Integer));
                 }
             }
 

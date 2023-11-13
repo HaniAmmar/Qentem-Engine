@@ -540,10 +540,6 @@ class HArray {
         return (Capacity() - 1);
     }
 
-    // inline void *geStorage(SizeT *ptr) const noexcept {
-    //     return static_cast<void *>(ptr + Capacity());
-    // }
-
     inline SizeT *getHashTable() const noexcept {
         return hashTable_.GetPointer();
     }
@@ -553,16 +549,15 @@ class HArray {
     }
 
     HAItem_ *allocate(SizeT new_capacity) {
+        static constexpr SizeT size_sum = SizeT(sizeof(SizeT) + sizeof(HAItem_));
+
         if (new_capacity < SizeT{2}) {
             new_capacity = SizeT{2};
         }
 
         new_capacity = Memory::AlignSize(new_capacity);
         setCapacity(new_capacity);
-
-        const SizeT size = ((sizeof(SizeT) + sizeof(HAItem_)) * new_capacity);
-        SizeT      *ht   = static_cast<SizeT *>(static_cast<void *>(Memory::Allocate<char>(size)));
-
+        SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
         setHashTable(ht);
         Memory::SetToZero(ht, (sizeof(SizeT) * new_capacity));
 

@@ -101,25 +101,25 @@ struct TagBit {
             }
 
             case TagType::Math: {
-                Memory::Dispose(static_cast<MathTag *>(info_));
+                Memory::Dispose((MathTag *)(info_));
                 Memory::Deallocate(info_);
                 break;
             }
 
             case TagType::Loop: {
-                Memory::Dispose(static_cast<LoopTag *>(info_));
+                Memory::Dispose((LoopTag *)(info_));
                 Memory::Deallocate(info_);
                 break;
             }
 
             case TagType::InLineIf: {
-                Memory::Dispose(static_cast<InLineIfTag *>(info_));
+                Memory::Dispose((InLineIfTag *)(info_));
                 Memory::Deallocate(info_);
                 break;
             }
 
             case TagType::If: {
-                Memory::Dispose(static_cast<Array<IfTagCase> *>(info_));
+                Memory::Dispose((Array<IfTagCase> *)(info_));
                 Memory::Deallocate(info_);
                 break;
             }
@@ -200,13 +200,13 @@ struct IfTagCase {
     Array<QExpression> Case;
 };
 
-template <typename Char_T_, int S>
+template <typename, unsigned int S>
 struct TPStrings {};
 
 template <typename Char_T_>
 struct TagPatterns_T_ {
   private:
-    static constexpr int size_ = static_cast<int>(sizeof(Char_T_));
+    static constexpr unsigned int size_ = sizeof(Char_T_);
 
   public:
     /*

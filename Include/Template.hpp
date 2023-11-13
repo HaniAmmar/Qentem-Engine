@@ -664,7 +664,7 @@ struct TemplateSub {
     }
 
     void renderVariable(const TagBit *tag) const {
-        const VariableTag &i_tag = *(static_cast<const VariableTag *>(tag->GetInfo()));
+        const VariableTag &i_tag = *((const VariableTag *)(tag->GetInfo()));
         const Value_T_    *value = getValue(i_tag);
 
         if (value != nullptr) {
@@ -698,7 +698,7 @@ struct TemplateSub {
     }
 
     void renderRawVariable(const TagBit *tag) const {
-        const VariableTag &i_tag = *(static_cast<const VariableTag *>(tag->GetInfo()));
+        const VariableTag &i_tag = *((const VariableTag *)(tag->GetInfo()));
         const Value_T_    *value = getValue(i_tag);
 
         if ((value != nullptr) && value->CopyStringValueTo(*stream_, Config::TemplatePrecision)) {
@@ -710,7 +710,7 @@ struct TemplateSub {
     }
 
     void renderMath(const TagBit *tag) const {
-        const MathTag     &i_tag = *(static_cast<const MathTag *>(tag->GetInfo()));
+        const MathTag     &i_tag = *((const MathTag *)(tag->GetInfo()));
         const QExpression *expr  = i_tag.Expressions.First();
         QExpression        result;
 
@@ -743,7 +743,7 @@ struct TemplateSub {
     }
 
     void renderLoop(const TagBit *tag) const {
-        const LoopTag  &i_tag = *(static_cast<const LoopTag *>(tag->GetInfo()));
+        const LoopTag  &i_tag = *((const LoopTag *)(tag->GetInfo()));
         Value_T_        grouped_set;
         const Value_T_ *loop_set;
 
@@ -815,7 +815,7 @@ struct TemplateSub {
     }
 
     void renderInLineIf(const TagBit *tag) const {
-        const InLineIfTag &i_tag = *(static_cast<const InLineIfTag *>(tag->GetInfo()));
+        const InLineIfTag &i_tag = *((const InLineIfTag *)(tag->GetInfo()));
         const QExpression *expr  = i_tag.Case.First();
         QExpression        result;
 
@@ -845,7 +845,7 @@ struct TemplateSub {
     }
 
     void renderIf(const TagBit *tag) const {
-        const IfTag     &i_tag = *(static_cast<const IfTag *>(tag->GetInfo()));
+        const IfTag     &i_tag = *((const IfTag *)(tag->GetInfo()));
         const IfTagCase *item  = i_tag.First();
         const IfTagCase *end   = (item + i_tag.Size());
         QExpression      result;
@@ -872,7 +872,7 @@ struct TemplateSub {
     }
 
     void parseVariableTag(SizeT offset, SizeT end_offset, void *tag) const noexcept {
-        VariableTag &i_tag = *(static_cast<VariableTag *>(tag));
+        VariableTag &i_tag = *((VariableTag *)(tag));
         i_tag.Offset       = offset;
         i_tag.Length       = ((end_offset - offset) & 0xFFU);
 
@@ -900,7 +900,7 @@ struct TemplateSub {
     }
 
     void parseMathTag(SizeT offset, SizeT end_offset, void *tag) const {
-        MathTag &i_tag    = *(static_cast<MathTag *>(tag));
+        MathTag &i_tag    = *((MathTag *)(tag));
         i_tag.Expressions = parseExpressions(offset, end_offset);
         i_tag.Offset      = offset;
         i_tag.EndOffset   = end_offset;
@@ -920,7 +920,7 @@ struct TemplateSub {
     }
 
     void parseLoopTag(SizeT offset, SizeT end_offset, void *tag) const {
-        LoopTag    &i_tag = *(static_cast<LoopTag *>(tag));
+        LoopTag    &i_tag = *((LoopTag *)(tag));
         const SizeT loop_content_offset =
             Engine::FindOne<Char_T_>(TagPatterns::MultiLineSuffix, content_, offset, end_offset, length_);
 
@@ -993,7 +993,7 @@ struct TemplateSub {
     }
 
     void parseInLineIfTag(SizeT offset, SizeT end_offset, void *tag) const {
-        InLineIfTag &i_tag = *(static_cast<InLineIfTag *>(tag));
+        InLineIfTag &i_tag = *((InLineIfTag *)(tag));
 
         SizeT true_offset      = 0;
         SizeT true_end_offset  = 0;
@@ -1056,7 +1056,7 @@ struct TemplateSub {
     }
 
     void parseIfTag(SizeT offset, const SizeT end_offset, void *tag) const {
-        IfTag        &i_tag = *(static_cast<IfTag *>(tag));
+        IfTag        &i_tag = *((IfTag *)(tag));
         Array<TagBit> sub_tags;
         SizeT         offset2 = getQuotedValue(offset, end_offset);
         SizeT         case_end_offset;
@@ -1163,8 +1163,8 @@ struct TemplateSub {
         } else {
             const TemplateSub *that = this;
             {
-                const unsigned int level    = static_cast<unsigned int>(level_);
-                unsigned int       iv_level = static_cast<unsigned int>(v_level);
+                const unsigned int level    = (unsigned int)(level_);
+                unsigned int       iv_level = (unsigned int)(v_level);
                 value                       = loop_value_;
 
                 while (iv_level < level) {
@@ -1336,37 +1336,37 @@ struct TemplateSub {
             }
 
             case QOperation::Less: { // <
-                left.Number.Natural = static_cast<unsigned long long>(left < right);
+                left.Number.Natural = (unsigned long long)(left < right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::LessOrEqual: { // <=
-                left.Number.Natural = static_cast<unsigned long long>(left <= right);
+                left.Number.Natural = (unsigned long long)(left <= right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Greater: { // >
-                left.Number.Natural = static_cast<unsigned long long>(left > right);
+                left.Number.Natural = (unsigned long long)(left > right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::GreaterOrEqual: { // >=
-                left.Number.Natural = static_cast<unsigned long long>(left >= right);
+                left.Number.Natural = (unsigned long long)(left >= right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::And: { // &&
-                left.Number.Natural = static_cast<unsigned long long>((left > 0U) && (right > 0U));
+                left.Number.Natural = (unsigned long long)((left > 0U) && (right > 0U));
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.Number.Natural = static_cast<unsigned long long>((left > 0U) || (right > 0U));
+                left.Number.Natural = (unsigned long long)((left > 0U) || (right > 0U));
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
@@ -1595,7 +1595,7 @@ struct TemplateSub {
                 }
             }
 
-            left.Number.Natural = static_cast<unsigned long long>(left == right);
+            left.Number.Natural = (unsigned long long)(left == right);
             left.Type           = ExpressionType::NaturalNumber;
             return true;
         }

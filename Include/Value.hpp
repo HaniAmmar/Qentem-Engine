@@ -152,8 +152,8 @@ class Value {
 
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
-        static constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        static constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
+        static constexpr bool is_unsigned = (Number_T_(-1) > 0);
+        static constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
 
         if constexpr (is_unsigned) {
             number_.SetNumber((unsigned long long)(num));
@@ -352,8 +352,8 @@ class Value {
 
     template <typename Number_T_>
     inline Value &operator=(Number_T_ num) noexcept {
-        static constexpr bool is_unsigned = (static_cast<Number_T_>(-1) > 0);
-        static constexpr bool is_float    = (static_cast<double>(static_cast<Number_T_>(1.5)) == 1.5);
+        static constexpr bool is_unsigned = (Number_T_(-1) > 0);
+        static constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
 
         if (!IsNumber()) {
             reset();
@@ -1015,7 +1015,7 @@ class Value {
 
         if (val != nullptr) {
             key    = val->First();
-            length = static_cast<Number_T_>(val->Length());
+            length = Number_T_(val->Length());
             return true;
         }
 
@@ -1190,7 +1190,7 @@ class Value {
             }
 
             case 3: {
-                return QNumber{static_cast<long long>(number.Real)}.Natural;
+                return QNumber{(long long)(number.Real)}.Natural;
             }
 
             default: {
@@ -1209,7 +1209,7 @@ class Value {
             }
 
             case 3: {
-                return static_cast<long long>(number.Real);
+                return (long long)(number.Real);
             }
 
             default: {
@@ -1223,11 +1223,11 @@ class Value {
 
         switch (SetNumber(number)) {
             case 1: {
-                return static_cast<double>(number.Natural);
+                return double(number.Natural);
             }
 
             case 2: {
-                return static_cast<double>(number.Integer);
+                return double(number.Integer);
             }
 
             case 3: {
@@ -1418,7 +1418,7 @@ class Value {
 
     inline ValueType Type() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        return static_cast<ValueType>(type_.Storage_.GetHighByte());
+        return ValueType(type_.Storage_.GetHighByte());
 #else
         return type_;
 #endif

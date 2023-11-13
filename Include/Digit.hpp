@@ -33,10 +33,10 @@ namespace Qentem {
 struct Digit {
     template <bool Reverse_V_ = false, typename Stream_T_, typename Number_T_>
     inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
-        using Char_T_ = typename Stream_T_::CharType;
-
+        using Char_T_                                      = typename Stream_T_::CharType;
         static constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
         static constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
+        Char_T_                       storage[max_number_of_digits];
 
         if constexpr (is_signed) {
             if (number < 0) {
@@ -45,21 +45,12 @@ struct Digit {
             }
         }
 
-        Char_T_ storage[max_number_of_digits];
-        SizeT   offset = max_number_of_digits;
-
-        RawIntToString<Reverse_V_>(&(storage[0]), offset, number);
-
         if constexpr (!Reverse_V_) {
-            stream.Write(&(storage[offset]), (max_number_of_digits - offset));
+            const SizeT offset = intToString<false>(&(storage[max_number_of_digits]), number);
+            stream.Write(&(storage[max_number_of_digits - offset]), offset);
         } else {
-            stream.Write(&(storage[0U]), offset);
+            stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), number));
         }
-    }
-
-    template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
-    static void RawIntToString(Char_T_ *storage, SizeT &offset, Number_T_ number) noexcept {
-        intToString<Reverse_V_>(storage, offset, number);
     }
 
     template <typename Stream_T_>
@@ -224,7 +215,7 @@ struct Digit {
                                         }
                                     }
 
-                                    number.Real = static_cast<double>(number.Natural);
+                                    number.Real = double(number.Natural);
 
                                     if ((flags & stringToNumberFlags::MergedExponent) == 0U) {
                                         exponent = (unsigned int)(offset)-exponent;
@@ -269,41 +260,43 @@ struct Digit {
     };
 
     template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
-    QENTEM_NOINLINE static void intToString(Char_T_ *storage, SizeT &offset, Number_T_ number) noexcept {
+    QENTEM_NOINLINE static SizeT intToString(Char_T_ *storage, Number_T_ number) noexcept {
+        const Char_T_ *str = storage;
+
         if constexpr (!Reverse_V_) {
-            const SizeT o_offset = offset;
-
             while (number >= Number_T_{10}) {
                 const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
                 number /= Number_T_{100};
 
-                --offset;
-                storage[offset] = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
-                --offset;
-                storage[offset] = Char_T_(DigitUtils::DigitTable[index]);
+                --storage;
+                *storage = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
+                --storage;
+                *storage = Char_T_(DigitUtils::DigitTable[index]);
             }
 
-            if ((number != 0) || (offset == o_offset)) {
-                --offset;
-                storage[offset] = (Char_T_(number) + DigitUtils::DigitChars::ZeroChar);
+            if ((number != 0) || (str == storage)) {
+                --storage;
+                *storage = Char_T_(DigitUtils::DigitTable2[number]);
             }
+
+            return SizeT(str - storage);
         } else {
-            offset = 0;
-
             while (number >= Number_T_{10}) {
                 const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
                 number /= Number_T_{100};
 
-                storage[offset] = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
-                ++offset;
-                storage[offset] = Char_T_(DigitUtils::DigitTable[index]);
-                ++offset;
+                *storage = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
+                ++storage;
+                *storage = Char_T_(DigitUtils::DigitTable[index]);
+                ++storage;
             }
 
-            if ((number != 0) || (offset == SizeT{0})) {
-                storage[offset] = (Char_T_(number) + DigitUtils::DigitChars::ZeroChar);
-                ++offset;
+            if ((number != 0) || (str == storage)) {
+                *storage = Char_T_(DigitUtils::DigitTable2[number]);
+                ++storage;
             }
+
+            return SizeT(storage - str);
         }
     }
 
@@ -469,7 +462,7 @@ struct Digit {
                 }
             }
 
-            number.Real = static_cast<double>(number.Natural);
+            number.Real = double(number.Natural);
 
             if (((flags & stringToNumberFlags::NegativeExponent) != 0U)) {
                 powerOfNegativeTen(number.Real, exponent);

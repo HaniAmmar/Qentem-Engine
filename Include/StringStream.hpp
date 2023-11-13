@@ -253,7 +253,7 @@ class StringStream {
         }
     }
 
-    void InsertAt(Char_T_ ch, SizeT index) {
+    inline void InsertAt(Char_T_ ch, SizeT index) {
         if (index < Length()) {
             Char_T_       *first  = (Storage() + index);
             Char_T_       *second = first;
@@ -273,7 +273,7 @@ class StringStream {
     }
 
     // Set the needed length to write directly to the buffer,
-    Char_T_ *Buffer(const SizeT len) {
+    inline Char_T_ *Buffer(const SizeT len) {
         const SizeT current_offset = Length();
         length_ += len;
 
@@ -392,7 +392,7 @@ class StringStream {
         setStorage(Memory::Allocate<Char_T_>(size));
     }
 
-    void write(const Char_T_ *str, const SizeT len) {
+    inline void write(const Char_T_ *str, const SizeT len) {
         if (len != 0) {
             const SizeT current_offset = Length();
             length_ += len;

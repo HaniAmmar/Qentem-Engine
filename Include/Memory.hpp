@@ -38,7 +38,7 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     if (m_size != 0) {
         offset += (QENTEM_SIMD_SIZE * m_size);
         const QENTEM_SIMD_VAR  m_zero    = QENTEM_SIMD_ZERO;
-        QENTEM_SIMD_VAR       *m_pointer = static_cast<QENTEM_SIMD_VAR *>(pointer);
+        QENTEM_SIMD_VAR       *m_pointer = (QENTEM_SIMD_VAR *)(pointer);
         const QENTEM_SIMD_VAR *end       = (m_pointer + m_size);
 
         do {
@@ -48,7 +48,7 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     }
 #endif
 
-    char *src = static_cast<char *>(pointer);
+    char *src = (char *)(pointer);
 
     while (offset < size) {
         src[offset] = 0;
@@ -66,8 +66,8 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
 
     if (m_size != 0) {
         offset += (QENTEM_SIMD_SIZE * m_size);
-        QENTEM_SIMD_VAR       *m_to   = static_cast<QENTEM_SIMD_VAR *>(to);
-        const QENTEM_SIMD_VAR *m_form = static_cast<const QENTEM_SIMD_VAR *>(from);
+        QENTEM_SIMD_VAR       *m_to   = (QENTEM_SIMD_VAR *)(to);
+        const QENTEM_SIMD_VAR *m_form = (const QENTEM_SIMD_VAR *)(from);
         const QENTEM_SIMD_VAR *end    = (m_form + m_size);
 
         do {
@@ -78,8 +78,8 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     }
 #endif
 
-    char       *des = static_cast<char *>(to);
-    const char *src = static_cast<const char *>(from);
+    char       *des = (char *)(to);
+    const char *src = (const char *)(from);
 
     while (offset < size) {
         des[offset] = src[offset];
@@ -254,7 +254,6 @@ inline static Type_ *AllocateInit(Values_T_ &&...values) noexcept {
     Type_ *pointer = Allocate<Type_>(1);
     InitializeValues(pointer, Move(values)...);
     return pointer;
-    // return new Type_{static_cast<Values_T_ &&>(values)...};
 }
 
 // Allocate and copy

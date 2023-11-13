@@ -82,17 +82,17 @@ static bool StringToNumber(Number_T_ &num, const char *str) noexcept {
 
     switch (Digit::StringToNumber(number, str, offset, length)) {
         case 1: {
-            num = static_cast<Number_T_>(number.Natural);
+            num = Number_T_(number.Natural);
             break;
         }
 
         case 2: {
-            num = static_cast<Number_T_>(number.Integer);
+            num = Number_T_(number.Integer);
             break;
         }
 
         case 3: {
-            num = static_cast<Number_T_>(number.Real);
+            num = Number_T_(number.Real);
             break;
         }
 
