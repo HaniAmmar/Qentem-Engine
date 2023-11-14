@@ -304,7 +304,7 @@ There are over 15k lines of code for testing; 5 times the size of the library, a
     cd Build
     cmake ..
     cmake --build .
-    ctest
+    ctest -C Debug
     ```
 
 -   gcc/clang
