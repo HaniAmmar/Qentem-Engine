@@ -240,25 +240,25 @@ struct Digit {
                             has_dot = true;
                             continue;
 
-                            if (offset < max_end_offset) {
-                                digit = content[offset];
+                            // if (offset < max_end_offset) {
+                            //     digit = content[offset];
 
-                                if ((digit > DigitUtils::DigitChars::ZeroChar) &&
-                                    (digit <= DigitUtils::DigitChars::NineChar)) {
-                                    continue;
-                                }
+                            //     if ((digit > DigitUtils::DigitChars::ZeroChar) &&
+                            //         (digit <= DigitUtils::DigitChars::NineChar)) {
+                            //         continue;
+                            //     }
 
-                                if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + 1U) < max_end_offset) {
-                                    digit = content[offset + 1U];
+                            //     if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + 1U) < max_end_offset) {
+                            //         digit = content[offset + 1U];
 
-                                    if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                                        (digit <= DigitUtils::DigitChars::NineChar)) {
-                                        continue;
-                                    }
-                                }
-                            }
+                            //         if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                            //             (digit <= DigitUtils::DigitChars::NineChar)) {
+                            //             continue;
+                            //         }
+                            //     }
+                            // }
 
-                            break;
+                            // break;
                         }
 
                         return QNumberType::NotANumber; // x.x.x..x
