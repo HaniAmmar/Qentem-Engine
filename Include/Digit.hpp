@@ -31,36 +31,55 @@
  */
 namespace Qentem {
 struct Digit {
-    template <bool Reverse_V_ = false, typename Stream_T_, typename Number_T_>
-    inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
-        using Char_T_                               = typename Stream_T_::CharType;
-        constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
-        constexpr bool         is_signed            = ((Number_T_{0} - 1) < 0);
-        Char_T_                storage[max_number_of_digits];
+    enum class RealFormatType : unsigned char { Default = 0, Fixed = 1, Scientific = 2 };
 
-        if constexpr (is_signed) {
-            if (number < 0) {
-                number = -number;
-                stream += DigitUtils::DigitChars::NegativeChar;
+    struct RealFormatInfo {
+        RealFormatInfo(unsigned int precision) noexcept : Precision{precision} {
+        }
+
+        explicit RealFormatInfo(RealFormatType type) noexcept : Type{type} {
+        }
+
+        RealFormatInfo(unsigned int precision, RealFormatType type) noexcept : Precision{precision}, Type{type} {
+        }
+
+        unsigned int   Precision{6U};
+        RealFormatType Type{RealFormatType::Default};
+    };
+    /////////////////////////////////////////////////////////////////
+    template <bool Reverse_V_ = false, typename Stream_T_, typename Number_T_>
+    inline static void NumberToString(Stream_T_ &stream, Number_T_ number,
+                                      RealFormatInfo format = RealFormatInfo{15U}) {
+        using Char_T_ = typename Stream_T_::CharType;
+
+        if constexpr (IsFloat<Number_T_>()) {
+            constexpr unsigned int size = sizeof(number);
+            if constexpr (size == 4U) {
+                realToString<Number_T_>(stream, QNumber32{number}.Natural, format);
+            } else if constexpr (size == 2U) {
+                realToString<Number_T_>(stream, QNumber16<Number_T_>{number}.Natural, format);
+            } else {
+                realToString<Number_T_>(stream, QNumber64{number}.Natural, format);
+            }
+        } else {
+            constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
+            Char_T_                storage[max_number_of_digits];
+            QNumber                qnum{number};
+
+            if constexpr (!IsUnsigned<Number_T_>()) {
+                if (qnum.Integer < 0) {
+                    qnum.Integer = -qnum.Integer;
+                    stream += DigitUtils::DigitChars::NegativeChar;
+                }
+            }
+
+            if constexpr (Reverse_V_) {
+                stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), number));
+            } else {
+                const SizeT offset = intToString(&(storage[max_number_of_digits]), qnum.Natural);
+                stream.Write(&(storage[max_number_of_digits - offset]), offset);
             }
         }
-
-        if constexpr (!Reverse_V_) {
-            const SizeT offset = intToString<false>(&(storage[max_number_of_digits]), number);
-            stream.Write(&(storage[max_number_of_digits - offset]), offset);
-        } else {
-            stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), number));
-        }
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, double number, unsigned int precision = 15U) {
-        realToString(stream, number, precision);
-    }
-
-    template <typename Stream_T_>
-    inline static void NumberToString(Stream_T_ &stream, float number, unsigned int precision = 15U) {
-        realToString(stream, number, precision);
     }
     /////////////////////////////////////////////////////////////////
     template <typename Char_T_>
@@ -95,171 +114,638 @@ struct Digit {
         number       = 0;
 
         if (offset < length) {
-            number += (Number_T_(content[offset]) - DigitUtils::DigitChars::ZeroChar);
+            number += (Number_T_(content[offset]) - Number_T_(DigitUtils::DigitChars::ZeroChar));
             ++offset;
 
             while (offset < length) {
                 number *= Number_T_{10};
-                number += (Number_T_(content[offset]) - DigitUtils::DigitChars::ZeroChar);
+                number += (Number_T_(content[offset]) - Number_T_(DigitUtils::DigitChars::ZeroChar));
                 ++offset;
             }
         }
     }
 
     template <typename Char_T_>
-    static QNumberType StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
+    inline static QNumberType StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
+                                             SizeT end_offset) noexcept {
+        return stringToNumber(number, content, offset, end_offset);
+    }
+
+    //////////// Private ////////////
+  private:
+    template <typename Char_T_>
+    static QNumberType stringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
-        SizeT        o_offset = offset;
-        SizeT        max_end_offset;
-        unsigned int flags    = 0;
-        unsigned int exponent = 0;
-        number.Natural        = 0;
+        constexpr SizeT max_length = SizeT{19};
+        number.Natural             = 0;
 
         if (offset < end_offset) {
-            Char_T_ digit = content[offset];
-
+            SizeT   dot_offset   = 0;
+            SizeT   exp_offset   = 0;
+            SizeT   start_offset = 0;
+            SizeT   tmp_offset;
+            Char_T_ digit         = content[offset];
+            bool    is_negative   = false;
+            bool    is_real       = false;
+            bool    has_dot       = false;
+            bool    fraction_only = false;
+            ///////////////////////////////////////////////////////////
             if (digit == DigitUtils::DigitChars::NegativeChar) {
                 ++offset;
-                flags |= stringToNumberFlags::Negative;
-
+                is_negative = true;
             } else if (digit == DigitUtils::DigitChars::PositiveChar) {
                 ++offset;
             }
 
-            if ((end_offset - offset) < SizeT{19}) {
-                max_end_offset = end_offset;
-            } else {
-                max_end_offset = (offset + SizeT{19});
-
-                if ((flags & stringToNumberFlags::Negative) != 0) {
-                    --max_end_offset;
-                }
-
-                flags |= stringToNumberFlags::OverFlow;
-            }
-
-            if (offset < max_end_offset) {
+            tmp_offset = offset;
+            ///////////////////////////////////////////////////////////
+            if (offset < end_offset) {
                 digit = content[offset];
 
                 if ((digit > DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
+                    // 123456789
                     number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                    tmp_offset   = (((end_offset - offset) < max_length) ? end_offset : (offset + max_length));
+                    start_offset = offset;
                     ++offset;
-                    digit = content[offset];
-                } else if ((digit == DigitUtils::DigitChars::ZeroChar) && ((max_end_offset - offset) > SizeT{1})) {
-                    ++offset;
-                    digit = content[offset];
-
-                    if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
-                        return QNumberType::NotANumber; // Leading zero.
-                    }
-                }
-
-                while (true) {
-                    while ((offset < max_end_offset) && (digit >= DigitUtils::DigitChars::ZeroChar) &&
-                           (digit <= DigitUtils::DigitChars::NineChar)) {
-                        number.Natural *= 10ULL;
-                        number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                } else if ((digit == DigitUtils::DigitChars::ZeroChar) || (digit == DigitUtils::DigitChars::DotChar)) {
+                    if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + SizeT{1}) < end_offset) {
                         ++offset;
                         digit = content[offset];
+
+                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                            // 0000xxxx
+                            return QNumberType::NotANumber; // Leading zero.
+                        }
                     }
 
-                    switch (digit) {
-                        case DigitUtils::DigitChars::DotChar: {
-                            if ((flags & stringToNumberFlags::Real) == 0U) {
-                                flags |= stringToNumberFlags::Real;
+                    if (digit == DigitUtils::DigitChars::DotChar) {
+                        // 0.xxxxxxxx
+                        dot_offset = offset;
+                        ++offset;
+                        start_offset  = offset;
+                        is_real       = true;
+                        has_dot       = true;
+                        fraction_only = true;
+
+                        while (offset < end_offset) {
+                            // 0.000000000x
+                            digit = content[offset];
+
+                            if (digit == DigitUtils::DigitChars::ZeroChar) {
                                 ++offset;
-                                ++o_offset;
-
-                                exponent = (unsigned int)(offset);
-
-                                if (offset == max_end_offset) {
-                                    digit = 0;
-                                } else {
-                                    digit = content[offset];
-                                }
-
                                 continue;
                             }
 
-                            return QNumberType::NotANumber;
+                            break;
+                        }
+                        ///////////////////////////////////////////////////////////
+                        if ((start_offset == offset) && (dot_offset == tmp_offset) &&
+                            ((digit < DigitUtils::DigitChars::ZeroChar) ||
+                             (digit > DigitUtils::DigitChars::NineChar))) {
+                            return QNumberType::NotANumber; // Just a dot.
+                        }
+                        ///////////////////////////////////////////////////////////
+                        start_offset = offset;
+                    }
+
+                    tmp_offset = (((end_offset - offset) < max_length) ? end_offset : (offset + max_length));
+                } else {
+                    return QNumberType::NotANumber;
+                }
+                ///////////////////////////////////////////////////////////
+                const SizeT max_end_offset = tmp_offset;
+                ///////////////////////////////////////////////////////////
+                while (offset < end_offset) {
+                    while (offset < max_end_offset) {
+                        digit = content[offset];
+
+                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                            number.Natural *= 10ULL;
+                            number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                            ++offset;
+                            continue;
                         }
 
-                        case DigitUtils::DigitChars::UE_Char:
-                        case DigitUtils::DigitChars::E_Char: {
-                            if (number.Natural != 0) {
-                                if ((flags & stringToNumberFlags::Real) != 0U) {
-                                    exponent = ((unsigned int)(offset)-exponent);
+                        break;
+                    }
+
+                    if (digit == DigitUtils::DigitChars::DotChar) {
+                        if (!has_dot) {
+                            dot_offset = offset;
+                            ++offset;
+                            is_real = true;
+                            has_dot = true;
+                            continue;
+
+                            if (offset < max_end_offset) {
+                                digit = content[offset];
+
+                                if ((digit > DigitUtils::DigitChars::ZeroChar) &&
+                                    (digit <= DigitUtils::DigitChars::NineChar)) {
+                                    continue;
                                 }
 
-                                if ((offset < end_offset) &&
-                                    exponentToNumber(exponent, flags, content, offset, end_offset)) {
-                                    digit          = 0;
-                                    max_end_offset = offset;
-                                    continue;
+                                if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + 1U) < max_end_offset) {
+                                    digit = content[offset + 1U];
+
+                                    if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                                        (digit <= DigitUtils::DigitChars::NineChar)) {
+                                        continue;
+                                    }
                                 }
                             }
 
-                            return QNumberType::NotANumber;
+                            break;
+                        }
+
+                        return QNumberType::NotANumber; // x.x.x..x
+                    }
+
+                    break;
+                }
+                ///////////////////////////////////////////////////////////
+                tmp_offset = offset;
+                ///////////////////////////////////////////////////////////
+                if (!is_real && (offset < end_offset)) {
+                    digit = content[offset];
+
+                    switch (digit) {
+                        case DigitUtils::DigitChars::DotChar:
+                        case DigitUtils::DigitChars::E_Char:
+                        case DigitUtils::DigitChars::UE_Char: {
+                            is_real = true;
+                            break;
                         }
 
                         default: {
-                            if (o_offset != offset) {
-                                if ((offset < max_end_offset) || ((flags & stringToNumberFlags::OverFlow) == 0U)) {
-                                    if ((flags & stringToNumberFlags::Real) == 0U) {
-                                        if ((flags & stringToNumberFlags::Negative) == 0U) {
-                                            return QNumberType::Natural;
-                                        }
-
-                                        if (number.Integer != 0) {
-                                            number.Integer = -number.Integer;
-                                            return QNumberType::Integer;
-                                        }
-                                    }
-
-                                    number.Real = double(number.Natural);
-
-                                    if ((flags & stringToNumberFlags::MergedExponent) == 0U) {
-                                        exponent = (unsigned int)(offset)-exponent;
-                                        flags |= stringToNumberFlags::NegativeExponent;
-                                    }
-
-                                    if (((flags & stringToNumberFlags::NegativeExponent) != 0U)) {
-                                        powerOfNegativeTen(number.Real, exponent);
-                                    } else {
-                                        powerOfTen(number.Real, exponent);
-                                    }
-
-                                    if ((flags & stringToNumberFlags::Negative) != 0) {
-                                        number.Real = -number.Real;
-                                    }
-
-                                    return QNumberType::Real;
+                            if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                                (digit <= DigitUtils::DigitChars::NineChar)) {
+                                if ((number.Natural > 0x1999999999999999ULL) ||
+                                    ((number.Natural == 0x1999999999999999ULL) &&
+                                     (digit > DigitUtils::DigitChars::FiveChar))) {
+                                    is_real = true;
+                                    break;
                                 }
 
-                                return roundNumber(number, exponent, flags, content, offset, end_offset);
-                            }
+                                number.Natural *= 10ULL;
+                                number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                                ++offset;
+                                ++tmp_offset;
 
-                            return QNumberType::NotANumber;
+                                if (offset < end_offset) {
+                                    digit = content[offset];
+
+                                    switch (digit) {
+                                        case DigitUtils::DigitChars::DotChar:
+                                        case DigitUtils::DigitChars::E_Char:
+                                        case DigitUtils::DigitChars::UE_Char: {
+                                            is_real = true;
+                                            break;
+                                        }
+
+                                        default: {
+                                            if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                                                (digit <= DigitUtils::DigitChars::NineChar)) {
+                                                is_real = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+                ///////////////////////////////////////////////////////////
+                if (!is_real) {
+                    if (!is_negative) {
+                        return QNumberType::Natural;
+                    }
+
+                    if (number.Natural == 0ULL) {
+                        number.Natural |= 0x8000000000000000ULL;
+                        return QNumberType::Real;
+                    }
+
+                    if (number.Natural <= 0x7FFFFFFFFFFFFFFFULL) {
+                        number.Integer = -number.Integer;
+                        return QNumberType::Integer;
+                    }
+                }
+                ///////////////////////////////////////////////////////////
+                if (number.Natural != 0ULL) {
+                    const unsigned int e_p10_power =
+                        ((unsigned int)(tmp_offset - start_offset) - (unsigned int)(!fraction_only && has_dot));
+
+                    const unsigned int e_n10_power =
+                        (fraction_only ? (e_p10_power + ((unsigned int)(start_offset - dot_offset) - 1U))
+                                       : (has_dot ? ((unsigned int)(offset - dot_offset) - 1U) : 0U));
+
+                    // const unsigned int e_n10_power =
+                    //     (fraction_only
+                    //          ? ((tmp_offset - start_offset) + ((unsigned int)(start_offset - dot_offset) - 1U))
+                    //          : (has_dot ? ((unsigned int)(offset - dot_offset) - 1U) : 0U));
+
+                    unsigned int exponent        = 0;
+                    bool         is_negative_exp = false;
+                    bool         keep_going      = (offset < end_offset);
+                    ///////////////////////////////////////////////////////////
+                    tmp_offset   = dot_offset;
+                    start_offset = offset;
+                    ///////////////////////////////////////////////////////////
+                    while (keep_going) {
+                        digit = content[offset];
+
+                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                            ++offset;
+                            keep_going = (offset < end_offset);
+                            continue;
+                        }
+
+                        switch (content[offset]) {
+                            case DigitUtils::DigitChars::DotChar: {
+                                if (!has_dot) {
+                                    dot_offset = offset;
+                                    ++offset;
+                                    has_dot    = true;
+                                    keep_going = (offset < end_offset);
+                                    continue;
+                                }
+
+                                return QNumberType::NotANumber;
+                            }
+
+                            case DigitUtils::DigitChars::E_Char:
+                            case DigitUtils::DigitChars::UE_Char: {
+                                exp_offset = offset;
+                                ++offset;
+
+                                if (parseExponent(content, exponent, is_negative_exp, offset, end_offset)) {
+                                    keep_going = false;
+                                    continue;
+                                }
+
+                                return QNumberType::NotANumber;
+                            }
+
+                            default:
+                                keep_going = false;
+                                break;
+                        }
+                    }
+                    ///////////////////////////////////////
+                    unsigned int e_extra_p10_power = 0;
+
+                    if (!fraction_only && (start_offset != offset)) {
+                        if (!has_dot) {
+                            e_extra_p10_power = (unsigned int)((exp_offset == SizeT{0}) ? (offset - start_offset)
+                                                                                        : (exp_offset - start_offset));
+                        } else if (dot_offset != tmp_offset) {
+                            e_extra_p10_power = (unsigned int)(dot_offset - start_offset);
+                        }
+
+                        if (!is_negative_exp) {
+                            exponent += e_extra_p10_power;
+                        } else if (exponent <= e_extra_p10_power) {
+                            exponent        = (e_extra_p10_power - exponent);
+                            is_negative_exp = false;
+                        } else {
+                            exponent -= e_extra_p10_power;
+                        }
+                    }
+                    ///////////////////////////////////////
+                    if (is_negative_exp) {
+                        exponent += e_n10_power;
+
+                    } else if (exponent >= e_n10_power) {
+                        exponent -= e_n10_power;
+                    } else {
+                        exponent        = (e_n10_power - exponent);
+                        is_negative_exp = true;
+                    }
+
+                    if ((is_negative_exp && (exponent > e_p10_power) && ((exponent - e_p10_power) > 324U)) ||
+                        (!is_negative_exp && ((exponent + e_p10_power) > 309U))) {
+                        return QNumberType::NotANumber;
+                    }
+
+                    if (is_negative_exp) {
+                        SizeT fraction_end_offset = 0;
+
+                        fraction_end_offset = (exp_offset == SizeT{0}) ? offset : exp_offset;
+
+                        powerOfNegativeTen(number.Natural, content, start_offset, fraction_end_offset, exponent);
+                    } else {
+                        powerOfPositiveTen(number.Natural, content, start_offset,
+                                           (start_offset + SizeT(e_extra_p10_power)), exponent);
+                    }
+                }
+                ///////////////////////////////////////
+                if (is_negative) {
+                    number.Natural |= 0x8000000000000000ULL;
+                }
+
+                return QNumberType::Real;
             }
         }
 
         return QNumberType::NotANumber;
     }
+    /////////////////////////////////////////
+    template <typename Char_T_>
+    static void powerOfNegativeTen(unsigned long long &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
+                                   unsigned int exponent) noexcept {
+        using UNumber_T  = SystemIntType;
+        using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
+        //////////////////////////////////////////////////////////////
+        BigInt<UNumber_T, 320U> bint{number};
+        //////////////////////////////////////////////////////////////
+        constexpr unsigned int shift_limit = (sizeof(UNumber_T) * 8U);
+        unsigned int           shifted     = 0;
+        //////////////////////////////////////////////////////////////
+        if ((offset < end_offset) && (exponent != 0)) {
+            UNumber_T              num;
+            constexpr unsigned int max_digits = 40U;
+            const unsigned int     diff       = (unsigned int)(end_offset - offset);
+            unsigned int           length     = ((diff <= max_digits) ? diff : max_digits);
+            //////////////////////////////////////////////////////////////
+            end_offset = (offset + length);
+            exponent += length;
+            //////////////////////////////////////////////////////////////
+            while (length >= DigitLimit::MaxPowerOfTenDigits) {
+                length -= DigitLimit::MaxPowerOfTenDigits;
 
-  private:
-    //////////// Private ////////////
+                const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
+                num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                ++offset;
 
-    struct stringToNumberFlags {
-        static constexpr unsigned int Real             = 1U;
-        static constexpr unsigned int Negative         = 2U;
-        static constexpr unsigned int NegativeExponent = 4U;
-        static constexpr unsigned int MergedExponent   = 8U;
-        static constexpr unsigned int OverFlow         = 16U;
-    };
+                while (offset < sub_end_offset) {
+                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
+                        num *= UNumber_T{10};
+                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                    }
 
+                    ++offset;
+                }
+
+                bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
+                bint += num;
+            }
+            ////////////////////////////////////////////////////////////
+            if (offset < end_offset) {
+                num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                ++offset;
+
+                while (offset < end_offset) {
+                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
+                        num *= UNumber_T{10};
+                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                    }
+
+                    ++offset;
+                }
+
+                bint *= DigitLimit::PowerOfTen[length];
+                bint += num;
+            }
+        }
+
+        if (bint.Index() < 3) {
+            shifted += 64U;
+            bint <<= 64U;
+        }
+        //////////////////////////////////////////////////////////////
+        shifted += exponent;
+        //////////////////////////////////////////////////////////////
+        if constexpr (Config::Is64bit) {
+            while (exponent >= DigitLimit::MaxPowerOfFive) {
+                // 2**126 = 85070591730234615865843651857942052864
+                // 5**27 = 7450580596923828125
+                // 2**126 / 5**27 = 11417981541647679048.4
+                // 126-64=62; See 2**126 and shift_limit (for 64-bit)
+
+                bint *= DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][0U];
+                bint >>= shift_limit;
+                shifted += (unsigned int)(DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][1U]);
+                exponent -= DigitLimit::MaxPowerOfFive;
+            }
+
+            if (exponent != 0U) {
+                bint *= DigitLimit::PowerOfOneOverFive[exponent][0U];
+                bint >>= shift_limit;
+                shifted += (unsigned int)(DigitLimit::PowerOfOneOverFive[exponent][1U]);
+            }
+        } else {
+            while (exponent >= DigitLimit::MaxPowerOfFive) {
+                bint <<= shift_limit;
+                bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+                shifted += shift_limit;
+                exponent -= DigitLimit::MaxPowerOfFive;
+            }
+
+            if (exponent != 0U) {
+                bint <<= shift_limit;
+                bint /= DigitLimit::PowerOfFive[exponent];
+                shifted += shift_limit;
+            }
+        }
+        //////////////////////////////////////////////////////////////
+        unsigned int       exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
+        const unsigned int bit = bint.FindLastBit();
+
+        // if (bit <= 52U) {
+        //     number = (unsigned long long)(bint);
+        //     number <<= (53U - bit);
+        // } else {
+        bint >>= (bit - 53U);
+        number = (unsigned long long)(bint);
+        // }
+        //////////////////////////////////////////////////////////////
+        if (shifted <= bit) {
+            shifted = (bit - shifted);
+            exp += shifted;
+
+            number += (number & 1ULL);
+            number >>= 1U;
+            exp += (number > 0x1FFFFFFFFFFFFFULL);
+        } else {
+            shifted -= bit;
+
+            if (exp > shifted) {
+                exp -= shifted;
+                number += (number & 1ULL);
+                number >>= 1U;
+                exp += (number > 0x1FFFFFFFFFFFFFULL);
+            } else {
+                number >>= (shifted - exp) + 1U;
+                number += (number & 1ULL);
+                number >>= 1U;
+                exp = (number > 0xFFFFFFFFFFFFFULL);
+            }
+        }
+
+        number &= 0xFFFFFFFFFFFFFULL;
+        number |= ((unsigned long long)(exp) << 52U);
+    }
+    /////////////////////////////////////////
+    template <typename Char_T_>
+    static void powerOfPositiveTen(unsigned long long &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
+                                   unsigned int exponent) noexcept {
+        using UNumber_T  = SystemIntType;
+        using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
+        //////////////////////////////////////////////////////////////
+        BigInt<UNumber_T, 192U> bint{number};
+        //////////////////////////////////////////////////////////////
+        constexpr unsigned int bint_limit  = 2U;
+        constexpr unsigned int shift_limit = (sizeof(UNumber_T) * 8U);
+        unsigned int           shifted     = 0;
+        //////////////////////////////////////////////////////////////
+        if ((offset < end_offset) && (exponent != 0)) {
+            UNumber_T              num;
+            constexpr unsigned int max_digits = 30U;
+            const unsigned int     diff       = (unsigned int)(end_offset - offset);
+            unsigned int           length     = ((diff <= max_digits) ? diff : max_digits);
+            //////////////////////////////////////////////////////////////
+            if (exponent >= length) {
+                end_offset = (offset + length);
+                exponent -= length;
+            } else {
+                end_offset = (offset + exponent);
+                length     = (end_offset - offset);
+                exponent   = 0;
+            }
+            //////////////////////////////////////////////////////////////
+            while (length >= DigitLimit::MaxPowerOfTenDigits) {
+                length -= DigitLimit::MaxPowerOfTenDigits;
+
+                const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
+                num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                ++offset;
+
+                while (offset < sub_end_offset) {
+                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
+                        num *= UNumber_T{10};
+                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                    }
+
+                    ++offset;
+                }
+
+                bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
+                bint += num;
+            }
+            //////////////////////////////////////////////////////////////
+            if (offset < end_offset) {
+                num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                ++offset;
+
+                while (offset < end_offset) {
+                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
+                        num *= UNumber_T{10};
+                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+                    }
+
+                    ++offset;
+                }
+
+                bint *= DigitLimit::PowerOfTen[length];
+                bint += num;
+            }
+        }
+        //////////////////////////////////////////////////////////////
+        shifted += exponent;
+
+        while (exponent >= DigitLimit::MaxPowerOfFive) {
+            bint *= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+
+            if (bint.Index() > bint_limit) {
+                bint >>= shift_limit;
+                shifted += shift_limit;
+            }
+
+            exponent -= DigitLimit::MaxPowerOfFive;
+        }
+
+        if (exponent != 0U) {
+            bint *= DigitLimit::PowerOfFive[exponent];
+        }
+        //////////////////////////////////////////////////////////////
+        const unsigned int bit = bint.FindLastBit();
+
+        if (bit <= 52U) {
+            number = (unsigned long long)(bint);
+            number <<= (52U - bit);
+        } else {
+            bint >>= (bit - 53U);
+            number = (unsigned long long)(bint);
+            number += (unsigned long long)(number & 1ULL);
+            number >>= 1U;
+            shifted += (unsigned int)(number > 0x1FFFFFFFFFFFFFULL);
+        }
+        //////////////////////////////////////////////////////////////
+        unsigned long long exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
+        exp += bit;
+        exp += shifted;
+        exp <<= 52U;
+        number &= 0xFFFFFFFFFFFFFULL;
+        number |= exp;
+    }
+    /////////////////////////////////////////
+    template <typename Char_T_>
+    static bool parseExponent(const Char_T_ *content, unsigned int &exponent, bool &is_negative_exp, SizeT &offset,
+                              const SizeT end_offset) noexcept {
+        bool sign_set = false;
+
+        while (offset < end_offset) {
+            switch (content[offset]) {
+                case DigitUtils::DigitChars::PositiveChar: {
+                    if (!sign_set) {
+                        ++offset;
+                        sign_set = true;
+                        break;
+                    }
+
+                    return false;
+                }
+                case DigitUtils::DigitChars::NegativeChar: {
+                    if (!sign_set) {
+                        ++offset;
+                        is_negative_exp = true;
+                        sign_set        = true;
+                        break;
+                    }
+
+                    return false;
+                }
+
+                default: {
+                    const SizeT o_offset = offset;
+
+                    while (offset < end_offset) {
+                        const Char_T_ digit = content[offset];
+
+                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
+                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                            exponent *= 10ULL;
+                            exponent += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                            ++offset;
+                            continue;
+                        }
+
+                        break;
+                    }
+
+                    return (o_offset != offset);
+                }
+            }
+        }
+
+        return false;
+    }
+    /////////////////////////////////////////
     template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
     QENTEM_NOINLINE static SizeT intToString(Char_T_ *storage, Number_T_ number) noexcept {
         const Char_T_ *str = storage;
@@ -270,9 +756,9 @@ struct Digit {
                 number /= Number_T_{100};
 
                 --storage;
-                *storage = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
+                *storage = Char_T_(DigitUtils::DigitTable1[index + SizeT{1}]);
                 --storage;
-                *storage = Char_T_(DigitUtils::DigitTable[index]);
+                *storage = Char_T_(DigitUtils::DigitTable1[index]);
             }
 
             if ((number != 0) || (str == storage)) {
@@ -286,9 +772,9 @@ struct Digit {
                 const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
                 number /= Number_T_{100};
 
-                *storage = Char_T_(DigitUtils::DigitTable[index + SizeT{1}]);
+                *storage = Char_T_(DigitUtils::DigitTable1[index + SizeT{1}]);
                 ++storage;
-                *storage = Char_T_(DigitUtils::DigitTable[index]);
+                *storage = Char_T_(DigitUtils::DigitTable1[index]);
                 ++storage;
             }
 
@@ -300,310 +786,58 @@ struct Digit {
             return SizeT(storage - str);
         }
     }
+    /////////////////////////////////////////
+    template <typename Float_T_, typename Stream_T_, typename Number_T_>
+    static void realToString(Stream_T_ &stream, const Number_T_ number, const RealFormatInfo format) {
+        using Char_T_  = typename Stream_T_::CharType;
+        using Bucket_T = typename bestFitNumberType<Number_T_, Config::Is64bit>::NumberType_;
+        using Info_T   = DigitUtils::RealNumberInfo<Float_T_, sizeof(number)>;
 
-    template <typename Char_T_>
-    QENTEM_NOINLINE static int exponentToNumber(unsigned int &exponent, unsigned int &flags, const Char_T_ *content,
-                                                SizeT &offset, SizeT end_offset) noexcept {
-        flags |= stringToNumberFlags::Real;
-        flags |= stringToNumberFlags::MergedExponent;
-
-        ++offset;
-        Char_T_ digit = content[offset];
-
-        switch (digit) {
-            case DigitUtils::DigitChars::NegativeChar: {
-                flags |= stringToNumberFlags::NegativeExponent;
-                ++offset;
-                break;
-            }
-
-            case DigitUtils::DigitChars::PositiveChar: {
-                ++offset;
-                break;
-            }
-
-            default: {
-                if ((digit < DigitUtils::DigitChars::ZeroChar) || (digit > DigitUtils::DigitChars::NineChar)) {
-                    return false;
-                }
-            }
-        }
-
-        const SizeT  sci_offset   = offset;
-        unsigned int sci_exponent = 0U;
-
-        while (offset < end_offset) {
-            digit = content[offset];
-
-            if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
-                sci_exponent *= 10ULL;
-                sci_exponent += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
-                ++offset;
-                continue;
-            }
-
-            break;
-        }
-
-        if ((flags & stringToNumberFlags::NegativeExponent) == 0U) {
-            if (exponent <= sci_exponent) {
-                exponent = (sci_exponent - exponent);
-            } else {
-                exponent = (exponent - sci_exponent);
-                flags |= stringToNumberFlags::NegativeExponent;
-            }
-        } else {
-            exponent += sci_exponent;
-        }
-
-        return (sci_offset != offset);
-    }
-
-    template <typename Char_T_>
-    QENTEM_NOINLINE static QNumberType roundNumber(QNumber &number, unsigned int &exponent, unsigned int &flags,
-                                                   const Char_T_ *content, SizeT &offset, SizeT end_offset) noexcept {
-        const SizeT  last_offset   = offset;
-        unsigned int exponent_diff = 0U;
-        Char_T_      digit         = 0;
-        bool         keep_on       = true;
-        bool         is_diff_set   = false;
-
-        while ((offset < end_offset) && keep_on) {
-            do {
-                digit = content[offset];
-
-                if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
-                    ++offset;
-                    continue;
-                }
-
-                break;
-            } while (offset < end_offset);
-
-            switch (digit) {
-                case DigitUtils::DigitChars::DotChar: {
-                    exponent_diff = (unsigned int)(offset - last_offset);
-                    is_diff_set   = true;
-
-                    ++offset;
-                    continue;
-                }
-
-                case DigitUtils::DigitChars::E_Char:
-                case DigitUtils::DigitChars::UE_Char: {
-                    if ((flags & stringToNumberFlags::Real) == 0U) {
-                        flags |= stringToNumberFlags::Real;
-
-                        if (!is_diff_set) {
-                            exponent_diff = (unsigned int)(offset - last_offset);
-                        }
-                    } else {
-                        exponent = ((unsigned int)(last_offset)-exponent);
-                    }
-
-                    if ((offset < end_offset) && exponentToNumber(exponent, flags, content, offset, end_offset)) {
-                        keep_on = false;
-                        continue;
-                    }
-
-                    return QNumberType::NotANumber;
-                }
-
-                default: {
-                    if (((flags & stringToNumberFlags::Real) == 0U) && !is_diff_set) {
-                        exponent_diff = (unsigned int)(offset);
-                        exponent_diff -= last_offset;
-                    }
-
-                    keep_on = false;
-                }
-            }
-        }
-
-        if ((flags & stringToNumberFlags::Real) == 0U) {
-            if ((exponent_diff == 0U) || ((exponent_diff == 1U) && (number.Natural < 0x2000000000000000ULL))) {
-                digit                  = content[last_offset];
-                unsigned long long tmp = number.Natural;
-
-                if ((digit >= DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
-                    tmp *= 10U;
-                    tmp += ((unsigned long long)(digit)-DigitUtils::DigitChars::ZeroChar);
-
-                    if ((flags & stringToNumberFlags::Negative) != 0) {
-                        tmp &= 0x7FFFFFFFFFFFFFFFULL;
-                    }
-
-                    if (tmp > number.Natural) {
-                        number.Natural = tmp;
-                    } else {
-                        flags |= stringToNumberFlags::Real;
-                    }
-                }
-            } else {
-                flags |= stringToNumberFlags::Real;
-            }
-        }
-
-        if ((flags & stringToNumberFlags::Real) != 0U) {
-            if (exponent != 0 && ((flags & stringToNumberFlags::MergedExponent) == 0U)) {
-                exponent = ((unsigned int)(last_offset)-exponent);
-                flags |= stringToNumberFlags::NegativeExponent;
-            }
-
-            if (exponent_diff != 0) {
-                if ((flags & stringToNumberFlags::NegativeExponent) == 0U) {
-                    exponent += exponent_diff;
-                } else {
-                    if (exponent < exponent_diff) {
-                        exponent = (exponent_diff - exponent);
-                        flags ^= stringToNumberFlags::NegativeExponent;
-                    } else {
-                        exponent -= exponent_diff;
-                    }
-                }
-            }
-
-            number.Real = double(number.Natural);
-
-            if (((flags & stringToNumberFlags::NegativeExponent) != 0U)) {
-                powerOfNegativeTen(number.Real, exponent);
-            } else {
-                powerOfTen(number.Real, exponent);
-            }
-
-            if ((flags & stringToNumberFlags::Negative) != 0U) {
-                number.Real = -number.Real;
-            }
-
-            if (number.Natural != 9218868437227405312ULL) {
-                return QNumberType::Real;
-            }
-
-            return QNumberType::NotANumber;
-        }
-
-        if ((flags & stringToNumberFlags::Negative) == 0U) {
-            return QNumberType::Natural;
-        }
-
-        if (number.Integer != 0) {
-            number.Integer = -number.Integer;
-            return QNumberType::Integer;
-        }
-
-        return QNumberType::NotANumber;
-    }
-
-    static void powerOfTen(double &number, unsigned int exponent) noexcept {
-        while (exponent >= 100U) {
-            number *= 1e100;
-            exponent -= 100U;
-        }
-
-        while (exponent >= 10U) {
-            number *= 1e10;
-            exponent -= 10U;
-        }
-
-        while (exponent > 0U) {
-            number *= 10U;
-            --exponent;
-        }
-    }
-
-    static void powerOfNegativeTen(double &number, unsigned int exponent) noexcept {
-        while (exponent >= 100U) {
-            number /= 1e100;
-            exponent -= 100U;
-        }
-
-        while (exponent >= 10U) {
-            number /= 1e10;
-            exponent -= 10U;
-        }
-
-        while (exponent > 0U) {
-            number /= 10U;
-            --exponent;
-        }
-    }
-
-    // ------------------------------------------------------
-    // struct RealFormatType {
-    // static constexpr unsigned int Default = 0U;
-    // static constexpr unsigned int Fixed      = 1U;
-    // static constexpr unsigned int Scientific = 2U;
-    // };
-
-    // struct RealFormatInfo {
-    //     RealFormatInfo() noexcept : Precision{6U}, Type{RealFormatType::Default} {
-    //     }
-
-    //     RealFormatInfo(unsigned int precision, unsigned int type) noexcept : Precision{precision}, Type{type} {
-    //     }
-
-    //     unsigned int Precision;
-    //     unsigned int Type;
-    // };
-
-    template <typename Stream_T_, typename Number_T_>
-    static void realToString(Stream_T_ &stream, const Number_T_ number, const unsigned int precision) {
-        using Char_T_ = typename Stream_T_::CharType;
-        using Info_T  = DigitUtils::RealNumberInfo<Number_T_>;
-        const Info_T info{number};
-        using UNumber_T = decltype(info.NaturalNumber);
-
-#ifdef QENTEM_64BIT_ARCH
-        using Bucket_T = UNumber_T;
-#else
-        using Bucket_T = unsigned int;
-#endif
-
-        using DigitLimit     = DigitUtils::DigitLimit<Bucket_T, sizeof(Bucket_T)>;
-        const UNumber_T bias = (info.NaturalNumber & Info_T::ExponentMask);
+        const Number_T_ bias = (number & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
-            if (info.NaturalNumber & Info_T::SignMask) {
+            if ((number & Info_T::SignMask) != 0) {
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
 
-            UNumber_T mantissa = (info.NaturalNumber & Info_T::MantissaMask);
+            Number_T_ mantissa = (number & Info_T::MantissaMask);
 
-            if ((mantissa != UNumber_T{0}) || (bias != UNumber_T{0})) {
-                if (bias != UNumber_T{0}) {
+            if ((mantissa != Number_T_{0}) || (bias != Number_T_{0})) {
+                if (bias != Number_T_{0}) {
                     mantissa |= Info_T::LeadingBit;
                 } else {
                     mantissa <<= 1U;
                 }
 
-                BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(UNumber_T) * 8U * 3U))> b_int{mantissa};
+                BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(Number_T_) * 8U * 3U))> bint{mantissa};
+                using DigitLimit = DigitUtils::DigitLimit<bint.SizeOfType()>;
                 /////////////////////////////////////
-                const unsigned int first_shift      = Platform::CTZ(mantissa);
+                const unsigned int first_shift      = Platform::FindFirstBit(mantissa);
                 const int          exponent         = (int)((bias >> Info_T::MantissaSize) - Info_T::Bias);
                 const bool         is_positive_exp  = (exponent >= 0);
                 const unsigned int positive_exp     = (unsigned int)(is_positive_exp ? exponent : -exponent);
                 const unsigned int first_bit        = (Info_T::MantissaSize - first_shift);
-                const unsigned int exp_actual_value = (positive_exp + ((bias == UNumber_T{0}) * first_bit));
+                const unsigned int exp_actual_value = (positive_exp + ((bias == Number_T_{0}) * first_bit));
                 const unsigned int digits           = (((exp_actual_value * 30103U) / 100000U) + 1U);
                 unsigned int       fraction_length  = 0;
-                const bool         extra_digits     = (digits > precision);
+                const bool         extra_digits     = (digits > format.Precision);
                 bool               round_up         = false;
                 const bool         big_offset       = (positive_exp >= first_bit);
                 const bool         no_fraction      = (is_positive_exp && (big_offset || extra_digits));
                 /////////////////////////////////////
                 if (no_fraction) {
-                    const unsigned int drop    = (!extra_digits) ? 0 : (digits - (precision + 1U));
+                    const unsigned int drop    = ((!extra_digits) ? 0U : (digits - (format.Precision + 1U)));
                     const unsigned int m_shift = (Info_T::MantissaSize + drop);
 
                     if (m_shift < positive_exp) {
-                        b_int <<= (positive_exp - m_shift);
+                        bint <<= (positive_exp - m_shift);
                     } else {
-                        b_int >>= (m_shift - positive_exp);
+                        bint >>= (m_shift - positive_exp);
                     }
 
                     if (drop != 0U) {
                         round_up = true;
-                        bigIntDropDigits<Bucket_T>(b_int, drop);
+                        bigIntDropDigits(bint, drop);
                     }
                 } else {
                     unsigned int shift  = 0U;
@@ -614,14 +848,14 @@ struct Digit {
                         fraction_length -= positive_exp;
 
                         if (extra_digits) {
-                            needed = (digits - precision);
+                            needed = (digits - format.Precision);
                         } else {
-                            needed = (precision - digits);
+                            needed = (format.Precision - digits);
                         }
                     } else {
                         fraction_length += positive_exp;
 
-                        needed = (digits + precision);
+                        needed = (digits + format.Precision);
                     }
 
                     ++needed; // For rounding.
@@ -632,44 +866,48 @@ struct Digit {
                         round_up        = true;
                     }
 
-                    b_int >>= first_shift;
+                    bint >>= first_shift;
 
                     unsigned int times = fraction_length;
 
-                    if (times >= DigitLimit::MaxPowerOfFiveDrop) {
-                        const unsigned int max_index = (precision < Info_T::MaxCut)
-                                                           ? ((precision / DigitLimit::PowerOfTenDigits) + 2U)
-                                                           : b_int.MaxIndex;
+                    if (times >= DigitLimit::MaxPowerOfFive) {
+                        const unsigned int max_index = (format.Precision < Info_T::MaxCut)
+                                                           ? ((format.Precision / DigitLimit::MaxPowerOfTenDigits) + 2U)
+                                                           : bint.MaxIndex();
 
                         do {
-                            b_int.MultiplyBy(DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFiveDrop]);
-                            times -= DigitLimit::MaxPowerOfFiveDrop;
+                            bint *= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
 
-                            if ((b_int.GetIndex() >= max_index) && (shift >= DigitLimit::MaxPowerOfFiveShift)) {
-                                b_int.ShiftRight(DigitLimit::MaxPowerOfFiveShift);
+                            if ((bint.Index() >= max_index) && (shift >= DigitLimit::MaxPowerOfFiveShift)) {
+                                bint >>= DigitLimit::MaxPowerOfFiveShift;
                                 shift -= DigitLimit::MaxPowerOfFiveShift;
                             }
-                        } while (times >= DigitLimit::MaxPowerOfFiveDrop);
+
+                            times -= DigitLimit::MaxPowerOfFive;
+                        } while (times >= DigitLimit::MaxPowerOfFive);
                     }
 
                     if (times != 0U) {
-                        b_int.MultiplyBy(DigitLimit::PowerOfFive[times]);
+                        bint *= DigitLimit::PowerOfFive[times];
                     }
 
-                    b_int.ShiftRight(shift);
+                    bint >>= shift;
                 }
 
                 const SizeT start_at = stream.Length();
-                bigIntToString<Bucket_T>(stream, b_int);
-                formatStringNumber(stream, start_at, precision, digits, fraction_length, is_positive_exp, round_up);
+                bigIntToString(stream, bint);
+
+                // Only 'Default' is implemented
+                formatStringNumber(stream, start_at, format.Precision, digits, fraction_length, is_positive_exp,
+                                   round_up);
             } else {
                 stream += DigitUtils::DigitChars::ZeroChar;
             }
         } else {
             constexpr unsigned int size = sizeof(Char_T_);
 
-            if ((info.NaturalNumber & Info_T::MantissaMask) == UNumber_T{0}) {
-                if (info.NaturalNumber & Info_T::SignMask) {
+            if ((number & Info_T::MantissaMask) == Number_T_{0}) {
+                if ((number & Info_T::SignMask) != Number_T_{0}) {
                     stream += DigitUtils::DigitChars::NegativeChar;
                 }
 
@@ -694,41 +932,54 @@ struct Digit {
     }
 
     template <typename Stream_T_, typename Number_T_>
-    static void insertZeros(Stream_T_ &stream, const Number_T_ length) {
+    inline static void insertZeros(Stream_T_ &stream, const Number_T_ length) {
         using Char_T_               = typename Stream_T_::CharType;
         constexpr unsigned int size = sizeof(Char_T_);
         stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
     }
 
-    template <typename Number_T_, typename Stream_T_, typename BigInt_T_>
-    static void bigIntToString(Stream_T_ &stream, BigInt_T_ &b_int) {
-        using DigitLimit = DigitUtils::DigitLimit<Number_T_, sizeof(Number_T_)>;
+    template <typename Stream_T_, typename BigInt_T_>
+    static void bigIntToString(Stream_T_ &stream, BigInt_T_ &bint) {
+        using DigitLimit = DigitUtils::DigitLimit<BigInt_T_::SizeOfType()>;
 
-        while (b_int.IsBig()) {
+        while (bint.IsBig()) {
             const SizeT length = stream.Length();
-            NumberToString<true>(stream, b_int.DivideBy(DigitLimit::MaxPowerOfTenValue));
+            NumberToString<true>(stream, bint.DivideBy(DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits]));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            insertZeros(stream, (DigitLimit::PowerOfTenDigits - (stream.Length() - length)));
+            insertZeros(stream, (DigitLimit::MaxPowerOfTenDigits - (stream.Length() - length)));
         }
 
-        if (b_int.NotZero()) {
-            NumberToString<true>(stream, b_int.GetNumber());
+        if (bint.NotZero()) {
+            NumberToString<true>(stream, bint.Number());
         }
     }
 
-    template <typename Number_T_, typename BigInt_T_>
-    static void bigIntDropDigits(BigInt_T_ &b_int, unsigned int drop) noexcept {
-        using DigitLimit = DigitUtils::DigitLimit<Number_T_, sizeof(Number_T_)>;
+    template <typename BigInt_T_>
+    inline static void bigIntDropDigits(BigInt_T_ &bint, unsigned int drop) noexcept {
+        using DigitLimit = DigitUtils::DigitLimit<BigInt_T_::SizeOfType()>;
 
-        while (drop >= DigitLimit::MaxPowerOfFiveDrop) {
-            b_int.DivideBy(DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFiveDrop]);
-            drop -= DigitLimit::MaxPowerOfFiveDrop;
+        // if constexpr (Config::Is64bit) {
+        //     while (drop >= DigitLimit::MaxPowerOfFive) {
+        //         bint *= DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][0U];
+        //         bint >>= ((unsigned int)(DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][1U]) + 64U);
+        //         drop -= DigitLimit::MaxPowerOfFive;
+        //     }
+
+        //     if (drop != 0) {
+        //         bint *= DigitLimit::PowerOfOneOverFive[drop][0U];
+        //         bint >>= ((unsigned int)(DigitLimit::PowerOfOneOverFive[drop][1U]) + 64U);
+        //     }
+        // } else {
+        while (drop >= DigitLimit::MaxPowerOfFive) {
+            bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+            drop -= DigitLimit::MaxPowerOfFive;
         }
 
         if (drop != 0U) {
-            b_int.DivideBy(DigitLimit::PowerOfFive[drop]);
+            bint /= DigitLimit::PowerOfFive[drop];
         }
+        // }
     }
 
     template <typename Stream_T_>
@@ -768,12 +1019,12 @@ struct Digit {
                     ++power;
 
                     if (power < precision) {
-                        SizeT tmp = power;
+                        SizeT power_index = power;
 
                         do {
                             --index;
                             stream.Storage()[index] = DigitUtils::DigitChars::ZeroChar;
-                        } while (--tmp != 0);
+                        } while (--power_index != 0);
                     }
                 } else {
                     --power;
@@ -831,7 +1082,8 @@ struct Digit {
             ((number < last) &&
              ((*number > DigitUtils::DigitChars::FiveChar) ||
               ((*number == DigitUtils::DigitChars::FiveChar) &&
-               (round_up || ((unsigned int)(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U)))));
+               (round_up ||
+                (((unsigned int)(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U) != 0U)))));
 
         if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChars::NineChar)) {
@@ -845,6 +1097,19 @@ struct Digit {
             }
         }
     }
+
+    template <typename, bool S>
+    struct bestFitNumberType {};
+
+    template <typename Number_T_>
+    struct bestFitNumberType<Number_T_, true> {
+        using NumberType_ = Number_T_;
+    };
+
+    template <typename Number_T_>
+    struct bestFitNumberType<Number_T_, false> {
+        using NumberType_ = unsigned int;
+    };
 };
 
 } // namespace Qentem

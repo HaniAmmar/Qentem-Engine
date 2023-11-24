@@ -88,38 +88,57 @@ struct DigitChars {
     static constexpr char UW_Char      = 'W';
 };
 ///////////////////////////////////////////////////
-static const char DigitTable[]  = {"000102030405060708091011121314151617181920212223242526272829"
-                                    "303132333435363738394041424344454647484950515253545556575859"
-                                    "606162636465666768697071727374757677787980818283848586878889"
-                                    "90919293949596979899"};
+static const char DigitTable1[] = {"000102030405060708091011121314151617181920212223242526272829"
+                                   "303132333435363738394041424344454647484950515253545556575859"
+                                   "606162636465666768697071727374757677787980818283848586878889"
+                                   "90919293949596979899"};
 static const char DigitTable2[] = {"0123456789"};
 ///////////////////////////////////////////////////
-template <typename, unsigned int S>
+template <unsigned int Size_T>
 struct DigitLimit {};
 
-// uint32_t
-template <typename Number_T_>
-struct DigitLimit<Number_T_, 4U> {
-    static constexpr unsigned int MaxPowerOfFiveDrop  = 13U;
-    static constexpr unsigned int MaxPowerOfFiveShift = 32U;
-    static constexpr unsigned int MaxPowerOfTenValue  = 1000000000ULL;
-    static constexpr unsigned int PowerOfTenDigits    = 9U;
+// uint16_t
+template <>
+struct DigitLimit<2U> {
+    static constexpr unsigned int MaxPowerOfFiveShift = 16U;
+    static constexpr unsigned int MaxPowerOfFive      = 6U;
+    static constexpr unsigned int MaxPowerOfTenDigits = 4U;
 
-    static constexpr unsigned int PowerOfFive[] = {
-        // clang-format off
-        1U,5U,25U,125U,625U,3125U,15625U,78125U,390625U,
-        1953125U,9765625U,48828125U,244140625U,1220703125U
-        // clang-format on
-    };
+    static constexpr unsigned short PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
+    static constexpr unsigned short PowerOfTen[]  = {1U, 10U, 100U, 1000U, 10000U};
+
+    // static constexpr unsigned short PowerOfOneOverFive[][2U] = {
+    //     // 2^N/5
+    // };
+};
+
+// uint32_t
+template <>
+struct DigitLimit<4U> {
+    static constexpr unsigned int MaxPowerOfFiveShift = 32U;
+    static constexpr unsigned int MaxPowerOfFive      = 13U;
+    static constexpr unsigned int MaxPowerOfTenDigits = 9U;
+
+    static constexpr unsigned int PowerOfFive[] = {1U,       5U,        25U,        125U,       625U,
+                                                   3125U,    15625U,    78125U,     390625U,    1953125U,
+                                                   9765625U, 48828125U, 244140625U, 1220703125U};
+
+    static constexpr unsigned int PowerOfTen[] = {1U,      10U,      100U,      1000U,      10000U,
+                                                  100000U, 1000000U, 10000000U, 100000000U, 1000000000U};
+
+    static constexpr unsigned int PowerOfOneOverFive[][2U] = {
+        // 2^N/5
+        {1U, 0U},           {3435973837U, 2U},  {2748779070U, 4U},  {2199023256U, 6U},  {3518437209U, 9U},
+        {2814749768U, 11U}, {2251799814U, 13U}, {3602879702U, 16U}, {2882303762U, 18U}, {2305843010U, 20U},
+        {3689348815U, 23U}, {2951479052U, 25U}, {2361183242U, 27U}, {2361183242U, 27U}};
 };
 
 // uint64_t
-template <typename Number_T_>
-struct DigitLimit<Number_T_, 8U> {
-    static constexpr unsigned int       MaxPowerOfFiveDrop  = 27U;
-    static constexpr unsigned int       MaxPowerOfFiveShift = 64U;
-    static constexpr unsigned long long MaxPowerOfTenValue  = 10000000000000000000ULL;
-    static constexpr unsigned int       PowerOfTenDigits    = 19U;
+template <>
+struct DigitLimit<8U> {
+    static constexpr unsigned int MaxPowerOfFiveShift = 64U;
+    static constexpr unsigned int MaxPowerOfFive      = 27U;
+    static constexpr unsigned int MaxPowerOfTenDigits = 19U;
 
     static constexpr unsigned long long PowerOfFive[] = {
         // clang-format off
@@ -130,16 +149,55 @@ struct DigitLimit<Number_T_, 8U> {
         298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
         // clang-format on
     };
+
+    static constexpr unsigned long long PowerOfTen[] = {
+        // clang-format off
+        1ULL,
+        10ULL,
+        100ULL,
+        1000ULL,
+        10000ULL,
+        100000ULL,
+        1000000ULL,
+        10000000ULL,
+        100000000ULL,
+        1000000000ULL,
+        10000000000ULL,
+        100000000000ULL,
+        1000000000000ULL,
+        10000000000000ULL,
+        100000000000000ULL,
+        1000000000000000ULL,
+        10000000000000000ULL,
+        100000000000000000ULL,
+        1000000000000000000ULL,
+        10000000000000000000ULL
+        // clang-format on
+    };
+
+    static constexpr unsigned long long PowerOfOneOverFive[][2U] = {
+        // 2^N/5
+        // clang-format off
+        {1ULL,0U},
+        {14757395258967641293ULL, 2U},  {11805916207174113035ULL, 4U},  {9444732965739290428ULL, 6U},
+        {15111572745182864684ULL, 9U},  {12089258196146291748ULL, 11U}, {9671406556917033398ULL, 13U},
+        {15474250491067253437ULL, 16U}, {12379400392853802749ULL, 18U}, {9903520314283042200ULL, 20U},
+        {15845632502852867519ULL, 23U}, {12676506002282294015ULL, 25U}, {10141204801825835212ULL, 27U},
+        {16225927682921336340ULL, 30U}, {12980742146337069072ULL, 32U}, {10384593717069655258ULL, 34U},
+        {16615349947311448412ULL, 37U}, {13292279957849158730ULL, 39U}, {10633823966279326984ULL, 41U},
+        {17014118346046923174ULL, 44U}, {13611294676837538539ULL, 46U}, {10889035741470030831ULL, 48U},
+        {17422457186352049330ULL, 51U}, {13937965749081639464ULL, 53U}, {11150372599265311571ULL, 55U},
+        {17840596158824498514ULL, 58U}, {14272476927059598811ULL, 60U}, {11417981541647679048ULL, 62U}
+        // clang-format on
+    };
 };
 ///////////////////////////////////////////////////
-template <typename>
+template <typename, unsigned int S>
 struct RealNumberInfo {};
 
+// double
 template <>
-struct RealNumberInfo<double> {
-    explicit RealNumberInfo(double number) noexcept : RealNumber{number} {
-    }
-
+struct RealNumberInfo<double, 8U> {
     static constexpr unsigned int       Bias         = 1023U;
     static constexpr unsigned int       ExponentSize = 11U;
     static constexpr unsigned int       MantissaSize = 52U;
@@ -148,32 +206,50 @@ struct RealNumberInfo<double> {
     static constexpr unsigned long long MantissaMask = 0xFFFFFFFFFFFFFULL;
     static constexpr unsigned long long LeadingBit   = 0x10000000000000ULL;
     static constexpr unsigned int       MaxCut       = 300U;
-
-    union {
-        double             RealNumber;
-        unsigned long long NaturalNumber;
-    };
 };
 
+// float32
 template <>
-struct RealNumberInfo<float> {
-    explicit RealNumberInfo(float number) noexcept : RealNumber{number} {
-    }
-
+struct RealNumberInfo<float, 4U> {
     static constexpr unsigned int Bias         = 127U;
     static constexpr unsigned int ExponentSize = 8U;
     static constexpr unsigned int MantissaSize = 23U;
     static constexpr unsigned int SignMask     = 0x80000000U;
     static constexpr unsigned int ExponentMask = 0x7F800000U;
-    static constexpr unsigned int LeadingBit   = 0x800000U;
     static constexpr unsigned int MantissaMask = 0x7FFFFFU;
+    static constexpr unsigned int LeadingBit   = 0x800000U;
     static constexpr unsigned int MaxCut       = 30U;
-
-    union {
-        float        RealNumber;
-        unsigned int NaturalNumber;
-    };
 };
+
+#if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
+// float16_t, _Float16
+template <>
+struct RealNumberInfo<float16_t, 2U> {
+    static constexpr unsigned int   Bias         = 15U;
+    static constexpr unsigned int   ExponentSize = 5U;
+    static constexpr unsigned int   MantissaSize = 10U;
+    static constexpr unsigned short SignMask     = 0x8000U;
+    static constexpr unsigned short ExponentMask = 0x7C00U;
+    static constexpr unsigned short MantissaMask = 0x3FFU;
+    static constexpr unsigned short LeadingBit   = 0x400U;
+    static constexpr unsigned int   MaxCut       = 0U;
+};
+#endif
+
+#if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
+// // bfloat16_t
+template <>
+struct RealNumberInfo<bfloat16_t, 2U> {
+    static constexpr unsigned int   Bias         = 127U;
+    static constexpr unsigned int   ExponentSize = 8U;
+    static constexpr unsigned int   MantissaSize = 7U;
+    static constexpr unsigned short SignMask     = 0x8000U;
+    static constexpr unsigned short ExponentMask = 0x7F80U;
+    static constexpr unsigned short MantissaMask = 0x7FU;
+    static constexpr unsigned short LeadingBit   = 0x80U;
+    static constexpr unsigned int   MaxCut       = 0U;
+};
+#endif
 
 } // namespace Qentem::DigitUtils
 
