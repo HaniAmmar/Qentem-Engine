@@ -520,37 +520,17 @@ struct Digit {
         //////////////////////////////////////////////////////////////
         shifted += exponent;
         //////////////////////////////////////////////////////////////
-        if constexpr (Config::Is64bit) {
-            while (exponent >= DigitLimit::MaxPowerOfFive) {
-                // 2**126 = 85070591730234615865843651857942052864
-                // 5**27 = 7450580596923828125
-                // 2**126 / 5**27 = 11417981541647679048.4
-                // 126-64=62; See 2**126 and shift_limit (for 64-bit)
+        while (exponent >= DigitLimit::MaxPowerOfFive) {
+            bint <<= shift_limit;
+            bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+            shifted += shift_limit;
+            exponent -= DigitLimit::MaxPowerOfFive;
+        }
 
-                bint *= DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][0U];
-                bint >>= shift_limit;
-                shifted += (unsigned int)(DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][1U]);
-                exponent -= DigitLimit::MaxPowerOfFive;
-            }
-
-            if (exponent != 0U) {
-                bint *= DigitLimit::PowerOfOneOverFive[exponent][0U];
-                bint >>= shift_limit;
-                shifted += (unsigned int)(DigitLimit::PowerOfOneOverFive[exponent][1U]);
-            }
-        } else {
-            while (exponent >= DigitLimit::MaxPowerOfFive) {
-                bint <<= shift_limit;
-                bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
-                shifted += shift_limit;
-                exponent -= DigitLimit::MaxPowerOfFive;
-            }
-
-            if (exponent != 0U) {
-                bint <<= shift_limit;
-                bint /= DigitLimit::PowerOfFive[exponent];
-                shifted += shift_limit;
-            }
+        if (exponent != 0U) {
+            bint <<= shift_limit;
+            bint /= DigitLimit::PowerOfFive[exponent];
+            shifted += shift_limit;
         }
         //////////////////////////////////////////////////////////////
         unsigned int       exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
