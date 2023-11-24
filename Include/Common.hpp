@@ -25,14 +25,24 @@
 
 namespace Qentem {
 
+using NullType = decltype(nullptr);
+using Size32T  = unsigned int;
+using Size64T  = unsigned long long;
+
+#ifndef QENTEM_SIZE_T
+#define QENTEM_SIZE_T
+using SizeT = Size32T;
+#endif
+
 struct Config {
+    static constexpr unsigned int FloatDoublePrecision{15U};
+    static constexpr unsigned int TemplatePrecision{3U};
+    static constexpr unsigned int PointerSize{sizeof(void *)};
+    static constexpr bool         Is64bit{(PointerSize == 8U)};
+
 #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(_M_ARM64) || defined(__ppc64__) ||       \
     defined(__powerpc64__) || defined(__s390__)
 #define QENTEM_64BIT_ARCH 1
-    // static constexpr bool Is64bit = (sizeof(void *) == 8);
-    static constexpr bool Is64bit = true;
-#else
-    static constexpr bool Is64bit                 = false;
 #endif
     ///////////////////////////////////////////////
 #ifndef QENTEM_BIG_ENDIAN
@@ -42,9 +52,10 @@ struct Config {
 #endif
 /////////////////
 #if defined(QENTEM_BIG_ENDIAN) && (QENTEM_BIG_ENDIAN == 1)
-    static constexpr bool BigEndian = true;
+    static constexpr bool BigEndian{true};
 #else
-    static constexpr bool BigEndian               = false;
+    static constexpr bool BigEndian{false};
+#undef QENTEM_BIG_ENDIAN
 #endif
 ///////////////////////////////////////////////
 #ifdef QENTEM_64BIT_ARCH
@@ -58,39 +69,31 @@ struct Config {
 #endif
 /////////////////
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    static constexpr bool PointerTagging = true;
+    static constexpr bool PointerTagging{Is64bit};
+#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
+    static constexpr bool ShortStringOptimization{PointerTagging};
 #else
-    static constexpr bool PointerTagging          = false;
-#endif
-///////////////////////////////////////////////
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-#ifndef QENTEM_SSO
-// Short string optimization
-#define QENTEM_SSO 1
-#endif
-#else
+    static constexpr bool ShortStringOptimization{false};
 #undef QENTEM_SSO
 #endif
-/////////////////
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    static constexpr bool ShortStringOptimization = true;
 #else
-    static constexpr bool ShortStringOptimization = false;
+    static constexpr bool PointerTagging{false};
+    static constexpr bool ShortStringOptimization{false};
+#undef QENTEM_POINTER_TAGGING
 #endif
 
     ///////////////////////////////////////////////
+
 #ifndef QENTEM_AUTO_ESCAPE_HTML
 #define QENTEM_AUTO_ESCAPE_HTML 1
 #endif
 /////////////////
 #if defined(QENTEM_AUTO_ESCAPE_HTML) && (QENTEM_AUTO_ESCAPE_HTML == 1)
-    static constexpr bool AutoEscapeHTML = true;
+    static constexpr bool AutoEscapeHTML{true};
 #else
-    static constexpr bool AutoEscapeHTML          = false;
+    static constexpr bool AutoEscapeHTML{false};
+#undef QENTEM_AUTO_ESCAPE_HTML
 #endif
-
-    static constexpr unsigned int FloatDoublePrecision = 15U;
-    static constexpr unsigned int TemplatePrecision    = 3U;
 };
 ///////////////////////////////////////////////
 
@@ -119,41 +122,107 @@ struct Config {
 #define QENTEM_INLINE __attribute__((always_inline))
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
+//*********************************************
+template <unsigned int S>
+struct SystemIntTypeT {};
 
-#ifndef QENTEM_SIZE_T
-#define QENTEM_SIZE_T
-using SizeT = unsigned int;
+template <>
+struct SystemIntTypeT<8U> {
+    using NumberType_ = Size64T;
+};
 
-// inline static constexpr SizeT SizeTMax = SizeT(-1);
-#endif
+template <>
+struct SystemIntTypeT<4U> {
+    using NumberType_ = Size32T;
+};
 
-using NullType = decltype(nullptr);
-using Size32T  = unsigned int;
-using Size64T  = unsigned long long;
+using SystemIntType = typename SystemIntTypeT<Config::PointerSize>::NumberType_;
 
 enum class QNumberType : unsigned char { NotANumber = 0, Real = 1, Natural = 2, Integer = 3 };
 
-union QNumber {
-    QNumber() noexcept                           = default;
-    QNumber(QNumber &&) noexcept                 = default;
-    QNumber(const QNumber &) noexcept            = default;
-    QNumber &operator=(QNumber &&) noexcept      = default;
-    QNumber &operator=(const QNumber &) noexcept = default;
-    ~QNumber() noexcept                          = default;
+template <typename Type_>
+static constexpr bool IsFloat() {
+    return (Type_(0.5) != 0);
+}
 
-    explicit QNumber(unsigned long long number) noexcept : Natural{number} {
-    }
+template <typename Type_>
+static constexpr bool IsUnsigned() {
+    return (Type_(-1) > 0);
+}
 
-    explicit QNumber(long long number) noexcept : Integer{number} {
-    }
+union QNumber64 {
+    QNumber64() noexcept                             = default;
+    QNumber64(QNumber64 &&) noexcept                 = default;
+    QNumber64(const QNumber64 &) noexcept            = default;
+    QNumber64 &operator=(QNumber64 &&) noexcept      = default;
+    QNumber64 &operator=(const QNumber64 &) noexcept = default;
+    ~QNumber64() noexcept                            = default;
 
-    explicit QNumber(double number) noexcept : Real{number} {
+    template <typename Number_T_>
+    explicit QNumber64(Number_T_ num) noexcept {
+        if constexpr (IsFloat<Number_T_>()) {
+            Real = double(num);
+        } else if constexpr (IsUnsigned<Number_T_>()) {
+            Natural = (unsigned long long)(num);
+        } else {
+            Integer = (long long)(num);
+        }
     }
 
     unsigned long long Natural{0};
     long long          Integer;
     double             Real;
 };
+
+union QNumber32 {
+    QNumber32() noexcept                             = default;
+    QNumber32(QNumber32 &&) noexcept                 = default;
+    QNumber32(const QNumber32 &) noexcept            = default;
+    QNumber32 &operator=(QNumber32 &&) noexcept      = default;
+    QNumber32 &operator=(const QNumber32 &) noexcept = default;
+    ~QNumber32() noexcept                            = default;
+
+    template <typename Number_T_>
+    explicit QNumber32(Number_T_ num) noexcept {
+        if constexpr (IsFloat<Number_T_>()) {
+            Real = float(num);
+        } else if constexpr (IsUnsigned<Number_T_>()) {
+            Natural = (unsigned int)(num);
+        } else {
+            Integer = int(num);
+        }
+    }
+
+    unsigned int Natural{0};
+    int          Integer;
+    float        Real;
+};
+
+template <typename Number_T_>
+union QNumber16 {
+    QNumber16() noexcept                             = default;
+    QNumber16(QNumber16 &&) noexcept                 = default;
+    QNumber16(const QNumber16 &) noexcept            = default;
+    QNumber16 &operator=(QNumber16 &&) noexcept      = default;
+    QNumber16 &operator=(const QNumber16 &) noexcept = default;
+    ~QNumber16() noexcept                            = default;
+
+    explicit QNumber16(Number_T_ num) noexcept {
+        if constexpr (IsFloat<Number_T_>()) {
+            Real = Number_T_(num);
+        } else if constexpr (IsUnsigned<Number_T_>()) {
+            Natural = (unsigned int)(num);
+        } else {
+            Integer = int(num);
+        }
+    }
+
+    unsigned short Natural{0};
+    short          Integer;
+    Number_T_      Real; // float16 or whatever.
+};
+
+using QNumber = QNumber64;
 
 } // namespace Qentem
 
