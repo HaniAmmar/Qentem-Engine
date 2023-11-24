@@ -276,56 +276,56 @@ static void TestString2(TestHelper &helper) {
     helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
-#if defined(QENTEM_SSO) && (QENTEM_SSO == 1U)
-    char sstr[32];
-    str1.Reset();
-    for (SizeT i = 0; i < String8::ShortStringMax; i++) {
-        str1 += "A";
-        sstr[i] = 'A';
+    if constexpr (Config::ShortStringOptimization) {
+        char sstr[32];
+        str1.Reset();
+        for (SizeT i = 0; i < String8::ShortStringMax; i++) {
+            str1 += "A";
+            sstr[i] = 'A';
+        }
+
+        str1 += "_";
+        sstr[String8::ShortStringMax]     = '_';
+        sstr[String8::ShortStringMax + 1] = '\0';
+
+        helper.Equal(str1.Length(), (String8::ShortStringMax + 1U), "Length", __LINE__);
+        helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
+
+        str1.Reset();
+        SizeT sso_x = 0;
+        for (SizeT i = 3; i < String8::ShortStringMax; i++) {
+            str1 += "A";
+            sstr[sso_x] = 'A';
+            ++sso_x;
+        }
+
+        str1 += "_";
+        sstr[sso_x]   = '_';
+        sstr[++sso_x] = '\0';
+        helper.Equal(str1.Length(), (String8::ShortStringMax - 2U), "Length", __LINE__);
+        helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
+
+        str1 += "B";
+        sstr[sso_x]   = 'B';
+        sstr[++sso_x] = '\0';
+        helper.Equal(str1.Length(), (String8::ShortStringMax - 1), "Length", __LINE__);
+        helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
+
+        str1 += "_C";
+        sstr[sso_x]   = '_';
+        sstr[++sso_x] = 'C';
+        sstr[++sso_x] = '\0';
+        helper.Equal(str1.Length(), (String8::ShortStringMax + 1), "Length", __LINE__);
+        helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
     }
-
-    str1 += "_";
-    sstr[String8::ShortStringMax]     = '_';
-    sstr[String8::ShortStringMax + 1] = '\0';
-
-    helper.Equal(str1.Length(), (String8::ShortStringMax + 1U), "Length", __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
-    helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
-
-    str1.Reset();
-    SizeT sso_x = 0;
-    for (SizeT i = 3; i < String8::ShortStringMax; i++) {
-        str1 += "A";
-        sstr[sso_x] = 'A';
-        ++sso_x;
-    }
-
-    str1 += "_";
-    sstr[sso_x]   = '_';
-    sstr[++sso_x] = '\0';
-    helper.Equal(str1.Length(), (String8::ShortStringMax - 2U), "Length", __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
-    helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
-
-    str1 += "B";
-    sstr[sso_x]   = 'B';
-    sstr[++sso_x] = '\0';
-    helper.Equal(str1.Length(), (String8::ShortStringMax - 1), "Length", __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
-    helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
-
-    str1 += "_C";
-    sstr[sso_x]   = '_';
-    sstr[++sso_x] = 'C';
-    sstr[++sso_x] = '\0';
-    helper.Equal(str1.Length(), (String8::ShortStringMax + 1), "Length", __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
-    helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
-#endif
 
     str1.Reset();
     str1 += "a";
