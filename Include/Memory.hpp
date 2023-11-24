@@ -174,7 +174,7 @@ struct QuickSort {
 
 /////////////////////////////////////////////////////////////////////
 inline static SizeT AlignSize(SizeT n_size) noexcept {
-    const SizeT size = (SizeT{1} << Platform::CLZ(n_size));
+    const SizeT size = (SizeT{1} << Platform::FindLastBit(n_size));
 
     if (size < n_size) {
         return (size * SizeT{2});

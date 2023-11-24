@@ -100,167 +100,141 @@ namespace Qentem::Platform {
 
 #ifdef _MSC_VER
 
-#ifdef QENTEM_64BIT_ARCH
-inline static unsigned long CTZ(unsigned long long value) noexcept {
-    // 'value' should be bigger than zero.
-    unsigned long index = 0;
-    _BitScanForward64(&index, value);
-
-    return index;
-}
-
 template <typename Number_T_>
-inline static unsigned long CTZ(Number_T_ value) noexcept {
+inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    unsigned long index = 0;
-    _BitScanForward(&index, value);
+    constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
+    unsigned long          index = 0;
 
-    return index;
-}
-
-inline static unsigned long CLZ(unsigned long long value) noexcept {
-    // 'value' should be bigger than zero.
-    unsigned long index = 0;
-    _BitScanReverse64(&index, value);
-
-    return index;
-}
-
-template <typename Number_T_>
-inline static unsigned long CLZ(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
-    unsigned long index = 0;
-    _BitScanReverse(&index, value);
-
-    return index;
-}
-
-#else
-template <typename Number_T_>
-inline static unsigned int CTZ(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
-    constexpr unsigned int size     = (sizeof(Number_T_) * 8U);
-    constexpr unsigned int int_size = 32U;
-    unsigned long          index    = 0;
-
-    if constexpr (size == 64U) {
-        /// 01010101 <---
-        const unsigned long lower_bits = (unsigned long)(value);
-
-        if (lower_bits != 0U) {
-            _BitScanForward(&index, lower_bits);
-            return (unsigned int)(index);
+    if constexpr (Config::Is64bit) {
+        if constexpr (size == 64U) {
+            _BitScanForward64(&index, (unsigned long long)(value));
+        } else {
+            _BitScanForward(&index, (unsigned long)(value));
         }
 
-        value >>= int_size;
-        _BitScanForward(&index, (unsigned long)(value));
-        return ((unsigned int)(index) + int_size);
-    } else {
-        _BitScanForward(&index, (unsigned long)(value));
         return (unsigned int)(index);
+    } else {
+        constexpr unsigned int int_size = 32U;
+
+        if constexpr (size == 64U) {
+            /// 01010101 <---
+            const unsigned long lower_bits = (unsigned long)(value);
+
+            if (lower_bits != 0U) {
+                _BitScanForward(&index, lower_bits);
+                return (unsigned int)(index);
+            }
+
+            value >>= int_size;
+            _BitScanForward(&index, (unsigned long)(value));
+            return ((unsigned int)(index) + int_size);
+        } else {
+            _BitScanForward(&index, (unsigned long)(value));
+            return (unsigned int)(index);
+        }
     }
 }
 
 template <typename Number_T_>
-inline static unsigned int CLZ(Number_T_ value) noexcept {
+inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size     = (sizeof(Number_T_) * 8U);
-    constexpr unsigned int int_size = 32U;
-    unsigned long          index    = 0;
+    constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
+    unsigned long          index = 0;
 
-    if constexpr (size == 64U) {
-        /// 01010101 <---
-        const unsigned long lower_bits = (unsigned long)(value);
-        value >>= int_size;
-
-        if (value == Number_T_{0}) {
-            _BitScanReverse(&index, lower_bits);
-            return (unsigned int)(index);
+    if constexpr (Config::Is64bit) {
+        if constexpr (size == 64U) {
+            _BitScanReverse64(&index, (unsigned long long)(value));
+        } else {
+            _BitScanReverse(&index, (unsigned long)(value));
         }
 
-        _BitScanReverse(&index, (unsigned long)(value));
-        return ((unsigned int)(index) + int_size);
-    } else {
-        _BitScanReverse(&index, (unsigned long)(value));
         return (unsigned int)(index);
+    } else {
+        constexpr unsigned int int_size = 32U;
+
+        if constexpr (size == 64U) {
+            /// 01010101 <---
+            const unsigned long lower_bits = (unsigned long)(value);
+            value >>= int_size;
+
+            if (value == Number_T_{0}) {
+                _BitScanReverse(&index, lower_bits);
+                return (unsigned int)(index);
+            }
+
+            _BitScanReverse(&index, (unsigned long)(value));
+            return ((unsigned int)(index) + int_size);
+        } else {
+            _BitScanReverse(&index, (unsigned long)(value));
+            return (unsigned int)(index);
+        }
     }
 }
-#endif
-///////////////////////////////////////
+
 #else
 
-#ifdef QENTEM_64BIT_ARCH
-
 template <typename Number_T_>
-inline static unsigned int CTZ(Number_T_ value) noexcept {
+inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U);
 
-    if (size == 64U) {
-        return (unsigned int)(__builtin_ctzl((unsigned long)(value)));
-    }
+    if constexpr (Config::Is64bit) {
+        if constexpr (size == 64U) {
+            return (unsigned int)(__builtin_ctzl((unsigned long)(value)));
+        }
 
-    return (unsigned int)(__builtin_ctz((unsigned int)(value)));
+        return (unsigned int)(__builtin_ctz((unsigned int)(value)));
+    } else {
+        constexpr unsigned int int_size = 32U;
+
+        if constexpr (size == 64U) {
+            /// 01010101 <---
+            const unsigned int lower_bits = (unsigned int)(value);
+
+            if (lower_bits != 0U) {
+                return (unsigned int)(__builtin_ctz(lower_bits));
+            }
+
+            value >>= int_size;
+            return ((unsigned int)(__builtin_ctz((unsigned int)(value))) + int_size);
+        }
+
+        return (unsigned int)(__builtin_ctz((unsigned int)(value)));
+    }
 }
 
 template <typename Number_T_>
-inline static unsigned int CLZ(Number_T_ value) noexcept {
+inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
+    // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U) - 1U;
-    // 'value' should be bigger than zero.
 
-    if (size == 63U) {
-        return (size - (unsigned int)(__builtin_clzl((unsigned long)(value))));
-    }
-
-    return (size - (unsigned int)(__builtin_clz((unsigned int)(value))));
-}
-
-#else
-
-template <typename Number_T_>
-inline static unsigned int CTZ(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
-    constexpr unsigned int size     = (sizeof(Number_T_) * 8U);
-    constexpr unsigned int int_size = 32U;
-
-    if (size == 64U) {
-        /// 01010101 <---
-        const unsigned int lower_bits = (unsigned int)(value);
-
-        if (lower_bits != 0U) {
-            return (unsigned int)(__builtin_ctz(lower_bits));
+    if constexpr (Config::Is64bit) {
+        if constexpr (size == 63U) {
+            return (size - (unsigned int)(__builtin_clzl((unsigned long)(value))));
         }
 
-        value >>= int_size;
-        return ((unsigned int)(__builtin_ctz((unsigned int)(value))) + int_size);
-    }
+        return (size - (unsigned int)(__builtin_clz((unsigned int)(value))));
+    } else {
+        constexpr unsigned int int_size   = 32U;
+        constexpr unsigned int taken_size = (int_size - 1U);
 
-    return (unsigned int)(__builtin_ctz((unsigned int)(value)));
-}
+        if constexpr (size == 64U) {
+            /// ---> 01010101
+            const unsigned int lower_bits = (unsigned int)(value);
+            value >>= int_size;
 
-template <typename Number_T_>
-inline static unsigned int CLZ(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
-    constexpr unsigned int size       = (sizeof(Number_T_) * 8U);
-    constexpr unsigned int int_size   = 32U;
-    constexpr unsigned int taken_size = (int_size - 1U);
+            if (value == Number_T_{0}) {
+                return (taken_size - (unsigned int)(__builtin_clz(lower_bits)));
+            }
 
-    if (size == 64U) {
-        /// ---> 01010101
-        const unsigned int lower_bits = (unsigned int)(value);
-        value >>= int_size;
-
-        if (value == Number_T_{0}) {
-            return (taken_size - (unsigned int)(__builtin_clz(lower_bits)));
+            return ((taken_size - (unsigned int)(__builtin_clz((unsigned int)(value)))) + int_size);
         }
 
-        return ((taken_size - (unsigned int)(__builtin_clz((unsigned int)(value)))) + int_size);
+        return (taken_size - (unsigned int)(__builtin_clz((unsigned int)(value))));
     }
-
-    return (taken_size - (unsigned int)(__builtin_clz((unsigned int)(value))));
 }
 
-#endif
 #endif
 ///////////////////////////////////////
 #ifdef QENTEM_SIMD_ENABLED
