@@ -152,18 +152,15 @@ class Value {
 
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
-        constexpr bool is_unsigned = (Number_T_(-1) > 0);
-        constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
-
-        if constexpr (is_unsigned) {
-            number_.SetNumber((unsigned long long)(num));
-            setTypeToUInt64();
-        } else if constexpr (!is_float) {
-            number_.SetNumber((long long)(num));
-            setTypeToInt64();
-        } else {
+        if constexpr (IsFloat<Number_T_>()) {
             number_.SetNumber(double(num));
             setTypeToDouble();
+        } else if constexpr (IsUnsigned<Number_T_>()) {
+            number_.SetNumber((unsigned long long)(num));
+            setTypeToUInt64();
+        } else {
+            number_.SetNumber((long long)(num));
+            setTypeToInt64();
         }
     }
 
@@ -193,7 +190,7 @@ class Value {
                 reset();
             }
 
-            if (!Config::PointerTagging) {
+            if constexpr (!Config::PointerTagging) {
                 setType(t_type);
             }
 
@@ -352,22 +349,19 @@ class Value {
 
     template <typename Number_T_>
     inline Value &operator=(Number_T_ num) noexcept {
-        constexpr bool is_unsigned = (Number_T_(-1) > 0);
-        constexpr bool is_float    = (double(Number_T_(1.5)) == 1.5);
-
         if (!IsNumber()) {
             reset();
         }
 
-        if constexpr (is_unsigned) {
-            number_.SetNumber((unsigned long long)(num));
-            setTypeToUInt64();
-        } else if constexpr (!is_float) {
-            number_.SetNumber((long long)(num));
-            setTypeToInt64();
-        } else {
+        if constexpr (IsFloat<Number_T_>()) {
             number_.SetNumber(double(num));
             setTypeToDouble();
+        } else if constexpr (IsUnsigned<Number_T_>()) {
+            number_.SetNumber((unsigned long long)(num));
+            setTypeToUInt64();
+        } else {
+            number_.SetNumber((long long)(num));
+            setTypeToInt64();
         }
 
         return *this;
@@ -1194,7 +1188,8 @@ class Value {
             }
 
             default: {
-                return 0U;
+                // TODO: try to convert string to number
+                return 0;
             }
         };
     }
@@ -1213,6 +1208,7 @@ class Value {
             }
 
             default: {
+                // TODO: try to convert string to number
                 return 0;
             }
         };
@@ -1235,6 +1231,7 @@ class Value {
             }
 
             default: {
+                // TODO: try to convert string to number
                 return 0.0;
             }
         };
