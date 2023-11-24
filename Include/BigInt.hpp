@@ -367,7 +367,8 @@ struct BigInt {
     }
 
     static constexpr unsigned int AlignSize() noexcept {
-        return ((TotalBits() / BitSize()) + (unsigned int)(TotalBits() > (1U << Platform::FindLastBit(TotalBits()))));
+        return ((TotalBits() / BitSize()) +
+                (unsigned int)(TotalBits() > (1U << Platform::FindLastBitConst(TotalBits()))));
     }
 
   private:

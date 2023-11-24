@@ -101,7 +101,7 @@ namespace Qentem::Platform {
 #ifdef _MSC_VER
 
 template <typename Number_T_>
-inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
+inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
     unsigned long          index = 0;
@@ -118,7 +118,7 @@ inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
         constexpr unsigned int int_size = 32U;
 
         if constexpr (size == 64U) {
-            /// 01010101 <---
+            // 01010101 <---
             const unsigned long lower_bits = (unsigned long)(value);
 
             if (lower_bits != 0U) {
@@ -137,7 +137,7 @@ inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
 }
 
 template <typename Number_T_>
-inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
+inline static unsigned int FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
     unsigned long          index = 0;
@@ -154,7 +154,7 @@ inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
         constexpr unsigned int int_size = 32U;
 
         if constexpr (size == 64U) {
-            /// 01010101 <---
+            // 01010101 <---
             const unsigned long lower_bits = (unsigned long)(value);
             value >>= int_size;
 
@@ -175,7 +175,7 @@ inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
 #else
 
 template <typename Number_T_>
-inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
+inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U);
 
@@ -189,7 +189,7 @@ inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
         constexpr unsigned int int_size = 32U;
 
         if constexpr (size == 64U) {
-            /// 01010101 <---
+            // 01010101 <---
             const unsigned int lower_bits = (unsigned int)(value);
 
             if (lower_bits != 0U) {
@@ -205,7 +205,7 @@ inline static constexpr unsigned int FindFirstBit(Number_T_ value) noexcept {
 }
 
 template <typename Number_T_>
-inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
+inline static unsigned int FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
     constexpr unsigned int size = (sizeof(Number_T_) * 8U) - 1U;
 
@@ -220,7 +220,7 @@ inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
         constexpr unsigned int taken_size = (int_size - 1U);
 
         if constexpr (size == 64U) {
-            /// ---> 01010101
+            // ---> 01010101
             const unsigned int lower_bits = (unsigned int)(value);
             value >>= int_size;
 
@@ -234,8 +234,36 @@ inline static constexpr unsigned int FindLastBit(Number_T_ value) noexcept {
         return (taken_size - (unsigned int)(__builtin_clz((unsigned int)(value))));
     }
 }
-
 #endif
+
+// These two are used during compiling, so do bother optimizing them.
+template <typename Number_T_>
+inline static constexpr unsigned int FindFirstBitConst(Number_T_ value) noexcept {
+    // 'value' should be bigger than zero.
+    unsigned int index = 0;
+
+    while ((value & Number_T_{1}) == Number_T_{0}) {
+        ++index;
+        value >>= 1U;
+    }
+
+    return index;
+}
+
+template <typename Number_T_>
+inline static constexpr unsigned int FindLastBitConst(Number_T_ value) noexcept {
+    // 'value' should be bigger than zero.
+    constexpr unsigned int size  = (sizeof(Number_T_) * 8U) - 1U;
+    constexpr Number_T_    mask  = (Number_T_{1} << size);
+    unsigned int           index = size;
+
+    while ((value & mask) == Number_T_{0}) {
+        --index;
+        value <<= 1U;
+    }
+
+    return index;
+}
 ///////////////////////////////////////
 #ifdef QENTEM_SIMD_ENABLED
 
