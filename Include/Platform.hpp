@@ -337,9 +337,11 @@ inline static constexpr unsigned int FindFirstBitConst(Number_T_ value) noexcept
     // 'value' should be bigger than zero.
     unsigned int index = 0;
 
-    while ((value & Number_T_{1}) == Number_T_{0}) {
-        ++index;
-        value >>= 1U;
+    if (value != Number_T_{0}) {
+        while ((value & Number_T_{1}) == Number_T_{0}) {
+            ++index;
+            value >>= 1U;
+        }
     }
 
     return index;
@@ -348,13 +350,15 @@ inline static constexpr unsigned int FindFirstBitConst(Number_T_ value) noexcept
 template <typename Number_T_>
 inline static constexpr unsigned int FindLastBitConst(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size  = (sizeof(Number_T_) * 8U) - 1U;
+    constexpr unsigned int size  = ((sizeof(Number_T_) * 8U) - 1U);
     constexpr Number_T_    mask  = (Number_T_{1} << size);
     unsigned int           index = size;
 
-    while ((value & mask) == Number_T_{0}) {
-        --index;
-        value <<= 1U;
+    if (value != Number_T_{0}) {
+        while ((value & mask) == Number_T_{0}) {
+            --index;
+            value <<= 1U;
+        }
     }
 
     return index;
