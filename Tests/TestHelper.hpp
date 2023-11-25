@@ -307,6 +307,10 @@ struct TestHelper {
         TestOutPut::Print("Streaming SIMD Extensions 2: On\n");
 #endif
 
+#if defined(QENTEM_MSIMD128) && (QENTEM_MSIMD128 == 1)
+        TestOutPut::Print("WASM SIMD128: On\n");
+#endif
+
         if constexpr (Config::AutoEscapeHTML) {
             TestOutPut::Print("Auto Escape HTML: On\n");
         }
