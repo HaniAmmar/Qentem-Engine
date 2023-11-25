@@ -33,16 +33,16 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = (size >> QENTEM_SIMD_SHIFT_SIZE);
+    const Number_T_ m_size = (size >> QentemSIMD::ShiftWidth);
 
     if (m_size != 0) {
-        offset += (QENTEM_SIMD_SIZE * m_size);
-        const QENTEM_SIMD_VAR  m_zero    = QENTEM_SIMD_ZERO;
-        QENTEM_SIMD_VAR       *m_pointer = (QENTEM_SIMD_VAR *)(pointer);
-        const QENTEM_SIMD_VAR *end       = (m_pointer + m_size);
+        offset += (QentemSIMD::Size * m_size);
+        const QentemSIMD::VAR_T  m_zero    = QentemSIMD::Zero();
+        QentemSIMD::VAR_T       *m_pointer = (QentemSIMD::VAR_T *)(pointer);
+        const QentemSIMD::VAR_T *end       = (m_pointer + m_size);
 
         do {
-            QENTEM_SIMD_STOREU(m_pointer, m_zero);
+            QentemSIMD::Store(m_pointer, m_zero);
             ++m_pointer;
         } while (m_pointer < end);
     }
@@ -62,16 +62,16 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = (size >> QENTEM_SIMD_SHIFT_SIZE);
+    const Number_T_ m_size = (size >> QentemSIMD::ShiftWidth);
 
     if (m_size != 0) {
-        offset += (QENTEM_SIMD_SIZE * m_size);
-        QENTEM_SIMD_VAR       *m_to   = (QENTEM_SIMD_VAR *)(to);
-        const QENTEM_SIMD_VAR *m_form = (const QENTEM_SIMD_VAR *)(from);
-        const QENTEM_SIMD_VAR *end    = (m_form + m_size);
+        offset += (QentemSIMD::Size * m_size);
+        QentemSIMD::VAR_T       *m_to   = (QentemSIMD::VAR_T *)(to);
+        const QentemSIMD::VAR_T *m_form = (const QentemSIMD::VAR_T *)(from);
+        const QentemSIMD::VAR_T *end    = (m_form + m_size);
 
         do {
-            QENTEM_SIMD_STOREU(m_to, QENTEM_SIMD_LOAD(m_form));
+            QentemSIMD::Store(m_to, QentemSIMD::Load(m_form));
             ++m_form;
             ++m_to;
         } while (m_form < end);

@@ -32,7 +32,7 @@ template <typename>
 struct JSONotation_T_;
 
 template <typename Char_T_, typename Stream_T_>
-QENTEM_MAYBE_UNUSED static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) {
+static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) {
     using JSONotation = JSONotation_T_<Char_T_>;
 
     SizeT offset  = 0;
