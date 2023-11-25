@@ -727,7 +727,7 @@ struct Digit {
     }
     /////////////////////////////////////////
     template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
-    QENTEM_NOINLINE static SizeT intToString(Char_T_ *storage, Number_T_ number) noexcept {
+    static SizeT intToString(Char_T_ *storage, Number_T_ number) noexcept {
         const Char_T_ *str = storage;
 
         if constexpr (!Reverse_V_) {
