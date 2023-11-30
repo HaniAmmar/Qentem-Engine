@@ -75,32 +75,34 @@ QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &str
 }
 
 template <typename Number_T_>
-static bool StringToNumber(Number_T_ &num, const char *str) noexcept {
+static bool StringToNumber(TestHelper &helper, Number_T_ &num, const char *str) noexcept {
     QNumber     number;
     SizeT       offset = 0;
     const SizeT length = StringUtils::Count(str);
 
-    switch (Digit::StringToNumber(number, str, offset, length)) {
-        case QNumberType::Natural: {
-            num = Number_T_(number.Natural);
-            break;
-        }
+    if (!helper.HasError() || helper.IsContinueOnError()) {
+        switch (Digit::StringToNumber(number, str, offset, length)) {
+            case QNumberType::Natural: {
+                num = Number_T_(number.Natural);
+                break;
+            }
 
-        case QNumberType::Integer: {
-            num = Number_T_(number.Integer);
-            break;
-        }
+            case QNumberType::Integer: {
+                num = Number_T_(number.Integer);
+                break;
+            }
 
-        case QNumberType::Real: {
-            num = Number_T_(number.Real);
-            break;
-        }
+            case QNumberType::Real: {
+                num = Number_T_(number.Real);
+                break;
+            }
 
-        default: {
-            num = 0;
-            return false;
-        }
-    };
+            default: {
+                num = 0;
+                return false;
+            }
+        };
+    }
 
     return (offset >= length);
 }
@@ -111,42 +113,42 @@ static void TestStringToNumber1(TestHelper &helper) {
     const char        *str;
 
     str = "";
-    helper.EqualsFalse(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsFalse(StringToNumber(helper, number, str), "valid", __LINE__);
 
     str = "0";
-    helper.EqualsTrue(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, number, str), "valid", __LINE__);
     helper.Equal(number, 0U, str, __LINE__);
 
     str = "0.0";
-    helper.EqualsTrue(StringToNumber(d_number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, d_number, str), "valid", __LINE__);
     helper.Equal(d_number, 0.0, str, __LINE__);
 
     str = "-0";
-    helper.EqualsTrue(StringToNumber(d_number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, d_number, str), "valid", __LINE__);
     helper.Equal(d_number, -0.0, str, __LINE__);
 
     str = "-0.0";
-    helper.EqualsTrue(StringToNumber(d_number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, d_number, str), "valid", __LINE__);
     helper.Equal(d_number, -0.0, str, __LINE__);
 
     str = "1";
-    helper.EqualsTrue(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, number, str), "valid", __LINE__);
     helper.Equal(number, 1U, str, __LINE__);
 
     str = "1000000";
-    helper.EqualsTrue(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, number, str), "valid", __LINE__);
     helper.Equal(number, 1000000U, str, __LINE__);
 
     str = "1010101";
-    helper.EqualsTrue(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, number, str), "valid", __LINE__);
     helper.Equal(number, 1010101U, str, __LINE__);
 
     str = "9999999";
-    helper.EqualsTrue(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, number, str), "valid", __LINE__);
     helper.Equal(number, 9999999U, str, __LINE__);
 
     str = "123456789";
-    helper.EqualsTrue(StringToNumber(number, str), "valid", __LINE__);
+    helper.EqualsTrue(StringToNumber(helper, number, str), "valid", __LINE__);
     helper.Equal(number, 123456789U, str, __LINE__);
 }
 
@@ -162,315 +164,315 @@ static void TestStringToNumber2(TestHelper &helper) {
     bool        valid;
 
     str   = "1-e";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+e";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-e1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+e1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1--e1";
-    valid = StringToNumber(number_ulong, str);
+    valid = StringToNumber(helper, number_ulong, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1++e1";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e-";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e+";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e--1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e++1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1ee1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "E1";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-E";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+E";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-E1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+E1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1--E1";
-    valid = StringToNumber(number_ulong, str);
+    valid = StringToNumber(helper, number_ulong, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1++E1";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E-";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E+";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E--1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1E++1";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1EE1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "..";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "...";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".  ";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "..  ";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "...  ";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+.";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-.";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+..";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+...";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-..";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-...";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".0.0";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0.0.";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0..0";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0..0]]]";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = ".123.123";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123.123.";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "123..123";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "12y3";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1x23";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "w123";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-";
-    valid = StringToNumber(number_float, str);
+    valid = StringToNumber(helper, number_float, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e+";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e-";
-    valid = StringToNumber(number_long, str);
+    valid = StringToNumber(helper, number_long, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-w1";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+w1";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "01";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+01";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-01";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "00001";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+00001";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-00001";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "0123456";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+0123456";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-0123456";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "e1";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "e12";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1-e";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "e-1";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "-e12";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1+e";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "+e1";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "e+12";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "500000000000000000X000.000000000000";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e-330";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e+310";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e+999";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 
     str   = "1e-999";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsFalse(valid, "valid", __LINE__);
 }
 
@@ -585,240 +587,240 @@ static void TestStringToNumber4(TestHelper &helper) {
     bool        valid;
 
     str   = "-1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, -1.0, "number", __LINE__);
 
     str   = "+1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1.0, "number", __LINE__);
 
     str   = "+1";
-    valid = StringToNumber(number_uint, str);
+    valid = StringToNumber(helper, number_uint, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_uint, 1U, "number", __LINE__);
 
     str   = "-1";
-    valid = StringToNumber(number_int, str);
+    valid = StringToNumber(helper, number_int, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_int, -1, "number", __LINE__);
 
     str   = "1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1.0, "number", __LINE__);
 
     str   = "1.0";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1.0, "number", __LINE__);
 
     str   = "1.00001";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1.00001, "number", __LINE__);
 
     str   = "1.1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1.1, "number", __LINE__);
 
     str   = "123456789";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 123456789.0, "number", __LINE__);
 
     str   = "1.48828125";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1.48828125, "number", __LINE__);
 
     str   = "1e10";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1e10, "number", __LINE__);
 
     str   = "1E10";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1e10, "number", __LINE__);
 
     str   = "1e+10";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1e10, "number", __LINE__);
 
     str   = "1E+10";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1e10, "number", __LINE__);
 
     str   = "1E5";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 1e5, "number", __LINE__);
 
     str   = "0.3";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 0.3, "number", __LINE__);
 
     str   = "0.2";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 0.2, "number", __LINE__);
 
     str   = "0.1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 0.1, "number", __LINE__);
 
     str   = "0.5";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 0.5, "number", __LINE__);
 
     str   = "4.5";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 4.5, "number", __LINE__);
 
     str   = "2.3";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 2.3, "number", __LINE__);
 
     str   = "3.2";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 3.2, "number", __LINE__);
 
     str   = "5.1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 5.1, "number", __LINE__);
 
     str   = "-1";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, -1, "number", __LINE__);
 
     str   = ".123";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, .123, "number", __LINE__);
 
     str   = "-123.";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, -123., "number", __LINE__);
 
     str   = "-.123";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, -.123, "number", __LINE__);
 
     str   = "+123.";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, +123., "number", __LINE__);
 
     str   = "+.123";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, +.123, "number", __LINE__);
 
     str   = "123.";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 123., "number", __LINE__);
 
     str   = ".123e00";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, .123e00, "number", __LINE__);
 
     str   = "-123.e00";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, -123.e00, "number", __LINE__);
 
     str   = "-.123e00";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, -.123e00, "number", __LINE__);
 
     str   = "+123.e00";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, +123.e00, "number", __LINE__);
 
     str   = "+.123e00";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, +.123e00, "number", __LINE__);
 
     str = "123.e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, 123.e00, "number", __LINE__);
 
     str = ".123e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, .123e00, "number", __LINE__);
 
     str = "-123.e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, -123.e00, "number", __LINE__);
 
     str = "-.123e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, -.123e00, "number", __LINE__);
 
     str = "+123.e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, +123.e00, "number", __LINE__);
 
     str = "+.123e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, +.123e00, "number", __LINE__);
 
     str = "123.e00 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, 123.e00, "number", __LINE__);
 
     str = ".123 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, .123, "number", __LINE__);
 
     str = "-123. ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, -123., "number", __LINE__);
 
     str = "-.123 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, -.123, "number", __LINE__);
 
     str = "+123. ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, +123., "number", __LINE__);
 
     str = "+.123 ";
-    StringToNumber(number_double, str);
+    StringToNumber(helper, number_double, str);
     helper.Equal(number_double, +.123, "number", __LINE__);
 
     str   = ".0";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 0.0, "number", __LINE__);
 
     str   = "0.";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 0.0, "number", __LINE__);
 
     str   = "123456789.123456789";
-    valid = StringToNumber(number_double, str);
+    valid = StringToNumber(helper, number_double, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(number_double, 123456789.123456789, "number", __LINE__);
 }
@@ -831,401 +833,401 @@ static void TestStringToNumber5(TestHelper &helper) {
     bool               valid;
 
     str   = "-1.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1, "number", __LINE__);
 
     str   = "-1.1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1.1, "number", __LINE__);
 
     str   = "-123456789";
-    valid = StringToNumber(ll_number, str);
+    valid = StringToNumber(helper, ll_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(ll_number, -123456789, "number", __LINE__);
 
     str   = "-1.48828125";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1.48828125, "number", __LINE__);
 
     str   = "-1e10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e10, "number", __LINE__);
 
     str   = "-1E10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e10, "d_number", __LINE__);
 
     str   = "-1e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e10, "d_number", __LINE__);
 
     str   = "-1e+9";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e9, "d_number", __LINE__);
 
     str   = "-1E+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e10, "d_number", __LINE__);
 
     str   = "-1e00";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1, "d_number", __LINE__);
 
     str   = "-1e-00";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1, "d_number", __LINE__);
 
     str   = "-1e+00";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1, "d_number", __LINE__);
 
     str   = "1e-00";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1, "d_number", __LINE__);
 
     str   = "1e+00";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1, "d_number", __LINE__);
 
     str   = "1e-5";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-5, "d_number", __LINE__);
 
     str   = "1e5";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e5, "d_number", __LINE__);
 
     str   = "1e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-10, "d_number", __LINE__);
 
     str   = "1e+9";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e9, "d_number", __LINE__);
 
     str   = "-1e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e-10, "d_number", __LINE__);
 
     str   = "1E-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-10, "d_number", __LINE__);
 
     str   = "-1E-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e-10, "d_number", __LINE__);
 
     str   = "-0.3";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -0.3, "d_number", __LINE__);
 
     str   = "-0.2";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -0.2, "d_number", __LINE__);
 
     str   = "-0.1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -0.1, "d_number", __LINE__);
 
     str   = "-2.3";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -2.3, "d_number", __LINE__);
 
     str   = "-3.2";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -3.2, "d_number", __LINE__);
 
     str   = "-4.";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -4., "d_number", __LINE__);
 
     str   = "-5.1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -5.1, "d_number", __LINE__);
 
     str   = "-0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -0.0, "d_number", __LINE__);
 
     str   = "-0.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -0.0, "d_number", __LINE__);
 
     str   = "-123456789.12345679";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -123456789.123456789, "number", __LINE__);
 
     str   = "1844674407370955161";
-    valid = StringToNumber(ull_number, str);
+    valid = StringToNumber(helper, ull_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(ull_number, 1844674407370955161ULL, "number", __LINE__);
 
     str   = "-1844674407370955161";
-    valid = StringToNumber(ll_number, str);
+    valid = StringToNumber(helper, ll_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(ll_number, -1844674407370955161LL, "number", __LINE__);
 
     str   = "18446744073709551615";
-    valid = StringToNumber(ull_number, str);
+    valid = StringToNumber(helper, ull_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(ull_number, 18446744073709551615ULL, "number", __LINE__);
 
     str   = "18446744073709551616";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 18446744073709551616.0, "number", __LINE__);
 
     str   = "-18446744073709551615";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -18446744073709551615.0, "number", __LINE__);
 
     str   = "-18446744073709551616";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -18446744073709551616.0, "number", __LINE__);
 
     str   = "-18446744073709551616e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -18446744073709551616e-10, "number", __LINE__);
 
     str   = "+18446744073709551616e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, +18446744073709551616e+10, "number", __LINE__);
 
     str   = "+18446744073709551615e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, +18446744073709551615e+10, "number", __LINE__);
 
     str   = "-18446744073709551615e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -18446744073709551615e-10, "number", __LINE__);
 
     str   = "-184467440737095516155";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -184467440737095516155.0, "number", __LINE__);
 
     str   = "184467440737095516155";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 184467440737095516155.0, "number", __LINE__);
 
     str   = "9223372036854775807";
-    valid = StringToNumber(ll_number, str);
+    valid = StringToNumber(helper, ll_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(ll_number, 9223372036854775807LL, "number", __LINE__);
 
     str   = "-9223372036854775807";
-    valid = StringToNumber(ll_number, str);
+    valid = StringToNumber(helper, ll_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(ll_number, -9223372036854775807LL, "number", __LINE__);
 
     str   = "-9223372036854775808";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -9223372036854775808.0, "number", __LINE__);
 
     str   = "-9223372036854775808.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -9223372036854775808.0, "number", __LINE__);
 
     str   = "5000000000000000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5e33, "number", __LINE__);
 
     str   = "5000000000000000000000.000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5e21, "number", __LINE__);
 
     str   = "5000000000000000000000000000000000e-15";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000.0, "number", __LINE__);
 
     str   = "5000000000000000000000e100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.000000000000000072e+121, "number", __LINE__);
 
     str   = "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e92, "number", __LINE__);
 
     str   = "200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 2e+92, "number", __LINE__);
 
     str   = "999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e93, "number", __LINE__);
 
     str   = "340282366920938463463374607431768211455";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 340282366920938463463374607431768211455.0, "number", __LINE__);
 
     str   = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 115792089237316195423570985008687907853269984665640564039457584007913129639935.0, "number",
                  __LINE__);
 
     str   = "3.123456789123456789123456789123456789123456789123456789123456789";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 3.123456789123456812, "number", __LINE__);
 
     str   = "3.123456789123456789123456789123456789123456789123456789123456789e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 31234567891.23456955, "number", __LINE__);
 
     str   = "3.123456789123456789123456789123456789123456789123456789123456789e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 3.123456789123456789123456789123456789123456789123456789123456789e-10, "number", __LINE__);
 
     str   = "3.123456789123456789123456789123456789123456789123456789123456789e100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 3.123456789123456643e+100, "number", __LINE__);
 
     str   = "3.123456789123456789123456789123456789123456789123456789123456789e-100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 3.1234567891234566e-100, "number", __LINE__);
 
     str =
         "3.123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 3.123456789123456856e-308, "number", __LINE__);
 
     str =
         "1.7976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157e+300";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.797693134862315648e+300, "number", __LINE__);
 
     str =
         "17976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157797693134862315779769313486231577976931348623157e+52";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.797693134862315708e+308, "number", __LINE__);
 
     str   = "-1.7976931348623157e308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1.7976931348623157e308, "number", __LINE__);
 
     str   = "1.7976931348623157e+300";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.797693134862315648e+300, "number", __LINE__);
 
     str   = "1.7976931348623157e+1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 17.97693134862315745, "number", __LINE__);
 
     str   = "4856312379865454687821527487362783273278723787e-7";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.856312379865454319e+38, "number", __LINE__);
 
     str   = "4856312379865454687821527487362783273278723787e+7";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.856312379865455113e+52, "number", __LINE__);
 
     str   = "1.0e308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.0e308, "d_number", __LINE__);
 
     str   = "-1.0e308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1.0e308, "d_number", __LINE__);
 
     str   = "1e308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e308, "d_number", __LINE__);
 
     str   = "-1e308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e308, "d_number", __LINE__);
 
     str   = "1.0e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 9.999999999999999093e-309, "d_number", __LINE__);
 
     str   = "-1.0e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1.0e-308, "d_number", __LINE__);
 
     str   = "1e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-308, "d_number", __LINE__);
 
     str   = "-1e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -1e-308, "d_number", __LINE__);
 
     str   = "4.9406564584124654E-324";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.9406564584124654E-324, "d_number", __LINE__);
 
     str   = "4.940656458412465442e-324";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.940656458412465442e-324, "d_number", __LINE__);
 }
@@ -1236,589 +1238,589 @@ static void TestStringToNumber6(TestHelper &helper) {
     bool        valid;
 
     str   = "-12.34";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -12.34, "number", __LINE__);
 
     str   = "1.00000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1, "number", __LINE__);
 
     str   = "1.05";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.05, "number", __LINE__);
 
     str   = "0.25";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.25, "number", __LINE__);
 
     str   = "1.00005";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.00005, "number", __LINE__);
 
     str   = "-0.00025";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, -0.00025, "number", __LINE__);
 
     str   = "0.3743";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.3743, "number", __LINE__);
 
     str   = "458.3743";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 458.3743, "number", __LINE__);
 
     str   = "458.3";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 458.3, "number", __LINE__);
 
     str   = "4.3";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.3, "number", __LINE__);
 
     str   = "1123.0005";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1123.0005, "number", __LINE__);
 
     str   = "25e-5";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 25e-5, "number", __LINE__);
 
     str   = "1.000025";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.000025, "number", __LINE__);
 
     str   = "10.005e1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 10.005e1, "number", __LINE__);
 
     str =
         "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 9.999999999999999666e+117, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001, "number", __LINE__);
 
     str   = "0.0000000000000000000000005555";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000005555, "number", __LINE__);
 
     str   = "0.0000000000000000000000005555e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000005555e-10, "number", __LINE__);
 
     str   = "0.0000000000000000000000005555e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000005555e+10, "number", __LINE__);
 
     str   = "0.0000000000000000000000005555e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000005555e+50, "number", __LINE__);
 
     str   = "0.0000000000000000000000005555e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000005555e-50, "number", __LINE__);
 
     str = "0.0000000000000000000000005555   ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.0000000000000000000000005555, "number", __LINE__);
 
     str = "0.0000000000000000000000005555e-10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.0000000000000000000000005555e-10, "number", __LINE__);
 
     str = "0.0000000000000000000000005555e+10   ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.0000000000000000000000005555e+10, "number", __LINE__);
 
     str = "0.0000000000000000000000005555e+50   ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.0000000000000000000000005555e+50, "number", __LINE__);
 
     str = "0.0000000000000000000000005555e-50   ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.0000000000000000000000005555e-50, "number", __LINE__);
 
     str   = "0.00000005";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.00000005, "number", __LINE__);
 
     str   = "0.00000005e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.00000005e-10, "number", __LINE__);
 
     str   = "0.00000005e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.00000005e+10, "number", __LINE__);
 
     str   = "0.00000005e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.00000005e+50, "number", __LINE__);
 
     str   = "0.00000005e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.00000005e-50, "number", __LINE__);
 
     str = "0.00000005 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.00000005, "number", __LINE__);
 
     str = "0.00000005e-10 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.00000005e-10, "number", __LINE__);
 
     str = "0.00000005e+10 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.00000005e+10, "number", __LINE__);
 
     str = "0.00000005e+50 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.00000005e50, "number", __LINE__);
 
     str = "0.00000005e-50 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 0.00000005e-50, "number", __LINE__);
 
     str   = "50000000000000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000.0, "number", __LINE__);
 
     str   = "50000000000000000.0e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000.0e-10, "number", __LINE__);
 
     str   = "50000000000000000.0e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000.0e+10, "number", __LINE__);
 
     str   = "50000000000000000.0e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000.0e+50, "number", __LINE__);
 
     str = "50000000000000000.0  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000000000000.0, "number", __LINE__);
 
     str = "50000000000000000.0e-10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000000000000.0e-10, "number", __LINE__);
 
     str = "50000000000000000.0e+10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000000000000.0e+10, "number", __LINE__);
 
     str = "50000000000000000.0e+50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000000000000.0e+50, "number", __LINE__);
 
     str = "50000000000000000.0e+50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000000000000.0e+50, "number", __LINE__);
 
     str   = "5000000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000.0, "number", __LINE__);
 
     str   = "5000000000.0e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000.0e-10, "number", __LINE__);
 
     str   = "5000000000.0e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000.0e+10, "number", __LINE__);
 
     str   = "5000000000.0e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000.0e-50, "number", __LINE__);
 
     str   = "5000000000.0e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000.0e+50, "number", __LINE__);
 
     str = "5000000000.0  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5000000000.0, "number", __LINE__);
 
     str = "5000000000.0e-10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5000000000.0e-10, "number", __LINE__);
 
     str = "5000000000.0e+10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5000000000.0e+10, "number", __LINE__);
 
     str = "5000000000.0e-50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5000000000.0e-50, "number", __LINE__);
 
     str = "5000000000.0e+50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5000000000.0e+50, "number", __LINE__);
 
     str   = "50000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000.0, "number", __LINE__);
 
     str   = "50000000.0e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000.0e-10, "number", __LINE__);
 
     str   = "50000000.0e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000.0e+10, "number", __LINE__);
 
     str   = "50000000.0e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000.0e+50, "number", __LINE__);
 
     str   = "50000000.0e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000.0e-50, "number", __LINE__);
 
     str = "50000000.0  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000.0, "number", __LINE__);
 
     str = "50000000.0e-10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000.0e-10, "number", __LINE__);
 
     str = "50000000.0e+10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000.0e+10, "number", __LINE__);
 
     str = "50000000.0e+50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000.0e+50, "number", __LINE__);
 
     str = "50000000.0e-50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50000000.0e-50, "number", __LINE__);
 
     str   = "50.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50.0, "number", __LINE__);
 
     str   = "50.0e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50.0e-10, "number", __LINE__);
 
     str   = "50.0e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50.0e+10, "number", __LINE__);
 
     str   = "50.0e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50.0e+50, "number", __LINE__);
 
     str   = "50.0e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50.0e-50, "number", __LINE__);
 
     str = "50.0  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50.0, "number", __LINE__);
 
     str = "50.0e-10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50.0e-10, "number", __LINE__);
 
     str = "50.0e+10  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50.0e+10, "number", __LINE__);
 
     str = "50.0e+50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50.0e+50, "number", __LINE__);
 
     str = "50.0e-50  ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 50.0e-50, "number", __LINE__);
 
     str   = "5.0000000000000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.0000000000000000000000000000000, "number", __LINE__);
 
     str   = "5.0000000000000000000000000000000E10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.0000000000000000000000000000000E10, "number", __LINE__);
 
     str   = "5.0000000000000000000000000000000E-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.0000000000000000000000000000000E-10, "number", __LINE__);
 
     str   = "5.0000000000000000000000000000000E-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.0000000000000000000000000000000E-50, "number", __LINE__);
 
     str   = "5.0000000000000000000000000000000E+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.0000000000000000000000000000000E+50, "number", __LINE__);
 
     str = "5.0000000000000000000000000000000 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5.0000000000000000000000000000000, "number", __LINE__);
 
     str = "5.0000000000000000000000000000000E10 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5.0000000000000000000000000000000E10, "number", __LINE__);
 
     str = "5.0000000000000000000000000000000E-10 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5.0000000000000000000000000000000E-10, "number", __LINE__);
 
     str = "5.0000000000000000000000000000000E-50 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5.0000000000000000000000000000000E-50, "number", __LINE__);
 
     str = "5.0000000000000000000000000000000E+50 ";
-    StringToNumber(d_number, str);
+    StringToNumber(helper, d_number, str);
     helper.Equal(d_number, 5.0000000000000000000000000000000E+50, "number", __LINE__);
 
     str   = "500000000000000.00000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 500000000000000.00000000000000000, "number", __LINE__);
 
     str   = "500000000000000.00000000000000000e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 500000000000000.00000000000000000e+10, "number", __LINE__);
 
     str   = "500000000000000.00000000000000000e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 500000000000000.00000000000000000e-10, "number", __LINE__);
 
     str   = "500000000000000.00000000000000000e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 500000000000000.00000000000000000e-50, "number", __LINE__);
 
     str   = "500000000000000.00000000000000000e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 500000000000000.00000000000000000e+50, "number", __LINE__);
 
     str   = "50000000000000000000000000000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000000000.0, "number", __LINE__);
 
     str   = "50000000000000000000000000000000.0e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000000000.0e+10, "number", __LINE__);
 
     str   = "50000000000000000000000000000000.0e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000000000.0e-10, "number", __LINE__);
 
     str   = "50000000000000000000000000000000.0e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000000000.0e-50, "number", __LINE__);
 
     str   = "50000000000000000000000000000000.0e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000000000.0e+50, "number", __LINE__);
 
     str   = "50000000000000000000000000.000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000.000000, "number", __LINE__);
 
     str   = "50000000000000000000000000.000000e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000.000000e+10, "number", __LINE__);
 
     str   = "50000000000000000000000000.000000e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000.000000e-10, "number", __LINE__);
 
     str   = "50000000000000000000000000.000000e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000.000000e-50, "number", __LINE__);
 
     str   = "50000000000000000000000000.000000e+50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000000000000.000000e+50, "number", __LINE__);
 
     str   = "5000000000000000000000000000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000000000000000.0, "number", __LINE__);
 
     str   = "5000000000000000000000000000000.0E10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000000000000000.0E10, "number", __LINE__);
 
     str   = "5000000000000000000000000000000.0E-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000000000000000.0E-10, "number", __LINE__);
 
     str   = "5000000000000000000000000000000.0E-60";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000000000000000.0E-60, "number", __LINE__);
 
     str   = "5000000000000000000000000000000.0E+60";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000000000000000.0E+60, "number", __LINE__);
 
     str   = "50000000000000000.5";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000000.5, "number", __LINE__);
 
     str   = "5.0000000050000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5.0000000050000000000000000000000, "number", __LINE__);
 
     str   = "500000000.90000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 500000000.90000000000000000, "number", __LINE__);
 
     str   = "50000000000000.90000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 50000000000000.90000000000000000, "number", __LINE__);
 
     str   = "5000000000000000000000000000000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5000000000000000000000000000000000.0, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number,
                  1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000,
                  "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000e10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000e10, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000e+10, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0e+10, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0e10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0e10, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number,
                  1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000e+10,
                  "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000e-10, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0e-10, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number,
                  1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000e-10,
                  "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000e-100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000e-100, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0e-100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0e-100, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.000000000000000000000000000000000000000000000000e-100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(
         d_number,
@@ -1826,52 +1828,52 @@ static void TestStringToNumber6(TestHelper &helper) {
         "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000e100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000e100, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0e100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0e100, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000e+100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000e+100, "number", __LINE__);
 
     str   = "1000000000000000000000000000000000000000000000000.0e+100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1000000000000000000000000000000000000000000000000.0e+100, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001e+10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e+10, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001e10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e10, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001e+100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e+100, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001e100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e100, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e-10, "number", __LINE__);
 
     str   = "0.0000000000000000000000000000000000000000000000001e-100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e-100, "number", __LINE__);
 }
@@ -1882,152 +1884,152 @@ static void TestStringToNumber7(TestHelper &helper) {
     bool        valid;
 
     str   = "5e-1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 5e-1, "number", __LINE__);
 
     str   = "10e-1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 10e-1, "number", __LINE__);
 
     str   = "15e-1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 15e-1, "number", __LINE__);
 
     str   = "1.0e-1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.0e-1, "number", __LINE__);
 
     str   = "1.5e-1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.5e-1, "number", __LINE__);
 
     str   = "6.25";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 6.25, "number", __LINE__);
 
     str   = "62.5";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 62.5, "number", __LINE__);
 
     str   = "0.625";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.625, "number", __LINE__);
 
     str   = "0.58963";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 0.58963, "number", __LINE__);
 
     str   = "10.58963";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 10.58963, "number", __LINE__);
 
     str   = "1e-10";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-10, "number", __LINE__);
 
     str   = "1e-50";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-50, "number", __LINE__);
 
     str   = "1e-100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-100, "number", __LINE__);
 
     str   = "1e-200";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-200, "number", __LINE__);
 
     str   = "1e-250";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-250, "number", __LINE__);
 
     str   = "1e-300";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-300, "number", __LINE__);
 
     str   = "1e-305";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-305, "number", __LINE__);
 
     str   = "1e-307";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-307, "number", __LINE__);
 
     str   = "1e-310";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-310, "number", __LINE__);
 
     str   = "1e-323";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e-323, "number", __LINE__);
 
     str   = "10e100";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 10e100, "number", __LINE__);
 
     str   = "1e1";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1e1, "number", __LINE__);
 
     str   = "155e-3";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 155e-3, "number", __LINE__);
 
     str   = "72057594037927932.0";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 72057594037927932.0, "number", __LINE__);
 
     str   = "1.78005908680576090884592783737e-307";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 1.78005908680576090884592783737e-307, "number", __LINE__);
 
     str   = "8.90029543402880553236093086933e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 8.90029543402880553236093086933e-308, "number", __LINE__);
 
     str   = "2.22507385850720138309023271733e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 2.22507385850720138309023271733e-308, "number", __LINE__);
 
     str   = "2.22507385850720088902458687609e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 2.22507385850720088902458687609e-308, "number", __LINE__);
 
     str   = "4.94065645841246544176568792868e-324";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.94065645841246544176568792868e-324, "number", __LINE__);
 
     str   = "4.45014771701440227211481959342e-308";
-    valid = StringToNumber(d_number, str);
+    valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
     helper.Equal(d_number, 4.45014771701440227211481959342e-308, "number", __LINE__);
 }
