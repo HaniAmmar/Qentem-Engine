@@ -455,8 +455,8 @@ struct Digit {
         return QNumberType::NotANumber;
     }
     /////////////////////////////////////////
-    template <typename Char_T_>
-    static void powerOfNegativeTen(unsigned long long &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
+    template <typename Number_T_, typename Char_T_>
+    static void powerOfNegativeTen(Number_T_ &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
                                    unsigned int exponent) noexcept {
         using UNumber_T  = SystemIntType;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
@@ -466,57 +466,60 @@ struct Digit {
         constexpr unsigned int shift_limit = (sizeof(UNumber_T) * 8U);
         unsigned int           shifted     = 0;
         //////////////////////////////////////////////////////////////
-        if ((offset < end_offset) && (exponent != 0)) {
-            UNumber_T              num;
-            constexpr unsigned int max_digits = 40U;
-            const unsigned int     diff       = (unsigned int)(end_offset - offset);
-            unsigned int           length     = ((diff <= max_digits) ? diff : max_digits);
-            //////////////////////////////////////////////////////////////
-            end_offset = (offset + length);
-            exponent += length;
-            //////////////////////////////////////////////////////////////
-            while (length >= DigitLimit::MaxPowerOfTenDigits) {
-                length -= DigitLimit::MaxPowerOfTenDigits;
+        (void)content;
+        (void)offset;
+        (void)end_offset;
+        // if ((offset < end_offset) && (exponent != 0)) {
+        //     UNumber_T              num;
+        //     constexpr unsigned int max_digits = 40U;
+        //     const unsigned int     diff       = (unsigned int)(end_offset - offset);
+        //     unsigned int           length     = ((diff <= max_digits) ? diff : max_digits);
+        //     //////////////////////////////////////////////////////////////
+        //     end_offset = (offset + length);
+        //     exponent += length;
+        //     //////////////////////////////////////////////////////////////
+        //     while (length >= DigitLimit::MaxPowerOfTenDigits) {
+        //         length -= DigitLimit::MaxPowerOfTenDigits;
 
-                const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
-                num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                ++offset;
+        //         const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
+        //         num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //         ++offset;
 
-                while (offset < sub_end_offset) {
-                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
-                        num *= UNumber_T{10};
-                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                    }
+        //         while (offset < sub_end_offset) {
+        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
+        //                 num *= UNumber_T{10};
+        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //             }
 
-                    ++offset;
-                }
+        //             ++offset;
+        //         }
 
-                bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
-                bint += num;
-            }
-            ////////////////////////////////////////////////////////////
-            if (offset < end_offset) {
-                num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                ++offset;
+        //         bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
+        //         bint += num;
+        //     }
+        //     ////////////////////////////////////////////////////////////
+        //     if (offset < end_offset) {
+        //         num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //         ++offset;
 
-                while (offset < end_offset) {
-                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
-                        num *= UNumber_T{10};
-                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                    }
+        //         while (offset < end_offset) {
+        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
+        //                 num *= UNumber_T{10};
+        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //             }
 
-                    ++offset;
-                }
+        //             ++offset;
+        //         }
 
-                bint *= DigitLimit::PowerOfTen[length];
-                bint += num;
-            }
-        }
+        //         bint *= DigitLimit::PowerOfTen[length];
+        //         bint += num;
+        //     }
+        // }
 
-        if (bint.Index() < 3) {
-            shifted += 64U;
-            bint <<= 64U;
-        }
+        // if (bint.Index() < 3) {
+        shifted += 64U;
+        bint <<= 64U;
+        // }
         //////////////////////////////////////////////////////////////
         shifted += exponent;
         //////////////////////////////////////////////////////////////
@@ -571,8 +574,8 @@ struct Digit {
         number |= ((unsigned long long)(exp) << 52U);
     }
     /////////////////////////////////////////
-    template <typename Char_T_>
-    static void powerOfPositiveTen(unsigned long long &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
+    template <typename Number_T_, typename Char_T_>
+    static void powerOfPositiveTen(Number_T_ &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
                                    unsigned int exponent) noexcept {
         using UNumber_T  = SystemIntType;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
@@ -583,58 +586,62 @@ struct Digit {
         constexpr unsigned int shift_limit = (sizeof(UNumber_T) * 8U);
         unsigned int           shifted     = 0;
         //////////////////////////////////////////////////////////////
-        if ((offset < end_offset) && (exponent != 0)) {
-            UNumber_T              num;
-            constexpr unsigned int max_digits = 30U;
-            const unsigned int     diff       = (unsigned int)(end_offset - offset);
-            unsigned int           length     = ((diff <= max_digits) ? diff : max_digits);
-            //////////////////////////////////////////////////////////////
-            if (exponent >= length) {
-                end_offset = (offset + length);
-                exponent -= length;
-            } else {
-                end_offset = (offset + exponent);
-                length     = (end_offset - offset);
-                exponent   = 0;
-            }
-            //////////////////////////////////////////////////////////////
-            while (length >= DigitLimit::MaxPowerOfTenDigits) {
-                length -= DigitLimit::MaxPowerOfTenDigits;
+        (void)content;
+        (void)offset;
+        (void)end_offset;
 
-                const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
-                num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                ++offset;
+        // if ((offset < end_offset) && (exponent != 0)) {
+        //     UNumber_T              num;
+        //     constexpr unsigned int max_digits = 30U;
+        //     const unsigned int     diff       = (unsigned int)(end_offset - offset);
+        //     unsigned int           length     = ((diff <= max_digits) ? diff : max_digits);
+        //     //////////////////////////////////////////////////////////////
+        //     if (exponent >= length) {
+        //         end_offset = (offset + length);
+        //         exponent -= length;
+        //     } else {
+        //         end_offset = (offset + exponent);
+        //         length     = (end_offset - offset);
+        //         exponent   = 0;
+        //     }
+        //     //////////////////////////////////////////////////////////////
+        //     while (length >= DigitLimit::MaxPowerOfTenDigits) {
+        //         length -= DigitLimit::MaxPowerOfTenDigits;
 
-                while (offset < sub_end_offset) {
-                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
-                        num *= UNumber_T{10};
-                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                    }
+        //         const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
+        //         num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //         ++offset;
 
-                    ++offset;
-                }
+        //         while (offset < sub_end_offset) {
+        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
+        //                 num *= UNumber_T{10};
+        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //             }
 
-                bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
-                bint += num;
-            }
-            //////////////////////////////////////////////////////////////
-            if (offset < end_offset) {
-                num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                ++offset;
+        //             ++offset;
+        //         }
 
-                while (offset < end_offset) {
-                    if (content[offset] != DigitUtils::DigitChars::DotChar) {
-                        num *= UNumber_T{10};
-                        num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-                    }
+        //         bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
+        //         bint += num;
+        //     }
+        //     //////////////////////////////////////////////////////////////
+        //     if (offset < end_offset) {
+        //         num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //         ++offset;
 
-                    ++offset;
-                }
+        //         while (offset < end_offset) {
+        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
+        //                 num *= UNumber_T{10};
+        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
+        //             }
 
-                bint *= DigitLimit::PowerOfTen[length];
-                bint += num;
-            }
-        }
+        //             ++offset;
+        //         }
+
+        //         bint *= DigitLimit::PowerOfTen[length];
+        //         bint += num;
+        //     }
+        // }
         //////////////////////////////////////////////////////////////
         shifted += exponent;
 
@@ -769,9 +776,8 @@ struct Digit {
     /////////////////////////////////////////
     template <typename Float_T_, typename Stream_T_, typename Number_T_>
     static void realToString(Stream_T_ &stream, const Number_T_ number, const RealFormatInfo format) {
-        using Char_T_  = typename Stream_T_::CharType;
-        using Bucket_T = typename bestFitNumberType<Number_T_, Config::Is64bit>::NumberType_;
-        using Info_T   = DigitUtils::RealNumberInfo<Float_T_, sizeof(number)>;
+        using Char_T_ = typename Stream_T_::CharType;
+        using Info_T  = DigitUtils::RealNumberInfo<Float_T_, sizeof(number)>;
 
         const Number_T_ bias = (number & Info_T::ExponentMask);
 
@@ -789,7 +795,7 @@ struct Digit {
                     mantissa <<= 1U;
                 }
 
-                BigInt<Bucket_T, ((Info_T::Bias + 1U) + (sizeof(Number_T_) * 8U * 3U))> bint{mantissa};
+                BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(Number_T_) * 8U * 3U))> bint{mantissa};
                 using DigitLimit = DigitUtils::DigitLimit<bint.SizeOfType()>;
                 /////////////////////////////////////
                 const unsigned int first_shift      = Platform::FindFirstBit(mantissa);
@@ -939,18 +945,6 @@ struct Digit {
     inline static void bigIntDropDigits(BigInt_T_ &bint, unsigned int drop) noexcept {
         using DigitLimit = DigitUtils::DigitLimit<BigInt_T_::SizeOfType()>;
 
-        // if constexpr (Config::Is64bit) {
-        //     while (drop >= DigitLimit::MaxPowerOfFive) {
-        //         bint *= DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][0U];
-        //         bint >>= ((unsigned int)(DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive][1U]) + 64U);
-        //         drop -= DigitLimit::MaxPowerOfFive;
-        //     }
-
-        //     if (drop != 0) {
-        //         bint *= DigitLimit::PowerOfOneOverFive[drop][0U];
-        //         bint >>= ((unsigned int)(DigitLimit::PowerOfOneOverFive[drop][1U]) + 64U);
-        //     }
-        // } else {
         while (drop >= DigitLimit::MaxPowerOfFive) {
             bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
             drop -= DigitLimit::MaxPowerOfFive;
@@ -959,7 +953,6 @@ struct Digit {
         if (drop != 0U) {
             bint /= DigitLimit::PowerOfFive[drop];
         }
-        // }
     }
 
     template <typename Stream_T_>
@@ -1077,19 +1070,6 @@ struct Digit {
             }
         }
     }
-
-    template <typename, bool S>
-    struct bestFitNumberType {};
-
-    template <typename Number_T_>
-    struct bestFitNumberType<Number_T_, true> {
-        using NumberType_ = Number_T_;
-    };
-
-    template <typename Number_T_>
-    struct bestFitNumberType<Number_T_, false> {
-        using NumberType_ = unsigned int;
-    };
 };
 
 } // namespace Qentem

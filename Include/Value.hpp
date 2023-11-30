@@ -43,6 +43,89 @@ enum class ValueType : unsigned char {
     Null
 };
 
+struct VNumber {
+    VNumber() = default;
+
+    VNumber(VNumber &&v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
+        v_num.number_.ull = 0;
+        v_num.p_number_   = 0;
+    }
+
+    VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
+    }
+
+    VNumber &operator=(const VNumber &v_num) noexcept {
+        if (this != &v_num) {
+            number_   = v_num.number_;
+            p_number_ = v_num.p_number_;
+        }
+
+        return *this;
+    }
+
+    VNumber &operator=(VNumber &&) = delete;
+
+    template <typename Number_T_>
+    explicit VNumber(const Number_T_ &num) noexcept : number_{num} {
+    }
+
+    inline void SetNumber(double num) noexcept {
+        number_.ddl = num;
+    }
+
+    inline void SetNumber(unsigned long long num) noexcept {
+        number_.ull = num;
+    }
+
+    inline void SetNumber(long long num) noexcept {
+        number_.sll = num;
+    }
+
+    inline unsigned long long GetUInt64() const noexcept {
+        return number_.ull;
+    }
+
+    inline long long GetInt64() const noexcept {
+        return number_.sll;
+    }
+
+    inline double GetDouble() const noexcept {
+        return number_.ddl;
+    }
+
+    inline void ClearAll() noexcept {
+        if constexpr (Config::PointerTagging) {
+            number_.ull = 0;
+            p_number_   = 0;
+        }
+    }
+
+  private:
+    union Number_T {
+        explicit Number_T(unsigned long long num) noexcept : ull{num} {
+        }
+
+        explicit Number_T(long long num) noexcept : sll{num} {
+        }
+
+        explicit Number_T(double num) noexcept : ddl{num} {
+        }
+
+        unsigned long long ull;
+        long long          sll;
+        double             ddl;
+        SizeT              padding_[2]{0}; // Just in case SizeT is set to long
+    };
+
+#ifndef QENTEM_BIG_ENDIAN
+    Number_T           number_{0ULL};
+    unsigned long long p_number_{0ULL};
+#else
+    unsigned long long p_number_{0ULL};
+    Number_T           number_{0ULL};
+#endif
+};
+
 template <typename Char_T_>
 class Value {
     using JSONotation = JSONotation_T_<Char_T_>;
@@ -1743,93 +1826,7 @@ class Value {
         }
     }
 
-    struct VNumber {
-      public:
-        VNumber()  = default;
-        ~VNumber() = default;
-
-        VNumber(VNumber &&v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
-            v_num.number_.ull = 0;
-            v_num.p_number_   = 0;
-        }
-
-        VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
-        }
-
-        VNumber &operator=(const VNumber &v_num) noexcept {
-            if (this != &v_num) {
-                number_   = v_num.number_;
-                p_number_ = v_num.p_number_;
-            }
-
-            return *this;
-        }
-
-        VNumber &operator=(VNumber &&) = delete;
-
-        template <typename Number_T_>
-        explicit VNumber(const Number_T_ &num) noexcept : number_{num} {
-        }
-
-        inline void SetNumber(double num) noexcept {
-            number_.ddl = num;
-        }
-
-        inline void SetNumber(unsigned long long num) noexcept {
-            number_.ull = num;
-        }
-
-        inline void SetNumber(long long num) noexcept {
-            number_.sll = num;
-        }
-
-        inline unsigned long long GetUInt64() const noexcept {
-            return number_.ull;
-        }
-
-        inline long long GetInt64() const noexcept {
-            return number_.sll;
-        }
-
-        inline double GetDouble() const noexcept {
-            return number_.ddl;
-        }
-
-        inline void ClearAll() noexcept {
-            if constexpr (Config::PointerTagging) {
-                number_.ull = 0;
-                p_number_   = 0;
-            }
-        }
-
-      private:
-        union Number_T_ {
-            Number_T_() = default;
-            explicit Number_T_(unsigned long long num) noexcept : ull{num} {
-            }
-
-            explicit Number_T_(long long num) noexcept : sll{num} {
-            }
-
-            explicit Number_T_(double num) noexcept : ddl{num} {
-            }
-
-            unsigned long long ull;
-            long long          sll;
-            double             ddl;
-            SizeT              padding_[2]{0}; // Just in case SizeT is set to long
-        };
-
-#ifndef QENTEM_BIG_ENDIAN
-        Number_T_          number_{};
-        unsigned long long p_number_{0};
-#else
-        unsigned long long p_number_{0};
-        Number_T_          number_{};
-#endif
-    };
-
-    struct TagType {
+    struct VType {
 #ifndef QENTEM_BIG_ENDIAN
       private:
         SizeT index_capacity_[2]{0};
@@ -1851,7 +1848,7 @@ class Value {
         VString string_;
         VNumber number_;
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        TagType type_;
+        VType type_;
 #endif
     };
 
