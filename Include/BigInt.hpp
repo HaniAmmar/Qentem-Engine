@@ -219,15 +219,28 @@ struct BigInt {
     }
     ////////////////////////////////////////////////////
     inline Number_T_ DivideBy(const Number_T_ divisor) noexcept {
-        Number_T_ remainder = 0;
         Number_T_ index     = index_id_;
-
-        remainder = (big_int_[index_id_] % divisor);
+        Number_T_ remainder = (big_int_[index_id_] % divisor);
         big_int_[index_id_] /= divisor;
+
+        const unsigned int initial_shift = [=]() noexcept -> unsigned int {
+            static constexpr unsigned int max_index = (BitSize() - 1U);
+
+            if constexpr (BitSize() == 64U) {
+                return (max_index - Platform::FindLastBit(divisor));
+            } else {
+                return 0U;
+            }
+        }();
 
         while (index != Number_T_{0}) {
             --index;
-            DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor);
+
+            if constexpr (BitSize() == 64U) {
+                DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor, initial_shift);
+            } else {
+                DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor);
+            }
         }
 
         index_id_ -= ((index_id_ > Number_T_{0}) && (big_int_[index_id_] == Number_T_{0}));
@@ -371,6 +384,14 @@ struct BigInt {
                 (unsigned int)(TotalBits() > (1U << Platform::FindLastBitConst(TotalBits()))));
     }
 
+    inline void SetIndex(Number_T_ id) noexcept {
+        index_id_ = id;
+    }
+
+    inline Number_T_ *Storage() noexcept {
+        return big_int_;
+    }
+
   private:
     Number_T_ big_int_[MaxIndex() + Number_T_{1}]{0};
     Number_T_ index_id_{0};
@@ -466,12 +487,14 @@ struct DoubleSize<Number_T_, 32U> {
 template <typename Number_T_>
 struct DoubleSize<Number_T_, 64U> {
 #ifdef QENTEM_64BIT_ARCH
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+                              const unsigned int initial_shift) {
+        (void)initial_shift;
 #ifdef _MSC_VER
         dividend_low = _udiv128(dividend_high, dividend_low, divisor, &dividend_high);
 #else
         __uint128_t dividend128 = dividend_high;
-        dividend128 <<= 64U;
+        dividend128 <<= width;
         dividend128 |= dividend_low;
         dividend_high = Number_T_(dividend128 % divisor);
         dividend128 /= divisor;
@@ -479,21 +502,17 @@ struct DoubleSize<Number_T_, 64U> {
 #endif
     }
 #endif
-
     inline static Number_T_ Multiply(Number_T_ &number, Number_T_ multiplier) noexcept {
-        // constexpr unsigned int shift = (sizeof(Number_T_) * 4U);
-        // constexpr Number_T_    mask  = (Number_T_{1} << shift) - Number_T_{1};
-        constexpr unsigned int shift = 32U;
-        constexpr Number_T_    mask  = 0xFFFFFFFFU;
-
-        Number_T_       number_high    = (number >> shift);
         const Number_T_ number_low     = (number & mask);
+        Number_T_       number_high    = number;
         Number_T_       multiplier_low = (multiplier & mask);
 
         number = (number_low * multiplier_low);
 
+        number_high >>= shift;
         multiplier_low *= number_high;
         multiplier_low += (number >> shift);
+        number &= mask;
 
         multiplier >>= shift;
         number_high *= multiplier;
@@ -502,12 +521,17 @@ struct DoubleSize<Number_T_, 64U> {
         multiplier_low &= mask;
         multiplier_low += (number_low * multiplier);
 
-        number &= mask;
         number |= (multiplier_low << shift);
-        number_high += (multiplier_low >> shift);
+        multiplier_low >>= shift;
+        number_high += multiplier_low;
 
         return number_high;
     }
+
+  private:
+    static constexpr unsigned int width = (sizeof(Number_T_) * 8U);
+    static constexpr unsigned int shift = (width / 2U);
+    static constexpr Number_T_    mask  = (~(Number_T_{0}) >> shift);
 };
 
 } // namespace Qentem
