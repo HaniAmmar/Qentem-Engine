@@ -314,7 +314,7 @@ inline static unsigned int FindLastBit(Number_T_ value) noexcept {
         constexpr unsigned int int_size   = 32U;
         constexpr unsigned int taken_size = (int_size - 1U);
 
-        if constexpr (size == 64U) {
+        if constexpr (size == 63U) {
             // ---> 01010101
             const unsigned int lower_bits = (unsigned int)(value);
             value >>= int_size;
