@@ -64,12 +64,12 @@ struct BigInt {
         return *this;
     }
 
-    inline explicit operator Number_T_() const {
+    inline explicit operator Number_T_() const noexcept {
         return big_int_[0];
     }
 
     template <typename N_Number_T_>
-    inline explicit operator N_Number_T_() const {
+    inline explicit operator N_Number_T_() const noexcept {
         constexpr unsigned int n_size = (sizeof(N_Number_T_) * 8U);
 
         if constexpr (n_size == BitSize()) {
@@ -488,7 +488,7 @@ template <typename Number_T_>
 struct DoubleSize<Number_T_, 64U> {
 #ifdef QENTEM_64BIT_ARCH
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
-                              const unsigned int initial_shift) {
+                              const unsigned int initial_shift) noexcept {
         (void)initial_shift;
 #ifdef _MSC_VER
         dividend_low = _udiv128(dividend_high, dividend_low, divisor, &dividend_high);

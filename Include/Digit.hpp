@@ -64,19 +64,18 @@ struct Digit {
         } else {
             constexpr unsigned int max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
             Char_T_                storage[max_number_of_digits];
-            QNumber                qnum{number};
 
             if constexpr (!IsUnsigned<Number_T_>()) {
-                if (qnum.Integer < 0) {
-                    qnum.Integer = -qnum.Integer;
+                if (number < 0) {
+                    number = -number;
                     stream += DigitUtils::DigitChars::NegativeChar;
                 }
             }
 
             if constexpr (Reverse_V_) {
-                stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), number));
+                stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), QNumber{number}.Natural));
             } else {
-                const SizeT offset = intToString(&(storage[max_number_of_digits]), qnum.Natural);
+                const SizeT offset = intToString(&(storage[max_number_of_digits]), QNumber{number}.Natural);
                 stream.Write(&(storage[max_number_of_digits - offset]), offset);
             }
         }
@@ -114,12 +113,14 @@ struct Digit {
         number       = 0;
 
         if (offset < length) {
-            number += (Number_T_(content[offset]) - Number_T_(DigitUtils::DigitChars::ZeroChar));
+            number += Number_T_(content[offset]);
+            number -= Number_T_{DigitUtils::DigitChars::ZeroChar};
             ++offset;
 
             while (offset < length) {
                 number *= Number_T_{10};
-                number += (Number_T_(content[offset]) - Number_T_(DigitUtils::DigitChars::ZeroChar));
+                number += Number_T_(content[offset]);
+                number -= Number_T_{DigitUtils::DigitChars::ZeroChar};
                 ++offset;
             }
         }
@@ -136,6 +137,7 @@ struct Digit {
     template <typename Char_T_>
     static QNumberType stringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
+        using Number_T             = decltype(number.Natural);
         constexpr SizeT max_length = SizeT{19};
         number.Natural             = 0;
 
@@ -164,7 +166,8 @@ struct Digit {
 
                 if ((digit > DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
                     // 123456789
-                    number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                    number.Natural += Number_T(digit);
+                    number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
                     tmp_offset   = (((end_offset - offset) < max_length) ? end_offset : (offset + max_length));
                     start_offset = offset;
                     ++offset;
@@ -224,7 +227,8 @@ struct Digit {
                         if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
                             (digit <= DigitUtils::DigitChars::NineChar)) {
                             number.Natural *= 10ULL;
-                            number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                            number.Natural += Number_T(digit);
+                            number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
                             ++offset;
                             continue;
                         }
@@ -291,7 +295,8 @@ struct Digit {
                                 }
 
                                 number.Natural *= 10ULL;
-                                number.Natural += (unsigned int)(digit - DigitUtils::DigitChars::ZeroChar);
+                                number.Natural += Number_T(digit);
+                                number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
                                 ++offset;
                                 ++tmp_offset;
 
@@ -563,7 +568,9 @@ struct Digit {
                 number >>= 1U;
                 exp += (number > 0x1FFFFFFFFFFFFFULL);
             } else {
-                number >>= (shifted - exp) + 1U;
+                shifted -= exp;
+                ++shifted;
+                number >>= shifted;
                 number += (number & 1ULL);
                 number >>= 1U;
                 exp = (number > 0xFFFFFFFFFFFFFULL);

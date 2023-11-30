@@ -75,7 +75,7 @@ QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &str
 }
 
 template <typename Number_T_>
-static bool StringToNumber(TestHelper &helper, Number_T_ &num, const char *str) noexcept {
+static bool StringToNumber(const TestHelper &helper, Number_T_ &num, const char *str) noexcept {
     QNumber     number;
     SizeT       offset = 0;
     const SizeT length = StringUtils::Count(str);

@@ -549,7 +549,7 @@ class HArray {
     }
 
     HAItem_ *allocate(SizeT new_capacity) {
-        constexpr SizeT size_sum = SizeT(sizeof(SizeT) + sizeof(HAItem_));
+        constexpr SizeT size_sum = SizeT{sizeof(SizeT) + sizeof(HAItem_)};
 
         if (new_capacity < SizeT{2}) {
             new_capacity = SizeT{2};

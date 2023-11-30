@@ -44,14 +44,14 @@ enum class ValueType : unsigned char {
 };
 
 struct VNumber {
-    VNumber() = default;
+    VNumber()                      = default;
+    VNumber &operator=(VNumber &&) = default;
+    VNumber(const VNumber &)       = default;
+    ~VNumber()                     = default;
 
     VNumber(VNumber &&v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
         v_num.number_.ull = 0;
         v_num.p_number_   = 0;
-    }
-
-    VNumber(const VNumber &v_num) noexcept : number_{v_num.number_}, p_number_{v_num.p_number_} {
     }
 
     VNumber &operator=(const VNumber &v_num) noexcept {
@@ -62,8 +62,6 @@ struct VNumber {
 
         return *this;
     }
-
-    VNumber &operator=(VNumber &&) = delete;
 
     template <typename Number_T_>
     explicit VNumber(const Number_T_ &num) noexcept : number_{num} {
