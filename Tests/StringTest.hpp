@@ -50,9 +50,15 @@ static void TestString1(TestHelper &helper) {
     str1 = String8("abcd");
     helper.Equal(str1.Length(), 4U, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__); // Dose it have /0 at the end?
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
     helper.Equal(str1, "abcd", "str1", __LINE__);
     helper.NotEqual(str1, "abcdef", "str1", "abcdef", __LINE__);
+
+    str1 = String8("abcd-bcd");
+    helper.Equal(str1.Length(), 8U, "Length", __LINE__);
+    helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1, "abcd-bcd", "str1", __LINE__);
 
     str1 = String8("abcd", 2U);
     helper.Equal(str1.Length(), 2U, "Length", __LINE__);
