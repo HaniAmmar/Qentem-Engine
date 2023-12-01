@@ -39,11 +39,6 @@ struct Config {
     static constexpr unsigned int TemplatePrecision{3U};
     static constexpr unsigned int PointerSize{sizeof(void *)};
     static constexpr bool         Is64bit{(PointerSize == 8U)};
-
-#if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__) || defined(_M_ARM64) || defined(__ppc64__) ||       \
-    defined(__powerpc64__) || defined(__s390__)
-#define QENTEM_64BIT_ARCH 1
-#endif
     ///////////////////////////////////////////////
 #ifndef QENTEM_BIG_ENDIAN
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
@@ -58,7 +53,8 @@ struct Config {
 #undef QENTEM_BIG_ENDIAN
 #endif
 ///////////////////////////////////////////////
-#ifdef QENTEM_64BIT_ARCH
+#if defined(_M_X64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__powerpc64__) ||  \
+    defined(__s390__)
 // 64bit arch only uses the lower 48 bits for pointers,
 // the upper 16 bits can be used for tagging.
 #ifndef QENTEM_POINTER_TAGGING

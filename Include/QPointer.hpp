@@ -35,14 +35,14 @@ class QPointer {
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
-    explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {
+    inline explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {
     }
 
-    QPointer(QPointer &&src) noexcept : pointer_{src.pointer_} {
+    inline QPointer(QPointer &&src) noexcept : pointer_{src.pointer_} {
         src.pointer_ = nullptr;
     }
 
-    QPointer &operator=(QPointer &&src) noexcept {
+    inline QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
             pointer_     = src.pointer_;
             src.pointer_ = nullptr;
@@ -51,7 +51,7 @@ class QPointer {
         return *this;
     }
 
-    void SetPointer(Type_T_ *pointer) noexcept {
+    inline void SetPointer(Type_T_ *pointer) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         union {
             Type_T_           *M_PTR;
@@ -67,7 +67,7 @@ class QPointer {
 #endif
     }
 
-    Type_T_ *GetPointer() const noexcept {
+    inline Type_T_ *GetPointer() const noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         union {
             Type_T_           *M_PTR;
@@ -81,7 +81,7 @@ class QPointer {
 #endif
     }
 
-    void MovePointerOnly(QPointer &src) noexcept {
+    inline void MovePointerOnly(QPointer &src) noexcept {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
         bits_.number_ = src.bits_.number_;
 #else
@@ -92,19 +92,18 @@ class QPointer {
     }
 
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(unsigned char byte) noexcept {
         bits_.high_byte_ = byte;
     }
 
-    unsigned char GetHighByte() const noexcept {
+    inline unsigned char GetHighByte() const noexcept {
         return bits_.high_byte_;
     }
 
-    void SetLowByte(unsigned char byte) noexcept {
+    inline void SetLowByte(unsigned char byte) noexcept {
         bits_.low_byte_ = byte;
     }
-
-    unsigned char GetLowByte() const noexcept {
+    inline unsigned char GetLowByte() const noexcept {
         return bits_.low_byte_;
     }
 #else
@@ -125,7 +124,7 @@ class QPointer {
     }
 #endif
 
-    void Reset() noexcept {
+    inline void Reset() noexcept {
         pointer_ = nullptr;
     }
 

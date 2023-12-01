@@ -182,7 +182,7 @@ struct QentemSIMD {
 
 #ifdef _MSC_VER
 #include <intrin.h>
-#ifdef QENTEM_64BIT_ARCH
+#if defined(_M_X64)
 #pragma intrinsic(_BitScanForward64)
 #pragma intrinsic(_BitScanReverse64)
 #else
