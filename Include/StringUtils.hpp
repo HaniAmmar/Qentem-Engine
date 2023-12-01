@@ -185,7 +185,7 @@ struct StringUtils {
         SizeT offset = 0;
 
         while (offset < length) {
-            hash += (base * offset * SizeT(key[offset]));
+            hash += ~(base * offset * SizeT(key[offset]));
             base += offset;
 
             if (offset != length) {
