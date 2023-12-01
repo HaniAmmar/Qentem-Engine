@@ -173,7 +173,7 @@ class Array {
 
     inline Type_ &InsertGet(Type_ &&item) {
         *this += Memory::Move(item);
-        return *(Storage() + (Size() - 1));
+        return *(Storage() + (Size() - SizeT{1}));
     }
 
     void Clear() noexcept {

@@ -89,7 +89,8 @@ struct TagBit {
         }
     }
 
-    TagBit(SizeT offset, SizeT length) noexcept : content_{offset, length}, type_{TagType::RawText} {
+    TagBit(SizeT offset, SizeT length) noexcept
+        : content_{(unsigned int)(offset), (unsigned int)(length)}, type_{TagType::RawText} {
     }
 
     ~TagBit() {

@@ -42,20 +42,20 @@ class StringStream {
     }
 
     explicit StringStream(SizeT size) {
-        if (size != 0) {
+        if (size != SizeT{0}) {
             allocate(size);
         }
     }
 
     StringStream(StringStream &&src) noexcept
         : storage_{src.Storage()}, length_{src.Length()}, capacity_{src.Capacity()} {
-        src.setLength(0);
-        src.setCapacity(0);
+        src.setLength(SizeT{0});
+        src.setCapacity(SizeT{0});
         src.clearStorage();
     }
 
     StringStream(const StringStream &src) {
-        if (src.Length() != 0) {
+        if (src.Length() != SizeT{0}) {
             allocate(src.Length());
             write(src.First(), src.Length());
         }
@@ -68,8 +68,8 @@ class StringStream {
             setLength(src.Length());
             setCapacity(src.Capacity());
 
-            src.setLength(0);
-            src.setCapacity(0);
+            src.setLength(SizeT{0});
+            src.setCapacity(SizeT{0});
             src.clearStorage();
         }
 
@@ -78,8 +78,8 @@ class StringStream {
 
     StringStream &operator=(const StringStream &src) {
         if (this != &src) {
-            setLength(0);
-            setCapacity(0);
+            setLength(SizeT{0});
+            setCapacity(SizeT{0});
             Memory::Deallocate(Storage());
             clearStorage();
             write(src.First(), src.Length());
@@ -89,8 +89,8 @@ class StringStream {
     }
 
     StringStream &operator=(const Char_T_ *str) {
-        setLength(0);
-        setCapacity(0);
+        setLength(SizeT{0});
+        setCapacity(SizeT{0});
         Memory::Deallocate(Storage());
         clearStorage();
         write(str, StringUtils::Count(str));
@@ -99,8 +99,8 @@ class StringStream {
     }
 
     StringStream &operator=(const String<Char_T_> &src) {
-        setLength(0);
-        setCapacity(0);
+        setLength(SizeT{0});
+        setCapacity(SizeT{0});
         Memory::Deallocate(Storage());
         clearStorage();
         write(src.First(), src.Length());
@@ -112,7 +112,7 @@ class StringStream {
         if (Capacity() == Length()) {
             SizeT n_size = Capacity();
 
-            if (n_size == 0) {
+            if (n_size == SizeT{0}) {
                 n_size = initial_size_;
             }
 
@@ -140,11 +140,11 @@ class StringStream {
         const SizeT len = src.Length();
 
         if (src.Capacity() > len) {
-            src.Storage()[len] = 0;
+            src.Storage()[len] = Char_T_{0};
             out << src.First();
         } else {
             StringStream n_src = src;
-            n_src += Char_T_{'\0'};
+            n_src += Char_T_{0};
             out << n_src.First();
         }
 
@@ -172,37 +172,20 @@ class StringStream {
     }
 
     inline bool operator==(const StringStream &stream) const noexcept {
-        if (Length() != stream.Length()) {
-            return false;
-        }
-
-        return StringUtils::IsEqual(First(), stream.First(), Length());
+        return ((Length() == stream.Length()) && StringUtils::IsEqual(First(), stream.First(), Length()));
     }
 
     inline bool operator==(const String<Char_T_> &string) const noexcept {
-        if (Length() != string.Length()) {
-            return false;
-        }
-
-        return StringUtils::IsEqual(First(), string.First(), Length());
+        return ((Length() == string.Length()) && StringUtils::IsEqual(First(), string.First(), Length()));
     }
 
     inline bool operator==(const Char_T_ *str) const noexcept {
         const SizeT len = StringUtils::Count(str);
-
-        if (Length() != len) {
-            return false;
-        }
-
-        return StringUtils::IsEqual(First(), str, len);
+        return ((Length() == len) && StringUtils::IsEqual(First(), str, len));
     }
 
     inline bool IsEqual(const Char_T_ *str, const SizeT length) const noexcept {
-        if (Length() != length) {
-            return false;
-        }
-
-        return StringUtils::IsEqual(First(), str, length);
+        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
     }
 
     inline bool operator!=(const StringStream &stream) const noexcept {
@@ -222,12 +205,12 @@ class StringStream {
     }
 
     inline void Clear() noexcept {
-        setLength(0);
+        setLength(SizeT{0});
     }
 
     void Reset() noexcept {
-        setLength(0);
-        setCapacity(0);
+        setLength(SizeT{0});
+        setCapacity(SizeT{0});
         Memory::Deallocate(Storage());
         clearStorage();
     }
@@ -238,7 +221,7 @@ class StringStream {
         }
     }
 
-    inline void Reverse(SizeT index = 0) noexcept {
+    inline void Reverse(SizeT index = SizeT{0}) noexcept {
         SizeT end = Length();
 
         while (index < end) {
@@ -291,8 +274,8 @@ class StringStream {
     }
 
     Char_T_ *Detach() noexcept {
-        setLength(0);
-        setCapacity(0);
+        setLength(SizeT{0});
+        setCapacity(SizeT{0});
         Char_T_ *str = Storage();
         clearStorage();
 
@@ -303,7 +286,7 @@ class StringStream {
         const SizeT len = Length();
 
         if (Capacity() > len) {
-            Storage()[len] = 0;
+            Storage()[len] = Char_T_{0};
             return String<Char_T_>(Detach(), len);
         }
 
@@ -342,7 +325,7 @@ class StringStream {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Length() == 0);
+        return (Length() == SizeT{0});
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -391,7 +374,7 @@ class StringStream {
     }
 
     inline void write(const Char_T_ *str, const SizeT len) {
-        if (len != 0) {
+        if (len != SizeT{0}) {
             const SizeT current_offset = Length();
             length_ += len;
 
@@ -412,7 +395,7 @@ class StringStream {
         Memory::Deallocate(src);
     }
 
-    static constexpr SizeT initial_size_ = 4; // * 4 = 16
+    static constexpr SizeT initial_size_ = SizeT{4}; // * 4 = 16
 
     Char_T_ *storage_{nullptr};
     SizeT    length_{0};

@@ -39,7 +39,7 @@
 
 namespace Qentem::Test {
 
-static SizeT HexStringToNumber(const char *str) noexcept {
+static unsigned int HexStringToNumber(const char *str) noexcept {
     return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
@@ -2035,8 +2035,8 @@ static void TestStringToNumber7(TestHelper &helper) {
 }
 
 static void TestHexStringToNumber(TestHelper &helper) {
-    SizeT       number;
-    const char *hex = "";
+    unsigned int number;
+    const char  *hex = "";
 
     number = HexStringToNumber(hex);
     helper.Equal(number, 0U, "number", __LINE__);

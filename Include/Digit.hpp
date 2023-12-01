@@ -924,8 +924,8 @@ struct Digit {
         NumberToString(stream, power_of_ten);
     }
 
-    template <typename Stream_T_, typename Number_T_>
-    inline static void insertZeros(Stream_T_ &stream, const Number_T_ length) {
+    template <typename Stream_T_>
+    inline static void insertZeros(Stream_T_ &stream, const SizeT length) {
         using Char_T_               = typename Stream_T_::CharType;
         constexpr unsigned int size = sizeof(Char_T_);
         stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
@@ -940,7 +940,7 @@ struct Digit {
             NumberToString<true>(stream, bint.DivideBy(DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits]));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            insertZeros(stream, (DigitLimit::MaxPowerOfTenDigits - (stream.Length() - length)));
+            insertZeros(stream, (DigitLimit::MaxPowerOfTenDigits - SizeT(stream.Length() - length)));
         }
 
         if (bint.NotZero()) {
@@ -966,21 +966,23 @@ struct Digit {
     static void formatStringNumber(Stream_T_ &stream, const SizeT started_at, const unsigned int precision,
                                    const unsigned int calculated_digits, unsigned int fraction_length,
                                    const bool is_positive_exp, const bool round_up) {
-        using Char_T_                    = typename Stream_T_::CharType;
-        const SizeT        stream_length = (stream.Length() - started_at);
-        SizeT              index         = started_at;
-        SizeT              power;
-        SizeT              length;
-        const unsigned int precision_plus_one = (precision + 1U);
+        using Char_T_             = typename Stream_T_::CharType;
+        const SizeT stream_length = (stream.Length() - started_at);
+        SizeT       index         = started_at;
+        SizeT       power;
+        SizeT       length;
+        const SizeT precision_plus_one = SizeT(precision + SizeT{1});
 
         if (is_positive_exp) {
-            length = stream_length +
-                     ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : 0) -
-                     fraction_length;
+            length =
+                SizeT(stream_length +
+                      ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
+                      fraction_length);
             power = (length - SizeT{1});
         } else {
             length = stream_length;
-            power  = (((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT{0}) + SizeT{1});
+            power =
+                (((fraction_length > stream_length) ? SizeT(fraction_length - stream_length) : SizeT{0}) + SizeT{1});
         }
 
         if (stream_length > precision_plus_one) {
@@ -1030,11 +1032,11 @@ struct Digit {
         if (!display_exp) {
             if ((fraction_length != 0) && (fraction_length > index2)) {
                 if (!is_positive_exp && (power != 0)) {
-                    insertZeros(stream, (power - 1U));
+                    insertZeros(stream, SizeT(power - SizeT{1}));
                     stream += DigitUtils::DigitChars::DotChar;
                     stream += DigitUtils::DigitChars::ZeroChar;
                 } else if ((stream_length - SizeT{1}) != index2) {
-                    stream.InsertAt(DigitUtils::DigitChars::DotChar, (fraction_length + started_at));
+                    stream.InsertAt(DigitUtils::DigitChars::DotChar, SizeT(fraction_length + started_at));
                 }
             }
         } else if ((stream_length - SizeT{1}) != index2) {

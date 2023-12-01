@@ -215,7 +215,7 @@ static void TestEngine1(TestHelper &helper) {
     ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, (content_len - 1), content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT(content_len - SizeT{1}), content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     find_       = "ABC";
@@ -291,13 +291,13 @@ static void TestEngine2(TestHelper &helper) {
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "00000001", 0U, 8U);
+    ret = Engine::FindOne('1', "00000001", SizeT{0}, SizeT{8});
     helper.Equal(ret, 8U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "0000000000000001", 0U, 16U);
+    ret = Engine::FindOne('1', "0000000000000001", SizeT{0}, SizeT{16});
     helper.Equal(ret, 16U, "return", __LINE__);
 
-    ret = Engine::FindOne('1', "00000000000000000000000000000001", 0U, 32U);
+    ret = Engine::FindOne('1', "00000000000000000000000000000001", SizeT{0}, SizeT{32});
     helper.Equal(ret, 32U, "return", __LINE__);
 
     content     = "ABC   ";

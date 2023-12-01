@@ -174,7 +174,7 @@ struct QuickSort {
 
 /////////////////////////////////////////////////////////////////////
 inline static SizeT AlignSize(SizeT n_size) noexcept {
-    const SizeT size = (SizeT{1} << Platform::FindLastBit(n_size));
+    const SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size));
 
     if (size < n_size) {
         return (size * SizeT{2});
@@ -185,7 +185,7 @@ inline static SizeT AlignSize(SizeT n_size) noexcept {
 /////////////////////////////////////////////////////////////////////
 template <typename Type_>
 inline static Type_ *Allocate(SizeT size) {
-    Type_ *pointer = ChangePointer<Type_>(::operator new(size * sizeof(Type_)));
+    Type_ *pointer = ChangePointer<Type_>(::operator new(SystemIntType(size * sizeof(Type_))));
 
 #ifdef QENTEM_TEST_HELPER_H_
     MemoryRecord::AddAllocation(pointer);
