@@ -1063,7 +1063,7 @@ struct Digit {
              ((*number > DigitUtils::DigitChars::FiveChar) ||
               ((*number == DigitUtils::DigitChars::FiveChar) &&
                (round_up ||
-                (((unsigned int)(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U) != 0U)))));
+                (((unsigned int)(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U) == 1U)))));
 
         if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChars::NineChar)) {
