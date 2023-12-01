@@ -587,7 +587,7 @@ struct Digit {
         using UNumber_T  = SystemIntType;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 192U> bint{number};
+        BigInt<UNumber_T, 320U> bint{number};
         //////////////////////////////////////////////////////////////
         constexpr unsigned int bint_limit  = 2U;
         constexpr unsigned int shift_limit = (sizeof(UNumber_T) * 8U);
