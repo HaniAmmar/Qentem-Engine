@@ -486,22 +486,78 @@ struct DoubleSize<Number_T_, 32U> {
 ////////////////////////////////////////////////////
 template <typename Number_T_>
 struct DoubleSize<Number_T_, 64U> {
-#ifdef QENTEM_64BIT_ARCH
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
                               const unsigned int initial_shift) noexcept {
-        (void)initial_shift;
-#ifdef _MSC_VER
-        dividend_low = _udiv128(dividend_high, dividend_low, divisor, &dividend_high);
-#else
-        __uint128_t dividend128 = dividend_high;
-        dividend128 <<= width;
-        dividend128 |= dividend_low;
-        dividend_high = Number_T_(dividend128 % divisor);
-        dividend128 /= divisor;
-        dividend_low = Number_T_(dividend128);
-#endif
+        const Number_T_ divisor_shifted = (divisor << initial_shift);
+        dividend_high <<= initial_shift;
+        // -----------------------
+        const Number_T_ carry = (dividend_low % divisor);
+        dividend_low /= divisor;
+        // -----------------------
+        const Number_T_ divisor_low  = (divisor_shifted >> shift);
+        const Number_T_ divisor_high = (divisor_shifted & mask);
+        // -----------------------
+        Number_T_ quotient = (dividend_high / divisor_low);
+        dividend_high %= divisor_low;
+        Number_T_ reminder = (quotient * divisor_high);
+
+        dividend_high <<= shift;
+
+        if (dividend_high < reminder) {
+            --quotient;
+
+            if ((reminder - dividend_high) > divisor_shifted) {
+                --quotient;
+                reminder -= divisor_shifted;
+            }
+
+            reminder -= divisor_shifted;
+        }
+
+        dividend_high -= reminder;
+        // -----------------------
+        quotient <<= shift;
+        dividend_low += quotient;
+        // -----------------------
+        quotient = (dividend_high / divisor_low);
+        dividend_high %= divisor_low;
+        reminder = (quotient * divisor_high);
+
+        dividend_high <<= shift;
+
+        if (dividend_high < reminder) {
+            --quotient;
+
+            if ((reminder - dividend_high) > divisor_shifted) {
+                --quotient;
+                reminder -= divisor_shifted;
+            }
+
+            reminder -= divisor_shifted;
+        }
+
+        dividend_high -= reminder;
+        // -----------------------
+        dividend_low += quotient;
+        // -----------------------
+        dividend_high >>= initial_shift;
+        // -----------------------
+        const Number_T_ original_dividend_high = dividend_high;
+        dividend_high += carry;
+        // -----------------------
+        if (original_dividend_high > dividend_high) {
+            // Overflow
+            constexpr Number_T_ overflow_dividend = (Number_T_{1} << (width - 1U));
+            dividend_high += ((overflow_dividend % (divisor >> 1U)) << 1U);
+            ++dividend_low;
+        }
+
+        if (dividend_high >= divisor) {
+            dividend_high -= divisor;
+            ++dividend_low;
+        }
     }
-#endif
+
     inline static Number_T_ Multiply(Number_T_ &number, Number_T_ multiplier) noexcept {
         const Number_T_ number_low     = (number & mask);
         Number_T_       number_high    = number;
