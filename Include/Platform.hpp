@@ -210,7 +210,7 @@ inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
 
         return (unsigned int)(index);
     } else {
-        constexpr unsigned int int_size = 32U;
+        constexpr unsigned int int_size = (sizeof(int) * 8U);
 
         if constexpr (size == 64U) {
             // 01010101 <---
@@ -246,7 +246,7 @@ inline static unsigned int FindLastBit(Number_T_ value) noexcept {
 
         return (unsigned int)(index);
     } else {
-        constexpr unsigned int int_size = 32U;
+        constexpr unsigned int int_size = (sizeof(int) * 8U);
 
         if constexpr (size == 64U) {
             // 01010101 <---
@@ -281,7 +281,7 @@ inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
 
         return (unsigned int)(__builtin_ctz((unsigned int)(value)));
     } else {
-        constexpr unsigned int int_size = 32U;
+        constexpr unsigned int int_size = (sizeof(int) * 8U);
 
         if constexpr (size == 64U) {
             // 01010101 <---
@@ -302,18 +302,17 @@ inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
 template <typename Number_T_>
 inline static unsigned int FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size = (sizeof(Number_T_) * 8U) - 1U;
+    constexpr unsigned int int_size   = (sizeof(int) * 8U);
+    constexpr unsigned int taken_size = (int_size - 1U);
+    constexpr unsigned int size       = ((sizeof(Number_T_) * 8U) - 1U);
 
     if constexpr (Config::Is64bit) {
         if constexpr (size == 63U) {
             return (size - (unsigned int)(__builtin_clzl((unsigned long)(value))));
         }
 
-        return (size - (unsigned int)(__builtin_clz((unsigned int)(value))));
+        return (taken_size - (unsigned int)(__builtin_clz((unsigned int)(value))));
     } else {
-        constexpr unsigned int int_size   = 32U;
-        constexpr unsigned int taken_size = (int_size - 1U);
-
         if constexpr (size == 63U) {
             // ---> 01010101
             const unsigned int lower_bits = (unsigned int)(value);
