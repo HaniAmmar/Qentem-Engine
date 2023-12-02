@@ -314,9 +314,9 @@ struct BigInt {
     }
     ////////////////////////////////////////////////////
     inline unsigned int FindFirstBit() const noexcept {
-        Number_T_ index = 0;
+        Number_T_ index = Number_T_{0};
 
-        while ((big_int_[index] == 0) && (index <= index_id_)) {
+        while ((big_int_[index] == Number_T_{0}) && (index <= index_id_)) {
             ++index;
         }
 
@@ -396,17 +396,13 @@ struct BigInt {
     Number_T_ big_int_[MaxIndex() + Number_T_{1}]{0};
     Number_T_ index_id_{0};
 
-    inline void set(const Number_T_ number) noexcept {
-        big_int_[0U] = number;
-    }
-
     template <typename N_Number_T_>
     inline void set(N_Number_T_ number) noexcept {
         constexpr unsigned int n_size = ((sizeof(N_Number_T_) * 8U) / BitSize());
 
-        big_int_[0U] = Number_T_(number);
-
         if constexpr (n_size > 1U) {
+            big_int_[0U] = Number_T_(number);
+
             number >>= BitSize();
 
             while (number != N_Number_T_{0}) {
@@ -414,6 +410,8 @@ struct BigInt {
                 big_int_[index_id_] = Number_T_(number);
                 number >>= BitSize();
             }
+        } else {
+            big_int_[0U] = number;
         }
     }
 };
@@ -548,6 +546,7 @@ struct DoubleSize<Number_T_, 64U> {
         if (original_dividend_high > dividend_high) {
             // Overflow
             constexpr Number_T_ overflow_dividend = (Number_T_{1} << (width - 1U));
+
             dividend_high += ((overflow_dividend % (divisor >> 1U)) << 1U);
             ++dividend_low;
         }
