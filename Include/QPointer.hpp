@@ -75,7 +75,10 @@ struct QPointerData<Type_T_, true> {
     }
 
     inline unsigned char GetHighByte() const noexcept {
-        return ((PtrNumber & 0xFF00000000000000ULL) >> 56U);
+        unsigned long long byte64 = PtrNumber;
+        byte64 &= 0xFF00000000000000ULL;
+        byte64 >>= 56U;
+        return (unsigned char)(byte64);
     }
 
     inline void SetLowByte(unsigned char byte) noexcept {
@@ -85,7 +88,10 @@ struct QPointerData<Type_T_, true> {
         PtrNumber |= byte64;
     }
     inline unsigned char GetLowByte() const noexcept {
-        return ((PtrNumber & 0x00FF000000000000ULL) >> 48U);
+        unsigned long long byte64 = PtrNumber;
+        byte64 &= 0x00FF000000000000ULL;
+        byte64 >>= 48U;
+        return (unsigned char)(byte64);
     }
 
     union {

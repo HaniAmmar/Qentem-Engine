@@ -485,7 +485,7 @@ struct TemplateSub {
                         const SizeT l_end_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TagPatterns::LoopPrefix, TagPatterns::LoopPrefixLength, TagPatterns::LoopSuffix,
                             TagPatterns::LoopSuffixLength, content_,
-                            SizeT(current_offset + TagPatterns::InLineIfPrefixLength - 1), end_offset, length_);
+                            SizeT(current_offset + TagPatterns::InLineIfPrefixLength - SizeT{1}), end_offset, length_);
 
                         if (l_end_offset != 0) {
                             if (last_offset != offset) {
@@ -501,7 +501,7 @@ struct TemplateSub {
                         }
                     }
                 } else if (content_[current_offset] == TagPatterns::If_2ND_Char) { // <if
-                    if (StringUtils::IsEqual((TagPatterns::IfPrefix + SizeT{2}), (content_ + current_offset + 1),
+                    if (StringUtils::IsEqual((TagPatterns::IfPrefix + SizeT{2}), (content_ + current_offset + SizeT{1}),
                                              (TagPatterns::IfPrefixLength - SizeT{2}))) {
                         const SizeT i_end_offset = Engine::SkipInnerPatterns<Char_T_>(
                             TagPatterns::IfPrefix, TagPatterns::IfPrefixLength, TagPatterns::IfSuffix,
