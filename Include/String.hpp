@@ -31,10 +31,61 @@ namespace Qentem {
 
 /*
  * String container with null terminator and a taggable pointer.
- *
- * If the length is less than ((6 + (sizeof(SizeT) * 2))/ sizeof(Char_T_)) the
- * string will be stored on the stack.
  */
+
+template <typename Type_T_, bool>
+struct StringData;
+
+template <typename Char_T_>
+struct StringData<Char_T_, false> {
+    // Little-Endian
+    StringData() = default;
+
+    StringData(SizeT padding, SizeT length, QPointer<Char_T_> &&storage) noexcept
+        : Padding{padding}, Length{length}, Storage{Memory::Move(storage)} {
+    }
+
+    inline Char_T_ *shortStorage() noexcept {
+        return Memory::ChangePointer<Char_T_>(&Padding);
+    }
+
+    inline const Char_T_ *shortStorage() const noexcept {
+        return Memory::ChangePointer<const Char_T_>(&Padding);
+    }
+
+    SizeT             Padding{0};
+    SizeT             Length{0};
+    QPointer<Char_T_> Storage{};
+};
+
+template <typename Char_T_>
+struct StringData<Char_T_, true> {
+    // Big-Endian
+    StringData() = default;
+
+    StringData(SizeT padding, SizeT length, QPointer<Char_T_> &&storage) noexcept
+        : Storage{Memory::Move(storage)}, Padding{padding}, Length{length} {
+    }
+
+    inline Char_T_ *shortStorage() noexcept {
+        // Two tags at the start
+        return Memory::ChangePointer<Char_T_>(Memory::ChangePointer<char>(&Storage) + 2U);
+        // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&Storage) +
+        // 2));
+    }
+
+    inline const Char_T_ *shortStorage() const noexcept {
+        // Two tags at the start
+        return Memory::ChangePointer<const Char_T_>(Memory::ChangePointer<const char>(&Storage) + 2U);
+        // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&Storage) +
+        // 2));
+    }
+
+    QPointer<Char_T_> Storage{};
+    SizeT             Padding{0};
+    SizeT             Length{0};
+};
+
 template <typename Char_T_>
 class String {
   public:
@@ -45,7 +96,7 @@ class String {
 
     String() = default;
 
-    String(String &&src) noexcept : padding_(src.padding_), length_(src.length_), storage_{Memory::Move(src.storage_)} {
+    String(String &&src) noexcept : data_{src.data_.Padding, src.data_.Length, Memory::Move(src.data_.Storage)} {
         src.clearLength();
     }
 
@@ -83,12 +134,12 @@ class String {
     }
 
     ~String() {
-        deallocate(Storage());
+        deallocate();
     }
 
     String &operator=(String &&src) noexcept {
         if (this != &src) {
-            deallocate(Storage());
+            deallocate();
             const SizeT len = src.Length();
             setLength(len);
 
@@ -103,7 +154,7 @@ class String {
                 }
             }
 
-            storage_.MovePointerOnly(src.storage_);
+            data_.Storage.MovePointerOnly(src.data_.Storage);
             src.clearLength();
         }
 
@@ -112,7 +163,7 @@ class String {
 
     String &operator=(const String &src) {
         if (this != &src) {
-            deallocate(Storage());
+            deallocate();
             copyString(src.First(), src.Length());
         }
 
@@ -120,7 +171,7 @@ class String {
     }
 
     String &operator=(const Char_T_ *str) {
-        deallocate(Storage());
+        deallocate();
         copyString(str, StringUtils::Count(str));
         return *this;
     }
@@ -231,7 +282,7 @@ class String {
     }
 
     void Reset() noexcept {
-        deallocate(Storage());
+        deallocate();
         clearLength();
         clearStorage();
     }
@@ -263,10 +314,10 @@ class String {
 
     inline SizeT Length() const noexcept {
         if constexpr (Config::ShortStringOptimization) {
-            const unsigned char len = storage_.GetLowByte();
-            return ((len == not_short_value_) ? length_ : len);
+            const unsigned char len = data_.Storage.GetLowByte();
+            return ((len == not_short_value_) ? data_.Length : len);
         } else {
-            return length_;
+            return data_.Length;
         }
     }
 
@@ -274,36 +325,22 @@ class String {
         if constexpr (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
-#ifndef QENTEM_BIG_ENDIAN
-                return Memory::ChangePointer<Char_T_>(&padding_);
-#else
-                // Two tags at the start
-                return Memory::ChangePointer<Char_T_>(Memory::ChangePointer<char>(&storage_) + 2);
-                // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) +
-                // 2));
-#endif
+                return shortStorage();
             }
         }
 
-        return storage_.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     inline const Char_T_ *Storage() const noexcept {
         if constexpr (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
-#ifndef QENTEM_BIG_ENDIAN
-                return Memory::ChangePointer<const Char_T_>(&padding_);
-#else
-                // Two tags at the start
-                return Memory::ChangePointer<const Char_T_>(Memory::ChangePointer<const char>(&storage_) + 2);
-                // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) +
-                // 2));
-#endif
+                return shortStorage();
             }
         }
 
-        return storage_.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     static String Merge(const String &src1, const String &src2) {
@@ -323,20 +360,22 @@ class String {
 
                     if (src != nullptr) {
                         Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
-                        deallocate(src);
+                        if (src_len >= ShortStringMax) {
+                            Memory::Deallocate(src);
+                        }
                     }
 
                     setStorage(ns);
 
                 } else {
-                    ns = Memory::ChangePointer<Char_T_>(&padding_);
+                    ns = Memory::ChangePointer<Char_T_>(&(data_.Padding));
                 }
             } else {
                 ns = allocate(new_len);
 
                 if (src != nullptr) {
                     Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
-                    deallocate(src);
+                    Memory::Deallocate(src);
                 }
             }
 
@@ -358,19 +397,20 @@ class String {
 
     inline void StepBack(const SizeT len) noexcept {
         if (len <= Length()) {
-            length_ -= len;
+            data_.Length -= len;
         }
     }
 
     inline void Reverse(SizeT index = SizeT{0}) noexcept {
-        SizeT end = Length();
+        SizeT    end = Length();
+        Char_T_ *str = Storage();
 
         while (index < end) {
-            const Char_T_ tmp = Storage()[index];
+            const Char_T_ tmp = str[index];
 
             --end;
-            Storage()[index] = Storage()[end];
-            Storage()[end]   = tmp;
+            str[index] = str[end];
+            str[end]   = tmp;
             ++index;
         }
     }
@@ -449,54 +489,42 @@ class String {
     inline const Char_T_ *storageLength(SizeT length) const noexcept {
         if constexpr (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
-#ifndef QENTEM_BIG_ENDIAN
-                return Memory::ChangePointer<const Char_T_>(&padding_);
-#else
-                // Two tags at the start
-                return Memory::ChangePointer<const Char_T_>(Memory::ChangePointer<const char>(&storage_) + 2);
-                // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&storage_) +
-                // 2));
-#endif
+                return shortStorage();
             }
         }
 
-        return storage_.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     void clearLength() noexcept {
         if constexpr (Config::ShortStringOptimization) {
-            storage_.SetLowByte((unsigned char)(0));
+            data_.Storage.SetLowByte((unsigned char)(0));
         }
 
-        length_ = SizeT{0};
+        data_.Length = SizeT{0};
     }
 
     void setLength(SizeT new_length) noexcept {
         if constexpr (Config::ShortStringOptimization) {
             if (new_length < ShortStringMax) {
-                storage_.SetLowByte((unsigned char)(new_length));
+                data_.Storage.SetLowByte((unsigned char)(new_length));
             } else {
-                storage_.SetLowByte(not_short_value_);
-                length_ = new_length;
+                data_.Storage.SetLowByte(not_short_value_);
+                data_.Length = new_length;
             }
         } else {
-            length_ = new_length;
+            data_.Length = new_length;
         }
     }
 
     void setStorage(Char_T_ *ptr) noexcept {
-        storage_.SetPointer(ptr);
+        data_.Storage.SetPointer(ptr);
     }
 
     Char_T_ *allocate(SizeT new_size) {
         if constexpr (Config::ShortStringOptimization) {
             if (new_size <= ShortStringMax) {
-#ifndef QENTEM_BIG_ENDIAN
-                return Memory::ChangePointer<Char_T_>(&padding_);
-#else
-                // Two tags at the start
-                return Memory::ChangePointer<Char_T_>((Memory::ChangePointer<char>(&storage_) + 2));
-#endif
+                return shortStorage();
             }
         }
 
@@ -505,19 +533,26 @@ class String {
         return ns;
     }
 
-    void deallocate(Char_T_ *old_storage) noexcept {
-        // TODO: remove Char_T_ *
+    void deallocate() noexcept {
         if constexpr (Config::ShortStringOptimization) {
             if (Length() >= ShortStringMax) {
-                Memory::Deallocate(old_storage);
+                Memory::Deallocate(Storage());
             }
         } else {
-            Memory::Deallocate(old_storage);
+            Memory::Deallocate(Storage());
         }
     }
 
     void clearStorage() noexcept {
-        storage_.Reset();
+        data_.Storage.Reset();
+    }
+
+    inline Char_T_ *shortStorage() noexcept {
+        return data_.shortStorage();
+    }
+
+    inline const Char_T_ *shortStorage() const noexcept {
+        return data_.shortStorage();
     }
 
     static String merge(const Char_T_ *str1, const SizeT len1, const Char_T_ *str2, const SizeT len2) {
@@ -542,17 +577,8 @@ class String {
         setLength(len);
     }
 
-    static constexpr unsigned char not_short_value_ = 255;
-
-#ifndef QENTEM_BIG_ENDIAN
-    SizeT             padding_{0};
-    SizeT             length_{0};
-    QPointer<Char_T_> storage_{};
-#else
-    QPointer<Char_T_> storage_{};
-    SizeT             padding_{0};
-    SizeT             length_{0};
-#endif
+    static constexpr unsigned char           not_short_value_ = 255;
+    StringData<Char_T_, Config::IsBigEndian> data_;
 };
 
 } // namespace Qentem

@@ -285,7 +285,7 @@ struct TestHelper {
 
         TestOutPut::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
-        if constexpr (Config::BigEndian) {
+        if constexpr (Config::IsBigEndian) {
             TestOutPut::Print("Endianness: Big-Endian\n");
         } else {
             TestOutPut::Print("Endianness: Little-Endian\n");

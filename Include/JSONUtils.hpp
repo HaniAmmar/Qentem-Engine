@@ -233,7 +233,7 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) 
 }
 
 template <typename, unsigned int S>
-struct JSONotationStrings {};
+struct JSONotationStrings;
 
 template <typename Char_T_>
 struct JSONotation_T_ {

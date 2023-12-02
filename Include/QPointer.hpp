@@ -28,6 +28,112 @@
 namespace Qentem {
 
 template <typename Type_T_>
+union PointerNumber {
+    inline explicit PointerNumber(Type_T_ *pointer) noexcept : Pointer{pointer} {
+    }
+
+    inline explicit PointerNumber(unsigned long long number) noexcept : Number{number} {
+    }
+
+    Type_T_           *Pointer;
+    unsigned long long Number{0};
+};
+
+template <typename Type_T_, bool>
+struct QPointerData;
+
+template <typename Type_T_>
+struct QPointerData<Type_T_, true> {
+    // With Tag
+    QPointerData() = default;
+
+    inline explicit QPointerData(Type_T_ *pointer) noexcept : Pointer{pointer} {
+    }
+
+    inline void SetPointer(Type_T_ *pointer) noexcept {
+        PointerNumber<Type_T_> pn{pointer};
+        PtrNumber &= 0xFFFF000000000000ULL;
+        pn.Pointer = pointer;
+        pn.Number &= 0xFFFFFFFFFFFFULL;
+        PtrNumber |= pn.Number;
+    }
+
+    inline Type_T_ *GetPointer() const noexcept {
+        return PointerNumber<Type_T_>{PtrNumber & 0xFFFFFFFFFFFFULL}.Pointer;
+    }
+
+    inline void MovePointerOnly(QPointerData &src) noexcept {
+        PtrNumber &= 0xFFFF000000000000ULL;
+        PtrNumber |= (src.PtrNumber & 0xFFFFFFFFFFFFULL);
+    }
+
+    inline void SetHighByte(unsigned char byte) noexcept {
+        unsigned long long byte64 = byte;
+        PtrNumber &= 0xFFFFFFFFFFFFFFULL;
+        byte64 <<= 56U;
+        PtrNumber |= byte64;
+    }
+
+    inline unsigned char GetHighByte() const noexcept {
+        return ((PtrNumber & 0xFF00000000000000ULL) >> 56U);
+    }
+
+    inline void SetLowByte(unsigned char byte) noexcept {
+        unsigned long long byte64 = byte;
+        PtrNumber &= 0xFF00FFFFFFFFFFFFULL;
+        byte64 <<= 48U;
+        PtrNumber |= byte64;
+    }
+    inline unsigned char GetLowByte() const noexcept {
+        return ((PtrNumber & 0x00FF000000000000ULL) >> 48U);
+    }
+
+    union {
+        Type_T_           *Pointer{nullptr};
+        unsigned long long PtrNumber;
+    };
+};
+
+template <typename Type_T_>
+struct QPointerData<Type_T_, false> {
+    // Without Tag
+    QPointerData() = default;
+
+    inline explicit QPointerData(Type_T_ *pointer) noexcept : Pointer{pointer} {
+    }
+
+    inline void SetPointer(Type_T_ *pointer) noexcept {
+        Pointer = pointer;
+    }
+
+    inline Type_T_ *GetPointer() const noexcept {
+        return Pointer;
+    }
+
+    inline void MovePointerOnly(QPointerData &src) noexcept {
+        Pointer = src.Pointer;
+    }
+
+    inline void SetHighByte(unsigned char byte) noexcept {
+        (void)byte;
+    }
+
+    inline unsigned char GetHighByte() const noexcept {
+        return 0;
+    }
+
+    inline void SetLowByte(unsigned char byte) noexcept {
+        (void)byte;
+    }
+
+    inline unsigned char GetLowByte() const noexcept {
+        return 0;
+    }
+
+    Type_T_ *Pointer{nullptr};
+};
+
+template <typename Type_T_>
 class QPointer {
   public:
     QPointer()                               = default;
@@ -35,121 +141,57 @@ class QPointer {
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
-    inline explicit QPointer(Type_T_ *pointer) noexcept : pointer_{pointer} {
+    inline explicit QPointer(Type_T_ *pointer) noexcept : data_{pointer} {
     }
 
-    inline QPointer(QPointer &&src) noexcept : pointer_{src.pointer_} {
-        src.pointer_ = nullptr;
+    inline QPointer(QPointer &&src) noexcept : data_{src.data_.Pointer} {
+        src.data_.Pointer = nullptr;
     }
 
     inline QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
-            pointer_     = src.pointer_;
-            src.pointer_ = nullptr;
+            data_.Pointer     = src.data_.Pointer;
+            src.data_.Pointer = nullptr;
         }
 
         return *this;
     }
 
     inline void SetPointer(Type_T_ *pointer) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        union {
-            Type_T_           *M_PTR;
-            unsigned long long M_NUM{0};
-        } static pn{};
-
-        pn.M_PTR = pointer;
-        pn.M_NUM &= 0x0000FFFFFFFFFFFFULL;
-        p_number_ &= 0xFFFF000000000000ULL;
-        p_number_ |= pn.M_NUM;
-#else
-        pointer_ = pointer;
-#endif
+        data_.SetPointer(pointer);
     }
 
     inline Type_T_ *GetPointer() const noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        union {
-            Type_T_           *M_PTR;
-            unsigned long long M_NUM{0};
-        } static pn{};
-
-        pn.M_NUM = bits_.number_;
-        return pn.M_PTR;
-#else
-        return pointer_;
-#endif
+        return data_.GetPointer();
     }
 
     inline void MovePointerOnly(QPointer &src) noexcept {
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        bits_.number_ = src.bits_.number_;
-#else
-        pointer_ = src.pointer_;
-#endif
-
-        src.pointer_ = nullptr;
+        data_.MovePointerOnly(src.data_);
+        src.data_.Pointer = nullptr;
     }
 
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     inline void SetHighByte(unsigned char byte) noexcept {
-        bits_.high_byte_ = byte;
-    }
-
-    inline unsigned char GetHighByte() const noexcept {
-        return bits_.high_byte_;
+        data_.SetHighByte(byte);
     }
 
     inline void SetLowByte(unsigned char byte) noexcept {
-        bits_.low_byte_ = byte;
+        data_.SetLowByte(byte);
     }
+
     inline unsigned char GetLowByte() const noexcept {
-        return bits_.low_byte_;
-    }
-#else
-    void SetHighByte(unsigned char byte) noexcept {
-        (void)byte;
+        return data_.GetLowByte();
     }
 
-    unsigned char GetHighByte() const noexcept {
-        return 0;
+    inline unsigned char GetHighByte() const noexcept {
+        return data_.GetHighByte();
     }
-
-    void SetLowByte(unsigned char byte) noexcept {
-        (void)byte;
-    }
-
-    unsigned char GetLowByte() const noexcept {
-        return 0;
-    }
-#endif
 
     inline void Reset() noexcept {
-        pointer_ = nullptr;
+        data_.Pointer = nullptr;
     }
 
   private:
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    struct Bits {
-#ifndef QENTEM_BIG_ENDIAN
-        unsigned long long number_ : 48;
-        unsigned long long low_byte_ : 8;
-        unsigned long long high_byte_ : 8;
-#else
-        unsigned long long high_byte_ : 8;
-        unsigned long long low_byte_ : 8;
-        unsigned long long number_ : 48;
-#endif
-    };
-#endif
-
-    union {
-        Type_T_ *pointer_{nullptr};
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-        unsigned long long p_number_;
-        Bits               bits_;
-#endif
-    };
+    QPointerData<Type_T_, Config::PointerTagging> data_;
 };
 
 } // namespace Qentem

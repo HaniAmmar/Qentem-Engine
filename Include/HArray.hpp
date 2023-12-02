@@ -35,6 +35,13 @@ namespace Qentem {
  * deleted items and resets its hash base. Also, Its pointer is taggable.
  */
 
+/*|-------------------------------------------|*/
+/*|                Hash Table                 |*/
+/*|____________________|______________________|*/
+/*|     Positions      |       Items          |*/
+/*| 0, 1 , 2, ... n-1  | item 0, item 1, ...  |*/
+/*|____________________|______________________|*/
+
 template <typename Value_, typename Char_T_>
 struct HAItem_T_ {
     SizeT           Hash;
@@ -50,14 +57,38 @@ struct HAItem_T_ {
         return (Key > item.Key);
     }
 };
+///////////////////////////////////////////////
+template <bool BigEndian>
+struct HArrayData;
 
-/*|-------------------------------------------|*/
-/*|                Hash Table                 |*/
-/*|____________________|______________________|*/
-/*|     Positions      |       Items          |*/
-/*| 0, 1 , 2, ... n-1  | item 0, item 1, ...  |*/
-/*|____________________|______________________|*/
+template <>
+struct HArrayData<false> {
+    // Little-Endian
+    HArrayData() = default;
 
+    HArrayData(SizeT index, SizeT capacity, QPointer<SizeT> &&hashTable) noexcept
+        : Index{index}, Capacity{capacity}, HashTable{Memory::Move(hashTable)} {
+    }
+
+    SizeT           Index{0};
+    SizeT           Capacity{0};
+    QPointer<SizeT> HashTable{};
+};
+
+template <>
+struct HArrayData<true> {
+    // Big-Endian
+    HArrayData() = default;
+
+    HArrayData(SizeT index, SizeT capacity, QPointer<SizeT> &&hashTable) noexcept
+        : HashTable{Memory::Move(hashTable)}, Index{index}, Capacity{capacity} {
+    }
+
+    QPointer<SizeT> HashTable{};
+    SizeT           Index{0};
+    SizeT           Capacity{0};
+};
+///////////////////////////////////////////////
 template <typename Value_, typename Char_T_>
 class HArray {
     using HAItem_ = HAItem_T_<Value_, Char_T_>;
@@ -78,8 +109,7 @@ class HArray {
         Memory::Deallocate(getHashTable());
     }
 
-    HArray(HArray &&src) noexcept
-        : index_{src.Size()}, capacity_{src.Capacity()}, hashTable_{Memory::Move(src.hashTable_)} {
+    HArray(HArray &&src) noexcept : data_{src.Size(), src.Capacity(), Memory::Move(src.data_.HashTable)} {
         src.setSize(0);
         src.setCapacity(0);
     }
@@ -98,7 +128,7 @@ class HArray {
             setCapacity(src.Capacity());
             src.setSize(0);
             src.setCapacity(0);
-            hashTable_.MovePointerOnly(src.hashTable_);
+            data_.HashTable.MovePointerOnly(src.data_.HashTable);
 
             Memory::Dispose(storage, (storage + size));
             Memory::Deallocate(ht);
@@ -481,11 +511,11 @@ class HArray {
     }
 
     inline SizeT Size() const noexcept {
-        return index_;
+        return data_.Index;
     }
 
     inline SizeT Capacity() const noexcept {
-        return capacity_;
+        return data_.Capacity;
     }
 
     inline HAItem_ *Storage() const noexcept {
@@ -541,11 +571,11 @@ class HArray {
     }
 
     inline SizeT *getHashTable() const noexcept {
-        return hashTable_.GetPointer();
+        return data_.HashTable.GetPointer();
     }
 
     inline void setHashTable(SizeT *ptr) noexcept {
-        hashTable_.SetPointer(ptr);
+        data_.HashTable.SetPointer(ptr);
     }
 
     HAItem_ *allocate(SizeT new_capacity) {
@@ -565,15 +595,15 @@ class HArray {
     }
 
     inline void clearHashTable() noexcept {
-        hashTable_.Reset();
+        data_.HashTable.Reset();
     }
 
     inline void setSize(const SizeT new_size) noexcept {
-        index_ = new_size;
+        data_.Index = new_size;
     }
 
     inline void setCapacity(const SizeT new_capacity) noexcept {
-        capacity_ = new_capacity;
+        data_.Capacity = new_capacity;
     }
 
     inline void expand() {
@@ -582,7 +612,7 @@ class HArray {
 
     HAItem_ *insert(SizeT *index, Key_ &&key, const SizeT hash) noexcept {
         HAItem_ *item = (Storage() + Size());
-        ++index_;
+        ++(data_.Index);
         *index = Size();
 
         item->Next = 0;
@@ -698,15 +728,7 @@ class HArray {
         }
     }
 
-#ifndef QENTEM_BIG_ENDIAN
-    SizeT           index_{0};
-    SizeT           capacity_{0};
-    QPointer<SizeT> hashTable_{};
-#else
-    QPointer<SizeT> hashTable_{};
-    SizeT           index_{0};
-    SizeT           capacity_{0};
-#endif
+    HArrayData<Config::IsBigEndian> data_{};
 };
 
 } // namespace Qentem

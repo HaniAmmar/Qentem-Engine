@@ -38,18 +38,19 @@ struct Config {
     static constexpr unsigned int FloatDoublePrecision{15U};
     static constexpr unsigned int TemplatePrecision{3U};
     static constexpr unsigned int PointerSize{sizeof(void *)};
-    static constexpr bool         Is64bit{(PointerSize == 8U)};
+    static constexpr bool         Is64bit{PointerSize == 8U};
+
     ///////////////////////////////////////////////
 #ifndef QENTEM_BIG_ENDIAN
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define QENTEM_BIG_ENDIAN 1
 #endif
 #endif
-/////////////////
+///////////////////////////////////////////////
 #if defined(QENTEM_BIG_ENDIAN) && (QENTEM_BIG_ENDIAN == 1)
-    static constexpr bool BigEndian{true};
+    static constexpr bool IsBigEndian{true};
 #else
-    static constexpr bool BigEndian{false};
+    static constexpr bool IsBigEndian{false};
 #undef QENTEM_BIG_ENDIAN
 #endif
 ///////////////////////////////////////////////
@@ -63,7 +64,7 @@ struct Config {
 #else
 #undef QENTEM_POINTER_TAGGING
 #endif
-/////////////////
+///////////////////////////////////////////////
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     static constexpr bool PointerTagging{Is64bit};
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
@@ -83,7 +84,7 @@ struct Config {
 #ifndef QENTEM_AUTO_ESCAPE_HTML
 #define QENTEM_AUTO_ESCAPE_HTML 1
 #endif
-/////////////////
+///////////////////////////////////////////////
 #if defined(QENTEM_AUTO_ESCAPE_HTML) && (QENTEM_AUTO_ESCAPE_HTML == 1)
     static constexpr bool AutoEscapeHTML{true};
 #else
