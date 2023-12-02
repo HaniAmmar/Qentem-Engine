@@ -91,9 +91,7 @@ struct Config {
     static constexpr bool AutoEscapeHTML{false};
 #undef QENTEM_AUTO_ESCAPE_HTML
 #endif
-};
 ///////////////////////////////////////////////
-
 #ifndef QENTEM_AVX2
 #define QENTEM_AVX2 0
 #endif
@@ -109,6 +107,14 @@ struct Config {
 #ifndef __SSE2__
 #undef QENTEM_SSE2
 #endif
+
+#if (QENTEM_AVX2 == 1) || (QENTEM_SSE2 == 1) || (QENTEM_MSIMD128 == 1)
+    static constexpr bool IsSIMDEnabled{true};
+#else
+    static constexpr bool IsSIMDEnabled{false};
+#endif
+};
+///////////////////////////////////////////////
 
 #ifdef _MSC_VER
 #define QENTEM_NOINLINE __declspec(noinline)

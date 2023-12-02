@@ -330,7 +330,7 @@ inline static unsigned int FindLastBit(Number_T_ value) noexcept {
 }
 #endif
 
-// These two are used during compiling, so do bother optimizing them.
+// These two are used during compiling, so do not bother optimizing them.
 template <typename Number_T_>
 inline static constexpr unsigned int FindFirstBitConst(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
