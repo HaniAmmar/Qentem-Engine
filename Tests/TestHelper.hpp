@@ -100,7 +100,7 @@ struct MemoryRecord {
         ++(allocations);
         ++(subAllocations);
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_M_X64)
         remainingSize += _msize(pointer);
 #elif defined(__APPLE__)
         remainingSize += malloc_size(pointer);
@@ -117,7 +117,7 @@ struct MemoryRecord {
         ++(deallocations);
         ++(subDeallocations);
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32) || defined(_M_X64)
         remainingSize -= _msize(pointer);
 #elif defined(__APPLE__)
         remainingSize -= malloc_size(pointer);
