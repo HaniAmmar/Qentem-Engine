@@ -178,6 +178,66 @@ struct QentemSIMD {
         return (Number_T)(wasm_i8x16_bitmask(wasm_i32x4_eq(left, right)));
     }
 };
+#else
+struct QentemSIMD {
+    using Number_T = unsigned int;
+    using VAR_T    = unsigned int;
+
+    static constexpr unsigned int ShiftWidth = 0;
+    static constexpr unsigned int Size       = 0;
+
+    static VAR_T Load(const VAR_T *pointer) noexcept {
+        (void)pointer;
+        return 0;
+    }
+
+    static void Store(VAR_T *left, const VAR_T &right) noexcept {
+        (void)left;
+        (void)right;
+    }
+
+    static VAR_T Zero() noexcept {
+        return 0;
+    }
+
+    static VAR_T SetToOne8Bit(char value) noexcept {
+        (void)value;
+        return 0;
+    }
+
+    static VAR_T SetToOne16Bit(short value) noexcept {
+        (void)value;
+        return 0;
+    }
+
+    static VAR_T SetToOne32Bit(int value) noexcept {
+        (void)value;
+        return 0;
+    }
+
+    static VAR_T SetToOne64Bit(long long value) noexcept {
+        (void)value;
+        return 0;
+    }
+
+    static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        (void)left;
+        (void)right;
+        return 0;
+    }
+
+    static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        (void)left;
+        (void)right;
+        return 0;
+    }
+
+    static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        (void)left;
+        (void)right;
+        return 0;
+    }
+};
 #endif
 
 #ifdef _MSC_VER
@@ -363,8 +423,6 @@ inline static constexpr unsigned int FindLastBitConst(Number_T_ value) noexcept 
     return index;
 }
 ///////////////////////////////////////
-#ifdef QENTEM_SIMD_ENABLED
-
 template <typename, typename, unsigned int CharSize>
 struct SMIDCompare_T {};
 
@@ -458,7 +516,6 @@ inline static constexpr Number_T_ SMIDNextOffset() noexcept {
     constexpr Number_T_ offset = (QentemSIMD::Size / sizeof(Char_T_));
     return offset;
 }
-#endif
 
 } // namespace Qentem::Platform
 
