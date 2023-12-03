@@ -1055,26 +1055,26 @@ class Value {
         }
     }
 
-    inline unsigned int GetNumberType() const noexcept {
+    inline QNumberType GetNumberType() const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
                 // Natural number.
-                return 1U;
+                return QNumberType::Natural;
             }
 
             case ValueType::IntLong: {
                 // Integer number.
-                return 2U;
+                return QNumberType::Integer;
             }
 
             case ValueType::Double: {
                 // Real number.
-                return 3U;
+                return QNumberType::Real;
             }
 
             default: {
                 // NAN: Not A Number
-                return 0;
+                return QNumberType::NotANumber;
             }
         }
     }
