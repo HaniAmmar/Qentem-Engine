@@ -158,10 +158,6 @@ static void TestTrueValue(TestHelper &helper) {
     ValueC value3{Memory::Move(value1)};
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
-    // value1 = true;
-    // ValueC value3(Memory::Move(value1));
-    // helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
-
     helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
 
     value3 = true;
@@ -2297,7 +2293,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = true;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2320,7 +2316,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = true;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2361,7 +2357,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = false;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2384,7 +2380,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = false;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2425,7 +2421,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = nullptr;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2448,7 +2444,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = nullptr;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2489,7 +2485,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = 33;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2512,7 +2508,7 @@ static void TestCopyValue1(TestHelper &helper) {
     value1 = 34;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2561,7 +2557,7 @@ static void TestCopyValue2(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2584,7 +2580,7 @@ static void TestCopyValue2(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2625,7 +2621,7 @@ static void TestCopyValue2(TestHelper &helper) {
     value1 = VArray(1);
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2666,7 +2662,7 @@ static void TestCopyValue2(TestHelper &helper) {
     value1 = VHArray(1);
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
@@ -2746,7 +2742,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = true;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
@@ -2772,7 +2768,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = true;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2842,7 +2838,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = false;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
@@ -2868,7 +2864,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = false;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -2938,7 +2934,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = nullptr;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
@@ -2964,7 +2960,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = nullptr;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -3033,7 +3029,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = 10e10;
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
@@ -3059,7 +3055,7 @@ static void TestCopyValue3(TestHelper &helper) {
     value1 = 9.1;
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -3146,7 +3142,7 @@ static void TestCopyValue4(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
@@ -3172,7 +3168,7 @@ static void TestCopyValue4(TestHelper &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -3250,7 +3246,7 @@ static void TestCopyValue4(TestHelper &helper) {
     value1 = VArray(1);
 
     // Has values
-    h_arr_var = VHArray();
+    h_arr_var = VHArray{};
 
     for (unsigned int i = 0; i < 3; i++) {
         VString key;
@@ -3328,7 +3324,7 @@ static void TestCopyValue4(TestHelper &helper) {
     value1 = VHArray(1);
 
     // Has values
-    arr_var = VArray();
+    arr_var = VArray{};
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
@@ -3691,12 +3687,12 @@ static void TestAddition2(TestHelper &helper) {
 
     //////////////
 
-    value += VHArray();
+    value += VHArray{};
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value.Size(), 1U, "Size()", __LINE__);
     helper.EqualsTrue(value[0].IsObject(), "value[0].IsObject()", __LINE__);
 
-    value += VHArray();
+    value += VHArray{};
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value.Size(), 2U, "Size()", __LINE__);
     helper.EqualsTrue(value[0].IsObject(), "value[0].IsObject()", __LINE__);
@@ -4210,7 +4206,7 @@ static void TestAddition6(TestHelper &helper) {
     h_arr_var[VString("w4")] = Memory::Move(str_var);
     h_arr_storage2           = h_arr_var.First();
 
-    value2 = VHArray();   // Setting to object type.
+    value2 = VHArray{};   // Setting to object type.
     value2.Merge(value1); // Copy
     helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
     helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
@@ -4221,7 +4217,7 @@ static void TestAddition6(TestHelper &helper) {
     helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
                  "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
-    value2 = VHArray();  // Clearing and  Setting to object type.
+    value2 = VHArray{};  // Clearing and  Setting to object type.
     value2 += h_arr_var; // Copy
     helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
     helper.NotEqual(value2.GetObject(), nullptr, "GetObject()", "null", __LINE__);
@@ -4236,7 +4232,7 @@ static void TestAddition6(TestHelper &helper) {
 
     ////
 
-    value2 = VHArray();                 // Clearing and  Setting to object type.
+    value2 = VHArray{};                 // Clearing and  Setting to object type.
     value2.Merge(Memory::Move(value1)); // Move
     helper.EqualsTrue(value1.IsUndefined(), "value1.IsUndefined()", __LINE__);
     helper.Equal(value2.Size(), 3U, "value2.Size()", __LINE__);
@@ -4251,7 +4247,7 @@ static void TestAddition6(TestHelper &helper) {
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
 
-    value2 = VHArray();                // Clearing and  Setting to object type.
+    value2 = VHArray{};                // Clearing and  Setting to object type.
     value2 += Memory::Move(h_arr_var); // Move
     helper.Equal(h_arr_var.First(), nullptr, "h_arr_var.First()", "null", __LINE__);
     helper.Equal(value2.Size(), 4U, "value2.Size()", __LINE__);
@@ -4271,7 +4267,7 @@ static void TestAddition6(TestHelper &helper) {
     }
 
     ////////
-    value2 = VHArray();   // Clearing and  Setting to object type.
+    value2 = VHArray{};   // Clearing and  Setting to object type.
     value2.Merge(value1); // Copy
     value2 += h_arr_var;  // Copy
     helper.Equal(value2.Size(), 7U, "value2.Size()", __LINE__);
@@ -4288,7 +4284,7 @@ static void TestAddition6(TestHelper &helper) {
                  "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
     ////
-    value2       = VHArray(); // Clearing and  Setting to object type.
+    value2       = VHArray{}; // Clearing and  Setting to object type.
     value2["w0"] = 5;
     value2["w1"] = 100;
     value2["w2"] = 200;
@@ -4313,7 +4309,7 @@ static void TestAddition6(TestHelper &helper) {
     helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
                  "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
 
-    value2       = VHArray(); // Clearing and  Setting to object type.
+    value2       = VHArray{}; // Clearing and  Setting to object type.
     value2["w0"] = 5;
     value2["w1"] = 100;
     value2["w2"] = 200;
@@ -4344,7 +4340,7 @@ static void TestStringify1(TestHelper &helper) {
     ValueC             value;
 
     ///////////
-    value = VArray();
+    value = VArray{};
     helper.Equal(value.Stringify(ss), "[]", "Stringify()", __LINE__);
     ss.Clear();
 
@@ -4379,12 +4375,12 @@ static void TestStringify1(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[{}]", "Stringify()", __LINE__);
     ss.Clear();
     ///////////
@@ -4426,13 +4422,13 @@ static void TestStringify1(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value += VArray();
+    value += VArray{};
     value += true;
     helper.Equal(value.Stringify(ss), "[[],true]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
+    value += VHArray{};
     value += true;
     helper.Equal(value.Stringify(ss), "[{},true]", "Stringify()", __LINE__);
     ss.Clear();
@@ -4476,13 +4472,13 @@ static void TestStringify1(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value += VArray();
+    value += VArray{};
     value += false;
     helper.Equal(value.Stringify(ss), "[[],false]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
+    value += VHArray{};
     value += false;
     helper.Equal(value.Stringify(ss), "[{},false]", "Stringify()", __LINE__);
     ss.Clear();
@@ -4525,13 +4521,13 @@ static void TestStringify1(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value += VArray();
+    value += VArray{};
     value += nullptr;
     helper.Equal(value.Stringify(ss), "[[],null]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
+    value += VHArray{};
     value += nullptr;
     helper.Equal(value.Stringify(ss), "[{},null]", "Stringify()", __LINE__);
     ss.Clear();
@@ -4574,13 +4570,13 @@ static void TestStringify1(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value += VArray();
+    value += VArray{};
     value += "ABCDEF";
     helper.Equal(value.Stringify(ss), R"([[],"ABCDEF"])", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
+    value += VHArray{};
     value += "ABCDEFG";
     helper.Equal(value.Stringify(ss), R"([{},"ABCDEFG"])", "Stringify()", __LINE__);
     ss.Clear();
@@ -4588,107 +4584,107 @@ static void TestStringify1(TestHelper &helper) {
 
     value.Reset();
     value += true;
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[true,[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[false,[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[null,[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += 10000;
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[10000,[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += "ABC";
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), R"(["ABC",[]])", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray();
-    value += VArray();
+    value += VArray{};
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[[],[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
-    value += VArray();
+    value += VHArray{};
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[{},[]]", "Stringify()", __LINE__);
     ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[true,{}]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[false,{}]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[null,{}]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += -1000;
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[-1000,{}]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += "ABC";
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), R"(["ABC",{}])", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray();
-    value += VHArray();
+    value += VArray{};
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[[],{}]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
-    value += VHArray();
+    value += VHArray{};
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[{},{}]", "Stringify()", __LINE__);
     ss.Clear();
     ///////////
 
     value.Reset();
     value += true;
-    value += VHArray();
+    value += VHArray{};
     value += false;
     helper.Equal(value.Stringify(ss), "[true,{},false]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VArray();
+    value += VArray{};
     value += nullptr;
     helper.Equal(value.Stringify(ss), "[false,[],null]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VHArray();
+    value += VHArray{};
     value += "ABC";
     helper.Equal(value.Stringify(ss), R"([null,{},"ABC"])", "Stringify()", __LINE__);
     ss.Clear();
@@ -4702,21 +4698,21 @@ static void TestStringify1(TestHelper &helper) {
 
     value.Reset();
     value += "ABC";
-    value += VArray();
-    value += VHArray();
+    value += VArray{};
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), R"(["ABC",[],{}])", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray();
-    value += VHArray();
+    value += VArray{};
+    value += VHArray{};
     value[2] = 498;
     helper.Equal(value.Stringify(ss), "[[],{},498]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
-    value += VArray();
+    value += VHArray{};
+    value += VArray{};
     value += true;
     helper.Equal(value.Stringify(ss), "[{},[],true]", "Stringify()", __LINE__);
     ///////////
@@ -4724,49 +4720,49 @@ static void TestStringify1(TestHelper &helper) {
 
     value.Reset();
     value += true;
-    value += VHArray();
+    value += VHArray{};
     value += 0;
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[true,{},0,[]]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += false;
-    value += VArray();
+    value += VArray{};
     value += nullptr;
-    value += VHArray();
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), "[false,[],null,{}]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += nullptr;
-    value += VHArray();
+    value += VHArray{};
     value += "ABC";
-    value += VArray();
+    value += VArray{};
     helper.Equal(value.Stringify(ss), R"([null,{},"ABC",[]])", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value += "ABC";
-    value += VArray();
-    value += VHArray();
+    value += VArray{};
+    value += VHArray{};
     value += nullptr;
     helper.Equal(value.Stringify(ss), R"(["ABC",[],{},null])", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VArray();
+    value += VArray{};
     value += false;
-    value += VHArray();
+    value += VHArray{};
     value += true;
     helper.Equal(value.Stringify(ss), "[[],false,{},true]", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value += VHArray();
+    value += VHArray{};
     value += nullptr;
-    value += VArray();
-    value += VArray();
+    value += VArray{};
+    value += VArray{};
     helper.Equal(value.Stringify(ss), "[{},null,[],[]]", "Stringify()", __LINE__);
     ss.Clear();
     ///////////
@@ -4777,15 +4773,15 @@ static void TestStringify1(TestHelper &helper) {
     value += nullptr;
     value += 123;
     value += "ABC";
-    value += VArray();
-    value += VHArray();
+    value += VArray{};
+    value += VHArray{};
     helper.Equal(value.Stringify(ss), R"([true,false,null,123,"ABC",[],{}])", "Stringify()", __LINE__);
     ss.Clear();
     ///////////
 
     value.Reset();
-    value += VHArray();
-    value += VArray();
+    value += VHArray{};
+    value += VArray{};
     value += "a";
     value += 1.5;
     value += nullptr;
@@ -4800,7 +4796,7 @@ static void TestStringify2(TestHelper &helper) {
     ValueC             value;
 
     ///////////
-    value = VHArray();
+    value = VHArray{};
     helper.Equal(value.Stringify(ss), R"({})", "Stringify()", __LINE__);
     ss.Clear();
 
@@ -4835,12 +4831,12 @@ static void TestStringify2(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value["ABC"] = VArray();
+    value["ABC"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"ABC":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["5vn7b83y98t3wrupwmwa4ataw"] = VHArray();
+    value["5vn7b83y98t3wrupwmwa4ataw"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"5vn7b83y98t3wrupwmwa4ataw":{}})", "Stringify()", __LINE__);
     ///////////
     ss.Clear();
@@ -4882,13 +4878,13 @@ static void TestStringify2(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value["X"]   = VArray();
+    value["X"]   = VArray{};
     value["123"] = true;
     helper.Equal(value.Stringify(ss), R"({"X":[],"123":true})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["x"] = VHArray();
+    value["x"] = VHArray{};
     value["A"] = true;
     helper.Equal(value.Stringify(ss), R"({"x":{},"A":true})", "Stringify()", __LINE__);
     ///////////
@@ -4932,13 +4928,13 @@ static void TestStringify2(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value["X"] = VArray();
+    value["X"] = VArray{};
     value["A"] = false;
     helper.Equal(value.Stringify(ss), R"({"X":[],"A":false})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VHArray();
+    value["X"] = VHArray{};
     value["A"] = false;
     helper.Equal(value.Stringify(ss), R"({"X":{},"A":false})", "Stringify()", __LINE__);
     ///////////
@@ -4981,13 +4977,13 @@ static void TestStringify2(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value["X"] = VArray();
+    value["X"] = VArray{};
     value["n"] = nullptr;
     helper.Equal(value.Stringify(ss), R"({"X":[],"n":null})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["t"] = VHArray();
+    value["t"] = VHArray{};
     value["A"] = nullptr;
     helper.Equal(value.Stringify(ss), R"({"t":{},"A":null})", "Stringify()", __LINE__);
     ///////////
@@ -5030,13 +5026,13 @@ static void TestStringify2(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value["o"] = VArray();
+    value["o"] = VArray{};
     value["A"] = "ABCDEF";
     helper.Equal(value.Stringify(ss), R"({"o":[],"A":"ABCDEF"})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["A"] = VHArray();
+    value["A"] = VHArray{};
     value["o"] = "ABCDEFG";
     helper.Equal(value.Stringify(ss), R"({"A":{},"o":"ABCDEFG"})", "Stringify()", __LINE__);
     ///////////
@@ -5044,107 +5040,107 @@ static void TestStringify2(TestHelper &helper) {
 
     value.Reset();
     value["d"] = true;
-    value["y"] = VArray();
+    value["y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"d":true,"y":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = false;
-    value["y"] = VArray();
+    value["y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"A":false,"y":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
-    value["y"] = VArray();
+    value["y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"A":null,"y":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = 10000;
-    value["y"] = VArray();
+    value["y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"A":10000,"y":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
-    value["y"] = VArray();
+    value["y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"A":"ABC","y":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VArray();
-    value["y"] = VArray();
+    value["X"] = VArray{};
+    value["y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"X":[],"y":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VHArray();
-    value["Y"] = VArray();
+    value["X"] = VHArray{};
+    value["Y"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"X":{},"Y":[]})", "Stringify()", __LINE__);
     ///////////
     ss.Clear();
 
     value.Reset();
     value["A"] = true;
-    value["y"] = VHArray();
+    value["y"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":true,"y":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = false;
-    value["y"] = VHArray();
+    value["y"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":false,"y":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = nullptr;
-    value["y"] = VHArray();
+    value["y"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":null,"y":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = -1000;
-    value["y"] = VHArray();
+    value["y"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":-1000,"y":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = "ABC";
-    value["y"] = VHArray();
+    value["y"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":"ABC","y":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["C"] = VArray();
-    value["R"] = VHArray();
+    value["C"] = VArray{};
+    value["R"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"C":[],"R":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["cc"] = VHArray();
-    value["rr"] = VHArray();
+    value["cc"] = VHArray{};
+    value["rr"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"cc":{},"rr":{}})", "Stringify()", __LINE__);
     ///////////
     ss.Clear();
 
     value.Reset();
     value["A"]  = true;
-    value["y"]  = VHArray();
+    value["y"]  = VHArray{};
     value["AA"] = false;
     helper.Equal(value.Stringify(ss), R"({"A":true,"y":{},"AA":false})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"] = false;
-    value["y"] = VArray();
+    value["y"] = VArray{};
     value["B"] = nullptr;
     helper.Equal(value.Stringify(ss), R"({"A":false,"y":[],"B":null})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["A"]   = nullptr;
-    value["y"]   = VHArray();
+    value["y"]   = VHArray{};
     value["ABC"] = "ABC";
     helper.Equal(value.Stringify(ss), R"({"A":null,"y":{},"ABC":"ABC"})", "Stringify()", __LINE__);
     ss.Clear();
@@ -5158,21 +5154,21 @@ static void TestStringify2(TestHelper &helper) {
 
     value.Reset();
     value["A"]     = "ABC";
-    value["y"]     = VArray();
-    value["key-u"] = VHArray();
+    value["y"]     = VArray{};
+    value["key-u"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":"ABC","y":[],"key-u":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"]     = VArray();
-    value["Y"]     = VHArray();
+    value["X"]     = VArray{};
+    value["Y"]     = VHArray{};
     value["key-u"] = 498;
     helper.Equal(value.Stringify(ss), R"({"X":[],"Y":{},"key-u":498})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"] = VHArray();
-    value["y"] = VArray();
+    value["X"] = VHArray{};
+    value["y"] = VArray{};
     value["A"] = true;
     helper.Equal(value.Stringify(ss), R"({"X":{},"y":[],"A":true})", "Stringify()", __LINE__);
     ///////////
@@ -5180,49 +5176,49 @@ static void TestStringify2(TestHelper &helper) {
 
     value.Reset();
     value["{}}"]   = true;
-    value["y"]     = VHArray();
+    value["y"]     = VHArray{};
     value["AA"]    = 0;
-    value["k-300"] = VArray();
+    value["k-300"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"{}}":true,"y":{},"AA":0,"k-300":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["B1"]    = false;
-    value["y"]     = VArray();
+    value["y"]     = VArray{};
     value["[A]"]   = nullptr;
-    value["k-300"] = VHArray();
+    value["k-300"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"B1":false,"y":[],"[A]":null,"k-300":{}})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["{A}"]   = nullptr;
-    value["y"]     = VHArray();
+    value["y"]     = VHArray{};
     value["AA"]    = "ABC";
-    value["k-300"] = VArray();
+    value["k-300"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"{A}":null,"y":{},"AA":"ABC","k-300":[]})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
     value["x"]     = "ABC";
-    value["[]]"]   = VArray();
-    value["key-u"] = VHArray();
+    value["[]]"]   = VArray{};
+    value["key-u"] = VHArray{};
     value["A"]     = nullptr;
     helper.Equal(value.Stringify(ss), R"({"x":"ABC","[]]":[],"key-u":{},"A":null})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"]       = VArray();
+    value["X"]       = VArray{};
     value["CCCCccc"] = false;
-    value["key-u"]   = VHArray();
+    value["key-u"]   = VHArray{};
     value["A"]       = true;
     helper.Equal(value.Stringify(ss), R"({"X":[],"CCCCccc":false,"key-u":{},"A":true})", "Stringify()", __LINE__);
     ss.Clear();
 
     value.Reset();
-    value["X"]     = VHArray();
+    value["X"]     = VHArray{};
     value["A"]     = nullptr;
-    value["key-u"] = VArray();
-    value["k-300"] = VArray();
+    value["key-u"] = VArray{};
+    value["k-300"] = VArray{};
     helper.Equal(value.Stringify(ss), R"({"X":{},"A":null,"key-u":[],"k-300":[]})", "Stringify()", __LINE__);
 
     ///////////
@@ -5234,8 +5230,8 @@ static void TestStringify2(TestHelper &helper) {
     value["C"] = nullptr;
     value["D"] = 123;
     value["E"] = "ABC";
-    value["F"] = VArray();
-    value["G"] = VHArray();
+    value["F"] = VArray{};
+    value["G"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", "Stringify()",
                  __LINE__);
 
@@ -5243,8 +5239,8 @@ static void TestStringify2(TestHelper &helper) {
     ss.Clear();
 
     value.Reset();
-    value["A"]       = VHArray();
-    value["BB"]      = VArray();
+    value["A"]       = VHArray{};
+    value["BB"]      = VArray{};
     value["CCC"]     = "a";
     value["DDDD"]    = 1.5;
     value["EEEEE"]   = nullptr;
@@ -5265,19 +5261,19 @@ static void TestStringify3(TestHelper &helper) {
     value[0] += nullptr;
     value[0] += 0;
     value[0] += "ABC";
-    value[0] += VArray();
-    value[0] += VHArray();
+    value[0] += VArray{};
+    value[0] += VHArray{};
     helper.Equal(value.Stringify(ss), R"([[true,false,null,0,"ABC",[],{}]])", "Stringify()", __LINE__);
     ss.Clear();
 
-    value         = VArray();
+    value         = VArray{};
     value[0]["a"] = true;
     value[0]["0"] = false;
     value[0]["1"] = nullptr;
     value[0]["V"] = 0;
     value[0]["B"] = "a";
-    value[0]["2"] = VArray();
-    value[0]["6"] = VHArray();
+    value[0]["2"] = VArray{};
+    value[0]["6"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"([{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}])", "Stringify()",
                  __LINE__);
     ss.Clear();
@@ -5288,8 +5284,8 @@ static void TestStringify3(TestHelper &helper) {
     value["o"] += nullptr;
     value["o"] += 0;
     value["o"] += "ABC";
-    value["o"] += VArray();
-    value["o"] += VHArray();
+    value["o"] += VArray{};
+    value["o"] += VHArray{};
     helper.Equal(value.Stringify(ss), R"({"o":[true,false,null,0,"ABC",[],{}]})", "Stringify()", __LINE__);
     ss.Clear();
 
@@ -5299,8 +5295,8 @@ static void TestStringify3(TestHelper &helper) {
     value["i"]["1"] = nullptr;
     value["i"]["V"] = 0;
     value["i"]["B"] = "a";
-    value["i"]["2"] = VArray();
-    value["i"]["6"] = VHArray();
+    value["i"]["2"] = VArray{};
+    value["i"]["6"] = VHArray{};
     helper.Equal(value.Stringify(ss), R"({"i":{"a":true,"0":false,"1":null,"V":0,"B":"a","2":[],"6":{}}})",
                  "Stringify()", __LINE__);
 }
@@ -5337,7 +5333,7 @@ static void TestDeleteValue(TestHelper &helper) {
     helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
     ss.Clear();
 
-    value[0] = VArray();
+    value[0] = VArray{};
     value.RemoveIndex(vu_long_long{0});
     helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
     ss.Clear();
@@ -5389,8 +5385,8 @@ static void TestDeleteValue(TestHelper &helper) {
     ss.Clear();
 
     value[0] = "a";
-    value[1] = VArray();
-    value[2] = VHArray();
+    value[1] = VArray{};
+    value[2] = VHArray{};
     value.RemoveIndex(2);
     helper.Equal(value.Stringify(ss), R"(["a",[]])", "value.Stringify()", __LINE__);
     ss.Clear();
@@ -5415,7 +5411,7 @@ static void TestDeleteValue(TestHelper &helper) {
     helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
     ss.Clear();
 
-    value["A"] = VArray();
+    value["A"] = VArray{};
     value.Remove("A");
     helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
     ss.Clear();
@@ -5458,8 +5454,8 @@ static void TestDeleteValue(TestHelper &helper) {
     ss.Clear();
 
     value["A"]   = "a";
-    value["bb"]  = VHArray();
-    value["AAA"] = VArray();
+    value["bb"]  = VHArray{};
+    value["AAA"] = VArray{};
     value.Remove("AAA");
     helper.Equal(value.Stringify(ss), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
     ss.Clear();
@@ -5472,8 +5468,8 @@ static void TestDeleteValue(TestHelper &helper) {
     ss.Clear();
 
     value["A"]   = "a";
-    value["bb"]  = VHArray();
-    value["AAA"] = VArray();
+    value["bb"]  = VHArray{};
+    value["AAA"] = VArray{};
     value["AAA"].Reset();
     helper.Equal(value.Stringify(ss), R"({"A":"a","bb":{}})", "value.Stringify()", __LINE__);
     ss.Clear();
@@ -5553,13 +5549,13 @@ static void TestGroupValue(TestHelper &helper) {
     StringStream<char> ss;
     ValueC             value;
 
-    value += VHArray();
-    value += VHArray();
-    value += VHArray();
-    value += VHArray();
-    value += VHArray();
-    value += VHArray();
-    value += VHArray();
+    value += VHArray{};
+    value += VHArray{};
+    value += VHArray{};
+    value += VHArray{};
+    value += VHArray{};
+    value += VHArray{};
+    value += VHArray{};
 
     value[0]["year"] = 2019;
     value[1]["year"] = 2020;
@@ -5638,7 +5634,7 @@ static void TestGroupValue(TestHelper &helper) {
     value.GroupBy(value2, "year");
     helper.EqualsFalse(value.GroupBy(value2, "year"), "value2.Stringify()", __LINE__);
 
-    value[2]["year"] = VHArray();
+    value[2]["year"] = VHArray{};
     helper.EqualsFalse(value.GroupBy(value2, "year"), "value2.Stringify()", __LINE__);
 
     ///////////////////
@@ -5675,10 +5671,10 @@ static void TestGroupValue(TestHelper &helper) {
 
     value2 += 5.4;
     value2 += "str";
-    value2 += VArray();
+    value2 += VArray{};
     value2 += nullptr;
     value2 += true;
-    value2 += VHArray();
+    value2 += VHArray{};
     value2 += false;
 
     value = value2;
