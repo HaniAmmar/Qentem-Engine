@@ -92,7 +92,7 @@ class String {
     using CharType = Char_T_;
 
     // Two numbers, and one pointer -2 for tagging bytes (see QPointer).
-    static constexpr SizeT ShortStringMax = ((sizeof(String) - 2U) / sizeof(Char_T_));
+    static constexpr SizeT ShortStringMax = ((sizeof(StringData<Char_T_, false>) - 2U) / sizeof(Char_T_));
 
     String() = default;
 
