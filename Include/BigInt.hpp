@@ -485,14 +485,15 @@ template <typename Number_T_>
 struct DoubleSize<Number_T_, 64U> {
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
                               const SizeT32 initial_shift) noexcept {
-        const Number_T_ divisor_shifted = (divisor << initial_shift);
-        dividend_high <<= initial_shift;
-        // -----------------------
         const Number_T_ carry = (dividend_low % divisor);
         dividend_low /= divisor;
         // -----------------------
+        const Number_T_ divisor_shifted = (divisor << initial_shift);
+        // -----------------------
         const Number_T_ divisor_low  = (divisor_shifted >> shift);
         const Number_T_ divisor_high = (divisor_shifted & mask);
+        // -----------------------
+        dividend_high <<= initial_shift;
         // -----------------------
         Number_T_ quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
