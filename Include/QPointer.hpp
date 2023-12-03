@@ -32,11 +32,11 @@ union PointerNumber {
     inline explicit PointerNumber(Type_T_ *pointer) noexcept : Pointer{pointer} {
     }
 
-    inline explicit PointerNumber(unsigned long long number) noexcept : Number{number} {
+    inline explicit PointerNumber(SystemIntType number) noexcept : Number{number} {
     }
 
-    Type_T_           *Pointer;
-    unsigned long long Number{0};
+    Type_T_      *Pointer;
+    SystemIntType Number{0};
 };
 
 template <typename Type_T_, bool>
