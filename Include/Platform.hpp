@@ -34,13 +34,15 @@
 #define QENTEM_SIMD_ENABLED
 #endif
 
+namespace Qentem::Platform {
+
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
-struct QentemSIMD {
-    using Number_T = unsigned int;
+struct SIMD {
+    using Number_T = SizeT32;
     using VAR_T    = __m256i;
 
-    static constexpr unsigned int ShiftWidth = 5U;
-    static constexpr unsigned int Size       = 32U;
+    static constexpr SizeT32 ShiftWidth = 5U;
+    static constexpr SizeT32 Size       = 32U;
 
     static VAR_T Load(const VAR_T *pointer) noexcept {
         return _mm256_loadu_si256(pointer);
@@ -83,12 +85,12 @@ struct QentemSIMD {
     }
 };
 #elif defined(QENTEM_SSE2) && (QENTEM_SSE2 == 1)
-struct QentemSIMD {
-    using Number_T = unsigned int;
+struct SIMD {
+    using Number_T = SizeT32;
     using VAR_T    = __m128i;
 
-    static constexpr unsigned int ShiftWidth = 4U;
-    static constexpr unsigned int Size       = 16U;
+    static constexpr SizeT32 ShiftWidth = 4U;
+    static constexpr SizeT32 Size       = 16U;
 
     static VAR_T Load(const VAR_T *pointer) noexcept {
         return _mm_loadu_si128(pointer);
@@ -131,12 +133,12 @@ struct QentemSIMD {
     }
 };
 #elif defined(QENTEM_MSIMD128) && (QENTEM_MSIMD128 == 1)
-struct QentemSIMD {
-    using Number_T = unsigned int;
+struct SIMD {
+    using Number_T = SizeT32;
     using VAR_T    = v128_t;
 
-    static constexpr unsigned int ShiftWidth = 4U;
-    static constexpr unsigned int Size       = 16U;
+    static constexpr SizeT32 ShiftWidth = 4U;
+    static constexpr SizeT32 Size       = 16U;
 
     static VAR_T Load(const VAR_T *pointer) noexcept {
         return wasm_v128_load(pointer);
@@ -179,12 +181,12 @@ struct QentemSIMD {
     }
 };
 #else
-struct QentemSIMD {
-    using Number_T = unsigned int;
-    using VAR_T    = unsigned int;
+struct SIMD {
+    using Number_T = SizeT32;
+    using VAR_T    = SizeT32;
 
-    static constexpr unsigned int ShiftWidth = 0;
-    static constexpr unsigned int Size       = 0;
+    static constexpr SizeT32 ShiftWidth = 0;
+    static constexpr SizeT32 Size       = 0;
 
     static constexpr VAR_T Load(const VAR_T *pointer) noexcept {
         (void)pointer;
@@ -249,28 +251,23 @@ struct QentemSIMD {
 #pragma intrinsic(_BitScanForward)
 #pragma intrinsic(_BitScanReverse)
 #endif
-#endif
-
-namespace Qentem::Platform {
-
-#ifdef _MSC_VER
 
 template <typename Number_T_>
-inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
+inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
-    unsigned long          index = 0;
+    constexpr SizeT32 size  = (sizeof(Number_T_) * 8U);
+    unsigned long     index = 0;
 
     if constexpr (Config::Is64bit) {
         if constexpr (size == 64U) {
-            _BitScanForward64(&index, (unsigned long long)(value));
+            _BitScanForward64(&index, SizeT64(value));
         } else {
             _BitScanForward(&index, (unsigned long)(value));
         }
 
-        return (unsigned int)(index);
+        return SizeT32(index);
     } else {
-        constexpr unsigned int int_size = (sizeof(int) * 8U);
+        constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
         if constexpr (size == 64U) {
             // 01010101 <---
@@ -278,35 +275,35 @@ inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
 
             if (lower_bits != 0U) {
                 _BitScanForward(&index, lower_bits);
-                return (unsigned int)(index);
+                return SizeT32(index);
             }
 
             value >>= int_size;
             _BitScanForward(&index, (unsigned long)(value));
-            return ((unsigned int)(index) + int_size);
+            return (SizeT32(index) + int_size);
         } else {
             _BitScanForward(&index, (unsigned long)(value));
-            return (unsigned int)(index);
+            return SizeT32(index);
         }
     }
 }
 
 template <typename Number_T_>
-inline static unsigned int FindLastBit(Number_T_ value) noexcept {
+inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size  = (sizeof(Number_T_) * 8U);
-    unsigned long          index = 0;
+    constexpr SizeT32 size  = (sizeof(Number_T_) * 8U);
+    unsigned long     index = 0;
 
     if constexpr (Config::Is64bit) {
         if constexpr (size == 64U) {
-            _BitScanReverse64(&index, (unsigned long long)(value));
+            _BitScanReverse64(&index, SizeT64(value));
         } else {
             _BitScanReverse(&index, (unsigned long)(value));
         }
 
-        return (unsigned int)(index);
+        return SizeT32(index);
     } else {
-        constexpr unsigned int int_size = (sizeof(int) * 8U);
+        constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
         if constexpr (size == 64U) {
             // 01010101 <---
@@ -315,14 +312,14 @@ inline static unsigned int FindLastBit(Number_T_ value) noexcept {
 
             if (value == Number_T_{0}) {
                 _BitScanReverse(&index, lower_bits);
-                return (unsigned int)(index);
+                return SizeT32(index);
             }
 
             _BitScanReverse(&index, (unsigned long)(value));
-            return ((unsigned int)(index) + int_size);
+            return (SizeT32(index) + int_size);
         } else {
             _BitScanReverse(&index, (unsigned long)(value));
-            return (unsigned int)(index);
+            return SizeT32(index);
         }
     }
 }
@@ -330,71 +327,71 @@ inline static unsigned int FindLastBit(Number_T_ value) noexcept {
 #else
 
 template <typename Number_T_>
-inline static unsigned int FindFirstBit(Number_T_ value) noexcept {
+inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size = (sizeof(Number_T_) * 8U);
+    constexpr SizeT32 size = (sizeof(Number_T_) * 8U);
 
     if constexpr (Config::Is64bit) {
         if constexpr (size == 64U) {
-            return (unsigned int)(__builtin_ctzl((unsigned long)(value)));
+            return SizeT32(__builtin_ctzl((unsigned long)(value)));
         }
 
-        return (unsigned int)(__builtin_ctz((unsigned int)(value)));
+        return SizeT32(__builtin_ctz(SizeT32(value)));
     } else {
-        constexpr unsigned int int_size = (sizeof(int) * 8U);
+        constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
         if constexpr (size == 64U) {
             // 01010101 <---
-            const unsigned int lower_bits = (unsigned int)(value);
+            const SizeT32 lower_bits = SizeT32(value);
 
             if (lower_bits != 0U) {
-                return (unsigned int)(__builtin_ctz(lower_bits));
+                return SizeT32(__builtin_ctz(lower_bits));
             }
 
             value >>= int_size;
-            return ((unsigned int)(__builtin_ctz((unsigned int)(value))) + int_size);
+            return (SizeT32(__builtin_ctz(SizeT32(value))) + int_size);
         }
 
-        return (unsigned int)(__builtin_ctz((unsigned int)(value)));
+        return SizeT32(__builtin_ctz(SizeT32(value)));
     }
 }
 
 template <typename Number_T_>
-inline static unsigned int FindLastBit(Number_T_ value) noexcept {
+inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int int_size   = (sizeof(int) * 8U);
-    constexpr unsigned int taken_size = (int_size - 1U);
-    constexpr unsigned int size       = ((sizeof(Number_T_) * 8U) - 1U);
+    constexpr SizeT32 int_size   = (sizeof(int) * 8U);
+    constexpr SizeT32 taken_size = (int_size - 1U);
+    constexpr SizeT32 size       = ((sizeof(Number_T_) * 8U) - 1U);
 
     if constexpr (Config::Is64bit) {
         if constexpr (size == 63U) {
-            return (size - (unsigned int)(__builtin_clzl((unsigned long)(value))));
+            return (size - SizeT32(__builtin_clzl((unsigned long)(value))));
         }
 
-        return (taken_size - (unsigned int)(__builtin_clz((unsigned int)(value))));
+        return (taken_size - SizeT32(__builtin_clz(SizeT32(value))));
     } else {
         if constexpr (size == 63U) {
             // ---> 01010101
-            const unsigned int lower_bits = (unsigned int)(value);
+            const SizeT32 lower_bits = SizeT32(value);
             value >>= int_size;
 
             if (value == Number_T_{0}) {
-                return (taken_size - (unsigned int)(__builtin_clz(lower_bits)));
+                return (taken_size - SizeT32(__builtin_clz(lower_bits)));
             }
 
-            return ((taken_size - (unsigned int)(__builtin_clz((unsigned int)(value)))) + int_size);
+            return ((taken_size - SizeT32(__builtin_clz(SizeT32(value)))) + int_size);
         }
 
-        return (taken_size - (unsigned int)(__builtin_clz((unsigned int)(value))));
+        return (taken_size - SizeT32(__builtin_clz(SizeT32(value))));
     }
 }
 #endif
 
 // These two are used during compiling, so do not bother optimizing them.
 template <typename Number_T_>
-inline static constexpr unsigned int FindFirstBitConst(Number_T_ value) noexcept {
+inline static constexpr SizeT32 FindFirstBitConst(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    unsigned int index = 0;
+    SizeT32 index = 0;
 
     if (value != Number_T_{0}) {
         while ((value & Number_T_{1}) == Number_T_{0}) {
@@ -407,11 +404,11 @@ inline static constexpr unsigned int FindFirstBitConst(Number_T_ value) noexcept
 }
 
 template <typename Number_T_>
-inline static constexpr unsigned int FindLastBitConst(Number_T_ value) noexcept {
+inline static constexpr SizeT32 FindLastBitConst(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr unsigned int size  = ((sizeof(Number_T_) * 8U) - 1U);
-    constexpr Number_T_    mask  = (Number_T_{1} << size);
-    unsigned int           index = size;
+    constexpr SizeT32   size  = ((sizeof(Number_T_) * 8U) - 1U);
+    constexpr Number_T_ mask  = (Number_T_{1} << size);
+    SizeT32             index = size;
 
     if (value != Number_T_{0}) {
         while ((value & mask) == Number_T_{0}) {
@@ -423,33 +420,33 @@ inline static constexpr unsigned int FindLastBitConst(Number_T_ value) noexcept 
     return index;
 }
 ///////////////////////////////////////
-template <typename, typename, unsigned int CharSize>
+template <typename, typename, SizeT32>
 struct SMIDCompare_T {};
 
 template <typename Char_T_, typename SIMDValue>
-inline static constexpr QentemSIMD::Number_T SMIDCompare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+inline static constexpr Platform::SIMD::Number_T SMIDCompare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
     return SMIDCompare_T<Char_T_, SIMDValue, sizeof(Char_T_)>::Compare(val1, val2);
 }
 
 // char
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 1U> {
-    inline constexpr static QentemSIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
-        return QentemSIMD::Compare8Bit(val1, val2);
+    inline constexpr static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+        return Platform::SIMD::Compare8Bit(val1, val2);
     }
 };
 
 // char16
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 2U> {
-    inline static QentemSIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
-        QentemSIMD::Number_T bits16 = QentemSIMD::Compare16Bit(val1, val2);
-        QentemSIMD::Number_T bits   = 0;
-        unsigned int         count  = 0U;
-        const unsigned int   shift  = 2U;
+    inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+        Platform::SIMD::Number_T bits16 = Platform::SIMD::Compare16Bit(val1, val2);
+        Platform::SIMD::Number_T bits   = 0;
+        SizeT32                  count  = 0U;
+        const SizeT32            shift  = 2U;
 
         while (bits16 != 0) {
-            bits |= ((bits16 & QentemSIMD::Number_T{1}) << count);
+            bits |= ((bits16 & Platform::SIMD::Number_T{1}) << count);
             bits16 >>= shift;
             ++count;
         }
@@ -461,14 +458,14 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 2U> {
 // char32_t
 template <typename Char_T_, typename SIMDValue>
 struct SMIDCompare_T<Char_T_, SIMDValue, 4U> {
-    inline static QentemSIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
-        QentemSIMD::Number_T bits32 = QentemSIMD::Compare32Bit(val1, val2);
-        QentemSIMD::Number_T bits   = 0;
-        unsigned int         count  = 0U;
-        const unsigned int   shift  = 4U;
+    inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
+        Platform::SIMD::Number_T bits32 = Platform::SIMD::Compare32Bit(val1, val2);
+        Platform::SIMD::Number_T bits   = 0;
+        SizeT32                  count  = 0U;
+        const SizeT32            shift  = 4U;
 
         while (bits32 != 0) {
-            bits |= ((bits32 & QentemSIMD::Number_T{1}) << count);
+            bits |= ((bits32 & Platform::SIMD::Number_T{1}) << count);
             bits32 >>= shift;
             ++count;
         }
@@ -479,41 +476,41 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 4U> {
 
 //////////////////////////////////
 
-template <typename, unsigned int S>
+template <typename, SizeT32>
 struct SMIDSetToOne_T {};
 
 template <typename Char_T_>
-inline static constexpr QentemSIMD::VAR_T SMIDSetToOne(const Char_T_ value) noexcept {
+inline static constexpr Platform::SIMD::VAR_T SMIDSetToOne(const Char_T_ value) noexcept {
     return SMIDSetToOne_T<Char_T_, sizeof(Char_T_)>::Set(value);
 }
 
 // char
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 1U> {
-    inline static constexpr QentemSIMD::VAR_T Set(const Char_T_ value) noexcept {
-        return QentemSIMD::SetToOne8Bit(value);
+    inline static constexpr Platform::SIMD::VAR_T Set(const Char_T_ value) noexcept {
+        return Platform::SIMD::SetToOne8Bit(value);
     }
 };
 
 // char16
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 2U> {
-    inline static constexpr QentemSIMD::VAR_T Set(const Char_T_ value) noexcept {
-        return QentemSIMD::SetToOne16Bit(short(value));
+    inline static constexpr Platform::SIMD::VAR_T Set(const Char_T_ value) noexcept {
+        return Platform::SIMD::SetToOne16Bit(short(value));
     }
 };
 
 // char32_t
 template <typename Char_T_>
 struct SMIDSetToOne_T<Char_T_, 4U> {
-    inline static constexpr QentemSIMD::VAR_T Set(const Char_T_ value) noexcept {
-        return QentemSIMD::SetToOne32Bit(int(value));
+    inline static constexpr Platform::SIMD::VAR_T Set(const Char_T_ value) noexcept {
+        return Platform::SIMD::SetToOne32Bit(int(value));
     }
 };
 
 template <typename Char_T_, typename Number_T_>
 inline static constexpr Number_T_ SMIDNextOffset() noexcept {
-    constexpr Number_T_ offset = (QentemSIMD::Size / sizeof(Char_T_));
+    constexpr Number_T_ offset = (Platform::SIMD::Size / sizeof(Char_T_));
     return offset;
 }
 

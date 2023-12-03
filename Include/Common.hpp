@@ -26,19 +26,19 @@
 namespace Qentem {
 
 using NullType = decltype(nullptr);
-using Size32T  = unsigned int;
-using Size64T  = unsigned long long;
+using SizeT32  = unsigned int;
+using SizeT64  = unsigned long long;
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
-using SizeT = Size32T;
+using SizeT = SizeT32;
 #endif
 
 struct Config {
-    static constexpr unsigned int FloatDoublePrecision{15U};
-    static constexpr unsigned int TemplatePrecision{3U};
-    static constexpr unsigned int PointerSize{sizeof(void *)};
-    static constexpr bool         Is64bit{PointerSize == 8U};
+    static constexpr SizeT32 FloatDoublePrecision{15U};
+    static constexpr SizeT32 TemplatePrecision{3U};
+    static constexpr SizeT32 PointerSize{sizeof(void *)};
+    static constexpr bool    Is64bit{PointerSize == 8U};
 
     ///////////////////////////////////////////////
 #ifndef QENTEM_BIG_ENDIAN
@@ -126,17 +126,17 @@ struct Config {
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
 //*********************************************
-template <unsigned int S>
+template <SizeT32>
 struct SystemIntTypeT {};
 
 template <>
 struct SystemIntTypeT<8U> {
-    using NumberType_ = Size64T;
+    using NumberType_ = SizeT64;
 };
 
 template <>
 struct SystemIntTypeT<4U> {
-    using NumberType_ = Size32T;
+    using NumberType_ = SizeT32;
 };
 
 using SystemIntType = typename SystemIntTypeT<Config::PointerSize>::NumberType_;
@@ -166,15 +166,15 @@ union QNumber64 {
         if constexpr (IsFloat<Number_T_>()) {
             Real = double(num);
         } else if constexpr (IsUnsigned<Number_T_>()) {
-            Natural = (unsigned long long)(num);
+            Natural = SizeT64(num);
         } else {
             Integer = (long long)(num);
         }
     }
 
-    unsigned long long Natural{0};
-    long long          Integer;
-    double             Real;
+    SizeT64   Natural{0};
+    long long Integer;
+    double    Real;
 };
 
 union QNumber32 {
@@ -190,15 +190,15 @@ union QNumber32 {
         if constexpr (IsFloat<Number_T_>()) {
             Real = float(num);
         } else if constexpr (IsUnsigned<Number_T_>()) {
-            Natural = (unsigned int)(num);
+            Natural = SizeT32(num);
         } else {
             Integer = int(num);
         }
     }
 
-    unsigned int Natural{0};
-    int          Integer;
-    float        Real;
+    SizeT32 Natural{0};
+    int     Integer;
+    float   Real;
 };
 
 template <typename Number_T_>
@@ -214,9 +214,9 @@ union QNumber16 {
         if constexpr (IsFloat<Number_T_>()) {
             Real = Number_T_(num);
         } else if constexpr (IsUnsigned<Number_T_>()) {
-            Natural = (unsigned int)(num);
+            Natural = (unsigned short)(num);
         } else {
-            Integer = int(num);
+            Integer = short(num);
         }
     }
 

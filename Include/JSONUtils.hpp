@@ -85,7 +85,7 @@ static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &strea
                         ++offset;
 
                         if ((length - offset) > 3) {
-                            unsigned int code = Digit::HexStringToNumber((content + offset), 4);
+                            SizeT32 code = Digit::HexStringToNumber((content + offset), 4);
                             offset += 4;
                             offset2 = offset;
 
@@ -232,13 +232,13 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) 
     stream.Write((content + offset2), (offset - offset2));
 }
 
-template <typename, unsigned int S>
+template <typename, SizeT32>
 struct JSONotationStrings;
 
 template <typename Char_T_>
 struct JSONotation_T_ {
   private:
-    static constexpr unsigned int size_ = sizeof(Char_T_);
+    static constexpr SizeT32 size_ = sizeof(Char_T_);
 
   public:
     static constexpr Char_T_ QuoteChar    = '"';

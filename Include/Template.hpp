@@ -1171,9 +1171,9 @@ struct TemplateSub {
         } else {
             const TemplateSub *that = this;
             {
-                const unsigned int level    = (unsigned int)(level_);
-                unsigned int       iv_level = (unsigned int)(v_level);
-                value                       = loop_value_;
+                const SizeT32 level    = SizeT32(level_);
+                SizeT32       iv_level = SizeT32(v_level);
+                value                  = loop_value_;
 
                 while (iv_level < level) {
                     that = that->parent_;
@@ -1344,37 +1344,37 @@ struct TemplateSub {
             }
 
             case QOperation::Less: { // <
-                left.Number.Natural = (unsigned long long)(left < right);
+                left.Number.Natural = SizeT64(left < right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::LessOrEqual: { // <=
-                left.Number.Natural = (unsigned long long)(left <= right);
+                left.Number.Natural = SizeT64(left <= right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Greater: { // >
-                left.Number.Natural = (unsigned long long)(left > right);
+                left.Number.Natural = SizeT64(left > right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::GreaterOrEqual: { // >=
-                left.Number.Natural = (unsigned long long)(left >= right);
+                left.Number.Natural = SizeT64(left >= right);
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::And: { // &&
-                left.Number.Natural = (unsigned long long)((left > 0U) && (right > 0U));
+                left.Number.Natural = SizeT64((left > 0U) && (right > 0U));
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.Number.Natural = (unsigned long long)((left > 0U) || (right > 0U));
+                left.Number.Natural = SizeT64((left > 0U) || (right > 0U));
                 left.Type           = ExpressionType::NaturalNumber;
                 break;
             }
@@ -1583,7 +1583,7 @@ struct TemplateSub {
                 }
             }
 
-            left.Number.Natural = (unsigned long long)(left == right);
+            left.Number.Natural = SizeT64(left == right);
             left.Type           = ExpressionType::NaturalNumber;
             return true;
         }

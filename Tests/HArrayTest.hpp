@@ -29,7 +29,7 @@
 
 namespace Qentem::Test {
 
-using HashArray = HArray<unsigned int, char>;
+using HashArray = HArray<SizeT32, char>;
 
 static void TestHArray1(TestHelper &helper) {
     HashArray numbers1;
@@ -95,11 +95,11 @@ static void TestHArray1(TestHelper &helper) {
 }
 
 static void TestHArray2(TestHelper &helper) {
-    HashArray                            numbers1(8);
-    HashArray                            numbers2;
-    const String<char>                  *key;
-    const char                          *str_c;
-    const HAItem_T_<unsigned int, char> *storage;
+    HashArray                       numbers1(8);
+    HashArray                       numbers2;
+    const String<char>             *key;
+    const char                     *str_c;
+    const HAItem_T_<SizeT32, char> *storage;
 
     numbers1["key1"] = 1;
     helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
@@ -257,11 +257,11 @@ static void TestHArray2(TestHelper &helper) {
 }
 
 static void TestHArray3(TestHelper &helper) {
-    HashArray                            numbers1(8);
-    HashArray                            numbers2;
-    const String<char>                  *key;
-    const char                          *str_c;
-    const HAItem_T_<unsigned int, char> *storage;
+    HashArray                       numbers1(8);
+    HashArray                       numbers2;
+    const String<char>             *key;
+    const char                     *str_c;
+    const HAItem_T_<SizeT32, char> *storage;
 
     numbers2["key4"] = 40;
     numbers2["key1"] = 10;
@@ -302,11 +302,11 @@ static void TestHArray3(TestHelper &helper) {
 }
 
 static void TestHArray4(TestHelper &helper) {
-    HashArray                            numbers1;
-    HashArray                            numbers2;
-    HashArray                            numbers3(3);
-    const HAItem_T_<unsigned int, char> *storage;
-    unsigned int                        *value;
+    HashArray                       numbers1;
+    HashArray                       numbers2;
+    HashArray                       numbers3(3);
+    const HAItem_T_<SizeT32, char> *storage;
+    SizeT32                        *value;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -364,8 +364,8 @@ static void TestHArray4(TestHelper &helper) {
     helper.Equal(numbers1["key9"], 900U, "key9", __LINE__);
     helper.Equal(numbers1["key10"], 1000U, "key10", __LINE__);
 
-    SizeT               index = 0;
-    const unsigned int *val   = numbers1.GetValue(index);
+    SizeT          index = 0;
+    const SizeT32 *val   = numbers1.GetValue(index);
     helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
     helper.Equal(*val, 100U, "0", __LINE__);
 
@@ -460,7 +460,7 @@ static void TestHArray4(TestHelper &helper) {
 
     numbers1.Reset();
 
-    for (unsigned int i = 0; i < 10; i++) {
+    for (SizeT32 i = 0; i < 10; i++) {
         String<char> key;
         String<char> key2;
 

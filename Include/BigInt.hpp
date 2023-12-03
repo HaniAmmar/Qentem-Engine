@@ -33,10 +33,10 @@ namespace Qentem {
 // 16 64bit int = 1024 bits
 // (number of variables) * sizeof(variable) * 8 = Width_T_
 
-template <typename Number_T_, unsigned int Size_>
+template <typename Number_T_, SizeT32>
 struct DoubleSize {};
 
-template <typename Number_T_, unsigned int Width_T_>
+template <typename Number_T_, SizeT32 Width_T_>
 struct BigInt {
     using NumberType_ = Number_T_;
 
@@ -70,15 +70,15 @@ struct BigInt {
 
     template <typename N_Number_T_>
     inline explicit operator N_Number_T_() const noexcept {
-        constexpr unsigned int n_size = (sizeof(N_Number_T_) * 8U);
+        constexpr SizeT32 n_size = (sizeof(N_Number_T_) * 8U);
 
         if constexpr (n_size == BitSize()) {
             return big_int_[0];
         } else if constexpr (n_size < BitSize()) {
             return N_Number_T_(big_int_[0]);
         } else {
-            N_Number_T_  num   = 0;
-            unsigned int count = (n_size / BitSize());
+            N_Number_T_ num   = 0;
+            SizeT32     count = (n_size / BitSize());
 
             while ((--count != 0) && (count >= index_id_)) {
                 num |= big_int_[1];
@@ -139,11 +139,11 @@ struct BigInt {
         return (out != number);
     }
 
-    inline void operator<<=(const unsigned int number) noexcept {
+    inline void operator<<=(const SizeT32 number) noexcept {
         ShiftLeft(number);
     }
 
-    inline void operator>>=(const unsigned int number) noexcept {
+    inline void operator>>=(const SizeT32 number) noexcept {
         ShiftRight(number);
     }
 
@@ -223,8 +223,8 @@ struct BigInt {
         Number_T_ remainder = (big_int_[index_id_] % divisor);
         big_int_[index_id_] /= divisor;
 
-        const unsigned int initial_shift = [=]() noexcept -> unsigned int {
-            static constexpr unsigned int max_index = (BitSize() - 1U);
+        const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
+            static constexpr SizeT32 max_index = (BitSize() - 1U);
 
             if constexpr (BitSize() == 64U) {
                 return (max_index - Platform::FindLastBit(divisor));
@@ -248,7 +248,7 @@ struct BigInt {
         return remainder;
     }
     ////////////////////////////////////////////////////
-    inline void ShiftRight(unsigned int offset) noexcept {
+    inline void ShiftRight(SizeT32 offset) noexcept {
         Number_T_ index = 0U;
 
         while (offset >= BitSize()) {
@@ -265,7 +265,7 @@ struct BigInt {
         }
 
         if (offset != Number_T_{0}) {
-            const unsigned int shift_size = (BitSize() - offset);
+            const SizeT32 shift_size = (BitSize() - offset);
 
             big_int_[Number_T_{0}] >>= offset;
 
@@ -279,7 +279,7 @@ struct BigInt {
         }
     }
 
-    inline void ShiftLeft(unsigned int offset) noexcept {
+    inline void ShiftLeft(SizeT32 offset) noexcept {
         Number_T_ index = index_id_;
 
         while (offset >= BitSize()) {
@@ -297,7 +297,7 @@ struct BigInt {
         }
 
         if (offset != Number_T_{0}) {
-            const unsigned int shift_size = (BitSize() - offset);
+            const SizeT32 shift_size = (BitSize() - offset);
 
             const Number_T_ carry = (big_int_[index] >> shift_size);
             big_int_[index] <<= offset;
@@ -313,7 +313,7 @@ struct BigInt {
         }
     }
     ////////////////////////////////////////////////////
-    inline unsigned int FindFirstBit() const noexcept {
+    inline SizeT32 FindFirstBit() const noexcept {
         Number_T_ index = Number_T_{0};
 
         while ((big_int_[index] == Number_T_{0}) && (index <= index_id_)) {
@@ -323,15 +323,15 @@ struct BigInt {
         return (Platform::FindFirstBit(big_int_[index_id_]) + (index * BitSize()));
     }
 
-    inline unsigned int FindLastBit() const noexcept {
-        return (Platform::FindLastBit(big_int_[index_id_]) + (unsigned int)(index_id_ * BitSize()));
+    inline SizeT32 FindLastBit() const noexcept {
+        return (Platform::FindLastBit(big_int_[index_id_]) + SizeT32(index_id_ * BitSize()));
     }
     ////////////////////////////////////////////////////
     inline Number_T_ Number() const noexcept {
         return big_int_[0U];
     }
 
-    inline Number_T_ const *Bucket(const unsigned int index) const noexcept {
+    inline Number_T_ const *Bucket(const SizeT32 index) const noexcept {
         if (index <= index_id_) {
             return (big_int_ + index);
         }
@@ -339,7 +339,7 @@ struct BigInt {
         return nullptr;
     }
 
-    inline Number_T_ *Bucket(const unsigned int index) noexcept {
+    inline Number_T_ *Bucket(const SizeT32 index) noexcept {
         if (index <= index_id_) {
             return (big_int_ + index);
         }
@@ -351,19 +351,19 @@ struct BigInt {
         return index_id_;
     }
 
-    inline static constexpr unsigned int MaxIndex() noexcept {
+    inline static constexpr SizeT32 MaxIndex() noexcept {
         return (AlignSize() - 1U);
     }
 
-    inline static constexpr unsigned int BitSize() noexcept {
+    inline static constexpr SizeT32 BitSize() noexcept {
         return (SizeOfType() * 8U);
     }
 
-    inline static constexpr unsigned int TotalBits() noexcept {
+    inline static constexpr SizeT32 TotalBits() noexcept {
         return Width_T_;
     }
 
-    inline static constexpr unsigned int SizeOfType() noexcept {
+    inline static constexpr SizeT32 SizeOfType() noexcept {
         return sizeof(Number_T_);
     }
 
@@ -379,9 +379,8 @@ struct BigInt {
         return (*this == Number_T_{0});
     }
 
-    static constexpr unsigned int AlignSize() noexcept {
-        return ((TotalBits() / BitSize()) +
-                (unsigned int)(TotalBits() > (1U << Platform::FindLastBitConst(TotalBits()))));
+    static constexpr SizeT32 AlignSize() noexcept {
+        return ((TotalBits() / BitSize()) + SizeT32(TotalBits() > (1U << Platform::FindLastBitConst(TotalBits()))));
     }
 
     inline void SetIndex(Number_T_ id) noexcept {
@@ -398,7 +397,7 @@ struct BigInt {
 
     template <typename N_Number_T_>
     inline void set(N_Number_T_ number) noexcept {
-        constexpr unsigned int n_size = ((sizeof(N_Number_T_) * 8U) / BitSize());
+        constexpr SizeT32 n_size = ((sizeof(N_Number_T_) * 8U) / BitSize());
 
         if constexpr (n_size > 1U) {
             big_int_[0U] = Number_T_(number);
@@ -418,7 +417,7 @@ struct BigInt {
 ////////////////////////////////////////////////////
 template <typename Number_T_>
 struct DoubleSize<Number_T_, 8U> {
-    static constexpr unsigned int shift = 8U;
+    static constexpr SizeT32 shift = 8U;
 
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
         unsigned short dividend16 = dividend_high;
@@ -440,10 +439,10 @@ struct DoubleSize<Number_T_, 8U> {
 ////////////////////////////////////////////////////
 template <typename Number_T_>
 struct DoubleSize<Number_T_, 16U> {
-    static constexpr unsigned int shift = 16U;
+    static constexpr SizeT32 shift = 16U;
 
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
-        unsigned int dividend32 = dividend_high;
+        SizeT32 dividend32 = dividend_high;
         dividend32 <<= shift;
         dividend32 |= dividend_low;
         dividend_high = Number_T_(dividend32 % divisor);
@@ -452,7 +451,7 @@ struct DoubleSize<Number_T_, 16U> {
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
-        unsigned int number32 = number;
+        SizeT32 number32 = number;
         number32 *= multiplier;
         number = Number_T_(number32);
 
@@ -462,10 +461,10 @@ struct DoubleSize<Number_T_, 16U> {
 ////////////////////////////////////////////////////
 template <typename Number_T_>
 struct DoubleSize<Number_T_, 32U> {
-    static constexpr unsigned int shift = 32U;
+    static constexpr SizeT32 shift = 32U;
 
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
-        unsigned long long dividend64 = dividend_high;
+        SizeT64 dividend64 = dividend_high;
         dividend64 <<= shift;
         dividend64 |= dividend_low;
         dividend_high = Number_T_(dividend64 % divisor);
@@ -474,7 +473,7 @@ struct DoubleSize<Number_T_, 32U> {
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
-        unsigned long long number64 = number;
+        SizeT64 number64 = number;
         number64 *= multiplier;
         number = Number_T_(number64);
 
@@ -485,7 +484,7 @@ struct DoubleSize<Number_T_, 32U> {
 template <typename Number_T_>
 struct DoubleSize<Number_T_, 64U> {
     inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
-                              const unsigned int initial_shift) noexcept {
+                              const SizeT32 initial_shift) noexcept {
         const Number_T_ divisor_shifted = (divisor << initial_shift);
         dividend_high <<= initial_shift;
         // -----------------------
@@ -584,9 +583,9 @@ struct DoubleSize<Number_T_, 64U> {
     }
 
   private:
-    static constexpr unsigned int width = (sizeof(Number_T_) * 8U);
-    static constexpr unsigned int shift = (width / 2U);
-    static constexpr Number_T_    mask  = (~(Number_T_{0}) >> shift);
+    static constexpr SizeT32   width = (sizeof(Number_T_) * 8U);
+    static constexpr SizeT32   shift = (width / 2U);
+    static constexpr Number_T_ mask  = (~(Number_T_{0}) >> shift);
 };
 
 } // namespace Qentem

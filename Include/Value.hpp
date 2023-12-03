@@ -87,15 +87,15 @@ struct VNumberData<Number_T_, false> {
     // Little-Endian
     VNumberData() = default;
 
-    VNumberData(Number_T_ number, unsigned long long ptr_number) noexcept : Number{number}, PtrNumber{ptr_number} {
+    VNumberData(Number_T_ number, SizeT64 ptr_number) noexcept : Number{number}, PtrNumber{ptr_number} {
     }
 
     template <typename Type_>
     explicit VNumberData(Type_ number) noexcept : Number{number} {
     }
 
-    Number_T_          Number{0ULL};
-    unsigned long long PtrNumber{0ULL};
+    Number_T_ Number{0ULL};
+    SizeT64   PtrNumber{0ULL};
 };
 
 template <typename Number_T_>
@@ -103,15 +103,15 @@ struct VNumberData<Number_T_, true> {
     // Big-Endian
     VNumberData() = default;
 
-    VNumberData(Number_T_ number, unsigned long long ptr_number) noexcept : PtrNumber{ptr_number}, Number{number} {
+    VNumberData(Number_T_ number, SizeT64 ptr_number) noexcept : PtrNumber{ptr_number}, Number{number} {
     }
 
     template <typename Type_>
     explicit VNumberData(Type_ number) noexcept : Number{number} {
     }
 
-    unsigned long long PtrNumber{0ULL};
-    Number_T_          Number{0ULL};
+    SizeT64   PtrNumber{0ULL};
+    Number_T_ Number{0ULL};
 };
 
 struct VNumberT {
@@ -142,7 +142,7 @@ struct VNumberT {
         data_.Number.ddl = num;
     }
 
-    inline void SetNumber(unsigned long long num) noexcept {
+    inline void SetNumber(SizeT64 num) noexcept {
         data_.Number.ull = num;
     }
 
@@ -150,7 +150,7 @@ struct VNumberT {
         data_.Number.sll = num;
     }
 
-    inline unsigned long long GetUInt64() const noexcept {
+    inline SizeT64 GetUInt64() const noexcept {
         return data_.Number.ull;
     }
 
@@ -171,7 +171,7 @@ struct VNumberT {
 
   private:
     union Number_T {
-        explicit Number_T(unsigned long long num) noexcept : ull{num} {
+        explicit Number_T(SizeT64 num) noexcept : ull{num} {
         }
 
         explicit Number_T(long long num) noexcept : sll{num} {
@@ -180,10 +180,10 @@ struct VNumberT {
         explicit Number_T(double num) noexcept : ddl{num} {
         }
 
-        unsigned long long ull;
-        long long          sll;
-        double             ddl;
-        SizeT              padding_[2]{0}; // Just in case SizeT is set to long
+        SizeT64   ull;
+        long long sll;
+        double    ddl;
+        SizeT     padding_[2]{0}; // Just in case SizeT is set to long
     };
 
     VNumberData<Number_T, Config::IsBigEndian> data_{};
@@ -247,7 +247,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
     explicit ValueData(const Char_T_ *str, SizeT length) : VString{str, length} {
     }
 
-    explicit ValueData(unsigned long long num) noexcept : VNumber{num} {
+    explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
     }
 
     explicit ValueData(long long num) noexcept : VNumber{num} {
@@ -329,7 +329,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, false> {
     explicit ValueData(const Char_T_ *str, SizeT length) : VString{str, length} {
     }
 
-    explicit ValueData(unsigned long long num) noexcept : VNumber{num} {
+    explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
     }
 
     explicit ValueData(long long num) noexcept : VNumber{num} {
@@ -429,7 +429,7 @@ class Value {
         setTypeToString();
     }
 
-    explicit Value(unsigned long long num) noexcept : data_{num} {
+    explicit Value(SizeT64 num) noexcept : data_{num} {
         setTypeToUInt64();
     }
 
@@ -447,7 +447,7 @@ class Value {
             data_.VNumber.SetNumber(double(num));
             setTypeToDouble();
         } else if constexpr (IsUnsigned<Number_T_>()) {
-            data_.VNumber.SetNumber((unsigned long long)(num));
+            data_.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
             data_.VNumber.SetNumber((long long)(num));
@@ -648,7 +648,7 @@ class Value {
             data_.VNumber.SetNumber(double(num));
             setTypeToDouble();
         } else if constexpr (IsUnsigned<Number_T_>()) {
-            data_.VNumber.SetNumber((unsigned long long)(num));
+            data_.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
             data_.VNumber.SetNumber((long long)(num));
@@ -1356,7 +1356,7 @@ class Value {
         }
     }
 
-    bool SetString(VStringT &value, unsigned int precision = Config::FloatDoublePrecision) const {
+    bool SetString(VStringT &value, SizeT32 precision = Config::FloatDoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 value = data_.VString;
@@ -1405,7 +1405,7 @@ class Value {
     }
 
     template <typename StringStream_T_>
-    bool CopyStringValueTo(StringStream_T_ &stream, unsigned int precision = Config::FloatDoublePrecision) const {
+    bool CopyStringValueTo(StringStream_T_ &stream, SizeT32 precision = Config::FloatDoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 stream.Write(data_.VString.First(), data_.VString.Length());
@@ -1465,7 +1465,7 @@ class Value {
         return false;
     }
 
-    unsigned long long GetUInt64() const noexcept {
+    SizeT64 GetUInt64() const noexcept {
         QNumber number;
 
         switch (SetNumber(number)) {
@@ -1771,7 +1771,7 @@ class Value {
     }
 
     template <typename Stream_T_>
-    inline Stream_T_ &Stringify(Stream_T_ &stream, unsigned int precision = Config::FloatDoublePrecision) const {
+    inline Stream_T_ &Stringify(Stream_T_ &stream, SizeT32 precision = Config::FloatDoublePrecision) const {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -1783,14 +1783,14 @@ class Value {
         return stream;
     }
 
-    inline VStringT Stringify(unsigned int precision = Config::FloatDoublePrecision) const {
+    inline VStringT Stringify(SizeT32 precision = Config::FloatDoublePrecision) const {
         StringStream<Char_T_> stream;
         return Stringify(stream, precision).GetString();
     }
 
   private:
     template <typename Stream_T_>
-    static void stringifyObject(const VObjectT &obj, Stream_T_ &stream, unsigned int precision) {
+    static void stringifyObject(const VObjectT &obj, Stream_T_ &stream, SizeT32 precision) {
         using V_item_ = HAItem_T_<Value, Char_T_>;
 
         stream += JSONotation::SCurlyChar;
@@ -1817,7 +1817,7 @@ class Value {
     }
 
     template <typename Stream_T_>
-    static void stringifyArray(const VArrayT &arr, Stream_T_ &stream, unsigned int precision) {
+    static void stringifyArray(const VArrayT &arr, Stream_T_ &stream, SizeT32 precision) {
         stream += JSONotation::SSquareChar;
 
         for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
@@ -1837,7 +1837,7 @@ class Value {
     }
 
     template <typename Stream_T_>
-    static void stringifyValue(const Value &val, Stream_T_ &stream, unsigned int precision) {
+    static void stringifyValue(const Value &val, Stream_T_ &stream, SizeT32 precision) {
         switch (val.Type()) {
             case ValueType::Object: {
                 stringifyObject(val.data_.VObject, stream, precision);

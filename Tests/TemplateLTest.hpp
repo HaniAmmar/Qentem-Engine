@@ -2925,18 +2925,18 @@ static void TestLoopLTag2(TestHelper &helper) {
     helper.Equal(Template::Render(content, value, ss), LR"(some_valsome_valsome_val)", LR"(Render())", __LINE__);
     ss.Clear();
 
-    constexpr unsigned int size_4 = (8 * 4);
+    constexpr SizeT32 size_4 = (8 * 4);
 
     StringStream<wchar_t> content2;
     StringStream<wchar_t> output;
     Value<wchar_t>        value2;
 
-    for (unsigned int i = 0; i < size_4; i++) {
+    for (SizeT32 i = 0; i < size_4; i++) {
         value2 += i;
     }
 
     content2 += LR"(<loop value="loop1-value">A {var:loop1-value} B</loop>)";
-    for (unsigned int i = 0; i < size_4; i++) {
+    for (SizeT32 i = 0; i < size_4; i++) {
         output += LR"(A )";
         Digit::NumberToString(output, i);
         output += LR"( B)";
@@ -3349,7 +3349,7 @@ static void TestIfLTag2(TestHelper &helper) {
 }
 
 static void TestRenderL1(TestHelper &helper) {
-    constexpr unsigned int size_4 = (8 * 4);
+    constexpr SizeT32 size_4 = (8 * 4);
 
     StringStream<wchar_t> ss;
     StringStream<wchar_t> content;
@@ -3357,11 +3357,11 @@ static void TestRenderL1(TestHelper &helper) {
     String<wchar_t>       str;
     Value<wchar_t>        value;
 
-    for (unsigned int i = 0; i < size_4; i++) {
+    for (SizeT32 i = 0; i < size_4; i++) {
         value += i;
     }
 
-    for (unsigned int i = 0; i < size_4; i++) {
+    for (SizeT32 i = 0; i < size_4; i++) {
         content += LR"({var:)";
         str.Reset();
         Digit::NumberToString(str, i);
@@ -3376,8 +3376,8 @@ static void TestRenderL1(TestHelper &helper) {
     content.Clear();
     output.Clear();
 
-    unsigned int size = 8;
-    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
+    SizeT32 size = 8;
+    for (SizeT32 i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += LR"({var:)";
             str.Reset();
@@ -3406,7 +3406,7 @@ static void TestRenderL1(TestHelper &helper) {
     output.Clear();
 
     size = 8;
-    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
+    for (SizeT32 i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += LR"({var:)";
             str.Reset();
@@ -3435,7 +3435,7 @@ static void TestRenderL1(TestHelper &helper) {
     output.Clear();
 
     size = 8;
-    for (unsigned int i = 0, x = 1; i < size_4; i++, x++) {
+    for (SizeT32 i = 0, x = 1; i < size_4; i++, x++) {
         if (x != size) {
             content += LR"({var:)";
             str.Reset();

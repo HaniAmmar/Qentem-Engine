@@ -89,8 +89,7 @@ struct TagBit {
         }
     }
 
-    TagBit(SizeT offset, SizeT length) noexcept
-        : content_{(unsigned int)(offset), (unsigned int)(length)}, type_{TagType::RawText} {
+    TagBit(SizeT offset, SizeT length) noexcept : content_{SizeT32(offset), SizeT32(length)}, type_{TagType::RawText} {
     }
 
     ~TagBit() {
@@ -138,18 +137,18 @@ struct TagBit {
         return type_;
     }
 
-    inline unsigned int GetOffset() const noexcept {
+    inline SizeT32 GetOffset() const noexcept {
         return content_.offset;
     }
 
-    inline unsigned int GetLength() const noexcept {
+    inline SizeT32 GetLength() const noexcept {
         return content_.length;
     }
 
   private:
     struct Content_ {
-        unsigned int offset;
-        unsigned int length;
+        SizeT32 offset;
+        SizeT32 length;
     };
 
     union {
@@ -201,13 +200,13 @@ struct IfTagCase {
     Array<QExpression> Case;
 };
 
-template <typename, unsigned int S>
+template <typename, SizeT32>
 struct TPStrings {};
 
 template <typename Char_T_>
 struct TagPatterns_T_ {
   private:
-    static constexpr unsigned int size_ = sizeof(Char_T_);
+    static constexpr SizeT32 size_ = sizeof(Char_T_);
 
   public:
     /*

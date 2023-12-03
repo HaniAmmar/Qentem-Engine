@@ -39,7 +39,7 @@
 
 namespace Qentem::Test {
 
-static unsigned int HexStringToNumber(const char *str) noexcept {
+static SizeT32 HexStringToNumber(const char *str) noexcept {
     return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
@@ -108,9 +108,9 @@ static bool StringToNumber(const TestHelper &helper, Number_T_ &num, const char 
 }
 
 static void TestStringToNumber1(TestHelper &helper) {
-    unsigned long long number   = 0;
-    double             d_number = 0;
-    const char        *str;
+    SizeT64     number   = 0;
+    double      d_number = 0;
+    const char *str;
 
     str = "";
     helper.EqualsFalse(StringToNumber(helper, number, str), "valid", __LINE__);
@@ -154,7 +154,7 @@ static void TestStringToNumber1(TestHelper &helper) {
 
 static void TestStringToNumber2(TestHelper &helper) {
     int           number_int    = 0;
-    unsigned int  number_uint   = 0;
+    SizeT32       number_uint   = 0;
     long          number_long   = 0;
     unsigned long number_ulong  = 0;
     float         number_float  = 0;
@@ -579,9 +579,9 @@ static void TestStringToNumber3(TestHelper &helper) {
 }
 
 static void TestStringToNumber4(TestHelper &helper) {
-    int          number_int    = 0;
-    unsigned int number_uint   = 0;
-    double       number_double = 0;
+    int     number_int    = 0;
+    SizeT32 number_uint   = 0;
+    double  number_double = 0;
 
     const char *str;
     bool        valid;
@@ -826,11 +826,11 @@ static void TestStringToNumber4(TestHelper &helper) {
 }
 
 static void TestStringToNumber5(TestHelper &helper) {
-    const char        *str        = nullptr;
-    double             d_number   = 0;
-    long long          ll_number  = 0;
-    unsigned long long ull_number = 0;
-    bool               valid;
+    const char *str        = nullptr;
+    double      d_number   = 0;
+    long long   ll_number  = 0;
+    SizeT64     ull_number = 0;
+    bool        valid;
 
     str   = "-1.0";
     valid = StringToNumber(helper, d_number, str);
@@ -2035,8 +2035,8 @@ static void TestStringToNumber7(TestHelper &helper) {
 }
 
 static void TestHexStringToNumber(TestHelper &helper) {
-    unsigned int number;
-    const char  *hex = "";
+    SizeT32     number;
+    const char *hex = "";
 
     number = HexStringToNumber(hex);
     helper.Equal(number, 0U, "number", __LINE__);

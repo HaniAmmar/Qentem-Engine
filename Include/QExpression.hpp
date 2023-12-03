@@ -63,9 +63,9 @@ struct QExpression {
     // QExpression -------------------------------------------
     struct ExpressionValue {
         union {
-            unsigned long long Natural{0}; // Natural number.
-            long long          Integer;    // Integer number.
-            double             Real;       // Real number.
+            SizeT64   Natural{0}; // Natural number.
+            long long Integer;    // Integer number.
+            double    Real;       // Real number.
         };
 
         SizeT Offset{0}; // String for use in ==
@@ -317,14 +317,14 @@ struct QExpression {
         }
     }
 
-    static void PowerOf(unsigned long long &left, unsigned long long right) noexcept {
+    static void PowerOf(SizeT64 &left, SizeT64 right) noexcept {
         if (right > 1U) {
             if ((right & 1U) != 1U) {
                 PowerOf(left, (right / 2U));
                 left *= left;
             } else {
                 --right;
-                const unsigned long long num = left;
+                const SizeT64 num = left;
                 PowerOf(left, (right / 2U));
                 left *= left;
                 left *= num;
@@ -333,10 +333,10 @@ struct QExpression {
     }
 
     bool operator^=(const QExpression &right) noexcept {
-        unsigned long long num_left       = 0;
-        unsigned long long num_right      = 0;
-        bool               left_negative  = false;
-        bool               right_negative = false;
+        SizeT64 num_left       = 0;
+        SizeT64 num_right      = 0;
+        bool    left_negative  = false;
+        bool    right_negative = false;
 
         switch (Type) {
             case ExpressionType::NaturalNumber: {
@@ -531,7 +531,7 @@ struct QExpression {
     bool operator>(const Number_T_ number) const noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
-                return (Number.Natural > (unsigned long long)(number));
+                return (Number.Natural > SizeT64(number));
             }
 
             case ExpressionType::IntegerNumber: {
@@ -703,7 +703,7 @@ struct QExpression {
     bool operator!=(const Number_T_ number) const noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
-                return (Number.Natural != (unsigned long long)(number));
+                return (Number.Natural != SizeT64(number));
             }
 
             case ExpressionType::IntegerNumber: {

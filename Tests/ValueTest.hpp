@@ -306,8 +306,6 @@ static void TestNullValue(TestHelper &helper) {
 }
 
 static void TestNumberValue1(TestHelper &helper) {
-    using vu_int = unsigned int;
-
     ValueC value1;
     ValueC value2;
 
@@ -362,7 +360,7 @@ static void TestNumberValue1(TestHelper &helper) {
 
     value1.Reset();
 
-    value1 = vu_int{10};
+    value1 = SizeT32{10};
     value2 = ValueC{value1};
     helper.Equal(value2.GetNumber(), 10.0, "GetNumber()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
@@ -379,7 +377,7 @@ static void TestNumberValue1(TestHelper &helper) {
     value2 = double{785};
     helper.Equal(value2.GetNumber(), 785.0, "GetNumber()", __LINE__);
 
-    value2 = vu_int{0};
+    value2 = SizeT32{0};
     helper.EqualsTrue(value2.GetBool(bool_var), "GetBool()", __LINE__);
     helper.EqualsFalse(bool_var, "bool_var", __LINE__);
 
@@ -393,10 +391,8 @@ static void TestNumberValue1(TestHelper &helper) {
 }
 
 static void TestNumberValue2(TestHelper &helper) {
-    using vu_short     = unsigned short;
-    using vu_int       = unsigned int;
-    using vu_long      = unsigned long;
-    using vu_long_long = unsigned long long;
+    using vu_short = unsigned short;
+    using vu_long  = unsigned long;
 
     ValueC  value1;
     VString str_var;
@@ -423,7 +419,7 @@ static void TestNumberValue2(TestHelper &helper) {
     helper.EqualsTrue(bool_var, "bool_var", __LINE__);
     value1.Reset();
 
-    value1 = ValueC{vu_int{10}};
+    value1 = ValueC{SizeT32{10}};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, "NumberType = Natural", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
@@ -445,7 +441,7 @@ static void TestNumberValue2(TestHelper &helper) {
     helper.Equal(num_var.Natural, 10U, "num_var", __LINE__);
     value1.Reset();
 
-    value1 = ValueC{vu_long_long{10}};
+    value1 = ValueC{SizeT64{10}};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, "NumberType = Natural", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
@@ -674,10 +670,8 @@ static void TestNumberValue4(TestHelper &helper) {
 }
 
 static void TestNumberValue5(TestHelper &helper) {
-    using vu_short     = unsigned short;
-    using vu_int       = unsigned int;
-    using vu_long      = unsigned long;
-    using vu_long_long = unsigned long long;
+    using vu_short = unsigned short;
+    using vu_long  = unsigned long;
 
     using v_long_long = long long;
 
@@ -698,7 +692,7 @@ static void TestNumberValue5(TestHelper &helper) {
     helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
     helper.Equal(value1.GetNumber(), -10.5, "GetNumber()", __LINE__);
 
-    value1 = vu_int{10};
+    value1 = SizeT32{10};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, "NumberType = Natural", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
@@ -723,7 +717,7 @@ static void TestNumberValue5(TestHelper &helper) {
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
 
-    value1 = vu_long_long{10};
+    value1 = SizeT64{10};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, "NumberType = Natural", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
@@ -1095,7 +1089,7 @@ static void TestObjectValue1(TestHelper &helper) {
     SizeT              c_str_len;
     bool               bool_var;
 
-    for (unsigned int i = 0; i < 5; i++) {
+    for (SizeT32 i = 0; i < 5; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -1137,7 +1131,7 @@ static void TestObjectValue1(TestHelper &helper) {
     value2 = h_arr_var;
 
     h_arr_var.Reset();
-    for (unsigned int i = 0; i < 10; i++) {
+    for (SizeT32 i = 0; i < 10; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -1160,7 +1154,7 @@ static void TestObjectValue1(TestHelper &helper) {
 
     h_arr_var.Reset();
     // Testing empty values
-    for (unsigned int i = 0; i < 10; i++) {
+    for (SizeT32 i = 0; i < 10; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key];
@@ -1194,7 +1188,7 @@ static void TestObjectValue1(TestHelper &helper) {
     value1 = h_arr_var;
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
 
-    for (unsigned int i = 0; i < 7; i++) {
+    for (SizeT32 i = 0; i < 7; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -1225,7 +1219,7 @@ static void TestObjectValue2(TestHelper &helper) {
     const char        *c_str_var;
 
     h_arr_var.Reset();
-    for (unsigned int i = 0; i < 7; i++) {
+    for (SizeT32 i = 0; i < 7; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -1245,7 +1239,7 @@ static void TestObjectValue2(TestHelper &helper) {
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 
     h_arr_var.Reset();
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -1258,7 +1252,7 @@ static void TestObjectValue2(TestHelper &helper) {
     helper.NotEqual(value3.GetObject()->First(), nullptr, "GetArray()->First()", "null", __LINE__);
     helper.NotEqual(value3.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
-    for (unsigned int i = 0; i < 13; i++) {
+    for (SizeT32 i = 0; i < 13; i++) {
         VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
@@ -2318,7 +2312,7 @@ static void TestCopyValue1(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2382,7 +2376,7 @@ static void TestCopyValue1(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2446,7 +2440,7 @@ static void TestCopyValue1(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2510,7 +2504,7 @@ static void TestCopyValue1(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2582,7 +2576,7 @@ static void TestCopyValue2(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2623,7 +2617,7 @@ static void TestCopyValue2(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2770,7 +2764,7 @@ static void TestCopyValue3(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2866,7 +2860,7 @@ static void TestCopyValue3(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -2962,7 +2956,7 @@ static void TestCopyValue3(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -3057,7 +3051,7 @@ static void TestCopyValue3(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -3170,7 +3164,7 @@ static void TestCopyValue4(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -3248,7 +3242,7 @@ static void TestCopyValue4(TestHelper &helper) {
     // Has values
     h_arr_var = VHArray{};
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (SizeT32 i = 0; i < 3; i++) {
         VString key;
 
         Digit::NumberToString(key, i);
@@ -3340,9 +3334,6 @@ static void TestCopyValue4(TestHelper &helper) {
 }
 
 static void TestIndexOperator1(TestHelper &helper) {
-    using vu_int       = unsigned int;
-    using vu_long_long = unsigned long long;
-
     ValueC        value;
     const VString str1("D");
     const VString str2("DEFG");
@@ -3365,12 +3356,12 @@ static void TestIndexOperator1(TestHelper &helper) {
     helper.Equal(value[0].GetNumber(), 20.0, "value[0]", __LINE__);
     helper.Equal(value[1].GetNumber(), 30.0, "value[1]", __LINE__);
 
-    value[0]               = 50;
-    value[1]               = 100;
-    value[2]               = 200;
-    value[int{3}]          = 300;
-    value[vu_long_long{4}] = 400;
-    value[vu_int{5}]       = 500;
+    value[0]          = 50;
+    value[1]          = 100;
+    value[2]          = 200;
+    value[int{3}]     = 300;
+    value[SizeT64{4}] = 400;
+    value[SizeT32{5}] = 500;
 
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
     helper.Equal(value.Size(), 6U, "Size()", __LINE__);
@@ -3522,9 +3513,6 @@ static void TestIndexOperator2(TestHelper &helper) {
 }
 
 static void TestAddition1(TestHelper &helper) {
-    using vu_int       = unsigned int;
-    using vu_long_long = unsigned long long;
-
     ValueC        value;
     const VString str1("D");
     const VString str2("DEFG");
@@ -3543,8 +3531,8 @@ static void TestAddition1(TestHelper &helper) {
     value[0] = 50;
     value[1] = 100;
     value += int{200};
-    value += vu_int{300};
-    value += vu_long_long{400};
+    value += SizeT32{300};
+    value += SizeT64{400};
     value += double{500};
 
     helper.EqualsTrue(value.IsArray(), "IsArray()", __LINE__);
@@ -5316,10 +5304,7 @@ static void TestStringify4(TestHelper &helper) {
 
 static void TestDeleteValue(TestHelper &helper) {
     StringStream<char> ss;
-    using vu_int       = unsigned int;
-    using vu_long_long = unsigned long long;
-
-    ValueC value;
+    ValueC             value;
 
     value[0] = 1;
     value.RemoveIndex(int{0});
@@ -5328,13 +5313,13 @@ static void TestDeleteValue(TestHelper &helper) {
     ss.Clear();
 
     value[0] = "c";
-    value.RemoveIndex(vu_int{0});
+    value.RemoveIndex(SizeT32{0});
     helper.Equal(value.GetValue(0), nullptr, "GetValue(0)", "null", __LINE__);
     helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
     ss.Clear();
 
     value[0] = VArray{};
-    value.RemoveIndex(vu_long_long{0});
+    value.RemoveIndex(SizeT64{0});
     helper.Equal(value.Stringify(ss), R"([])", "value.Stringify()", __LINE__);
     ss.Clear();
 

@@ -96,7 +96,7 @@ static void TestCount(TestHelper &helper) {
 }
 
 static void TestTrimLeft(TestHelper &helper) {
-    unsigned int offset = 0;
+    SizeT32 offset = 0;
 
     StringUtils::TrimLeft("", offset, 0U);
     helper.Equal(offset, 0U, "offset", __LINE__);
@@ -233,7 +233,7 @@ static void TestTrimLeft(TestHelper &helper) {
 }
 
 static void TestTrimRight(TestHelper &helper) {
-    unsigned int end_offset = 0;
+    SizeT32 end_offset = 0;
 
     StringUtils::TrimRight("", 0U, end_offset);
     helper.Equal(end_offset, 0U, "end_offset", __LINE__);

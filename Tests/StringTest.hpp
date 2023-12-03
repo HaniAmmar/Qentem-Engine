@@ -400,9 +400,9 @@ static void TestString2(TestHelper &helper) {
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
 
     struct SimpleStream {
-        char               str[8]{0};
-        const unsigned int max = 8;
-        unsigned int       index{0};
+        char          str[8]{0};
+        const SizeT32 max = 8;
+        SizeT32       index{0};
 
         void operator<<(const char *c) noexcept {
             while (index < max) {

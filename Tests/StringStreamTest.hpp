@@ -269,9 +269,9 @@ static void TestStringStream(TestHelper &helper) {
     helper.Equal(ss2, "12345678", "StringStream", __LINE__);
 
     struct SimpleStream {
-        char               str[16]{0};
-        const unsigned int max = 16;
-        unsigned int       index{0};
+        char          str[16]{0};
+        const SizeT32 max = 16;
+        SizeT32       index{0};
 
         void operator<<(const char *string) noexcept {
             for (SizeT i = 0; i < max; i++) {

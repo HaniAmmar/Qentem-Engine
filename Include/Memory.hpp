@@ -33,16 +33,16 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = (size >> QentemSIMD::ShiftWidth);
+    const Number_T_ m_size = (size >> Platform::SIMD::ShiftWidth);
 
     if (m_size != 0) {
-        offset += (QentemSIMD::Size * m_size);
-        const QentemSIMD::VAR_T  m_zero    = QentemSIMD::Zero();
-        QentemSIMD::VAR_T       *m_pointer = (QentemSIMD::VAR_T *)(pointer);
-        const QentemSIMD::VAR_T *end       = (m_pointer + m_size);
+        offset += (Platform::SIMD::Size * m_size);
+        const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
+        Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
+        const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
 
         do {
-            QentemSIMD::Store(m_pointer, m_zero);
+            Platform::SIMD::Store(m_pointer, m_zero);
             ++m_pointer;
         } while (m_pointer < end);
     }
@@ -62,16 +62,16 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = (size >> QentemSIMD::ShiftWidth);
+    const Number_T_ m_size = (size >> Platform::SIMD::ShiftWidth);
 
     if (m_size != 0) {
-        offset += (QentemSIMD::Size * m_size);
-        QentemSIMD::VAR_T       *m_to   = (QentemSIMD::VAR_T *)(to);
-        const QentemSIMD::VAR_T *m_form = (const QentemSIMD::VAR_T *)(from);
-        const QentemSIMD::VAR_T *end    = (m_form + m_size);
+        offset += (Platform::SIMD::Size * m_size);
+        Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
+        const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
+        const Platform::SIMD::VAR_T *end    = (m_form + m_size);
 
         do {
-            QentemSIMD::Store(m_to, QentemSIMD::Load(m_form));
+            Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
             ++m_form;
             ++m_to;
         } while (m_form < end);

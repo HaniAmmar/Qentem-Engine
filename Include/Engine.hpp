@@ -50,15 +50,15 @@ class Engine {
         if constexpr (Config::IsSIMDEnabled) {
             if (offset < end_offset) {
                 Number_T_ m_size =
-                    ((((full_length > end_offset) ? full_length : end_offset) - offset) >> QentemSIMD::ShiftWidth);
+                    ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::ShiftWidth);
 
                 if (m_size != 0) {
-                    const QentemSIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
+                    const Platform::SIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
 
                     do {
-                        const QentemSIMD::VAR_T m_content =
-                            QentemSIMD::Load(Memory::ChangePointer<const QentemSIMD::VAR_T>(content + offset));
-                        const QentemSIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
+                        const Platform::SIMD::VAR_T m_content =
+                            Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content + offset));
+                        const Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
 
                         if (bits != 0) {
                             const Number_T_ simd_offset =
@@ -98,20 +98,20 @@ class Engine {
             if constexpr (Config::IsSIMDEnabled) {
                 Number_T_ m_size =
                     ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
-                     QentemSIMD::ShiftWidth);
+                     Platform::SIMD::ShiftWidth);
 
                 if (m_size != 0) {
-                    const Char_T_          *content_ofs     = (content + offset);
-                    const QentemSIMD::VAR_T m_pattern_first = Platform::SMIDSetToOne(*pattern);
-                    const QentemSIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern[len_one_less]);
+                    const Char_T_              *content_ofs     = (content + offset);
+                    const Platform::SIMD::VAR_T m_pattern_first = Platform::SMIDSetToOne(*pattern);
+                    const Platform::SIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern[len_one_less]);
 
                     do {
-                        QentemSIMD::VAR_T m_content =
-                            QentemSIMD::Load(Memory::ChangePointer<const QentemSIMD::VAR_T>(content_ofs));
-                        QentemSIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
+                        Platform::SIMD::VAR_T m_content =
+                            Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs));
+                        Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
 
-                        m_content = QentemSIMD::Load(
-                            Memory::ChangePointer<const QentemSIMD::VAR_T>(content_ofs + len_one_less));
+                        m_content = Platform::SIMD::Load(
+                            Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs + len_one_less));
                         bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
 
                         while (bits != 0) {
@@ -126,7 +126,7 @@ class Engine {
                                 return (pattern_index + pattern_length);
                             }
 
-                            bits ^= (QentemSIMD::Number_T{1} << index);
+                            bits ^= (Platform::SIMD::Number_T{1} << index);
                         }
 
                         offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();

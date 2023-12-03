@@ -389,7 +389,7 @@ static void TestArray4(TestHelper &helper) {
 }
 
 static void TestArraySort(TestHelper &helper) {
-    Array<unsigned int> numbers;
+    Array<SizeT32> numbers;
 
     numbers += 3;
     numbers += 0;
@@ -400,7 +400,7 @@ static void TestArraySort(TestHelper &helper) {
 
     numbers.Sort();
 
-    unsigned int *storage = numbers.Storage();
+    SizeT32 *storage = numbers.Storage();
 
     helper.Equal(storage[0], 0U, "storage[0]", __LINE__);
     helper.Equal(storage[1], 1U, "storage[1]", __LINE__);
