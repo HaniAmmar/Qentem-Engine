@@ -40,6 +40,15 @@ template <typename Number_T_, SizeT32 Width_T_>
 struct BigInt {
     using NumberType_ = Number_T_;
 
+    enum class BigIntOperation : unsigned char {
+        // Internal use only
+        Set = 0, // =
+        Or,      // |
+        And,     // &
+        Add,     // +
+        Subtract // -
+    };
+
     BigInt() noexcept                          = default;
     BigInt(BigInt &&) noexcept                 = default;
     BigInt(const BigInt &) noexcept            = default;
@@ -49,7 +58,7 @@ struct BigInt {
 
     template <typename N_Number_T_>
     inline BigInt(const N_Number_T_ number) noexcept {
-        set(number);
+        multiOperation<BigIntOperation::Set>(number);
     }
 
     template <typename N_Number_T_>
@@ -59,13 +68,9 @@ struct BigInt {
             --index_id_;
         }
 
-        set(number);
+        multiOperation<BigIntOperation::Set>(number);
 
         return *this;
-    }
-
-    inline explicit operator Number_T_() const noexcept {
-        return big_int_[0];
     }
 
     template <typename N_Number_T_>
@@ -147,28 +152,31 @@ struct BigInt {
         ShiftRight(number);
     }
 
-    inline void operator|=(const Number_T_ number) noexcept {
-        big_int_[0U] |= number;
+    template <typename N_Number_T_>
+    inline void operator|=(const N_Number_T_ number) noexcept {
+        multiOperation<BigIntOperation::Or>(number);
     }
 
-    inline void operator&=(const Number_T_ number) noexcept {
-        big_int_[0U] &= number;
+    template <typename N_Number_T_>
+    inline void operator&=(const N_Number_T_ number) noexcept {
+        multiOperation<BigIntOperation::And>(number);
     }
 
-    inline void operator*=(const Number_T_ number) noexcept {
-        MultiplyBy(number);
-    }
-
-    inline void operator/=(const Number_T_ number) noexcept {
-        DivideBy(number);
-    }
-
-    inline void operator+=(const Number_T_ number) noexcept {
-        Add(number);
+    template <typename N_Number_T_>
+    inline void operator+=(const N_Number_T_ number) noexcept {
+        multiOperation<BigIntOperation::Add>(number);
     }
 
     inline void operator-=(const Number_T_ number) noexcept {
-        Subtract(number);
+        multiOperation<BigIntOperation::Subtract>(number);
+    }
+
+    inline void operator*=(const Number_T_ number) noexcept {
+        Multiply(number);
+    }
+
+    inline void operator/=(const Number_T_ number) noexcept {
+        Divide(number);
     }
     ////////////////////////////////////////////////////
     void Add(Number_T_ number, Number_T_ index = 0) noexcept {
@@ -209,7 +217,7 @@ struct BigInt {
         }
     }
     ////////////////////////////////////////////////////
-    inline void MultiplyBy(Number_T_ multiplier) noexcept {
+    inline void Multiply(Number_T_ multiplier) noexcept {
         Number_T_ index = (index_id_ + Number_T_{1});
 
         do {
@@ -218,7 +226,7 @@ struct BigInt {
         } while (index != Number_T_{0});
     }
     ////////////////////////////////////////////////////
-    inline Number_T_ DivideBy(const Number_T_ divisor) noexcept {
+    inline Number_T_ Divide(const Number_T_ divisor) noexcept {
         Number_T_ index     = index_id_;
         Number_T_ remainder = (big_int_[index_id_] % divisor);
         big_int_[index_id_] /= divisor;
@@ -395,22 +403,54 @@ struct BigInt {
     Number_T_ big_int_[MaxIndex() + Number_T_{1}]{0};
     Number_T_ index_id_{0};
 
-    template <typename N_Number_T_>
-    inline void set(N_Number_T_ number) noexcept {
+    template <BigIntOperation Operation, typename N_Number_T_>
+    inline void multiOperation(N_Number_T_ number) noexcept {
         constexpr SizeT32 n_size = ((sizeof(N_Number_T_) * 8U) / BitSize());
 
         if constexpr (n_size > 1U) {
-            big_int_[0U] = Number_T_(number);
+            if constexpr (Operation == BigIntOperation::Add) {
+                Add(Number_T_(number));
+            } else if constexpr (Operation == BigIntOperation::Subtract) {
+                Subtract(Number_T_(number));
+            } else if constexpr (Operation == BigIntOperation::Or) {
+                big_int_[0U] |= Number_T_(number);
+            } else if constexpr (Operation == BigIntOperation::And) {
+                big_int_[0U] &= Number_T_(number);
+            } else {
+                big_int_[0U] = Number_T_(number);
+            }
 
             number >>= BitSize();
 
             while (number != N_Number_T_{0}) {
                 ++index_id_;
-                big_int_[index_id_] = Number_T_(number);
+
+                if constexpr (Operation == BigIntOperation::Add) {
+                    Add(Number_T_(number), index_id_);
+                } else if constexpr (Operation == BigIntOperation::Subtract) {
+                    Subtract(Number_T_(number), index_id_);
+                } else if constexpr (Operation == BigIntOperation::Or) {
+                    big_int_[index_id_] |= Number_T_(number);
+                } else if constexpr (Operation == BigIntOperation::And) {
+                    big_int_[index_id_] &= Number_T_(number);
+                } else {
+                    big_int_[index_id_] = Number_T_(number);
+                }
+
                 number >>= BitSize();
             }
         } else {
-            big_int_[0U] = number;
+            if constexpr (Operation == BigIntOperation::Add) {
+                Add(number);
+            } else if constexpr (Operation == BigIntOperation::Subtract) {
+                Subtract(number);
+            } else if constexpr (Operation == BigIntOperation::Or) {
+                big_int_[0U] |= number;
+            } else if constexpr (Operation == BigIntOperation::And) {
+                big_int_[0U] &= number;
+            } else {
+                big_int_[0U] = number;
+            }
         }
     }
 };

@@ -950,7 +950,7 @@ struct Digit {
 
         while (bint.IsBig()) {
             const SizeT length = stream.Length();
-            NumberToString<true>(stream, bint.DivideBy(DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits]));
+            NumberToString<true>(stream, bint.Divide(DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits]));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
             insertZeros(stream, (DigitLimit::MaxPowerOfTenDigits - SizeT(stream.Length() - length)));
