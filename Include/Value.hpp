@@ -51,7 +51,7 @@ struct VTypeT<false> {
     // Little-Endian
     VTypeT() = default;
 
-    void DoNothing() {
+    constexpr void DoNothing() noexcept {
         // Annoying unused var
         (void)index_capacity_;
     }
@@ -68,7 +68,8 @@ struct VTypeT<true> {
     // Big-Endian
     VTypeT() = default;
 
-    void DoNothing() {
+    constexpr void DoNothing() noexcept {
+        // Annoying unused var
         (void)index_capacity_;
     }
 
@@ -196,6 +197,10 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
     ValueData() noexcept : VNumber{} {
     }
 
+    ValueData(const ValueData &)            = delete;
+    ValueData &operator=(ValueData &&)      = delete;
+    ValueData &operator=(const ValueData &) = delete;
+
     ValueData(ValueData &&val) noexcept : VNumber{Memory::Move(val.VNumber)} {
     }
 
@@ -273,6 +278,10 @@ template <typename Char_T_, typename VObjectT, typename VArrayT, typename VStrin
 struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, false> {
     ValueData() noexcept : VNumber{} {
     }
+
+    ValueData(const ValueData &)            = delete;
+    ValueData &operator=(ValueData &&)      = delete;
+    ValueData &operator=(const ValueData &) = delete;
 
     ValueData(ValueData &&val) noexcept : VNumber{Memory::Move(val.VNumber)} {
     }

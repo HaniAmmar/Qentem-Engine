@@ -42,7 +42,7 @@ struct ArrayData<Type_T_, false> {
         : Index{index}, Capacity{capacity}, Storage{Memory::Move(storage)} {
     }
 
-    explicit ArrayData(SizeT size) : Capacity{size} {
+    explicit ArrayData(SizeT size) noexcept : Capacity{size} {
     }
 
     SizeT             Index{0};
@@ -59,7 +59,7 @@ struct ArrayData<Type_T_, true> {
         : Storage{Memory::Move(storage)}, Index{index}, Capacity{capacity} {
     }
 
-    explicit ArrayData(SizeT size) : Capacity{size} {
+    explicit ArrayData(SizeT size) noexcept : Capacity{size} {
     }
 
     QPointer<Type_T_> Storage{};

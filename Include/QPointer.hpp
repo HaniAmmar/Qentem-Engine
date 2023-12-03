@@ -65,6 +65,7 @@ struct QPointerData<Type_T_, true> {
     inline void MovePointerOnly(QPointerData &src) noexcept {
         PtrNumber &= 0xFFFF000000000000ULL;
         PtrNumber |= (src.PtrNumber & 0xFFFFFFFFFFFFULL);
+        src.PtrNumber = 0;
     }
 
     inline void SetHighByte(unsigned char byte) noexcept {
@@ -117,7 +118,8 @@ struct QPointerData<Type_T_, false> {
     }
 
     inline void MovePointerOnly(QPointerData &src) noexcept {
-        Pointer = src.Pointer;
+        Pointer     = src.Pointer;
+        src.Pointer = nullptr;
     }
 
     inline void SetHighByte(unsigned char byte) noexcept {
@@ -173,7 +175,6 @@ class QPointer {
 
     inline void MovePointerOnly(QPointer &src) noexcept {
         data_.MovePointerOnly(src.data_);
-        src.data_.Pointer = nullptr;
     }
 
     inline void SetHighByte(unsigned char byte) noexcept {

@@ -186,53 +186,53 @@ struct QentemSIMD {
     static constexpr unsigned int ShiftWidth = 0;
     static constexpr unsigned int Size       = 0;
 
-    static VAR_T Load(const VAR_T *pointer) noexcept {
+    static constexpr VAR_T Load(const VAR_T *pointer) noexcept {
         (void)pointer;
         return 0;
     }
 
-    static void Store(VAR_T *left, const VAR_T &right) noexcept {
+    static constexpr void Store(const VAR_T *left, const VAR_T &right) noexcept {
         (void)left;
         (void)right;
     }
 
-    static VAR_T Zero() noexcept {
+    static constexpr VAR_T Zero() noexcept {
         return 0;
     }
 
-    static VAR_T SetToOne8Bit(char value) noexcept {
+    static constexpr VAR_T SetToOne8Bit(char value) noexcept {
         (void)value;
         return 0;
     }
 
-    static VAR_T SetToOne16Bit(short value) noexcept {
+    static constexpr VAR_T SetToOne16Bit(short value) noexcept {
         (void)value;
         return 0;
     }
 
-    static VAR_T SetToOne32Bit(int value) noexcept {
+    static constexpr VAR_T SetToOne32Bit(int value) noexcept {
         (void)value;
         return 0;
     }
 
-    static VAR_T SetToOne64Bit(long long value) noexcept {
+    static constexpr VAR_T SetToOne64Bit(long long value) noexcept {
         (void)value;
         return 0;
     }
 
-    static Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
-        (void)left;
-        (void)right;
-        return 0;
-    }
-
-    static Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
+    static constexpr Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
         (void)left;
         (void)right;
         return 0;
     }
 
-    static Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
+    static constexpr Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
+        (void)left;
+        (void)right;
+        return 0;
+    }
+
+    static constexpr Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
         (void)left;
         (void)right;
         return 0;
