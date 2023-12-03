@@ -43,7 +43,7 @@ using SizeT = SizeT32;
 #endif
 
 struct Config {
-    static constexpr SizeT32 FloatDoublePrecision{QENTEM_DOUBLE_PRECISION};
+    static constexpr SizeT32 DoublePrecision{QENTEM_DOUBLE_PRECISION};
     static constexpr SizeT32 TemplatePrecision{QENTEM_TEMPLATE_PRECISION};
     static constexpr SizeT32 PointerSize{sizeof(void *)};
     static constexpr bool    Is64bit{PointerSize == 8U};

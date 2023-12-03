@@ -1356,7 +1356,7 @@ class Value {
         }
     }
 
-    bool SetString(VStringT &value, SizeT32 precision = Config::FloatDoublePrecision) const {
+    bool SetString(VStringT &value, SizeT32 precision = Config::DoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 value = data_.VString;
@@ -1405,7 +1405,7 @@ class Value {
     }
 
     template <typename StringStream_T_>
-    bool CopyStringValueTo(StringStream_T_ &stream, SizeT32 precision = Config::FloatDoublePrecision) const {
+    bool CopyStringValueTo(StringStream_T_ &stream, SizeT32 precision = Config::DoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 stream.Write(data_.VString.First(), data_.VString.Length());
@@ -1771,7 +1771,7 @@ class Value {
     }
 
     template <typename Stream_T_>
-    inline Stream_T_ &Stringify(Stream_T_ &stream, SizeT32 precision = Config::FloatDoublePrecision) const {
+    inline Stream_T_ &Stringify(Stream_T_ &stream, SizeT32 precision = Config::DoublePrecision) const {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -1783,7 +1783,7 @@ class Value {
         return stream;
     }
 
-    inline VStringT Stringify(SizeT32 precision = Config::FloatDoublePrecision) const {
+    inline VStringT Stringify(SizeT32 precision = Config::DoublePrecision) const {
         StringStream<Char_T_> stream;
         return Stringify(stream, precision).GetString();
     }
