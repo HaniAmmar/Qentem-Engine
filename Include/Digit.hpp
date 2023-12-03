@@ -44,6 +44,16 @@ struct Digit {
         RealFormatInfo(unsigned int precision, RealFormatType type) noexcept : Precision{precision}, Type{type} {
         }
 
+        RealFormatInfo &operator=(unsigned int precision) noexcept {
+            Precision = precision;
+            return *this;
+        }
+
+        RealFormatInfo &operator=(RealFormatType type) noexcept {
+            Type = type;
+            return *this;
+        }
+
         unsigned int   Precision{6U};
         RealFormatType Type{RealFormatType::Default};
     };
