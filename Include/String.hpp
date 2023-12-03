@@ -39,11 +39,16 @@ struct StringData;
 template <typename Char_T_>
 struct StringData<Char_T_, false> {
     // Little-Endian
-    StringData() = default;
+    StringData() noexcept = default;
 
-    StringData(SizeT padding, SizeT length, QPointer<Char_T_> &&storage) noexcept
-        : Padding{padding}, Length{length}, Storage{Memory::Move(storage)} {
+    StringData(StringData &&src) noexcept
+        : Padding{src.Padding}, Length{src.Length}, Storage{Memory::Move(src.Storage)} {
+        src.Length = 0;
     }
+
+    StringData(const StringData &)            = delete;
+    StringData &operator=(StringData &&)      = delete;
+    StringData &operator=(const StringData &) = delete;
 
     inline Char_T_ *shortStorage() noexcept {
         return Memory::ChangePointer<Char_T_>(&Padding);
@@ -61,11 +66,16 @@ struct StringData<Char_T_, false> {
 template <typename Char_T_>
 struct StringData<Char_T_, true> {
     // Big-Endian
-    StringData() = default;
+    StringData() noexcept = default;
 
-    StringData(SizeT padding, SizeT length, QPointer<Char_T_> &&storage) noexcept
-        : Storage{Memory::Move(storage)}, Padding{padding}, Length{length} {
+    StringData(StringData &&src) noexcept
+        : Storage{Memory::Move(src.Storage)}, Padding{src.Padding}, Length{src.Length} {
+        src.Length = 0;
     }
+
+    StringData(const StringData &)            = delete;
+    StringData &operator=(StringData &&)      = delete;
+    StringData &operator=(const StringData &) = delete;
 
     inline Char_T_ *shortStorage() noexcept {
         // Two tags at the start
@@ -94,11 +104,8 @@ class String {
     // Two numbers, and one pointer -2 for tagging bytes (see QPointer).
     static constexpr SizeT ShortStringMax = ((sizeof(StringData<Char_T_, false>) - 2U) / sizeof(Char_T_));
 
-    String() = default;
-
-    String(String &&src) noexcept : data_{src.data_.Padding, src.data_.Length, Memory::Move(src.data_.Storage)} {
-        src.clearLength();
-    }
+    String() noexcept             = default;
+    String(String &&src) noexcept = default;
 
     String(const String &src) {
         copyString(src.First(), src.Length());

@@ -38,8 +38,19 @@ struct ArrayData<Type_T_, false> {
     // Little-Endian
     ArrayData() = default;
 
-    ArrayData(SizeT index, SizeT capacity, QPointer<Type_T_> &&storage) noexcept
-        : Index{index}, Capacity{capacity}, Storage{Memory::Move(storage)} {
+    ArrayData(ArrayData &&src) noexcept : Index{src.Index}, Capacity{src.Capacity}, Storage{Memory::Move(src.Storage)} {
+        src.Index    = 0;
+        src.Capacity = 0;
+    }
+
+    ArrayData(const ArrayData &)            = delete;
+    ArrayData &operator=(ArrayData &&)      = delete;
+    ArrayData &operator=(const ArrayData &) = delete;
+
+    ~ArrayData() {
+        Type_T_ *storage = Storage.GetPointer();
+        Memory::Dispose(storage, (storage + Index));
+        Memory::Deallocate(storage);
     }
 
     explicit ArrayData(SizeT size) noexcept : Capacity{size} {
@@ -55,11 +66,22 @@ struct ArrayData<Type_T_, true> {
     // Big-Endian
     ArrayData() = default;
 
-    ArrayData(SizeT index, SizeT capacity, QPointer<Type_T_> &&storage) noexcept
-        : Storage{Memory::Move(storage)}, Index{index}, Capacity{capacity} {
+    ArrayData(ArrayData &&src) noexcept : Storage{Memory::Move(src.Storage)}, Index{src.Index}, Capacity{src.Capacity} {
+        src.Index    = 0;
+        src.Capacity = 0;
     }
 
     explicit ArrayData(SizeT size) noexcept : Capacity{size} {
+    }
+
+    ArrayData(const ArrayData &)            = delete;
+    ArrayData &operator=(ArrayData &&)      = delete;
+    ArrayData &operator=(const ArrayData &) = delete;
+
+    ~ArrayData() {
+        Type_T_ *storage = Storage.GetPointer();
+        Memory::Dispose(storage, (storage + Index));
+        Memory::Deallocate(storage);
     }
 
     QPointer<Type_T_> Storage{};
@@ -70,7 +92,9 @@ struct ArrayData<Type_T_, true> {
 template <typename Type_T_>
 class Array {
   public:
-    Array() = default;
+    Array() noexcept            = default;
+    Array(Array &&src) noexcept = default;
+    ~Array()                    = default;
 
     explicit Array(SizeT size) : data_{size} {
         if (size != 0) {
@@ -78,19 +102,8 @@ class Array {
         }
     }
 
-    Array(Array &&src) noexcept : data_{src.Size(), src.Capacity(), Memory::Move(src.data_.Storage)} {
-        src.setSize(0);
-        src.setCapacity(0);
-    }
-
     Array(const Array &src) : data_{src.Size()} {
         copyArray(src);
-    }
-
-    ~Array() {
-        Type_T_ *storage = Storage();
-        Memory::Dispose(storage, (storage + Size()));
-        Memory::Deallocate(storage);
     }
 
     Array &operator=(Array &&src) noexcept {

@@ -45,7 +45,15 @@ struct QPointerData;
 template <typename Type_T_>
 struct QPointerData<Type_T_, true> {
     // With Tag
-    QPointerData() = default;
+    QPointerData() noexcept = default;
+
+    QPointerData(const QPointerData &)            = delete;
+    QPointerData &operator=(QPointerData &&)      = delete;
+    QPointerData &operator=(const QPointerData &) = delete;
+
+    inline QPointerData(QPointerData &&src) noexcept : Pointer{src.Pointer} {
+        src.Pointer = nullptr;
+    }
 
     inline explicit QPointerData(Type_T_ *pointer) noexcept : Pointer{pointer} {
     }
@@ -104,7 +112,15 @@ struct QPointerData<Type_T_, true> {
 template <typename Type_T_>
 struct QPointerData<Type_T_, false> {
     // Without Tag
-    QPointerData() = default;
+    QPointerData() noexcept = default;
+
+    QPointerData(const QPointerData &)            = delete;
+    QPointerData &operator=(QPointerData &&)      = delete;
+    QPointerData &operator=(const QPointerData &) = delete;
+
+    inline QPointerData(QPointerData &&src) noexcept : Pointer{src.Pointer} {
+        src.Pointer = nullptr;
+    }
 
     inline explicit QPointerData(Type_T_ *pointer) noexcept : Pointer{pointer} {
     }
@@ -144,16 +160,13 @@ struct QPointerData<Type_T_, false> {
 template <typename Type_T_>
 class QPointer {
   public:
-    QPointer()                               = default;
-    ~QPointer()                              = default;
+    QPointer() noexcept                      = default;
+    inline QPointer(QPointer &&src) noexcept = default;
+    ~QPointer() noexcept                     = default;
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
     inline explicit QPointer(Type_T_ *pointer) noexcept : data_{pointer} {
-    }
-
-    inline QPointer(QPointer &&src) noexcept : data_{src.data_.Pointer} {
-        src.data_.Pointer = nullptr;
     }
 
     inline QPointer &operator=(QPointer &&src) noexcept {

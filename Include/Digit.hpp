@@ -22,6 +22,7 @@
 
 #include "BigInt.hpp"
 #include "DigitUtils.hpp"
+#include "StringUtils.hpp"
 
 #ifndef QENTEM_DIGIT_H_
 #define QENTEM_DIGIT_H_
