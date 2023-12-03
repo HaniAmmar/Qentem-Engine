@@ -1479,7 +1479,6 @@ class Value {
             }
 
             default: {
-                // TODO: try to convert string to number
                 return 0;
             }
         };
@@ -1499,7 +1498,6 @@ class Value {
             }
 
             default: {
-                // TODO: try to convert string to number
                 return 0;
             }
         };
@@ -1522,7 +1520,6 @@ class Value {
             }
 
             default: {
-                // TODO: try to convert string to number
                 return 0.0;
             }
         };
