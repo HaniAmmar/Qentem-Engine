@@ -39,7 +39,10 @@ struct StringData;
 template <typename Char_T_>
 struct StringData<Char_T_, false> {
     // Little-Endian
-    StringData() noexcept = default;
+    static constexpr unsigned char not_short_value_ = 255;
+
+    StringData() noexcept  = default;
+    ~StringData() noexcept = default;
 
     StringData(StringData &&src) noexcept
         : Padding{src.Padding}, Length{src.Length}, Storage{Memory::Move(src.Storage)} {
@@ -50,11 +53,11 @@ struct StringData<Char_T_, false> {
     StringData &operator=(StringData &&)      = delete;
     StringData &operator=(const StringData &) = delete;
 
-    inline Char_T_ *shortStorage() noexcept {
+    inline Char_T_ *GetShortStorage() noexcept {
         return Memory::ChangePointer<Char_T_>(&Padding);
     }
 
-    inline const Char_T_ *shortStorage() const noexcept {
+    inline const Char_T_ *GetShortStorage() const noexcept {
         return Memory::ChangePointer<const Char_T_>(&Padding);
     }
 
@@ -66,7 +69,10 @@ struct StringData<Char_T_, false> {
 template <typename Char_T_>
 struct StringData<Char_T_, true> {
     // Big-Endian
-    StringData() noexcept = default;
+    static constexpr unsigned char not_short_value_ = 255;
+
+    StringData() noexcept  = default;
+    ~StringData() noexcept = default;
 
     StringData(StringData &&src) noexcept
         : Storage{Memory::Move(src.Storage)}, Padding{src.Padding}, Length{src.Length} {
@@ -77,14 +83,14 @@ struct StringData<Char_T_, true> {
     StringData &operator=(StringData &&)      = delete;
     StringData &operator=(const StringData &) = delete;
 
-    inline Char_T_ *shortStorage() noexcept {
+    inline Char_T_ *GetShortStorage() noexcept {
         // Two tags at the start
         return Memory::ChangePointer<Char_T_>(Memory::ChangePointer<char>(&Storage) + 2U);
         // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&Storage) +
         // 2));
     }
 
-    inline const Char_T_ *shortStorage() const noexcept {
+    inline const Char_T_ *GetShortStorage() const noexcept {
         // Two tags at the start
         return Memory::ChangePointer<const Char_T_>(Memory::ChangePointer<const char>(&Storage) + 2U);
         // return reinterpret_cast<Char_T_ *>(const_cast<char *>(reinterpret_cast<const char *>(&Storage) +
@@ -360,7 +366,7 @@ class String {
         if constexpr (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                return shortStorage();
+                return GetShortStorage();
             }
         }
 
@@ -371,7 +377,7 @@ class String {
         if constexpr (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                return shortStorage();
+                return GetShortStorage();
             }
         }
 
@@ -536,7 +542,7 @@ class String {
     inline const Char_T_ *getStorage(SizeT length) const noexcept {
         if constexpr (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return shortStorage();
+                return GetShortStorage();
             }
         }
 
@@ -546,7 +552,7 @@ class String {
     inline Char_T_ *getStorage(SizeT length) noexcept {
         if constexpr (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return shortStorage();
+                return GetShortStorage();
             }
         }
 
@@ -581,7 +587,7 @@ class String {
     Char_T_ *allocate(SizeT new_size) {
         if constexpr (Config::ShortStringOptimization) {
             if (new_size <= ShortStringMax) {
-                return shortStorage();
+                return GetShortStorage();
             }
         }
 
@@ -606,12 +612,12 @@ class String {
         data_.Storage.Reset();
     }
 
-    inline Char_T_ *shortStorage() noexcept {
-        return data_.shortStorage();
+    inline Char_T_ *GetShortStorage() noexcept {
+        return data_.GetShortStorage();
     }
 
-    inline const Char_T_ *shortStorage() const noexcept {
-        return data_.shortStorage();
+    inline const Char_T_ *GetShortStorage() const noexcept {
+        return data_.GetShortStorage();
     }
 
     static String merge(const Char_T_ *str1, const SizeT len1, const Char_T_ *str2, const SizeT len2) {

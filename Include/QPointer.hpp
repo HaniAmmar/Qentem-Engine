@@ -45,7 +45,8 @@ struct QPointerData;
 template <typename Type_T_>
 struct QPointerData<Type_T_, true> {
     // With Tag
-    QPointerData() noexcept = default;
+    QPointerData() noexcept  = default;
+    ~QPointerData() noexcept = default;
 
     QPointerData(const QPointerData &)            = delete;
     QPointerData &operator=(QPointerData &&)      = delete;
@@ -112,7 +113,8 @@ struct QPointerData<Type_T_, true> {
 template <typename Type_T_>
 struct QPointerData<Type_T_, false> {
     // Without Tag
-    QPointerData() noexcept = default;
+    QPointerData() noexcept  = default;
+    ~QPointerData() noexcept = default;
 
     QPointerData(const QPointerData &)            = delete;
     QPointerData &operator=(QPointerData &&)      = delete;
