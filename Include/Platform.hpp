@@ -443,10 +443,15 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 2U> {
         Platform::SIMD::Number_T bits16 = Platform::SIMD::Compare16Bit(val1, val2);
         Platform::SIMD::Number_T bits   = 0;
         SizeT32                  count  = 0U;
-        const SizeT32            shift  = 2U;
+        constexpr SizeT32        shift  = 2U;
 
         while (bits16 != 0) {
-            bits |= ((bits16 & Platform::SIMD::Number_T{1}) << count);
+            while ((bits16 & Platform::SIMD::Number_T{1}) == 0) {
+                bits16 >>= shift;
+                ++count;
+            }
+
+            bits |= (Platform::SIMD::Number_T{1} << count);
             bits16 >>= shift;
             ++count;
         }
@@ -462,10 +467,15 @@ struct SMIDCompare_T<Char_T_, SIMDValue, 4U> {
         Platform::SIMD::Number_T bits32 = Platform::SIMD::Compare32Bit(val1, val2);
         Platform::SIMD::Number_T bits   = 0;
         SizeT32                  count  = 0U;
-        const SizeT32            shift  = 4U;
+        constexpr SizeT32        shift  = 4U;
 
         while (bits32 != 0) {
-            bits |= ((bits32 & Platform::SIMD::Number_T{1}) << count);
+            while ((bits32 & Platform::SIMD::Number_T{1}) == 0) {
+                bits32 >>= shift;
+                ++count;
+            }
+
+            bits |= (Platform::SIMD::Number_T{1} << count);
             bits32 >>= shift;
             ++count;
         }
