@@ -144,7 +144,7 @@ class String {
         copyString(str, len);
     }
 
-    explicit String(const Char_T_ *str) {
+    String(const Char_T_ *str) {
         copyString(str, StringUtils::Count(str));
     }
 
