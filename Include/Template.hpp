@@ -248,14 +248,6 @@ struct Template {
         return stream;
     }
 
-    // template <typename Char_T_, typename Value_T_>
-    // inline static StringStream<Char_T_> &Render(const Char_T_ *content, const Value_T_ &value,
-    //                                             StringStream<Char_T_> &stream) {
-    //     Array<Tags::TagBit> tags_cache;
-    //     Render(content, StringUtils::Count(content), value, stream, tags_cache);
-    //     return stream;
-    // }
-
     template <typename StringStream_T_, typename Char_T_, typename Value_T_>
     inline static StringStream_T_ Render(const Char_T_ *content, const SizeT length, const Value_T_ &value) {
         StringStream_T_ stream;

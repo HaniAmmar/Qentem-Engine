@@ -204,7 +204,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
     ValueData(ValueData &&val) noexcept : VNumber{Memory::Move(val.VNumber)} {
     }
 
-    ~ValueData() noexcept {
+    ~ValueData() {
         switch (GetType()) {
             case ValueType::Object: {
                 Memory::Dispose(&VObject);
@@ -286,7 +286,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, false> {
     ValueData(ValueData &&val) noexcept : VNumber{Memory::Move(val.VNumber)} {
     }
 
-    ~ValueData() noexcept {
+    ~ValueData() {
         switch (GetType()) {
             case ValueType::Object: {
                 Memory::Dispose(&VObject);
@@ -364,8 +364,8 @@ class Value {
     using VStringT    = String<Char_T_>;
 
   public:
-    Value()  = default;
-    ~Value() = default;
+    Value() noexcept  = default;
+    ~Value() noexcept = default;
 
     Value(Value &&val) noexcept : data_{Memory::Move(val.data_)} {
         if (!Config::PointerTagging) {

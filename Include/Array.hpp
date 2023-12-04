@@ -36,7 +36,7 @@ struct ArrayData;
 template <typename Type_T_>
 struct ArrayData<Type_T_, false> {
     // Little-Endian
-    ArrayData() = default;
+    ArrayData() noexcept = default;
 
     ArrayData(ArrayData &&src) noexcept : Index{src.Index}, Capacity{src.Capacity}, Storage{Memory::Move(src.Storage)} {
         src.Index    = 0;
@@ -64,7 +64,7 @@ struct ArrayData<Type_T_, false> {
 template <typename Type_T_>
 struct ArrayData<Type_T_, true> {
     // Big-Endian
-    ArrayData() = default;
+    ArrayData() noexcept = default;
 
     ArrayData(ArrayData &&src) noexcept : Storage{Memory::Move(src.Storage)}, Index{src.Index}, Capacity{src.Capacity} {
         src.Index    = 0;
@@ -221,8 +221,10 @@ class Array {
     }
 
     inline Type_T_ &InsertGet(Type_T_ &&item) {
+        const SizeT size = Size();
+
         *this += Memory::Move(item);
-        return *(Storage() + (Size() - SizeT{1}));
+        return *(Storage() + size);
     }
 
     void Clear() noexcept {

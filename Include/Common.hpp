@@ -32,6 +32,8 @@ using SizeT64I = long long;
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
+// When using 'unsigned short', SSO needs to be off (stack padding)
+// Also see TagBit(TagBit &&)
 using SizeT = SizeT32;
 #endif
 
@@ -60,18 +62,14 @@ struct Config {
     static constexpr bool IsBigEndian{true};
 #else
     static constexpr bool IsBigEndian{false};
-#undef QENTEM_BIG_ENDIAN
 #endif
 ///////////////////////////////////////////////
-#if defined(_M_X64) || defined(__x86_64__) || defined(__aarch64__) || defined(__ppc64__) || defined(__powerpc64__) ||  \
-    defined(__s390__)
-// 64bit arch only uses the lower 48 bits for pointers,
-// the upper 16 bits can be used for tagging.
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
 #endif
-#else
-#undef QENTEM_POINTER_TAGGING
+
+#ifndef QENTEM_SSO
+#define QENTEM_SSO 1
 #endif
 ///////////////////////////////////////////////
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)

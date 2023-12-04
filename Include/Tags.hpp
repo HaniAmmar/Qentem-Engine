@@ -51,8 +51,16 @@ struct TagBit {
     TagBit &operator=(const TagBit &) = delete;
     TagBit &operator=(TagBit &&)      = delete;
 
-    TagBit(TagBit &&tag) noexcept : content_(tag.content_), type_{tag.type_} {
-        // tag.content_ = {0, 0};
+    TagBit(TagBit &&tag) noexcept : content_{tag.content_}, type_{tag.type_} {
+        // content_ should equal info_ or bigger,
+        // using 'short' for SizeT will need to uncomment the next lines;
+
+        // if (type_ != TagType::RawText) {
+        //     info_ = tag.info_;
+        // } else {
+        //     content_ = tag.content_;
+        // }
+
         tag.type_ = TagType::None;
     }
 
@@ -89,7 +97,7 @@ struct TagBit {
         }
     }
 
-    TagBit(SizeT offset, SizeT length) noexcept : content_{SizeT32(offset), SizeT32(length)}, type_{TagType::RawText} {
+    TagBit(SizeT offset, SizeT length) noexcept : content_{offset, length}, type_{TagType::RawText} {
     }
 
     ~TagBit() {
@@ -137,18 +145,18 @@ struct TagBit {
         return type_;
     }
 
-    inline SizeT32 GetOffset() const noexcept {
+    inline SizeT GetOffset() const noexcept {
         return content_.offset;
     }
 
-    inline SizeT32 GetLength() const noexcept {
+    inline SizeT GetLength() const noexcept {
         return content_.length;
     }
 
   private:
     struct Content_ {
-        SizeT32 offset;
-        SizeT32 length;
+        SizeT offset;
+        SizeT length;
     };
 
     union {
