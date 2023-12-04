@@ -630,35 +630,40 @@ struct TemplateSub {
                 case '&': {
                     stream->Write((str + offset), (index - offset));
                     stream->Write(TagPatterns::HTMLAnd, TagPatterns::HTMLAndLength);
-                    offset = (++index);
+                    ++index;
+                    offset = index;
                     break;
                 }
 
                 case '<': {
                     stream->Write((str + offset), (index - offset));
                     stream->Write(TagPatterns::HTMLLess, TagPatterns::HTMLLessLength);
-                    offset = (++index);
+                    ++index;
+                    offset = index;
                     break;
                 }
 
                 case '>': {
                     stream->Write((str + offset), (index - offset));
                     stream->Write(TagPatterns::HTMLGreater, TagPatterns::HTMLGreaterLength);
-                    offset = (++index);
+                    ++index;
+                    offset = index;
                     break;
                 }
 
                 case '"': {
                     stream->Write((str + offset), (index - offset));
                     stream->Write(TagPatterns::HTMLQuote, TagPatterns::HTMLQuoteLength);
-                    offset = (++index);
+                    ++index;
+                    offset = index;
                     break;
                 }
 
                 case '\'': {
                     stream->Write((str + offset), (index - offset));
                     stream->Write(TagPatterns::HTMLSingleQuote, TagPatterns::HTMLSingleQuoteLength);
-                    offset = (++index);
+                    ++index;
+                    offset = index;
                     break;
                 }
 
@@ -709,12 +714,10 @@ struct TemplateSub {
         const VariableTag &i_tag = *((const VariableTag *)(tag->GetInfo()));
         const Value_T_    *value = getValue(i_tag);
 
-        if ((value != nullptr) && value->CopyStringValueTo(*stream_, Config::TemplatePrecision)) {
-            return;
+        if ((value == nullptr) || !(value->CopyStringValueTo(*stream_, Config::TemplatePrecision))) {
+            stream_->Write(((content_ + i_tag.Offset) - TagPatterns::RawVariablePrefixLength),
+                           (i_tag.Length + TagPatterns::RawVariableFullLength));
         }
-
-        stream_->Write(((content_ + i_tag.Offset) - TagPatterns::RawVariablePrefixLength),
-                       (i_tag.Length + TagPatterns::RawVariableFullLength));
     }
 
     void renderMath(const TagBit *tag) const {
@@ -907,11 +910,11 @@ struct TemplateSub {
         }
     }
 
-    void parseMathTag(SizeT offset, SizeT end_offset, void *tag) const {
+    void parseMathTag(const SizeT offset, const SizeT end_offset, void *tag) const {
         MathTag &i_tag    = *((MathTag *)(tag));
-        i_tag.Expressions = parseExpressions(offset, end_offset);
         i_tag.Offset      = offset;
         i_tag.EndOffset   = end_offset;
+        i_tag.Expressions = parseExpressions(i_tag.Offset, i_tag.EndOffset);
     }
 
     /*
@@ -1152,7 +1155,7 @@ struct TemplateSub {
         const Char_T_  *id        = (content_ + v_offset);
         const SizeT     length    = v_length;
         SizeT           offset    = 0;
-        const bool      has_index = (id[(length - 1)] == TagPatterns::VariableIndexSuffix);
+        const bool      has_index = (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix);
 
         if (v_is_loop_value != 1) {
             if (!has_index) {
