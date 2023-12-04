@@ -226,31 +226,31 @@ struct TagPatterns_T_ {
     static constexpr Char_T_ VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr Char_T_        Var_2ND_Char         = 'v'; // Second character
     static constexpr const Char_T_ *VariablePrefix       = TPStrings<Char_T_, size_>::VariablePrefix;
+    static constexpr Char_T_        Var_2ND_Char         = VariablePrefix[1U]; // Second character
     static constexpr SizeT          VariablePrefixLength = StringUtils::ConstCount(VariablePrefix);
     static constexpr SizeT          VariableFullLength   = (VariablePrefixLength + InLineSuffixLength);
 
     // {raw:
-    static constexpr Char_T_        Raw_2ND_Char            = 'r'; // Second character
-    static constexpr SizeT          RawVariableFullLength   = (VariablePrefixLength + InLineSuffixLength);
     static constexpr const Char_T_ *RawVariablePrefix       = TPStrings<Char_T_, size_>::RawVariablePrefix;
+    static constexpr Char_T_        Raw_2ND_Char            = RawVariablePrefix[1U]; // Second character
     static constexpr SizeT          RawVariablePrefixLength = StringUtils::ConstCount(RawVariablePrefix);
+    static constexpr SizeT          RawVariableFullLength   = (RawVariablePrefixLength + InLineSuffixLength);
 
     // {math:
-    static constexpr Char_T_        Math_2ND_Char    = 'm'; // Second character
     static constexpr const Char_T_ *MathPrefix       = TPStrings<Char_T_, size_>::MathPrefix;
+    static constexpr Char_T_        Math_2ND_Char    = MathPrefix[1U]; // Second character
     static constexpr SizeT          MathPrefixLength = StringUtils::ConstCount(MathPrefix);
     static constexpr SizeT          MathFullLength   = (MathPrefixLength + InLineSuffixLength);
 
     // {if
-    static constexpr Char_T_        InlineIf_2ND_Char    = 'i'; // Second character
     static constexpr const Char_T_ *InLineIfPrefix       = TPStrings<Char_T_, size_>::InLineIfPrefix;
+    static constexpr Char_T_        InlineIf_2ND_Char    = InLineIfPrefix[1U]; // Second character
     static constexpr SizeT          InLineIfPrefixLength = StringUtils::ConstCount(InLineIfPrefix);
 
     // <loop
-    static constexpr Char_T_        Loop_2ND_Char    = 'l'; // Second character
     static constexpr const Char_T_ *LoopPrefix       = TPStrings<Char_T_, size_>::LoopPrefix;
+    static constexpr Char_T_        Loop_2ND_Char    = LoopPrefix[1U]; // Second character
     static constexpr SizeT          LoopPrefixLength = StringUtils::ConstCount(LoopPrefix);
 
     // </loop>
@@ -258,8 +258,8 @@ struct TagPatterns_T_ {
     static constexpr SizeT          LoopSuffixLength = StringUtils::ConstCount(LoopSuffix);
 
     // <if
-    static constexpr Char_T_        If_2ND_Char    = 'i'; // Second character
     static constexpr const Char_T_ *IfPrefix       = TPStrings<Char_T_, size_>::IfPrefix;
+    static constexpr Char_T_        If_2ND_Char    = IfPrefix[1U]; // Second character
     static constexpr SizeT          IfPrefixLength = StringUtils::ConstCount(IfPrefix);
 
     // </if>
@@ -307,9 +307,6 @@ struct TagPatterns_T_ {
     static constexpr Char_T_ ValueChar = 'a'; // v[a]lue
     static constexpr Char_T_ SortChar  = 'o'; // s[o]rt
     static constexpr Char_T_ GroupChar = 'r'; // g[r]oup
-
-    // Var
-    static constexpr Char_T_ TildeChar = '~'; // Tilde
 };
 
 // char
