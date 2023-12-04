@@ -828,7 +828,7 @@ static void TestStringToNumber4(TestHelper &helper) {
 static void TestStringToNumber5(TestHelper &helper) {
     const char *str        = nullptr;
     double      d_number   = 0;
-    long long   ll_number  = 0;
+    SizeT64I    ll_number  = 0;
     SizeT64     ull_number = 0;
     bool        valid;
 

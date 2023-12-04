@@ -146,7 +146,7 @@ struct VNumberT {
         data_.Number.ull = num;
     }
 
-    inline void SetNumber(long long num) noexcept {
+    inline void SetNumber(SizeT64I num) noexcept {
         data_.Number.sll = num;
     }
 
@@ -154,7 +154,7 @@ struct VNumberT {
         return data_.Number.ull;
     }
 
-    inline long long GetInt64() const noexcept {
+    inline SizeT64I GetInt64() const noexcept {
         return data_.Number.sll;
     }
 
@@ -174,16 +174,16 @@ struct VNumberT {
         explicit Number_T(SizeT64 num) noexcept : ull{num} {
         }
 
-        explicit Number_T(long long num) noexcept : sll{num} {
+        explicit Number_T(SizeT64I num) noexcept : sll{num} {
         }
 
         explicit Number_T(double num) noexcept : ddl{num} {
         }
 
-        SizeT64   ull;
-        long long sll;
-        double    ddl;
-        SizeT     padding_[2]{0}; // Just in case SizeT is set to long
+        SizeT64  ull;
+        SizeT64I sll;
+        double   ddl;
+        SizeT    padding_[2]{0}; // Just in case SizeT is set to long
     };
 
     VNumberData<Number_T, Config::IsBigEndian> data_{};
@@ -250,7 +250,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
     explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
     }
 
-    explicit ValueData(long long num) noexcept : VNumber{num} {
+    explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
     }
 
     explicit ValueData(double num) noexcept : VNumber{num} {
@@ -332,7 +332,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, false> {
     explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
     }
 
-    explicit ValueData(long long num) noexcept : VNumber{num} {
+    explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
     }
 
     explicit ValueData(double num) noexcept : VNumber{num} {
@@ -433,7 +433,7 @@ class Value {
         setTypeToUInt64();
     }
 
-    explicit Value(long long num) noexcept : data_{num} {
+    explicit Value(SizeT64I num) noexcept : data_{num} {
         setTypeToInt64();
     }
 
@@ -450,7 +450,7 @@ class Value {
             data_.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
-            data_.VNumber.SetNumber((long long)(num));
+            data_.VNumber.SetNumber(SizeT64I(num));
             setTypeToInt64();
         }
     }
@@ -651,7 +651,7 @@ class Value {
             data_.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
-            data_.VNumber.SetNumber((long long)(num));
+            data_.VNumber.SetNumber(SizeT64I(num));
             setTypeToInt64();
         }
 
@@ -1475,7 +1475,7 @@ class Value {
             }
 
             case QNumberType::Real: {
-                return QNumber{(long long)(number.Real)}.Natural;
+                return QNumber{SizeT64I(number.Real)}.Natural;
             }
 
             default: {
@@ -1484,7 +1484,7 @@ class Value {
         };
     }
 
-    long long GetInt64() const noexcept {
+    SizeT64I GetInt64() const noexcept {
         QNumber number;
 
         switch (SetNumber(number)) {
@@ -1494,7 +1494,7 @@ class Value {
             }
 
             case QNumberType::Real: {
-                return (long long)(number.Real);
+                return SizeT64I(number.Real);
             }
 
             default: {

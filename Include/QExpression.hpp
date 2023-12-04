@@ -63,9 +63,9 @@ struct QExpression {
     // QExpression -------------------------------------------
     struct ExpressionValue {
         union {
-            SizeT64   Natural{0}; // Natural number.
-            long long Integer;    // Integer number.
-            double    Real;       // Real number.
+            SizeT64  Natural{0}; // Natural number.
+            SizeT64I Integer;    // Integer number.
+            double   Real;       // Real number.
         };
 
         SizeT Offset{0}; // String for use in ==
@@ -370,7 +370,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_left = QNumber{(long long)(Number.Real)}.Natural;
+                num_left = QNumber{SizeT64I(Number.Real)}.Natural;
                 break;
             }
 
@@ -412,7 +412,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_right = QNumber{(long long)(right_real)}.Natural;
+                num_right = QNumber{SizeT64I(right_real)}.Natural;
             }
 
             default: {
@@ -496,14 +496,14 @@ struct QExpression {
         }
     }
 
-    long long operator%(const QExpression &right) const noexcept {
-        long long result = 0;
+    SizeT64I operator%(const QExpression &right) const noexcept {
+        SizeT64I result = 0;
 
         switch (Type) {
             case ExpressionType::NaturalNumber:
             case ExpressionType::IntegerNumber: {
                 if (right.Type == ExpressionType::RealNumber) {
-                    result = (Number.Integer % (long long)(right.Number.Real));
+                    result = (Number.Integer % SizeT64I(right.Number.Real));
                 } else {
                     result = (Number.Integer % right.Number.Integer);
                 }
@@ -512,9 +512,9 @@ struct QExpression {
             }
 
             case ExpressionType::RealNumber: {
-                result = (long long)(Number.Real);
+                result = SizeT64I(Number.Real);
                 if (right.Type == ExpressionType::RealNumber) {
-                    result %= (long long)(right.Number.Real);
+                    result %= SizeT64I(right.Number.Real);
                 } else {
                     result %= right.Number.Integer;
                 }
@@ -535,7 +535,7 @@ struct QExpression {
             }
 
             case ExpressionType::IntegerNumber: {
-                return (Number.Integer > (long long)(number));
+                return (Number.Integer > SizeT64I(number));
             }
 
             default: {
@@ -707,7 +707,7 @@ struct QExpression {
             }
 
             case ExpressionType::IntegerNumber: {
-                return (Number.Integer != (long long)(number));
+                return (Number.Integer != SizeT64I(number));
             }
 
             default: {

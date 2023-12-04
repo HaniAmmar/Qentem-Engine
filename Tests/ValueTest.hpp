@@ -454,8 +454,6 @@ static void TestNumberValue2(TestHelper &helper) {
 }
 
 static void TestNumberValue3(TestHelper &helper) {
-    using v_long_long = long long;
-
     ValueC  value1;
     VString str_var;
     QNumber num_var;
@@ -545,7 +543,7 @@ static void TestNumberValue3(TestHelper &helper) {
     helper.Equal(num_var.Integer, -10, "num_var", __LINE__);
     value1.Reset();
 
-    value1 = ValueC{v_long_long{10}};
+    value1 = ValueC{SizeT64I{10}};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, "NumberType = Integer", __LINE__);
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
@@ -673,8 +671,6 @@ static void TestNumberValue5(TestHelper &helper) {
     using vu_short = unsigned short;
     using vu_long  = unsigned long;
 
-    using v_long_long = long long;
-
     ValueC value1;
 
     value1 = vu_short{10};
@@ -727,7 +723,7 @@ static void TestNumberValue5(TestHelper &helper) {
     helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, "GetNumber()", __LINE__);
 
-    value1 = v_long_long{10};
+    value1 = SizeT64I{10};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, "NumberType = Integer", __LINE__);
     helper.EqualsTrue(value1.IsInt64(), "IsInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);

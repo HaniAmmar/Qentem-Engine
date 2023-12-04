@@ -68,7 +68,7 @@ struct SIMD {
         return _mm256_set1_epi32(value);
     }
 
-    static VAR_T SetToOne64Bit(long long value) noexcept {
+    static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
         return _mm256_set1_epi64x(value);
     }
 
@@ -116,7 +116,7 @@ struct SIMD {
         return _mm_set1_epi32(value);
     }
 
-    static VAR_T SetToOne64Bit(long long value) noexcept {
+    static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
         return _mm_set1_epi64x(value);
     }
 
@@ -164,7 +164,7 @@ struct SIMD {
         return wasm_i32x4_splat(value);
     }
 
-    static VAR_T SetToOne64Bit(long long value) noexcept {
+    static VAR_T SetToOne64Bit(SizeT64I value) noexcept {
         return wasm_i64x2_splat(value);
     }
 
@@ -217,7 +217,7 @@ struct SIMD {
         return 0;
     }
 
-    static constexpr VAR_T SetToOne64Bit(long long value) noexcept {
+    static constexpr VAR_T SetToOne64Bit(SizeT64I value) noexcept {
         (void)value;
         return 0;
     }

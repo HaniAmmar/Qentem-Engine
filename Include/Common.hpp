@@ -28,6 +28,7 @@ namespace Qentem {
 using NullType = decltype(nullptr);
 using SizeT32  = unsigned int;
 using SizeT64  = unsigned long long;
+using SizeT64I = long long;
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
@@ -176,13 +177,13 @@ union QNumber64 {
         } else if constexpr (IsUnsigned<Number_T_>()) {
             Natural = SizeT64(num);
         } else {
-            Integer = (long long)(num);
+            Integer = SizeT64I(num);
         }
     }
 
-    SizeT64   Natural{0};
-    long long Integer;
-    double    Real;
+    SizeT64  Natural{0};
+    SizeT64I Integer;
+    double   Real;
 };
 
 union QNumber32 {
