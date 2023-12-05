@@ -33,10 +33,13 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = (size >> Platform::SIMD::ShiftWidth);
+    const Number_T_ m_size = size;
+    m_size >>= Platform::SIMD::Shift;
 
     if (m_size != 0) {
-        offset += (Platform::SIMD::Size * m_size);
+        offset = m_size;
+        offset <<= Platform::SIMD::Shift;
+
         const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
         Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
         const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
@@ -73,10 +76,13 @@ QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T_ size) noe
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = (size >> Platform::SIMD::ShiftWidth);
+    const Number_T_ m_size = size;
+    m_size >>= Platform::SIMD::Shift;
 
     if (m_size != 0) {
-        offset += (Platform::SIMD::Size * m_size);
+        offset = m_size;
+        offset <<= Platform::SIMD::Shift;
+
         Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
         const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
         const Platform::SIMD::VAR_T *end    = (m_form + m_size);
@@ -110,105 +116,80 @@ QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T_ size) noe
     }
 }
 /////////////////////////////////////////////////////////////////////
-template <typename Type_>
-static constexpr Type_ *ChangePointer(void *value) noexcept {
-    return (Type_ *)(value);
+template <typename Type_T_>
+static constexpr Type_T_ *ChangePointer(void *value) noexcept {
+    return (Type_T_ *)(value);
 }
 
-template <typename Type_>
-static constexpr const Type_ *ChangePointer(const void *value) noexcept {
-    return (const Type_ *)(value);
+template <typename Type_T_>
+static constexpr const Type_T_ *ChangePointer(const void *value) noexcept {
+    return (const Type_T_ *)(value);
 }
 /////////////////////////////////////////////////////////////////////
-template <typename Type_>
-static constexpr Type_ &&Move(Type_ &value) noexcept {
-    return (Type_ &&)(value);
+template <typename Type_T_>
+static constexpr Type_T_ &&Move(Type_T_ &value) noexcept {
+    return (Type_T_ &&)(value);
 }
 
-template <typename Type_>
-static constexpr Type_ &&Move(Type_ &&value) noexcept {
-    return (Type_ &&)(value);
+template <typename Type_T_>
+static constexpr Type_T_ &&Move(Type_T_ &&value) noexcept {
+    return (Type_T_ &&)(value);
 }
 /////////////////////////////////////////////////////////////////////
-template <typename Type_>
-inline static void Swap(Type_ &item1, Type_ &item2) noexcept {
-    Type_ item = Move(item1);
-    item1      = Move(item2);
-    item2      = Move(item);
+template <typename Type_T_>
+inline static void Swap(Type_T_ &item1, Type_T_ &item2) noexcept {
+    Type_T_ item = Move(item1);
+    item1        = Move(item2);
+    item2        = Move(item);
 }
 
-template <typename Type_, typename Number_T_>
-struct QuickSort {
-  private:
-    inline static void ascendSort(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
-        if (start < end) {
-            Type_    *item  = (arr + start);
-            Number_T_ index = start;
+template <bool Ascend_T_, typename Type_T_, typename Number_T_>
+inline static void Sort(Type_T_ *arr, Number_T_ start, Number_T_ end) noexcept {
+    if (start != end) {
+        Type_T_  &item   = arr[start];
+        Number_T_ index  = start;
+        Number_T_ offset = (start + Number_T_{1});
 
-            for (Number_T_ x = (start + 1); x < end; x++) {
-                if (!((*(arr + x)) > *item)) {
+        while (offset < end) {
+            if constexpr (Ascend_T_) {
+                if (arr[offset] < item) {
                     ++index;
-                    Swap((*(arr + index)), ((*(arr + x))));
+                    Swap(arr[index], arr[offset]);
+                }
+            } else {
+                if (arr[offset] > item) {
+                    ++index;
+                    Swap(arr[index], arr[offset]);
                 }
             }
 
-            Swap((*(arr + index)), (*(arr + start)));
-
-            ascendSort(arr, start, index);
-            ascendSort(arr, (index + 1), end);
+            ++offset;
         }
-    }
 
-    inline static void descendSort(Type_ *arr, Number_T_ start, Number_T_ end) noexcept {
-        if (start < end) {
-            Type_    *item  = (arr + start);
-            Number_T_ index = start;
-
-            for (Number_T_ x = (start + 1); x < end; x++) {
-                if (!((*(arr + x)) < *item)) {
-                    ++index;
-                    Swap((*(arr + index)), ((*(arr + x))));
-                }
-            }
-
-            Swap((*(arr + index)), (*(arr + start)));
-
-            descendSort(arr, start, index);
-            descendSort(arr, (index + 1), end);
+        if (index != start) {
+            Swap(arr[index], arr[start]);
         }
-    }
 
-  public:
-    inline static void Sort(Type_ *arr, Number_T_ start, Number_T_ end, bool ascend) noexcept {
-        if (ascend) {
-            ascendSort(arr, start, end);
-        } else {
-            descendSort(arr, start, end);
-        }
+        Sort<Ascend_T_>(arr, start, index);
+        ++index;
+        Sort<Ascend_T_>(arr, index, end);
     }
-
-    QuickSort()                             = delete;
-    QuickSort(QuickSort &&)                 = delete;
-    QuickSort(const QuickSort &)            = delete;
-    QuickSort &operator=(QuickSort &&)      = delete;
-    QuickSort &operator=(const QuickSort &) = delete;
-    ~QuickSort()                            = delete;
-};
+}
 
 /////////////////////////////////////////////////////////////////////
 inline static SizeT AlignSize(SizeT n_size) noexcept {
-    const SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size));
+    SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size));
 
     if (size < n_size) {
-        return (size * SizeT{2});
+        size <<= 1U;
     }
 
     return size;
 }
 /////////////////////////////////////////////////////////////////////
-template <typename Type_>
-inline static Type_ *Allocate(SizeT size) {
-    Type_ *pointer = ChangePointer<Type_>(::operator new(SystemIntType(size * sizeof(Type_))));
+template <typename Type_T_>
+inline static Type_T_ *Allocate(SizeT size) {
+    Type_T_ *pointer = ChangePointer<Type_T_>(::operator new(SystemIntType(size * sizeof(Type_T_))));
 
 #ifdef QENTEM_TEST_HELPER_H_
     MemoryRecord::AddAllocation(pointer);
@@ -218,74 +199,74 @@ inline static Type_ *Allocate(SizeT size) {
 }
 
 // Initializer
-template <typename Type_>
-inline static void Initialize(Type_ *pointer) noexcept {
-    new (pointer) Type_{};
+template <typename Type_T_>
+inline static void Initialize(Type_T_ *pointer) noexcept {
+    new (pointer) Type_T_{};
 }
 
 // Range copy initializer
-template <typename Type_>
-inline static void Initialize(Type_ *pointer, const Type_ *end) noexcept {
+template <typename Type_T_>
+inline static void Initialize(Type_T_ *pointer, const Type_T_ *end) noexcept {
     while (pointer < end) {
-        new (pointer) Type_{};
+        new (pointer) Type_T_{};
         ++pointer;
     }
 }
 
 // Move initializer
-template <typename Type_>
-inline static void Initialize(Type_ *pointer, Type_ &&value) noexcept {
-    new (pointer) Type_{Move(value)};
+template <typename Type_T_>
+inline static void Initialize(Type_T_ *pointer, Type_T_ &&value) noexcept {
+    new (pointer) Type_T_{Move(value)};
 }
 
 // Copy initializer
-template <typename Type_>
-inline static void Initialize(Type_ *pointer, const Type_ &value) {
-    new (pointer) Type_{value};
+template <typename Type_T_>
+inline static void Initialize(Type_T_ *pointer, const Type_T_ &value) {
+    new (pointer) Type_T_{value};
 }
 
 // Range copy initializer
-template <typename Type_>
-inline static void Initialize(Type_ *pointer, const Type_ *end, const Type_ &value) {
+template <typename Type_T_>
+inline static void Initialize(Type_T_ *pointer, const Type_T_ *end, const Type_T_ &value) {
     while (pointer < end) {
-        new (pointer) Type_{value};
+        new (pointer) Type_T_{value};
         ++pointer;
     }
 }
 
-template <typename Type_, typename... Values_T_>
-inline static void InitializeValues(Type_ *pointer, Values_T_ &&...values) noexcept {
-    new (pointer) Type_{Move(values)...};
+template <typename Type_T_, typename... Values_T_>
+inline static void InitializeValues(Type_T_ *pointer, Values_T_ &&...values) noexcept {
+    new (pointer) Type_T_{Move(values)...};
 }
 
-template <typename Type_, typename... Values_T_>
-inline static void InitializeValues(Type_ *pointer, const Values_T_ &...values) noexcept {
-    new (pointer) Type_{values...};
+template <typename Type_T_, typename... Values_T_>
+inline static void InitializeValues(Type_T_ *pointer, const Values_T_ &...values) noexcept {
+    new (pointer) Type_T_{values...};
 }
 
-template <typename Type_>
-inline static Type_ *AllocateInit() {
-    Type_ *pointer = Allocate<Type_>(1);
+template <typename Type_T_>
+inline static Type_T_ *AllocateInit() {
+    Type_T_ *pointer = Allocate<Type_T_>(1);
     Initialize(pointer);
     return pointer;
-    // return new Type_{};
+    // return new Type_T_{};
 }
 
 // Allocate and move
-template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(Values_T_ &&...values) noexcept {
-    Type_ *pointer = Allocate<Type_>(1);
+template <typename Type_T_, typename... Values_T_>
+inline static Type_T_ *AllocateInit(Values_T_ &&...values) noexcept {
+    Type_T_ *pointer = Allocate<Type_T_>(1);
     InitializeValues(pointer, Move(values)...);
     return pointer;
 }
 
 // Allocate and copy
-template <typename Type_, typename... Values_T_>
-inline static Type_ *AllocateInit(const Values_T_ &...values) {
-    Type_ *pointer = Allocate<Type_>(1);
+template <typename Type_T_, typename... Values_T_>
+inline static Type_T_ *AllocateInit(const Values_T_ &...values) {
+    Type_T_ *pointer = Allocate<Type_T_>(1);
     InitializeValues(pointer, values...);
     return pointer;
-    // return new Type_{values...};
+    // return new Type_T_{values...};
 }
 
 inline static void Deallocate(void *pointer) noexcept {
@@ -297,21 +278,18 @@ inline static void Deallocate(void *pointer) noexcept {
     ::operator delete(pointer);
 }
 
-template <typename Type_>
-inline static void Dispose(Type_ *item, const Type_ *end) noexcept {
-    while (item < end) {
-        if (item != nullptr) {
-            item->~Type_();
-        }
-
-        ++item;
+template <typename Type_T_>
+inline static void Dispose(Type_T_ *item) noexcept {
+    if (item != nullptr) {
+        item->~Type_T_();
     }
 }
 
-template <typename Type_>
-inline static void Dispose(Type_ *item) noexcept {
-    if (item != nullptr) {
-        item->~Type_();
+template <typename Type_T_>
+inline static void Dispose(Type_T_ *item, const Type_T_ *end) noexcept {
+    while (item < end) {
+        Dispose(item);
+        ++item;
     }
 }
 

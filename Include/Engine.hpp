@@ -50,7 +50,7 @@ class Engine {
         if constexpr (Config::IsSIMDEnabled) {
             if (offset < end_offset) {
                 Number_T_ m_size =
-                    ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::ShiftWidth);
+                    ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
 
                 if (m_size != 0) {
                     const Platform::SIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
@@ -98,7 +98,7 @@ class Engine {
             if constexpr (Config::IsSIMDEnabled) {
                 Number_T_ m_size =
                     ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
-                     Platform::SIMD::ShiftWidth);
+                     Platform::SIMD::Shift);
 
                 if (m_size != 0) {
                     const Char_T_              *content_ofs     = (content + offset);

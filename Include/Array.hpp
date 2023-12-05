@@ -290,7 +290,11 @@ class Array {
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(bool ascend = true) noexcept {
-        Memory::QuickSort<Type_T_, SizeT>::Sort(Storage(), 0, Size(), ascend);
+        if (ascend) {
+            Memory::Sort<true>(Storage(), SizeT{0}, Size());
+        } else {
+            Memory::Sort<false>(Storage(), SizeT{0}, Size());
+        }
     }
 
     void Compress() {

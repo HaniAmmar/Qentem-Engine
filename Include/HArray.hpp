@@ -511,7 +511,12 @@ class HArray {
     void Sort(const bool ascend = true) noexcept {
         constexpr SizeT32 size = sizeof(SizeT);
 
-        Memory::QuickSort<HAItem_T, SizeT>::Sort(Storage(), 0, Size(), ascend);
+        if (ascend) {
+            Memory::Sort<true>(Storage(), SizeT{0}, Size());
+        } else {
+            Memory::Sort<false>(Storage(), SizeT{0}, Size());
+        }
+
         Memory::SetToZero<size>(data_.GetHashTable(), (size * Capacity()));
         generateHash();
     }

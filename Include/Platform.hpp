@@ -41,8 +41,8 @@ struct SIMD {
     using Number_T = SizeT32;
     using VAR_T    = __m256i;
 
-    static constexpr SizeT32 ShiftWidth = 5U;
-    static constexpr SizeT32 Size       = 32U;
+    static constexpr SizeT32 Shift = 5U;
+    static constexpr SizeT32 Size  = 32U;
 
     static VAR_T Load(const VAR_T *pointer) noexcept {
         return _mm256_loadu_si256(pointer);
@@ -89,8 +89,8 @@ struct SIMD {
     using Number_T = SizeT32;
     using VAR_T    = __m128i;
 
-    static constexpr SizeT32 ShiftWidth = 4U;
-    static constexpr SizeT32 Size       = 16U;
+    static constexpr SizeT32 Shift = 4U;
+    static constexpr SizeT32 Size  = 16U;
 
     static VAR_T Load(const VAR_T *pointer) noexcept {
         return _mm_loadu_si128(pointer);
@@ -137,8 +137,8 @@ struct SIMD {
     using Number_T = SizeT32;
     using VAR_T    = v128_t;
 
-    static constexpr SizeT32 ShiftWidth = 4U;
-    static constexpr SizeT32 Size       = 16U;
+    static constexpr SizeT32 Shift = 4U;
+    static constexpr SizeT32 Size  = 16U;
 
     static VAR_T Load(const VAR_T *pointer) noexcept {
         return wasm_v128_load(pointer);
@@ -185,8 +185,8 @@ struct SIMD {
     using Number_T = SizeT32;
     using VAR_T    = SizeT32;
 
-    static constexpr SizeT32 ShiftWidth = 0;
-    static constexpr SizeT32 Size       = 0;
+    static constexpr SizeT32 Shift = 0;
+    static constexpr SizeT32 Size  = 0;
 
     static constexpr VAR_T Load(const VAR_T *pointer) noexcept {
         (void)pointer;
