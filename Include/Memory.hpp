@@ -28,7 +28,7 @@
 namespace Qentem::Memory {
 
 // size = the number of bytes
-template <typename Number_T_>
+template <SizeT32 Width_T_, typename Number_T_>
 inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
@@ -48,17 +48,28 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     }
 #endif
 
-    char *src = (char *)(pointer);
+    if constexpr (Width_T_ >= SizeT32{8}) {
+        SizeT64 *src = (SizeT64 *)(pointer);
 
-    while (offset < size) {
-        src[offset] = 0;
-        ++offset;
+        size >>= 3U;
+
+        while (offset < size) {
+            src[offset] = 0;
+            ++offset;
+        }
+    } else {
+        char *src = (char *)(pointer);
+
+        while (offset < size) {
+            src[offset] = 0;
+            ++offset;
+        }
     }
 }
 
 // size = the number of bytes
-template <typename Number_T_>
-inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
+template <SizeT32 Width_T_, typename Number_T_>
+QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
 #ifdef QENTEM_SIMD_ENABLED
@@ -78,12 +89,24 @@ inline static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     }
 #endif
 
-    char       *des = (char *)(to);
-    const char *src = (const char *)(from);
+    if constexpr (Width_T_ >= SizeT32{8}) {
+        SizeT64       *des = (SizeT64 *)(to);
+        const SizeT64 *src = (const SizeT64 *)(from);
 
-    while (offset < size) {
-        des[offset] = src[offset];
-        ++offset;
+        size >>= 3U;
+
+        while (offset < size) {
+            des[offset] = src[offset];
+            ++offset;
+        }
+    } else {
+        char       *des = (char *)(to);
+        const char *src = (const char *)(from);
+
+        while (offset < size) {
+            des[offset] = src[offset];
+            ++offset;
+        }
     }
 }
 /////////////////////////////////////////////////////////////////////

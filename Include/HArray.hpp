@@ -509,8 +509,10 @@ class HArray {
 
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(const bool ascend = true) noexcept {
+        constexpr SizeT32 size = sizeof(SizeT);
+
         Memory::QuickSort<HAItem_T, SizeT>::Sort(Storage(), 0, Size(), ascend);
-        Memory::SetToZero(data_.GetHashTable(), (sizeof(SizeT) * Capacity()));
+        Memory::SetToZero<size>(data_.GetHashTable(), (size * Capacity()));
         generateHash();
     }
 
@@ -608,7 +610,8 @@ class HArray {
     }
 
     HAItem_T *allocate(SizeT new_capacity) {
-        constexpr SizeT size_sum = SizeT{sizeof(SizeT) + sizeof(HAItem_T)};
+        constexpr SizeT32 size     = sizeof(SizeT);
+        constexpr SizeT   size_sum = SizeT{size + sizeof(HAItem_T)};
 
         if (new_capacity < SizeT{2}) {
             new_capacity = SizeT{2};
@@ -618,7 +621,7 @@ class HArray {
         setCapacity(new_capacity);
         SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
         setHashTable(ht);
-        Memory::SetToZero(ht, (sizeof(SizeT) * new_capacity));
+        Memory::SetToZero<size>(ht, (size * new_capacity));
 
         return Memory::ChangePointer<HAItem_T>(ht + Capacity());
     }
@@ -662,8 +665,8 @@ class HArray {
                 item->Next = 0;
                 item->Hash = 0;
 
-                item->Key   = Key_T();
-                item->Value = Value_T_();
+                item->Key   = Key_T{};
+                item->Value = Value_T_{};
             }
         }
     }

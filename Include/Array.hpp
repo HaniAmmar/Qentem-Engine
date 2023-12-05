@@ -156,7 +156,7 @@ class Array {
             }
 
             if (src.IsNotEmpty()) {
-                Memory::Copy((Storage() + Size()), src.First(), src.Size() * sizeof(Type_T_));
+                Memory::Copy<sizeof(Type_T_)>((Storage() + Size()), src.First(), src.Size() * sizeof(Type_T_));
             }
 
             setSize(n_size);
@@ -393,7 +393,7 @@ class Array {
         Type_T_ *des = allocate();
 
         if (IsNotEmpty()) {
-            Memory::Copy(des, src, (Size() * sizeof(Type_T_)));
+            Memory::Copy<sizeof(Type_T_)>(des, src, (Size() * sizeof(Type_T_)));
         }
 
         Memory::Deallocate(src);

@@ -163,8 +163,9 @@ class String {
                     // Setting every variable is easier unless SizeT is Set to
                     // a type where there will be padding on the stack,
                     // for that the entire stack has to be copied.
-                    Char_T_ *str = Storage();
-                    Memory::Copy(str, src.Storage(), (len * sizeof(Char_T_)));
+                    constexpr SizeT32 size = sizeof(Char_T_);
+                    Char_T_          *str  = Storage();
+                    Memory::Copy<size>(str, src.Storage(), (len * size));
                     str[len] = Char_T_{0};
                 }
             }
@@ -332,13 +333,14 @@ class String {
         Char_T_ *str;
 
         if constexpr (Config::ShortStringOptimization) {
-            const SizeT len = Length();
-            Char_T_    *src = getStorage(len);
+            constexpr SizeT32 size = sizeof(Char_T_);
+            const SizeT       len  = Length();
+            Char_T_          *src  = getStorage(len);
 
             if (len < ShortStringMax) {
                 const SizeT len2 = (len + SizeT{1});
                 str              = Memory::Allocate<Char_T_>(len2);
-                Memory::Copy(str, src, (len2 * sizeof(Char_T_)));
+                Memory::Copy<size>(str, src, (len2 * size));
                 str[len] = Char_T_{0};
             } else {
                 str = src;
@@ -393,17 +395,18 @@ class String {
 
     void Write(const Char_T_ *str, const SizeT len) {
         if ((str != nullptr) && (len != SizeT{0})) {
-            const SizeT src_len = Length();
-            SizeT       new_len = (src_len + len) + SizeT{1};
-            Char_T_    *src     = getStorage(src_len);
-            Char_T_    *ns;
+            constexpr SizeT32 size    = sizeof(Char_T_);
+            const SizeT       src_len = Length();
+            SizeT             new_len = (src_len + len) + SizeT{1};
+            Char_T_          *src     = getStorage(src_len);
+            Char_T_          *ns;
 
             if constexpr (Config::ShortStringOptimization) {
                 if (new_len > ShortStringMax) {
                     ns = Memory::Allocate<Char_T_>(new_len);
 
                     if (src != nullptr) {
-                        Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
+                        Memory::Copy<size>(ns, src, (src_len * size));
                         if (src_len >= ShortStringMax) {
                             Memory::Deallocate(src);
                         }
@@ -418,12 +421,12 @@ class String {
                 ns = allocate(new_len);
 
                 if (src != nullptr) {
-                    Memory::Copy(ns, src, (src_len * sizeof(Char_T_)));
+                    Memory::Copy<size>(ns, src, (src_len * size));
                     Memory::Deallocate(src);
                 }
             }
 
-            Memory::Copy((ns + src_len), str, (len * sizeof(Char_T_)));
+            Memory::Copy<size>((ns + src_len), str, (len * size));
             --new_len;
             ns[new_len] = Char_T_{0};
             setLength(new_len);
@@ -621,23 +624,25 @@ class String {
     }
 
     static String merge(const Char_T_ *str1, const SizeT len1, const Char_T_ *str2, const SizeT len2) {
-        String   ns  = String{SizeT(len1 + len2)};
-        Char_T_ *des = ns.Storage();
+        constexpr SizeT32 size = sizeof(Char_T_);
+        String            ns   = String{SizeT(len1 + len2)};
+        Char_T_          *des  = ns.Storage();
 
         if (len1 != SizeT{0}) {
-            Memory::Copy(des, str1, (len1 * sizeof(Char_T_)));
+            Memory::Copy<size>(des, str1, (len1 * size));
         }
 
         if (len2 != SizeT{0}) {
-            Memory::Copy((des + len1), str2, (len2 * sizeof(Char_T_)));
+            Memory::Copy<size>((des + len1), str2, (len2 * size));
         }
 
         return ns;
     }
 
     void copyString(const Char_T_ *str, const SizeT len) {
-        Char_T_ *ns = allocate(len + SizeT{1});
-        Memory::Copy(ns, str, (len * sizeof(Char_T_)));
+        constexpr SizeT32 size = sizeof(Char_T_);
+        Char_T_          *ns   = allocate(len + SizeT{1});
+        Memory::Copy<size>(ns, str, (len * size));
         ns[len] = Char_T_{0};
         setLength(len);
     }

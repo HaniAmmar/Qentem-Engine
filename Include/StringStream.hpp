@@ -375,23 +375,25 @@ class StringStream {
 
     inline void write(const Char_T_ *str, const SizeT len) {
         if (len != SizeT{0}) {
-            const SizeT current_offset = Length();
+            constexpr SizeT32 size           = sizeof(Char_T_);
+            const SizeT       current_offset = Length();
             length_ += len;
 
             if (Capacity() < Length()) {
                 expand(Length());
             }
 
-            Memory::Copy((Storage() + current_offset), str, (len * sizeof(Char_T_)));
+            Memory::Copy<size>((Storage() + current_offset), str, (len * size));
         }
     }
 
     void expand(const SizeT new_capacity) {
-        const SizeT src_cap = Capacity();
-        Char_T_    *src     = Storage();
+        constexpr SizeT32 size    = sizeof(Char_T_);
+        const SizeT       src_cap = Capacity();
+        Char_T_          *src     = Storage();
         allocate(new_capacity);
 
-        Memory::Copy(Storage(), src, (src_cap * sizeof(Char_T_)));
+        Memory::Copy<size>(Storage(), src, (src_cap * size));
         Memory::Deallocate(src);
     }
 
