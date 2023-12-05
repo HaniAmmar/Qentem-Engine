@@ -100,34 +100,33 @@ struct DigitLimit {};
 // uint16_t
 template <>
 struct DigitLimit<2U> {
-    static constexpr SizeT32 MaxPowerOfFiveShift = 16U;
-    static constexpr SizeT32 MaxPowerOfFive      = 6U;
-    static constexpr SizeT32 MaxPowerOfTenDigits = 4U;
+    static constexpr SizeT32 MaxShift           = 16U;
+    static constexpr SizeT32 MaxPowerOfFive     = 6U;
+    static constexpr SizeT32 MaxPowerOfTen      = 4U;
+    static constexpr SizeT32 MaxPowerOfTenValue = 10000U;
 
     static constexpr unsigned short PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
-    static constexpr unsigned short PowerOfTen[]  = {1U, 10U, 100U, 1000U, 10000U};
 };
 
 // uint32_t
 template <>
 struct DigitLimit<4U> {
-    static constexpr SizeT32 MaxPowerOfFiveShift = 32U;
-    static constexpr SizeT32 MaxPowerOfFive      = 13U;
-    static constexpr SizeT32 MaxPowerOfTenDigits = 9U;
+    static constexpr SizeT32 MaxShift           = 32U;
+    static constexpr SizeT32 MaxPowerOfFive     = 13U;
+    static constexpr SizeT32 MaxPowerOfTen      = 9U;
+    static constexpr SizeT32 MaxPowerOfTenValue = 1000000000U;
 
     static constexpr SizeT32 PowerOfFive[] = {1U,     5U,      25U,      125U,     625U,      3125U,      15625U,
                                               78125U, 390625U, 1953125U, 9765625U, 48828125U, 244140625U, 1220703125U};
-
-    static constexpr SizeT32 PowerOfTen[] = {1U,      10U,      100U,      1000U,      10000U,
-                                             100000U, 1000000U, 10000000U, 100000000U, 1000000000U};
 };
 
 // uint64_t
 template <>
 struct DigitLimit<8U> {
-    static constexpr SizeT32 MaxPowerOfFiveShift = 64U;
-    static constexpr SizeT32 MaxPowerOfFive      = 27U;
-    static constexpr SizeT32 MaxPowerOfTenDigits = 19U;
+    static constexpr SizeT32 MaxShift           = 64U;
+    static constexpr SizeT32 MaxPowerOfFive     = 27U;
+    static constexpr SizeT32 MaxPowerOfTen      = 19U;
+    static constexpr SizeT64 MaxPowerOfTenValue = 10000000000000000000ULL;
 
     static constexpr SizeT64 PowerOfFive[] = {
         // clang-format off
@@ -136,31 +135,6 @@ struct DigitLimit<8U> {
         152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
         476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
         298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
-        // clang-format on
-    };
-
-    static constexpr SizeT64 PowerOfTen[] = {
-        // clang-format off
-        1ULL,
-        10ULL,
-        100ULL,
-        1000ULL,
-        10000ULL,
-        100000ULL,
-        1000000ULL,
-        10000000ULL,
-        100000000ULL,
-        1000000000ULL,
-        10000000000ULL,
-        100000000000ULL,
-        1000000000000ULL,
-        10000000000000ULL,
-        100000000000000ULL,
-        1000000000000000ULL,
-        10000000000000000ULL,
-        100000000000000000ULL,
-        1000000000000000000ULL,
-        10000000000000000000ULL
         // clang-format on
     };
 };

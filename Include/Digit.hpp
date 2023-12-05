@@ -449,14 +449,9 @@ struct Digit {
                     }
 
                     if (is_negative_exp) {
-                        SizeT fraction_end_offset = 0;
-
-                        fraction_end_offset = (exp_offset == SizeT{0}) ? offset : exp_offset;
-
-                        powerOfNegativeTen(number.Natural, content, start_offset, fraction_end_offset, exponent);
+                        powerOfNegativeTen(number.Natural, exponent);
                     } else {
-                        powerOfPositiveTen(number.Natural, content, start_offset,
-                                           (start_offset + SizeT(e_extra_p10_power)), exponent);
+                        powerOfPositiveTen(number.Natural, exponent);
                     }
                 }
                 ///////////////////////////////////////
@@ -471,85 +466,29 @@ struct Digit {
         return QNumberType::NotANumber;
     }
     /////////////////////////////////////////
-    template <typename Number_T_, typename Char_T_>
-    static void powerOfNegativeTen(Number_T_ &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
-                                   SizeT32 exponent) noexcept {
+    template <typename Number_T_>
+    static void powerOfNegativeTen(Number_T_ &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SystemIntType;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 320U> bint{number};
+        BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
-        constexpr SizeT32 shift_limit = (sizeof(UNumber_T) * 8U);
-        SizeT32           shifted     = 0;
-        //////////////////////////////////////////////////////////////
-        (void)content;
-        (void)offset;
-        (void)end_offset;
-        // if ((offset < end_offset) && (exponent != 0)) {
-        //     UNumber_T              num;
-        //     constexpr SizeT32 max_digits = 40U;
-        //     const SizeT32     diff       = SizeT32(end_offset - offset);
-        //     SizeT32           length     = ((diff <= max_digits) ? diff : max_digits);
-        //     //////////////////////////////////////////////////////////////
-        //     end_offset = (offset + length);
-        //     exponent += length;
-        //     //////////////////////////////////////////////////////////////
-        //     while (length >= DigitLimit::MaxPowerOfTenDigits) {
-        //         length -= DigitLimit::MaxPowerOfTenDigits;
-
-        //         const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
-        //         num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //         ++offset;
-
-        //         while (offset < sub_end_offset) {
-        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
-        //                 num *= UNumber_T{10};
-        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //             }
-
-        //             ++offset;
-        //         }
-
-        //         bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
-        //         bint += num;
-        //     }
-        //     ////////////////////////////////////////////////////////////
-        //     if (offset < end_offset) {
-        //         num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //         ++offset;
-
-        //         while (offset < end_offset) {
-        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
-        //                 num *= UNumber_T{10};
-        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //             }
-
-        //             ++offset;
-        //         }
-
-        //         bint *= DigitLimit::PowerOfTen[length];
-        //         bint += num;
-        //     }
-        // }
-
-        // if (bint.Index() < 3) {
-        shifted += 64U;
+        SizeT32 shifted = 64U;
         bint <<= 64U;
-        // }
         //////////////////////////////////////////////////////////////
         shifted += exponent;
         //////////////////////////////////////////////////////////////
         while (exponent >= DigitLimit::MaxPowerOfFive) {
-            bint <<= shift_limit;
+            bint <<= DigitLimit::MaxShift;
             bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
-            shifted += shift_limit;
+            shifted += DigitLimit::MaxShift;
             exponent -= DigitLimit::MaxPowerOfFive;
         }
 
         if (exponent != 0U) {
-            bint <<= shift_limit;
+            bint <<= DigitLimit::MaxShift;
             bint /= DigitLimit::PowerOfFive[exponent];
-            shifted += shift_limit;
+            shifted += DigitLimit::MaxShift;
         }
         //////////////////////////////////////////////////////////////
         SizeT32       exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
@@ -567,24 +506,24 @@ struct Digit {
             shifted = (bit - shifted);
             exp += shifted;
 
-            number += (number & 1ULL);
+            number += (number & Number_T_{1});
             number >>= 1U;
-            exp += (number > 0x1FFFFFFFFFFFFFULL);
+            exp += (number > Number_T_{0x1FFFFFFFFFFFFF});
         } else {
             shifted -= bit;
 
             if (exp > shifted) {
                 exp -= shifted;
-                number += (number & 1ULL);
+                number += (number & Number_T_{1});
                 number >>= 1U;
-                exp += (number > 0x1FFFFFFFFFFFFFULL);
+                exp += (number > Number_T_{0x1FFFFFFFFFFFFF});
             } else {
                 shifted -= exp;
                 ++shifted;
                 number >>= shifted;
-                number += (number & 1ULL);
+                number += (number & Number_T_{1});
                 number >>= 1U;
-                exp = (number > 0xFFFFFFFFFFFFFULL);
+                exp = (number > Number_T_{0xFFFFFFFFFFFFF});
             }
         }
 
@@ -592,74 +531,15 @@ struct Digit {
         number |= (SizeT64(exp) << 52U);
     }
     /////////////////////////////////////////
-    template <typename Number_T_, typename Char_T_>
-    static void powerOfPositiveTen(Number_T_ &number, const Char_T_ *content, SizeT offset, SizeT end_offset,
-                                   SizeT32 exponent) noexcept {
+    template <typename Number_T_>
+    static void powerOfPositiveTen(Number_T_ &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SystemIntType;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 320U> bint{number};
+        BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
-        constexpr SizeT32 bint_limit  = 2U;
-        constexpr SizeT32 shift_limit = (sizeof(UNumber_T) * 8U);
-        SizeT32           shifted     = 0;
-        //////////////////////////////////////////////////////////////
-        (void)content;
-        (void)offset;
-        (void)end_offset;
-
-        // if ((offset < end_offset) && (exponent != 0)) {
-        //     UNumber_T              num;
-        //     constexpr SizeT32 max_digits = 30U;
-        //     const SizeT32     diff       = SizeT32(end_offset - offset);
-        //     SizeT32           length     = ((diff <= max_digits) ? diff : max_digits);
-        //     //////////////////////////////////////////////////////////////
-        //     if (exponent >= length) {
-        //         end_offset = (offset + length);
-        //         exponent -= length;
-        //     } else {
-        //         end_offset = (offset + exponent);
-        //         length     = (end_offset - offset);
-        //         exponent   = 0;
-        //     }
-        //     //////////////////////////////////////////////////////////////
-        //     while (length >= DigitLimit::MaxPowerOfTenDigits) {
-        //         length -= DigitLimit::MaxPowerOfTenDigits;
-
-        //         const SizeT sub_end_offset = (offset + DigitLimit::MaxPowerOfTenDigits);
-        //         num                        = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //         ++offset;
-
-        //         while (offset < sub_end_offset) {
-        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
-        //                 num *= UNumber_T{10};
-        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //             }
-
-        //             ++offset;
-        //         }
-
-        //         bint *= DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits];
-        //         bint += num;
-        //     }
-        //     //////////////////////////////////////////////////////////////
-        //     if (offset < end_offset) {
-        //         num = (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //         ++offset;
-
-        //         while (offset < end_offset) {
-        //             if (content[offset] != DigitUtils::DigitChars::DotChar) {
-        //                 num *= UNumber_T{10};
-        //                 num += (UNumber_T)(content[offset] - DigitUtils::DigitChars::ZeroChar);
-        //             }
-
-        //             ++offset;
-        //         }
-
-        //         bint *= DigitLimit::PowerOfTen[length];
-        //         bint += num;
-        //     }
-        // }
+        constexpr SizeT32 bint_limit = 2U;
+        SizeT32           shifted    = 0;
         //////////////////////////////////////////////////////////////
         shifted += exponent;
 
@@ -667,8 +547,8 @@ struct Digit {
             bint *= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
 
             if (bint.Index() > bint_limit) {
-                bint >>= shift_limit;
-                shifted += shift_limit;
+                bint >>= DigitLimit::MaxShift;
+                shifted += DigitLimit::MaxShift;
             }
 
             exponent -= DigitLimit::MaxPowerOfFive;
@@ -686,9 +566,9 @@ struct Digit {
         } else {
             bint >>= (bit - 53U);
             number = SizeT64(bint);
-            number += SizeT64(number & 1ULL);
+            number += (number & Number_T_{1});
             number >>= 1U;
-            shifted += SizeT32(number > 0x1FFFFFFFFFFFFFULL);
+            shifted += SizeT32(number > Number_T_{0x1FFFFFFFFFFFFF});
         }
         //////////////////////////////////////////////////////////////
         SizeT64 exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
@@ -876,15 +756,15 @@ struct Digit {
 
                     if (times >= DigitLimit::MaxPowerOfFive) {
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
-                                                      ? ((format.Precision / DigitLimit::MaxPowerOfTenDigits) + 2U)
+                                                      ? ((format.Precision / DigitLimit::MaxPowerOfTen) + 2U)
                                                       : bint.MaxIndex();
 
                         do {
                             bint *= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
 
-                            if ((bint.Index() >= max_index) && (shift >= DigitLimit::MaxPowerOfFiveShift)) {
-                                bint >>= DigitLimit::MaxPowerOfFiveShift;
-                                shift -= DigitLimit::MaxPowerOfFiveShift;
+                            if ((bint.Index() >= max_index) && (shift >= DigitLimit::MaxShift)) {
+                                bint >>= DigitLimit::MaxShift;
+                                shift -= DigitLimit::MaxShift;
                             }
 
                             times -= DigitLimit::MaxPowerOfFive;
@@ -950,10 +830,10 @@ struct Digit {
 
         while (bint.IsBig()) {
             const SizeT length = stream.Length();
-            NumberToString<true>(stream, bint.Divide(DigitLimit::PowerOfTen[DigitLimit::MaxPowerOfTenDigits]));
+            NumberToString<true>(stream, bint.Divide(DigitLimit::MaxPowerOfTenValue));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            insertZeros(stream, (DigitLimit::MaxPowerOfTenDigits - SizeT(stream.Length() - length)));
+            insertZeros(stream, (DigitLimit::MaxPowerOfTen - SizeT(stream.Length() - length)));
         }
 
         if (bint.NotZero()) {
