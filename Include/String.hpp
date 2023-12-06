@@ -155,19 +155,13 @@ class String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate();
-            const SizeT len = src.Length();
-            setLength(len);
 
             if constexpr (Config::ShortStringOptimization) {
-                if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                    // Setting every variable is easier unless SizeT is Set to
-                    // a type where there will be padding on the stack,
-                    // for that the entire stack has to be copied.
-                    constexpr SizeT32 size = sizeof(Char_T_);
-                    Char_T_          *str  = Storage();
-                    Memory::Copy<size>(str, src.Storage(), (len * size));
-                    str[len] = Char_T_{0};
-                }
+                data_.Padding = src.data_.Padding;
+                data_.Length  = src.data_.Length;
+                setLength(src.Length());
+            } else {
+                data_.Length = src.data_.Length;
             }
 
             data_.Storage.MovePointerOnly(src.data_.Storage);
