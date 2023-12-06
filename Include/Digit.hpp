@@ -473,22 +473,42 @@ struct Digit {
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
-        SizeT32 shifted = 64U;
+        SizeT32 shifted = exponent;
+        //////////////////////////////////////////////////////////////
+        shifted += 64U;
         bint <<= 64U;
         //////////////////////////////////////////////////////////////
-        shifted += exponent;
-        //////////////////////////////////////////////////////////////
-        while (exponent >= DigitLimit::MaxPowerOfFive) {
-            bint <<= DigitLimit::MaxShift;
-            bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
-            shifted += DigitLimit::MaxShift;
-            exponent -= DigitLimit::MaxPowerOfFive;
-        }
+        if constexpr (sizeof(UNumber_T) == 8U) {
+            while (exponent >= DigitLimit::MaxPowerOfFive) {
+                // 2**126 = 85070591730234615865843651857942052864
+                // 5**27 = 7450580596923828125 (MaxPowerOfFive)
+                // 2**126 / 5**27 = 11417981541647679048.4
+                // 126-64=62; See 2**126 and 64 shift
 
-        if (exponent != 0U) {
-            bint <<= DigitLimit::MaxShift;
-            bint /= DigitLimit::PowerOfFive[exponent];
-            shifted += DigitLimit::MaxShift;
+                bint *= DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive];
+                bint >>= DigitLimit::MaxShift;
+                shifted += DigitLimit::PowerOfOneOverFiveShift[DigitLimit::MaxPowerOfFive];
+                exponent -= DigitLimit::MaxPowerOfFive;
+            }
+
+            if (exponent != 0U) {
+                bint *= DigitLimit::PowerOfOneOverFive[exponent];
+                bint >>= DigitLimit::MaxShift;
+                shifted += DigitLimit::PowerOfOneOverFiveShift[exponent];
+            }
+        } else {
+            while (exponent >= DigitLimit::MaxPowerOfFive) {
+                bint <<= DigitLimit::MaxShift;
+                bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+                shifted += DigitLimit::MaxShift;
+                exponent -= DigitLimit::MaxPowerOfFive;
+            }
+
+            if (exponent != 0U) {
+                bint <<= DigitLimit::MaxShift;
+                bint /= DigitLimit::PowerOfFive[exponent];
+                shifted += DigitLimit::MaxShift;
+            }
         }
         //////////////////////////////////////////////////////////////
         SizeT32       exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
