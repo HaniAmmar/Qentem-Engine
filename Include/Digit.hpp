@@ -468,7 +468,7 @@ struct Digit {
     /////////////////////////////////////////
     template <typename Number_T_>
     static void powerOfNegativeTen(Number_T_ &number, SizeT32 exponent) noexcept {
-        using UNumber_T  = SystemIntType;
+        using UNumber_T  = SizeT64;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 192U> bint{number};

@@ -118,6 +118,15 @@ struct DigitLimit<4U> {
 
     static constexpr SizeT32 PowerOfFive[] = {1U,     5U,      25U,      125U,     625U,      3125U,      15625U,
                                               78125U, 390625U, 1953125U, 9765625U, 48828125U, 244140625U, 1220703125U};
+
+    static constexpr unsigned int PowerOfOneOverFive[] = {
+        // 2^N/5
+        1U,          3435973837U, 2748779070U, 2199023256U, 3518437209U, 2814749768U, 2251799814U,
+        3602879702U, 2882303762U, 2305843010U, 3689348815U, 2951479052U, 2361183242U, 2361183242U};
+
+    static constexpr unsigned int PowerOfOneOverFiveShift[] = {// 2^N/5
+                                                               0U,  2U,  4U,  6U,  9U,  11U, 13U,
+                                                               16U, 18U, 20U, 23U, 25U, 27U, 27U};
 };
 
 // uint64_t
