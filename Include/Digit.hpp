@@ -73,6 +73,7 @@ struct Digit {
                 realToString<Number_T_>(stream, QNumber64{number}.Natural, format);
             }
         } else {
+            (void)format;
             constexpr SizeT32 max_number_of_digits = (((sizeof(Number_T_) * 8U * 30103U) / 100000U) + 1U);
             Char_T_           storage[max_number_of_digits];
 

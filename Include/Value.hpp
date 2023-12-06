@@ -483,6 +483,8 @@ class Value {
 
             if constexpr (!Config::PointerTagging) {
                 setType(t_type);
+            } else {
+                (void)t_type;
             }
 
             data_.VNumber = tmp;

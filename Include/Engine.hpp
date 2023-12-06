@@ -71,6 +71,8 @@ class Engine {
                     } while ((m_size != 0) && (offset < end_offset));
                 }
             }
+        } else {
+            (void)full_length;
         }
 
         while (offset < end_offset) {
@@ -134,6 +136,8 @@ class Engine {
                         --m_size;
                     } while ((m_size != 0) && (offset < end_offset));
                 }
+            } else {
+                (void)full_length;
             }
 
             while (offset < end_offset) {
