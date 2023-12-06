@@ -9,19 +9,20 @@ branches:
 platform:
   - x64
   - x86
+  - ARM
 
 configuration:
   - Release
 
 # cache:
-  # - Build -> .appveyor.yml
-  # - x64 -> .appveyor.yml
-  # - Release -> .appveyor.yml
+#   - Build -> .appveyor.yml
+#   - Release -> .appveyor.yml
+#   - x64 -> .appveyor.yml
+#   - x86 -> .appveyor.yml
+#   - ARM -> .appveyor.yml
 
 image:
     - Visual Studio 2019
-    # - Visual Studio 2017
-    # - Visual Studio 2015
 
 build_script:
   - mkdir Build
