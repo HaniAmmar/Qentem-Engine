@@ -49,7 +49,7 @@ struct Config {
     static constexpr SizeT32 DoublePrecision{QENTEM_DOUBLE_PRECISION};
     static constexpr SizeT32 TemplatePrecision{QENTEM_TEMPLATE_PRECISION};
     static constexpr SizeT32 PointerSize{sizeof(void *)};
-    static constexpr bool    Is64bit{PointerSize == 8U};
+    static constexpr bool    Is64bit{PointerSize == SizeT32{8}};
 
     ///////////////////////////////////////////////
 #ifndef QENTEM_BIG_ENDIAN
@@ -96,7 +96,6 @@ struct Config {
     static constexpr bool AutoEscapeHTML{true};
 #else
     static constexpr bool AutoEscapeHTML{false};
-#undef QENTEM_AUTO_ESCAPE_HTML
 #endif
 ///////////////////////////////////////////////
 #ifndef QENTEM_AVX2
