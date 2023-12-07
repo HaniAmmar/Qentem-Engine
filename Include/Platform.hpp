@@ -31,7 +31,6 @@
 #else
 #include <immintrin.h>
 #endif
-#define QENTEM_SIMD_ENABLED
 #endif
 
 namespace Qentem::Platform {

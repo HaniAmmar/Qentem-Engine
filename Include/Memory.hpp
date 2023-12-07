@@ -32,24 +32,23 @@ template <SizeT32 Width_T_, typename Number_T_>
 inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
-#ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = size;
-    m_size >>= Platform::SIMD::Shift;
+    if constexpr (Config::IsSIMDEnabled) {
+        const Number_T_ m_size = (size >> Platform::SIMD::Shift);
 
-    if (m_size != 0) {
-        offset = m_size;
-        offset <<= Platform::SIMD::Shift;
+        if (m_size != 0) {
+            offset = m_size;
+            offset <<= Platform::SIMD::Shift;
 
-        const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
-        Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
-        const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
+            const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
+            Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
+            const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
 
-        do {
-            Platform::SIMD::Store(m_pointer, m_zero);
-            ++m_pointer;
-        } while (m_pointer < end);
+            do {
+                Platform::SIMD::Store(m_pointer, m_zero);
+                ++m_pointer;
+            } while (m_pointer < end);
+        }
     }
-#endif
 
     char *src = (char *)(pointer);
 
@@ -64,25 +63,24 @@ template <SizeT32 Width_T_, typename Number_T_>
 QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
-#ifdef QENTEM_SIMD_ENABLED
-    const Number_T_ m_size = size;
-    m_size >>= Platform::SIMD::Shift;
+    if constexpr (Config::IsSIMDEnabled) {
+        const Number_T_ m_size = (size >> Platform::SIMD::Shift);
 
-    if (m_size != 0) {
-        offset = m_size;
-        offset <<= Platform::SIMD::Shift;
+        if (m_size != 0) {
+            offset = m_size;
+            offset <<= Platform::SIMD::Shift;
 
-        Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
-        const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
-        const Platform::SIMD::VAR_T *end    = (m_form + m_size);
+            Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
+            const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
+            const Platform::SIMD::VAR_T *end    = (m_form + m_size);
 
-        do {
-            Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
-            ++m_form;
-            ++m_to;
-        } while (m_form < end);
+            do {
+                Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
+                ++m_form;
+                ++m_to;
+            } while (m_form < end);
+        }
     }
-#endif
 
     char       *des = (char *)(to);
     const char *src = (const char *)(from);
