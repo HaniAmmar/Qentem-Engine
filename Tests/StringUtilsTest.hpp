@@ -212,6 +212,10 @@ static void TestTrimLeft(TestHelper &helper) {
     helper.Equal(offset, 3U, "offset", __LINE__);
 
     offset = 2;
+    StringUtils::TrimLeft("   a\n\r\t", offset, 7U);
+    helper.Equal(offset, 3U, "offset", __LINE__);
+
+    offset = 2;
     StringUtils::TrimLeft("   abc  ", offset, 8U);
     helper.Equal(offset, 3U, "offset", __LINE__);
 
@@ -391,6 +395,10 @@ static void TestTrimRight(TestHelper &helper) {
     end_offset = 4;
     StringUtils::TrimRight(" a  ", 4U, end_offset);
     helper.Equal(end_offset, 4U, "end_offset", __LINE__);
+
+    end_offset = 5;
+    StringUtils::TrimRight(" a\n\r\t", 0U, end_offset);
+    helper.Equal(end_offset, 2U, "end_offset", __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight(" abc  ", 0U, end_offset);
