@@ -319,13 +319,13 @@ struct QExpression {
 
     static void PowerOf(SizeT64 &left, SizeT64 right) noexcept {
         if (right > 1U) {
-            if ((right & 1U) != 1U) {
+            if ((right & SizeT64{1}) == SizeT64{0}) {
                 PowerOf(left, (right / 2U));
                 left *= left;
             } else {
                 --right;
                 const SizeT64 num = left;
-                PowerOf(left, (right / 2U));
+                PowerOf(left, (right / SizeT64{2}));
                 left *= left;
                 left *= num;
             }
@@ -357,15 +357,15 @@ struct QExpression {
             }
 
             case ExpressionType::RealNumber: {
-                left_negative = (Number.Real < 0);
+                left_negative = (Number.Real < 0.0);
 
                 if (left_negative) {
                     Number.Real = -Number.Real;
                 }
 
-                if ((Number.Real < 1) && (Number.Real > 0)) {
+                if ((Number.Real < 1.0) && (Number.Real > 0.0)) {
                     // No power of fraction at the moment.
-                    Number.Natural = 0;
+                    Number.Natural = SizeT64{0};
                     Type           = ExpressionType::NotANumber;
                     return false;
                 }
@@ -399,15 +399,15 @@ struct QExpression {
 
             case ExpressionType::RealNumber: {
                 double right_real = right.Number.Real;
-                right_negative    = (right_real < 0);
+                right_negative    = (right_real < 0.0);
 
                 if (right_negative) {
                     right_real = -right_real;
                 }
 
-                if ((right_real < 1) && (right_real > 0)) {
+                if ((right_real < 1.0) && (right_real > 0.0)) {
                     // No power of fraction at the moment.
-                    Number.Natural = 0;
+                    Number.Natural = SizeT64{0};
                     Type           = ExpressionType::NotANumber;
                     return false;
                 }
@@ -419,15 +419,15 @@ struct QExpression {
             }
         }
 
-        if (num_left != 0) {
-            if (num_right != 0) {
-                const bool right_odd = (num_right & 1U) == 0x1;
+        if (num_left != SizeT64{0}) {
+            if (num_right != SizeT64{0}) {
+                const bool right_odd = ((num_right & SizeT64{1}) == SizeT64{1});
 
                 PowerOf(num_left, num_right);
 
                 if (right_negative) {
                     Number.Real = double(num_left);
-                    Number.Real = 1 / Number.Real;
+                    Number.Real = 1.0 / Number.Real;
                     Type        = ExpressionType::RealNumber;
 
                     if (left_negative) {
@@ -446,11 +446,11 @@ struct QExpression {
                 return true;
             }
 
-            Number.Natural = 1;
+            Number.Natural = SizeT64{1};
             Type           = ExpressionType::NaturalNumber;
 
         } else {
-            Number.Natural = 0;
+            Number.Natural = SizeT64{0};
             Type           = ExpressionType::NaturalNumber;
         }
 

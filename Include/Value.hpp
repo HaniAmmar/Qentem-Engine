@@ -1481,7 +1481,7 @@ class Value {
             }
 
             default: {
-                return 0;
+                return SizeT64{0};
             }
         };
     }
