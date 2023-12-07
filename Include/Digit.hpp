@@ -751,15 +751,9 @@ struct Digit {
 
                     if (is_positive_exp) {
                         fraction_length -= positive_exp;
-
-                        if (extra_digits) {
-                            needed = (digits - format.Precision);
-                        } else {
-                            needed = (format.Precision - digits);
-                        }
+                        needed = (format.Precision - digits);
                     } else {
                         fraction_length += positive_exp;
-
                         needed = (digits + format.Precision);
                     }
 
