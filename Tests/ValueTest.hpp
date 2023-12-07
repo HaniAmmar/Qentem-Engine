@@ -39,7 +39,7 @@ static void TestEmptyValue(TestHelper &helper) {
 
     VStringStream ss_var;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -104,7 +104,7 @@ static void TestTrueValue(TestHelper &helper) {
 
     VStringStream ss_var;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -173,7 +173,7 @@ static void TestFalseValue(TestHelper &helper) {
 
     VStringStream ss_var;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -242,7 +242,7 @@ static void TestNullValue(TestHelper &helper) {
 
     VStringStream ss_var;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -311,7 +311,7 @@ static void TestNumberValue1(TestHelper &helper) {
 
     VStringStream ss_var;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -394,10 +394,10 @@ static void TestNumberValue2(TestHelper &helper) {
     using vu_short = unsigned short;
     using vu_long  = unsigned long;
 
-    ValueC  value1;
-    VString str_var;
-    QNumber num_var;
-    bool    bool_var;
+    ValueC    value1;
+    VString   str_var;
+    QNumber64 num_var;
+    bool      bool_var;
 
     /////////////////// unsigned
 
@@ -454,10 +454,10 @@ static void TestNumberValue2(TestHelper &helper) {
 }
 
 static void TestNumberValue3(TestHelper &helper) {
-    ValueC  value1;
-    VString str_var;
-    QNumber num_var;
-    bool    bool_var;
+    ValueC    value1;
+    VString   str_var;
+    QNumber64 num_var;
+    bool      bool_var;
 
     /////////////////// signed
 
@@ -556,10 +556,10 @@ static void TestNumberValue3(TestHelper &helper) {
 }
 
 static void TestNumberValue4(TestHelper &helper) {
-    ValueC  value1;
-    VString str_var;
-    QNumber num_var;
-    bool    bool_var;
+    ValueC    value1;
+    VString   str_var;
+    QNumber64 num_var;
+    bool      bool_var;
 
     /////////////////// float
 
@@ -735,7 +735,7 @@ static void TestStringValue(TestHelper &helper) {
 
     VStringStream ss_var;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -853,7 +853,7 @@ static void TestArrayValue(TestHelper &helper) {
     VArray        arr_var;
     const ValueC *storage;
     VString       str_var;
-    QNumber       num_var;
+    QNumber64     num_var;
     const char   *c_str_var;
     SizeT         c_str_len;
     bool          bool_var;
@@ -1080,7 +1080,7 @@ static void TestObjectValue1(TestHelper &helper) {
     const ObjectItem_ *storage;
     VStringStream      ss_var;
     VString            str_var;
-    QNumber            num_var;
+    QNumber64          num_var;
     const char        *c_str_var;
     SizeT              c_str_len;
     bool               bool_var;

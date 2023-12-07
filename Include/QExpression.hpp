@@ -370,7 +370,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_left = QNumber{SizeT64I(Number.Real)}.Natural;
+                num_left = QNumber64{SizeT64I(Number.Real)}.Natural;
                 break;
             }
 
@@ -389,7 +389,7 @@ struct QExpression {
                 right_negative = (right.Number.Integer < 0);
 
                 if (right_negative) {
-                    num_right = QNumber{-right.Number.Integer}.Natural;
+                    num_right = QNumber64{-right.Number.Integer}.Natural;
                 } else {
                     num_right = right.Number.Natural;
                 }
@@ -412,7 +412,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_right = QNumber{SizeT64I(right_real)}.Natural;
+                num_right = QNumber64{SizeT64I(right_real)}.Natural;
             }
 
             default: {

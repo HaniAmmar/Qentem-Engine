@@ -259,7 +259,7 @@ struct JSON {
                 }
 
                 default: {
-                    QNumber number;
+                    QNumber64 number;
 
                     switch (Digit::StringToNumber(number, content, offset, length)) {
                         case QNumberType::Natural: {

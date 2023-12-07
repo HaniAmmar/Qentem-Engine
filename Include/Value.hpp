@@ -1468,7 +1468,7 @@ class Value {
     }
 
     SizeT64 GetUInt64() const noexcept {
-        QNumber number;
+        QNumber64 number;
 
         switch (SetNumber(number)) {
             case QNumberType::Natural:
@@ -1477,7 +1477,7 @@ class Value {
             }
 
             case QNumberType::Real: {
-                return QNumber{SizeT64I(number.Real)}.Natural;
+                return QNumber64{SizeT64I(number.Real)}.Natural;
             }
 
             default: {
@@ -1487,7 +1487,7 @@ class Value {
     }
 
     SizeT64I GetInt64() const noexcept {
-        QNumber number;
+        QNumber64 number;
 
         switch (SetNumber(number)) {
             case QNumberType::Natural:
@@ -1506,7 +1506,7 @@ class Value {
     }
 
     double GetDouble() const noexcept {
-        QNumber number;
+        QNumber64 number;
 
         switch (SetNumber(number)) {
             case QNumberType::Natural: {
@@ -1531,7 +1531,7 @@ class Value {
         return GetDouble();
     }
 
-    QNumberType SetNumber(QNumber &number) const noexcept {
+    QNumberType SetNumber(QNumber64 &number) const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
                 number.Natural = (data_.VNumber.GetUInt64());

@@ -85,9 +85,9 @@ struct Digit {
             }
 
             if constexpr (Reverse_V_) {
-                stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), QNumber{number}.Natural));
+                stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), QNumber64{number}.Natural));
             } else {
-                const SizeT offset = intToString(&(storage[max_number_of_digits]), QNumber{number}.Natural);
+                const SizeT offset = intToString(&(storage[max_number_of_digits]), QNumber64{number}.Natural);
                 stream.Write(&(storage[max_number_of_digits - offset]), offset);
             }
         }
@@ -139,7 +139,7 @@ struct Digit {
     }
 
     template <typename Char_T_>
-    inline static QNumberType StringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
+    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T_ *content, SizeT &offset,
                                              SizeT end_offset) noexcept {
         return stringToNumber(number, content, offset, end_offset);
     }
@@ -147,7 +147,7 @@ struct Digit {
     //////////// Private ////////////
   private:
     template <typename Char_T_>
-    static QNumberType stringToNumber(QNumber &number, const Char_T_ *content, SizeT &offset,
+    static QNumberType stringToNumber(QNumber64 &number, const Char_T_ *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
         using Number_T             = decltype(number.Natural);
         constexpr SizeT max_length = SizeT{19};

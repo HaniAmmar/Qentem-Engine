@@ -1258,7 +1258,7 @@ struct TemplateSub {
                     const Value_T_ *val = getValue(expr->Variable);
 
                     if (val != nullptr) {
-                        QNumber val_number;
+                        QNumber64 val_number;
 
                         switch (val->SetNumber(val_number)) {
                             case QNumberType::Natural: {
@@ -1400,7 +1400,7 @@ struct TemplateSub {
     }
 
     bool isEqual(QExpression &left, QExpression &right) const noexcept {
-        QNumber         val_number;
+        QNumber64       val_number;
         const Value_T_ *left_value        = nullptr;
         const Value_T_ *right_value       = nullptr;
         const Char_T_  *left_content      = nullptr;
@@ -1660,7 +1660,7 @@ struct TemplateSub {
                 default: {
                     const SizeT original_offset = offset;
                     QExpression expr;
-                    QNumber     number;
+                    QNumber64   number;
                     expr.Operation = oper;
 
                     const QNumberType n_type = Digit::StringToNumber(number, content_, offset, end_offset);
