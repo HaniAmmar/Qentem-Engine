@@ -50,7 +50,6 @@ struct JSON {
     struct JSONParser {
         using VValue = Value<Char_T_>;
 
-      public:
         JSONParser()                              = delete;
         JSONParser(JSONParser &&)                 = delete;
         JSONParser(const JSONParser &)            = delete;
@@ -59,9 +58,9 @@ struct JSON {
         ~JSONParser()                             = delete;
 
         static VValue Parse(Stream_T_ &stream, const Char_T_ *content, SizeT length) {
-            VValue value;
+            VValue value{};
 
-            if (length != 0) {
+            if (length != SizeT{0}) {
                 SizeT offset = 0;
                 StringUtils::TrimLeft(content, offset, length);
                 parseValue(value, stream, content, offset, length);
