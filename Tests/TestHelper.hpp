@@ -26,17 +26,15 @@
 
 #include "Common.hpp"
 
+#include <iostream>
+#include <sstream>
+
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
 #elif defined(__FreeBSD__)
 #include <malloc_np.h>
 #else
 #include <malloc.h>
-#endif
-
-#ifndef QENTEM_OUTPUT_STREAM
-#include <iostream>
-#define QENTEM_OUTPUT_STREAM std::wcout
 #endif
 
 #ifndef QENTEM_TEST_HELPER_H_
@@ -54,7 +52,11 @@ struct TestOutPut {
 
     template <typename... Values_T_>
     inline static void Print(const Values_T_ &...values) {
-        (QENTEM_OUTPUT_STREAM << ... << values);
+        if (!IsCached) {
+            (std::wcout << ... << values);
+        } else {
+            (wss_ << ... << values);
+        }
     }
 
     enum Colors { TITLE, ERROR, PASS, END };
@@ -76,7 +78,15 @@ struct TestOutPut {
         return "";
     }
 
+    static std::wstringstream &GetCachedStream() noexcept {
+        return wss_;
+    }
+
     inline static bool IsColored{true};
+    inline static bool IsCached{false};
+
+  private:
+    inline static std::wstringstream wss_{};
 };
 
 struct MemoryRecord {
