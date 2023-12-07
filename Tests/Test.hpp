@@ -44,6 +44,59 @@
 
 namespace Qentem::Test {
 
+static int PrintResult(int passed, int failed) {
+    if (failed == 0) {
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "All good. (", passed, ") tests",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), '\n');
+        return 0;
+    }
+
+    TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Not good!",
+                      TestOutPut::GetColor(TestOutPut::Colors::END), " ", failed, " out of ", (passed + failed),
+                      " failed.\n");
+
+    return 1;
+}
+
+static void SelfTestLeak(TestHelper &helper, char *&ptr) {
+    ptr = Memory::Allocate<char>(8U);
+
+    helper.EqualsTrue(false, "EqualsTrue", 1);
+    helper.EqualsFalse(true, "EqualsFalse", 2);
+    helper.Equal(true, false, "Equal2", 4);
+    helper.Equal(true, false, "Equal1", 3, true);
+    helper.NotEqual(true, true, "NotEqual1", 5);
+    helper.NotEqual(true, true, "NotEqual2", 6, true);
+}
+
+static void SelfTest() {
+    const bool is_cached  = TestOutPut::IsCached;
+    const bool is_colored = TestOutPut::IsColored;
+
+    TestOutPut::IsCached = true;
+    TestHelper helper{"Test.hpp", __FILE__};
+
+    helper.ContinueOnError(true);
+
+    char *ptr = nullptr;
+    helper.Test("SelfTestLeak", SelfTestLeak, true, ptr);
+    Qentem::MemoryRecord::PrintMemoryStatus();
+    Memory::Deallocate(ptr);
+    MemoryRecord::ResetSubMemory();
+    TestOutPut::IsColored = false;
+
+    // const wchar_t *failed_message = L"\x1B[31mNot good!\x1B[0m 5 out of 15 failed.";
+    helper.EndTests();
+
+    if (helper.IsContinueOnError()) {
+        PrintResult(10, 5);
+    }
+
+    TestOutPut::IsColored = is_colored;
+    TestOutPut::IsCached  = is_cached;
+    TestOutPut::GetCachedStream().clear();
+}
+
 static int RunTests() {
     int passed = 0;
     int failed = 0;
@@ -64,17 +117,7 @@ static int RunTests() {
     ((Qentem::Test::RunTemplateUTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunTemplateLTests() == 0) ? ++passed : ++failed);
 
-    if (failed == 0) {
-        QENTEM_OUTPUT_STREAM << TestOutPut::GetColor(TestOutPut::Colors::PASS) << "All good. (" << passed << ") tests"
-                             << TestOutPut::GetColor(TestOutPut::Colors::END) << '\n';
-        return 0;
-    }
-
-    QENTEM_OUTPUT_STREAM << TestOutPut::GetColor(TestOutPut::Colors::ERROR) << "Not good!"
-                         << TestOutPut::GetColor(TestOutPut::Colors::END) << " " << failed << " out of "
-                         << (passed + failed) << " failed.\n";
-
-    return 1;
+    return PrintResult(passed, failed);
 }
 
 } // namespace Qentem::Test
