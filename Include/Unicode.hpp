@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+#include "Common.hpp"
+
 #ifndef QENTEM_UNICODE_H_
 #define QENTEM_UNICODE_H_
 
