@@ -2083,6 +2083,8 @@ static void TestMathUTag1(TestHelper &helper) {
 
     helper.Equal(Template::Render(uR"({math: {var:1} == true})", value, ss), uR"(1)", uR"(Render())", __LINE__);
     ss.Clear();
+
+    helper.Equal(Template::Render(uR"({math: 8 /2})", value, ss), uR"(4)", uR"(Render())", __LINE__);
 }
 
 static void TestMathUTag2(TestHelper &helper) {
@@ -2352,6 +2354,10 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="{var:5}" true="T" false="F"})";
     helper.Equal(Template::Render(content, value, ss), uR"(F)", uR"(Render())", __LINE__);
+    ss.Clear();
+
+    content = uR"({if case="{var:5}" true="T" false="{F}"})";
+    helper.Equal(Template::Render(content, value, ss), uR"({F})", uR"(Render())", __LINE__);
     ss.Clear();
 
     content = uR"({if case="{var:6}" true="T" false="F"})";

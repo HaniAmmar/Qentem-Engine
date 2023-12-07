@@ -249,6 +249,12 @@ static void TestEngine1(TestHelper &helper) {
 
     ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
+
+    content     = "ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0";
+    content_len = 40;
+
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    helper.Equal(ret, 0U, "return", __LINE__);
 }
 
 static void TestEngine2(TestHelper &helper) {

@@ -753,6 +753,9 @@ static void TestStringValue(TestHelper &helper) {
                  "value1.SetCharAndLength()", __LINE__);
     helper.Equal(value1.GetObject(), nullptr, "GetObject()", "null", __LINE__);
     helper.Equal(value1.GetArray(), nullptr, "GetArray()", "null", __LINE__);
+    helper.Equal(value1.GetUInt64(), SizeT64{0}, "GetUInt64()", "null", __LINE__);
+    helper.Equal(value1.GetInt64(), 0, "GetInt64()", "null", __LINE__);
+    helper.Equal(value1.GetDouble(), 0.0, "GetDouble()", "null", __LINE__);
     helper.NotEqual(value1.GetString(), nullptr, "GetString()", "null", __LINE__);
     helper.Equal(*(value1.GetString()), "-ABCDEF0123456789ABCDEF0123456789-", "GetString()", __LINE__);
     helper.NotEqual(value1.StringStorage(), nullptr, "StringStorage()", "null", __LINE__);

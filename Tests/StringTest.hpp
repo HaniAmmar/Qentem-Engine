@@ -37,15 +37,18 @@ static void TestString1(TestHelper &helper) {
     String8 str1;
     helper.Equal(str1.Length(), 0U, "Length", __LINE__);
     helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str1.Last(), nullptr, "Last()", "null", __LINE__);
 
     String8 str2{"0123456789"};
     helper.Equal(str2.Length(), 10U, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.NotEqual(str2.Last(), nullptr, "Last()", "null", __LINE__);
     helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
 
     str2.Reset();
     helper.Equal(str2.Length(), 0U, "Length", __LINE__);
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
+    helper.Equal(str2.Last(), nullptr, "Last()", "null", __LINE__);
 
     str1 = String8("abcd");
     helper.Equal(str1.Length(), 4U, "Length", __LINE__);

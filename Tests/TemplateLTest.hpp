@@ -2083,6 +2083,8 @@ static void TestMathLTag1(TestHelper &helper) {
 
     helper.Equal(Template::Render(LR"({math: {var:1} == true})", value, ss), LR"(1)", LR"(Render())", __LINE__);
     ss.Clear();
+
+    helper.Equal(Template::Render(LR"({math: 8 /2})", value, ss), LR"(4)", LR"(Render())", __LINE__);
 }
 
 static void TestMathLTag2(TestHelper &helper) {
@@ -2352,6 +2354,10 @@ static void TestInlineIfLTag(TestHelper &helper) {
 
     content = LR"({if case="{var:5}" true="T" false="F"})";
     helper.Equal(Template::Render(content, value, ss), LR"(F)", LR"(Render())", __LINE__);
+    ss.Clear();
+
+    content = LR"({if case="{var:5}" true="T" false="{F}"})";
+    helper.Equal(Template::Render(content, value, ss), LR"({F})", LR"(Render())", __LINE__);
     ss.Clear();
 
     content = LR"({if case="{var:6}" true="T" false="F"})";
