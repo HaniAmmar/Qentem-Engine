@@ -25,8 +25,6 @@
 #include "StringStream.hpp"
 
 // #define QENTEM_COMPARE_DIGIT_WITH_STL_ true
-#define QENTEM_TEST_DIGIT_SKIP_NAN_ true
-#define QENTEM_TEST_DIGIT_SKIP_INF_ true
 
 #ifdef QENTEM_COMPARE_DIGIT_WITH_STL_
 #include <iomanip>
@@ -76,7 +74,7 @@ QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &str
 
 template <typename Number_T_>
 QENTEM_NOINLINE static bool StringToNumber(const TestHelper &helper, Number_T_ &num, const char *str) noexcept {
-    QNumber     number;
+    QNumber64   number;
     SizeT       offset = 0;
     const SizeT length = StringUtils::Count(str);
 
@@ -478,7 +476,7 @@ static void TestStringToNumber2(TestHelper &helper) {
 
 static void TestStringToNumber3(TestHelper &helper) {
     const char *content = nullptr;
-    QNumber     number;
+    QNumber64   number;
     QNumberType type   = QNumberType::NotANumber;
     SizeT       offset = 0;
 
@@ -2116,15 +2114,10 @@ template <typename Stream_T_>
 static void TestDoubleToString1(TestHelper &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -0.0, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0, 6U, "0", "return", __LINE__);
-#ifndef QENTEM_TEST_DIGIT_SKIP_INF_
-    RealToStreamEqual(helper, stream, (1e+308 + 1e+308), 6U, "inf", "return", __LINE__);
-    RealToStreamEqual(helper, stream, (-1e+308 + -1e+308), 6U, "-inf", "return", __LINE__);
-#endif
 
-#ifndef QENTEM_TEST_DIGIT_SKIP_NAN_
-    RealToStreamEqual(helper, stream, ((1e+308 + 1e+308) / (1e+308 + 1e+308)), 6U, "nan", "return", __LINE__);
-    RealToStreamEqual(helper, stream, (0.0 / 0.0), 6U, "nan", "return", __LINE__);
-#endif
+    RealToStreamEqual(helper, stream, QNumber64{9218868437227405312ULL}.Real, 6U, "inf", "return", __LINE__);
+    RealToStreamEqual(helper, stream, QNumber64{18442240474082181120ULL}.Real, 6U, "-inf", "return", __LINE__);
+    RealToStreamEqual(helper, stream, QNumber64{18444492273895866368ULL}.Real, 6U, "nan", "return", __LINE__);
 
     RealToStreamEqual(helper, stream, 1.0, 6U, "1", "return", __LINE__);
     RealToStreamEqual(helper, stream, 2.0, 6U, "2", "return", __LINE__);
@@ -3316,15 +3309,9 @@ static void TestFloatToString1(TestHelper &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -0.0F, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0F, 6U, "0", "return", __LINE__);
 
-#ifndef QENTEM_TEST_DIGIT_SKIP_INF_
-    RealToStreamEqual(helper, stream, (3e+38f + 3e+38f), 6U, "inf", "return", __LINE__);
-    RealToStreamEqual(helper, stream, (-3e+38f + -3e+38f), 6U, "-inf", "return", __LINE__);
-#endif
-
-#ifndef QENTEM_TEST_DIGIT_SKIP_NAN_
-    RealToStreamEqual(helper, stream, ((3e+38f + 3e+38f) / (3e+38f + 3e+38f)), 6U, "nan", "return", __LINE__);
-    RealToStreamEqual(helper, stream, (0.0f / 0.0f), 6U, "nan", "return", __LINE__);
-#endif
+    RealToStreamEqual(helper, stream, QNumber32{2139095040U}.Real, 6U, "inf", "return", __LINE__);
+    RealToStreamEqual(helper, stream, QNumber32{4286578688U}.Real, 6U, "-inf", "return", __LINE__);
+    RealToStreamEqual(helper, stream, QNumber32{4290772992U}.Real, 6U, "nan", "return", __LINE__);
 
     RealToStreamEqual(helper, stream, 1.0F, 6U, "1", "return", __LINE__);
     RealToStreamEqual(helper, stream, 2.0F, 6U, "2", "return", __LINE__);
