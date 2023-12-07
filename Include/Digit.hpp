@@ -35,10 +35,12 @@ struct Digit {
     enum class RealFormatType : unsigned char { Default = 0, Fixed = 1, Scientific = 2 };
 
     struct RealFormatInfo {
+        RealFormatInfo() noexcept = default;
+
         RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
         }
 
-        explicit RealFormatInfo(RealFormatType type) noexcept : Type{type} {
+        RealFormatInfo(RealFormatType type) noexcept : Type{type} {
         }
 
         RealFormatInfo(SizeT32 precision, RealFormatType type) noexcept : Precision{precision}, Type{type} {

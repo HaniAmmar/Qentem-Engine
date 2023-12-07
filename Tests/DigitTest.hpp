@@ -2115,11 +2115,17 @@ static void TestDoubleToString1(TestHelper &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -0.0, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0, 6U, "0", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, QNumber64{9218868437227405312ULL}.Real, 6U, "inf", "return", __LINE__);
-    RealToStreamEqual(helper, stream, QNumber64{18442240474082181120ULL}.Real, 6U, "-inf", "return", __LINE__);
+    RealToStreamEqual(helper, stream, QNumber64{9218868437227405312ULL}.Real,
+                      Digit::RealFormatInfo{6U, Digit::RealFormatType::Default}, "inf", "return", __LINE__);
+    RealToStreamEqual(helper, stream, QNumber64{18442240474082181120ULL}.Real, Digit::RealFormatType::Default, "-inf",
+                      "return", __LINE__);
     RealToStreamEqual(helper, stream, QNumber64{18444492273895866368ULL}.Real, 6U, "nan", "return", __LINE__);
 
-    RealToStreamEqual(helper, stream, 1.0, 6U, "1", "return", __LINE__);
+    Digit::RealFormatInfo format{};
+    format = Digit::RealFormatType::Default;
+    format = 6U;
+
+    RealToStreamEqual(helper, stream, 1.0, format, "1", "return", __LINE__);
     RealToStreamEqual(helper, stream, 2.0, 6U, "2", "return", __LINE__);
     RealToStreamEqual(helper, stream, 3.0, 6U, "3", "return", __LINE__);
     RealToStreamEqual(helper, stream, 4.0, 6U, "4", "return", __LINE__);
