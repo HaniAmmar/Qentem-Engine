@@ -96,9 +96,14 @@ class Array {
     Array(Array &&src) noexcept = default;
     ~Array()                    = default;
 
-    explicit Array(SizeT size) : data_{size} {
+    explicit Array(SizeT size, bool initialize = false) : data_{size} {
         if (size != SizeT{0}) {
-            allocate();
+            Type_T_ *current = allocate();
+
+            if (initialize) {
+                Memory::Initialize(current, (current + size));
+                setSize(size);
+            }
         }
     }
 
@@ -276,6 +281,17 @@ class Array {
         Reset();
     }
 
+    void ResizeAndInitialize(SizeT new_size) {
+        Resize(new_size);
+
+        if (new_size > Size()) {
+            Type_T_ *current = Storage();
+            Memory::Initialize((current + Size()), (current + new_size));
+        }
+
+        setSize(Capacity());
+    }
+
     inline void Expect(SizeT size) {
         const SizeT n_size = (size + Size());
 
@@ -300,17 +316,6 @@ class Array {
     void Compress() {
         // Remove excess storage;
         Resize(Size());
-    }
-
-    void ResizeAndInitialize(SizeT new_size) {
-        Resize(new_size);
-
-        if (new_size > Size()) {
-            Type_T_ *current = Storage();
-            Memory::Initialize((current + Size()), (current + new_size));
-        }
-
-        setSize(Capacity());
     }
 
     inline Type_T_ *Storage() const noexcept {

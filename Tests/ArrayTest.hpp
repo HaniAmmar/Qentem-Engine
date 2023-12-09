@@ -324,11 +324,15 @@ static void TestArray3(TestHelper &helper) {
     /////////////////////
     numbers1.Reset();
     numbers1 += 1;
+
     for (SizeT &num : numbers1) {
         num += 10;
     }
 
     helper.Equal(*(numbers1.First()), SizeT{11}, "numbers1.First()", "11", __LINE__);
+    /////////////////////
+    Array<SizeT> numbers_init{8U, true};
+    helper.Equal(numbers_init.Size(), 8U, "Size", __LINE__);
 }
 
 static void TestArray4(TestHelper &helper) {
