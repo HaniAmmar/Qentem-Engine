@@ -121,8 +121,8 @@ struct VNumberT {
     ~VNumberT()                      = default;
 
     VNumberT(VNumberT &&v_num) noexcept : data_{v_num.data_.Number, v_num.data_.PtrNumber} {
-        v_num.data_.Number.ull = 0;
-        v_num.data_.PtrNumber  = 0;
+        v_num.data_.Number.ull = 0ULL;
+        v_num.data_.PtrNumber  = 0ULL;
     }
 
     VNumberT &operator=(const VNumberT &v_num) noexcept {
@@ -164,8 +164,8 @@ struct VNumberT {
 
     inline void ClearAll() noexcept {
         if constexpr (Config::PointerTagging) {
-            data_.Number.ull = 0;
-            data_.PtrNumber  = 0;
+            data_.Number.ull = 0ULL;
+            data_.PtrNumber  = 0ULL;
         }
     }
 
@@ -726,7 +726,7 @@ class Value {
             initArray();
         }
 
-        if (arr.Size() != 0) {
+        if (arr.Size() != SizeT{0}) {
             data_.VArray += Memory::Move(arr);
         } else {
             data_.VArray += Value{Memory::Move(arr)};
@@ -830,11 +830,11 @@ class Value {
         }
 
         if (data_.VArray.Size() == index) {
-            if (data_.VArray.Capacity() == data_.VArray.Size()) {
-                data_.VArray.Resize((index + 1) * 2);
-            }
+            // if (data_.VArray.Capacity() == data_.VArray.Size()) {
+            //     data_.VArray.Resize((index + SizeT{1}) * SizeT{2});
+            // }
 
-            data_.VArray += Value();
+            data_.VArray += Value{};
         } else {
             data_.VArray.ResizeAndInitialize(index + 1);
         }
@@ -1139,7 +1139,7 @@ class Value {
             return (data_.VArray.Size());
         }
 
-        return 0;
+        return SizeT{0};
     }
 
     void Merge(Value &&val) {
@@ -1292,7 +1292,7 @@ class Value {
             return (data_.VString.Length());
         }
 
-        return 0;
+        return SizeT{0};
     }
 
     // To get a pointer to a key and its length.
@@ -1500,7 +1500,7 @@ class Value {
             }
 
             default: {
-                return 0;
+                return SizeT64I{0};
             }
         };
     }
@@ -1549,13 +1549,13 @@ class Value {
             }
 
             case ValueType::True: {
-                number.Natural = 1;
+                number.Natural = SizeT64{1};
                 return QNumberType::Natural;
             }
 
             case ValueType::False:
             case ValueType::Null: {
-                number.Natural = 0;
+                number.Natural = SizeT64{0};
                 return QNumberType::Natural;
             }
 
@@ -1675,7 +1675,7 @@ class Value {
             }
 
             if (size != data_.VArray.Capacity()) {
-                if (size == 0) {
+                if (size == SizeT{0}) {
                     data_.VArray.Reset();
 
                     if constexpr (Config::PointerTagging) {
@@ -1730,6 +1730,7 @@ class Value {
                 }
 
                 SizeT count = 0;
+
                 for (const V_item_ *obj_item = _item->data_.VObject.First(), *obj_end = _item->data_.VObject.End();
                      obj_item != obj_end; obj_item++) {
                     if ((obj_item == nullptr) || obj_item->Value.IsUndefined()) {

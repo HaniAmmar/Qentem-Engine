@@ -39,8 +39,8 @@ struct ArrayData<Type_T_, false> {
     ArrayData() noexcept = default;
 
     ArrayData(ArrayData &&src) noexcept : Index{src.Index}, Capacity{src.Capacity}, Storage{Memory::Move(src.Storage)} {
-        src.Index    = 0;
-        src.Capacity = 0;
+        src.Index    = SizeT{0};
+        src.Capacity = SizeT{0};
     }
 
     ArrayData(const ArrayData &)            = delete;
@@ -67,8 +67,8 @@ struct ArrayData<Type_T_, true> {
     ArrayData() noexcept = default;
 
     ArrayData(ArrayData &&src) noexcept : Storage{Memory::Move(src.Storage)}, Index{src.Index}, Capacity{src.Capacity} {
-        src.Index    = 0;
-        src.Capacity = 0;
+        src.Index    = SizeT{0};
+        src.Capacity = SizeT{0};
     }
 
     explicit ArrayData(SizeT size) noexcept : Capacity{size} {
@@ -97,7 +97,7 @@ class Array {
     ~Array()                    = default;
 
     explicit Array(SizeT size) : data_{size} {
-        if (size != 0) {
+        if (size != SizeT{0}) {
             allocate();
         }
     }
@@ -113,8 +113,8 @@ class Array {
 
             setSize(src.Size());
             setCapacity(src.Capacity());
-            src.setSize(0);
-            src.setCapacity(0);
+            src.setSize(SizeT{0});
+            src.setCapacity(SizeT{0});
             data_.Storage.MovePointerOnly(src.data_.Storage);
 
             // Just in case the copied array is not a child array.
@@ -131,7 +131,7 @@ class Array {
             const SizeT size    = Size();
 
             setStorage(nullptr);
-            setSize(0);
+            setSize(SizeT{0});
             setCapacity(src.Size());
             copyArray(src);
 
@@ -144,7 +144,7 @@ class Array {
     }
 
     void operator+=(Array &&src) {
-        if (Capacity() == 0) {
+        if (Capacity() == SizeT{0}) {
             setSize(src.Size());
             setCapacity(src.Capacity());
             setStorage(src.Storage());
@@ -163,8 +163,8 @@ class Array {
             Memory::Deallocate(src.Storage());
         }
 
-        src.setSize(0);
-        src.setCapacity(0);
+        src.setSize(SizeT{0});
+        src.setCapacity(SizeT{0});
         src.clearStorage();
     }
 
@@ -189,7 +189,7 @@ class Array {
 
     void operator+=(Type_T_ &&item) {
         if (Size() == Capacity()) {
-            if (Capacity() == 0) {
+            if (Capacity() == SizeT{0}) {
                 setCapacity(1U);
             }
 
@@ -230,7 +230,7 @@ class Array {
     void Clear() noexcept {
         Type_T_ *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
-        setSize(0);
+        setSize(SizeT{0});
     }
 
     void Reset() noexcept {
@@ -238,13 +238,13 @@ class Array {
         Memory::Dispose(storage, (storage + Size()));
         Memory::Deallocate(storage);
         clearStorage();
-        setSize(0);
-        setCapacity(0);
+        setSize(SizeT{0});
+        setCapacity(SizeT{0});
     }
 
     Type_T_ *Detach() noexcept {
-        setSize(0);
-        setCapacity(0);
+        setSize(SizeT{0});
+        setCapacity(SizeT{0});
         Type_T_ *tmp = Storage();
         clearStorage();
 
@@ -254,14 +254,14 @@ class Array {
     void Reserve(SizeT size) {
         Reset();
 
-        if (size != 0) {
+        if (size != SizeT{0}) {
             setCapacity(size);
             allocate();
         }
     }
 
     void Resize(SizeT new_size) {
-        if (new_size != 0) {
+        if (new_size != SizeT{0}) {
             if (Size() > new_size) {
                 // Shrink
                 Type_T_ *storage = Storage();
@@ -334,7 +334,7 @@ class Array {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Size() == 0);
+        return (Size() == SizeT{0});
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -360,7 +360,7 @@ class Array {
 
     inline Type_T_ *Last() const noexcept {
         if (IsNotEmpty()) {
-            return (Storage() + (Size() - 1));
+            return (Storage() + (Size() - SizeT{1}));
         }
 
         return nullptr;
@@ -404,7 +404,7 @@ class Array {
     }
 
     void copyArray(const Array &src) {
-        if (Capacity() != 0) {
+        if (Capacity() != SizeT{0}) {
             setSize(src.Size());
             Type_T_       *storage  = allocate();
             const Type_T_ *src_item = src.First();

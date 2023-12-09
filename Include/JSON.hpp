@@ -97,7 +97,7 @@ struct JSON {
                     const Char_T_ *str = (content + offset);
                     SizeT          len = UnEscapeJSON(str, length, stream);
 
-                    if (len == 0) {
+                    if (len == SizeT{0}) {
                         break;
                     }
 
@@ -198,7 +198,7 @@ struct JSON {
                     const Char_T_ *str = (content + offset);
                     SizeT          len = UnEscapeJSON(str, (length - offset), stream);
 
-                    if (len == 0) {
+                    if (len == SizeT{0}) {
                         break;
                     }
 
@@ -221,7 +221,7 @@ struct JSON {
                     do {
                     } while ((content[++offset] == *(++true_string)));
 
-                    if (*(true_string) == 0) {
+                    if (*(true_string) == Char_T_{'\0'}) {
                         value = true;
                         return;
                     }
@@ -235,7 +235,7 @@ struct JSON {
                     do {
                     } while ((content[++offset] == *(++false_string)));
 
-                    if (*(false_string) == 0) {
+                    if (*(false_string) == Char_T_{'\0'}) {
                         value = false;
                         return;
                     }
@@ -249,7 +249,7 @@ struct JSON {
                     do {
                     } while ((content[++offset] == *(++null_string)));
 
-                    if (*(null_string) == 0) {
+                    if (*(null_string) == Char_T_{'\0'}) {
                         value = nullptr;
                         return;
                     }

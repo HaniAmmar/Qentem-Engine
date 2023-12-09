@@ -46,7 +46,8 @@ static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &strea
                 }
 
                 ++offset;
-                offset2 = (offset + 1);
+                offset2 = offset;
+                ++offset2;
 
                 switch (content[offset]) {
                     case JSONotation::QuoteChar:
@@ -84,9 +85,9 @@ static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &strea
                     case JSONotation::U_Char: {
                         ++offset;
 
-                        if ((length - offset) > 3) {
-                            SizeT32 code = Digit::HexStringToNumber((content + offset), 4);
-                            offset += 4;
+                        if ((length - offset) > SizeT{3}) {
+                            SizeT32 code = Digit::HexStringToNumber((content + offset), SizeT{4});
+                            offset += SizeT32{4};
                             offset2 = offset;
 
                             if ((code >> 8U) != 0xD8U) {
@@ -95,11 +96,11 @@ static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &strea
                             }
 
                             // Surrogate
-                            if ((length - offset) > 5) {
+                            if ((length - offset) > SizeT{5}) {
                                 code = (code ^ 0xD800U) << 10U;
                                 offset += SizeT{2};
 
-                                code += Digit::HexStringToNumber((content + offset), 4) & 0x3FFU;
+                                code += Digit::HexStringToNumber((content + offset), SizeT{4}) & 0x3FFU;
                                 code += 0x10000U;
 
                                 Unicode::ToUTF<Char_T_>(code, stream);
@@ -110,11 +111,11 @@ static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &strea
                             }
                         }
 
-                        return 0;
+                        return SizeT{0};
                     }
 
                     default: {
-                        return 0;
+                        return SizeT{0};
                     }
                 }
 
@@ -133,7 +134,7 @@ static SizeT UnEscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &strea
             case JSONotation::LineControlChar:
             case JSONotation::TabControlChar:
             case JSONotation::CarriageControlChar: {
-                return 0;
+                return SizeT{0};
             }
 
             default: {
@@ -172,7 +173,8 @@ static void EscapeJSON(const Char_T_ *content, SizeT length, Stream_T_ &stream) 
                 }
 
                 stream += JSONotation::BSlashChar;
-                offset2 = offset + 1;
+                offset2 = offset;
+                ++offset2;
 
                 switch (content[offset]) {
                     case JSONotation::QuoteChar: {
@@ -270,13 +272,13 @@ struct JSONotation_T_ {
     static constexpr Char_T_ E_Char  = 'e';
     static constexpr Char_T_ CE_Char = 'E';
 
-    static constexpr SizeT          TrueStringLength = 4U;
+    static constexpr SizeT          TrueStringLength = SizeT{4};
     static constexpr const Char_T_ *TrueString       = &(JSONotationStrings<Char_T_, size_>::TrueString[0]);
 
-    static constexpr SizeT          FalseStringLength = 5U;
+    static constexpr SizeT          FalseStringLength = SizeT{5};
     static constexpr const Char_T_ *FalseString       = &(JSONotationStrings<Char_T_, size_>::FalseString[0]);
 
-    static constexpr SizeT          NullStringLength = 4U;
+    static constexpr SizeT          NullStringLength = SizeT{4};
     static constexpr const Char_T_ *NullString       = &(JSONotationStrings<Char_T_, size_>::NullString[0]);
 };
 

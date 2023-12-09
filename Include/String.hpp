@@ -76,7 +76,7 @@ struct StringData<Char_T_, true> {
 
     StringData(StringData &&src) noexcept
         : Storage{Memory::Move(src.Storage)}, Padding{src.Padding}, Length{src.Length} {
-        src.Length = 0;
+        src.Length = SizeT{0};
     }
 
     StringData(const StringData &)            = delete;
@@ -485,7 +485,7 @@ class String {
     inline Char_T_ *Last() noexcept {
         const SizeT length = Length();
 
-        if (length != 0) {
+        if (length != SizeT{0}) {
             return (getStorage(length) + (length - SizeT{1}));
         }
 
@@ -495,7 +495,7 @@ class String {
     inline const Char_T_ *Last() const noexcept {
         const SizeT length = Length();
 
-        if (length != 0) {
+        if (length != SizeT{0}) {
             return (getStorage(length) + (length - SizeT{1}));
         }
 

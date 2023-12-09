@@ -73,7 +73,7 @@ struct Digit {
             Char_T_           storage[max_number_of_digits];
 
             if constexpr (!IsUnsigned<Number_T_>()) {
-                if (number < 0) {
+                if (number < Number_T_{0}) {
                     number = -number;
                     stream += DigitUtils::DigitChars::NegativeChar;
                 }
@@ -233,7 +233,7 @@ struct Digit {
 
                         if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
                             (digit <= DigitUtils::DigitChars::NineChar)) {
-                            number.Natural *= 10ULL;
+                            number.Natural *= Number_T{10};
                             number.Natural += Number_T(digit);
                             number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
                             ++offset;
@@ -259,7 +259,7 @@ struct Digit {
                                 }
 
                                 if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + 1U) < max_end_offset) {
-                                    digit = content[offset + 1U];
+                                    digit = content[offset + SizeT{1}];
 
                                     if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
                                         (digit <= DigitUtils::DigitChars::NineChar)) {
@@ -301,7 +301,7 @@ struct Digit {
                                     break;
                                 }
 
-                                number.Natural *= 10ULL;
+                                number.Natural *= Number_T{10};
                                 number.Natural += Number_T(digit);
                                 number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
                                 ++offset;
@@ -336,7 +336,7 @@ struct Digit {
                         return QNumberType::Natural;
                     }
 
-                    if (number.Natural == 0ULL) {
+                    if (number.Natural == Number_T{0}) {
                         number.Natural |= 0x8000000000000000ULL;
                         return QNumberType::Real;
                     }
@@ -347,13 +347,13 @@ struct Digit {
                     }
                 }
                 ///////////////////////////////////////////////////////////
-                if (number.Natural != 0ULL) {
+                if (number.Natural != Number_T{0}) {
                     const SizeT32 e_p10_power =
                         (SizeT32(tmp_offset - start_offset) - SizeT32(!fraction_only && has_dot));
 
                     const SizeT32 e_n10_power =
-                        (fraction_only ? (e_p10_power + (SizeT32(start_offset - dot_offset) - 1U))
-                                       : (has_dot ? (SizeT32(offset - dot_offset) - 1U) : 0U));
+                        (fraction_only ? (e_p10_power + (SizeT32(start_offset - dot_offset) - SizeT32{1}))
+                                       : (has_dot ? (SizeT32(offset - dot_offset) - SizeT32{1}) : SizeT32{0}));
 
                     // const SizeT32 e_n10_power =
                     //     (fraction_only
@@ -413,8 +413,8 @@ struct Digit {
 
                     if (!fraction_only && (start_offset != offset)) {
                         if (!has_dot) {
-                            e_extra_p10_power = SizeT32((exp_offset == SizeT{0}) ? (offset - start_offset)
-                                                                                 : (exp_offset - start_offset));
+                            e_extra_p10_power = SizeT32((exp_offset == SizeT32{0}) ? (offset - start_offset)
+                                                                                   : (exp_offset - start_offset));
                         } else if (dot_offset != tmp_offset) {
                             e_extra_p10_power = SizeT32(dot_offset - start_offset);
                         }
@@ -439,8 +439,8 @@ struct Digit {
                         is_negative_exp = true;
                     }
 
-                    if ((is_negative_exp && (exponent > e_p10_power) && ((exponent - e_p10_power) > 324U)) ||
-                        (!is_negative_exp && ((exponent + e_p10_power) > 309U))) {
+                    if ((is_negative_exp && (exponent > e_p10_power) && ((exponent - e_p10_power) > SizeT32{324})) ||
+                        (!is_negative_exp && ((exponent + e_p10_power) > SizeT32{309}))) {
                         return QNumberType::NotANumber;
                     }
 
@@ -487,7 +487,7 @@ struct Digit {
                 exponent -= DigitLimit::MaxPowerOfFive;
             }
 
-            if (exponent != 0U) {
+            if (exponent != SizeT32{0}) {
                 bint *= DigitLimit::PowerOfOneOverFive[exponent];
                 bint >>= DigitLimit::MaxShift;
                 shifted += DigitLimit::PowerOfOneOverFiveShift[exponent];
@@ -500,7 +500,7 @@ struct Digit {
                 exponent -= DigitLimit::MaxPowerOfFive;
             }
 
-            if (exponent != 0U) {
+            if (exponent != SizeT32{0}) {
                 bint <<= DigitLimit::MaxShift;
                 bint /= DigitLimit::PowerOfFive[exponent];
                 shifted += DigitLimit::MaxShift;
@@ -514,7 +514,7 @@ struct Digit {
         //     number = SizeT64(bint);
         //     number <<= (53U - bit);
         // } else {
-        bint >>= (bit - 53U);
+        bint >>= (bit - SizeT32{53});
         number = SizeT64(bint);
         // }
         //////////////////////////////////////////////////////////////
@@ -570,7 +570,7 @@ struct Digit {
             exponent -= DigitLimit::MaxPowerOfFive;
         }
 
-        if (exponent != 0U) {
+        if (exponent != SizeT32{0}) {
             bint *= DigitLimit::PowerOfFive[exponent];
         }
         //////////////////////////////////////////////////////////////
@@ -630,7 +630,7 @@ struct Digit {
 
                         if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
                             (digit <= DigitUtils::DigitChars::NineChar)) {
-                            exponent *= 10ULL;
+                            exponent *= SizeT32{10};
                             exponent += SizeT32(digit - DigitUtils::DigitChars::ZeroChar);
                             ++offset;
                             continue;
@@ -662,7 +662,7 @@ struct Digit {
                 *storage = Char_T_(DigitUtils::DigitTable1[index]);
             }
 
-            if ((number != 0) || (str == storage)) {
+            if ((number != Number_T_{0}) || (str == storage)) {
                 --storage;
                 *storage = Char_T_(DigitUtils::DigitTable2[number]);
             }
@@ -679,7 +679,7 @@ struct Digit {
                 ++storage;
             }
 
-            if ((number != 0) || (str == storage)) {
+            if ((number != Number_T_{0}) || (str == storage)) {
                 *storage = Char_T_(DigitUtils::DigitTable2[number]);
                 ++storage;
             }
@@ -696,7 +696,7 @@ struct Digit {
         const Number_T_ bias = (number & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
-            if ((number & Info_T::SignMask) != 0) {
+            if ((number & Info_T::SignMask) != Number_T_{0}) {
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
 
@@ -726,7 +726,7 @@ struct Digit {
                 const bool    no_fraction      = (is_positive_exp && (big_offset || extra_digits));
                 /////////////////////////////////////
                 if (no_fraction) {
-                    const SizeT32 drop    = ((!extra_digits) ? 0U : (digits - (format.Precision + 1U)));
+                    const SizeT32 drop    = ((!extra_digits) ? SizeT32{0} : (digits - (format.Precision + SizeT32{1})));
                     const SizeT32 m_shift = (Info_T::MantissaSize + drop);
 
                     if (m_shift < positive_exp) {
@@ -766,7 +766,7 @@ struct Digit {
 
                     if (times >= DigitLimit::MaxPowerOfFive) {
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
-                                                      ? ((format.Precision / DigitLimit::MaxPowerOfTen) + 2U)
+                                                      ? ((format.Precision / DigitLimit::MaxPowerOfTen) + SizeT32{2})
                                                       : bint.MaxIndex();
 
                         do {
@@ -781,7 +781,7 @@ struct Digit {
                         } while (times >= DigitLimit::MaxPowerOfFive);
                     }
 
-                    if (times != 0U) {
+                    if (times != SizeT32{0}) {
                         bint *= DigitLimit::PowerOfFive[times];
                     }
 
@@ -819,7 +819,7 @@ struct Digit {
         stream += DigitUtils::DigitChars::E_Char;
         stream += (positive ? DigitUtils::DigitChars::PositiveChar : DigitUtils::DigitChars::NegativeChar);
 
-        if (power_of_ten < 10U) {
+        if (power_of_ten < Number_T_{10}) {
             // e+01,e+09
             stream += DigitUtils::DigitChars::ZeroChar;
         }
@@ -900,7 +900,7 @@ struct Digit {
                 stream.Storage()[index] = DigitUtils::DigitChars::OneChar;
 
                 if (is_positive_exp) {
-                    fraction_length = 0;
+                    fraction_length = SizeT32{0};
                     ++power;
 
                     if (power < precision) {
@@ -909,7 +909,7 @@ struct Digit {
                         do {
                             --index;
                             stream.Storage()[index] = DigitUtils::DigitChars::ZeroChar;
-                        } while (--power_index != 0);
+                        } while (--power_index != SizeT{0});
                     }
                 } else {
                     --power;
@@ -918,12 +918,12 @@ struct Digit {
         }
         /////////////////////////////////////////////////////
         const bool display_exp =
-            ((is_positive_exp && ((power + 1U) > precision)) || (!is_positive_exp && (power > 4U)));
+            ((is_positive_exp && ((power + SizeT{1}) > precision)) || (!is_positive_exp && (power > SizeT{4})));
         /////////////////////////////////////////////////////
         Char_T_       *number = (stream.Storage() + index);
         const Char_T_ *last   = stream.Last();
 
-        if (display_exp || (fraction_length != 0)) {
+        if (display_exp || (fraction_length != SizeT32{0})) {
             while ((number < last) && (*number == DigitUtils::DigitChars::ZeroChar)) {
                 ++number;
                 ++index;
@@ -933,8 +933,8 @@ struct Digit {
         const SizeT index2 = (index - started_at);
 
         if (!display_exp) {
-            if ((fraction_length != 0) && (fraction_length > index2)) {
-                if (!is_positive_exp && (power != 0)) {
+            if ((fraction_length != SizeT32{0}) && (fraction_length > index2)) {
+                if (!is_positive_exp && (power != SizeT{0})) {
                     insertZeros(stream, SizeT(power - SizeT{1}));
                     stream += DigitUtils::DigitChars::DotChar;
                     stream += DigitUtils::DigitChars::ZeroChar;
@@ -964,10 +964,10 @@ struct Digit {
         ++index;
 
         const bool round =
-            ((number < last) &&
-             ((*number > DigitUtils::DigitChars::FiveChar) ||
-              ((*number == DigitUtils::DigitChars::FiveChar) &&
-               (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) & 1U) == 1U)))));
+            ((number < last) && ((*number > DigitUtils::DigitChars::FiveChar) ||
+                                 ((*number == DigitUtils::DigitChars::FiveChar) &&
+                                  (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) &
+                                                 SizeT32{1}) == SizeT32{1})))));
 
         if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChars::NineChar)) {

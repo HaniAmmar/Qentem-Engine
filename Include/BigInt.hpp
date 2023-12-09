@@ -85,7 +85,7 @@ struct BigInt {
             N_Number_T_ num   = 0;
             SizeT32     count = (n_size / BitSize());
 
-            while ((--count != 0) && (count >= index_id_)) {
+            while ((--count != SizeT32{0}) && (count >= index_id_)) {
                 num |= big_int_[1];
                 num <<= BitSize();
             }
@@ -180,7 +180,7 @@ struct BigInt {
     }
     ////////////////////////////////////////////////////
     void Add(Number_T_ number, Number_T_ index = 0) noexcept {
-        if (number != 0) {
+        if (number != Number_T_{0}) {
             while (index <= MaxIndex()) {
                 const Number_T_ tmp = big_int_[index];
                 big_int_[index] += number;
@@ -199,7 +199,7 @@ struct BigInt {
     }
 
     inline void Subtract(Number_T_ number, Number_T_ index = 0) noexcept {
-        if (number != 0) {
+        if (number != Number_T_{0}) {
             while (index <= MaxIndex()) {
                 const Number_T_ tmp = big_int_[index];
                 big_int_[index] -= number;

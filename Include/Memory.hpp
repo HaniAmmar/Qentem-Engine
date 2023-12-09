@@ -35,7 +35,7 @@ inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     if constexpr (Config::IsSIMDEnabled) {
         const Number_T_ m_size = (size >> Platform::SIMD::Shift);
 
-        if (m_size != 0) {
+        if (m_size != Number_T_{0}) {
             offset = m_size;
             offset <<= Platform::SIMD::Shift;
 
@@ -66,7 +66,7 @@ QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T_ size) noe
     if constexpr (Config::IsSIMDEnabled) {
         const Number_T_ m_size = (size >> Platform::SIMD::Shift);
 
-        if (m_size != 0) {
+        if (m_size != Number_T_{0}) {
             offset = m_size;
             offset <<= Platform::SIMD::Shift;
 

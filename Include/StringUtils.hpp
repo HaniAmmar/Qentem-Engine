@@ -41,7 +41,7 @@ struct StringUtils {
         Number_T_ len = 0;
 
         if (str != nullptr) {
-            while (*str != '\0') {
+            while (*str != Char_T_{'\0'}) {
                 ++str;
                 ++len;
             }
@@ -56,7 +56,7 @@ struct StringUtils {
         Number_T_      len   = 0;
 
         if (str_2 != nullptr) {
-            while (*str_2 != '\0') {
+            while (*str_2 != Char_T_{'\0'}) {
                 ++str_2;
                 ++len;
             }
@@ -115,7 +115,7 @@ struct StringUtils {
     // length: the number of characters
     template <typename Char_T_, typename Number_T_>
     static void Trim(const Char_T_ *str, Number_T_ &offset, Number_T_ &length) noexcept {
-        if (length != 0) {
+        if (length != Number_T_{0}) {
             Number_T_ end_offset = (length + offset);
             TrimLeft(str, offset, end_offset);
             TrimRight(str, offset, end_offset);
