@@ -85,11 +85,11 @@ static void SelfTest() {
     MemoryRecord::ResetSubMemory();
     TestOutPut::IsColored = false;
 
-    // const wchar_t *failed_message = L"\x1B[31mNot good!\x1B[0m 5 out of 15 failed.";
     helper.EndTests();
 
     if (helper.IsContinueOnError()) {
         PrintResult(10, 5);
+        // const wchar_t *failed_message = L"Not good! 5 out of 15 failed.\n";
     }
 
     TestOutPut::IsColored = is_colored;
