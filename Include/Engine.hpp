@@ -75,13 +75,13 @@ class Engine {
             (void)full_length;
         }
 
-        while (offset < end_offset) {
-            if (char_1 == content[offset]) {
-                ++offset;
-                return offset;
-            }
-
+        while ((offset < end_offset) && (char_1 != content[offset])) {
             ++offset;
+        }
+
+        if (offset < end_offset) {
+            ++offset;
+            return offset;
         }
 
         return Number_T_{0};
