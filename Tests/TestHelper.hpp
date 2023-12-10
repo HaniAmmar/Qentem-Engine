@@ -52,10 +52,10 @@ struct TestOutPut {
 
     template <typename... Values_T_>
     inline static void Print(const Values_T_ &...values) {
-        if (!IsCached) {
+        if (wss_ == nullptr) {
             (std::wcout << ... << values);
         } else {
-            (wss_ << ... << values);
+            ((*wss_) << ... << values);
         }
     }
 
@@ -78,15 +78,14 @@ struct TestOutPut {
         return "";
     }
 
-    static std::wstringstream &GetCachedStream() noexcept {
-        return wss_;
+    static void SetCachedStream(std::wstringstream *wss) noexcept {
+        wss_ = wss;
     }
 
     inline static bool IsColored{true};
-    inline static bool IsCached{false};
 
   private:
-    inline static std::wstringstream wss_{};
+    inline static std::wstringstream *wss_;
 };
 
 struct MemoryRecord {

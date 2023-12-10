@@ -331,7 +331,7 @@ static void TestArray3(TestHelper &helper) {
 
     helper.Equal(*(numbers1.First()), SizeT{11}, "numbers1.First()", "11", __LINE__);
     /////////////////////
-    Array<SizeT> numbers_init{8U, true};
+    const Array<SizeT> numbers_init{8U, true};
     helper.Equal(numbers_init.Size(), 8U, "Size", __LINE__);
 }
 

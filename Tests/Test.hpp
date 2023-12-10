@@ -64,16 +64,17 @@ static void SelfTestLeak(TestHelper &helper, char *&ptr) {
     helper.EqualsTrue(false, "EqualsTrue", 1);
     helper.EqualsFalse(true, "EqualsFalse", 2);
     helper.Equal(true, false, "Equal2", 4);
-    helper.Equal(true, false, "Equal1", 3, true);
+    helper.Equal(true, false, "Equal1", true, 3);
     helper.NotEqual(true, true, "NotEqual1", 5);
-    helper.NotEqual(true, true, "NotEqual2", 6, true);
+    helper.NotEqual(true, true, "NotEqual2", true, 6);
 }
 
 static void SelfTest() {
-    const bool is_cached  = TestOutPut::IsCached;
+    std::wstringstream wss{};
+    TestOutPut::SetCachedStream(&wss);
+
     const bool is_colored = TestOutPut::IsColored;
 
-    TestOutPut::IsCached = true;
     TestHelper helper{"Test.hpp", __FILE__};
 
     helper.ContinueOnError(true);
@@ -93,8 +94,7 @@ static void SelfTest() {
     }
 
     TestOutPut::IsColored = is_colored;
-    TestOutPut::IsCached  = is_cached;
-    TestOutPut::GetCachedStream().clear();
+    TestOutPut::SetCachedStream(nullptr);
 }
 
 static int RunTests() {
