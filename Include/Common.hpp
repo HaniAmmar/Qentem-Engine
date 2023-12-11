@@ -75,7 +75,7 @@ struct Config {
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
     static constexpr bool PointerTagging{Is64bit};
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    static constexpr bool ShortStringOptimization{PointerTagging & (sizeof(SizeT) >= 4U)};
+    static constexpr bool ShortStringOptimization{PointerTagging && (sizeof(SizeT) >= 4U)};
 #else
     static constexpr bool ShortStringOptimization{false};
 #undef QENTEM_SSO
