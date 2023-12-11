@@ -385,39 +385,6 @@ inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     }
 }
 #endif
-
-// These two are used during compiling, so do not bother optimizing them.
-template <typename Number_T_>
-inline static constexpr SizeT32 FindFirstBitConst(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
-    SizeT32 index = 0;
-
-    if (value != Number_T_{0}) {
-        while ((value & Number_T_{1}) == Number_T_{0}) {
-            ++index;
-            value >>= 1U;
-        }
-    }
-
-    return index;
-}
-
-template <typename Number_T_>
-inline static constexpr SizeT32 FindLastBitConst(Number_T_ value) noexcept {
-    // 'value' should be bigger than zero.
-    constexpr SizeT32   size  = ((sizeof(Number_T_) * 8U) - 1U);
-    constexpr Number_T_ mask  = (Number_T_{1} << size);
-    SizeT32             index = size;
-
-    if (value != Number_T_{0}) {
-        while ((value & mask) == Number_T_{0}) {
-            --index;
-            value <<= 1U;
-        }
-    }
-
-    return index;
-}
 ///////////////////////////////////////
 template <typename, typename, SizeT32>
 struct SMIDCompare_T {};
