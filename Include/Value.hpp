@@ -51,7 +51,7 @@ struct VTypeT<false> {
     // Little-Endian
     VTypeT() = default;
 
-    constexpr void DoNothing() noexcept {
+    void DoNothing() noexcept {
         // Annoying unused var
         (void)index_capacity_;
     }
@@ -68,7 +68,7 @@ struct VTypeT<true> {
     // Big-Endian
     VTypeT() = default;
 
-    constexpr void DoNothing() noexcept {
+    void DoNothing() noexcept {
         // Annoying unused var
         (void)index_capacity_;
     }
