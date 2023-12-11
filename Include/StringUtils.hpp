@@ -50,20 +50,20 @@ struct StringUtils {
         return len;
     }
 
-    template <typename Char_T_, typename Number_T_ = SizeT>
-    static constexpr Number_T_ ConstCount(const Char_T_ *str) noexcept {
-        const Char_T_ *str_2 = str;
-        Number_T_      len   = 0;
+    // template <typename Char_T_, typename Number_T_ = SizeT>
+    // static constexpr Number_T_ ConstCount(const Char_T_ *str) noexcept {
+    //     const Char_T_ *str_2 = str;
+    //     Number_T_      len   = 0;
 
-        if (str_2 != nullptr) {
-            while (*str_2 != Char_T_{'\0'}) {
-                ++str_2;
-                ++len;
-            }
-        }
+    //     if (str_2 != nullptr) {
+    //         while (*str_2 != Char_T_{'\0'}) {
+    //             ++str_2;
+    //             ++len;
+    //         }
+    //     }
 
-        return len;
-    }
+    //     return len;
+    // }
 
     template <typename Char_T_, typename Number_T_>
     static void TrimLeft(const Char_T_ *str, Number_T_ &offset, const Number_T_ end_offset) noexcept {

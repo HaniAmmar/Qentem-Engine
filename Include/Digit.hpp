@@ -813,11 +813,15 @@ struct Digit {
                     stream += DigitUtils::DigitChars::NegativeChar;
                 }
 
-                stream.Write(DigitUtils::DigitStrings<Char_T_, size>::InfinityString,
-                             StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T_, size>::InfinityString));
+                // stream.Write(DigitUtils::DigitStrings<Char_T_, size>::InfinityString,
+                //              StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T_, size>::InfinityString));
+
+                stream.Write(DigitUtils::DigitStrings<Char_T_, size>::InfinityString, SizeT{3});
             } else {
-                stream.Write(DigitUtils::DigitStrings<Char_T_, size>::NANString,
-                             StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T_, size>::NANString));
+                // stream.Write(DigitUtils::DigitStrings<Char_T_, size>::NANString,
+                //              StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T_, size>::NANString));
+
+                stream.Write(DigitUtils::DigitStrings<Char_T_, size>::NANString, SizeT{3});
             }
         }
     }
