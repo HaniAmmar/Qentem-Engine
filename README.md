@@ -52,7 +52,8 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
 
 ## Requirements
 
-C++ 17+ compiler.
+-   C++ 17+ compiler.
+-   C++ 11/14 (replace `if constexpr` with `if`).
 
 ## Documentation
 
