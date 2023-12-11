@@ -236,18 +236,23 @@ union QNumber16 {
     Number_T_      Real; // float16 or whatever.
 };
 //*********************************************
-template <typename Number_T_>
-static constexpr auto QNumberAuto(Number_T_ number) {
-    constexpr SizeT32 size = sizeof(Number_T_);
+template <typename Number_T_, SizeT32>
+struct QNumberAutoTypeT {};
 
-    if constexpr (size == 4U) {
-        return QNumber32{number};
-    } else if constexpr (size == 2U) {
-        return QNumber16<Number_T_>{number};
-    } else {
-        return QNumber64{number};
-    }
-}
+template <typename Number_T_>
+struct QNumberAutoTypeT<Number_T_, 2U> {
+    using QNumberType_T = QNumber16<Number_T_>;
+};
+
+template <typename Number_T_>
+struct QNumberAutoTypeT<Number_T_, 4U> {
+    using QNumberType_T = QNumber32;
+};
+
+template <typename Number_T_>
+struct QNumberAutoTypeT<Number_T_, 8U> {
+    using QNumberType_T = QNumber64;
+};
 
 } // namespace Qentem
 
