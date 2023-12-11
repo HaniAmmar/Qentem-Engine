@@ -192,7 +192,7 @@ struct SIMD {
         return 0;
     }
 
-    static constexpr void Store(const VAR_T *left, const VAR_T &right) noexcept {
+    static void Store(const VAR_T *left, const VAR_T &right) noexcept {
         (void)left;
         (void)right;
     }
