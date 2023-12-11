@@ -681,7 +681,7 @@ static void TestEngine5(TestHelper &helper) {
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{13}, content_len);
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
-    ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{500}, content_len);
+    ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{255}, content_len);
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "( (())";
@@ -762,7 +762,7 @@ static void TestEngine5(TestHelper &helper) {
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{16}, content_len);
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
-    ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{500}, content_len);
+    ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{255}, content_len);
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 
     content     = "(()";

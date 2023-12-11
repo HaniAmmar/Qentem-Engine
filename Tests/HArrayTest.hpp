@@ -405,7 +405,7 @@ static void TestHArray4(TestHelper &helper) {
     helper.NotEqual(val, nullptr, "GetValue(index)", "null", __LINE__);
     helper.Equal(*val, 1000U, "9", __LINE__);
 
-    val = numbers1.GetValue(SizeT{65530});
+    val = numbers1.GetValue(SizeT{255});
     helper.Equal(val, nullptr, "GetValue(index)", "null", __LINE__);
 
     numbers1 = numbers3; // Restore
