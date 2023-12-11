@@ -26,6 +26,8 @@
 namespace Qentem {
 
 using NullType = decltype(nullptr);
+using SizeT8   = unsigned char;
+using SizeT16  = unsigned short;
 using SizeT32  = unsigned int;
 using SizeT64  = unsigned long long;
 using SizeT64I = long long;
@@ -233,9 +235,38 @@ union QNumber16 {
     short          Integer;
     Number_T_      Real; // float16 or whatever.
 };
+
+template <typename Number_T_>
+union QNumber8 {
+    QNumber8() noexcept                            = default;
+    QNumber8(QNumber8 &&) noexcept                 = default;
+    QNumber8(const QNumber8 &) noexcept            = default;
+    QNumber8 &operator=(QNumber8 &&) noexcept      = default;
+    QNumber8 &operator=(const QNumber8 &) noexcept = default;
+    ~QNumber8() noexcept                           = default;
+
+    explicit QNumber8(Number_T_ num) noexcept {
+        if constexpr (IsFloat<Number_T_>()) {
+            Real = Number_T_(num);
+        } else if constexpr (IsUnsigned<Number_T_>()) {
+            Natural = (unsigned short)(num);
+        } else {
+            Integer = short(num);
+        }
+    }
+
+    unsigned short Natural{0};
+    short          Integer;
+    Number_T_      Real; // float8?
+};
 //*********************************************
 template <typename Number_T_, SizeT32>
 struct QNumberAutoTypeT {};
+
+template <typename Number_T_>
+struct QNumberAutoTypeT<Number_T_, 1U> {
+    using QNumberType_T = QNumber8<Number_T_>;
+};
 
 template <typename Number_T_>
 struct QNumberAutoTypeT<Number_T_, 2U> {
