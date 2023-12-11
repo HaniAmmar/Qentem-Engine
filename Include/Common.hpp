@@ -147,8 +147,13 @@ struct SystemIntTypeT<4U> {
 
 using SystemIntType = typename SystemIntTypeT<Config::PointerSize>::NumberType_;
 
-enum class QNumberType : unsigned char { NotANumber = 0, Real = 1, Natural = 2, Integer = 3 };
-
+enum class QNumberType : unsigned char {
+    NotANumber = 0,
+    Real       = 1, // double
+    Natural    = 2, // unsigned
+    Integer    = 3  // signed
+};
+//*********************************************
 template <typename Type_>
 static constexpr bool IsFloat() {
     return (Type_(0.5) != 0);
@@ -158,7 +163,7 @@ template <typename Type_>
 static constexpr bool IsUnsigned() {
     return (Type_(-1) > 0);
 }
-
+//*********************************************
 union QNumber64 {
     QNumber64() noexcept                             = default;
     QNumber64(QNumber64 &&) noexcept                 = default;
@@ -230,7 +235,7 @@ union QNumber16 {
     short          Integer;
     Number_T_      Real; // float16 or whatever.
 };
-
+//*********************************************
 template <typename Number_T_>
 static constexpr auto QNumberAuto(Number_T_ number) {
     constexpr SizeT32 size = sizeof(Number_T_);
@@ -238,7 +243,7 @@ static constexpr auto QNumberAuto(Number_T_ number) {
     if constexpr (size == 4U) {
         return QNumber32{number};
     } else if constexpr (size == 2U) {
-        return QNumber16{number};
+        return QNumber16<Number_T_>{number};
     } else {
         return QNumber64{number};
     }
