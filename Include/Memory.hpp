@@ -25,7 +25,8 @@
 #ifndef QENTEM_MEMORY_H_
 #define QENTEM_MEMORY_H_
 
-namespace Qentem::Memory {
+namespace Qentem {
+namespace Memory {
 
 // size = the number of bytes
 template <SizeT32 Width_T_, typename Number_T_>
@@ -268,6 +269,7 @@ inline static void Dispose(Type_T_ *item, const Type_T_ *end) noexcept {
     }
 }
 
-} // namespace Qentem::Memory
+} // namespace Memory
+} // namespace Qentem
 
 #endif

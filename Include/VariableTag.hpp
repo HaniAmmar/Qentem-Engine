@@ -26,7 +26,8 @@
 #ifndef QENTEM_VARIABLE_TAG_H_
 #define QENTEM_VARIABLE_TAG_H_
 
-namespace Qentem::Tags {
+namespace Qentem {
+namespace Tags {
 
 struct VariableTag {
     SizeT          Offset;
@@ -35,5 +36,7 @@ struct VariableTag {
     unsigned char  IsLoopValue;
 };
 
-} // namespace Qentem::Tags
+} // namespace Tags
+} // namespace Qentem
+
 #endif

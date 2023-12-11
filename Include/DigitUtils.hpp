@@ -25,7 +25,8 @@
 #ifndef QENTEM_DIGIT_UTILS_H_
 #define QENTEM_DIGIT_UTILS_H_
 
-namespace Qentem::DigitUtils {
+namespace Qentem {
+namespace DigitUtils {
 
 template <typename, SizeT32>
 struct DigitStrings {};
@@ -260,6 +261,7 @@ struct RealNumberInfo<bfloat16_t, 2U> {
 };
 #endif
 
-} // namespace Qentem::DigitUtils
+} // namespace DigitUtils
+} // namespace Qentem
 
 #endif

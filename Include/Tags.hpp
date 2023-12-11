@@ -27,7 +27,8 @@
 #ifndef QENTEM_TAGS_H_
 #define QENTEM_TAGS_H_
 
-namespace Qentem::Tags {
+namespace Qentem {
+namespace Tags {
 struct MathTag;
 struct LoopTag;
 struct InLineIfTag;
@@ -429,5 +430,7 @@ struct TPStrings<wchar_t, 2U> {
     static constexpr const wchar_t *HTMLSingleQuote   = L"&apos;";
 };
 
-} // namespace Qentem::Tags
+} // namespace Tags
+} // namespace Qentem
+
 #endif

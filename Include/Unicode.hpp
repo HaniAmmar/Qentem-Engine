@@ -25,7 +25,8 @@
 #ifndef QENTEM_UNICODE_H_
 #define QENTEM_UNICODE_H_
 
-namespace Qentem::Unicode {
+namespace Qentem {
+namespace Unicode {
 
 template <typename, typename, SizeT32>
 struct UnicodeToUTF {};
@@ -87,6 +88,7 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 4U> {
     }
 };
 
-} // namespace Qentem::Unicode
+} // namespace Unicode
+} // namespace Qentem
 
 #endif

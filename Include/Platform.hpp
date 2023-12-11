@@ -33,7 +33,8 @@
 #endif
 #endif
 
-namespace Qentem::Platform {
+namespace Qentem {
+namespace Platform {
 
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
 struct SIMD {
@@ -473,10 +474,10 @@ struct SMIDSetToOne_T<Char_T_, 4U> {
 
 template <typename Char_T_, typename Number_T_>
 inline static constexpr Number_T_ SMIDNextOffset() noexcept {
-    constexpr Number_T_ offset = (Platform::SIMD::Size / sizeof(Char_T_));
-    return offset;
+    return (Platform::SIMD::Size / sizeof(Char_T_));
 }
 
-} // namespace Qentem::Platform
+} // namespace Platform
+} // namespace Qentem
 
 #endif
