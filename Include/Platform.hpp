@@ -187,55 +187,42 @@ struct SIMD {
     static constexpr SizeT32 Shift = 0;
     static constexpr SizeT32 Size  = 0;
 
-    static constexpr VAR_T Load(const VAR_T *pointer) noexcept {
-        (void)pointer;
+    static constexpr VAR_T Load(const VAR_T *) noexcept {
         return 0;
     }
 
-    static void Store(const VAR_T *left, const VAR_T &right) noexcept {
-        (void)left;
-        (void)right;
+    static void Store(const VAR_T *, const VAR_T &) noexcept {
     }
 
     static constexpr VAR_T Zero() noexcept {
         return 0;
     }
 
-    static constexpr VAR_T SetToOne8Bit(char value) noexcept {
-        (void)value;
+    static constexpr VAR_T SetToOne8Bit(char) noexcept {
         return 0;
     }
 
-    static constexpr VAR_T SetToOne16Bit(short value) noexcept {
-        (void)value;
+    static constexpr VAR_T SetToOne16Bit(short) noexcept {
         return 0;
     }
 
-    static constexpr VAR_T SetToOne32Bit(int value) noexcept {
-        (void)value;
+    static constexpr VAR_T SetToOne32Bit(int) noexcept {
         return 0;
     }
 
-    static constexpr VAR_T SetToOne64Bit(SizeT64I value) noexcept {
-        (void)value;
+    static constexpr VAR_T SetToOne64Bit(SizeT64I) noexcept {
         return 0;
     }
 
-    static constexpr Number_T Compare8Bit(const VAR_T &left, const VAR_T &right) noexcept {
-        (void)left;
-        (void)right;
+    static constexpr Number_T Compare8Bit(const VAR_T &, const VAR_T &) noexcept {
         return 0;
     }
 
-    static constexpr Number_T Compare16Bit(const VAR_T &left, const VAR_T &right) noexcept {
-        (void)left;
-        (void)right;
+    static constexpr Number_T Compare16Bit(const VAR_T &, const VAR_T &) noexcept {
         return 0;
     }
 
-    static constexpr Number_T Compare32Bit(const VAR_T &left, const VAR_T &right) noexcept {
-        (void)left;
-        (void)right;
+    static constexpr Number_T Compare32Bit(const VAR_T &, const VAR_T &) noexcept {
         return 0;
     }
 };
