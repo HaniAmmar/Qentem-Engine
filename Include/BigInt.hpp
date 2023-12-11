@@ -360,7 +360,10 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
-        return (AlignSize() - 1U);
+        constexpr SizeT32 size      = (TotalBits() / BitSize());
+        constexpr SizeT32 max_index = (((BitSize() * size) == TotalBits()) ? size : size + SizeT32{1});
+
+        return max_index;
     }
 
     inline static constexpr SizeT32 BitSize() noexcept {
@@ -385,10 +388,6 @@ struct BigInt {
 
     inline bool IsZero() const noexcept {
         return (*this == Number_T_{0});
-    }
-
-    static constexpr SizeT32 AlignSize() noexcept {
-        return ((TotalBits() / BitSize()) + SizeT32(TotalBits() > (1U << Platform::FindLastBitConst(TotalBits()))));
     }
 
     inline void SetIndex(Number_T_ id) noexcept {
