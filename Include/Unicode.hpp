@@ -31,7 +31,7 @@ template <typename, typename, SizeT32>
 struct UnicodeToUTF {};
 
 template <typename Char_T_, typename Stream_T_>
-static constexpr void ToUTF(SizeT32 unicode, Stream_T_ &stream) {
+static void ToUTF(SizeT32 unicode, Stream_T_ &stream) {
     UnicodeToUTF<Char_T_, Stream_T_, sizeof(Char_T_)>::ToUTF(unicode, stream);
 }
 
