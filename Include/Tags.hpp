@@ -52,14 +52,11 @@ struct TagBit {
     TagBit &operator=(TagBit &&)      = delete;
 
     TagBit(TagBit &&tag) noexcept : content_{tag.content_}, type_{tag.type_} {
-        // content_ should equal info_ or bigger,
-        // using 'short' for SizeT will need to uncomment the next lines;
-
-        // if (type_ != TagType::RawText) {
-        //     info_ = tag.info_;
-        // } else {
-        //     content_ = tag.content_;
-        // }
+        if constexpr (sizeof(Content_T_) < sizeof(void *)) {
+            if ((type_ != TagType::RawText)) {
+                info_ = tag.info_;
+            }
+        }
 
         tag.type_ = TagType::None;
     }
@@ -154,14 +151,14 @@ struct TagBit {
     }
 
   private:
-    struct Content_ {
+    struct Content_T_ {
         SizeT offset;
         SizeT length;
     };
 
     union {
-        void    *info_;
-        Content_ content_{0, 0};
+        void      *info_;
+        Content_T_ content_{0, 0};
     };
 
     TagType type_{TagType::None};
