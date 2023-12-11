@@ -232,10 +232,8 @@ struct BigInt {
         big_int_[index_id_] /= divisor;
 
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
-            static constexpr SizeT32 max_index = (BitSize() - 1U);
-
             if constexpr (BitSize() == 64U) {
-                return (max_index - Platform::FindLastBit(divisor));
+                return ((BitSize() - 1U) - Platform::FindLastBit(divisor));
             } else {
                 return 0U;
             }
@@ -243,12 +241,7 @@ struct BigInt {
 
         while (index != Number_T_{0}) {
             --index;
-
-            if constexpr (BitSize() == 64U) {
-                DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor, initial_shift);
-            } else {
-                DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor);
-            }
+            DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor, initial_shift);
         }
 
         index_id_ -= ((index_id_ > Number_T_{0}) && (big_int_[index_id_] == Number_T_{0}));
@@ -456,7 +449,10 @@ template <typename Number_T_>
 struct DoubleSize<Number_T_, 8U> {
     static constexpr SizeT32 shift = 8U;
 
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+                              const SizeT32 initial_shift) noexcept {
+        (void)initial_shift;
+
         unsigned short dividend16 = dividend_high;
         dividend16 <<= shift;
         dividend16 |= dividend_low;
@@ -478,7 +474,10 @@ template <typename Number_T_>
 struct DoubleSize<Number_T_, 16U> {
     static constexpr SizeT32 shift = 16U;
 
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+                              const SizeT32 initial_shift) noexcept {
+        (void)initial_shift;
+
         SizeT32 dividend32 = dividend_high;
         dividend32 <<= shift;
         dividend32 |= dividend_low;
@@ -500,7 +499,10 @@ template <typename Number_T_>
 struct DoubleSize<Number_T_, 32U> {
     static constexpr SizeT32 shift = 32U;
 
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor) noexcept {
+    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+                              const SizeT32 initial_shift) noexcept {
+        (void)initial_shift;
+
         SizeT64 dividend64 = dividend_high;
         dividend64 <<= shift;
         dividend64 |= dividend_low;
