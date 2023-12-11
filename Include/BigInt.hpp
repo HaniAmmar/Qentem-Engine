@@ -167,7 +167,8 @@ struct BigInt {
         multiOperation<BigIntOperation::Add>(number);
     }
 
-    inline void operator-=(const Number_T_ number) noexcept {
+    template <typename N_Number_T_>
+    inline void operator-=(const N_Number_T_ number) noexcept {
         multiOperation<BigIntOperation::Subtract>(number);
     }
 
@@ -398,17 +399,17 @@ struct BigInt {
         constexpr SizeT32 n_size = ((sizeof(N_Number_T_) * 8U) / BitSize());
 
         if constexpr (n_size > 1U) {
-            if constexpr (Operation == BigIntOperation::Add) {
-                Add(Number_T_(number));
-            } else if constexpr (Operation == BigIntOperation::Subtract) {
-                Subtract(Number_T_(number));
-            } else if constexpr (Operation == BigIntOperation::Or) {
-                big_int_[0U] |= Number_T_(number);
-            } else if constexpr (Operation == BigIntOperation::And) {
-                big_int_[0U] &= Number_T_(number);
-            } else {
-                big_int_[0U] = Number_T_(number);
-            }
+        if constexpr (Operation == BigIntOperation::Add) {
+            Add(Number_T_(number));
+        } else if constexpr (Operation == BigIntOperation::Subtract) {
+            Subtract(Number_T_(number));
+        } else if constexpr (Operation == BigIntOperation::Or) {
+            big_int_[0U] |= Number_T_(number);
+        } else if constexpr (Operation == BigIntOperation::And) {
+            big_int_[0U] &= Number_T_(number);
+        } else {
+            big_int_[0U] = Number_T_(number);
+        }
 
             number >>= BitSize();
 
