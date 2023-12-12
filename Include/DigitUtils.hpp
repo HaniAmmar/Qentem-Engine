@@ -101,105 +101,141 @@ struct DigitLimit {};
 // uint16_t
 template <>
 struct DigitLimit<2U> {
-    static constexpr SizeT32 MaxShift           = 16U;
-    static constexpr SizeT32 MaxPowerOfFive     = 6U;
-    static constexpr SizeT32 MaxPowerOfTen      = 4U;
-    static constexpr SizeT32 MaxPowerOfTenValue = 10000U;
+    static constexpr const SizeT32 MaxShift           = 16U;
+    static constexpr const SizeT32 MaxPowerOfFive     = 6U;
+    static constexpr const SizeT32 MaxPowerOfTen      = 4U;
+    static constexpr const SizeT32 MaxPowerOfTenValue = 10000U;
 
-    static constexpr unsigned short PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
+    static unsigned short GetPowerOfFive(SizeT32 index) noexcept {
+        static const unsigned short PowerOfFive[] = {1U, 5U, 25U, 125U, 625U, 3125U, 15625U};
 
-    static constexpr unsigned int PowerOfOneOverFive[] = {
+        return PowerOfFive[index];
+    }
 
-        // 2^N/5
-        1U,     52429U, 41944U, 33555U,
-        53688U, 42950U, 34360U
+    static unsigned short GetPowerOfOneOverFive(SizeT32 index) noexcept {
+        static const unsigned short PowerOfOneOverFive[] = {
 
-    };
+            // 2^N/5
+            1U,     52429U, 41944U, 33555U,
+            53688U, 42950U, 34360U
 
-    static constexpr unsigned int PowerOfOneOverFiveShift[] = {
+        };
 
-        // 2^N/5
-        0U, 2U,  4U, 6U,
-        9U, 11U, 13U
+        return PowerOfOneOverFive[index];
+    }
 
-    };
+    static unsigned short GetPowerOfOneOverFiveShift(SizeT32 index) noexcept {
+        static const unsigned short PowerOfOneOverFiveShift[] = {
+
+            // 2^N/5
+            0U, 2U,  4U, 6U,
+            9U, 11U, 13U
+
+        };
+
+        return PowerOfOneOverFiveShift[index];
+    }
 };
 
 // uint32_t
 template <>
 struct DigitLimit<4U> {
-    static constexpr SizeT32 MaxShift           = 32U;
-    static constexpr SizeT32 MaxPowerOfFive     = 13U;
-    static constexpr SizeT32 MaxPowerOfTen      = 9U;
-    static constexpr SizeT32 MaxPowerOfTenValue = 1000000000U;
+    static constexpr const SizeT32 MaxShift           = 32U;
+    static constexpr const SizeT32 MaxPowerOfFive     = 13U;
+    static constexpr const SizeT32 MaxPowerOfTen      = 9U;
+    static constexpr const SizeT32 MaxPowerOfTenValue = 1000000000U;
 
-    static constexpr SizeT32 PowerOfFive[] = {
-        // clang-format off
-        1U,       5U,        25U,        125U,       625U,
-        3125U,    15625U,    78125U,     390625U,    1953125U,
-        9765625U, 48828125U, 244140625U, 1220703125U
-        // clang-format on
-    };
+    static SizeT32 GetPowerOfFive(SizeT32 index) noexcept {
+        static const SizeT32 PowerOfFive[] = {
+            // clang-format off
+            1U,       5U,        25U,        125U,       625U,
+            3125U,    15625U,    78125U,     390625U,    1953125U,
+            9765625U, 48828125U, 244140625U, 1220703125U
+            // clang-format on
+        };
 
-    static constexpr unsigned int PowerOfOneOverFive[] = {
-        // 2^N/5
+        return PowerOfFive[index];
+    }
 
-        1U,          3435973837U, 2748779070U, 2199023256U, 3518437209U, 2814749768U, 2251799814U, 3602879702U,
-        2882303762U, 2305843010U, 3689348815U, 2951479052U, 2361183242U, 3777893187U
+    static SizeT32 GetPowerOfOneOverFive(SizeT32 index) noexcept {
+        static const SizeT32 PowerOfOneOverFive[] = {
+            // 2^N/5
+            // clang-format off
+            1U,          3435973837U, 2748779070U, 2199023256U, 3518437209U, 2814749768U, 2251799814U, 3602879702U,
+            2882303762U, 2305843010U, 3689348815U, 2951479052U, 2361183242U, 3777893187U
+            // clang-format on
+        };
 
-    };
+        return PowerOfOneOverFive[index];
+    }
 
-    static constexpr unsigned int PowerOfOneOverFiveShift[] = {
+    static SizeT32 GetPowerOfOneOverFiveShift(SizeT32 index) noexcept {
+        static const SizeT32 PowerOfOneOverFiveShift[] = {
+            // 2^N/5
+            // clang-format off
+            0U,  2U,  4U,  6U,  9U,  11U, 13U, 16U,
+            18U, 20U, 23U, 25U, 27U, 30U
+            // clang-format on
+        };
 
-        // 2^N/5
-        0U,  2U,  4U,  6U,  9U,  11U, 13U, 16U,
-        18U, 20U, 23U, 25U, 27U, 30U
-
-    };
+        return PowerOfOneOverFiveShift[index];
+    }
 };
 
 // uint64_t
 template <>
 struct DigitLimit<8U> {
-    static constexpr SizeT32 MaxShift           = 64U;
-    static constexpr SizeT32 MaxPowerOfFive     = 27U;
-    static constexpr SizeT32 MaxPowerOfTen      = 19U;
-    static constexpr SizeT64 MaxPowerOfTenValue = 10000000000000000000ULL;
+    static constexpr const SizeT32 MaxShift           = 64U;
+    static constexpr const SizeT32 MaxPowerOfFive     = 27U;
+    static constexpr const SizeT32 MaxPowerOfTen      = 19U;
+    static constexpr const SizeT64 MaxPowerOfTenValue = 10000000000000000000ULL;
 
-    static constexpr SizeT64 PowerOfFive[] = {
-        // clang-format off
-        1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
-        9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
-        152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
-        476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
-        298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
-        // clang-format on
-    };
+    static SizeT64 GetPowerOfFive(SizeT32 index) noexcept {
+        static const SizeT64 PowerOfFive[] = {
+            // clang-format off
+            1ULL,5ULL,25ULL,125ULL,625ULL,3125ULL,15625ULL,78125ULL,390625ULL,1953125ULL,
+            9765625ULL,48828125ULL,244140625ULL,1220703125ULL,6103515625ULL,30517578125ULL,
+            152587890625ULL,762939453125ULL,3814697265625ULL,19073486328125ULL,95367431640625ULL,
+            476837158203125ULL,2384185791015625ULL,11920928955078125ULL,59604644775390625ULL,
+            298023223876953125ULL,1490116119384765625ULL,7450580596923828125ULL
+            // clang-format on
+        };
 
-    static constexpr SizeT64 PowerOfOneOverFive[] = {
-        // 2^N/5
-        // clang-format off
-        1ULL,
-        14757395258967641293ULL, 11805916207174113035ULL, 9444732965739290428ULL,
-        15111572745182864684ULL, 12089258196146291748ULL, 9671406556917033398ULL,
-        15474250491067253437ULL, 12379400392853802749ULL, 9903520314283042200ULL,
-        15845632502852867519ULL, 12676506002282294015ULL, 10141204801825835212ULL,
-        16225927682921336340ULL, 12980742146337069072ULL, 10384593717069655258ULL,
-        16615349947311448412ULL, 13292279957849158730ULL, 10633823966279326984ULL,
-        17014118346046923174ULL, 13611294676837538539ULL, 10889035741470030831ULL,
-        17422457186352049330ULL, 13937965749081639464ULL, 11150372599265311571ULL,
-        17840596158824498514ULL, 14272476927059598811ULL, 11417981541647679048ULL
-        // clang-format on
-    };
+        return PowerOfFive[index];
+    }
 
-    static constexpr SizeT32 PowerOfOneOverFiveShift[] = {
-        // 2^N/5
-        // clang-format off
-        0U,  2U,  4U,  6U,  9U,  11U, 13U, 16U, 18U, 20U,
-        23U, 25U, 27U, 30U, 32U, 34U, 37U, 39U, 41U, 44U,
-        46U, 48U, 51U, 53U, 55U, 58U, 60U, 62U
-        // clang-format on
-    };
+    static SizeT64 GetPowerOfOneOverFive(SizeT32 index) noexcept {
+        static const SizeT64 PowerOfOneOverFive[] = {
+            // 2^N/5
+            // clang-format off
+            1ULL,
+            14757395258967641293ULL, 11805916207174113035ULL, 9444732965739290428ULL,
+            15111572745182864684ULL, 12089258196146291748ULL, 9671406556917033398ULL,
+            15474250491067253437ULL, 12379400392853802749ULL, 9903520314283042200ULL,
+            15845632502852867519ULL, 12676506002282294015ULL, 10141204801825835212ULL,
+            16225927682921336340ULL, 12980742146337069072ULL, 10384593717069655258ULL,
+            16615349947311448412ULL, 13292279957849158730ULL, 10633823966279326984ULL,
+            17014118346046923174ULL, 13611294676837538539ULL, 10889035741470030831ULL,
+            17422457186352049330ULL, 13937965749081639464ULL, 11150372599265311571ULL,
+            17840596158824498514ULL, 14272476927059598811ULL, 11417981541647679048ULL
+            // clang-format on
+        };
+
+        return PowerOfOneOverFive[index];
+    }
+
+    static SizeT32 GetPowerOfOneOverFiveShift(SizeT32 index) noexcept {
+        static const SizeT32 PowerOfOneOverFiveShift[] = {
+            // 2^N/5
+            // clang-format off
+            0U,  2U,  4U,  6U,  9U,  11U, 13U, 16U, 18U, 20U,
+            23U, 25U, 27U, 30U, 32U, 34U, 37U, 39U, 41U, 44U,
+            46U, 48U, 51U, 53U, 55U, 58U, 60U, 62U
+            // clang-format on
+        };
+
+        return PowerOfOneOverFiveShift[index];
+    }
 };
 ///////////////////////////////////////////////////
 template <typename, SizeT32>
@@ -208,41 +244,41 @@ struct RealNumberInfo {};
 // double
 template <>
 struct RealNumberInfo<double, 8U> {
-    static constexpr SizeT32 Bias         = 1023U;
-    static constexpr SizeT32 ExponentSize = 11U;
-    static constexpr SizeT32 MantissaSize = 52U;
-    static constexpr SizeT64 SignMask     = 0x8000000000000000ULL;
-    static constexpr SizeT64 ExponentMask = 0x7FF0000000000000ULL;
-    static constexpr SizeT64 MantissaMask = 0xFFFFFFFFFFFFFULL;
-    static constexpr SizeT64 LeadingBit   = 0x10000000000000ULL;
-    static constexpr SizeT32 MaxCut       = 300U;
+    static constexpr const SizeT32 Bias         = 1023U;
+    static constexpr const SizeT32 ExponentSize = 11U;
+    static constexpr const SizeT32 MantissaSize = 52U;
+    static constexpr const SizeT64 SignMask     = 0x8000000000000000ULL;
+    static constexpr const SizeT64 ExponentMask = 0x7FF0000000000000ULL;
+    static constexpr const SizeT64 MantissaMask = 0xFFFFFFFFFFFFFULL;
+    static constexpr const SizeT64 LeadingBit   = 0x10000000000000ULL;
+    static constexpr const SizeT32 MaxCut       = 300U;
 };
 
 // float32
 template <>
 struct RealNumberInfo<float, 4U> {
-    static constexpr SizeT32 Bias         = 127U;
-    static constexpr SizeT32 ExponentSize = 8U;
-    static constexpr SizeT32 MantissaSize = 23U;
-    static constexpr SizeT32 SignMask     = 0x80000000U;
-    static constexpr SizeT32 ExponentMask = 0x7F800000U;
-    static constexpr SizeT32 MantissaMask = 0x7FFFFFU;
-    static constexpr SizeT32 LeadingBit   = 0x800000U;
-    static constexpr SizeT32 MaxCut       = 30U;
+    static constexpr const SizeT32 Bias         = 127U;
+    static constexpr const SizeT32 ExponentSize = 8U;
+    static constexpr const SizeT32 MantissaSize = 23U;
+    static constexpr const SizeT32 SignMask     = 0x80000000U;
+    static constexpr const SizeT32 ExponentMask = 0x7F800000U;
+    static constexpr const SizeT32 MantissaMask = 0x7FFFFFU;
+    static constexpr const SizeT32 LeadingBit   = 0x800000U;
+    static constexpr const SizeT32 MaxCut       = 30U;
 };
 
 #if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
 // float16_t, _Float16
 template <>
 struct RealNumberInfo<float16_t, 2U> {
-    static constexpr SizeT32        Bias         = 15U;
-    static constexpr SizeT32        ExponentSize = 5U;
-    static constexpr SizeT32        MantissaSize = 10U;
-    static constexpr unsigned short SignMask     = 0x8000U;
-    static constexpr unsigned short ExponentMask = 0x7C00U;
-    static constexpr unsigned short MantissaMask = 0x3FFU;
-    static constexpr unsigned short LeadingBit   = 0x400U;
-    static constexpr SizeT32        MaxCut       = 0U;
+    static constexpr const SizeT32        Bias         = 15U;
+    static constexpr const SizeT32        ExponentSize = 5U;
+    static constexpr const SizeT32        MantissaSize = 10U;
+    static constexpr const unsigned short SignMask     = 0x8000U;
+    static constexpr const unsigned short ExponentMask = 0x7C00U;
+    static constexpr const unsigned short MantissaMask = 0x3FFU;
+    static constexpr const unsigned short LeadingBit   = 0x400U;
+    static constexpr const SizeT32        MaxCut       = 0U;
 };
 #endif
 
@@ -250,14 +286,14 @@ struct RealNumberInfo<float16_t, 2U> {
 // // bfloat16_t
 template <>
 struct RealNumberInfo<bfloat16_t, 2U> {
-    static constexpr SizeT32        Bias         = 127U;
-    static constexpr SizeT32        ExponentSize = 8U;
-    static constexpr SizeT32        MantissaSize = 7U;
-    static constexpr unsigned short SignMask     = 0x8000U;
-    static constexpr unsigned short ExponentMask = 0x7F80U;
-    static constexpr unsigned short MantissaMask = 0x7FU;
-    static constexpr unsigned short LeadingBit   = 0x80U;
-    static constexpr SizeT32        MaxCut       = 0U;
+    static constexpr const SizeT32        Bias         = 127U;
+    static constexpr const SizeT32        ExponentSize = 8U;
+    static constexpr const SizeT32        MantissaSize = 7U;
+    static constexpr const unsigned short SignMask     = 0x8000U;
+    static constexpr const unsigned short ExponentMask = 0x7F80U;
+    static constexpr const unsigned short MantissaMask = 0x7FU;
+    static constexpr const unsigned short LeadingBit   = 0x80U;
+    static constexpr const SizeT32        MaxCut       = 0U;
 };
 #endif
 

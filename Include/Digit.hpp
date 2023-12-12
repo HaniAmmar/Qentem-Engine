@@ -491,28 +491,28 @@ struct Digit {
                 // 2**126 / 5**27 = 11417981541647679048.4
                 // 126-64=62; See 2**126 and 64 shift
 
-                bint *= DigitLimit::PowerOfOneOverFive[DigitLimit::MaxPowerOfFive];
+                bint *= DigitLimit::GetPowerOfOneOverFive(DigitLimit::MaxPowerOfFive);
                 bint >>= DigitLimit::MaxShift;
-                shifted += DigitLimit::PowerOfOneOverFiveShift[DigitLimit::MaxPowerOfFive];
+                shifted += DigitLimit::GetPowerOfOneOverFiveShift(DigitLimit::MaxPowerOfFive);
                 exponent -= DigitLimit::MaxPowerOfFive;
             }
 
             if (exponent != SizeT32{0}) {
-                bint *= DigitLimit::PowerOfOneOverFive[exponent];
+                bint *= DigitLimit::GetPowerOfOneOverFive(exponent);
                 bint >>= DigitLimit::MaxShift;
-                shifted += DigitLimit::PowerOfOneOverFiveShift[exponent];
+                shifted += DigitLimit::GetPowerOfOneOverFiveShift(exponent);
             }
         } else {
             while (exponent >= DigitLimit::MaxPowerOfFive) {
                 bint <<= DigitLimit::MaxShift;
-                bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+                bint /= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
                 shifted += DigitLimit::MaxShift;
                 exponent -= DigitLimit::MaxPowerOfFive;
             }
 
             if (exponent != SizeT32{0}) {
                 bint <<= DigitLimit::MaxShift;
-                bint /= DigitLimit::PowerOfFive[exponent];
+                bint /= DigitLimit::GetPowerOfFive(exponent);
                 shifted += DigitLimit::MaxShift;
             }
         }
@@ -570,7 +570,7 @@ struct Digit {
         shifted += exponent;
 
         while (exponent >= DigitLimit::MaxPowerOfFive) {
-            bint *= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+            bint *= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
 
             if (bint.Index() > bint_limit) {
                 bint >>= DigitLimit::MaxShift;
@@ -581,7 +581,7 @@ struct Digit {
         }
 
         if (exponent != SizeT32{0}) {
-            bint *= DigitLimit::PowerOfFive[exponent];
+            bint *= DigitLimit::GetPowerOfFive(exponent);
         }
         //////////////////////////////////////////////////////////////
         const SizeT32 bit = bint.FindLastBit();
@@ -780,7 +780,7 @@ struct Digit {
                                                       : bint.MaxIndex();
 
                         do {
-                            bint *= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+                            bint *= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
 
                             if ((bint.Index() >= max_index) && (shift >= DigitLimit::MaxShift)) {
                                 bint >>= DigitLimit::MaxShift;
@@ -792,7 +792,7 @@ struct Digit {
                     }
 
                     if (times != SizeT32{0}) {
-                        bint *= DigitLimit::PowerOfFive[times];
+                        bint *= DigitLimit::GetPowerOfFive(times);
                     }
 
                     bint >>= shift;
@@ -870,12 +870,12 @@ struct Digit {
         using DigitLimit = DigitUtils::DigitLimit<BigInt_T_::SizeOfType()>;
 
         while (drop >= DigitLimit::MaxPowerOfFive) {
-            bint /= DigitLimit::PowerOfFive[DigitLimit::MaxPowerOfFive];
+            bint /= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
             drop -= DigitLimit::MaxPowerOfFive;
         }
 
         if (drop != 0U) {
-            bint /= DigitLimit::PowerOfFive[drop];
+            bint /= DigitLimit::GetPowerOfFive(drop);
         }
     }
 
