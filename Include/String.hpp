@@ -535,6 +535,14 @@ class String {
         return !(IsEmpty());
     }
 
+    inline unsigned char GetHighByte() const noexcept {
+        return data_.Storage.GetHighByte();
+    }
+
+    inline void SetHighByte(unsigned char byte) noexcept {
+        data_.Storage.SetHighByte(byte);
+    }
+
     // For STL
     inline const Char_T_ *begin() const noexcept {
         return First();
