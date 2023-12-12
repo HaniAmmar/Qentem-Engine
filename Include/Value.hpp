@@ -1407,7 +1407,7 @@ class Value {
     }
 
     template <typename StringStream_T_>
-    bool CopyStringValueTo(StringStream_T_ &stream, SizeT32 precision = Config::DoublePrecision) const {
+    bool CopyValueTo(StringStream_T_ &stream, SizeT32 precision = Config::DoublePrecision) const {
         switch (Type()) {
             case ValueType::String: {
                 stream.Write(data_.VString.First(), data_.VString.Length());

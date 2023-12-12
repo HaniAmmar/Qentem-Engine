@@ -126,7 +126,7 @@ static void TestTrueValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "true", "str_var", __LINE__);
-    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.EqualsTrue(value1.CopyValueTo(ss_var), "CopyValueTo()", __LINE__);
     helper.Equal(ss_var, "true", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 1.0, "GetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
@@ -195,7 +195,7 @@ static void TestFalseValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "false", "str_var", __LINE__);
-    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.EqualsTrue(value1.CopyValueTo(ss_var), "CopyValueTo()", __LINE__);
     helper.Equal(ss_var, "false", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
@@ -264,7 +264,7 @@ static void TestNullValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "null", "str_var", __LINE__);
-    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.EqualsTrue(value1.CopyValueTo(ss_var), "CopyValueTo()", __LINE__);
     helper.Equal(ss_var, "null", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, "Natural", __LINE__);
@@ -331,7 +331,7 @@ static void TestNumberValue1(TestHelper &helper) {
     helper.Equal(value1.Length(), 0U, "Length()", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "33", "str_var", __LINE__);
-    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.EqualsTrue(value1.CopyValueTo(ss_var), "CopyValueTo()", __LINE__);
     helper.Equal(ss_var, "33", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, "GetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, "Integer", __LINE__);
@@ -764,7 +764,7 @@ static void TestStringValue(TestHelper &helper) {
     helper.Equal(value1.Length(), 34U, "Length()", __LINE__);
     helper.EqualsTrue(value1.SetString(str_var), "SetString()", __LINE__);
     helper.Equal(str_var, "-ABCDEF0123456789ABCDEF0123456789-", "str_var", __LINE__);
-    helper.EqualsTrue(value1.CopyStringValueTo(ss_var), "CopyStringValueTo()", __LINE__);
+    helper.EqualsTrue(value1.CopyValueTo(ss_var), "CopyValueTo()", __LINE__);
     helper.Equal(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", "ss_var", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, "GetNumber()", __LINE__);
     helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, "NotANumber", __LINE__);

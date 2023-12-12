@@ -683,7 +683,7 @@ struct TemplateSub {
                 }
             }
 
-            if (value->CopyStringValueTo(*stream_, Config::TemplatePrecision)) {
+            if (value->CopyValueTo(*stream_, Config::TemplatePrecision)) {
                 return;
             }
 
@@ -706,7 +706,7 @@ struct TemplateSub {
         const VariableTag &i_tag = *((const VariableTag *)(tag->GetInfo()));
         const Value_T_    *value = getValue(i_tag);
 
-        if ((value == nullptr) || !(value->CopyStringValueTo(*stream_, Config::TemplatePrecision))) {
+        if ((value == nullptr) || !(value->CopyValueTo(*stream_, Config::TemplatePrecision))) {
             stream_->Write(((content_ + i_tag.Offset) - TagPatterns::RawVariablePrefixLength),
                            (i_tag.Length + TagPatterns::RawVariableFullLength));
         }
