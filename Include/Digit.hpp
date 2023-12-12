@@ -69,17 +69,19 @@ struct Digit {
         constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000U) + 1U);
         Char_T_           storage[max_number_of_digits];
 
+        QNumberType_T qn = QNumberType_T{number};
+
         if QENTEM_CONSTEXPR (!IsUnsigned<Number_T_>()) {
             if (number < Number_T_{0}) {
-                number = -number;
+                qn.Integer = -qn.Integer;
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
         }
 
         if QENTEM_CONSTEXPR (Reverse_V_) {
-            stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), QNumberType_T{number}.Natural));
+            stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), qn.Natural));
         } else {
-            const SizeT offset = intToString(&(storage[max_number_of_digits]), QNumberType_T{number}.Natural);
+            const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
             stream.Write(&(storage[max_number_of_digits - offset]), offset);
         }
     }
