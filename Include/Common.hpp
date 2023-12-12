@@ -236,7 +236,6 @@ union QNumber16 {
     Number_T_      Real; // float16 or whatever.
 };
 
-template <typename Number_T_>
 union QNumber8 {
     QNumber8() noexcept                            = default;
     QNumber8(QNumber8 &&) noexcept                 = default;
@@ -245,19 +244,17 @@ union QNumber8 {
     QNumber8 &operator=(const QNumber8 &) noexcept = default;
     ~QNumber8() noexcept                           = default;
 
+    template <typename Number_T_>
     explicit QNumber8(Number_T_ num) noexcept {
-        if constexpr (IsFloat<Number_T_>()) {
-            Real = Number_T_(num);
-        } else if constexpr (IsUnsigned<Number_T_>()) {
-            Natural = (unsigned short)(num);
+        if constexpr (IsUnsigned<Number_T_>()) {
+            Natural = (unsigned char)(num);
         } else {
-            Integer = short(num);
+            Integer = char(num);
         }
     }
 
-    unsigned short Natural{0};
-    short          Integer;
-    Number_T_      Real; // float8?
+    unsigned char Natural{0};
+    char          Integer;
 };
 //*********************************************
 template <typename Number_T_, SizeT32>
@@ -265,7 +262,7 @@ struct QNumberAutoTypeT {};
 
 template <typename Number_T_>
 struct QNumberAutoTypeT<Number_T_, 1U> {
-    using QNumberType_T = QNumber8<Number_T_>;
+    using QNumberType_T = QNumber8;
 };
 
 template <typename Number_T_>
