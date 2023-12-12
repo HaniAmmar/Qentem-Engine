@@ -32,10 +32,10 @@ using SizeT32  = unsigned int;
 using SizeT64  = unsigned long long;
 using SizeT64I = long long;
 
-#if __cplusplus > 201402L
-#define QENTEM_CONSTEXPR constexpr
-#else
+#if __cplusplus < 201703L
 #define QENTEM_CONSTEXPR
+#else
+#define QENTEM_CONSTEXPR constexpr
 #endif
 
 #ifndef QENTEM_SIZE_T
