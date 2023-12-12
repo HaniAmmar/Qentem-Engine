@@ -2,7 +2,7 @@
 
 int main() {
     Qentem::TestHelper::PrintInfo();
-    const int ret = Qentem::Test::RunTemplateLTests();
+    int ret = Qentem::Test::RunTemplateLTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 
     return ret;
