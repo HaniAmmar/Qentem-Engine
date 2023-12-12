@@ -379,8 +379,7 @@ static void TestNumberValue1(TestHelper &helper) {
 }
 
 static void TestNumberValue2(TestHelper &helper) {
-    using vu_short = unsigned short;
-    using vu_long  = unsigned long;
+    using vu_long = unsigned long;
 
     ValueC        value1;
     VStringStream ss_var;
@@ -389,7 +388,7 @@ static void TestNumberValue2(TestHelper &helper) {
 
     /////////////////// unsigned
 
-    value1 = ValueC{vu_short{10}};
+    value1 = ValueC{SizeT16{10}};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, "NumberType = Natural", __LINE__);
     helper.EqualsTrue(value1.Type() == ValueType::UIntLong, "UIntLong", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
@@ -660,12 +659,11 @@ static void TestNumberValue4(TestHelper &helper) {
 }
 
 static void TestNumberValue5(TestHelper &helper) {
-    using vu_short = unsigned short;
-    using vu_long  = unsigned long;
+    using vu_long = unsigned long;
 
     ValueC value1;
 
-    value1 = vu_short{10};
+    value1 = SizeT16{10};
     helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, "NumberType = Natural", __LINE__);
     helper.EqualsTrue(value1.IsUInt64(), "IsUInt64()", __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);

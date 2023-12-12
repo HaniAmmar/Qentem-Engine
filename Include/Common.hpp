@@ -231,15 +231,15 @@ union QNumber16 {
         if QENTEM_CONSTEXPR (IsFloat<Number_T_>()) {
             Real = Number_T_(num);
         } else if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
-            Natural = (unsigned short)(num);
+            Natural = SizeT16(num);
         } else {
             Integer = short(num);
         }
     }
 
-    unsigned short Natural{0};
-    short          Integer;
-    Number_T_      Real; // float16 or whatever.
+    SizeT16   Natural{0};
+    short     Integer;
+    Number_T_ Real; // float16 or whatever.
 };
 
 union QNumber8 {

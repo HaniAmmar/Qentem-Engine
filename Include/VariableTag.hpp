@@ -30,10 +30,10 @@ namespace Qentem {
 namespace Tags {
 
 struct VariableTag {
-    SizeT          Offset;
-    unsigned short Length;
-    unsigned char  Level;
-    unsigned char  IsLoopValue;
+    SizeT         Offset;
+    SizeT16       Length;
+    unsigned char Level;
+    unsigned char IsLoopValue;
 };
 
 } // namespace Tags

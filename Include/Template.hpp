@@ -266,7 +266,7 @@ struct TemplateSub {
     TemplateSub() = delete;
 
     TemplateSub(const Char_T_ *content, SizeT length, StringStream_T_ *stream, const Value_T_ *root_value,
-                const TemplateSub *parent = nullptr, const unsigned short level = 0) noexcept
+                const TemplateSub *parent = nullptr, const SizeT16 level = 0) noexcept
         : content_{content}, stream_{stream}, value_{root_value}, parent_{parent}, length_{length}, level_{level} {
     }
 
@@ -779,7 +779,7 @@ struct TemplateSub {
                 grouped_set.Sort((i_tag.Options & LoopTagOptions::SortAscend) == LoopTagOptions::SortAscend);
             }
 
-            const unsigned short level = (level_ + 1U);
+            const SizeT16 level = (level_ + 1U);
 
             // Stage 4: Render
             TemplateSub loop_template{content_, length_, stream_, value_, this, level};
@@ -988,8 +988,8 @@ struct TemplateSub {
             }
         }
 
-        const unsigned short level = (level_ + 1);
-        TemplateSub          loop_template{content_, length_, nullptr, nullptr, this, level};
+        const SizeT16 level = (level_ + 1);
+        TemplateSub   loop_template{content_, length_, nullptr, nullptr, this, level};
         loop_template.loop_value_offset_ = (i_tag.Offset + i_tag.ValueOffset);
         loop_template.loop_value_length_ = i_tag.ValueLength;
         loop_template.parse(i_tag.SubTags, loop_content_offset, end_offset);
@@ -1141,7 +1141,7 @@ struct TemplateSub {
         return getValue(variable.Offset, variable.Length, variable.Level, variable.IsLoopValue);
     }
 
-    const Value_T_ *getValue(SizeT v_offset, unsigned short v_length, unsigned char v_level,
+    const Value_T_ *getValue(SizeT v_offset, SizeT16 v_length, unsigned char v_level,
                              unsigned char v_is_loop_value) const noexcept {
         const Value_T_ *value     = nullptr;
         const Char_T_  *id        = (content_ + v_offset);
@@ -1857,17 +1857,17 @@ struct TemplateSub {
         return false;
     }
 
-    const Char_T_       *content_;
-    StringStream_T_     *stream_;
-    const Value_T_      *value_;
-    const TemplateSub   *parent_;
-    const Value_T_      *loop_value_{nullptr};
-    const Char_T_       *loop_key_{nullptr};
-    SizeT                loop_key_length_{0};
-    SizeT                loop_value_offset_{0};
-    const SizeT          length_;
-    unsigned short       loop_value_length_{0};
-    const unsigned short level_;
+    const Char_T_     *content_;
+    StringStream_T_   *stream_;
+    const Value_T_    *value_;
+    const TemplateSub *parent_;
+    const Value_T_    *loop_value_{nullptr};
+    const Char_T_     *loop_key_{nullptr};
+    SizeT              loop_key_length_{0};
+    SizeT              loop_value_offset_{0};
+    const SizeT        length_;
+    SizeT16            loop_value_length_{0};
+    const SizeT16      level_;
 };
 
 } // namespace Qentem

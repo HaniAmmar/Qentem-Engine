@@ -457,7 +457,7 @@ struct DoubleSize<Number_T_, 8U> {
                               const SizeT32 initial_shift) noexcept {
         (void)initial_shift;
 
-        unsigned short dividend16 = dividend_high;
+        SizeT16 dividend16 = dividend_high;
         dividend16 <<= shift;
         dividend16 |= dividend_low;
         dividend_high = Number_T_(dividend16 % divisor);
@@ -466,7 +466,7 @@ struct DoubleSize<Number_T_, 8U> {
     }
 
     inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
-        unsigned short number16 = number;
+        SizeT16 number16 = number;
         number16 *= multiplier;
         number = Number_T_(number16);
 
