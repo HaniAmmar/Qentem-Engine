@@ -5,7 +5,7 @@ include_directories("Include")
 enable_testing()
 
 if(MSVC)
-    add_compile_options(/W4)
+    add_compile_options(/W4 /Zc:__cplusplus)
 else()
     add_compile_options(-Wall -Wextra -fno-exceptions)
     option(ENABLE_COVERAGE "Enable Coverage for gcc/clang" FALSE)
