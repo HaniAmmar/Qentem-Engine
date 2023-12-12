@@ -96,6 +96,7 @@ class Engine {
                           Number_T_ offset, Number_T_ end_offset, Number_T_ full_length = 0) noexcept {
         if ((offset < end_offset) && ((offset + pattern_length) <= end_offset)) {
             const Number_T_ len_one_less = (pattern_length - Number_T_{1});
+            const Char_T_   pattern_last = pattern[len_one_less];
             end_offset -= len_one_less;
 
             if constexpr (Config::IsSIMDEnabled) {
@@ -106,7 +107,7 @@ class Engine {
                 if (m_size != Number_T_{0}) {
                     const Char_T_              *content_ofs     = (content + offset);
                     const Platform::SIMD::VAR_T m_pattern_first = Platform::SMIDSetToOne(*pattern);
-                    const Platform::SIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern[len_one_less]);
+                    const Platform::SIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern_last);
 
                     do {
                         Platform::SIMD::VAR_T m_content =
@@ -142,7 +143,7 @@ class Engine {
             }
 
             while (offset < end_offset) {
-                if ((*pattern == content[offset]) && (pattern[len_one_less] == content[offset + len_one_less])) {
+                if ((*pattern == content[offset]) && (pattern_last == content[offset + len_one_less])) {
                     Number_T_ tmp_offset{1};
 
                     while ((tmp_offset < len_one_less) && (pattern[tmp_offset] == content[tmp_offset + offset])) {
