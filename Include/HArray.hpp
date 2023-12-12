@@ -569,6 +569,14 @@ class HArray {
         return Storage();
     }
 
+    inline HAItem_T *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (Storage() + (Size() - SizeT{1}));
+        }
+
+        return nullptr;
+    }
+
     inline const HAItem_T *End() const noexcept {
         return (First() + Size());
     }
@@ -579,6 +587,22 @@ class HArray {
 
     inline bool IsNotEmpty() const noexcept {
         return !(IsEmpty());
+    }
+
+    inline unsigned char GetHighByte() const noexcept {
+        return data_.HashTable.GetHighByte();
+    }
+
+    inline void SetHighByte(unsigned char byte) noexcept {
+        data_.HashTable.SetHighByte(byte);
+    }
+
+    inline unsigned char GetLowByte() const noexcept {
+        return data_.HashTable.GetLowByte();
+    }
+
+    inline void SetLowByte(unsigned char byte) noexcept {
+        data_.HashTable.SetLowByte(byte);
     }
 
     // For STL
@@ -596,14 +620,6 @@ class HArray {
 
     inline HAItem_T *end() noexcept {
         return (Storage() + Size());
-    }
-
-    inline HAItem_T *Last() const noexcept {
-        if (IsNotEmpty()) {
-            return (Storage() + (Size() - SizeT{1}));
-        }
-
-        return nullptr;
     }
 
     //////////// Private ////////////
