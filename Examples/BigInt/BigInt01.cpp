@@ -109,6 +109,8 @@ int main() {
     // Output: 340282366762482138434845932253270245375
 
     std::cout << "Remaining: " << bint3.Divide(1000000000U) << '\n';
+    // Output: Remaining: 270245375
+
     PrintDigits(bint3);
     // Output: 340282366762482138434845932253
 
