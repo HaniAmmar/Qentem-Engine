@@ -316,7 +316,7 @@ static void TestArray3(TestHelper &helper) {
     ///////////////////////////
     numbers1.Clear();
 
-    SizeT &nu1 = numbers1.InsertGet(5);
+    SizeT &nu1 = numbers1.Insert(5);
     ++nu1;
 
     helper.Equal(*(numbers1.First()), SizeT{6}, "numbers1.First()", "6", __LINE__);

@@ -374,7 +374,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::VariablePrefixLength;
-                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
                                 parseVariableTag(offset, (v_end_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GetInfo());
                                 last_offset = v_end_offset;
@@ -400,7 +400,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::RawVariablePrefixLength;
-                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
                                 parseVariableTag(offset, (r_end_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GetInfo());
                                 last_offset = r_end_offset;
@@ -426,7 +426,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::MathPrefixLength;
-                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
                                 parseMathTag(offset, (m_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                                 last_offset = m_end_offset;
                                 offset      = m_end_offset;
@@ -452,7 +452,7 @@ struct TemplateSub {
                                 }
 
                                 offset += TagPatterns::InLineIfPrefixLength;
-                                const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::InLineIf});
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::InLineIf});
                                 parseInLineIfTag(offset, (ii_end_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GetInfo());
                                 last_offset = ii_end_offset;
@@ -485,7 +485,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::InLineIfPrefixLength;
-                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Loop});
+                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Loop});
                             parseLoopTag(offset, (l_end_offset - TagPatterns::LoopSuffixLength), tag.GetInfo());
                             last_offset = l_end_offset;
                             offset      = l_end_offset;
@@ -505,7 +505,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::IfPrefixLength;
-                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::If});
+                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::If});
                             parseIfTag(offset, (i_end_offset - TagPatterns::IfSuffixLength), tag.GetInfo());
                             last_offset = i_end_offset;
                             offset      = i_end_offset;
@@ -546,7 +546,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::VariablePrefixLength;
-                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Variable});
+                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
                             parseVariableTag(offset, (v_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                             last_offset = v_end_offset;
                             offset      = v_end_offset;
@@ -569,7 +569,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::RawVariablePrefixLength;
-                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::RawVariable});
+                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
                             parseVariableTag(offset, (r_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                             last_offset = r_end_offset;
                             offset      = r_end_offset;
@@ -591,7 +591,7 @@ struct TemplateSub {
                             }
 
                             offset += TagPatterns::MathPrefixLength;
-                            const TagBit &tag = tags_cache.InsertGet(TagBit{TagType::Math});
+                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
                             parseMathTag(offset, (m_end_offset - TagPatterns::InLineSuffixLength), tag.GetInfo());
                             last_offset = m_end_offset;
                             offset      = m_end_offset;
@@ -1048,7 +1048,7 @@ struct TemplateSub {
         if (i_tag.Case.IsNotEmpty()) {
             if (true_offset != true_end_offset) {
                 lightParse(i_tag.SubTags, true_offset, true_end_offset);
-                QExpression &expr   = i_tag.Case.InsertGet(QExpression{});
+                QExpression &expr   = i_tag.Case.Insert(QExpression{});
                 expr.Number.Natural = i_tag.SubTags.Size(); // To use only one heap for true and false.
             }
 
@@ -1634,8 +1634,7 @@ struct TemplateSub {
                     --end_offset; // Drop )
 
                     if ((last_oper != oper) || (oper != QOperation::NoOp)) {
-                        const QExpression &expr =
-                            exprs.InsertGet(QExpression{parseExpressions(offset, end_offset), oper});
+                        const QExpression &expr = exprs.Insert(QExpression{parseExpressions(offset, end_offset), oper});
                         return (expr.SubExpressions.Size() != SizeT{0});
                     }
 
@@ -1649,7 +1648,7 @@ struct TemplateSub {
                         offset += TagPatterns::VariablePrefixLength;
                         end_offset -= TagPatterns::InLineSuffixLength;
 
-                        QExpression &expr = exprs.InsertGet(QExpression{ExpressionType::Variable, oper});
+                        QExpression &expr = exprs.Insert(QExpression{ExpressionType::Variable, oper});
                         parseVariableTag(offset, end_offset, &(expr.Variable));
                         return true;
                     }

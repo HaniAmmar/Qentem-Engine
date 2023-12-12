@@ -217,19 +217,20 @@ class Array {
         *this += src;
     }
 
-    inline void Insert(Type_T_ &&item) {
-        *this += Memory::Move(item);
-    }
-
-    inline void Insert(const Type_T_ &item) {
-        *this += Memory::Move(Type_T_{item});
-    }
-
-    inline Type_T_ &InsertGet(Type_T_ &&item) {
+    inline Type_T_ &Insert(Type_T_ &&item) {
         const SizeT size = Size();
 
         *this += Memory::Move(item);
-        return *(Storage() + size);
+
+        return Storage()[size];
+    }
+
+    inline Type_T_ &Insert(const Type_T_ &item) {
+        const SizeT size = Size();
+
+        *this += Memory::Move(Type_T_{item});
+
+        return Storage()[size];
     }
 
     void Clear() noexcept {
@@ -334,6 +335,14 @@ class Array {
         return Storage();
     }
 
+    inline Type_T_ *Last() const noexcept {
+        if (IsNotEmpty()) {
+            return (Storage() + (Size() - SizeT{1}));
+        }
+
+        return nullptr;
+    }
+
     inline const Type_T_ *End() const noexcept {
         return (First() + Size());
     }
@@ -361,14 +370,6 @@ class Array {
 
     inline Type_T_ *end() noexcept {
         return (Storage() + Size());
-    }
-
-    inline Type_T_ *Last() const noexcept {
-        if (IsNotEmpty()) {
-            return (Storage() + (Size() - SizeT{1}));
-        }
-
-        return nullptr;
     }
 
     //////////// Private ////////////
