@@ -206,7 +206,7 @@ struct Template {
 
     //     static HArray<Array<Tags::TagBit>, Char_T_> cache;
 
-    //     Array<Tags::TagBit> &tags = cache.GetOrAdd(name, name_length);
+    //     Array<Tags::TagBit> &tags = cache.Get(name, name_length);
 
     //     if (tags.IsEmpty()) {
     //         temp.Parse(tags);

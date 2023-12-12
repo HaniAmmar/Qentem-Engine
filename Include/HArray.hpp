@@ -246,7 +246,7 @@ class HArray {
     }
 
     Value_T_ &operator[](const Char_T_ *key) {
-        return GetOrAdd(key, StringUtils::Count(key));
+        return Get(key, StringUtils::Count(key));
     }
 
     Value_T_ &operator[](Key_T &&key) {
@@ -287,7 +287,7 @@ class HArray {
         return insert(index, Key_T(key), hash)->Value;
     }
 
-    Value_T_ &GetOrAdd(const Char_T_ *key, const SizeT len) {
+    Value_T_ &Get(const Char_T_ *key, const SizeT len) {
         if (Size() == Capacity()) {
             expand();
         }

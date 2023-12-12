@@ -1707,7 +1707,7 @@ class Value {
                             return false;
                         }
 
-                        groupedValue.data_.VObject.GetOrAdd(str, str_len) += Memory::Move(new_sub_obj);
+                        groupedValue.data_.VObject.Get(str, str_len) += Memory::Move(new_sub_obj);
 
                         ++_item;
                         continue;
