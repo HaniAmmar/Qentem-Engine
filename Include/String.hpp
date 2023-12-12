@@ -391,25 +391,26 @@ class String {
         if ((str != nullptr) && (len != SizeT{0})) {
             constexpr SizeT32 size    = sizeof(Char_T_);
             const SizeT       src_len = Length();
-            SizeT             new_len = (src_len + len) + SizeT{1};
+            SizeT             new_len = ((src_len + len) + SizeT{1});
             Char_T_          *src     = getStorage(src_len);
             Char_T_          *ns;
 
             if constexpr (Config::ShortStringOptimization) {
-                if (new_len > ShortStringMax) {
+                if (new_len <= ShortStringMax) {
+                    ns = Memory::ChangePointer<Char_T_>(&(data_.Padding));
+
+                } else {
                     ns = Memory::Allocate<Char_T_>(new_len);
 
                     if (src != nullptr) {
                         Memory::Copy<size>(ns, src, (src_len * size));
+
                         if (src_len >= ShortStringMax) {
                             Memory::Deallocate(src);
                         }
                     }
 
                     setStorage(ns);
-
-                } else {
-                    ns = Memory::ChangePointer<Char_T_>(&(data_.Padding));
                 }
             } else {
                 ns = allocate(new_len);
@@ -437,8 +438,27 @@ class String {
     }
 
     inline void StepBack(const SizeT len) noexcept {
-        if (len <= Length()) {
-            data_.Length -= len;
+        const SizeT length = Length();
+
+        if (len <= length) {
+            Char_T_    *str     = getStorage(length);
+            const SizeT new_len = (length - len);
+
+            if constexpr (Config::ShortStringOptimization) {
+                if (new_len < ShortStringMax) {
+                    if (length >= ShortStringMax) {
+                        constexpr SizeT32 size = sizeof(Char_T_);
+
+                        Char_T_ *str_s = getStorage(new_len);
+                        Memory::Copy<size>(str_s, str, (new_len * size));
+                        Memory::Deallocate(str);
+                        str = str_s;
+                    }
+                }
+            }
+
+            setLength(new_len);
+            str[new_len] = Char_T_{0};
         }
     }
 

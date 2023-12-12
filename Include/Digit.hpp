@@ -961,7 +961,10 @@ struct Digit {
         }
 
         stream.Reverse(started_at);
-        stream.StepBack(index - started_at);
+
+        if (index != started_at) {
+            stream.StepBack(index - started_at);
+        }
 
         if (display_exp) {
             insertPowerOfTen(stream, power, is_positive_exp);
