@@ -180,7 +180,7 @@ struct MemoryRecord {
     }
 
   private:
-    static MemoryRecordData &getStorage() {
+    static MemoryRecordData &getStorage() noexcept {
         static MemoryRecordData data{};
 
         return data;
