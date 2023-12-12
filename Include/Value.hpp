@@ -1663,6 +1663,8 @@ class Value {
         using V_item_ = HAItem_T_<Value, Char_T_>;
         StringStream<Char_T_> stream;
         VObjectT              new_sub_obj;
+        const Char_T_        *str     = nullptr;
+        SizeT                 str_len = 0;
         SizeT                 grouped_key_index;
 
         if (IsArray()) {
@@ -1686,8 +1688,15 @@ class Value {
                             if ((obj_item != nullptr) && !(obj_item->Value.IsUndefined())) {
                                 if (count != grouped_key_index) {
                                     new_sub_obj[obj_item->Key] = obj_item->Value;
-                                } else if (!(obj_item->Value.CopyValueTo(stream))) {
-                                    return false;
+                                } else if (!(obj_item->Value.SetCharAndLength(str, str_len))) {
+                                    stream.Clear();
+
+                                    if (obj_item->Value.CopyValueTo(stream)) {
+                                        str     = stream.First();
+                                        str_len = stream.Length();
+                                    } else {
+                                        return false;
+                                    }
                                 }
 
                                 ++count;
@@ -1698,9 +1707,7 @@ class Value {
                             return false;
                         }
 
-                        groupedValue.data_.VObject.GetOrAdd(stream.First(), stream.Length()) +=
-                            Memory::Move(new_sub_obj);
-                        stream.Clear();
+                        groupedValue.data_.VObject.GetOrAdd(str, str_len) += Memory::Move(new_sub_obj);
 
                         ++_item;
                         continue;
