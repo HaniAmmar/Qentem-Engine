@@ -209,9 +209,7 @@ class String {
     }
 
     String &operator+=(const Char_T_ ch) {
-        Char_T_ arr[1];
-        arr[0U] = ch;
-        Write(&(arr[0U]), SizeT{1});
+        Write(&ch, SizeT{1});
 
         return *this;
     }
@@ -219,6 +217,7 @@ class String {
     String operator+(String &&src) const {
         String ns{Merge(*this, src)};
         src.Reset();
+
         return ns;
     }
 
@@ -234,6 +233,7 @@ class String {
     template <typename Stream_T_>
     friend Stream_T_ &operator<<(Stream_T_ &out, const String &src) {
         out << src.First();
+
         return out;
     }
 

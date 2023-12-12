@@ -43,7 +43,7 @@ static void TestString1(TestHelper &helper) {
     helper.Equal(str2.Length(), SizeT{10U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.NotEqual(str2.Last(), nullptr, "Last()", "null", __LINE__);
-    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
 
     str2.Reset();
     helper.Equal(str2.Length(), SizeT{0U}, "Length", __LINE__);
@@ -53,20 +53,20 @@ static void TestString1(TestHelper &helper) {
     str1 = String8("abcd");
     helper.Equal(str1.Length(), SizeT{4U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcd", "str1", __LINE__);
     helper.NotEqual(str1, "abcdef", "str1", "abcdef", __LINE__);
 
     str1 = String8("abcd-bcd");
     helper.Equal(str1.Length(), SizeT{8U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcd-bcd", "str1", __LINE__);
 
     str1 = String8("abcd", 2U);
     helper.Equal(str1.Length(), SizeT{2U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "ab", "str1", __LINE__);
     helper.NotEqual(str1, "abcd", "str1", "abcd", __LINE__);
 
@@ -91,7 +91,7 @@ static void TestString1(TestHelper &helper) {
     str2 = "abcdef"; // Copy
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(str2.First(), "abcdef", 5U), "IsEqual", __LINE__);
 
     str2 = str1; // Copy
@@ -252,37 +252,37 @@ static void TestString2(TestHelper &helper) {
     str1.Write("a", 1U);
     helper.Equal(str1.Length(), SizeT{1U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "a", "str1", __LINE__);
 
     str1.Write("bc", 2U);
     helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abc", "str1", __LINE__);
 
     str1.Write("", 0U);
     helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abc", "str1", __LINE__);
 
     str2 = String8::Merge(str1, String8("def"));
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
     str2 = String8::Merge(str2, String8(""));
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
     str2 = String8::Merge(String8(""), str2);
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str2.First()[str2.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
     if constexpr (Config::ShortStringOptimization) {
@@ -299,7 +299,7 @@ static void TestString2(TestHelper &helper) {
 
         helper.Equal(str1.Length(), (String8::ShortStringMax + 1U), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
 
         str1.Reset();
@@ -315,7 +315,7 @@ static void TestString2(TestHelper &helper) {
         sstr[++sso_x] = '\0';
         helper.Equal(str1.Length(), (String8::ShortStringMax - 2U), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
 
         str1 += "B";
@@ -323,7 +323,7 @@ static void TestString2(TestHelper &helper) {
         sstr[++sso_x] = '\0';
         helper.Equal(str1.Length(), (String8::ShortStringMax - 1), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
 
         str1 += "_C";
@@ -332,7 +332,7 @@ static void TestString2(TestHelper &helper) {
         sstr[++sso_x] = '\0';
         helper.Equal(str1.Length(), (String8::ShortStringMax + 1), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-        helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+        helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
     }
 
@@ -340,27 +340,27 @@ static void TestString2(TestHelper &helper) {
     str1 += "a";
     helper.Equal(str1.Length(), SizeT{1U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "a", "str1", __LINE__);
 
     str1 += "bc";
     helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abc", "str1", __LINE__);
 
     str2 = "def";
     str1 += str2;
     helper.Equal(str1.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcdef", "str1", __LINE__);
 
     str2 = "ghi";
     str1 += Memory::Move(str2);
     helper.Equal(str1.Length(), SizeT{9U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcdefghi", "str1", __LINE__);
     helper.Equal(str2.Length(), SizeT{0U}, "Length", __LINE__);
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
@@ -368,27 +368,37 @@ static void TestString2(TestHelper &helper) {
     str1 = str1 + "";
     helper.Equal(str1.Length(), SizeT{9U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcdefghi", "str1", __LINE__);
 
     str1 = str1 + "gkl";
     helper.Equal(str1.Length(), SizeT{12U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcdefghigkl", "str1", __LINE__);
 
     str2 = "123";
     str1 = str1 + str2;
     helper.Equal(str1.Length(), SizeT{15U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcdefghigkl123", "str1", __LINE__);
+
+    str1 = "123";
+    str1 += '4';
+    helper.Equal(str1.Length(), SizeT{4U}, "Length", __LINE__);
+    helper.Equal(str1, "1234", "str1", __LINE__);
+
+    str1 = "aaaaaaaaaaaaaaaaaaaaaaaa";
+    str1 += '4';
+    helper.Equal(str1.Length(), SizeT{25U}, "Length", __LINE__);
+    helper.Equal(str1, "aaaaaaaaaaaaaaaaaaaaaaaa4", "str1", __LINE__);
 
     str1 = "aaaaaaaaaaaaaaaaaaaaaaaa";
     str1 += "aaaaaaaaaaaaaaaaaaaaaaaa";
     helper.Equal(str1.Length(), SizeT{48U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "str1", __LINE__);
 
     str1.Reset();
@@ -397,7 +407,7 @@ static void TestString2(TestHelper &helper) {
     str1 = str1 + Memory::Move(str2);
     helper.Equal(str1.Length(), SizeT{8U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
-    helper.Equal(str1.First()[str1.Length()], '\0', "First()[Length]", __LINE__);
+    helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "12345678", "str1", __LINE__);
     helper.Equal(str2.Length(), SizeT{0U}, "Length", __LINE__);
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
