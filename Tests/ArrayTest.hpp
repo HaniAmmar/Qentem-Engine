@@ -322,7 +322,7 @@ static void TestArray3(TestHelper &helper) {
     helper.Equal(*(numbers1.First()), SizeT{6}, "numbers1.First()", "6", __LINE__);
 
     /////////////////////
-    numbers1.Reset();
+    numbers1.Clear();
     numbers1 += 1;
 
     for (SizeT &num : numbers1) {
@@ -333,6 +333,33 @@ static void TestArray3(TestHelper &helper) {
     /////////////////////
     const Array<SizeT> numbers_init{8U, true};
     helper.Equal(numbers_init.Size(), 8U, "Size", __LINE__);
+
+    /////////////////////
+
+    numbers1.Clear();
+    numbers1 += 6;
+    numbers1 += 7;
+    numbers1 += 5;
+    numbers1 += 1;
+    numbers1 += 3;
+    numbers1 += 4;
+    numbers1 += 2;
+
+    SizeT32 *storage = numbers1.Storage();
+    numbers1.Swap(storage[3], storage[6]);
+    numbers1.Swap(storage[0], storage[6]);
+    numbers1.Swap(storage[3], storage[1]);
+    numbers1.Swap(storage[2], storage[4]);
+    numbers1.Swap(storage[3], storage[5]);
+    numbers1.Swap(storage[6], storage[5]);
+
+    helper.Equal(storage[0], 1U, "storage[0]", __LINE__);
+    helper.Equal(storage[1], 2U, "storage[1]", __LINE__);
+    helper.Equal(storage[2], 3U, "storage[2]", __LINE__);
+    helper.Equal(storage[3], 4U, "storage[3]", __LINE__);
+    helper.Equal(storage[4], 5U, "storage[4]", __LINE__);
+    helper.Equal(storage[5], 6U, "storage[5]", __LINE__);
+    helper.Equal(storage[6], 7U, "storage[5]", __LINE__);
 }
 
 static void TestArray4(TestHelper &helper) {
