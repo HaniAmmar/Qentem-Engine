@@ -1709,9 +1709,9 @@ class Value {
 
     bool GroupBy(Value &groupedValue, const Char_T_ *key, const SizeT length) const {
         using V_item_ = HAItem_T_<Value, Char_T_>;
-        VObjectT new_sub_obj;
-        VStringT grouped_key;
-        SizeT    grouped_key_index;
+        StringStream<Char_T_> stream;
+        VObjectT              new_sub_obj;
+        SizeT                 grouped_key_index;
 
         if (IsArray()) {
             groupedValue.Reset();
@@ -1719,37 +1719,46 @@ class Value {
 
             const Value *_item = data_.VArray.First();
 
-            if ((_item == nullptr) || !(_item->IsObject()) ||
-                !(_item->data_.VObject.GetKeyIndex(grouped_key_index, key, length))) {
-                return false;
-            }
+            if ((_item != nullptr) && _item->IsObject() &&
+                _item->data_.VObject.GetKeyIndex(grouped_key_index, key, length)) {
+                const Value *end = data_.VArray.End();
 
-            for (const Value *end = data_.VArray.End(); _item != end; _item++) {
-                if ((_item == nullptr) || !(_item->IsObject())) {
+                while (_item != end) {
+                    if ((_item != nullptr) && _item->IsObject()) {
+                        SizeT count = 0;
+
+                        const V_item_ *obj_item = _item->data_.VObject.First();
+                        const V_item_ *obj_end  = _item->data_.VObject.End();
+
+                        while (obj_item != obj_end) {
+                            if ((obj_item != nullptr) && !(obj_item->Value.IsUndefined())) {
+                                if (count != grouped_key_index) {
+                                    new_sub_obj[obj_item->Key] = obj_item->Value;
+                                } else if (!(obj_item->Value.CopyValueTo(stream))) {
+                                    return false;
+                                }
+
+                                ++count;
+                                ++obj_item;
+                                continue;
+                            }
+
+                            return false;
+                        }
+
+                        groupedValue.data_.VObject.GetOrAdd(stream.First(), stream.Length()) +=
+                            Memory::Move(new_sub_obj);
+                        stream.Clear();
+
+                        ++_item;
+                        continue;
+                    }
+
                     return false;
                 }
 
-                SizeT count = 0;
-
-                for (const V_item_ *obj_item = _item->data_.VObject.First(), *obj_end = _item->data_.VObject.End();
-                     obj_item != obj_end; obj_item++) {
-                    if ((obj_item == nullptr) || obj_item->Value.IsUndefined()) {
-                        return false;
-                    }
-
-                    if (count != grouped_key_index) {
-                        new_sub_obj[obj_item->Key] = obj_item->Value;
-                    } else if (!obj_item->Value.SetString(grouped_key)) {
-                        return false;
-                    }
-
-                    ++count;
-                }
-
-                groupedValue.data_.VObject[Memory::Move(grouped_key)] += Memory::Move(new_sub_obj);
+                return true;
             }
-
-            return true;
         }
 
         return false;
