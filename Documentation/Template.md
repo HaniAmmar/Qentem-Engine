@@ -162,15 +162,15 @@ using Qentem::Value;
 
 int main() {
     Value<char> value;
-    value["some_math"] = "1+4*2+1";
-    value["one"]       = "1";
-    value["three"]     = "3";
+    value["one"]   = "1";
+    value["two"]   = "2";
+    value["three"] = "3";
+    value["four"]  = "4";
 
     const char *content = R"(
 0.1+0.2 is: {math: 0.1  +   0.2 }
-{var:some_math} = {math:{var:some_math}}; (1+8+1)
+{var:one}+{var:four}*{var:two}+{var:one} = {math:{var:one}+{var:four}*{var:two}+{var:one}}; (1+8+1)
 6^2 = {math:6^2}
---1 = {math:--1}
 {var:one}+{var:three} = {math:{var:one}+{var:three}}
 9 % 5 = {math:9 % 5}
 )";
@@ -182,7 +182,6 @@ int main() {
             0.1+0.2 is: 0.3
             1+4*2+1 = 10; (1+8+1)
             6^2 = 36
-            --1 = 1
             1+3 = 4
             9 % 5 = 4
     */
@@ -418,7 +417,7 @@ To force converting the variables to numbers, use parentheses: {math:({var:bool}
 <loop set="..." value="..." group="..." sort="...">...</loop>
 ```
 
-Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop. `group` groups the giving array by sub-value of an object. `sort` will sort the set in ascendind or descending order.
+Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop. `group` groups the giving array by sub-value of an object. `sort` will sort the set in ascending or descending order.
 
 ### Loop Example 1 (unordered set)
 
@@ -919,12 +918,12 @@ int main() {
 {
     "dir": "ltr",
     "title": "Wishful News",
-    "darkmode": 1,
+    "dark_mode": 1,
     "body": {
         "bc": "rgb(17, 66, 61)",
         "color": "black",
-        "darkmode_color": "white",
-        "H1": "Leatest News"
+        "dark_mode_color": "white",
+        "H1": "Latest News"
     },
     "news": [
         {
@@ -1002,7 +1001,7 @@ int main() {
     <style>
         body {
             background-color: {var:body[bc]};
-            color: {if case="{var:darkmode}" true="{var:body[darkmode_color]}" false="{var:body[color]}"}
+            color: {if case="{var:dark_mode}" true="{var:body[dark_mode_color]}" false="{var:body[color]}"}
         }
     </style>
 </head>

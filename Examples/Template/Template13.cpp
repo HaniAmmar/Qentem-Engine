@@ -13,12 +13,12 @@ int main() {
 {
     "dir": "ltr",
     "title": "Wishful News",
-    "darkmode": 1,
+    "dark_mode": 1,
     "body": {
         "bc": "rgb(17, 66, 61)",
         "color": "black",
-        "darkmode_color": "white",
-        "H1": "Leatest News"
+        "dark_mode_color": "white",
+        "H1": "Latest News"
     },
     "news": [
         {
@@ -92,7 +92,7 @@ int main() {
     <style>
         body {
             background-color: {raw:body[bc]};
-            color: {if case="{var:darkmode}" true="{var:body[darkmode_color]}" false="{var:body[color]}"}
+            color: {if case="{var:dark_mode}" true="{var:body[dark_mode_color]}" false="{var:body[color]}"}
         }
 
         .i_span {
