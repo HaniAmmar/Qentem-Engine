@@ -673,7 +673,7 @@ struct TemplateSub {
         const Value_T_    *value = getValue(i_tag);
 
         if (value != nullptr) {
-            if constexpr (Config::AutoEscapeHTML) {
+            if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
                 if (value->IsString()) {
                     const Char_T_ *str;
                     SizeT          len;
@@ -688,7 +688,7 @@ struct TemplateSub {
             }
 
             if ((i_tag.IsLoopValue == 1) && (loop_key_ != nullptr)) {
-                if constexpr (Config::AutoEscapeHTML) {
+                if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
                     escapeHTMLSpecialChars(stream_, loop_key_, loop_key_length_);
                 } else {
                     stream_->Write(loop_key_, loop_key_length_);

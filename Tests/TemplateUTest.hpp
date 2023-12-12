@@ -28,7 +28,8 @@
 #ifndef QENTEM_TEMPLATE_U_TESTS_H_
 #define QENTEM_TEMPLATE_U_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestVariableUTag1(TestHelper &helper) {
     StringStream<char16_t> ss;
@@ -650,7 +651,7 @@ static void TestVariableUTag4(TestHelper &helper) {
     value += uR"("ABC'DEF<GHI>GK<)";
     value += uR"(A""BC<<DE>>FG''HI&&GK)";
 
-    if constexpr (Config::AutoEscapeHTML) {
+    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(uR"({var:0})", value, ss), uR"(&lt;)", uR"(Render())", __LINE__);
         ss.Clear();
 
@@ -2572,7 +2573,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="1" true="{var:0}" false="{var:1}"})";
 
-    if constexpr (Config::AutoEscapeHTML) {
+    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2, ss), uR"(&amp;)", uR"(Render())", __LINE__);
         ss.Clear();
 
@@ -2587,7 +2588,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="0" true="{var:0}" false="{var:1}"})";
 
-    if constexpr (Config::AutoEscapeHTML) {
+    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2, ss), uR"(&quot;)", uR"(Render())", __LINE__);
         ss.Clear();
 
@@ -3550,6 +3551,7 @@ static int RunTemplateUTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

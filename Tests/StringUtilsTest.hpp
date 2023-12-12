@@ -26,7 +26,8 @@
 #ifndef QENTEM_STRING_UTILS_TESTS_H_
 #define QENTEM_STRING_UTILS_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestHash(TestHelper &helper) {
     SizeT hash;
@@ -820,6 +821,7 @@ static int RunStringUtilsTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

@@ -28,7 +28,8 @@
 #ifndef QENTEM_EVALUATE_TESTS_H_
 #define QENTEM_EVALUATE_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, const Value<char> &value) {
     using TemplateSubCV             = TemplateSub<char, Value<char>, StringStream<char>>;
@@ -4746,6 +4747,7 @@ static int RunEvaluateTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

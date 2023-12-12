@@ -47,7 +47,7 @@ class Engine {
     template <typename Char_T_, typename Number_T_>
     static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content, Number_T_ offset, const Number_T_ end_offset,
                              Number_T_ full_length = 0) noexcept {
-        if constexpr (Config::IsSIMDEnabled) {
+        if QENTEM_CONSTEXPR (Config::IsSIMDEnabled) {
             if (offset < end_offset) {
                 Number_T_ m_size =
                     ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
@@ -99,7 +99,7 @@ class Engine {
             const Char_T_   pattern_last = pattern[len_one_less];
             end_offset -= len_one_less;
 
-            if constexpr (Config::IsSIMDEnabled) {
+            if QENTEM_CONSTEXPR (Config::IsSIMDEnabled) {
                 Number_T_ m_size =
                     ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
                      Platform::SIMD::Shift);

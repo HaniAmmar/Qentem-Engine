@@ -35,7 +35,8 @@
 #ifndef QENTEM_DIGIT_TESTS_H_
 #define QENTEM_DIGIT_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static SizeT32 HexStringToNumber(const char *str) noexcept {
     return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
@@ -3926,6 +3927,7 @@ static int RunDigitTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

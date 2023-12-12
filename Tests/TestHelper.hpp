@@ -52,17 +52,28 @@ struct TestOutPut {
 
     template <typename... Values_T_>
     inline static void Print(const Values_T_ &...values) {
-        if (wss_ == nullptr) {
+        if (getCachedStream() == nullptr) {
+#if __cplusplus > 201402L
             (std::wcout << ... << values);
+#else
+            int dummy[sizeof...(Values_T_)] = {(std::wcout << values, 0)...};
+            (void)dummy;
+#endif
+
         } else {
-            ((*wss_) << ... << values);
+#if __cplusplus > 201402L
+            ((*getCachedStream()) << ... << values);
+#else
+            int dummy[sizeof...(Values_T_)] = {((*getCachedStream()) << values, 0)...};
+            (void)dummy;
+#endif
         }
     }
 
     enum Colors { TITLE, ERROR, PASS, END };
 
     QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
-        if (IsColored) {
+        if (IsColored()) {
             switch (color) {
                 case TITLE:
                     return "\x1B[36m";
@@ -79,13 +90,30 @@ struct TestOutPut {
     }
 
     static void SetCachedStream(std::wstringstream *wss) noexcept {
-        wss_ = wss;
+        getCachedStream() = wss;
     }
 
-    inline static bool IsColored{true};
+    static bool &IsColored() noexcept {
+        static bool isColored{true};
+
+        return isColored;
+    }
 
   private:
-    inline static std::wstringstream *wss_;
+    static std::wstringstream *&getCachedStream() noexcept {
+        static std::wstringstream *wss{nullptr};
+
+        return wss;
+    }
+};
+
+struct MemoryRecordData {
+    SizeT  allocations{0};
+    SizeT  deallocations{0};
+    SizeT  subAllocations{0};
+    SizeT  subDeallocations{0};
+    size_t remainingSize{0};
+    size_t peakSize{0};
 };
 
 struct MemoryRecord {
@@ -97,51 +125,52 @@ struct MemoryRecord {
     MemoryRecord &operator=(const MemoryRecord &) = delete;
 
     inline static void ResetSubMemory() noexcept {
-        subAllocations   = 0;
-        subDeallocations = 0;
+        getStorage().subAllocations   = 0;
+        getStorage().subDeallocations = 0;
     }
 
     inline static SizeT CheckSubMemory() noexcept {
-        return (subAllocations - subDeallocations);
+        return (getStorage().subAllocations - getStorage().subDeallocations);
     }
 
     inline static void AddAllocation(void *pointer) noexcept {
-        ++(allocations);
-        ++(subAllocations);
+        ++(getStorage().allocations);
+        ++(getStorage().subAllocations);
 
 #if defined(_WIN32) || defined(_M_X64)
-        remainingSize += _msize(pointer);
+        getStorage().remainingSize += _msize(pointer);
 #elif defined(__APPLE__)
-        remainingSize += malloc_size(pointer);
+        getStorage().remainingSize += malloc_size(pointer);
 #else
-        remainingSize += malloc_usable_size(pointer);
+        getStorage().remainingSize += malloc_usable_size(pointer);
 #endif
 
-        if (remainingSize > peakSize) {
-            peakSize = remainingSize;
+        if (getStorage().remainingSize > getStorage().peakSize) {
+            getStorage().peakSize = getStorage().remainingSize;
         }
     }
 
     QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
-        ++(deallocations);
-        ++(subDeallocations);
+        ++(getStorage().deallocations);
+        ++(getStorage().subDeallocations);
 
 #if defined(_WIN32) || defined(_M_X64)
-        remainingSize -= _msize(pointer);
+        getStorage().remainingSize -= _msize(pointer);
 #elif defined(__APPLE__)
-        remainingSize -= malloc_size(pointer);
+        getStorage().remainingSize -= malloc_size(pointer);
 #else
-        remainingSize -= malloc_usable_size(pointer);
+        getStorage().remainingSize -= malloc_usable_size(pointer);
 #endif
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
-        TestOutPut::Print("\nMemory: ", (double(remainingSize) / 1024), " KB, Peak: ", (double(peakSize) / 1024),
-                          " KB.\n");
+        TestOutPut::Print("\nMemory: ", (double(getStorage().remainingSize) / 1024),
+                          " KB, Peak: ", (double(getStorage().peakSize) / 1024), " KB.\n");
 
-        TestOutPut::Print("Allocations: ", allocations, ", Deallocations: ", deallocations, ".\n");
+        TestOutPut::Print("Allocations: ", getStorage().allocations, ", Deallocations: ", getStorage().deallocations,
+                          ".\n");
 
-        const SizeT remaining_deallocations = (allocations - deallocations);
+        const SizeT remaining_deallocations = (getStorage().allocations - getStorage().deallocations);
 
         if (remaining_deallocations != 0) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
@@ -151,12 +180,11 @@ struct MemoryRecord {
     }
 
   private:
-    inline static SizeT  allocations{0};
-    inline static SizeT  deallocations{0};
-    inline static SizeT  subAllocations{0};
-    inline static SizeT  subDeallocations{0};
-    inline static size_t remainingSize{0};
-    inline static size_t peakSize{0};
+    static MemoryRecordData &getStorage() {
+        static MemoryRecordData data{};
+
+        return data;
+    }
 };
 
 struct TestHelper {
@@ -286,7 +314,7 @@ struct TestHelper {
     QENTEM_NOINLINE static void PrintInfo() {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
-        if constexpr (Config::Is64bit) {
+        if QENTEM_CONSTEXPR (Config::Is64bit) {
             TestOutPut::Print("Arch: 64-bit\n");
         } else {
             TestOutPut::Print("Arch: 32-bit\n");
@@ -294,17 +322,17 @@ struct TestHelper {
 
         TestOutPut::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
-        if constexpr (Config::IsBigEndian) {
+        if QENTEM_CONSTEXPR (Config::IsBigEndian) {
             TestOutPut::Print("Endianness: Big-Endian\n");
         } else {
             TestOutPut::Print("Endianness: Little-Endian\n");
         }
 
-        if constexpr (Config::PointerTagging) {
+        if QENTEM_CONSTEXPR (Config::PointerTagging) {
             TestOutPut::Print("Tagged Pointers: On\n");
         }
 
-        if constexpr (Config::ShortStringOptimization) {
+        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
             TestOutPut::Print("Short String Optimization: On\n");
         }
 
@@ -320,7 +348,7 @@ struct TestHelper {
         TestOutPut::Print("WASM SIMD128: On\n");
 #endif
 
-        if constexpr (Config::AutoEscapeHTML) {
+        if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
             TestOutPut::Print("Auto Escape HTML: On\n");
         }
 

@@ -29,7 +29,8 @@
 #ifndef QENTEM_ENGINE_TESTS_H_
 #define QENTEM_ENGINE_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestEngine1(TestHelper &helper) {
     SizeT       ret;
@@ -1079,6 +1080,7 @@ static int RunEngineTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

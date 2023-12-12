@@ -27,7 +27,8 @@
 #ifndef QENTEM_HARRAY_TESTS_H_
 #define QENTEM_HARRAY_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 using HashArray = HArray<SizeT32, char>;
 
@@ -1031,6 +1032,7 @@ static int RunHArrayTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

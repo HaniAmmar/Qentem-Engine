@@ -127,7 +127,7 @@ struct VNumberT {
     }
 
     inline void ClearAll() noexcept {
-        if constexpr (Config::PointerTagging) {
+        if QENTEM_CONSTEXPR (Config::PointerTagging) {
             data_.Number.ull = 0ULL;
             data_.PtrNumber  = 0ULL;
         }
@@ -405,10 +405,10 @@ class Value {
 
     template <typename Number_T_>
     explicit Value(Number_T_ num) noexcept {
-        if constexpr (IsFloat<Number_T_>()) {
+        if QENTEM_CONSTEXPR (IsFloat<Number_T_>()) {
             data_.VNumber.SetNumber(double(num));
             setTypeToDouble();
-        } else if constexpr (IsUnsigned<Number_T_>()) {
+        } else if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
             data_.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
@@ -433,7 +433,7 @@ class Value {
             const VNumberT  tmp    = val.data_.VNumber;
             const ValueType t_type = val.Type();
 
-            if constexpr (Config::PointerTagging) {
+            if QENTEM_CONSTEXPR (Config::PointerTagging) {
                 val.data_.VNumber.ClearAll();
             } else {
                 val.setTypeToUndefined();
@@ -443,7 +443,7 @@ class Value {
                 reset();
             }
 
-            if constexpr (!Config::PointerTagging) {
+            if QENTEM_CONSTEXPR (!Config::PointerTagging) {
                 setType(t_type);
             } else {
                 (void)t_type;
@@ -489,7 +489,7 @@ class Value {
             } else {
                 reset();
 
-                if constexpr (Config::PointerTagging) {
+                if QENTEM_CONSTEXPR (Config::PointerTagging) {
                     data_.VNumber.ClearAll();
                 } else {
                     setTypeToUndefined();
@@ -608,10 +608,10 @@ class Value {
             reset();
         }
 
-        if constexpr (IsFloat<Number_T_>()) {
+        if QENTEM_CONSTEXPR (IsFloat<Number_T_>()) {
             data_.VNumber.SetNumber(double(num));
             setTypeToDouble();
-        } else if constexpr (IsUnsigned<Number_T_>()) {
+        } else if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
             data_.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
@@ -1567,7 +1567,7 @@ class Value {
     void Reset() noexcept {
         reset();
 
-        if constexpr (Config::PointerTagging) {
+        if QENTEM_CONSTEXPR (Config::PointerTagging) {
             data_.VNumber.ClearAll();
         } else {
             setTypeToUndefined();
@@ -1592,7 +1592,7 @@ class Value {
                 if (size == SizeT{0}) {
                     data_.VArray.Reset();
 
-                    if constexpr (Config::PointerTagging) {
+                    if QENTEM_CONSTEXPR (Config::PointerTagging) {
                         setTypeToArray();
                     }
 

@@ -26,7 +26,8 @@
 #ifndef QENTEM_STRINGSTREAM_TESTS_H_
 #define QENTEM_STRINGSTREAM_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestStringStream(TestHelper &helper) {
     StringStream<char> ss1;
@@ -316,6 +317,7 @@ static int RunStringStreamTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

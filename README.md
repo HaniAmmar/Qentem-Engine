@@ -23,7 +23,7 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
 
 -   General
 
-    -   Cross-platform, header-only and self-contained; no external libraries are needed.
+    -   Cross-platform, header-only and self-contained; no external libraries are needed (including STL).
     -   Fast string to number and number to string (Does not use CPU FPU).
     -   Supports 32-bit and 64-bit architecture, little and big-endian.
     -   No exceptions (try, catch and throw).
@@ -52,8 +52,7 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
 
 ## Requirements
 
--   C++ 17+ compiler.
--   C++ 11/14 (replace `if constexpr` with `if`).
+C++ 11+ compiler.
 
 ## Documentation
 
@@ -61,7 +60,7 @@ Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/
 
 ## Live Testing
 
-Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool)
+Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool).
 
 ## Template Example
 

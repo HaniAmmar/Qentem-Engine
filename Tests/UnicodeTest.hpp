@@ -27,7 +27,8 @@
 #ifndef QENTEM_UNICODE_TESTS_H_
 #define QENTEM_UNICODE_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestToUTF8(TestHelper &helper) {
     /*
@@ -330,6 +331,7 @@ static int RunUnicodeTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

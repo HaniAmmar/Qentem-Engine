@@ -26,7 +26,8 @@
 #ifndef QENTEM_VALUE_TESTS_H_
 #define QENTEM_VALUE_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 using VString       = String<char>;
 using ValueC        = Value<char>;
@@ -5955,6 +5956,7 @@ static int RunValueTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

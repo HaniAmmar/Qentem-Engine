@@ -27,7 +27,8 @@
 #ifndef QENTEM_ARRAY_TESTS_H_
 #define QENTEM_ARRAY_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestArray1(TestHelper &helper) {
     const SizeT *storage;
@@ -598,6 +599,7 @@ static int RunArrayTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

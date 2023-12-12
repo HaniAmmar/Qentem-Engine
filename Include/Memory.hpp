@@ -33,7 +33,7 @@ template <SizeT32 Width_T_, typename Number_T_>
 inline static void SetToZero(void *pointer, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
-    if constexpr (Config::IsSIMDEnabled) {
+    if QENTEM_CONSTEXPR (Config::IsSIMDEnabled) {
         const Number_T_ m_size = (size >> Platform::SIMD::Shift);
 
         if (m_size != Number_T_{0}) {
@@ -64,7 +64,7 @@ template <SizeT32 Width_T_, typename Number_T_>
 QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T_ size) noexcept {
     Number_T_ offset = 0;
 
-    if constexpr (Config::IsSIMDEnabled) {
+    if QENTEM_CONSTEXPR (Config::IsSIMDEnabled) {
         const Number_T_ m_size = (size >> Platform::SIMD::Shift);
 
         if (m_size != Number_T_{0}) {
@@ -127,7 +127,7 @@ inline static void Sort(Type_T_ *arr, Number_T_ start, Number_T_ end) noexcept {
         Number_T_ offset = (start + Number_T_{1});
 
         while (offset < end) {
-            if constexpr (Ascend_T_) {
+            if QENTEM_CONSTEXPR (Ascend_T_) {
                 if (arr[offset] < item) {
                     ++index;
                     Swap(arr[index], arr[offset]);

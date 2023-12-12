@@ -26,7 +26,8 @@
 #ifndef QENTEM_JSON_TESTS_H_
 #define QENTEM_JSON_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static void TestParse1(TestHelper &helper) {
     Value<char> value;
@@ -1228,6 +1229,7 @@ static int RunJSONTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

@@ -26,7 +26,8 @@
 #ifndef QENTEM_STRING_TESTS_H_
 #define QENTEM_STRING_TESTS_H_
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 using String8 = String<char>;
 
@@ -130,7 +131,7 @@ static void TestString1(TestHelper &helper) {
     char         *tmp_size_2 = Memory::Allocate<char>(2);
     const String8 str_size_2 = String8(tmp_size_2, 2U);
 
-    if constexpr (Config::ShortStringOptimization) {
+    if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
         helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
     } else {
         helper.Equal(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
@@ -285,7 +286,7 @@ static void TestString2(TestHelper &helper) {
     helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
-    if constexpr (Config::ShortStringOptimization) {
+    if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
         char sstr[32];
         str1.Reset();
         for (SizeT i = 0; i < String8::ShortStringMax; i++) {
@@ -599,6 +600,7 @@ static int RunStringTests() {
     return helper.EndTests();
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif

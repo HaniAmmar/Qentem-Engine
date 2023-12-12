@@ -77,9 +77,9 @@ struct BigInt {
     inline explicit operator N_Number_T_() const noexcept {
         constexpr SizeT32 n_size = (sizeof(N_Number_T_) * 8U);
 
-        if constexpr (n_size == BitSize()) {
+        if QENTEM_CONSTEXPR (n_size == BitSize()) {
             return big_int_[0];
-        } else if constexpr (n_size < BitSize()) {
+        } else if QENTEM_CONSTEXPR (n_size < BitSize()) {
             return N_Number_T_(big_int_[0]);
         } else {
             N_Number_T_ num   = 0;
@@ -233,7 +233,7 @@ struct BigInt {
         big_int_[index_id_] /= divisor;
 
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
-            if constexpr (BitSize() == 64U) {
+            if QENTEM_CONSTEXPR (BitSize() == 64U) {
                 return ((BitSize() - 1U) - Platform::FindLastBit(divisor));
             } else {
                 return 0U;
@@ -396,13 +396,13 @@ struct BigInt {
 
     template <BigIntOperation Operation>
     inline void multiOperation(Number_T_ number) noexcept {
-        if constexpr (Operation == BigIntOperation::Add) {
+        if QENTEM_CONSTEXPR (Operation == BigIntOperation::Add) {
             Add(number);
-        } else if constexpr (Operation == BigIntOperation::Subtract) {
+        } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::Subtract) {
             Subtract(number);
-        } else if constexpr (Operation == BigIntOperation::Or) {
+        } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::Or) {
             big_int_[0U] |= number;
-        } else if constexpr (Operation == BigIntOperation::And) {
+        } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::And) {
             big_int_[0U] &= number;
         } else {
             big_int_[0U] = number;
@@ -413,31 +413,31 @@ struct BigInt {
     inline void multiOperation(N_Number_T_ number) noexcept {
         constexpr SizeT32 n_size = ((sizeof(N_Number_T_) * 8U) / BitSize());
 
-        if constexpr (Operation == BigIntOperation::Add) {
+        if QENTEM_CONSTEXPR (Operation == BigIntOperation::Add) {
             Add(Number_T_(number));
-        } else if constexpr (Operation == BigIntOperation::Subtract) {
+        } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::Subtract) {
             Subtract(Number_T_(number));
-        } else if constexpr (Operation == BigIntOperation::Or) {
+        } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::Or) {
             big_int_[0U] |= Number_T_(number);
-        } else if constexpr (Operation == BigIntOperation::And) {
+        } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::And) {
             big_int_[0U] &= Number_T_(number);
         } else {
             big_int_[0U] = Number_T_(number);
         }
 
-        if constexpr (n_size > 1U) {
+        if QENTEM_CONSTEXPR (n_size > 1U) {
             number >>= BitSize();
 
             while (number != N_Number_T_{0}) {
                 ++index_id_;
 
-                if constexpr (Operation == BigIntOperation::Add) {
+                if QENTEM_CONSTEXPR (Operation == BigIntOperation::Add) {
                     Add(Number_T_(number), index_id_);
-                } else if constexpr (Operation == BigIntOperation::Subtract) {
+                } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::Subtract) {
                     Subtract(Number_T_(number), index_id_);
-                } else if constexpr (Operation == BigIntOperation::Or) {
+                } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::Or) {
                     big_int_[index_id_] |= Number_T_(number);
-                } else if constexpr (Operation == BigIntOperation::And) {
+                } else if QENTEM_CONSTEXPR (Operation == BigIntOperation::And) {
                     big_int_[index_id_] &= Number_T_(number);
                 } else {
                     big_int_[index_id_] = Number_T_(number);

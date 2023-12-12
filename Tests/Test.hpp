@@ -42,7 +42,8 @@
 #include "TemplateUTest.hpp"
 // clang-format on
 
-namespace Qentem::Test {
+namespace Qentem {
+namespace Test {
 
 static int PrintResult(int passed, int failed) {
     if (failed == 0) {
@@ -73,7 +74,7 @@ static void SelfTest() {
     std::wstringstream wss{};
     TestOutPut::SetCachedStream(&wss);
 
-    const bool is_colored = TestOutPut::IsColored;
+    const bool is_colored = TestOutPut::IsColored();
 
     TestHelper helper{"Test.hpp", __FILE__};
 
@@ -84,7 +85,7 @@ static void SelfTest() {
     Qentem::MemoryRecord::PrintMemoryStatus();
     Memory::Deallocate(ptr);
     MemoryRecord::ResetSubMemory();
-    TestOutPut::IsColored = false;
+    TestOutPut::IsColored() = false;
 
     helper.EndTests();
 
@@ -93,7 +94,7 @@ static void SelfTest() {
         // const wchar_t *failed_message = L"Not good! 5 out of 15 failed.\n";
     }
 
-    TestOutPut::IsColored = is_colored;
+    TestOutPut::IsColored() = is_colored;
     TestOutPut::SetCachedStream(nullptr);
 }
 
@@ -120,6 +121,7 @@ static int RunTests() {
     return PrintResult(passed, failed);
 }
 
-} // namespace Qentem::Test
+} // namespace Test
+} // namespace Qentem
 
 #endif
