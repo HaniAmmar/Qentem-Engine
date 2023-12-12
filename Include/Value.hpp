@@ -43,42 +43,6 @@ enum class ValueType : unsigned char {
     Null
 };
 ///////////////////////////////////////////////
-template <bool>
-struct VTypeT;
-
-template <>
-struct VTypeT<false> {
-    // Little-Endian
-    VTypeT() = default;
-
-    void DoNothing() noexcept {
-        // Annoying unused var
-        (void)index_capacity_;
-    }
-
-  private:
-    SizeT index_capacity_[2]{0};
-
-  public:
-    QPointer<void> Storage{};
-};
-
-template <>
-struct VTypeT<true> {
-    // Big-Endian
-    VTypeT() = default;
-
-    void DoNothing() noexcept {
-        // Annoying unused var
-        (void)index_capacity_;
-    }
-
-    QPointer<void> Storage{};
-
-  private:
-    SizeT index_capacity_[2]{0};
-};
-///////////////////////////////////////////////
 template <typename Number_T_, bool>
 struct VNumberData;
 
@@ -257,11 +221,11 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
     }
 
     inline ValueType GetType() const noexcept {
-        return ValueType(VType.Storage.GetHighByte());
+        return ValueType(VObject.GetHighByte());
     }
 
     inline void SetType(ValueType new_type) noexcept {
-        VType.Storage.SetHighByte((unsigned char)(new_type));
+        VObject.SetHighByte((unsigned char)(new_type));
     }
 
     union {
@@ -269,8 +233,6 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
         VArrayT  VArray;
         VStringT VString;
         VNumberT VNumber;
-
-        VTypeT<Config::IsBigEndian> VType;
     };
 };
 
