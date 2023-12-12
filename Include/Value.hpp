@@ -1358,54 +1358,6 @@ class Value {
         }
     }
 
-    bool SetString(VStringT &value, SizeT32 precision = Config::DoublePrecision) const {
-        switch (Type()) {
-            case ValueType::String: {
-                value = data_.VString;
-                break;
-            }
-
-            case ValueType::UIntLong: {
-                value.Reset();
-                Digit::NumberToString(value, data_.VNumber.GetUInt64());
-                break;
-            }
-
-            case ValueType::IntLong: {
-                value.Reset();
-                Digit::NumberToString(value, data_.VNumber.GetInt64());
-                break;
-            }
-
-            case ValueType::Double: {
-                value.Reset();
-                Digit::NumberToString(value, data_.VNumber.GetDouble(), precision);
-                break;
-            }
-
-            case ValueType::True: {
-                value = VStringT(JSONotation::TrueString, JSONotation::TrueStringLength);
-                break;
-            }
-
-            case ValueType::False: {
-                value = VStringT(JSONotation::FalseString, JSONotation::FalseStringLength);
-                break;
-            }
-
-            case ValueType::Null: {
-                value = VStringT(JSONotation::NullString, JSONotation::NullStringLength);
-                break;
-            }
-
-            default: {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     template <typename StringStream_T_>
     bool CopyValueTo(StringStream_T_ &stream, SizeT32 precision = Config::DoublePrecision) const {
         switch (Type()) {
