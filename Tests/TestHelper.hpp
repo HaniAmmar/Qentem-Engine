@@ -314,7 +314,7 @@ struct TestHelper {
     QENTEM_NOINLINE static void PrintInfo() {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), "Configurations",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
-        if QENTEM_CONSTEXPR (Config::Is64bit) {
+        if (Config::Is64bit) {
             TestOutPut::Print("Arch: 64-bit\n");
         } else {
             TestOutPut::Print("Arch: 32-bit\n");
@@ -322,17 +322,17 @@ struct TestHelper {
 
         TestOutPut::Print("SizeT: ", sizeof(SizeT), " bytes:\n");
 
-        if QENTEM_CONSTEXPR (Config::IsBigEndian) {
+        if (Config::IsBigEndian) {
             TestOutPut::Print("Endianness: Big-Endian\n");
         } else {
             TestOutPut::Print("Endianness: Little-Endian\n");
         }
 
-        if QENTEM_CONSTEXPR (Config::PointerTagging) {
+        if (Config::PointerTagging) {
             TestOutPut::Print("Tagged Pointers: On\n");
         }
 
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             TestOutPut::Print("Short String Optimization: On\n");
         }
 
@@ -348,7 +348,7 @@ struct TestHelper {
         TestOutPut::Print("WASM SIMD128: On\n");
 #endif
 
-        if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+        if (Config::AutoEscapeHTML) {
             TestOutPut::Print("Auto Escape HTML: On\n");
         }
 

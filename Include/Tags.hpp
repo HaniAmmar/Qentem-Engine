@@ -53,7 +53,9 @@ struct TagBit {
     TagBit &operator=(TagBit &&)      = delete;
 
     TagBit(TagBit &&tag) noexcept : content_{tag.content_}, type_{tag.type_} {
-        if QENTEM_CONSTEXPR (sizeof(Content_T_) < sizeof(void *)) {
+        constexpr bool is_smaller = sizeof(Content_T_) < sizeof(void *);
+
+        if (is_smaller) {
             if ((type_ != TagType::RawText)) {
                 info_ = tag.info_;
             }

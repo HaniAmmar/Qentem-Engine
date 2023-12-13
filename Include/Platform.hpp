@@ -242,11 +242,11 @@ struct SIMD {
 template <typename Number_T_>
 inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr SizeT32 size  = (sizeof(Number_T_) * 8U);
-    unsigned long     index = 0;
+    constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
+    unsigned long  index     = 0;
 
-    if QENTEM_CONSTEXPR (Config::Is64bit) {
-        if QENTEM_CONSTEXPR (size == 64U) {
+    if (Config::Is64bit) {
+        if (is_size_8) {
             _BitScanForward64(&index, SizeT64(value));
         } else {
             _BitScanForward(&index, (unsigned long)(value));
@@ -256,7 +256,7 @@ inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     } else {
         constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-        if QENTEM_CONSTEXPR (size == 64U) {
+        if (is_size_8) {
             // 01010101 <---
             const unsigned long lower_bits = (unsigned long)(value);
 
@@ -278,11 +278,11 @@ inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
 template <typename Number_T_>
 inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr SizeT32 size  = (sizeof(Number_T_) * 8U);
-    unsigned long     index = 0;
+    constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
+    unsigned long  index     = 0;
 
-    if QENTEM_CONSTEXPR (Config::Is64bit) {
-        if QENTEM_CONSTEXPR (size == 64U) {
+    if (Config::Is64bit) {
+        if (is_size_8) {
             _BitScanReverse64(&index, SizeT64(value));
         } else {
             _BitScanReverse(&index, (unsigned long)(value));
@@ -292,7 +292,7 @@ inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     } else {
         constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-        if QENTEM_CONSTEXPR (size == 64U) {
+        if (is_size_8) {
             // 01010101 <---
             const unsigned long lower_bits = (unsigned long)(value);
             value >>= int_size;
@@ -316,10 +316,10 @@ inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
 template <typename Number_T_>
 inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr SizeT32 size = (sizeof(Number_T_) * 8U);
+    constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
 
-    if QENTEM_CONSTEXPR (Config::Is64bit) {
-        if QENTEM_CONSTEXPR (size == 64U) {
+    if (Config::Is64bit) {
+        if (is_size_8) {
             return SizeT32(__builtin_ctzl((unsigned long)(value)));
         }
 
@@ -327,7 +327,7 @@ inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     } else {
         constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-        if QENTEM_CONSTEXPR (size == 64U) {
+        if (is_size_8) {
             // 01010101 <---
             const SizeT32 lower_bits = SizeT32(value);
 
@@ -346,18 +346,19 @@ inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
 template <typename Number_T_>
 inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr SizeT32 int_size   = (sizeof(int) * 8U);
-    constexpr SizeT32 taken_size = (int_size - 1U);
-    constexpr SizeT32 size       = ((sizeof(Number_T_) * 8U) - 1U);
+    constexpr SizeT32 int_size    = (sizeof(int) * 8U);
+    constexpr SizeT32 taken_size  = (int_size - 1U);
+    constexpr SizeT32 size        = ((sizeof(Number_T_) * 8U) - 1U);
+    constexpr bool    is_size_63b = (size == 63U);
 
-    if QENTEM_CONSTEXPR (Config::Is64bit) {
-        if QENTEM_CONSTEXPR (size == 63U) {
+    if (Config::Is64bit) {
+        if (is_size_63b) {
             return (size - SizeT32(__builtin_clzl((unsigned long)(value))));
         }
 
         return (taken_size - SizeT32(__builtin_clz(SizeT32(value))));
     } else {
-        if QENTEM_CONSTEXPR (size == 63U) {
+        if (is_size_63b) {
             // ---> 01010101
             const SizeT32 lower_bits = SizeT32(value);
             value >>= int_size;

@@ -128,7 +128,7 @@ class String {
     }
 
     String(Char_T_ *str, SizeT len) {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             if (len < ShortStringMax) {
                 copyString(str, len);
                 Memory::Deallocate(str);
@@ -156,7 +156,7 @@ class String {
         if (this != &src) {
             deallocate();
 
-            if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+            if (Config::ShortStringOptimization) {
                 data_.Padding = src.data_.Padding;
                 data_.Length  = src.data_.Length;
                 setLength(src.Length());
@@ -326,7 +326,7 @@ class String {
     Char_T_ *Detach() {
         Char_T_ *str;
 
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             constexpr SizeT32 size = sizeof(Char_T_);
             const SizeT       len  = Length();
             Char_T_          *src  = getStorage(len);
@@ -350,7 +350,7 @@ class String {
     }
 
     inline SizeT Length() const noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             const unsigned char len = data_.Storage.GetLowByte();
             return ((len == not_short_value_) ? data_.Length : len);
         } else {
@@ -359,7 +359,7 @@ class String {
     }
 
     inline Char_T_ *Storage() noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
                 return GetShortStorage();
@@ -370,7 +370,7 @@ class String {
     }
 
     inline const Char_T_ *Storage() const noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
                 return GetShortStorage();
@@ -395,7 +395,7 @@ class String {
             Char_T_          *src     = getStorage(src_len);
             Char_T_          *ns;
 
-            if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+            if (Config::ShortStringOptimization) {
                 if (new_len <= ShortStringMax) {
                     ns = Memory::ChangePointer<Char_T_>(&(data_.Padding));
 
@@ -444,7 +444,7 @@ class String {
             Char_T_    *str     = getStorage(length);
             const SizeT new_len = (length - len);
 
-            if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+            if (Config::ShortStringOptimization) {
                 if (new_len < ShortStringMax) {
                     if (length >= ShortStringMax) {
                         constexpr SizeT32 size = sizeof(Char_T_);
@@ -565,7 +565,7 @@ class String {
 
   private:
     inline const Char_T_ *getStorage(SizeT length) const noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
                 return GetShortStorage();
             }
@@ -575,7 +575,7 @@ class String {
     }
 
     inline Char_T_ *getStorage(SizeT length) noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
                 return GetShortStorage();
             }
@@ -585,7 +585,7 @@ class String {
     }
 
     void clearLength() noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             data_.Storage.SetLowByte((unsigned char)(0));
         }
 
@@ -593,7 +593,7 @@ class String {
     }
 
     void setLength(SizeT new_length) noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             if (new_length < ShortStringMax) {
                 data_.Storage.SetLowByte((unsigned char)(new_length));
             } else {
@@ -610,7 +610,7 @@ class String {
     }
 
     Char_T_ *allocate(SizeT new_size) {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             if (new_size <= ShortStringMax) {
                 return GetShortStorage();
             }
@@ -622,7 +622,7 @@ class String {
     }
 
     void deallocate() noexcept {
-        if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+        if (Config::ShortStringOptimization) {
             const SizeT length = Length();
 
             if (length >= ShortStringMax) {

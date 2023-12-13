@@ -651,7 +651,7 @@ static void TestVariableUTag4(TestHelper &helper) {
     value += uR"("ABC'DEF<GHI>GK<)";
     value += uR"(A""BC<<DE>>FG''HI&&GK)";
 
-    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+    if (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(uR"({var:0})", value, ss), uR"(&lt;)", uR"(Render())", __LINE__);
         ss.Clear();
 
@@ -2573,7 +2573,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="1" true="{var:0}" false="{var:1}"})";
 
-    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+    if (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2, ss), uR"(&amp;)", uR"(Render())", __LINE__);
         ss.Clear();
 
@@ -2588,7 +2588,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
 
     content = uR"({if case="0" true="{var:0}" false="{var:1}"})";
 
-    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+    if (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2, ss), uR"(&quot;)", uR"(Render())", __LINE__);
         ss.Clear();
 

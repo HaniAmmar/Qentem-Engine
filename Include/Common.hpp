@@ -180,9 +180,9 @@ union QNumber64 {
 
     template <typename Number_T_>
     explicit QNumber64(Number_T_ num) noexcept {
-        if QENTEM_CONSTEXPR (IsFloat<Number_T_>()) {
+        if (IsFloat<Number_T_>()) {
             Real = double(num);
-        } else if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
+        } else if (IsUnsigned<Number_T_>()) {
             Natural = SizeT64(num);
         } else {
             Integer = SizeT64I(num);
@@ -204,9 +204,9 @@ union QNumber32 {
 
     template <typename Number_T_>
     explicit QNumber32(Number_T_ num) noexcept {
-        if QENTEM_CONSTEXPR (IsFloat<Number_T_>()) {
+        if (IsFloat<Number_T_>()) {
             Real = float(num);
-        } else if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
+        } else if (IsUnsigned<Number_T_>()) {
             Natural = SizeT32(num);
         } else {
             Integer = int(num);
@@ -228,9 +228,9 @@ union QNumber16 {
     ~QNumber16() noexcept                            = default;
 
     explicit QNumber16(Number_T_ num) noexcept {
-        if QENTEM_CONSTEXPR (IsFloat<Number_T_>()) {
+        if (IsFloat<Number_T_>()) {
             Real = Number_T_(num);
-        } else if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
+        } else if (IsUnsigned<Number_T_>()) {
             Natural = SizeT16(num);
         } else {
             Integer = short(num);
@@ -252,7 +252,7 @@ union QNumber8 {
 
     template <typename Number_T_>
     explicit QNumber8(Number_T_ num) noexcept {
-        if QENTEM_CONSTEXPR (IsUnsigned<Number_T_>()) {
+        if (IsUnsigned<Number_T_>()) {
             Natural = (unsigned char)(num);
         } else {
             Integer = char(num);

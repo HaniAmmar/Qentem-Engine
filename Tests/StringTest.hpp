@@ -131,7 +131,7 @@ static void TestString1(TestHelper &helper) {
     char         *tmp_size_2 = Memory::Allocate<char>(2);
     const String8 str_size_2 = String8(tmp_size_2, 2U);
 
-    if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+    if (Config::ShortStringOptimization) {
         helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
     } else {
         helper.Equal(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
@@ -286,7 +286,7 @@ static void TestString2(TestHelper &helper) {
     helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
-    if QENTEM_CONSTEXPR (Config::ShortStringOptimization) {
+    if (Config::ShortStringOptimization) {
         char sstr[32];
         str1.Reset();
         for (SizeT i = 0; i < String8::ShortStringMax; i++) {

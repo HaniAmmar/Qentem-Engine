@@ -71,14 +71,14 @@ struct Digit {
 
         QNumberType_T qn{number};
 
-        if QENTEM_CONSTEXPR (!IsUnsigned<Number_T_>()) {
+        if (!IsUnsigned<Number_T_>()) {
             if (number < Number_T_{0}) {
                 qn.Integer = -qn.Integer;
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
         }
 
-        if QENTEM_CONSTEXPR (Reverse_V_) {
+        if (Reverse_V_) {
             stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), qn.Natural));
         } else {
             const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
@@ -488,7 +488,8 @@ struct Digit {
         shifted += 64U;
         bint <<= 64U;
         //////////////////////////////////////////////////////////////
-        if QENTEM_CONSTEXPR (sizeof(UNumber_T) == 8U) {
+        constexpr bool is_size_8 = (sizeof(UNumber_T) == 8U);
+        if (is_size_8) {
             while (exponent >= DigitLimit::MaxPowerOfFive) {
                 // 2**126 = 85070591730234615865843651857942052864
                 // 5**27 = 7450580596923828125 (MaxPowerOfFive)
@@ -663,7 +664,7 @@ struct Digit {
     static SizeT intToString(Char_T_ *storage, Number_T_ number) noexcept {
         const Char_T_ *str = storage;
 
-        if QENTEM_CONSTEXPR (!Reverse_V_) {
+        if (!Reverse_V_) {
             while (number >= Number_T_{10}) {
                 const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
                 number /= Number_T_{100};

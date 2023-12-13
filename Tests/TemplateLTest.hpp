@@ -651,7 +651,7 @@ static void TestVariableLTag4(TestHelper &helper) {
     value += LR"("ABC'DEF<GHI>GK<)";
     value += LR"(A""BC<<DE>>FG''HI&&GK)";
 
-    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+    if (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(LR"({var:0})", value, ss), LR"(&lt;)", LR"(Render())", __LINE__);
         ss.Clear();
 
@@ -2573,7 +2573,7 @@ static void TestInlineIfLTag(TestHelper &helper) {
 
     content = LR"({if case="1" true="{var:0}" false="{var:1}"})";
 
-    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+    if (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2, ss), LR"(&amp;)", LR"(Render())", __LINE__);
         ss.Clear();
 
@@ -2588,7 +2588,7 @@ static void TestInlineIfLTag(TestHelper &helper) {
 
     content = LR"({if case="0" true="{var:0}" false="{var:1}"})";
 
-    if QENTEM_CONSTEXPR (Config::AutoEscapeHTML) {
+    if (Config::AutoEscapeHTML) {
         helper.Equal(Template::Render(content, value2, ss), LR"(&quot;)", LR"(Render())", __LINE__);
         ss.Clear();
 
