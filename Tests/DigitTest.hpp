@@ -3898,6 +3898,12 @@ static void TestFloatToString2(TestHelper &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, 0.000009999999F, 6U, "1e-05", "return", __LINE__);
     RealToStreamEqual(helper, stream, 505.3125F, 6U, "505.312", "return", __LINE__);
     RealToStreamEqual(helper, stream, 505.003125F, 6U, "505.003", "return", __LINE__);
+
+#if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
+    RealToStreamEqual(helper, stream, 15.5F16, 6U, "15.5", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 65504.0F16, 6U, "65504", "return", __LINE__);
+    RealToStreamEqual(helper, stream, 5.96046e-8F16, 6U, "5.96046e-08", "return", __LINE__);
+#endif
 }
 
 static int RunDigitTests() {
