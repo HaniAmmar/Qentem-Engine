@@ -32,12 +32,6 @@ using SizeT32  = unsigned int;
 using SizeT64  = unsigned long long;
 using SizeT64I = long long;
 
-#if (defined(_MSVC_LANG) && (_MSVC_LANG < 201703L)) || (defined(__cplusplus) && (__cplusplus < 201703L))
-#define QENTEM_CONSTEXPR
-#else
-#define QENTEM_CONSTEXPR constexpr
-#endif
-
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
 using SizeT = SizeT32;
