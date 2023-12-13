@@ -1,4 +1,3 @@
-[![Build Status](https://app.travis-ci.com/HaniAmmar/Qentem-Engine.svg?branch=main)](https://app.travis-ci.com/HaniAmmar/Qentem-Engine)
 [![Build status](https://ci.appveyor.com/api/projects/status/08uk7dxqw3vn3usi/branch/main?svg=true)](https://ci.appveyor.com/project/HaniAmmar/qentem-engine/branch/main)
 [![codecov](https://codecov.io/gh/HaniAmmar/Qentem-Engine/branch/main/graph/badge.svg)](https://codecov.io/gh/HaniAmmar/Qentem-Engine)
 
