@@ -6,32 +6,49 @@ branches:
   only:
     - main
 
-platform:
-  - x64
-  - x86
-  - ARM
+# platform:
+#   - x64
+#   - x86
+#   - ARM
 
-configuration:
-  - Release
+# configuration:
+#   - Release
 
-# cache:
-#   - Build -> .appveyor.yml
-#   - Release -> .appveyor.yml
-#   - x64 -> .appveyor.yml
-#   - x86 -> .appveyor.yml
-#   - ARM -> .appveyor.yml
+environment:
+  matrix:
 
-image:
-    - Visual Studio 2019
+  - job_name: Windows build
+    appveyor_build_worker_image: Visual Studio 2019
 
-build_script:
-  - mkdir Build
-  - cd Build
-  - cmake ..
-  - cmake --build .
-
-test_script:
-  - ctest -C Debug
+  - job_name: Linux build
+    appveyor_build_worker_image: Ubuntu
 
 matrix:
   fast_finish: true
+
+for:
+  -
+    matrix:
+      only:
+        - job_name: Windows build
+
+    build_script:
+    - cmd: mkdir Build
+    - cmd: cd Build
+    - cmd: cmake ..
+    - cmd: cmake --build .
+
+    test_script:
+    - cmd: ctest -C Debug
+
+  -
+    matrix:
+      only:
+        - job_name: Linux build
+
+    build_script:
+    - sh: mkdir Build
+    - sh: g++ -g -O0 -Wall -Wextra -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
+
+    test_script:
+    - sh: ./Build/QTest.bin
