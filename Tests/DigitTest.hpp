@@ -2091,8 +2091,11 @@ static void TestHexStringToNumber(TestHelper &helper) {
 
 template <typename Stream_T_>
 static void TestIntToString1(TestHelper &helper, Stream_T_ &stream) {
-    IntToStreamEqual(helper, stream, char{1}, "1", "return", __LINE__);
-    IntToStreamEqual(helper, stream, char{-1}, "-1", "return", __LINE__);
+    IntToStreamEqual(helper, stream, SizeT8{255}, "255", "return", __LINE__);
+    IntToStreamEqual(helper, stream, char{-127}, "-127", "return", __LINE__);
+
+    IntToStreamEqual(helper, stream, SizeT16{65535}, "65535", "return", __LINE__);
+    IntToStreamEqual(helper, stream, short{-32767}, "-32767", "return", __LINE__);
 
     IntToStreamEqual(helper, stream, -1, "-1", "return", __LINE__);
     IntToStreamEqual(helper, stream, 1, "1", "return", __LINE__);
