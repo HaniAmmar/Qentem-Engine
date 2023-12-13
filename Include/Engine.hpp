@@ -47,33 +47,32 @@ class Engine {
     template <typename Char_T_, typename Number_T_>
     static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content, Number_T_ offset, const Number_T_ end_offset,
                              Number_T_ full_length = 0) noexcept {
-        if (Config::IsSIMDEnabled) {
-            if (offset < end_offset) {
-                Number_T_ m_size =
-                    ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
+#if defined(QENTEM_SIMD_ENABLED) && (QENTEM_SIMD_ENABLED == 1)
+        if (offset < end_offset) {
+            Number_T_ m_size =
+                ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
 
-                if (m_size != Number_T_{0}) {
-                    const Platform::SIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
+            if (m_size != Number_T_{0}) {
+                const Platform::SIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
 
-                    do {
-                        const Platform::SIMD::VAR_T m_content =
-                            Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content + offset));
-                        const Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
+                do {
+                    const Platform::SIMD::VAR_T m_content =
+                        Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content + offset));
+                    const Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
 
-                        if (bits != Platform::SIMD::Number_T{0}) {
-                            const Number_T_ simd_offset =
-                                Number_T_(Platform::FindFirstBit(bits) + offset + Number_T_{1});
-                            return ((simd_offset <= end_offset) ? simd_offset : Number_T_{0});
-                        }
+                    if (bits != Platform::SIMD::Number_T{0}) {
+                        const Number_T_ simd_offset = Number_T_(Platform::FindFirstBit(bits) + offset + Number_T_{1});
+                        return ((simd_offset <= end_offset) ? simd_offset : Number_T_{0});
+                    }
 
-                        offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
-                        --m_size;
-                    } while ((m_size != Number_T_{0}) && (offset < end_offset));
-                }
+                    offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+                    --m_size;
+                } while ((m_size != Number_T_{0}) && (offset < end_offset));
             }
-        } else {
-            (void)full_length;
         }
+#else
+        (void)full_length;
+#endif
 
         while ((offset < end_offset) && (char_1 != content[offset])) {
             ++offset;
@@ -99,48 +98,47 @@ class Engine {
             const Char_T_   pattern_last = pattern[len_one_less];
             end_offset -= len_one_less;
 
-            if (Config::IsSIMDEnabled) {
-                Number_T_ m_size =
-                    ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
-                     Platform::SIMD::Shift);
+#if defined(QENTEM_SIMD_ENABLED) && (QENTEM_SIMD_ENABLED == 1)
+            Number_T_ m_size = ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
+                                Platform::SIMD::Shift);
 
-                if (m_size != Number_T_{0}) {
-                    const Char_T_              *content_ofs     = (content + offset);
-                    const Platform::SIMD::VAR_T m_pattern_first = Platform::SMIDSetToOne(*pattern);
-                    const Platform::SIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern_last);
+            if (m_size != Number_T_{0}) {
+                const Char_T_              *content_ofs     = (content + offset);
+                const Platform::SIMD::VAR_T m_pattern_first = Platform::SMIDSetToOne(*pattern);
+                const Platform::SIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern_last);
 
-                    do {
-                        Platform::SIMD::VAR_T m_content =
-                            Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs));
-                        Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
+                do {
+                    Platform::SIMD::VAR_T m_content =
+                        Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs));
+                    Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
 
-                        m_content = Platform::SIMD::Load(
-                            Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs + len_one_less));
-                        bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
+                    m_content = Platform::SIMD::Load(
+                        Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs + len_one_less));
+                    bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
 
-                        while (bits != Platform::SIMD::Number_T{0}) {
-                            const Number_T_ index         = Number_T_(Platform::FindFirstBit(bits));
-                            const Number_T_ pattern_index = (index + offset);
+                    while (bits != Platform::SIMD::Number_T{0}) {
+                        const Number_T_ index         = Number_T_(Platform::FindFirstBit(bits));
+                        const Number_T_ pattern_index = (index + offset);
 
-                            if ((index + offset) > end_offset) {
-                                return Number_T_{0};
-                            }
-
-                            if (StringUtils::IsEqual(pattern, (content_ofs + index), len_one_less)) {
-                                return (pattern_index + pattern_length);
-                            }
-
-                            bits ^= (Platform::SIMD::Number_T{1} << index);
+                        if ((index + offset) > end_offset) {
+                            return Number_T_{0};
                         }
 
-                        offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
-                        content_ofs += Platform::SMIDNextOffset<Char_T_, Number_T_>();
-                        --m_size;
-                    } while ((m_size != Number_T_{0}) && (offset < end_offset));
-                }
-            } else {
-                (void)full_length;
+                        if (StringUtils::IsEqual(pattern, (content_ofs + index), len_one_less)) {
+                            return (pattern_index + pattern_length);
+                        }
+
+                        bits ^= (Platform::SIMD::Number_T{1} << index);
+                    }
+
+                    offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+                    content_ofs += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+                    --m_size;
+                } while ((m_size != Number_T_{0}) && (offset < end_offset));
             }
+#else
+            (void)full_length;
+#endif
 
             while (offset < end_offset) {
                 if ((*pattern == content[offset]) && (pattern_last == content[offset + len_one_less])) {

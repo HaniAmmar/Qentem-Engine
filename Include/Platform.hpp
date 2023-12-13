@@ -231,7 +231,7 @@ struct SIMD {
 
 #ifdef _MSC_VER
 #include <intrin.h>
-#if defined(_M_X64)
+#ifdef _M_X64
 #pragma intrinsic(_BitScanForward64)
 #pragma intrinsic(_BitScanReverse64)
 #else
@@ -245,34 +245,34 @@ inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
     unsigned long  index     = 0;
 
-    if constexpr (Config::Is64bit) {
-        if (is_size_8) {
-            _BitScanForward64(&index, SizeT64(value));
-        } else {
-            _BitScanForward(&index, (unsigned long)(value));
-        }
-
-        return SizeT32(index);
+#ifdef _M_X64
+    if (is_size_8) {
+        _BitScanForward64(&index, SizeT64(value));
     } else {
-        constexpr SizeT32 int_size = (sizeof(int) * 8U);
+        _BitScanForward(&index, (unsigned long)(value));
+    }
 
-        if (is_size_8) {
-            // 01010101 <---
-            const unsigned long lower_bits = (unsigned long)(value);
+    return SizeT32(index);
+#else
+    constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-            if (lower_bits != 0U) {
-                _BitScanForward(&index, lower_bits);
-                return SizeT32(index);
-            }
+    if (is_size_8) {
+        // 01010101 <---
+        const unsigned long lower_bits = (unsigned long)(value);
 
-            value >>= int_size;
-            _BitScanForward(&index, (unsigned long)(value));
-            return (SizeT32(index) + int_size);
-        } else {
-            _BitScanForward(&index, (unsigned long)(value));
+        if (lower_bits != 0U) {
+            _BitScanForward(&index, lower_bits);
             return SizeT32(index);
         }
+
+        value >>= int_size;
+        _BitScanForward(&index, (unsigned long)(value));
+        return (SizeT32(index) + int_size);
+    } else {
+        _BitScanForward(&index, (unsigned long)(value));
+        return SizeT32(index);
     }
+#endif
 }
 
 template <typename Number_T_>
@@ -281,34 +281,34 @@ inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
     unsigned long  index     = 0;
 
-    if constexpr (Config::Is64bit) {
-        if (is_size_8) {
-            _BitScanReverse64(&index, SizeT64(value));
-        } else {
-            _BitScanReverse(&index, (unsigned long)(value));
-        }
-
-        return SizeT32(index);
+#ifdef _M_X64
+    if (is_size_8) {
+        _BitScanReverse64(&index, SizeT64(value));
     } else {
-        constexpr SizeT32 int_size = (sizeof(int) * 8U);
+        _BitScanReverse(&index, (unsigned long)(value));
+    }
 
-        if (is_size_8) {
-            // 01010101 <---
-            const unsigned long lower_bits = (unsigned long)(value);
-            value >>= int_size;
+    return SizeT32(index);
+#else
+    constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-            if (value == Number_T_{0}) {
-                _BitScanReverse(&index, lower_bits);
-                return SizeT32(index);
-            }
+    if (is_size_8) {
+        // 01010101 <---
+        const unsigned long lower_bits = (unsigned long)(value);
+        value >>= int_size;
 
-            _BitScanReverse(&index, (unsigned long)(value));
-            return (SizeT32(index) + int_size);
-        } else {
-            _BitScanReverse(&index, (unsigned long)(value));
+        if (value == Number_T_{0}) {
+            _BitScanReverse(&index, lower_bits);
             return SizeT32(index);
         }
+
+        _BitScanReverse(&index, (unsigned long)(value));
+        return (SizeT32(index) + int_size);
+    } else {
+        _BitScanReverse(&index, (unsigned long)(value));
+        return SizeT32(index);
     }
+#endif
 }
 
 #else

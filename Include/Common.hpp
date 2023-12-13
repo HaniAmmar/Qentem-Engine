@@ -126,8 +126,10 @@ struct Config {
 
 #if (QENTEM_AVX2 == 1) || (QENTEM_SSE2 == 1) || (QENTEM_MSIMD128 == 1)
     static constexpr bool IsSIMDEnabled{true};
+#define QENTEM_SIMD_ENABLED 1
 #else
     static constexpr bool IsSIMDEnabled{false};
+#undef QENTEM_SIMD_ENABLED
 #endif
 };
 ///////////////////////////////////////////////
