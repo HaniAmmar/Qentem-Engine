@@ -69,7 +69,7 @@ struct Digit {
         constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000U) + 1U);
         Char_T_           storage[max_number_of_digits];
 
-        QNumberType_T qn = QNumberType_T{number};
+        QNumberType_T qn{number};
 
         if QENTEM_CONSTEXPR (!IsUnsigned<Number_T_>()) {
             if (number < Number_T_{0}) {
@@ -97,8 +97,9 @@ struct Digit {
     template <typename Char_T_>
     static SizeT32 HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
         using Uint_Char_T = SizeT32;
-        SizeT32 number    = 0;
-        SizeT32 offset    = 0;
+
+        SizeT32 number{0};
+        SizeT32 offset{0};
 
         while (offset < length) {
             const Char_T_ digit = value[offset];
@@ -156,7 +157,8 @@ struct Digit {
     template <typename Char_T_>
     static QNumberType stringToNumber(QNumber64 &number, const Char_T_ *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
-        using Number_T             = decltype(number.Natural);
+        using Number_T = decltype(number.Natural);
+
         constexpr SizeT max_length = SizeT{19};
         number.Natural             = 0;
 
@@ -481,7 +483,7 @@ struct Digit {
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
-        SizeT32 shifted = exponent;
+        SizeT32 shifted{exponent};
         //////////////////////////////////////////////////////////////
         shifted += 64U;
         bint <<= 64U;
@@ -566,11 +568,9 @@ struct Digit {
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
-        constexpr SizeT32 bint_limit = 2U;
-        SizeT32           shifted    = 0;
+        constexpr SizeT32 bint_limit{2U};
+        SizeT32           shifted{exponent};
         //////////////////////////////////////////////////////////////
-        shifted += exponent;
-
         while (exponent >= DigitLimit::MaxPowerOfFive) {
             bint *= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
 
@@ -610,7 +610,7 @@ struct Digit {
     template <typename Char_T_>
     static bool parseExponent(const Char_T_ *content, SizeT32 &exponent, bool &is_negative_exp, SizeT &offset,
                               const SizeT end_offset) noexcept {
-        bool sign_set = false;
+        bool sign_set{false};
 
         while (offset < end_offset) {
             switch (content[offset]) {
