@@ -245,7 +245,7 @@ inline static SizeT32 FindFirstBit(Number_T_ value) noexcept {
     constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
     unsigned long  index     = 0;
 
-    if (Config::Is64bit) {
+    if constexpr (Config::Is64bit) {
         if (is_size_8) {
             _BitScanForward64(&index, SizeT64(value));
         } else {
@@ -281,7 +281,7 @@ inline static SizeT32 FindLastBit(Number_T_ value) noexcept {
     constexpr bool is_size_8 = (sizeof(Number_T_) == 8U);
     unsigned long  index     = 0;
 
-    if (Config::Is64bit) {
+    if constexpr (Config::Is64bit) {
         if (is_size_8) {
             _BitScanReverse64(&index, SizeT64(value));
         } else {
