@@ -37,8 +37,15 @@ using SizeT64I = long long;
 using SizeT = SizeT32;
 #endif
 
-// #define QENTEM_ENABLE_FLOAT_16 1
-// #define QENTEM_ENABLE_BFLOAT_16 1
+#ifndef QENTEM_ENABLE_FLOAT_16
+// Requires c++23
+#define QENTEM_ENABLE_FLOAT_16 0
+#endif
+
+#ifndef QENTEM_ENABLE_BFLOAT_16
+// Requires c++23
+#define QENTEM_ENABLE_BFLOAT_16 0
+#endif
 
 #ifndef QENTEM_DOUBLE_PRECISION
 #define QENTEM_DOUBLE_PRECISION 15U
