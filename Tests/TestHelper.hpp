@@ -20,10 +20,6 @@
  * SOFTWARE.
  */
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4505) // Warning about functions not being used.
-#endif
-
 #include "Common.hpp"
 
 #include <iostream>
