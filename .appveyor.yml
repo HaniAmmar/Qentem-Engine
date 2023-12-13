@@ -25,6 +25,9 @@ environment:
     appveyor_build_worker_image: Ubuntu2204
     platform: x64
 
+  - job_name: macOS Monterey
+    appveyor_build_worker_image: macos-monterey
+
   # - job_name: Linux x86
   #   appveyor_build_worker_image: Ubuntu2204
   #   platform: x86
@@ -101,6 +104,18 @@ for:
 
   #   test_script:
   #   - sh: ./Build/QTest.bin
+
+  -
+    matrix:
+      only:
+        - job_name: macOS Monterey
+
+    build_script:
+    - sh: mkdir Build
+    - sh: clang++ -std=c++20 -g -O0 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+
+    test_script:
+    - sh: ./Build/QTest.bin
 
   -
     matrix:
