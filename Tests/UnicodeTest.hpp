@@ -79,7 +79,7 @@ static void TestToUTF8(TestHelper &helper) {
     helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
     helper.EqualsTrue(*(stream.First()) == QChar{194}, "stream.First()", __LINE__);
     helper.EqualsTrue(*(stream.First() + 1U) == QChar{161}, "*(stream.First()+1)", __LINE__);
-    const unsigned char v00A1[] = "¡";
+    const QChar v00A1[] = "¡";
     helper.Equal(stream, &(v00A1[0]), "stream == v00A1", __LINE__);
     stream.Clear();
 
@@ -101,7 +101,7 @@ static void TestToUTF8(TestHelper &helper) {
     helper.EqualsTrue(*(stream.First()) == QChar{224}, "stream.First()", __LINE__);
     helper.EqualsTrue(*(stream.First() + 1U) == QChar{162}, "*(stream.First()+1)", __LINE__);
     helper.EqualsTrue(*(stream.First() + 2U) == QChar{167}, "*(stream.First() + 2)", __LINE__);
-    const unsigned char v08A7[] = "ࢧ";
+    const QChar v08A7[] = "ࢧ";
     helper.Equal(stream, &(v08A7[0]), "stream == v08A7", __LINE__);
     stream.Clear();
 
@@ -118,7 +118,7 @@ static void TestToUTF8(TestHelper &helper) {
     helper.EqualsTrue(*(stream.First() + 1U) == QChar{144}, "*(stream.First()+1)", __LINE__);
     helper.EqualsTrue(*(stream.First() + 2U) == QChar{128}, "*(stream.First() + 2)", __LINE__);
     helper.EqualsTrue(*(stream.First() + 3U) == QChar{128}, "*(stream.First() + 3)", __LINE__);
-    const unsigned char v10000[] = "𐀀";
+    const QChar v10000[] = "𐀀";
     helper.Equal(stream, &(v10000[0]), "stream == v10000", __LINE__);
     stream.Clear();
 

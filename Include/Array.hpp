@@ -343,19 +343,19 @@ class Array {
         return nullptr;
     }
 
-    inline unsigned char GetHighByte() const noexcept {
+    inline SizeT8 GetHighByte() const noexcept {
         return data_.Storage.GetHighByte();
     }
 
-    inline void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(SizeT8 byte) noexcept {
         data_.Storage.SetHighByte(byte);
     }
 
-    inline unsigned char GetLowByte() const noexcept {
+    inline SizeT8 GetLowByte() const noexcept {
         return data_.Storage.GetLowByte();
     }
 
-    inline void SetLowByte(unsigned char byte) noexcept {
+    inline void SetLowByte(SizeT8 byte) noexcept {
         data_.Storage.SetLowByte(byte);
     }
 

@@ -77,31 +77,31 @@ struct QPointerData<Type_T_, true> {
         src.PtrNumber = 0;
     }
 
-    inline void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(SizeT8 byte) noexcept {
         SizeT64 byte64 = byte;
         PtrNumber &= 0xFFFFFFFFFFFFFFULL;
         byte64 <<= 56U;
         PtrNumber |= byte64;
     }
 
-    inline unsigned char GetHighByte() const noexcept {
+    inline SizeT8 GetHighByte() const noexcept {
         SizeT64 byte64 = PtrNumber;
         byte64 &= 0xFF00000000000000ULL;
         byte64 >>= 56U;
-        return (unsigned char)(byte64);
+        return SizeT8(byte64);
     }
 
-    inline void SetLowByte(unsigned char byte) noexcept {
+    inline void SetLowByte(SizeT8 byte) noexcept {
         SizeT64 byte64 = byte;
         PtrNumber &= 0xFF00FFFFFFFFFFFFULL;
         byte64 <<= 48U;
         PtrNumber |= byte64;
     }
-    inline unsigned char GetLowByte() const noexcept {
+    inline SizeT8 GetLowByte() const noexcept {
         SizeT64 byte64 = PtrNumber;
         byte64 &= 0x00FF000000000000ULL;
         byte64 >>= 48U;
-        return (unsigned char)(byte64);
+        return SizeT8(byte64);
     }
 
     union {
@@ -140,19 +140,19 @@ struct QPointerData<Type_T_, false> {
         src.Pointer = nullptr;
     }
 
-    inline void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(SizeT8 byte) noexcept {
         (void)byte;
     }
 
-    inline unsigned char GetHighByte() const noexcept {
+    inline SizeT8 GetHighByte() const noexcept {
         return 0;
     }
 
-    inline void SetLowByte(unsigned char byte) noexcept {
+    inline void SetLowByte(SizeT8 byte) noexcept {
         (void)byte;
     }
 
-    inline unsigned char GetLowByte() const noexcept {
+    inline SizeT8 GetLowByte() const noexcept {
         return 0;
     }
 
@@ -192,19 +192,19 @@ class QPointer {
         data_.MovePointerOnly(src.data_);
     }
 
-    inline void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(SizeT8 byte) noexcept {
         data_.SetHighByte(byte);
     }
 
-    inline void SetLowByte(unsigned char byte) noexcept {
+    inline void SetLowByte(SizeT8 byte) noexcept {
         data_.SetLowByte(byte);
     }
 
-    inline unsigned char GetLowByte() const noexcept {
+    inline SizeT8 GetLowByte() const noexcept {
         return data_.GetLowByte();
     }
 
-    inline unsigned char GetHighByte() const noexcept {
+    inline SizeT8 GetHighByte() const noexcept {
         return data_.GetHighByte();
     }
 

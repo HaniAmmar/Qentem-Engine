@@ -40,7 +40,7 @@ template <typename Number_T_, SizeT32 Width_T_>
 struct BigInt {
     using NumberType_ = Number_T_;
 
-    enum class BigIntOperation : unsigned char {
+    enum class BigIntOperation : SizeT8 {
         // Internal use only
         Set = 0, // =
         Or,      // |

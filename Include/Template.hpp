@@ -940,8 +940,8 @@ struct TemplateSub {
 
                     VariableTag set_var{};
                     parseVariableTag(set_offset, (set_offset + set_length), &set_var);
-                    i_tag.SetOffset = (unsigned char)(set_var.Offset - i_tag.Offset);
-                    i_tag.SetLength = (unsigned char)(set_var.Length);
+                    i_tag.SetOffset = SizeT8(set_var.Offset - i_tag.Offset);
+                    i_tag.SetLength = SizeT8(set_var.Length);
                     i_tag.SetLevel  = set_var.Level;
                     i_tag.Options |= set_var.IsLoopValue;
 
@@ -953,8 +953,8 @@ struct TemplateSub {
                 }
 
                 case TagPatterns::ValueChar: {
-                    i_tag.ValueOffset = (unsigned char)(last_offset - i_tag.Offset);
-                    i_tag.ValueLength = (unsigned char)((offset2 - SizeT{1}) - last_offset);
+                    i_tag.ValueOffset = SizeT8(last_offset - i_tag.Offset);
+                    i_tag.ValueLength = SizeT8((offset2 - SizeT{1}) - last_offset);
                     offset            = offset2;
                     offset2           = getQuotedValue(offset, loop_content_offset);
                     last_offset       = offset;
@@ -973,8 +973,8 @@ struct TemplateSub {
                 }
 
                 case TagPatterns::GroupChar: {
-                    i_tag.GroupOffset = (unsigned char)(last_offset - i_tag.Offset);
-                    i_tag.GroupLength = (unsigned char)((offset2 - SizeT{1}) - last_offset);
+                    i_tag.GroupOffset = SizeT8(last_offset - i_tag.Offset);
+                    i_tag.GroupLength = SizeT8((offset2 - SizeT{1}) - last_offset);
                     offset            = offset2;
                     offset2           = getQuotedValue(offset, loop_content_offset);
                     last_offset       = offset;
@@ -1141,8 +1141,7 @@ struct TemplateSub {
         return getValue(variable.Offset, variable.Length, variable.Level, variable.IsLoopValue);
     }
 
-    const Value_T_ *getValue(SizeT v_offset, SizeT16 v_length, unsigned char v_level,
-                             unsigned char v_is_loop_value) const noexcept {
+    const Value_T_ *getValue(SizeT v_offset, SizeT16 v_length, SizeT8 v_level, SizeT8 v_is_loop_value) const noexcept {
         const Value_T_ *value     = nullptr;
         const Char_T_  *id        = (content_ + v_offset);
         const SizeT     length    = v_length;

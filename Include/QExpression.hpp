@@ -30,7 +30,7 @@ namespace Qentem {
 
 struct QExpression {
     // ExpressionType -------------------------------------------
-    enum class ExpressionType : unsigned char {
+    enum class ExpressionType : SizeT8 {
         Empty = 0,
         RealNumber,
         NaturalNumber,
@@ -41,7 +41,7 @@ struct QExpression {
     };
 
     // QOperation -------------------------------------------
-    enum class QOperation : unsigned char {
+    enum class QOperation : SizeT8 {
         NoOp = 0,
         Or,             // ||
         And,            // &&

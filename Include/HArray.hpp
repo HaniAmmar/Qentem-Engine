@@ -589,19 +589,19 @@ class HArray {
         return !(IsEmpty());
     }
 
-    inline unsigned char GetHighByte() const noexcept {
+    inline SizeT8 GetHighByte() const noexcept {
         return data_.HashTable.GetHighByte();
     }
 
-    inline void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(SizeT8 byte) noexcept {
         data_.HashTable.SetHighByte(byte);
     }
 
-    inline unsigned char GetLowByte() const noexcept {
+    inline SizeT8 GetLowByte() const noexcept {
         return data_.HashTable.GetLowByte();
     }
 
-    inline void SetLowByte(unsigned char byte) noexcept {
+    inline void SetLowByte(SizeT8 byte) noexcept {
         data_.HashTable.SetLowByte(byte);
     }
 

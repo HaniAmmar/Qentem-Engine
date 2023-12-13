@@ -34,7 +34,7 @@ struct LoopTag;
 struct InLineIfTag;
 struct IfTagCase;
 //////////////////////
-enum class TagType : unsigned char {
+enum class TagType : SizeT8 {
     None = 0,
     Variable,    // {var:x}
     RawVariable, // {raw:x}
@@ -176,24 +176,24 @@ struct MathTag {
 
 // LoopTagOptions -------------------------------------------
 struct LoopTagOptions {
-    static constexpr unsigned char None           = 0;
-    static constexpr unsigned char SetIsLoopValue = 1;
-    static constexpr unsigned char SortAscend     = 2;
-    static constexpr unsigned char SortDescend    = 4;
+    static constexpr SizeT8 None           = 0;
+    static constexpr SizeT8 SetIsLoopValue = 1;
+    static constexpr SizeT8 SortAscend     = 2;
+    static constexpr SizeT8 SortDescend    = 4;
 };
 
 // LoopTagOptions -------------------------------------------
 struct LoopTag {
     Array<TagBit> SubTags;
     SizeT         Offset;
-    unsigned char SetOffset;
-    unsigned char SetLength;
-    unsigned char SetLevel;
-    unsigned char ValueOffset;
-    unsigned char GroupOffset;
-    unsigned char ValueLength;
-    unsigned char GroupLength;
-    unsigned char Options;
+    SizeT8        SetOffset;
+    SizeT8        SetLength;
+    SizeT8        SetLevel;
+    SizeT8        ValueOffset;
+    SizeT8        GroupOffset;
+    SizeT8        ValueLength;
+    SizeT8        GroupLength;
+    SizeT8        Options;
 };
 
 // InLineIfTag -------------------------------------------

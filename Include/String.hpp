@@ -39,7 +39,7 @@ struct StringData;
 template <typename Char_T_>
 struct StringData<Char_T_, false> {
     // Little-Endian
-    static constexpr unsigned char not_short_value_ = 255;
+    static constexpr SizeT8 not_short_value_ = 255;
 
     StringData() noexcept  = default;
     ~StringData() noexcept = default;
@@ -69,7 +69,7 @@ struct StringData<Char_T_, false> {
 template <typename Char_T_>
 struct StringData<Char_T_, true> {
     // Big-Endian
-    static constexpr unsigned char not_short_value_ = 255;
+    static constexpr SizeT8 not_short_value_ = 255;
 
     StringData() noexcept  = default;
     ~StringData() noexcept = default;
@@ -351,7 +351,7 @@ class String {
 
     inline SizeT Length() const noexcept {
         if (Config::ShortStringOptimization) {
-            const unsigned char len = data_.Storage.GetLowByte();
+            const SizeT8 len = data_.Storage.GetLowByte();
             return ((len == not_short_value_) ? data_.Length : len);
         } else {
             return data_.Length;
@@ -535,11 +535,11 @@ class String {
         return !(IsEmpty());
     }
 
-    inline unsigned char GetHighByte() const noexcept {
+    inline SizeT8 GetHighByte() const noexcept {
         return data_.Storage.GetHighByte();
     }
 
-    inline void SetHighByte(unsigned char byte) noexcept {
+    inline void SetHighByte(SizeT8 byte) noexcept {
         data_.Storage.SetHighByte(byte);
     }
 
@@ -586,7 +586,7 @@ class String {
 
     void clearLength() noexcept {
         if (Config::ShortStringOptimization) {
-            data_.Storage.SetLowByte((unsigned char)(0));
+            data_.Storage.SetLowByte(SizeT8{0});
         }
 
         data_.Length = SizeT{0};
@@ -595,7 +595,7 @@ class String {
     void setLength(SizeT new_length) noexcept {
         if (Config::ShortStringOptimization) {
             if (new_length < ShortStringMax) {
-                data_.Storage.SetLowByte((unsigned char)(new_length));
+                data_.Storage.SetLowByte(SizeT8(new_length));
             } else {
                 data_.Storage.SetLowByte(not_short_value_);
                 data_.Length = new_length;
@@ -669,7 +669,7 @@ class String {
         setLength(len);
     }
 
-    static constexpr unsigned char           not_short_value_ = 255;
+    static constexpr SizeT8                  not_short_value_ = 255;
     StringData<Char_T_, Config::IsBigEndian> data_;
 };
 

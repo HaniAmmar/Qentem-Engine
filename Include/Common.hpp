@@ -169,7 +169,7 @@ struct SystemIntTypeT<4U> {
 
 using SystemIntType = typename SystemIntTypeT<Config::PointerSize>::NumberType_;
 
-enum class QNumberType : unsigned char {
+enum class QNumberType : SizeT8 {
     NotANumber = 0,
     Real       = 1, // double
     Natural    = 2, // unsigned
@@ -244,9 +244,13 @@ union QNumber16 {
     ~QNumber16() noexcept                            = default;
 
     explicit QNumber16(Number_T_ num) noexcept {
+#if (defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)) ||                                              \
+    (defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1))
         if (IsFloat<Number_T_>()) {
             Real = Number_T_(num);
-        } else if (IsUnsigned<Number_T_>()) {
+        } else
+#endif
+            if (IsUnsigned<Number_T_>()) {
             Natural = SizeT16(num);
         } else {
             Integer = short(num);
@@ -269,14 +273,14 @@ union QNumber8 {
     template <typename Number_T_>
     explicit QNumber8(Number_T_ num) noexcept {
         if (IsUnsigned<Number_T_>()) {
-            Natural = (unsigned char)(num);
+            Natural = SizeT8(num);
         } else {
             Integer = char(num);
         }
     }
 
-    unsigned char Natural{0};
-    char          Integer;
+    SizeT8 Natural{0};
+    char   Integer;
 };
 ///////////////////////////////////////////////
 template <typename Number_T_, SizeT32>

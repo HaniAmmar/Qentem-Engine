@@ -30,7 +30,7 @@
 
 namespace Qentem {
 
-enum class ValueType : unsigned char {
+enum class ValueType : SizeT8 {
     Undefined = 0,
     Object,
     Array,
@@ -225,7 +225,7 @@ struct ValueData<Char_T_, VObjectT, VArrayT, VStringT, true> {
     }
 
     inline void SetType(ValueType new_type) noexcept {
-        VObject.SetHighByte((unsigned char)(new_type));
+        VObject.SetHighByte(SizeT8(new_type));
     }
 
     union {
