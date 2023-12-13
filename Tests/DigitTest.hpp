@@ -1347,8 +1347,10 @@ static void TestStringToNumber6(TestHelper &helper) {
     helper.Equal(d_number, 0.0000000000000000000000005555, "number", __LINE__);
 
     str = "0.0000000000000000000000005555e-10  ";
-    StringToNumber(helper, d_number, str);
-    helper.Equal(d_number, 0.0000000000000000000000005555e-10, "number", __LINE__);
+    QNumber64         d_num;
+    const QNumberType type = Digit::StringToNumber(d_num, str, StringUtils::Count(str));
+    helper.EqualsTrue((type == QNumberType::Real), "valid", __LINE__);
+    helper.Equal(d_num.Real, 0.0000000000000000000000005555e-10, "number", __LINE__);
 
     str = "0.0000000000000000000000005555e+10   ";
     StringToNumber(helper, d_number, str);
