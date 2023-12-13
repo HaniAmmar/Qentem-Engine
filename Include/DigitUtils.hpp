@@ -267,6 +267,22 @@ struct RealNumberInfo<float, 4U> {
     static constexpr const SizeT32 MaxCut       = 30U;
 };
 
+#if defined(QENTEM_ENABLE_FLOAT_128) && (QENTEM_ENABLE_FLOAT_128 == 1)
+// float128_t, _Float128
+template <>
+struct RealNumberInfo<FloatT128, 16U> {
+    // Not ready!
+    static constexpr const SizeT32  Bias         = 16383U;
+    static constexpr const SizeT32  ExponentSize = 15U;
+    static constexpr const SizeT32  MantissaSize = 112U;
+    static constexpr const SizeT128 SignMask     = 0x80000000000000000000000000000000;
+    static constexpr const SizeT128 ExponentMask = 0X7FFF0000000000000000000000000000;
+    static constexpr const SizeT128 MantissaMask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    static constexpr const SizeT128 LeadingBit   = 0x10000000000000000000000000000;
+    static constexpr const SizeT32  MaxCut       = 300U;
+};
+#endif
+
 #if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
 // float16_t, _Float16
 template <>
