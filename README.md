@@ -295,10 +295,9 @@ int main() {
 
 ## Tests
 
-There are over 15k lines of code for testing; 5 times the size of the library, and some tests can be examples. To run the tests:
+There are over 22k lines of code for testing; 5 times the size of the library. To run the tests:
 
 -   cmake
-
     ```shell
     mkdir Build
     cd Build
