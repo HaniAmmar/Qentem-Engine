@@ -37,6 +37,9 @@ using SizeT64I = long long;
 using SizeT = SizeT32;
 #endif
 
+// #define QENTEM_ENABLE_FLOAT_16 1
+// #define QENTEM_ENABLE_BFLOAT_16 1
+
 #ifndef QENTEM_DOUBLE_PRECISION
 #define QENTEM_DOUBLE_PRECISION 15U
 #endif
@@ -131,7 +134,17 @@ struct Config {
 #define QENTEM_INLINE __attribute__((always_inline))
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
-//*********************************************
+///////////////////////////////////////////////
+#if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
+// float16_t, _Float16
+using FloatT16 = decltype(0.0F16);
+#endif
+
+#if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
+// bfloat16_t
+using BFloatT16 = decltype(0.0BF16);
+#endif
+///////////////////////////////////////////////
 template <SizeT32>
 struct SystemIntTypeT {};
 
@@ -153,7 +166,7 @@ enum class QNumberType : unsigned char {
     Natural    = 2, // unsigned
     Integer    = 3  // signed
 };
-//*********************************************
+///////////////////////////////////////////////
 template <typename Type_>
 static constexpr bool IsFloat() {
     return (Type_(0.5) != 0);
@@ -163,7 +176,7 @@ template <typename Type_>
 static constexpr bool IsUnsigned() {
     return (Type_(-1) > 0);
 }
-//*********************************************
+///////////////////////////////////////////////
 union QNumber64 {
     QNumber64() noexcept                             = default;
     QNumber64(QNumber64 &&) noexcept                 = default;
@@ -256,7 +269,7 @@ union QNumber8 {
     unsigned char Natural{0};
     char          Integer;
 };
-//*********************************************
+///////////////////////////////////////////////
 template <typename Number_T_, SizeT32>
 struct QNumberAutoTypeT {};
 

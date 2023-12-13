@@ -270,7 +270,7 @@ struct RealNumberInfo<float, 4U> {
 #if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
 // float16_t, _Float16
 template <>
-struct RealNumberInfo<float16_t, 2U> {
+struct RealNumberInfo<FloatT16, 2U> {
     static constexpr const SizeT32 Bias         = 15U;
     static constexpr const SizeT32 ExponentSize = 5U;
     static constexpr const SizeT32 MantissaSize = 10U;
@@ -283,9 +283,9 @@ struct RealNumberInfo<float16_t, 2U> {
 #endif
 
 #if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
-// // bfloat16_t
+// bfloat16_t
 template <>
-struct RealNumberInfo<bfloat16_t, 2U> {
+struct RealNumberInfo<BFloatT16, 2U> {
     static constexpr const SizeT32 Bias         = 127U;
     static constexpr const SizeT32 ExponentSize = 8U;
     static constexpr const SizeT32 MantissaSize = 7U;
