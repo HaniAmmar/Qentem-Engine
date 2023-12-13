@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "Array.hpp"
 #include "String.hpp"
 
@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestArray1(TestHelper &helper) {
+static void TestArray1(QTest &helper) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2(8);
@@ -207,7 +207,7 @@ static void TestArray1(TestHelper &helper) {
     Memory::Deallocate(tmp);
 }
 
-static void TestArray2(TestHelper &helper) {
+static void TestArray2(QTest &helper) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2;
@@ -244,7 +244,7 @@ static void TestArray2(TestHelper &helper) {
     helper.NotEqual(numbers2.First(), storage, "First()", "storage", __LINE__);
 }
 
-static void TestArray3(TestHelper &helper) {
+static void TestArray3(QTest &helper) {
     Array<SizeT>        numbers1;
     Array<SizeT>        numbers2(8);
     Array<String<char>> strings;
@@ -363,7 +363,7 @@ static void TestArray3(TestHelper &helper) {
     helper.Equal(storage[6], 7U, "storage[5]", __LINE__);
 }
 
-static void TestArray4(TestHelper &helper) {
+static void TestArray4(QTest &helper) {
     Array<String<char>> strings1;
     Array<String<char>> strings2;
 
@@ -420,7 +420,7 @@ static void TestArray4(TestHelper &helper) {
     helper.Equal(strings2.Capacity(), 16U, "Capacity", __LINE__);
 }
 
-static void TestArraySort(TestHelper &helper) {
+static void TestArraySort(QTest &helper) {
     Array<SizeT32> numbers;
 
     numbers += 3;
@@ -586,7 +586,7 @@ static void TestArraySort(TestHelper &helper) {
 }
 
 static int RunArrayTests() {
-    TestHelper helper{"Array.hpp", __FILE__};
+    QTest helper{"Array.hpp", __FILE__};
 
     helper.PrintGroupName();
 

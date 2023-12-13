@@ -1,7 +1,7 @@
 #include "UnicodeTest.hpp"
 
 int main() {
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunUnicodeTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 

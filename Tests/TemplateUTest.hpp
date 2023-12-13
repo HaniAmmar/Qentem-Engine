@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "StringStream.hpp"
 #include "JSON.hpp"
 #include "Template.hpp"
@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestVariableUTag1(TestHelper &helper) {
+static void TestVariableUTag1(QTest &helper) {
     StringStream<char16_t> ss;
 
     const char16_t *content;
@@ -281,7 +281,7 @@ static void TestVariableUTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestVariableUTag2(TestHelper &helper) {
+static void TestVariableUTag2(QTest &helper) {
     StringStream<char16_t> ss;
     const Value<char16_t>  value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5])");
     const char16_t        *content;
@@ -337,7 +337,7 @@ static void TestVariableUTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestVariableUTag3(TestHelper &helper) {
+static void TestVariableUTag3(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -587,7 +587,7 @@ static void TestVariableUTag3(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestVariableUTag4(TestHelper &helper) {
+static void TestVariableUTag4(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
 
@@ -1006,7 +1006,7 @@ static void TestVariableUTag4(TestHelper &helper) {
     }
 }
 
-static void TestRawVariableUTag1(TestHelper &helper) {
+static void TestRawVariableUTag1(QTest &helper) {
     StringStream<char16_t> ss;
     const char16_t        *content;
 
@@ -1255,7 +1255,7 @@ static void TestRawVariableUTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRawVariableUTag2(TestHelper &helper) {
+static void TestRawVariableUTag2(QTest &helper) {
     StringStream<char16_t> ss;
     const Value<char16_t>  value = JSON::Parse(uR"(["A", "abc", true, 456, 1.5])");
     const char16_t        *content;
@@ -1311,7 +1311,7 @@ static void TestRawVariableUTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRawVariableUTag3(TestHelper &helper) {
+static void TestRawVariableUTag3(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -1561,7 +1561,7 @@ static void TestRawVariableUTag3(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRawVariableUTag4(TestHelper &helper) {
+static void TestRawVariableUTag4(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
 
@@ -1790,7 +1790,7 @@ static void TestRawVariableUTag4(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestMathUTag1(TestHelper &helper) {
+static void TestMathUTag1(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
 
@@ -2123,7 +2123,7 @@ static void TestMathUTag1(TestHelper &helper) {
     helper.EqualsTrue(Template::Render(uR"({math: 8 /2})", value, ss) == uR"(4)", "(Render())", __LINE__);
 }
 
-static void TestMathUTag2(TestHelper &helper) {
+static void TestMathUTag2(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
 
@@ -2313,7 +2313,7 @@ static void TestMathUTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestInlineIfUTag(TestHelper &helper) {
+static void TestInlineIfUTag(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -2658,7 +2658,7 @@ static void TestInlineIfUTag(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestLoopUTag1(TestHelper &helper) {
+static void TestLoopUTag1(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value3;
     const char16_t        *content;
@@ -2825,7 +2825,7 @@ static void TestLoopUTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestLoopUTag2(TestHelper &helper) {
+static void TestLoopUTag2(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -3001,7 +3001,7 @@ static void TestLoopUTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestLoopUTag3(TestHelper &helper) {
+static void TestLoopUTag3(QTest &helper) {
     StringStream<char16_t> ss;
     const char16_t        *content;
     Value<char16_t>        value = JSON::Parse(uR"(
@@ -3131,7 +3131,7 @@ static void TestLoopUTag3(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestIfUTag1(TestHelper &helper) {
+static void TestIfUTag1(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -3356,7 +3356,7 @@ static void TestIfUTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestIfUTag2(TestHelper &helper) {
+static void TestIfUTag2(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -3404,7 +3404,7 @@ static void TestIfUTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRenderU1(TestHelper &helper) {
+static void TestRenderU1(QTest &helper) {
     constexpr SizeT32 size_4 = (8 * 4);
 
     StringStream<char16_t> ss;
@@ -3511,7 +3511,7 @@ static void TestRenderU1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRenderU2(TestHelper &helper) {
+static void TestRenderU2(QTest &helper) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
     const char16_t        *content;
@@ -3569,7 +3569,7 @@ static void TestRenderU2(TestHelper &helper) {
 }
 
 static int RunTemplateUTests() {
-    TestHelper helper{"Template.hpp (16-bit char)", __FILE__};
+    QTest helper{"Template.hpp (16-bit char)", __FILE__};
 
     helper.PrintGroupName();
 

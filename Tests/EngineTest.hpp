@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "Array.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
@@ -32,7 +32,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestEngine1(TestHelper &helper) {
+static void TestEngine1(QTest &helper) {
     SizeT       ret;
     SizeT       content_len = 0;
     SizeT       find_len    = 3;
@@ -258,7 +258,7 @@ static void TestEngine1(TestHelper &helper) {
     helper.Equal(ret, 0U, "return", __LINE__);
 }
 
-static void TestEngine2(TestHelper &helper) {
+static void TestEngine2(QTest &helper) {
     SizeT           ret;
     SizeT           content_len = 16;
     constexpr SizeT find_len    = 3;
@@ -319,7 +319,7 @@ static void TestEngine2(TestHelper &helper) {
     helper.Equal(ret, 37U, "return", __LINE__);
 }
 
-static void TestEngine3(TestHelper &helper) {
+static void TestEngine3(QTest &helper) {
     SizeT       ret;
     SizeT       content_len = 0;
     const char *content     = "";
@@ -388,7 +388,7 @@ static void TestEngine3(TestHelper &helper) {
     helper.Equal(ret, 0U, "return", __LINE__);
 }
 
-static void TestEngine4(TestHelper &helper) {
+static void TestEngine4(QTest &helper) {
     SizeT       ret;
     SizeT       content_len = 12;
     const char *content     = "{{{{{{}}}}}}";
@@ -569,7 +569,7 @@ static void TestEngine4(TestHelper &helper) {
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-static void TestEngine5(TestHelper &helper) {
+static void TestEngine5(QTest &helper) {
     SizeT       ret;
     SizeT       content_len = 18;
     const char *content     = "       )          ";
@@ -785,7 +785,7 @@ static void TestEngine5(TestHelper &helper) {
     helper.Equal(ret, 0U, "SkipInnerPatterns()", __LINE__);
 }
 
-static void TestEngine6(TestHelper &helper) {
+static void TestEngine6(QTest &helper) {
     SizeT           ret;
     constexpr SizeT content_len = 50;
     const char     *content     = "{-{-{-     -}{-{-  -}{-   -}{- -}{- -}-}-}-}{- -}";
@@ -1024,7 +1024,7 @@ static void find_Engine701(const char *l_tag, SizeT l_tag_len, const char *r_tag
     }
 }
 
-static void TestEngine7(TestHelper &helper) {
+static void TestEngine7(QTest &helper) {
     Array<Item2Engine> items;
     StringStream<char> stream;
     const char        *content;
@@ -1065,7 +1065,7 @@ static void TestEngine7(TestHelper &helper) {
 }
 
 static int RunEngineTests() {
-    TestHelper helper{"Engine.hpp", __FILE__};
+    QTest helper{"Engine.hpp", __FILE__};
 
     helper.PrintGroupName();
 

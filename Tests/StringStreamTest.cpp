@@ -1,7 +1,7 @@
 #include "StringStreamTest.hpp"
 
 int main() {
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunStringStreamTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 

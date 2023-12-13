@@ -168,7 +168,7 @@ inline static Type_T_ *Allocate(SizeT size) {
     const SystemIntType byte_size = SystemIntType(size * sizeof(Type_T_));
     Type_T_            *pointer   = ChangePointer<Type_T_>(::operator new(byte_size));
 
-#ifdef QENTEM_TEST_HELPER_H_
+#ifdef QENTEM_Q_TEST_H_
     MemoryRecord::AddAllocation(pointer);
 #endif
     // TODO: Build Allocator
@@ -247,7 +247,7 @@ inline static Type_T_ *AllocateInit(const Values_T_ &...values) {
 }
 
 inline static void Deallocate(void *pointer) noexcept {
-#ifdef QENTEM_TEST_HELPER_H_
+#ifdef QENTEM_Q_TEST_H_
     if (pointer != nullptr) {
         MemoryRecord::RemoveAllocation(pointer);
     }

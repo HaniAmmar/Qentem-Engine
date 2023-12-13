@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "Digit.hpp"
 #include "HArray.hpp"
 
@@ -32,7 +32,7 @@ namespace Test {
 
 using HashArray = HArray<SizeT32, char>;
 
-static void TestHArray1(TestHelper &helper) {
+static void TestHArray1(QTest &helper) {
     HashArray numbers1;
     HashArray numbers2(8);
 
@@ -95,7 +95,7 @@ static void TestHArray1(TestHelper &helper) {
     numbers2 = numbers1;
 }
 
-static void TestHArray2(TestHelper &helper) {
+static void TestHArray2(QTest &helper) {
     HashArray                       numbers1(8);
     HashArray                       numbers2;
     const String<char>             *key;
@@ -257,7 +257,7 @@ static void TestHArray2(TestHelper &helper) {
     helper.Equal(numbers1["key9"], 90U, "key9", __LINE__);
 }
 
-static void TestHArray3(TestHelper &helper) {
+static void TestHArray3(QTest &helper) {
     HashArray                       numbers1(8);
     HashArray                       numbers2;
     const String<char>             *key;
@@ -302,7 +302,7 @@ static void TestHArray3(TestHelper &helper) {
     helper.Equal(numbers2.First(), nullptr, "First()", "null", __LINE__);
 }
 
-static void TestHArray4(TestHelper &helper) {
+static void TestHArray4(QTest &helper) {
     HashArray                       numbers1;
     HashArray                       numbers2;
     HashArray                       numbers3(3);
@@ -475,7 +475,7 @@ static void TestHArray4(TestHelper &helper) {
     }
 }
 
-static void TestHArray5(TestHelper &helper) {
+static void TestHArray5(QTest &helper) {
     HArray<SizeT, char> numbers1;
     SizeT              *value;
 
@@ -591,7 +591,7 @@ static void TestHArray5(TestHelper &helper) {
     helper.EqualsTrue(numbers1.Capacity() >= 1U, "Capacity() >= 1", __LINE__);
 }
 
-static void TestHArray6(TestHelper &helper) {
+static void TestHArray6(QTest &helper) {
     SizeT                                id;
     HArray<String<char>, char>           strings1;
     HArray<String<char>, char>           strings2;
@@ -677,7 +677,7 @@ static void TestHArray6(TestHelper &helper) {
     helper.Equal(strings2.GetValue(++id)->First(), c_str2, "strings[1].First()", "c_str2", __LINE__);
 }
 
-static void TestHArray7(TestHelper &helper) {
+static void TestHArray7(QTest &helper) {
     SizeT id = 1000;
 
     HArray<SizeT, char> numbers1(id);
@@ -721,7 +721,7 @@ static void TestHArray7(TestHelper &helper) {
     helper.Equal(numbers1.Size(), 0U, "Size()", __LINE__);
 }
 
-static void TestHArray8(TestHelper &helper) {
+static void TestHArray8(QTest &helper) {
     constexpr SizeT id = 100;
 
     HArray<SizeT, char> list(id);
@@ -792,7 +792,7 @@ static void TestHArray8(TestHelper &helper) {
     }
 }
 
-static void TestHArray9(TestHelper &helper) {
+static void TestHArray9(QTest &helper) {
     constexpr SizeT id = 10;
 
     HArray<SizeT, char>                   list(id);
@@ -878,7 +878,7 @@ static void TestHArray9(TestHelper &helper) {
     }
 }
 
-static void TestHArray10(TestHelper &helper) {
+static void TestHArray10(QTest &helper) {
     constexpr SizeT id = 10;
 
     HArray<SizeT, char> list(id);
@@ -901,7 +901,7 @@ static void TestHArray10(TestHelper &helper) {
     helper.Equal(list.GetItem(key1), nullptr, "GetItem(k-100)", "null", __LINE__);
 }
 
-static void TestHArraySort(TestHelper &helper) {
+static void TestHArraySort(QTest &helper) {
     HashArray strings;
 
     strings["2017"] += 2017;
@@ -1013,7 +1013,7 @@ static void TestHArraySort(TestHelper &helper) {
 }
 
 static int RunHArrayTests() {
-    TestHelper helper{"HArray.hpp", __FILE__};
+    QTest helper{"HArray.hpp", __FILE__};
 
     helper.PrintGroupName();
 

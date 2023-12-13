@@ -28,7 +28,7 @@
 
 int main() {
     Qentem::Test::SelfTest();
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
 
     // for (int i = 0; i < 100000; i++) {
     //     Qentem::Test::RunStringUtilsTests();

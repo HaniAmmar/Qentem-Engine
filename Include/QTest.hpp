@@ -33,8 +33,8 @@
 #include <malloc.h>
 #endif
 
-#ifndef QENTEM_TEST_HELPER_H_
-#define QENTEM_TEST_HELPER_H_
+#ifndef QENTEM_Q_TEST_H_
+#define QENTEM_Q_TEST_H_
 
 namespace Qentem {
 
@@ -192,15 +192,15 @@ struct MemoryRecord {
     }
 };
 
-struct TestHelper {
-    TestHelper()                              = delete;
-    ~TestHelper()                             = default;
-    TestHelper(TestHelper &&)                 = delete;
-    TestHelper(const TestHelper &)            = delete;
-    TestHelper &operator=(TestHelper &&)      = delete;
-    TestHelper &operator=(const TestHelper &) = delete;
+struct QTest {
+    QTest()                              = delete;
+    ~QTest()                             = default;
+    QTest(QTest &&)                 = delete;
+    QTest(const QTest &)            = delete;
+    QTest &operator=(QTest &&)      = delete;
+    QTest &operator=(const QTest &) = delete;
 
-    TestHelper(const char *name, const char *file_fullname) noexcept : test_name_{name}, file_fullname_{file_fullname} {
+    QTest(const char *name, const char *file_fullname) noexcept : test_name_{name}, file_fullname_{file_fullname} {
     }
 
     QENTEM_NOINLINE void PrintGroupName() const {
@@ -241,7 +241,7 @@ struct TestHelper {
     QENTEM_NOINLINE void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && !value) {
             error_ = true;
-            TestHelper::PrintErrorMessage1(false, name, line);
+            QTest::PrintErrorMessage1(false, name, line);
         }
     }
 
@@ -249,7 +249,7 @@ struct TestHelper {
     QENTEM_NOINLINE void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && value) {
             error_ = true;
-            TestHelper::PrintErrorMessage1(true, name, line);
+            QTest::PrintErrorMessage1(true, name, line);
         }
     }
 
@@ -258,7 +258,7 @@ struct TestHelper {
                                const Value3_T_ &value, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
-            TestHelper::PrintErrorMessage2(false, name, left, value, line);
+            QTest::PrintErrorMessage2(false, name, left, value, line);
         }
     }
 
@@ -267,7 +267,7 @@ struct TestHelper {
                                   const Value3_T_ &value, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
-            TestHelper::PrintErrorMessage2(true, name, left, value, line);
+            QTest::PrintErrorMessage2(true, name, left, value, line);
         }
     }
 
@@ -275,7 +275,7 @@ struct TestHelper {
     QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
         if ((!error_ || continue_on_error_) && (left != right)) {
             error_ = true;
-            TestHelper::PrintErrorMessage2(false, name, left, right, line);
+            QTest::PrintErrorMessage2(false, name, left, right, line);
         }
     }
 
@@ -284,7 +284,7 @@ struct TestHelper {
                                   unsigned long line) {
         if ((!error_ || continue_on_error_) && (left == right)) {
             error_ = true;
-            TestHelper::PrintErrorMessage2(true, name, left, right, line);
+            QTest::PrintErrorMessage2(true, name, left, right, line);
         }
     }
 

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "JSON.hpp"
 
 #ifndef QENTEM_JSON_TESTS_H_
@@ -29,7 +29,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestParse1(TestHelper &helper) {
+static void TestParse1(QTest &helper) {
     Value<char> value;
 
     ///////////
@@ -295,7 +295,7 @@ static void TestParse1(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"([["[]"],["[]"]])", "Stringify()", __LINE__);
 }
 
-static void TestParse2(TestHelper &helper) {
+static void TestParse2(QTest &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"({})");
@@ -539,7 +539,7 @@ static void TestParse2(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"({"a":{"c":"{}"},"b":{"d":"{}"}})", "Stringify()", __LINE__);
 }
 
-static void TestParse3(TestHelper &helper) {
+static void TestParse3(QTest &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"([{"one":1}])");
@@ -769,7 +769,7 @@ static void TestParse3(TestHelper &helper) {
     helper.Equal(value.Stringify(), R"([1,2])", "Stringify()", __LINE__);
 }
 
-static void TestParse4(TestHelper &helper) {
+static void TestParse4(QTest &helper) {
     Value<char>         value;
     const String<char> *key_ptr;
     const char         *str1;
@@ -885,7 +885,7 @@ static void TestParse4(TestHelper &helper) {
                       __LINE__);
 }
 
-static void TestParse5(TestHelper &helper) {
+static void TestParse5(QTest &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"([1   ]    ])");
@@ -1066,7 +1066,7 @@ static void TestParse5(TestHelper &helper) {
     helper.EqualsTrue(value.IsUndefined(), "value.IsUndefined()", __LINE__);
 }
 
-static void TestParse6(TestHelper &helper) {
+static void TestParse6(QTest &helper) {
     Value<char> value;
 
     value = JSON::Parse(R"(["\"])");
@@ -1215,7 +1215,7 @@ static void TestParse6(TestHelper &helper) {
 }
 
 static int RunJSONTests() {
-    TestHelper helper{"JSON.hpp", __FILE__};
+    QTest helper{"JSON.hpp", __FILE__};
 
     helper.PrintGroupName();
 

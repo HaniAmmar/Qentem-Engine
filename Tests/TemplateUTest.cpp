@@ -1,7 +1,7 @@
 #include "TemplateUTest.hpp"
 
 int main() {
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunTemplateUTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 

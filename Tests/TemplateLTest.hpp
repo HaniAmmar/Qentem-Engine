@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "StringStream.hpp"
 #include "JSON.hpp"
 #include "Template.hpp"
@@ -31,7 +31,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestVariableLTag1(TestHelper &helper) {
+static void TestVariableLTag1(QTest &helper) {
     StringStream<wchar_t> ss;
 
     const wchar_t *content;
@@ -281,7 +281,7 @@ static void TestVariableLTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestVariableLTag2(TestHelper &helper) {
+static void TestVariableLTag2(QTest &helper) {
     StringStream<wchar_t> ss;
     const Value<wchar_t>  value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
     const wchar_t        *content;
@@ -337,7 +337,7 @@ static void TestVariableLTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestVariableLTag3(TestHelper &helper) {
+static void TestVariableLTag3(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -587,7 +587,7 @@ static void TestVariableLTag3(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestVariableLTag4(TestHelper &helper) {
+static void TestVariableLTag4(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
 
@@ -1006,7 +1006,7 @@ static void TestVariableLTag4(TestHelper &helper) {
     }
 }
 
-static void TestRawVariableLTag1(TestHelper &helper) {
+static void TestRawVariableLTag1(QTest &helper) {
     StringStream<wchar_t> ss;
     const wchar_t        *content;
 
@@ -1255,7 +1255,7 @@ static void TestRawVariableLTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRawVariableLTag2(TestHelper &helper) {
+static void TestRawVariableLTag2(QTest &helper) {
     StringStream<wchar_t> ss;
     const Value<wchar_t>  value = JSON::Parse(LR"(["A", "abc", true, 456, 1.5])");
     const wchar_t        *content;
@@ -1311,7 +1311,7 @@ static void TestRawVariableLTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRawVariableLTag3(TestHelper &helper) {
+static void TestRawVariableLTag3(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -1561,7 +1561,7 @@ static void TestRawVariableLTag3(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRawVariableLTag4(TestHelper &helper) {
+static void TestRawVariableLTag4(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
 
@@ -1790,7 +1790,7 @@ static void TestRawVariableLTag4(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestMathLTag1(TestHelper &helper) {
+static void TestMathLTag1(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
 
@@ -2123,7 +2123,7 @@ static void TestMathLTag1(TestHelper &helper) {
     helper.EqualsTrue(Template::Render(LR"({math: 8 /2})", value, ss) == LR"(4)", "(Render())", __LINE__);
 }
 
-static void TestMathLTag2(TestHelper &helper) {
+static void TestMathLTag2(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
 
@@ -2313,7 +2313,7 @@ static void TestMathLTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestInlineIfLTag(TestHelper &helper) {
+static void TestInlineIfLTag(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -2658,7 +2658,7 @@ static void TestInlineIfLTag(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestLoopLTag1(TestHelper &helper) {
+static void TestLoopLTag1(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value3;
     const wchar_t        *content;
@@ -2825,7 +2825,7 @@ static void TestLoopLTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestLoopLTag2(TestHelper &helper) {
+static void TestLoopLTag2(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -3001,7 +3001,7 @@ static void TestLoopLTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestLoopLTag3(TestHelper &helper) {
+static void TestLoopLTag3(QTest &helper) {
     StringStream<wchar_t> ss;
     const wchar_t        *content;
     Value<wchar_t>        value = JSON::Parse(LR"(
@@ -3131,7 +3131,7 @@ static void TestLoopLTag3(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestIfLTag1(TestHelper &helper) {
+static void TestIfLTag1(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -3356,7 +3356,7 @@ static void TestIfLTag1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestIfLTag2(TestHelper &helper) {
+static void TestIfLTag2(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -3404,7 +3404,7 @@ static void TestIfLTag2(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRenderL1(TestHelper &helper) {
+static void TestRenderL1(QTest &helper) {
     constexpr SizeT32 size_4 = (8 * 4);
 
     StringStream<wchar_t> ss;
@@ -3511,7 +3511,7 @@ static void TestRenderL1(TestHelper &helper) {
     ss.Clear();
 }
 
-static void TestRenderL2(TestHelper &helper) {
+static void TestRenderL2(QTest &helper) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
     const wchar_t        *content;
@@ -3569,7 +3569,7 @@ static void TestRenderL2(TestHelper &helper) {
 }
 
 static int RunTemplateLTests() {
-    TestHelper helper{"Template.hpp (Wide char)", __FILE__};
+    QTest helper{"Template.hpp (Wide char)", __FILE__};
 
     helper.PrintGroupName();
 

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "Value.hpp"
 
 #ifndef QENTEM_VALUE_TESTS_H_
@@ -35,7 +35,7 @@ using VStringStream = StringStream<char>;
 using VHArray       = HArray<ValueC, char>;
 using VArray        = Array<ValueC>;
 
-static void TestEmptyValue(TestHelper &helper) {
+static void TestEmptyValue(QTest &helper) {
     ValueC value1;
 
     VStringStream ss_var;
@@ -98,7 +98,7 @@ static void TestEmptyValue(TestHelper &helper) {
     helper.EqualsTrue(value1.IsDouble(), "IsDouble()", __LINE__);
 }
 
-static void TestTrueValue(TestHelper &helper) {
+static void TestTrueValue(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -164,7 +164,7 @@ static void TestTrueValue(TestHelper &helper) {
     helper.EqualsTrue(value3.IsTrue(), "IsTrue()", __LINE__);
 }
 
-static void TestFalseValue(TestHelper &helper) {
+static void TestFalseValue(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -230,7 +230,7 @@ static void TestFalseValue(TestHelper &helper) {
     helper.EqualsTrue(value3.IsFalse(), "IsFalse()", __LINE__);
 }
 
-static void TestNullValue(TestHelper &helper) {
+static void TestNullValue(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -296,7 +296,7 @@ static void TestNullValue(TestHelper &helper) {
     helper.EqualsTrue(value3.IsNull(), "IsNull()", __LINE__);
 }
 
-static void TestNumberValue1(TestHelper &helper) {
+static void TestNumberValue1(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -378,7 +378,7 @@ static void TestNumberValue1(TestHelper &helper) {
     helper.Equal(value2.GetNumber(), 3.75, "GetNumber()", __LINE__);
 }
 
-static void TestNumberValue2(TestHelper &helper) {
+static void TestNumberValue2(QTest &helper) {
     using vu_long = unsigned long;
 
     ValueC        value1;
@@ -440,7 +440,7 @@ static void TestNumberValue2(TestHelper &helper) {
     value1.Reset();
 }
 
-static void TestNumberValue3(TestHelper &helper) {
+static void TestNumberValue3(QTest &helper) {
     ValueC        value1;
     VStringStream ss_var;
     QNumber64     num_var;
@@ -543,7 +543,7 @@ static void TestNumberValue3(TestHelper &helper) {
     value1.Reset();
 }
 
-static void TestNumberValue4(TestHelper &helper) {
+static void TestNumberValue4(QTest &helper) {
     ValueC        value1;
     VStringStream ss_var;
     QNumber64     num_var;
@@ -658,7 +658,7 @@ static void TestNumberValue4(TestHelper &helper) {
     value1.Reset();
 }
 
-static void TestNumberValue5(TestHelper &helper) {
+static void TestNumberValue5(QTest &helper) {
     using vu_long = unsigned long;
 
     ValueC value1;
@@ -719,7 +719,7 @@ static void TestNumberValue5(TestHelper &helper) {
     helper.Equal(value1.GetNumber(), 10.0, "GetNumber()", __LINE__);
 }
 
-static void TestStringValue(TestHelper &helper) {
+static void TestStringValue(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -848,7 +848,7 @@ static void TestStringValue(TestHelper &helper) {
     helper.Equal(ss_var, "321.25", "ss_var", __LINE__);
 }
 
-static void TestArrayValue(TestHelper &helper) {
+static void TestArrayValue(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1073,7 +1073,7 @@ static void TestArrayValue(TestHelper &helper) {
     helper.Equal(value2.GetArray()->Size(), 0U, "Size()", __LINE__);
 }
 
-static void TestObjectValue1(TestHelper &helper) {
+static void TestObjectValue1(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -1206,7 +1206,7 @@ static void TestObjectValue1(TestHelper &helper) {
     helper.EqualsTrue(value1.IsUndefined(), "isUndefined()", __LINE__);
 }
 
-static void TestObjectValue2(TestHelper &helper) {
+static void TestObjectValue2(QTest &helper) {
     ValueC value1;
 
     using ObjectItem_ = HAItem_T_<ValueC, char>;
@@ -1361,7 +1361,7 @@ static void TestObjectValue2(TestHelper &helper) {
     helper.EqualsTrue(value3.GetObject()->Capacity() >= 3U, "GetObject()->Capacity() >= 3", __LINE__);
 }
 
-static void TestMoveValue1(TestHelper &helper) {
+static void TestMoveValue1(QTest &helper) {
     ValueC value1;
 
     // true
@@ -1713,7 +1713,7 @@ static void TestMoveValue1(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestMoveValue2(TestHelper &helper) {
+static void TestMoveValue2(QTest &helper) {
     ValueC value1;
 
     // true
@@ -1781,7 +1781,7 @@ static void TestMoveValue2(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestMoveValue3(TestHelper &helper) {
+static void TestMoveValue3(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -2170,7 +2170,7 @@ static void TestMoveValue3(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestMoveValue4(TestHelper &helper) {
+static void TestMoveValue4(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -2245,7 +2245,7 @@ static void TestMoveValue4(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestCopyValue1(TestHelper &helper) {
+static void TestCopyValue1(QTest &helper) {
     ValueC value1;
 
     // true
@@ -2520,7 +2520,7 @@ static void TestCopyValue1(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestCopyValue2(TestHelper &helper) {
+static void TestCopyValue2(QTest &helper) {
     ValueC value1;
 
     // true
@@ -2666,7 +2666,7 @@ static void TestCopyValue2(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestCopyValue3(TestHelper &helper) {
+static void TestCopyValue3(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -3069,7 +3069,7 @@ static void TestCopyValue3(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestCopyValue4(TestHelper &helper) {
+static void TestCopyValue4(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
@@ -3331,7 +3331,7 @@ static void TestCopyValue4(TestHelper &helper) {
     ////////////////////////////////////////////
 }
 
-static void TestIndexOperator1(TestHelper &helper) {
+static void TestIndexOperator1(QTest &helper) {
     ValueC        value;
     const VString str1("D");
     const VString str2("DEFG");
@@ -3477,7 +3477,7 @@ static void TestIndexOperator1(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-static void TestIndexOperator2(TestHelper &helper) {
+static void TestIndexOperator2(QTest &helper) {
     ValueC  value;
     ValueC *value_ptr;
 
@@ -3510,7 +3510,7 @@ static void TestIndexOperator2(TestHelper &helper) {
     ////////////////////
 }
 
-static void TestAddition1(TestHelper &helper) {
+static void TestAddition1(QTest &helper) {
     ValueC        value;
     const VString str1("D");
     const VString str2("DEFG");
@@ -3554,7 +3554,7 @@ static void TestAddition1(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-static void TestAddition2(TestHelper &helper) {
+static void TestAddition2(QTest &helper) {
     ValueC  value;
     VString str;
 
@@ -3687,7 +3687,7 @@ static void TestAddition2(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-static void TestAddition3(TestHelper &helper) {
+static void TestAddition3(QTest &helper) {
     ValueC        value;
     VArray        arr_var;
     const ValueC *arr_storage;
@@ -3827,7 +3827,7 @@ static void TestAddition3(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-static void TestAddition4(TestHelper &helper) {
+static void TestAddition4(QTest &helper) {
     ValueC        value1;
     ValueC        value2;
     VArray        arr_var;
@@ -3997,7 +3997,7 @@ static void TestAddition4(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-static void TestAddition5(TestHelper &helper) {
+static void TestAddition5(QTest &helper) {
     ValueC        value1;
     ValueC        value2;
     VArray        arr_var;
@@ -4164,7 +4164,7 @@ static void TestAddition5(TestHelper &helper) {
     //////////////////////////////////////////
 }
 
-static void TestAddition6(TestHelper &helper) {
+static void TestAddition6(QTest &helper) {
     ValueC                         value1;
     ValueC                         value2;
     VString                        str_var;
@@ -4321,7 +4321,7 @@ static void TestAddition6(TestHelper &helper) {
     /////////////////////////////
 }
 
-static void TestStringify1(TestHelper &helper) {
+static void TestStringify1(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -4777,7 +4777,7 @@ static void TestStringify1(TestHelper &helper) {
     ///////////////////////////////////////
 }
 
-static void TestStringify2(TestHelper &helper) {
+static void TestStringify2(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -5238,7 +5238,7 @@ static void TestStringify2(TestHelper &helper) {
     ///////////////////////////////////////
 }
 
-static void TestStringify3(TestHelper &helper) {
+static void TestStringify3(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -5287,7 +5287,7 @@ static void TestStringify3(TestHelper &helper) {
                  "Stringify()", __LINE__);
 }
 
-static void TestStringify4(TestHelper &helper) {
+static void TestStringify4(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -5300,7 +5300,7 @@ static void TestStringify4(TestHelper &helper) {
     helper.Equal(value.Stringify(ss), R"(["\"\\\/\b\f\n\r\t"])", "value.Stringify()", __LINE__);
 }
 
-static void TestDeleteValue(TestHelper &helper) {
+static void TestDeleteValue(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -5464,7 +5464,7 @@ static void TestDeleteValue(TestHelper &helper) {
     helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
 }
 
-static void TestSortValue(TestHelper &helper) {
+static void TestSortValue(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -5528,7 +5528,7 @@ static void TestSortValue(TestHelper &helper) {
                  __LINE__);
 }
 
-static void TestGroupValue(TestHelper &helper) {
+static void TestGroupValue(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
 
@@ -5902,7 +5902,7 @@ static void TestGroupValue(TestHelper &helper) {
 }
 
 static int RunValueTests() {
-    TestHelper helper{"Value.hpp", __FILE__};
+    QTest helper{"Value.hpp", __FILE__};
 
     helper.PrintGroupName();
 

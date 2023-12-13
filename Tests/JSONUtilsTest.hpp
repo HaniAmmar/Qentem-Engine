@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "JSONUtils.hpp"
 #include "StringStream.hpp"
 
@@ -34,7 +34,7 @@ static void escapeJSON(const char *str, StringStream<char> &buffer) {
     EscapeJSON(str, StringUtils::Count(str), buffer);
 }
 
-static void TestEscapeJSON(TestHelper &helper) {
+static void TestEscapeJSON(QTest &helper) {
     const char        *str;
     StringStream<char> buffer;
     /*
@@ -339,7 +339,7 @@ static void TestEscapeJSON(TestHelper &helper) {
     buffer.Clear();
 }
 
-static void TestUnEscapeJSON1(TestHelper &helper) {
+static void TestUnEscapeJSON1(QTest &helper) {
     StringStream<char> buffer;
     const char        *str1;
     const char        *str2;
@@ -643,7 +643,7 @@ static void TestUnEscapeJSON1(TestHelper &helper) {
     buffer.Clear();
 }
 
-static void TestUnEscapeJSON2(TestHelper &helper) {
+static void TestUnEscapeJSON2(QTest &helper) {
     StringStream<char> buffer;
     const char        *str1;
     const char        *str2;
@@ -934,7 +934,7 @@ static void TestUnEscapeJSON2(TestHelper &helper) {
 }
 
 static int RunJSONUtilsTests() {
-    TestHelper helper{"JSONUtils.hpp", __FILE__};
+    QTest helper{"JSONUtils.hpp", __FILE__};
 
     helper.PrintGroupName();
 

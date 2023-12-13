@@ -24,7 +24,7 @@
 #define QENTEM_TEST_H_
 
 // clang-format off
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "StringUtilsTest.hpp"
 #include "StringTest.hpp"
 #include "StringStreamTest.hpp"
@@ -59,7 +59,7 @@ static int PrintResult(int passed, int failed) {
     return 1;
 }
 
-static void SelfTestLeak(TestHelper &helper, char *&ptr) {
+static void SelfTestLeak(QTest &helper, char *&ptr) {
     ptr = Memory::Allocate<char>(8U);
 
     helper.EqualsTrue(false, "EqualsTrue", 1);
@@ -76,7 +76,7 @@ static void SelfTest() {
 
     const bool is_colored = TestOutPut::IsColored();
 
-    TestHelper helper{"Test.hpp", __FILE__};
+    QTest helper{"Test.hpp", __FILE__};
 
     helper.ContinueOnError(true);
 

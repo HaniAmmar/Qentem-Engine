@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "Template.hpp"
 #include "Value.hpp"
 #include "StringStream.hpp"
@@ -72,7 +72,7 @@ QENTEM_NOINLINE static double TestEvaluate(const char *content, const Value<char
     return number;
 }
 
-static void TestEvaluate1(TestHelper &helper) {
+static void TestEvaluate1(QTest &helper) {
     const Value<char> value;
     double            number;
     const char       *content;
@@ -271,7 +271,7 @@ static void TestEvaluate1(TestHelper &helper) {
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate2(TestHelper &helper) {
+static void TestEvaluate2(QTest &helper) {
     const Value<char> value;
     double            number = -99;
     const char       *content;
@@ -440,7 +440,7 @@ static void TestEvaluate2(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate3(TestHelper &helper) {
+static void TestEvaluate3(QTest &helper) {
     const Value<char> value;
     double            number;
     const char       *content;
@@ -708,7 +708,7 @@ static void TestEvaluate3(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate4(TestHelper &helper) {
+static void TestEvaluate4(QTest &helper) {
     const Value<char> value;
     double            number;
     const char       *content;
@@ -953,7 +953,7 @@ static void TestEvaluate4(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate5(TestHelper &helper) {
+static void TestEvaluate5(QTest &helper) {
     const Value<char> value;
     double            number;
     const char       *content;
@@ -1199,7 +1199,7 @@ static void TestEvaluate5(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate6(TestHelper &helper) {
+static void TestEvaluate6(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -1405,7 +1405,7 @@ static void TestEvaluate6(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate7(TestHelper &helper) {
+static void TestEvaluate7(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -1680,7 +1680,7 @@ static void TestEvaluate7(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate8(TestHelper &helper) {
+static void TestEvaluate8(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -1957,7 +1957,7 @@ static void TestEvaluate8(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-static void TestEvaluate9(TestHelper &helper) {
+static void TestEvaluate9(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -2230,7 +2230,7 @@ static void TestEvaluate9(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-static void TestEvaluate10(TestHelper &helper) {
+static void TestEvaluate10(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -2503,7 +2503,7 @@ static void TestEvaluate10(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-static void TestEvaluate11(TestHelper &helper) {
+static void TestEvaluate11(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -2864,7 +2864,7 @@ static void TestEvaluate11(TestHelper &helper) {
     helper.Equal(number, 18, "number", __LINE__);
 }
 
-static void TestEvaluate12(TestHelper &helper) {
+static void TestEvaluate12(QTest &helper) {
     const Value<char> value;
     double            number = -1;
     const char       *content;
@@ -3047,7 +3047,7 @@ static void TestEvaluate12(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate13(TestHelper &helper) {
+static void TestEvaluate13(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -3265,7 +3265,7 @@ static void TestEvaluate13(TestHelper &helper) {
     helper.EqualsFalse(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate14(TestHelper &helper) {
+static void TestEvaluate14(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -3563,7 +3563,7 @@ static void TestEvaluate14(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-static void TestEvaluate15(TestHelper &helper) {
+static void TestEvaluate15(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -3738,7 +3738,7 @@ static void TestEvaluate15(TestHelper &helper) {
     helper.EqualsTrue(is_valid, "is_valid", __LINE__);
 }
 
-static void TestEvaluate16(TestHelper &helper) {
+static void TestEvaluate16(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -3962,7 +3962,7 @@ static void TestEvaluate16(TestHelper &helper) {
     helper.Equal(number, 1, "number", __LINE__);
 }
 
-static void TestEvaluate17(TestHelper &helper) {
+static void TestEvaluate17(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -4324,7 +4324,7 @@ static void TestEvaluate17(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
 }
 
-static void TestEvaluate18(TestHelper &helper) {
+static void TestEvaluate18(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -4623,7 +4623,7 @@ static void TestEvaluate18(TestHelper &helper) {
     helper.Equal(number, 0, "number", __LINE__);
 }
 
-static void TestEvaluate19(TestHelper &helper) {
+static void TestEvaluate19(QTest &helper) {
     Value<char> value;
     double      number = -1;
     const char *content;
@@ -4720,7 +4720,7 @@ static void TestEvaluate19(TestHelper &helper) {
 }
 
 static int RunEvaluateTests() {
-    TestHelper helper{"Evaluate.hpp", __FILE__};
+    QTest helper{"Evaluate.hpp", __FILE__};
 
     helper.PrintGroupName();
 

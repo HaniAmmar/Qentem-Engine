@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "StringStream.hpp"
 
 #ifndef QENTEM_STRINGSTREAM_TESTS_H_
@@ -29,7 +29,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestStringStream(TestHelper &helper) {
+static void TestStringStream(QTest &helper) {
     StringStream<char> ss1;
     StringStream<char> ss2{10}; // Preset size
     String<char>       str;
@@ -308,7 +308,7 @@ static void TestStringStream(TestHelper &helper) {
 }
 
 static int RunStringStreamTests() {
-    TestHelper helper{"StringStream.hpp", __FILE__};
+    QTest helper{"StringStream.hpp", __FILE__};
 
     helper.PrintGroupName();
 

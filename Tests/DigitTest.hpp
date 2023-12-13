@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "Digit.hpp"
 #include "StringStream.hpp"
 
@@ -43,7 +43,7 @@ static SizeT32 HexStringToNumber(const char *str) noexcept {
 }
 
 template <typename Number_T_>
-QENTEM_NOINLINE static void IntToStreamEqual(TestHelper &helper, StringStream<char> &stream, Number_T_ number,
+QENTEM_NOINLINE static void IntToStreamEqual(QTest &helper, StringStream<char> &stream, Number_T_ number,
                                              const char *expected, const char *name, unsigned long line) {
     Digit::NumberToString(stream, number);
     helper.Equal(stream, expected, name, line);
@@ -51,7 +51,7 @@ QENTEM_NOINLINE static void IntToStreamEqual(TestHelper &helper, StringStream<ch
 }
 
 template <typename Stream_T_, typename Number_T_>
-QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &stream, Number_T_ number,
+QENTEM_NOINLINE static void RealToStreamEqual(QTest &helper, Stream_T_ &stream, Number_T_ number,
                                               Digit::RealFormatInfo format, const char *expected, const char *name,
                                               unsigned long line) {
     if (!helper.HasError() || helper.IsContinueOnError()) {
@@ -74,7 +74,7 @@ QENTEM_NOINLINE static void RealToStreamEqual(TestHelper &helper, Stream_T_ &str
 }
 
 template <typename Number_T_>
-QENTEM_NOINLINE static bool StringToNumber(const TestHelper &helper, Number_T_ &num, const char *str) noexcept {
+QENTEM_NOINLINE static bool StringToNumber(const QTest &helper, Number_T_ &num, const char *str) noexcept {
     QNumber64   number;
     SizeT       offset = 0;
     const SizeT length = StringUtils::Count(str);
@@ -106,7 +106,7 @@ QENTEM_NOINLINE static bool StringToNumber(const TestHelper &helper, Number_T_ &
     return (offset >= length);
 }
 
-static void TestStringToNumber1(TestHelper &helper) {
+static void TestStringToNumber1(QTest &helper) {
     SizeT64     number   = 0;
     double      d_number = 0;
     const char *str;
@@ -151,7 +151,7 @@ static void TestStringToNumber1(TestHelper &helper) {
     helper.Equal(number, 123456789U, str, __LINE__);
 }
 
-static void TestStringToNumber2(TestHelper &helper) {
+static void TestStringToNumber2(QTest &helper) {
     int           number_int    = 0;
     SizeT32       number_uint   = 0;
     long          number_long   = 0;
@@ -475,7 +475,7 @@ static void TestStringToNumber2(TestHelper &helper) {
     helper.EqualsFalse(valid, "valid", __LINE__);
 }
 
-static void TestStringToNumber3(TestHelper &helper) {
+static void TestStringToNumber3(QTest &helper) {
     const char *content = nullptr;
     QNumber64   number;
     QNumberType type   = QNumberType::NotANumber;
@@ -577,7 +577,7 @@ static void TestStringToNumber3(TestHelper &helper) {
     helper.Equal(number.Real, -4.5, "number", __LINE__);
 }
 
-static void TestStringToNumber4(TestHelper &helper) {
+static void TestStringToNumber4(QTest &helper) {
     int     number_int    = 0;
     SizeT32 number_uint   = 0;
     double  number_double = 0;
@@ -824,7 +824,7 @@ static void TestStringToNumber4(TestHelper &helper) {
     helper.Equal(number_double, 123456789.123456789, "number", __LINE__);
 }
 
-static void TestStringToNumber5(TestHelper &helper) {
+static void TestStringToNumber5(QTest &helper) {
     const char *str        = nullptr;
     double      d_number   = 0;
     SizeT64I    ll_number  = 0;
@@ -1231,7 +1231,7 @@ static void TestStringToNumber5(TestHelper &helper) {
     helper.Equal(d_number, 4.940656458412465442e-324, "d_number", __LINE__);
 }
 
-static void TestStringToNumber6(TestHelper &helper) {
+static void TestStringToNumber6(QTest &helper) {
     const char *str      = nullptr;
     double      d_number = 0;
     bool        valid;
@@ -1879,7 +1879,7 @@ static void TestStringToNumber6(TestHelper &helper) {
     helper.Equal(d_number, 0.0000000000000000000000000000000000000000000000001e-100, "number", __LINE__);
 }
 
-static void TestStringToNumber7(TestHelper &helper) {
+static void TestStringToNumber7(QTest &helper) {
     const char *str      = nullptr;
     double      d_number = 0;
     bool        valid;
@@ -2035,7 +2035,7 @@ static void TestStringToNumber7(TestHelper &helper) {
     helper.Equal(d_number, 4.45014771701440227211481959342e-308, "number", __LINE__);
 }
 
-static void TestHexStringToNumber(TestHelper &helper) {
+static void TestHexStringToNumber(QTest &helper) {
     SizeT32     number;
     const char *hex = "";
 
@@ -2092,7 +2092,7 @@ static void TestHexStringToNumber(TestHelper &helper) {
 }
 
 template <typename Stream_T_>
-static void TestIntToString1(TestHelper &helper, Stream_T_ &stream) {
+static void TestIntToString1(QTest &helper, Stream_T_ &stream) {
     IntToStreamEqual(helper, stream, SizeT8{255}, "255", "return", __LINE__);
     IntToStreamEqual(helper, stream, char{-127}, "-127", "return", __LINE__);
 
@@ -2120,7 +2120,7 @@ static void TestIntToString1(TestHelper &helper, Stream_T_ &stream) {
 }
 
 template <typename Stream_T_>
-static void TestDoubleToString1(TestHelper &helper, Stream_T_ &stream) {
+static void TestDoubleToString1(QTest &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -0.0, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0, 6U, "0", "return", __LINE__);
 
@@ -2768,7 +2768,7 @@ static void TestDoubleToString1(TestHelper &helper, Stream_T_ &stream) {
 }
 
 template <typename Stream_T_>
-static void TestDoubleToString2(TestHelper &helper, Stream_T_ &stream) {
+static void TestDoubleToString2(QTest &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -0.0, 15U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0, 15U, "0", "return", __LINE__);
 
@@ -3250,7 +3250,7 @@ static void TestDoubleToString2(TestHelper &helper, Stream_T_ &stream) {
 }
 
 template <typename Stream_T_>
-static void TestDoubleToString3(TestHelper &helper, Stream_T_ &stream) {
+static void TestDoubleToString3(QTest &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -1.0, 6U, "-1", "return", __LINE__);
 
     RealToStreamEqual(helper, stream, 70.0, 6U, "70", "return", __LINE__);
@@ -3320,7 +3320,7 @@ static void TestDoubleToString3(TestHelper &helper, Stream_T_ &stream) {
 }
 
 template <typename Stream_T_>
-static void TestFloatToString1(TestHelper &helper, Stream_T_ &stream) {
+static void TestFloatToString1(QTest &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -0.0F, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0F, 6U, "0", "return", __LINE__);
 
@@ -3850,7 +3850,7 @@ static void TestFloatToString1(TestHelper &helper, Stream_T_ &stream) {
 }
 
 template <typename Stream_T_>
-static void TestFloatToString2(TestHelper &helper, Stream_T_ &stream) {
+static void TestFloatToString2(QTest &helper, Stream_T_ &stream) {
     RealToStreamEqual(helper, stream, -1.0F, 6U, "-1", "return", __LINE__);
 
     RealToStreamEqual(helper, stream, 70.0F, 6U, "70", "return", __LINE__);
@@ -3909,7 +3909,7 @@ static void TestFloatToString2(TestHelper &helper, Stream_T_ &stream) {
 static int RunDigitTests() {
     using SStream = StringStream<char>;
 
-    TestHelper helper{"Digit.hpp", __FILE__};
+    QTest helper{"Digit.hpp", __FILE__};
 
     // helper.ContinueOnError(true);
     helper.PrintGroupName();

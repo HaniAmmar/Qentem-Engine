@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "StringUtils.hpp"
 
 #ifndef QENTEM_STRING_UTILS_TESTS_H_
@@ -29,7 +29,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestHash(TestHelper &helper) {
+static void TestHash(QTest &helper) {
     SizeT hash;
     SizeT hash2;
     SizeT hash3;
@@ -70,7 +70,7 @@ static void TestHash(TestHelper &helper) {
     helper.NotEqual(hash2, 0U, "hash2", "0", __LINE__);
 }
 
-static void TestCount(TestHelper &helper) {
+static void TestCount(QTest &helper) {
     SizeT length = StringUtils::Count("");
     helper.Equal(length, 0U, "length", __LINE__);
 
@@ -96,7 +96,7 @@ static void TestCount(TestHelper &helper) {
     helper.Equal(length, 63U, "length", __LINE__);
 }
 
-static void TestTrimLeft(TestHelper &helper) {
+static void TestTrimLeft(QTest &helper) {
     SizeT32 offset = 0;
 
     StringUtils::TrimLeft("", offset, 0U);
@@ -237,7 +237,7 @@ static void TestTrimLeft(TestHelper &helper) {
     helper.Equal(offset, 2U, "offset", __LINE__);
 }
 
-static void TestTrimRight(TestHelper &helper) {
+static void TestTrimRight(QTest &helper) {
     SizeT32 end_offset = 0;
 
     StringUtils::TrimRight("", 0U, end_offset);
@@ -450,7 +450,7 @@ static void TestTrimRight(TestHelper &helper) {
     helper.Equal(end_offset, 5U, "end_offset", __LINE__);
 }
 
-static void TestTrim(TestHelper &helper) {
+static void TestTrim(QTest &helper) {
     SizeT offset = 0;
     SizeT length = 0;
 
@@ -669,7 +669,7 @@ static void TestTrim(TestHelper &helper) {
     helper.Equal(length, 3U, "length", __LINE__);
 }
 
-static void TestIsEqual(TestHelper &helper) {
+static void TestIsEqual(QTest &helper) {
     helper.EqualsTrue(StringUtils::IsEqual("", "", 0U), "IsEqual", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual("a", "a", 1U), "IsEqual", __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual("ab", "ab", 2U), "IsEqual", __LINE__);
@@ -718,7 +718,7 @@ static void TestIsEqual(TestHelper &helper) {
                        "IsEqual", __LINE__);
 }
 
-static void TestIsGreater(TestHelper &helper) {
+static void TestIsGreater(QTest &helper) {
     helper.EqualsTrue(StringUtils::IsGreater("", "", 0U, 0U, true), "IsGreater", __LINE__);
     helper.EqualsTrue(StringUtils::IsGreater("b", "a", 1U, 1U, false), "IsGreater", __LINE__);
     helper.EqualsTrue(StringUtils::IsGreater("a", "a", 1U, 1U, true), "IsGreater", __LINE__);
@@ -761,7 +761,7 @@ static void TestIsGreater(TestHelper &helper) {
     helper.EqualsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, false), "IsGreater", __LINE__);
 }
 
-static void TestIsLess(TestHelper &helper) {
+static void TestIsLess(QTest &helper) {
     helper.EqualsTrue(StringUtils::IsLess("", "", 0U, 0U, true), "IsLess", __LINE__);
     helper.EqualsTrue(StringUtils::IsLess("a", "b", 1U, 1U, false), "IsLess", __LINE__);
     helper.EqualsTrue(StringUtils::IsLess("a", "a", 1U, 1U, true), "IsLess", __LINE__);
@@ -805,7 +805,7 @@ static void TestIsLess(TestHelper &helper) {
 }
 
 static int RunStringUtilsTests() {
-    TestHelper helper{"StringUtils.hpp", __FILE__};
+    QTest helper{"StringUtils.hpp", __FILE__};
 
     helper.PrintGroupName();
 

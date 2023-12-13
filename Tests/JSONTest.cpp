@@ -1,7 +1,7 @@
 #include "JSONTest.hpp"
 
 int main() {
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunJSONTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 

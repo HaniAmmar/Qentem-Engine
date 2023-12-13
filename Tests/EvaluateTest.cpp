@@ -1,7 +1,7 @@
 #include "EvaluateTest.hpp"
 
 int main() {
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunEvaluateTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 

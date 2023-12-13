@@ -1,7 +1,7 @@
 #include "StringTest.hpp"
 
 int main() {
-    Qentem::TestHelper::PrintInfo();
+    Qentem::QTest::PrintInfo();
     const int ret = Qentem::Test::RunStringTests();
     Qentem::MemoryRecord::PrintMemoryStatus();
 

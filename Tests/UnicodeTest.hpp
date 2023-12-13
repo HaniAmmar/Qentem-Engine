@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "StringStream.hpp"
 #include "Unicode.hpp"
 
@@ -30,7 +30,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestToUTF8(TestHelper &helper) {
+static void TestToUTF8(QTest &helper) {
     /*
      * HEX         UNICODE      BINARY
      * 0x0000      0            00000000
@@ -139,7 +139,7 @@ static void TestToUTF8(TestHelper &helper) {
     stream.Clear();
 }
 
-static void TestToUTF16(TestHelper &helper) {
+static void TestToUTF16(QTest &helper) {
     using QChar = char16_t;
 
     StringStream<QChar> stream;
@@ -208,7 +208,7 @@ static void TestToUTF16(TestHelper &helper) {
     stream.Clear();
 }
 
-static void TestToUTF32(TestHelper &helper) {
+static void TestToUTF32(QTest &helper) {
     using QChar = char32_t;
 
     StringStream<char32_t> stream;
@@ -320,7 +320,7 @@ static int RunUnicodeTests() {
     // convertTo4Hex(0x1F859);
     // convertTo4Hex(0x10283);
 
-    TestHelper helper{"Unicode.hpp", __FILE__};
+    QTest helper{"Unicode.hpp", __FILE__};
 
     helper.PrintGroupName();
 

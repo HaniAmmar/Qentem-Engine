@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "TestHelper.hpp"
+#include "QTest.hpp"
 #include "String.hpp"
 
 #ifndef QENTEM_STRING_TESTS_H_
@@ -31,7 +31,7 @@ namespace Test {
 
 using String8 = String<char>;
 
-static void TestString1(TestHelper &helper) {
+static void TestString1(QTest &helper) {
     SizeT length;
     char *str_ptr;
 
@@ -138,7 +138,7 @@ static void TestString1(TestHelper &helper) {
     }
 }
 
-static void TestStringCompare(TestHelper &helper) {
+static void TestStringCompare(QTest &helper) {
     String8     str1("a");
     String8     str2("a");
     const char *str3 = "a";
@@ -246,7 +246,7 @@ static void TestStringCompare(TestHelper &helper) {
     helper.EqualsTrue((str2 < str1), "IsLess", __LINE__);
 }
 
-static void TestString2(TestHelper &helper) {
+static void TestString2(QTest &helper) {
     String8 str1;
     String8 str2;
 
@@ -496,7 +496,7 @@ static void TestString2(TestHelper &helper) {
     helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
 }
 
-static void TestStringTrim(TestHelper &helper) {
+static void TestStringTrim(QTest &helper) {
     String8 str1("");
 
     str1 = String8::Trim(str1);
@@ -588,7 +588,7 @@ static void TestStringTrim(TestHelper &helper) {
 }
 
 static int RunStringTests() {
-    TestHelper helper{"String.hpp", __FILE__};
+    QTest helper{"String.hpp", __FILE__};
 
     helper.PrintGroupName();
 
