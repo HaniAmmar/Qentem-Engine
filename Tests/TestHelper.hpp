@@ -108,12 +108,12 @@ struct TestOutPut {
 };
 
 struct MemoryRecordData {
-    SizeT  allocations{0};
-    SizeT  deallocations{0};
-    SizeT  subAllocations{0};
-    SizeT  subDeallocations{0};
-    size_t remainingSize{0};
-    size_t peakSize{0};
+    SizeT         allocations{0};
+    SizeT         deallocations{0};
+    SizeT         subAllocations{0};
+    SizeT         subDeallocations{0};
+    SystemIntType remainingSize{0};
+    SystemIntType peakSize{0};
 };
 
 struct MemoryRecord {
