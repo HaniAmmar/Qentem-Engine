@@ -125,52 +125,61 @@ struct MemoryRecord {
     MemoryRecord &operator=(const MemoryRecord &) = delete;
 
     inline static void ResetSubMemory() noexcept {
-        getStorage().subAllocations   = 0;
-        getStorage().subDeallocations = 0;
+        static MemoryRecordData &storage = getStorage();
+
+        storage.subAllocations   = 0;
+        storage.subDeallocations = 0;
     }
 
     inline static SizeT CheckSubMemory() noexcept {
-        return (getStorage().subAllocations - getStorage().subDeallocations);
+        static MemoryRecordData &storage = getStorage();
+
+        return (storage.subAllocations - storage.subDeallocations);
     }
 
     inline static void AddAllocation(void *pointer) noexcept {
-        ++(getStorage().allocations);
-        ++(getStorage().subAllocations);
+        static MemoryRecordData &storage = getStorage();
+
+        ++(storage.allocations);
+        ++(storage.subAllocations);
 
 #if defined(_WIN32) || defined(_M_X64)
-        getStorage().remainingSize += _msize(pointer);
+        storage.remainingSize += _msize(pointer);
 #elif defined(__APPLE__)
-        getStorage().remainingSize += malloc_size(pointer);
+        storage.remainingSize += malloc_size(pointer);
 #else
-        getStorage().remainingSize += malloc_usable_size(pointer);
+        storage.remainingSize += malloc_usable_size(pointer);
 #endif
 
-        if (getStorage().remainingSize > getStorage().peakSize) {
-            getStorage().peakSize = getStorage().remainingSize;
+        if (storage.remainingSize > storage.peakSize) {
+            storage.peakSize = storage.remainingSize;
         }
     }
 
     QENTEM_NOINLINE static void RemoveAllocation(void *pointer) noexcept {
-        ++(getStorage().deallocations);
-        ++(getStorage().subDeallocations);
+        static MemoryRecordData &storage = getStorage();
+
+        ++(storage.deallocations);
+        ++(storage.subDeallocations);
 
 #if defined(_WIN32) || defined(_M_X64)
-        getStorage().remainingSize -= _msize(pointer);
+        storage.remainingSize -= _msize(pointer);
 #elif defined(__APPLE__)
-        getStorage().remainingSize -= malloc_size(pointer);
+        storage.remainingSize -= malloc_size(pointer);
 #else
-        getStorage().remainingSize -= malloc_usable_size(pointer);
+        storage.remainingSize -= malloc_usable_size(pointer);
 #endif
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
-        TestOutPut::Print("\nMemory: ", (double(getStorage().remainingSize) / 1024),
-                          " KB, Peak: ", (double(getStorage().peakSize) / 1024), " KB.\n");
+        static MemoryRecordData &storage = getStorage();
 
-        TestOutPut::Print("Allocations: ", getStorage().allocations, ", Deallocations: ", getStorage().deallocations,
-                          ".\n");
+        TestOutPut::Print("\nMemory: ", (double(storage.remainingSize) / 1024),
+                          " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
 
-        const SizeT remaining_deallocations = (getStorage().allocations - getStorage().deallocations);
+        TestOutPut::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
+
+        const SizeT remaining_deallocations = (storage.allocations - storage.deallocations);
 
         if (remaining_deallocations != 0) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
