@@ -6,22 +6,28 @@ branches:
   only:
     - main
 
-# platform:
-#   - x64
-#   - x86
-#   - ARM
-
-# configuration:
-#   - Release
-
 environment:
   matrix:
 
-  # - job_name: Windows build
-  #   appveyor_build_worker_image: Visual Studio 2019
+  - job_name: Windows x64
+    appveyor_build_worker_image: Visual Studio 2019
+    platform: x64
 
-  # - job_name: Linux build
-  #   appveyor_build_worker_image: Ubuntu
+  - job_name: Windows ARM
+    appveyor_build_worker_image: Visual Studio 2022
+    platform: ARM
+
+  - job_name: Windows x86
+    appveyor_build_worker_image: Visual Studio 2017
+    platform: x86
+
+  - job_name: Linux x64
+    appveyor_build_worker_image: Ubuntu
+    platform: x64
+
+  - job_name: Linux x86
+    appveyor_build_worker_image: Ubuntu
+    platform: x86
 
   - job_name: Codecov
     appveyor_build_worker_image: Ubuntu
@@ -30,31 +36,71 @@ matrix:
   fast_finish: true
 
 for:
-  # -
-  #   matrix:
-  #     only:
-  #       - job_name: Windows build
+  -
+    matrix:
+      only:
+        - job_name: Windows x64
 
-  #   build_script:
-  #   - cmd: mkdir Build
-  #   - cmd: cd Build
-  #   - cmd: cmake ..
-  #   - cmd: cmake --build .
+    build_script:
+    - cmd: mkdir Build
+    - cmd: cd Build
+    - cmd: cmake ..
+    - cmd: cmake --build .
 
-  #   test_script:
-  #   - cmd: ctest -C Debug
+    test_script:
+    - cmd: ctest -C Debug
 
-  # -
-  #   matrix:
-  #     only:
-  #       - job_name: Linux build
+  -
+    matrix:
+      only:
+        - job_name: Windows ARM
 
-  #   build_script:
-  #   - sh: mkdir Build
-  #   - sh: g++ -g -O0 -Wall -Wextra -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
+    build_script:
+    - cmd: mkdir Build
+    - cmd: cd Build
+    - cmd: cmake ..
+    - cmd: cmake --build .
 
-  #   test_script:
-  #   - sh: ./Build/QTest.bin
+    test_script:
+    - cmd: ctest -C Debug
+
+  -
+    matrix:
+      only:
+        - job_name: Windows x86
+
+    build_script:
+    - cmd: mkdir Build
+    - cmd: cd Build
+    - cmd: cmake ..
+    - cmd: cmake --build .
+
+    test_script:
+    - cmd: ctest -C Debug
+
+  -
+    matrix:
+      only:
+        - job_name: Linux x64
+
+    build_script:
+    - sh: mkdir Build
+    - sh: g++ -std=c++17 -g -O0 -Wall -Wextra -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+
+    test_script:
+    - sh: ./Build/QTest.bin
+
+  -
+    matrix:
+      only:
+        - job_name: Linux x86
+
+    build_script:
+    - sh: mkdir Build
+    - sh: g++ -std=c++11 -g -O0 -m32 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+
+    test_script:
+    - sh: ./Build/QTest.bin
 
   -
     matrix:
