@@ -25,12 +25,12 @@ environment:
   #   appveyor_build_worker_image: Ubuntu
   #   platform: x64
 
-  - job_name: Linux x86
-    appveyor_build_worker_image: Ubuntu
-    platform: x86
+  # - job_name: Linux x86
+  #   appveyor_build_worker_image: Ubuntu
+  #   platform: x86
 
   - job_name: Codecov
-    appveyor_build_worker_image: Ubuntu
+    appveyor_build_worker_image: Ubuntu2204
 
 matrix:
   fast_finish: true
@@ -90,28 +90,30 @@ for:
   #   test_script:
   #   - sh: ./Build/QTest.bin
 
-  -
-    matrix:
-      only:
-        - job_name: Linux x86
+  # -
+  #   matrix:
+  #     only:
+  #       - job_name: Linux x86
 
-    build_script:
-    - sh: mkdir Build
-    - sh: g++ -std=c++11 -g -O0 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+  #   build_script:
+  #   - sh: mkdir Build
+  #   - sh: g++ -std=c++11 -g -O0 -m32 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
 
-    test_script:
-    - sh: ./Build/QTest.bin
+  #   test_script:
+  #   - sh: ./Build/QTest.bin
 
   -
     matrix:
       only:
         - job_name: Codecov
 
+    install:
+      - sudo apt install --yes lcov
     build_script:
     - sh: mkdir Build
-    - sh: g++ -std=c++17 -g -O0 --coverage -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
-
+    - sh: g++ -std=c++17 -g -O0 --coverage -fPIC -fprofile-arcs -ftest-coverage -fno-inline -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
     test_script:
     - sh: ./Build/QTest.bin
-    - sh: cd Build
+    - sh: lcov --capture --directory ./Build --output-file ./Build/Qentem.info
+    - sh: lcov --remove ./Build/Qentem.info '/usr/*' --output-file ./Build/Qentem.info
     - sh: bash <(curl -s https://codecov.io/bash)
