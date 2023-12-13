@@ -17,38 +17,55 @@ branches:
 environment:
   matrix:
 
-  - job_name: Windows build
-    appveyor_build_worker_image: Visual Studio 2019
+  # - job_name: Windows build
+  #   appveyor_build_worker_image: Visual Studio 2019
 
-  - job_name: Linux build
+  # - job_name: Linux build
+  #   appveyor_build_worker_image: Ubuntu
+
+  - job_name: Codecov
     appveyor_build_worker_image: Ubuntu
 
 matrix:
   fast_finish: true
 
 for:
+  # -
+  #   matrix:
+  #     only:
+  #       - job_name: Windows build
+
+  #   build_script:
+  #   - cmd: mkdir Build
+  #   - cmd: cd Build
+  #   - cmd: cmake ..
+  #   - cmd: cmake --build .
+
+  #   test_script:
+  #   - cmd: ctest -C Debug
+
+  # -
+  #   matrix:
+  #     only:
+  #       - job_name: Linux build
+
+  #   build_script:
+  #   - sh: mkdir Build
+  #   - sh: g++ -g -O0 -Wall -Wextra -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
+
+  #   test_script:
+  #   - sh: ./Build/QTest.bin
+
   -
     matrix:
       only:
-        - job_name: Windows build
-
-    build_script:
-    - cmd: mkdir Build
-    - cmd: cd Build
-    - cmd: cmake ..
-    - cmd: cmake --build .
-
-    test_script:
-    - cmd: ctest -C Debug
-
-  -
-    matrix:
-      only:
-        - job_name: Linux build
+        - job_name: Codecov
 
     build_script:
     - sh: mkdir Build
-    - sh: g++ -g -O0 -Wall -Wextra -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -std=c++17 -I ./Include -o ./Build/QTest.bin
+    - sh: g++ -std=c++17 -g -O0 --coverage -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
 
     test_script:
     - sh: ./Build/QTest.bin
+    - sh: cd Build
+    - sh: bash <(curl -s https://codecov.io/bash)
