@@ -101,34 +101,34 @@ struct TagBit {
     }
 
     ~TagBit() {
-        switch (_type) {
+        switch (GetType()) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                Memory::Deallocate(_info);
+                Memory::Deallocate(getInfo());
                 break;
             }
 
             case TagType::Math: {
-                Memory::Dispose((MathTag *)(_info));
-                Memory::Deallocate(_info);
+                Memory::Dispose((MathTag *)(getInfo()));
+                Memory::Deallocate(getInfo());
                 break;
             }
 
             case TagType::Loop: {
-                Memory::Dispose((LoopTag *)(_info));
-                Memory::Deallocate(_info);
+                Memory::Dispose((LoopTag *)(getInfo()));
+                Memory::Deallocate(getInfo());
                 break;
             }
 
             case TagType::InLineIf: {
-                Memory::Dispose((InLineIfTag *)(_info));
-                Memory::Deallocate(_info);
+                Memory::Dispose((InLineIfTag *)(getInfo()));
+                Memory::Deallocate(getInfo());
                 break;
             }
 
             case TagType::If: {
-                Memory::Dispose((Array<IfTagCase> *)(_info));
-                Memory::Deallocate(_info);
+                Memory::Dispose((Array<IfTagCase> *)(getInfo()));
+                Memory::Deallocate(getInfo());
                 break;
             }
 
@@ -137,8 +137,28 @@ struct TagBit {
         }
     }
 
-    inline void *GetInfo() const noexcept {
-        return _info;
+    inline VariableTag &GeVariableTag() const noexcept {
+        return *(Memory::ChangePointer<VariableTag>(getInfo()));
+    }
+
+    inline VariableTag &GeRawVariableTag() const noexcept {
+        return *(Memory::ChangePointer<VariableTag>(getInfo()));
+    }
+
+    inline MathTag &GetMathTag() const noexcept {
+        return *(Memory::ChangePointer<MathTag>(getInfo()));
+    }
+
+    inline LoopTag &GetLoopTag() const noexcept {
+        return *(Memory::ChangePointer<LoopTag>(getInfo()));
+    }
+
+    inline InLineIfTag &GetInLineIfTag() const noexcept {
+        return *(Memory::ChangePointer<InLineIfTag>(getInfo()));
+    }
+
+    inline Array<IfTagCase> &GetIfTag() const noexcept {
+        return *(Memory::ChangePointer<Array<IfTagCase>>(getInfo()));
     }
 
     inline TagType GetType() const noexcept {
@@ -154,6 +174,10 @@ struct TagBit {
     }
 
   private:
+    inline void *getInfo() const noexcept {
+        return _info;
+    }
+
     struct _Content_T {
         SizeT offset;
         SizeT length;
