@@ -109,18 +109,14 @@ class StringStream {
     }
 
     void operator+=(_Char_T one_char) {
-        if (Capacity() == Length()) {
-            SizeT n_size = Capacity();
+        const SizeT len = Length();
+        ++_length;
 
-            if (n_size == SizeT{0}) {
-                n_size = _initial_size;
-            }
-
-            expand(n_size * SizeT{4});
+        if (Capacity() == len) {
+            expand(_length);
         }
 
-        Storage()[Length()] = one_char;
-        ++_length;
+        Storage()[len] = one_char;
     }
 
     inline void operator+=(const StringStream<_Char_T> &src) {
@@ -314,7 +310,7 @@ class StringStream {
 
     inline _Char_T *Last() const noexcept {
         if (IsNotEmpty()) {
-            return (Storage() + (Length() - 1));
+            return (Storage() + (Length() - SizeT{1}));
         }
 
         return nullptr;
@@ -368,23 +364,21 @@ class StringStream {
     }
 
     void allocate(SizeT size) {
-        size = Memory::AlignSize(size);
+        size = Memory::AlignSize(size * SizeT{4});
         setCapacity(size);
         setStorage(Memory::Allocate<_Char_T>(size));
     }
 
     inline void write(const _Char_T *str, const SizeT len) {
-        if (len != SizeT{0}) {
-            constexpr SizeT32 size           = sizeof(_Char_T);
-            const SizeT       current_offset = Length();
-            _length += len;
+        constexpr SizeT32 size           = sizeof(_Char_T);
+        const SizeT       current_offset = Length();
+        _length += len;
 
-            if (Capacity() < Length()) {
-                expand(Length());
-            }
-
-            Memory::Copy<size>((Storage() + current_offset), str, (len * size));
+        if (Capacity() < _length) {
+            expand(_length);
         }
+
+        Memory::Copy<size>((Storage() + current_offset), str, (len * size));
     }
 
     void expand(const SizeT new_capacity) {
@@ -396,8 +390,6 @@ class StringStream {
         Memory::Copy<size>(Storage(), src, (src_cap * size));
         Memory::Deallocate(src);
     }
-
-    static constexpr SizeT _initial_size = SizeT{4}; // * 4 = 16
 
     _Char_T *_storage{nullptr};
     SizeT    _length{0};
