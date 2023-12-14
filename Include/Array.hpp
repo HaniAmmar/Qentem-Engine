@@ -23,18 +23,18 @@
 #include "Memory.hpp"
 #include "QPointer.hpp"
 
-#ifndef QENTEM_ARRAY_H_
-#define QENTEM_ARRAY_H_
+#ifndef _QENTEM_ARRAY_H
+#define _QENTEM_ARRAY_H
 
 namespace Qentem {
 /*
  * Simple resizable array, with pointer tagging.
  */
-template <typename Type_T_, bool>
+template <typename _Type_T, bool>
 struct ArrayData;
 
-template <typename Type_T_>
-struct ArrayData<Type_T_, false> {
+template <typename _Type_T>
+struct ArrayData<_Type_T, false> {
     // Little-Endian
     ArrayData() noexcept = default;
 
@@ -48,7 +48,7 @@ struct ArrayData<Type_T_, false> {
     ArrayData &operator=(const ArrayData &) = delete;
 
     ~ArrayData() {
-        Type_T_ *storage = Storage.GetPointer();
+        _Type_T *storage = Storage.GetPointer();
         Memory::Dispose(storage, (storage + Index));
         Memory::Deallocate(storage);
     }
@@ -58,11 +58,11 @@ struct ArrayData<Type_T_, false> {
 
     SizeT             Index{0};
     SizeT             Capacity{0};
-    QPointer<Type_T_> Storage{};
+    QPointer<_Type_T> Storage{};
 };
 
-template <typename Type_T_>
-struct ArrayData<Type_T_, true> {
+template <typename _Type_T>
+struct ArrayData<_Type_T, true> {
     // Big-Endian
     ArrayData() noexcept = default;
 
@@ -79,26 +79,26 @@ struct ArrayData<Type_T_, true> {
     ArrayData &operator=(const ArrayData &) = delete;
 
     ~ArrayData() {
-        Type_T_ *storage = Storage.GetPointer();
+        _Type_T *storage = Storage.GetPointer();
         Memory::Dispose(storage, (storage + Index));
         Memory::Deallocate(storage);
     }
 
-    QPointer<Type_T_> Storage{};
+    QPointer<_Type_T> Storage{};
     SizeT             Index{0};
     SizeT             Capacity{0};
 };
 
-template <typename Type_T_>
+template <typename _Type_T>
 class Array {
   public:
     Array() noexcept            = default;
     Array(Array &&src) noexcept = default;
     ~Array()                    = default;
 
-    explicit Array(SizeT size, bool initialize = false) : data_{size} {
+    explicit Array(SizeT size, bool initialize = false) : _data{size} {
         if (size != SizeT{0}) {
-            Type_T_ *current = allocate();
+            _Type_T *current = allocate();
 
             if (initialize) {
                 Memory::Initialize(current, (current + size));
@@ -107,20 +107,20 @@ class Array {
         }
     }
 
-    Array(const Array &src) : data_{src.Size()} {
+    Array(const Array &src) : _data{src.Size()} {
         copyArray(src);
     }
 
     Array &operator=(Array &&src) noexcept {
         if (this != &src) {
-            Type_T_    *storage = Storage();
+            _Type_T    *storage = Storage();
             const SizeT size    = Size();
 
             setSize(src.Size());
             setCapacity(src.Capacity());
             src.setSize(SizeT{0});
             src.setCapacity(SizeT{0});
-            data_.Storage.MovePointerOnly(src.data_.Storage);
+            _data.Storage.MovePointerOnly(src._data.Storage);
 
             // Just in case the copied array is not a child array.
             Memory::Dispose(storage, (storage + size));
@@ -132,7 +132,7 @@ class Array {
 
     Array &operator=(const Array &src) {
         if (this != &src) {
-            Type_T_    *storage = Storage();
+            _Type_T    *storage = Storage();
             const SizeT size    = Size();
 
             setStorage(nullptr);
@@ -161,7 +161,7 @@ class Array {
             }
 
             if (src.IsNotEmpty()) {
-                Memory::Copy<sizeof(Type_T_)>((Storage() + Size()), src.First(), src.Size() * sizeof(Type_T_));
+                Memory::Copy<sizeof(_Type_T)>((Storage() + Size()), src.First(), src.Size() * sizeof(_Type_T));
             }
 
             setSize(n_size);
@@ -180,10 +180,10 @@ class Array {
             resize(n_size);
         }
 
-        data_.Index += src.Size();
-        Type_T_       *storage  = Storage();
-        const Type_T_ *src_item = src.First();
-        const Type_T_ *src_end  = (src_item + src.Size());
+        _data.Index += src.Size();
+        _Type_T       *storage  = Storage();
+        const _Type_T *src_item = src.First();
+        const _Type_T *src_end  = (src_item + src.Size());
 
         while (src_item < src_end) {
             Memory::Initialize(storage, *src_item);
@@ -192,7 +192,7 @@ class Array {
         }
     }
 
-    void operator+=(Type_T_ &&item) {
+    void operator+=(_Type_T &&item) {
         if (Size() == Capacity()) {
             if (Capacity() == SizeT{0}) {
                 setCapacity(1U);
@@ -202,11 +202,11 @@ class Array {
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
-        ++data_.Index;
+        ++_data.Index;
     }
 
-    inline void operator+=(const Type_T_ &item) {
-        *this += Memory::Move(Type_T_{item});
+    inline void operator+=(const _Type_T &item) {
+        *this += Memory::Move(_Type_T{item});
     }
 
     inline void Insert(Array &&src) {
@@ -217,7 +217,7 @@ class Array {
         *this += src;
     }
 
-    inline Type_T_ &Insert(Type_T_ &&item) {
+    inline _Type_T &Insert(_Type_T &&item) {
         const SizeT size = Size();
 
         *this += Memory::Move(item);
@@ -225,22 +225,22 @@ class Array {
         return Storage()[size];
     }
 
-    inline Type_T_ &Insert(const Type_T_ &item) {
+    inline _Type_T &Insert(const _Type_T &item) {
         const SizeT size = Size();
 
-        *this += Memory::Move(Type_T_{item});
+        *this += Memory::Move(_Type_T{item});
 
         return Storage()[size];
     }
 
     void Clear() noexcept {
-        Type_T_ *storage = Storage();
+        _Type_T *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
         setSize(SizeT{0});
     }
 
     void Reset() noexcept {
-        Type_T_ *storage = Storage();
+        _Type_T *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
         Memory::Deallocate(storage);
         clearStorage();
@@ -248,10 +248,10 @@ class Array {
         setCapacity(SizeT{0});
     }
 
-    Type_T_ *Detach() noexcept {
+    _Type_T *Detach() noexcept {
         setSize(SizeT{0});
         setCapacity(SizeT{0});
-        Type_T_ *tmp = Storage();
+        _Type_T *tmp = Storage();
         clearStorage();
 
         return tmp;
@@ -270,7 +270,7 @@ class Array {
         if (new_size != SizeT{0}) {
             if (Size() > new_size) {
                 // Shrink
-                Type_T_ *storage = Storage();
+                _Type_T *storage = Storage();
                 Memory::Dispose((storage + new_size), (storage + Size()));
                 setSize(new_size);
             }
@@ -286,7 +286,7 @@ class Array {
         Resize(new_size);
 
         if (new_size > Size()) {
-            Type_T_ *current = Storage();
+            _Type_T *current = Storage();
             Memory::Initialize((current + Size()), (current + new_size));
         }
 
@@ -301,7 +301,7 @@ class Array {
         }
     }
 
-    void Swap(Type_T_ &item1, Type_T_ &item2) noexcept {
+    void Swap(_Type_T &item1, _Type_T &item2) noexcept {
         Memory::Swap(item1, item2);
     }
 
@@ -319,23 +319,23 @@ class Array {
         Resize(Size());
     }
 
-    inline Type_T_ *Storage() const noexcept {
-        return data_.Storage.GetPointer();
+    inline _Type_T *Storage() const noexcept {
+        return _data.Storage.GetPointer();
     }
 
     inline SizeT Size() const noexcept {
-        return data_.Index;
+        return _data.Index;
     }
 
     inline SizeT Capacity() const noexcept {
-        return data_.Capacity;
+        return _data.Capacity;
     }
 
-    inline const Type_T_ *First() const noexcept {
+    inline const _Type_T *First() const noexcept {
         return Storage();
     }
 
-    inline Type_T_ *Last() const noexcept {
+    inline _Type_T *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - SizeT{1}));
         }
@@ -344,22 +344,22 @@ class Array {
     }
 
     inline SizeT8 GetHighByte() const noexcept {
-        return data_.Storage.GetHighByte();
+        return _data.Storage.GetHighByte();
     }
 
     inline void SetHighByte(SizeT8 byte) noexcept {
-        data_.Storage.SetHighByte(byte);
+        _data.Storage.SetHighByte(byte);
     }
 
     inline SizeT8 GetLowByte() const noexcept {
-        return data_.Storage.GetLowByte();
+        return _data.Storage.GetLowByte();
     }
 
     inline void SetLowByte(SizeT8 byte) noexcept {
-        data_.Storage.SetLowByte(byte);
+        _data.Storage.SetLowByte(byte);
     }
 
-    inline const Type_T_ *End() const noexcept {
+    inline const _Type_T *End() const noexcept {
         return (First() + Size());
     }
 
@@ -372,54 +372,54 @@ class Array {
     }
 
     // For STL
-    inline const Type_T_ *begin() const noexcept {
+    inline const _Type_T *begin() const noexcept {
         return First();
     }
 
-    inline const Type_T_ *end() const noexcept {
+    inline const _Type_T *end() const noexcept {
         return End();
     }
 
-    inline Type_T_ *begin() noexcept {
+    inline _Type_T *begin() noexcept {
         return Storage();
     }
 
-    inline Type_T_ *end() noexcept {
+    inline _Type_T *end() noexcept {
         return (Storage() + Size());
     }
 
     //////////// Private ////////////
 
   private:
-    void setStorage(Type_T_ *ptr) noexcept {
-        data_.Storage.SetPointer(ptr);
+    void setStorage(_Type_T *ptr) noexcept {
+        _data.Storage.SetPointer(ptr);
     }
 
-    Type_T_ *allocate() {
-        Type_T_ *new_storage = Memory::Allocate<Type_T_>(Capacity());
+    _Type_T *allocate() {
+        _Type_T *new_storage = Memory::Allocate<_Type_T>(Capacity());
         setStorage(new_storage);
         return new_storage;
     }
 
     void clearStorage() noexcept {
-        data_.Storage.Reset();
+        _data.Storage.Reset();
     }
 
     void setSize(SizeT new_size) noexcept {
-        data_.Index = new_size;
+        _data.Index = new_size;
     }
 
     void setCapacity(SizeT new_capacity) noexcept {
-        data_.Capacity = new_capacity;
+        _data.Capacity = new_capacity;
     }
 
     void resize(SizeT new_size) {
-        Type_T_ *src = Storage();
+        _Type_T *src = Storage();
         setCapacity(new_size);
-        Type_T_ *des = allocate();
+        _Type_T *des = allocate();
 
         if (IsNotEmpty()) {
-            Memory::Copy<sizeof(Type_T_)>(des, src, (Size() * sizeof(Type_T_)));
+            Memory::Copy<sizeof(_Type_T)>(des, src, (Size() * sizeof(_Type_T)));
         }
 
         Memory::Deallocate(src);
@@ -428,9 +428,9 @@ class Array {
     void copyArray(const Array &src) {
         if (Capacity() != SizeT{0}) {
             setSize(src.Size());
-            Type_T_       *storage  = allocate();
-            const Type_T_ *src_item = src.First();
-            const Type_T_ *src_end  = (src_item + src.Size());
+            _Type_T       *storage  = allocate();
+            const _Type_T *src_item = src.First();
+            const _Type_T *src_end  = (src_item + src.Size());
 
             while (src_item < src_end) {
                 Memory::Initialize(storage, *src_item);
@@ -440,7 +440,7 @@ class Array {
         }
     }
 
-    ArrayData<Type_T_, Config::IsBigEndian> data_{};
+    ArrayData<_Type_T, Config::IsBigEndian> _data{};
 };
 
 } // namespace Qentem

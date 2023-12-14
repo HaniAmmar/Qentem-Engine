@@ -26,8 +26,8 @@
 #include "Engine.hpp"
 #include "StringStream.hpp"
 
-#ifndef QENTEM_ENGINE_TESTS_H_
-#define QENTEM_ENGINE_TESTS_H_
+#ifndef _QENTEM_ENGINE_TESTS_H
+#define _QENTEM_ENGINE_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -37,224 +37,224 @@ static void TestEngine1(QTest &helper) {
     SizeT       content_len = 0;
     SizeT       find_len    = 3;
     const char *content     = "";
-    const char *find_       = "ABC";
+    const char *_find       = "ABC";
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, SizeT{1});
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, SizeT{1});
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "A";
     content_len = 1;
-    find_       = "A";
+    _find       = "A";
 
-    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
     helper.Equal(ret, 1U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "AAAAA";
     content_len = 5;
 
-    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
     helper.Equal(ret, 2U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, content_len, content_len);
+    ret = Engine::FindOne(*_find, content, content_len, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{4}, content_len);
     helper.Equal(ret, 5U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{5}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "  A A        A";
     content_len = 14;
 
-    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
     helper.Equal(ret, 5U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{7}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{7}, content_len);
     helper.Equal(ret, 14U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
     helper.Equal(ret, 5U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{4}, content_len);
     helper.Equal(ret, 5U, "return", __LINE__);
 
-    ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
+    ret = Engine::FindOne(*_find, content, SizeT{5}, content_len);
     helper.Equal(ret, 14U, "return", __LINE__);
 
     content     = "A";
     content_len = 1;
-    find_       = "AB";
+    _find       = "AB";
     find_len    = 2;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content = "AA";
-    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content = "A   A   A";
-    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content = "  A   A   A  ";
-    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "AB";
     content_len = 2;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 2U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = " AB";
     content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
     content     = "AAB";
     content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
     content     = "AAAB";
     content_len = 4;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
     content     = "AAAAAAAAAB";
     content_len = 10;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 10U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
     helper.Equal(ret, 10U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
     helper.Equal(ret, 10U, "return", __LINE__);
 
     content     = "  AB";
     content_len = 4;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
     helper.Equal(ret, 4U, "return", __LINE__);
 
     content     = "        AB";
     content_len = 10;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 10U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
     helper.Equal(ret, 10U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
     helper.Equal(ret, 10U, "return", __LINE__);
 
     content     = "AAAAAAAAA";
     content_len = 9;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT(content_len - SizeT{1}), content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT(content_len - SizeT{1}), content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    find_       = "ABC";
+    _find       = "ABC";
     find_len    = 3;
     content     = "CBA";
     content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "BCBA";
     content_len = 4;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "123456789123456CBA";
     content_len = 18;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "ADC";
     content_len = 3;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "123456789123456ADC";
     content_len = 18;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0";
     content_len = 40;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 }
 
@@ -263,39 +263,39 @@ static void TestEngine2(QTest &helper) {
     SizeT           content_len = 16;
     constexpr SizeT find_len    = 3;
     const char     *content     = "ABABABABABAAABAB";
-    const char     *find_       = "ABC";
+    const char     *_find       = "ABC";
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
     content     = "ABABABABABAAABABC";
     content_len = 17;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 17U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{15}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{15}, content_len);
     helper.Equal(ret, 0U, "return", __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT{14}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{14}, content_len);
     helper.Equal(ret, 17U, "return", __LINE__);
 
     content     = "ABABABABABCABAAAB";
     content_len = 17;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, SizeT{11}, "return", __LINE__);
 
     content     = "   ABC   ";
     content_len = 9;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 6U, "return", __LINE__);
 
     content     = "ABC   ";
     content_len = 6;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
     ret = Engine::FindOne('1', "00000001", SizeT{0}, SizeT{8});
@@ -310,7 +310,7 @@ static void TestEngine2(QTest &helper) {
     content     = "ABC   ";
     content_len = 6;
 
-    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
     helper.Equal(ret, 3U, "return", __LINE__);
 
     content = R"(<loop value="loop1-value">loop1-value, </loop>)";
@@ -945,7 +945,7 @@ struct Item2Engine {
     Array<Item2Engine> SubItems;
     SizeT              Offset{0};
     SizeT              Length{0};
-    SizeT              padding_[2]{0};
+    SizeT              _padding[2]{0};
 };
 
 static void to_JSON(StringStream<char> &stream, const Array<Item2Engine> &items, const char *content) {

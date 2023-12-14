@@ -23,8 +23,8 @@
 #include "QTest.hpp"
 #include "Value.hpp"
 
-#ifndef QENTEM_VALUE_TESTS_H_
-#define QENTEM_VALUE_TESTS_H_
+#ifndef _QENTEM_VALUE_TESTS_H
+#define _QENTEM_VALUE_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -1077,10 +1077,10 @@ static void TestObjectValue1(QTest &helper) {
     ValueC value1;
     ValueC value2;
 
-    using ObjectItem_ = HAItem_T_<ValueC, char>;
+    using _ObjectItem = _HAItem_T<ValueC, char>;
 
     VHArray            h_arr_var;
-    const ObjectItem_ *storage;
+    const _ObjectItem *storage;
     VStringStream      ss_var;
     QNumber64          num_var;
     const char        *c_str_var;
@@ -1088,7 +1088,7 @@ static void TestObjectValue1(QTest &helper) {
     bool               bool_var;
 
     for (SizeT32 i = 0; i < 5; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1130,7 +1130,7 @@ static void TestObjectValue1(QTest &helper) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 10; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1153,7 +1153,7 @@ static void TestObjectValue1(QTest &helper) {
     h_arr_var.Reset();
     // Testing empty values
     for (SizeT32 i = 0; i < 10; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key];
     }
@@ -1163,7 +1163,7 @@ static void TestObjectValue1(QTest &helper) {
 
     h_arr_var.Reset();
     for (SizeT i = 0; i < 7; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1187,7 +1187,7 @@ static void TestObjectValue1(QTest &helper) {
     helper.EqualsTrue(value1.IsObject(), "IsObject()", __LINE__);
 
     for (SizeT32 i = 0; i < 7; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1209,16 +1209,16 @@ static void TestObjectValue1(QTest &helper) {
 static void TestObjectValue2(QTest &helper) {
     ValueC value1;
 
-    using ObjectItem_ = HAItem_T_<ValueC, char>;
+    using _ObjectItem = _HAItem_T<ValueC, char>;
 
     VHArray            h_arr_var;
-    const ObjectItem_ *storage;
+    const _ObjectItem *storage;
     VString            str_var;
     const char        *c_str_var;
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 7; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1238,7 +1238,7 @@ static void TestObjectValue2(QTest &helper) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1251,7 +1251,7 @@ static void TestObjectValue2(QTest &helper) {
     helper.NotEqual(value3.GetObject()->First(), storage, "GetArray()->First()", "storage", __LINE__);
 
     for (SizeT32 i = 0; i < 13; i++) {
-        VString key("Key_");
+        VString key("_Key");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1375,7 +1375,7 @@ static void TestMoveValue1(QTest &helper) {
     const ValueC *arr_storage; // = arr_var.First();
 
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    const _HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -1796,7 +1796,7 @@ static void TestMoveValue3(QTest &helper) {
     const ValueC *arr_storage; // = arr_var.First();
 
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    const _HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2259,7 +2259,7 @@ static void TestCopyValue1(QTest &helper) {
     const ValueC *arr_storage; // = arr_var.First();
 
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    const _HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2534,7 +2534,7 @@ static void TestCopyValue2(QTest &helper) {
     const ValueC *arr_storage; // = arr_var.First();
 
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    const _HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
@@ -2681,7 +2681,7 @@ static void TestCopyValue3(QTest &helper) {
     const ValueC *arr_storage; // = arr_var.First();
 
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    const _HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -3084,7 +3084,7 @@ static void TestCopyValue4(QTest &helper) {
     const ValueC *arr_storage; // = arr_var.First();
 
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    const _HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -4171,8 +4171,8 @@ static void TestAddition6(QTest &helper) {
     const char                    *str_c1;
     const char                    *str_c2;
     VHArray                        h_arr_var;
-    const HAItem_T_<ValueC, char> *h_arr_storage1 = nullptr;
-    const HAItem_T_<ValueC, char> *h_arr_storage2 = nullptr;
+    const _HAItem_T<ValueC, char> *h_arr_storage1 = nullptr;
+    const _HAItem_T<ValueC, char> *h_arr_storage2 = nullptr;
 
     value1["k1"] = 11;
     value1["k2"] = 22;

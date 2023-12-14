@@ -24,8 +24,8 @@
 #include "QExpression.hpp"
 #include "VariableTag.hpp"
 
-#ifndef QENTEM_TAGS_H_
-#define QENTEM_TAGS_H_
+#ifndef _QENTEM_TAGS_H
+#define _QENTEM_TAGS_H
 
 namespace Qentem {
 namespace Tags {
@@ -52,43 +52,43 @@ struct TagBit {
     TagBit &operator=(const TagBit &) = delete;
     TagBit &operator=(TagBit &&)      = delete;
 
-    TagBit(TagBit &&tag) noexcept : content_{tag.content_}, type_{tag.type_} {
-        constexpr bool is_smaller = sizeof(Content_T_) < sizeof(void *);
+    TagBit(TagBit &&tag) noexcept : _content{tag._content}, _type{tag._type} {
+        constexpr bool is_smaller = sizeof(_Content_T) < sizeof(void *);
 
         if (is_smaller) {
-            if ((type_ != TagType::RawText)) {
-                info_ = tag.info_;
+            if ((_type != TagType::RawText)) {
+                _info = tag._info;
             }
         }
 
-        tag.type_ = TagType::None;
+        tag._type = TagType::None;
     }
 
-    explicit TagBit(TagType type) : type_{type} {
+    explicit TagBit(TagType type) : _type{type} {
         switch (type) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                info_ = Memory::AllocateInit<VariableTag>();
+                _info = Memory::AllocateInit<VariableTag>();
                 break;
             }
 
             case TagType::Math: {
-                info_ = Memory::AllocateInit<MathTag>();
+                _info = Memory::AllocateInit<MathTag>();
                 break;
             }
 
             case TagType::Loop: {
-                info_ = Memory::AllocateInit<LoopTag>();
+                _info = Memory::AllocateInit<LoopTag>();
                 break;
             }
 
             case TagType::InLineIf: {
-                info_ = Memory::AllocateInit<InLineIfTag>();
+                _info = Memory::AllocateInit<InLineIfTag>();
                 break;
             }
 
             case TagType::If: {
-                info_ = Memory::AllocateInit<Array<IfTagCase>>();
+                _info = Memory::AllocateInit<Array<IfTagCase>>();
                 break;
             }
 
@@ -97,38 +97,38 @@ struct TagBit {
         }
     }
 
-    TagBit(SizeT offset, SizeT length) noexcept : content_{offset, length}, type_{TagType::RawText} {
+    TagBit(SizeT offset, SizeT length) noexcept : _content{offset, length}, _type{TagType::RawText} {
     }
 
     ~TagBit() {
-        switch (type_) {
+        switch (_type) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                Memory::Deallocate(info_);
+                Memory::Deallocate(_info);
                 break;
             }
 
             case TagType::Math: {
-                Memory::Dispose((MathTag *)(info_));
-                Memory::Deallocate(info_);
+                Memory::Dispose((MathTag *)(_info));
+                Memory::Deallocate(_info);
                 break;
             }
 
             case TagType::Loop: {
-                Memory::Dispose((LoopTag *)(info_));
-                Memory::Deallocate(info_);
+                Memory::Dispose((LoopTag *)(_info));
+                Memory::Deallocate(_info);
                 break;
             }
 
             case TagType::InLineIf: {
-                Memory::Dispose((InLineIfTag *)(info_));
-                Memory::Deallocate(info_);
+                Memory::Dispose((InLineIfTag *)(_info));
+                Memory::Deallocate(_info);
                 break;
             }
 
             case TagType::If: {
-                Memory::Dispose((Array<IfTagCase> *)(info_));
-                Memory::Deallocate(info_);
+                Memory::Dispose((Array<IfTagCase> *)(_info));
+                Memory::Deallocate(_info);
                 break;
             }
 
@@ -138,33 +138,33 @@ struct TagBit {
     }
 
     inline void *GetInfo() const noexcept {
-        return info_;
+        return _info;
     }
 
     inline TagType GetType() const noexcept {
-        return type_;
+        return _type;
     }
 
     inline SizeT GetOffset() const noexcept {
-        return content_.offset;
+        return _content.offset;
     }
 
     inline SizeT GetLength() const noexcept {
-        return content_.length;
+        return _content.length;
     }
 
   private:
-    struct Content_T_ {
+    struct _Content_T {
         SizeT offset;
         SizeT length;
     };
 
     union {
-        void      *info_;
-        Content_T_ content_{0, 0};
+        void      *_info;
+        _Content_T _content{0, 0};
     };
 
-    TagType type_{TagType::None};
+    TagType _type{TagType::None};
 };
 
 // MathTag -------------------------------------------
@@ -209,12 +209,12 @@ struct IfTagCase {
 };
 
 template <typename, SizeT32>
-struct TPStrings_T_ {};
+struct _TPStrings_T {};
 
-template <typename Char_T_>
-struct TagPatterns_T_ {
+template <typename _Char_T>
+struct _TagPatterns_T {
   private:
-    using TPStrings_T = TPStrings_T_<Char_T_, sizeof(Char_T_)>;
+    using TPStrings_T = _TPStrings_T<_Char_T, sizeof(_Char_T)>;
 
   public:
     /*
@@ -224,177 +224,177 @@ struct TagPatterns_T_ {
     static constexpr SizeT InLineSuffixLength = 1U;
     static constexpr SizeT InLinePrefixLength = 1U;
 
-    static constexpr Char_T_ InLinePrefix = '{';
-    static constexpr Char_T_ InLineSuffix = '}';
+    static constexpr _Char_T InLinePrefix = '{';
+    static constexpr _Char_T InLineSuffix = '}';
 
-    static constexpr Char_T_ MultiLinePrefix = '<';
-    static constexpr Char_T_ MultiLineSuffix = '>';
+    static constexpr _Char_T MultiLinePrefix = '<';
+    static constexpr _Char_T MultiLineSuffix = '>';
 
-    static constexpr Char_T_ VariableIndexPrefix = '[';
-    static constexpr Char_T_ VariableIndexSuffix = ']';
+    static constexpr _Char_T VariableIndexPrefix = '[';
+    static constexpr _Char_T VariableIndexSuffix = ']';
 
     // {var:
-    static constexpr const Char_T_ *VariablePrefix = TPStrings_T::VariablePrefix;
-    static constexpr Char_T_        Var_2ND_Char   = VariablePrefix[1U]; // Second character
+    static constexpr const _Char_T *VariablePrefix = TPStrings_T::VariablePrefix;
+    static constexpr _Char_T        Var_2ND_Char   = VariablePrefix[1U]; // Second character
     // static constexpr SizeT          VariablePrefixLength = StringUtils::ConstCount(VariablePrefix);
     static constexpr SizeT VariablePrefixLength = 5U;
     static constexpr SizeT VariableFullLength   = (VariablePrefixLength + InLineSuffixLength);
 
     // {raw:
-    static constexpr const Char_T_ *RawVariablePrefix = TPStrings_T::RawVariablePrefix;
-    static constexpr Char_T_        Raw_2ND_Char      = RawVariablePrefix[1U]; // Second character
+    static constexpr const _Char_T *RawVariablePrefix = TPStrings_T::RawVariablePrefix;
+    static constexpr _Char_T        Raw_2ND_Char      = RawVariablePrefix[1U]; // Second character
     // static constexpr SizeT          RawVariablePrefixLength = StringUtils::ConstCount(RawVariablePrefix);
     static constexpr SizeT RawVariablePrefixLength = 5U;
     static constexpr SizeT RawVariableFullLength   = (RawVariablePrefixLength + InLineSuffixLength);
 
     // {math:
-    static constexpr const Char_T_ *MathPrefix    = TPStrings_T::MathPrefix;
-    static constexpr Char_T_        Math_2ND_Char = MathPrefix[1U]; // Second character
+    static constexpr const _Char_T *MathPrefix    = TPStrings_T::MathPrefix;
+    static constexpr _Char_T        Math_2ND_Char = MathPrefix[1U]; // Second character
     // static constexpr SizeT          MathPrefixLength = StringUtils::ConstCount(MathPrefix);
     static constexpr SizeT MathPrefixLength = 6U;
     static constexpr SizeT MathFullLength   = (MathPrefixLength + InLineSuffixLength);
 
     // {if
-    static constexpr const Char_T_ *InLineIfPrefix    = TPStrings_T::InLineIfPrefix;
-    static constexpr Char_T_        InlineIf_2ND_Char = InLineIfPrefix[1U]; // Second character
+    static constexpr const _Char_T *InLineIfPrefix    = TPStrings_T::InLineIfPrefix;
+    static constexpr _Char_T        InlineIf_2ND_Char = InLineIfPrefix[1U]; // Second character
     // static constexpr SizeT          InLineIfPrefixLength = StringUtils::ConstCount(InLineIfPrefix);
     static constexpr SizeT InLineIfPrefixLength = 3U;
 
     // <loop
-    static constexpr const Char_T_ *LoopPrefix    = TPStrings_T::LoopPrefix;
-    static constexpr Char_T_        Loop_2ND_Char = LoopPrefix[1U]; // Second character
+    static constexpr const _Char_T *LoopPrefix    = TPStrings_T::LoopPrefix;
+    static constexpr _Char_T        Loop_2ND_Char = LoopPrefix[1U]; // Second character
     // static constexpr SizeT          LoopPrefixLength = StringUtils::ConstCount(LoopPrefix);
     static constexpr SizeT LoopPrefixLength = 5U;
 
     // </loop>
-    static constexpr const Char_T_ *LoopSuffix = TPStrings_T::LoopSuffix;
+    static constexpr const _Char_T *LoopSuffix = TPStrings_T::LoopSuffix;
     // static constexpr SizeT          LoopSuffixLength = StringUtils::ConstCount(LoopSuffix);
     static constexpr SizeT LoopSuffixLength = 7U;
 
     // <if
-    static constexpr const Char_T_ *IfPrefix    = TPStrings_T::IfPrefix;
-    static constexpr Char_T_        If_2ND_Char = IfPrefix[1U]; // Second character
+    static constexpr const _Char_T *IfPrefix    = TPStrings_T::IfPrefix;
+    static constexpr _Char_T        If_2ND_Char = IfPrefix[1U]; // Second character
     // static constexpr SizeT          IfPrefixLength = StringUtils::ConstCount(IfPrefix);
     static constexpr SizeT IfPrefixLength = 3U;
 
     // </if>
-    static constexpr const Char_T_ *IfSuffix = TPStrings_T::IfSuffix;
+    static constexpr const _Char_T *IfSuffix = TPStrings_T::IfSuffix;
     // static constexpr SizeT          IfSuffixLength = StringUtils::ConstCount(IfSuffix);
     static constexpr SizeT IfSuffixLength = 5U;
 
     // <else
-    static constexpr Char_T_        ElseIfChar = 'i'; // else[i]f
-    static constexpr const Char_T_ *ElsePrefix = TPStrings_T::ElsePrefix;
+    static constexpr _Char_T        ElseIfChar = 'i'; // else[i]f
+    static constexpr const _Char_T *ElsePrefix = TPStrings_T::ElsePrefix;
     // static constexpr SizeT          ElsePrefixLength = StringUtils::ConstCount(ElsePrefix);
     static constexpr SizeT ElsePrefixLength = 5U;
 
     // />
-    static constexpr const Char_T_ *ElseSuffix = TPStrings_T::ElseSuffix;
+    static constexpr const _Char_T *ElseSuffix = TPStrings_T::ElseSuffix;
     // static constexpr SizeT          ElseSuffixLength = StringUtils::ConstCount(ElseSuffix);
     static constexpr SizeT ElseSuffixLength = 2U;
 
     // &amp; &
-    static constexpr const Char_T_ *HTMLAnd = TPStrings_T::HTMLAnd;
+    static constexpr const _Char_T *HTMLAnd = TPStrings_T::HTMLAnd;
     // static constexpr SizeT          HTMLAndLength = StringUtils::ConstCount(HTMLAnd);
     static constexpr SizeT HTMLAndLength = 5U;
 
     // &lt; <
-    static constexpr const Char_T_ *HTMLLess = TPStrings_T::HTMLLess;
+    static constexpr const _Char_T *HTMLLess = TPStrings_T::HTMLLess;
     // static constexpr SizeT          HTMLLessLength = StringUtils::ConstCount(HTMLLess);
     static constexpr SizeT HTMLLessLength = 4U;
 
     // &gt; >
-    static constexpr const Char_T_ *HTMLGreater = TPStrings_T::HTMLGreater;
+    static constexpr const _Char_T *HTMLGreater = TPStrings_T::HTMLGreater;
     // static constexpr SizeT          HTMLGreaterLength = StringUtils::ConstCount(HTMLGreater);
     static constexpr SizeT HTMLGreaterLength = 4U;
 
     // &quot; "
-    static constexpr const Char_T_ *HTMLQuote = TPStrings_T::HTMLQuote;
+    static constexpr const _Char_T *HTMLQuote = TPStrings_T::HTMLQuote;
     // static constexpr SizeT          HTMLQuoteLength = StringUtils::ConstCount(HTMLQuote);
     static constexpr SizeT HTMLQuoteLength = 6U;
 
     // &apos; ' (HTML5)
-    static constexpr const Char_T_ *HTMLSingleQuote = TPStrings_T::HTMLSingleQuote;
+    static constexpr const _Char_T *HTMLSingleQuote = TPStrings_T::HTMLSingleQuote;
     // static constexpr SizeT          HTMLSingleQuoteLength = StringUtils::ConstCount(HTMLSingleQuote);
     static constexpr SizeT HTMLSingleQuoteLength = 6U;
 
-    static constexpr Char_T_ QuoteChar = '"';
+    static constexpr _Char_T QuoteChar = '"';
 
     // Inline If
-    static constexpr Char_T_ CaseChar  = 'a'; // c[a]se
-    static constexpr Char_T_ TrueChar  = 'r'; // t[r]ue
-    static constexpr Char_T_ FalseChar = 'l'; // fa[l]se
+    static constexpr _Char_T CaseChar  = 'a'; // c[a]se
+    static constexpr _Char_T TrueChar  = 'r'; // t[r]ue
+    static constexpr _Char_T FalseChar = 'l'; // fa[l]se
 
     // Loop
-    static constexpr Char_T_ SetChar   = 'e'; //  s[e]t
-    static constexpr Char_T_ ValueChar = 'a'; // v[a]lue
-    static constexpr Char_T_ SortChar  = 'o'; // s[o]rt
-    static constexpr Char_T_ GroupChar = 'r'; // g[r]oup
+    static constexpr _Char_T SetChar   = 'e'; //  s[e]t
+    static constexpr _Char_T ValueChar = 'a'; // v[a]lue
+    static constexpr _Char_T SortChar  = 'o'; // s[o]rt
+    static constexpr _Char_T GroupChar = 'r'; // g[r]oup
 };
 
 // char
-template <typename Char_T_>
-struct TPStrings_T_<Char_T_, 1U> {
-    static constexpr const Char_T_ *VariablePrefix    = "{var:";
-    static constexpr const Char_T_ *RawVariablePrefix = "{raw:";
-    static constexpr const Char_T_ *MathPrefix        = "{math:";
-    static constexpr const Char_T_ *InLineIfPrefix    = "{if";
-    static constexpr const Char_T_ *LoopPrefix        = "<loop";
-    static constexpr const Char_T_ *LoopSuffix        = "</loop>";
-    static constexpr const Char_T_ *IfPrefix          = "<if";
-    static constexpr const Char_T_ *IfSuffix          = "</if>";
-    static constexpr const Char_T_ *ElsePrefix        = "<else";
-    static constexpr const Char_T_ *ElseSuffix        = "/>";
-    static constexpr const Char_T_ *HTMLAnd           = "&amp;";
-    static constexpr const Char_T_ *HTMLLess          = "&lt;";
-    static constexpr const Char_T_ *HTMLGreater       = "&gt;";
-    static constexpr const Char_T_ *HTMLQuote         = "&quot;";
-    static constexpr const Char_T_ *HTMLSingleQuote   = "&apos;";
+template <typename _Char_T>
+struct _TPStrings_T<_Char_T, 1U> {
+    static constexpr const _Char_T *VariablePrefix    = "{var:";
+    static constexpr const _Char_T *RawVariablePrefix = "{raw:";
+    static constexpr const _Char_T *MathPrefix        = "{math:";
+    static constexpr const _Char_T *InLineIfPrefix    = "{if";
+    static constexpr const _Char_T *LoopPrefix        = "<loop";
+    static constexpr const _Char_T *LoopSuffix        = "</loop>";
+    static constexpr const _Char_T *IfPrefix          = "<if";
+    static constexpr const _Char_T *IfSuffix          = "</if>";
+    static constexpr const _Char_T *ElsePrefix        = "<else";
+    static constexpr const _Char_T *ElseSuffix        = "/>";
+    static constexpr const _Char_T *HTMLAnd           = "&amp;";
+    static constexpr const _Char_T *HTMLLess          = "&lt;";
+    static constexpr const _Char_T *HTMLGreater       = "&gt;";
+    static constexpr const _Char_T *HTMLQuote         = "&quot;";
+    static constexpr const _Char_T *HTMLSingleQuote   = "&apos;";
 };
 
 // char16_t
-template <typename Char_T_>
-struct TPStrings_T_<Char_T_, 2U> {
-    static constexpr const Char_T_ *VariablePrefix    = u"{var:";
-    static constexpr const Char_T_ *RawVariablePrefix = u"{raw:";
-    static constexpr const Char_T_ *MathPrefix        = u"{math:";
-    static constexpr const Char_T_ *InLineIfPrefix    = u"{if";
-    static constexpr const Char_T_ *LoopPrefix        = u"<loop";
-    static constexpr const Char_T_ *LoopSuffix        = u"</loop>";
-    static constexpr const Char_T_ *IfPrefix          = u"<if";
-    static constexpr const Char_T_ *IfSuffix          = u"</if>";
-    static constexpr const Char_T_ *ElsePrefix        = u"<else";
-    static constexpr const Char_T_ *ElseSuffix        = u"/>";
-    static constexpr const Char_T_ *HTMLAnd           = u"&amp;";
-    static constexpr const Char_T_ *HTMLLess          = u"&lt;";
-    static constexpr const Char_T_ *HTMLGreater       = u"&gt;";
-    static constexpr const Char_T_ *HTMLQuote         = u"&quot;";
-    static constexpr const Char_T_ *HTMLSingleQuote   = u"&apos;";
+template <typename _Char_T>
+struct _TPStrings_T<_Char_T, 2U> {
+    static constexpr const _Char_T *VariablePrefix    = u"{var:";
+    static constexpr const _Char_T *RawVariablePrefix = u"{raw:";
+    static constexpr const _Char_T *MathPrefix        = u"{math:";
+    static constexpr const _Char_T *InLineIfPrefix    = u"{if";
+    static constexpr const _Char_T *LoopPrefix        = u"<loop";
+    static constexpr const _Char_T *LoopSuffix        = u"</loop>";
+    static constexpr const _Char_T *IfPrefix          = u"<if";
+    static constexpr const _Char_T *IfSuffix          = u"</if>";
+    static constexpr const _Char_T *ElsePrefix        = u"<else";
+    static constexpr const _Char_T *ElseSuffix        = u"/>";
+    static constexpr const _Char_T *HTMLAnd           = u"&amp;";
+    static constexpr const _Char_T *HTMLLess          = u"&lt;";
+    static constexpr const _Char_T *HTMLGreater       = u"&gt;";
+    static constexpr const _Char_T *HTMLQuote         = u"&quot;";
+    static constexpr const _Char_T *HTMLSingleQuote   = u"&apos;";
 };
 
 // char32_t
-template <typename Char_T_>
-struct TPStrings_T_<Char_T_, 4U> {
-    static constexpr const Char_T_ *VariablePrefix    = U"{var:";
-    static constexpr const Char_T_ *RawVariablePrefix = U"{raw:";
-    static constexpr const Char_T_ *MathPrefix        = U"{math:";
-    static constexpr const Char_T_ *InLineIfPrefix    = U"{if";
-    static constexpr const Char_T_ *LoopPrefix        = U"<loop";
-    static constexpr const Char_T_ *LoopSuffix        = U"</loop>";
-    static constexpr const Char_T_ *IfPrefix          = U"<if";
-    static constexpr const Char_T_ *IfSuffix          = U"</if>";
-    static constexpr const Char_T_ *ElsePrefix        = U"<else";
-    static constexpr const Char_T_ *ElseSuffix        = U"/>";
-    static constexpr const Char_T_ *HTMLAnd           = U"&amp;";
-    static constexpr const Char_T_ *HTMLLess          = U"&lt;";
-    static constexpr const Char_T_ *HTMLGreater       = U"&gt;";
-    static constexpr const Char_T_ *HTMLQuote         = U"&quot;";
-    static constexpr const Char_T_ *HTMLSingleQuote   = U"&apos;";
+template <typename _Char_T>
+struct _TPStrings_T<_Char_T, 4U> {
+    static constexpr const _Char_T *VariablePrefix    = U"{var:";
+    static constexpr const _Char_T *RawVariablePrefix = U"{raw:";
+    static constexpr const _Char_T *MathPrefix        = U"{math:";
+    static constexpr const _Char_T *InLineIfPrefix    = U"{if";
+    static constexpr const _Char_T *LoopPrefix        = U"<loop";
+    static constexpr const _Char_T *LoopSuffix        = U"</loop>";
+    static constexpr const _Char_T *IfPrefix          = U"<if";
+    static constexpr const _Char_T *IfSuffix          = U"</if>";
+    static constexpr const _Char_T *ElsePrefix        = U"<else";
+    static constexpr const _Char_T *ElseSuffix        = U"/>";
+    static constexpr const _Char_T *HTMLAnd           = U"&amp;";
+    static constexpr const _Char_T *HTMLLess          = U"&lt;";
+    static constexpr const _Char_T *HTMLGreater       = U"&gt;";
+    static constexpr const _Char_T *HTMLQuote         = U"&quot;";
+    static constexpr const _Char_T *HTMLSingleQuote   = U"&apos;";
 };
 
 // wchar_t size = 4
 template <>
-struct TPStrings_T_<wchar_t, 4U> {
+struct _TPStrings_T<wchar_t, 4U> {
     static constexpr const wchar_t *VariablePrefix    = L"{var:";
     static constexpr const wchar_t *RawVariablePrefix = L"{raw:";
     static constexpr const wchar_t *MathPrefix        = L"{math:";
@@ -414,7 +414,7 @@ struct TPStrings_T_<wchar_t, 4U> {
 
 // wchar_t size = 2
 template <>
-struct TPStrings_T_<wchar_t, 2U> {
+struct _TPStrings_T<wchar_t, 2U> {
     static constexpr const wchar_t *VariablePrefix    = L"{var:";
     static constexpr const wchar_t *RawVariablePrefix = L"{raw:";
     static constexpr const wchar_t *MathPrefix        = L"{math:";

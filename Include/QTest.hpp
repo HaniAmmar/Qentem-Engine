@@ -33,8 +33,8 @@
 #include <malloc.h>
 #endif
 
-#ifndef QENTEM_Q_TEST_H_
-#define QENTEM_Q_TEST_H_
+#ifndef _QENTEM_Q_TEST_H
+#define _QENTEM_Q_TEST_H
 
 namespace Qentem {
 
@@ -46,13 +46,13 @@ struct TestOutPut {
     TestOutPut &operator=(TestOutPut &&)      = delete;
     TestOutPut &operator=(const TestOutPut &) = delete;
 
-    template <typename... Values_T_>
-    inline static void Print(const Values_T_ &...values) {
+    template <typename... _Values_T>
+    inline static void Print(const _Values_T &...values) {
         if (getCachedStream() == nullptr) {
 #if __cplusplus > 201402L
             (std::wcout << ... << values);
 #else
-            int dummy[sizeof...(Values_T_)] = {(std::wcout << values, 0)...};
+            int dummy[sizeof...(_Values_T)] = {(std::wcout << values, 0)...};
             (void)dummy;
 #endif
 
@@ -60,7 +60,7 @@ struct TestOutPut {
 #if __cplusplus > 201402L
             ((*getCachedStream()) << ... << values);
 #else
-            int dummy[sizeof...(Values_T_)] = {((*getCachedStream()) << values, 0)...};
+            int dummy[sizeof...(_Values_T)] = {((*getCachedStream()) << values, 0)...};
             (void)dummy;
 #endif
         }
@@ -193,24 +193,24 @@ struct MemoryRecord {
 };
 
 struct QTest {
-    QTest()                              = delete;
-    ~QTest()                             = default;
+    QTest()                         = delete;
+    ~QTest()                        = default;
     QTest(QTest &&)                 = delete;
     QTest(const QTest &)            = delete;
     QTest &operator=(QTest &&)      = delete;
     QTest &operator=(const QTest &) = delete;
 
-    QTest(const char *name, const char *file_fullname) noexcept : test_name_{name}, file_fullname_{file_fullname} {
+    QTest(const char *name, const char *file_fullname) noexcept : _test_name{name}, _file_fullname{file_fullname} {
     }
 
     QENTEM_NOINLINE void PrintGroupName() const {
-        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
+        TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), _test_name,
                           TestOutPut::GetColor(TestOutPut::Colors::END), ":\n");
     }
 
     QENTEM_NOINLINE int EndTests() {
-        if (!error_) {
-            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), test_name_,
+        if (!_error) {
+            TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::TITLE), _test_name,
                               TestOutPut::GetColor(TestOutPut::Colors::PASS), " Passed all tests",
                               TestOutPut::GetColor(TestOutPut::Colors::END), "\n\n");
             return 0;
@@ -219,101 +219,101 @@ struct QTest {
         return 1;
     }
 
-    template <typename Char_T_, typename FUNC_T_>
-    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func) {
-        if (!error_ || continue_on_error_) {
-            part_name_ = name;
+    template <typename _Char_T, typename _FUNC_T>
+    QENTEM_NOINLINE void Test(_Char_T *name, _FUNC_T func) {
+        if (!_error || _continue_on_error) {
+            _part_name = name;
             func(*this);
             afterTest(true);
         }
     }
 
-    template <typename Char_T_, typename FUNC_T_, typename... Values_T_>
-    QENTEM_NOINLINE void Test(Char_T_ *name, FUNC_T_ func, bool test_for_leaks, Values_T_ &...values) {
-        if (!error_ || continue_on_error_) {
-            part_name_ = name;
+    template <typename _Char_T, typename _FUNC_T, typename... _Values_T>
+    QENTEM_NOINLINE void Test(_Char_T *name, _FUNC_T func, bool test_for_leaks, _Values_T &...values) {
+        if (!_error || _continue_on_error) {
+            _part_name = name;
             func(*this, values...);
             afterTest(test_for_leaks);
         }
     }
 
-    template <typename Char_T_>
-    QENTEM_NOINLINE void EqualsTrue(bool value, const Char_T_ *name, unsigned long line) {
-        if ((!error_ || continue_on_error_) && !value) {
-            error_ = true;
+    template <typename _Char_T>
+    QENTEM_NOINLINE void EqualsTrue(bool value, const _Char_T *name, unsigned long line) {
+        if ((!_error || _continue_on_error) && !value) {
+            _error = true;
             QTest::PrintErrorMessage1(false, name, line);
         }
     }
 
-    template <typename Char_T_>
-    QENTEM_NOINLINE void EqualsFalse(bool value, const Char_T_ *name, unsigned long line) {
-        if ((!error_ || continue_on_error_) && value) {
-            error_ = true;
+    template <typename _Char_T>
+    QENTEM_NOINLINE void EqualsFalse(bool value, const _Char_T *name, unsigned long line) {
+        if ((!_error || _continue_on_error) && value) {
+            _error = true;
             QTest::PrintErrorMessage1(true, name, line);
         }
     }
 
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
-                               const Value3_T_ &value, unsigned long line) {
-        if ((!error_ || continue_on_error_) && (left != right)) {
-            error_ = true;
+    template <typename _Char_T, typename _Value1_T, typename _Value2_T, typename _Value3_T>
+    QENTEM_NOINLINE void Equal(const _Value1_T &left, const _Value2_T &right, const _Char_T *name,
+                               const _Value3_T &value, unsigned long line) {
+        if ((!_error || _continue_on_error) && (left != right)) {
+            _error = true;
             QTest::PrintErrorMessage2(false, name, left, value, line);
         }
     }
 
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_, typename Value3_T_>
-    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
-                                  const Value3_T_ &value, unsigned long line) {
-        if ((!error_ || continue_on_error_) && (left == right)) {
-            error_ = true;
+    template <typename _Char_T, typename _Value1_T, typename _Value2_T, typename _Value3_T>
+    QENTEM_NOINLINE void NotEqual(const _Value1_T &left, const _Value2_T &right, const _Char_T *name,
+                                  const _Value3_T &value, unsigned long line) {
+        if ((!_error || _continue_on_error) && (left == right)) {
+            _error = true;
             QTest::PrintErrorMessage2(true, name, left, value, line);
         }
     }
 
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void Equal(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name, unsigned long line) {
-        if ((!error_ || continue_on_error_) && (left != right)) {
-            error_ = true;
+    template <typename _Char_T, typename _Value1_T, typename _Value2_T>
+    QENTEM_NOINLINE void Equal(const _Value1_T &left, const _Value2_T &right, const _Char_T *name, unsigned long line) {
+        if ((!_error || _continue_on_error) && (left != right)) {
+            _error = true;
             QTest::PrintErrorMessage2(false, name, left, right, line);
         }
     }
 
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void NotEqual(const Value1_T_ &left, const Value2_T_ &right, const Char_T_ *name,
+    template <typename _Char_T, typename _Value1_T, typename _Value2_T>
+    QENTEM_NOINLINE void NotEqual(const _Value1_T &left, const _Value2_T &right, const _Char_T *name,
                                   unsigned long line) {
-        if ((!error_ || continue_on_error_) && (left == right)) {
-            error_ = true;
+        if ((!_error || _continue_on_error) && (left == right)) {
+            _error = true;
             QTest::PrintErrorMessage2(true, name, left, right, line);
         }
     }
 
-    template <typename Char_T_>
-    QENTEM_NOINLINE void PrintErrorMessage1(bool equal, const Char_T_ *name, unsigned long line) {
+    template <typename _Char_T>
+    QENTEM_NOINLINE void PrintErrorMessage1(bool equal, const _Char_T *name, unsigned long line) {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n', file_fullname_, ":",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n', _file_fullname, ":",
                           line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `true`\n\n");
     }
 
-    template <typename Char_T_, typename Value1_T_, typename Value2_T_>
-    QENTEM_NOINLINE void PrintErrorMessage2(bool equal, const Char_T_ *name, const Value1_T_ &value1,
-                                            const Value2_T_ &value2, unsigned long line) {
+    template <typename _Char_T, typename _Value1_T, typename _Value2_T>
+    QENTEM_NOINLINE void PrintErrorMessage2(bool equal, const _Char_T *name, const _Value1_T &value1,
+                                            const _Value2_T &value2, unsigned long line) {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n', file_fullname_, ":",
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n', _file_fullname, ":",
                           line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `", value2,
                           "`\n Returned Value: `", value1, "`\n\n");
     }
 
     inline void ContinueOnError(bool continue_on_error) noexcept {
-        continue_on_error_ = continue_on_error;
+        _continue_on_error = continue_on_error;
     }
 
     inline bool HasError() const noexcept {
-        return error_;
+        return _error;
     }
 
     inline bool IsContinueOnError() const noexcept {
-        return continue_on_error_;
+        return _continue_on_error;
     }
 
     QENTEM_NOINLINE static void PrintInfo() {
@@ -362,9 +362,9 @@ struct QTest {
 
   private:
     QENTEM_NOINLINE void afterTest(bool test_for_leaks) {
-        if (!error_) {
+        if (!_error) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "Pass",
-                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n');
+                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n');
         }
 
         if (test_for_leaks) {
@@ -379,11 +379,11 @@ struct QTest {
         }
     }
 
-    const char *part_name_{nullptr};
-    const char *test_name_;
-    const char *file_fullname_;
-    bool        error_{false};
-    bool        continue_on_error_{false};
+    const char *_part_name{nullptr};
+    const char *_test_name;
+    const char *_file_fullname;
+    bool        _error{false};
+    bool        _continue_on_error{false};
 };
 
 } // namespace Qentem

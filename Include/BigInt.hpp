@@ -22,23 +22,23 @@
 
 #include "Platform.hpp"
 
-#ifndef QENTEM_BIG_INT_H_
-#define QENTEM_BIG_INT_H_
+#ifndef _QENTEM_BIG_INT_H
+#define _QENTEM_BIG_INT_H
 
 namespace Qentem {
 
-// Width_T_ is the needed number of bits:
+// _Width_T is the needed number of bits:
 // 2 64bit int = 128 bits
 // 6 64bit int = 384 bits
 // 16 64bit int = 1024 bits
-// (number of variables) * sizeof(variable) * 8 = Width_T_
+// (number of variables) * sizeof(variable) * 8 = _Width_T
 
-template <typename Number_T_, SizeT32>
+template <typename _Number_T, SizeT32>
 struct DoubleSize {};
 
-template <typename Number_T_, SizeT32 Width_T_>
+template <typename _Number_T, SizeT32 _Width_T>
 struct BigInt {
-    using NumberType_ = Number_T_;
+    using _NumberType = _Number_T;
 
     enum class BigIntOperation : SizeT8 {
         // Internal use only
@@ -56,16 +56,16 @@ struct BigInt {
     BigInt &operator=(const BigInt &) noexcept = default;
     ~BigInt() noexcept                         = default;
 
-    template <typename N_Number_T_>
-    inline BigInt(const N_Number_T_ number) noexcept {
+    template <typename _N_Number_T>
+    inline BigInt(const _N_Number_T number) noexcept {
         multiOperation<BigIntOperation::Set>(number);
     }
 
-    template <typename N_Number_T_>
-    inline BigInt &operator=(const N_Number_T_ number) noexcept {
-        while (index_id_ != Number_T_{0}) {
-            big_int_[index_id_] = Number_T_{0};
-            --index_id_;
+    template <typename _N_Number_T>
+    inline BigInt &operator=(const _N_Number_T number) noexcept {
+        while (_index_id != _Number_T{0}) {
+            _big_int[_index_id] = _Number_T{0};
+            --_index_id;
         }
 
         multiOperation<BigIntOperation::Set>(number);
@@ -73,76 +73,76 @@ struct BigInt {
         return *this;
     }
 
-    template <typename N_Number_T_>
-    inline explicit operator N_Number_T_() const noexcept {
-        constexpr SizeT32 n_size          = (sizeof(N_Number_T_) * 8U);
+    template <typename _N_Number_T>
+    inline explicit operator _N_Number_T() const noexcept {
+        constexpr SizeT32 n_size          = (sizeof(_N_Number_T) * 8U);
         constexpr bool    is_same_size    = (n_size == BitSize());
         constexpr bool    is_smaller_size = (n_size < BitSize());
 
         if (is_same_size) {
-            return big_int_[0];
+            return _big_int[0];
         } else if (is_smaller_size) {
-            return N_Number_T_(big_int_[0]);
+            return _N_Number_T(_big_int[0]);
         } else {
-            N_Number_T_ num   = 0;
+            _N_Number_T num   = 0;
             SizeT32     count = (n_size / BitSize());
 
-            while ((--count != SizeT32{0}) && (count >= index_id_)) {
-                num |= big_int_[1];
+            while ((--count != SizeT32{0}) && (count >= _index_id)) {
+                num |= _big_int[1];
                 num <<= BitSize();
             }
 
-            num |= big_int_[0];
+            num |= _big_int[0];
 
             return num;
         }
     }
 
-    inline friend bool operator<(const BigInt &out, const Number_T_ number) noexcept {
-        return (((out.index_id_ == Number_T_{0}) && (out.big_int_[0U] < number)));
+    inline friend bool operator<(const BigInt &out, const _Number_T number) noexcept {
+        return (((out._index_id == _Number_T{0}) && (out._big_int[0U] < number)));
     }
 
-    inline friend bool operator<(const Number_T_ number, const BigInt &out) noexcept {
+    inline friend bool operator<(const _Number_T number, const BigInt &out) noexcept {
         return (out > number);
     }
 
-    inline friend bool operator<=(const BigInt &out, const Number_T_ number) noexcept {
-        return (((out.index_id_ == Number_T_{0}) && (out.big_int_[0U] <= number)));
+    inline friend bool operator<=(const BigInt &out, const _Number_T number) noexcept {
+        return (((out._index_id == _Number_T{0}) && (out._big_int[0U] <= number)));
     }
 
-    inline friend bool operator<=(const Number_T_ number, const BigInt &out) noexcept {
+    inline friend bool operator<=(const _Number_T number, const BigInt &out) noexcept {
         return (out >= number);
     }
 
-    inline friend bool operator>(const BigInt &out, const Number_T_ number) noexcept {
-        return (((out.index_id_ != Number_T_{0}) || (out.big_int_[0U] > number)));
+    inline friend bool operator>(const BigInt &out, const _Number_T number) noexcept {
+        return (((out._index_id != _Number_T{0}) || (out._big_int[0U] > number)));
     }
 
-    inline friend bool operator>(const Number_T_ number, const BigInt &out) noexcept {
+    inline friend bool operator>(const _Number_T number, const BigInt &out) noexcept {
         return (out < number);
     }
 
-    inline friend bool operator>=(const BigInt &out, const Number_T_ number) noexcept {
-        return (((out.index_id_ != Number_T_{0}) || (out.big_int_[0U] >= number)));
+    inline friend bool operator>=(const BigInt &out, const _Number_T number) noexcept {
+        return (((out._index_id != _Number_T{0}) || (out._big_int[0U] >= number)));
     }
 
-    inline friend bool operator>=(const Number_T_ number, const BigInt &out) noexcept {
+    inline friend bool operator>=(const _Number_T number, const BigInt &out) noexcept {
         return (out <= number);
     }
 
-    inline friend bool operator==(const BigInt &out, const Number_T_ number) noexcept {
-        return (((out.index_id_ == Number_T_{0}) && (out.big_int_[0U] == number)));
+    inline friend bool operator==(const BigInt &out, const _Number_T number) noexcept {
+        return (((out._index_id == _Number_T{0}) && (out._big_int[0U] == number)));
     }
 
-    inline friend bool operator==(const Number_T_ number, const BigInt &out) noexcept {
+    inline friend bool operator==(const _Number_T number, const BigInt &out) noexcept {
         return (out == number);
     }
 
-    inline friend bool operator!=(const BigInt &out, const Number_T_ number) noexcept {
-        return (((out.index_id_ != Number_T_{0}) || (out.big_int_[0U] != number)));
+    inline friend bool operator!=(const BigInt &out, const _Number_T number) noexcept {
+        return (((out._index_id != _Number_T{0}) || (out._big_int[0U] != number)));
     }
 
-    inline friend bool operator!=(const Number_T_ number, const BigInt &out) noexcept {
+    inline friend bool operator!=(const _Number_T number, const BigInt &out) noexcept {
         return (out != number);
     }
 
@@ -154,86 +154,86 @@ struct BigInt {
         ShiftRight(number);
     }
 
-    template <typename N_Number_T_>
-    inline void operator|=(const N_Number_T_ number) noexcept {
+    template <typename _N_Number_T>
+    inline void operator|=(const _N_Number_T number) noexcept {
         multiOperation<BigIntOperation::Or>(number);
     }
 
-    template <typename N_Number_T_>
-    inline void operator&=(const N_Number_T_ number) noexcept {
+    template <typename _N_Number_T>
+    inline void operator&=(const _N_Number_T number) noexcept {
         multiOperation<BigIntOperation::And>(number);
     }
 
-    template <typename N_Number_T_>
-    inline void operator+=(const N_Number_T_ number) noexcept {
+    template <typename _N_Number_T>
+    inline void operator+=(const _N_Number_T number) noexcept {
         multiOperation<BigIntOperation::Add>(number);
     }
 
-    template <typename N_Number_T_>
-    inline void operator-=(const N_Number_T_ number) noexcept {
+    template <typename _N_Number_T>
+    inline void operator-=(const _N_Number_T number) noexcept {
         multiOperation<BigIntOperation::Subtract>(number);
     }
 
-    inline void operator*=(const Number_T_ number) noexcept {
+    inline void operator*=(const _Number_T number) noexcept {
         Multiply(number);
     }
 
-    inline void operator/=(const Number_T_ number) noexcept {
+    inline void operator/=(const _Number_T number) noexcept {
         Divide(number);
     }
     ////////////////////////////////////////////////////
-    void Add(Number_T_ number, Number_T_ index = 0) noexcept {
-        if (number != Number_T_{0}) {
+    void Add(_Number_T number, _Number_T index = 0) noexcept {
+        if (number != _Number_T{0}) {
             while (index <= MaxIndex()) {
-                const Number_T_ tmp = big_int_[index];
-                big_int_[index] += number;
+                const _Number_T tmp = _big_int[index];
+                _big_int[index] += number;
 
-                if (big_int_[index] > tmp) {
+                if (_big_int[index] > tmp) {
                     break;
                 }
 
                 // Overflow.
-                number = Number_T_{1};
+                number = _Number_T{1};
                 ++index;
             }
 
-            index_id_ += ((index > index_id_) && (index <= MaxIndex()));
+            _index_id += ((index > _index_id) && (index <= MaxIndex()));
         }
     }
 
-    inline void Subtract(Number_T_ number, Number_T_ index = 0) noexcept {
-        if (number != Number_T_{0}) {
+    inline void Subtract(_Number_T number, _Number_T index = 0) noexcept {
+        if (number != _Number_T{0}) {
             while (index <= MaxIndex()) {
-                const Number_T_ tmp = big_int_[index];
-                big_int_[index] -= number;
+                const _Number_T tmp = _big_int[index];
+                _big_int[index] -= number;
 
-                if (big_int_[index] < tmp) {
+                if (_big_int[index] < tmp) {
                     break;
                 }
 
                 // Overflow.
-                number = Number_T_{1};
+                number = _Number_T{1};
                 ++index;
             }
 
-            index_id_ -= ((index > Number_T_{0}) && (big_int_[index_id_] == Number_T_{0}));
+            _index_id -= ((index > _Number_T{0}) && (_big_int[_index_id] == _Number_T{0}));
         }
     }
     ////////////////////////////////////////////////////
-    inline void Multiply(Number_T_ multiplier) noexcept {
-        Number_T_ index = (index_id_ + Number_T_{1});
+    inline void Multiply(_Number_T multiplier) noexcept {
+        _Number_T index = (_index_id + _Number_T{1});
 
         do {
             --index;
-            Add(DoubleSize<Number_T_, BitSize()>::Multiply(big_int_[index], multiplier), (index + Number_T_{1}));
-        } while (index != Number_T_{0});
+            Add(DoubleSize<_Number_T, BitSize()>::Multiply(_big_int[index], multiplier), (index + _Number_T{1}));
+        } while (index != _Number_T{0});
     }
     ////////////////////////////////////////////////////
-    inline Number_T_ Divide(const Number_T_ divisor) noexcept {
+    inline _Number_T Divide(const _Number_T divisor) noexcept {
         constexpr bool is_size_64b = (BitSize() == 64U);
-        Number_T_      index       = index_id_;
-        Number_T_      remainder   = (big_int_[index_id_] % divisor);
-        big_int_[index_id_] /= divisor;
+        _Number_T      index       = _index_id;
+        _Number_T      remainder   = (_big_int[_index_id] % divisor);
+        _big_int[_index_id] /= divisor;
 
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
             if (is_size_64b) {
@@ -243,117 +243,117 @@ struct BigInt {
             }
         }();
 
-        while (index != Number_T_{0}) {
+        while (index != _Number_T{0}) {
             --index;
-            DoubleSize<Number_T_, BitSize()>::Divide(remainder, big_int_[index], divisor, initial_shift);
+            DoubleSize<_Number_T, BitSize()>::Divide(remainder, _big_int[index], divisor, initial_shift);
         }
 
-        index_id_ -= ((index_id_ > Number_T_{0}) && (big_int_[index_id_] == Number_T_{0}));
+        _index_id -= ((_index_id > _Number_T{0}) && (_big_int[_index_id] == _Number_T{0}));
 
         return remainder;
     }
     ////////////////////////////////////////////////////
     inline void ShiftRight(SizeT32 offset) noexcept {
-        Number_T_ index = 0U;
+        _Number_T index = 0U;
 
         while (offset >= BitSize()) {
-            while (index < index_id_) {
-                big_int_[index] = big_int_[index + Number_T_{1}];
+            while (index < _index_id) {
+                _big_int[index] = _big_int[index + _Number_T{1}];
                 ++index;
             }
 
-            big_int_[index_id_] = Number_T_{0};
-            index_id_ -= (index_id_ != Number_T_{0});
+            _big_int[_index_id] = _Number_T{0};
+            _index_id -= (_index_id != _Number_T{0});
 
-            index = Number_T_{0};
+            index = _Number_T{0};
             offset -= BitSize();
         }
 
-        if (offset != Number_T_{0}) {
+        if (offset != _Number_T{0}) {
             const SizeT32 shift_size = (BitSize() - offset);
 
-            big_int_[Number_T_{0}] >>= offset;
+            _big_int[_Number_T{0}] >>= offset;
 
-            while (index < index_id_) {
-                big_int_[index] |= (big_int_[index + Number_T_{1}] << shift_size);
+            while (index < _index_id) {
+                _big_int[index] |= (_big_int[index + _Number_T{1}] << shift_size);
                 ++index;
-                big_int_[index] >>= offset;
+                _big_int[index] >>= offset;
             }
 
-            index_id_ -= ((index_id_ != Number_T_{0}) && (big_int_[index_id_] == Number_T_{0}));
+            _index_id -= ((_index_id != _Number_T{0}) && (_big_int[_index_id] == _Number_T{0}));
         }
     }
 
     inline void ShiftLeft(SizeT32 offset) noexcept {
-        Number_T_ index = index_id_;
+        _Number_T index = _index_id;
 
         while (offset >= BitSize()) {
-            index_id_ += ((big_int_[index] != Number_T_{0}) && (index_id_ < MaxIndex()));
-            big_int_[index_id_] = big_int_[index];
+            _index_id += ((_big_int[index] != _Number_T{0}) && (_index_id < MaxIndex()));
+            _big_int[_index_id] = _big_int[index];
 
-            while (index != Number_T_{0}) {
-                big_int_[index] = big_int_[index - Number_T_{1}];
+            while (index != _Number_T{0}) {
+                _big_int[index] = _big_int[index - _Number_T{1}];
                 --index;
             }
 
-            big_int_[0U] = Number_T_{0};
-            index        = index_id_;
+            _big_int[0U] = _Number_T{0};
+            index        = _index_id;
             offset -= BitSize();
         }
 
-        if (offset != Number_T_{0}) {
+        if (offset != _Number_T{0}) {
             const SizeT32 shift_size = (BitSize() - offset);
 
-            const Number_T_ carry = (big_int_[index] >> shift_size);
-            big_int_[index] <<= offset;
+            const _Number_T carry = (_big_int[index] >> shift_size);
+            _big_int[index] <<= offset;
 
-            index_id_ += ((carry != Number_T_{0}) && (index_id_ < MaxIndex()));
-            big_int_[index_id_] |= carry;
+            _index_id += ((carry != _Number_T{0}) && (_index_id < MaxIndex()));
+            _big_int[_index_id] |= carry;
 
-            while (index != Number_T_{0}) {
-                big_int_[index] |= (big_int_[index - Number_T_{1}] >> shift_size);
+            while (index != _Number_T{0}) {
+                _big_int[index] |= (_big_int[index - _Number_T{1}] >> shift_size);
                 --index;
-                big_int_[index] <<= offset;
+                _big_int[index] <<= offset;
             }
         }
     }
     ////////////////////////////////////////////////////
     inline SizeT32 FindFirstBit() const noexcept {
-        Number_T_ index = Number_T_{0};
+        _Number_T index = _Number_T{0};
 
-        while ((big_int_[index] == Number_T_{0}) && (index <= index_id_)) {
+        while ((_big_int[index] == _Number_T{0}) && (index <= _index_id)) {
             ++index;
         }
 
-        return (Platform::FindFirstBit(big_int_[index_id_]) + (index * BitSize()));
+        return (Platform::FindFirstBit(_big_int[_index_id]) + (index * BitSize()));
     }
 
     inline SizeT32 FindLastBit() const noexcept {
-        return (Platform::FindLastBit(big_int_[index_id_]) + SizeT32(index_id_ * BitSize()));
+        return (Platform::FindLastBit(_big_int[_index_id]) + SizeT32(_index_id * BitSize()));
     }
     ////////////////////////////////////////////////////
-    inline Number_T_ Number() const noexcept {
-        return big_int_[0U];
+    inline _Number_T Number() const noexcept {
+        return _big_int[0U];
     }
 
-    inline Number_T_ const *Bucket(const SizeT32 index) const noexcept {
-        if (index <= index_id_) {
-            return (big_int_ + index);
+    inline _Number_T const *Bucket(const SizeT32 index) const noexcept {
+        if (index <= _index_id) {
+            return (_big_int + index);
         }
 
         return nullptr;
     }
 
-    inline Number_T_ *Bucket(const SizeT32 index) noexcept {
-        if (index <= index_id_) {
-            return (big_int_ + index);
+    inline _Number_T *Bucket(const SizeT32 index) noexcept {
+        if (index <= _index_id) {
+            return (_big_int + index);
         }
 
         return nullptr;
     }
 
-    inline Number_T_ Index() const noexcept {
-        return index_id_;
+    inline _Number_T Index() const noexcept {
+        return _index_id;
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
@@ -366,39 +366,39 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 TotalBits() noexcept {
-        return Width_T_;
+        return _Width_T;
     }
 
     inline static constexpr SizeT32 SizeOfType() noexcept {
-        return sizeof(Number_T_);
+        return sizeof(_Number_T);
     }
 
     inline bool IsBig() const noexcept {
-        return (index_id_ != Number_T_{0});
+        return (_index_id != _Number_T{0});
     }
 
     inline bool NotZero() const noexcept {
-        return (*this != Number_T_{0});
+        return (*this != _Number_T{0});
     }
 
     inline bool IsZero() const noexcept {
-        return (*this == Number_T_{0});
+        return (*this == _Number_T{0});
     }
 
-    inline void SetIndex(Number_T_ id) noexcept {
-        index_id_ = id;
+    inline void SetIndex(_Number_T id) noexcept {
+        _index_id = id;
     }
 
-    inline Number_T_ *Storage() noexcept {
-        return big_int_;
+    inline _Number_T *Storage() noexcept {
+        return _big_int;
     }
 
   private:
-    Number_T_ big_int_[MaxIndex() + Number_T_{1}]{0};
-    Number_T_ index_id_{0};
+    _Number_T _big_int[MaxIndex() + _Number_T{1}]{0};
+    _Number_T _index_id{0};
 
     template <BigIntOperation Operation>
-    inline void multiOperation(Number_T_ number) noexcept {
+    inline void multiOperation(_Number_T number) noexcept {
         switch (Operation) {
             case BigIntOperation::Add: {
                 Add(number);
@@ -411,81 +411,81 @@ struct BigInt {
             }
 
             case BigIntOperation::Or: {
-                big_int_[0U] |= number;
+                _big_int[0U] |= number;
                 break;
             }
 
             case BigIntOperation::And: {
-                big_int_[0U] &= number;
+                _big_int[0U] &= number;
                 break;
             }
 
             default: {
-                big_int_[0U] = number;
+                _big_int[0U] = number;
             }
         }
     }
 
-    template <BigIntOperation Operation, typename N_Number_T_>
-    inline void multiOperation(N_Number_T_ number) noexcept {
-        constexpr SizeT32 n_size         = ((sizeof(N_Number_T_) * 8U) / BitSize());
+    template <BigIntOperation Operation, typename _N_Number_T>
+    inline void multiOperation(_N_Number_T number) noexcept {
+        constexpr SizeT32 n_size         = ((sizeof(_N_Number_T) * 8U) / BitSize());
         constexpr bool    is_bigger_size = (n_size > 1U);
 
         switch (Operation) {
             case BigIntOperation::Add: {
-                Add(Number_T_(number));
+                Add(_Number_T(number));
                 break;
             }
 
             case BigIntOperation::Subtract: {
-                Subtract(Number_T_(number));
+                Subtract(_Number_T(number));
                 break;
             }
 
             case BigIntOperation::Or: {
-                big_int_[0U] |= Number_T_(number);
+                _big_int[0U] |= _Number_T(number);
                 break;
             }
 
             case BigIntOperation::And: {
-                big_int_[0U] &= Number_T_(number);
+                _big_int[0U] &= _Number_T(number);
                 break;
             }
 
             default: {
-                big_int_[0U] = Number_T_(number);
+                _big_int[0U] = _Number_T(number);
             }
         }
 
         if (is_bigger_size) {
             number >>= BitSize();
 
-            while (number != N_Number_T_{0}) {
-                ++index_id_;
+            while (number != _N_Number_T{0}) {
+                ++_index_id;
 
                 switch (Operation) {
                     case BigIntOperation::Add: {
-                        Add(Number_T_(number), index_id_);
+                        Add(_Number_T(number), _index_id);
                         break;
                     }
 
                     case BigIntOperation::Subtract: {
-                        Subtract(Number_T_(number), index_id_);
+                        Subtract(_Number_T(number), _index_id);
                         break;
                     }
 
                     case BigIntOperation::Or: {
-                        big_int_[index_id_] |= Number_T_(number);
+                        _big_int[_index_id] |= _Number_T(number);
                         break;
                     }
 
                     case BigIntOperation::And: {
-                        big_int_[index_id_] &= Number_T_(number);
+                        _big_int[_index_id] &= _Number_T(number);
                         break;
                     }
 
                     default: {
-                        big_int_[index_id_] = Number_T_(number);
+                        _big_int[_index_id] = _Number_T(number);
                     }
                 }
 
@@ -495,98 +495,98 @@ struct BigInt {
     }
 };
 ////////////////////////////////////////////////////
-template <typename Number_T_>
-struct DoubleSize<Number_T_, 8U> {
+template <typename _Number_T>
+struct DoubleSize<_Number_T, 8U> {
     static constexpr SizeT32 shift = 8U;
 
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+    inline static void Divide(_Number_T &dividend_high, _Number_T &dividend_low, const _Number_T divisor,
                               const SizeT32 initial_shift) noexcept {
         (void)initial_shift;
 
         SizeT16 dividend16 = dividend_high;
         dividend16 <<= shift;
         dividend16 |= dividend_low;
-        dividend_high = Number_T_(dividend16 % divisor);
+        dividend_high = _Number_T(dividend16 % divisor);
         dividend16 /= divisor;
-        dividend_low = Number_T_(dividend16);
+        dividend_low = _Number_T(dividend16);
     }
 
-    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+    inline static _Number_T Multiply(_Number_T &number, const _Number_T multiplier) noexcept {
         SizeT16 number16 = number;
         number16 *= multiplier;
-        number = Number_T_(number16);
+        number = _Number_T(number16);
 
-        return Number_T_(number16 >> shift);
+        return _Number_T(number16 >> shift);
     }
 };
 ////////////////////////////////////////////////////
-template <typename Number_T_>
-struct DoubleSize<Number_T_, 16U> {
+template <typename _Number_T>
+struct DoubleSize<_Number_T, 16U> {
     static constexpr SizeT32 shift = 16U;
 
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+    inline static void Divide(_Number_T &dividend_high, _Number_T &dividend_low, const _Number_T divisor,
                               const SizeT32 initial_shift) noexcept {
         (void)initial_shift;
 
         SizeT32 dividend32 = dividend_high;
         dividend32 <<= shift;
         dividend32 |= dividend_low;
-        dividend_high = Number_T_(dividend32 % divisor);
+        dividend_high = _Number_T(dividend32 % divisor);
         dividend32 /= divisor;
-        dividend_low = Number_T_(dividend32);
+        dividend_low = _Number_T(dividend32);
     }
 
-    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+    inline static _Number_T Multiply(_Number_T &number, const _Number_T multiplier) noexcept {
         SizeT32 number32 = number;
         number32 *= multiplier;
-        number = Number_T_(number32);
+        number = _Number_T(number32);
 
-        return Number_T_(number32 >> shift);
+        return _Number_T(number32 >> shift);
     }
 };
 ////////////////////////////////////////////////////
-template <typename Number_T_>
-struct DoubleSize<Number_T_, 32U> {
+template <typename _Number_T>
+struct DoubleSize<_Number_T, 32U> {
     static constexpr SizeT32 shift = 32U;
 
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+    inline static void Divide(_Number_T &dividend_high, _Number_T &dividend_low, const _Number_T divisor,
                               const SizeT32 initial_shift) noexcept {
         (void)initial_shift;
 
         SizeT64 dividend64 = dividend_high;
         dividend64 <<= shift;
         dividend64 |= dividend_low;
-        dividend_high = Number_T_(dividend64 % divisor);
+        dividend_high = _Number_T(dividend64 % divisor);
         dividend64 /= divisor;
-        dividend_low = Number_T_(dividend64);
+        dividend_low = _Number_T(dividend64);
     }
 
-    inline static Number_T_ Multiply(Number_T_ &number, const Number_T_ multiplier) noexcept {
+    inline static _Number_T Multiply(_Number_T &number, const _Number_T multiplier) noexcept {
         SizeT64 number64 = number;
         number64 *= multiplier;
-        number = Number_T_(number64);
+        number = _Number_T(number64);
 
-        return Number_T_(number64 >> shift);
+        return _Number_T(number64 >> shift);
     }
 };
 ////////////////////////////////////////////////////
-template <typename Number_T_>
-struct DoubleSize<Number_T_, 64U> {
-    inline static void Divide(Number_T_ &dividend_high, Number_T_ &dividend_low, const Number_T_ divisor,
+template <typename _Number_T>
+struct DoubleSize<_Number_T, 64U> {
+    inline static void Divide(_Number_T &dividend_high, _Number_T &dividend_low, const _Number_T divisor,
                               const SizeT32 initial_shift) noexcept {
-        const Number_T_ carry = (dividend_low % divisor);
+        const _Number_T carry = (dividend_low % divisor);
         dividend_low /= divisor;
         // -----------------------
-        const Number_T_ divisor_shifted = (divisor << initial_shift);
+        const _Number_T divisor_shifted = (divisor << initial_shift);
         // -----------------------
-        const Number_T_ divisor_low  = (divisor_shifted >> shift);
-        const Number_T_ divisor_high = (divisor_shifted & mask);
+        const _Number_T divisor_low  = (divisor_shifted >> shift);
+        const _Number_T divisor_high = (divisor_shifted & mask);
         // -----------------------
         dividend_high <<= initial_shift;
         // -----------------------
-        Number_T_ quotient = (dividend_high / divisor_low);
+        _Number_T quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
-        Number_T_ reminder = (quotient * divisor_high);
+        _Number_T reminder = (quotient * divisor_high);
 
         dividend_high <<= shift;
 
@@ -629,12 +629,12 @@ struct DoubleSize<Number_T_, 64U> {
         // -----------------------
         dividend_high >>= initial_shift;
         // -----------------------
-        const Number_T_ original_dividend_high = dividend_high;
+        const _Number_T original_dividend_high = dividend_high;
         dividend_high += carry;
         // -----------------------
         if (original_dividend_high > dividend_high) {
             // Overflow
-            constexpr Number_T_ overflow_dividend = (Number_T_{1} << (width - 1U));
+            constexpr _Number_T overflow_dividend = (_Number_T{1} << (width - 1U));
 
             dividend_high += ((overflow_dividend % (divisor >> 1U)) << 1U);
             ++dividend_low;
@@ -646,10 +646,10 @@ struct DoubleSize<Number_T_, 64U> {
         }
     }
 
-    inline static Number_T_ Multiply(Number_T_ &number, Number_T_ multiplier) noexcept {
-        const Number_T_ number_low     = (number & mask);
-        Number_T_       number_high    = number;
-        Number_T_       multiplier_low = (multiplier & mask);
+    inline static _Number_T Multiply(_Number_T &number, _Number_T multiplier) noexcept {
+        const _Number_T number_low     = (number & mask);
+        _Number_T       number_high    = number;
+        _Number_T       multiplier_low = (multiplier & mask);
 
         number = (number_low * multiplier_low);
 
@@ -673,9 +673,9 @@ struct DoubleSize<Number_T_, 64U> {
     }
 
   private:
-    static constexpr SizeT32   width = (sizeof(Number_T_) * 8U);
+    static constexpr SizeT32   width = (sizeof(_Number_T) * 8U);
     static constexpr SizeT32   shift = (width / 2U);
-    static constexpr Number_T_ mask  = (~(Number_T_{0}) >> shift);
+    static constexpr _Number_T mask  = (~(_Number_T{0}) >> shift);
 };
 
 } // namespace Qentem

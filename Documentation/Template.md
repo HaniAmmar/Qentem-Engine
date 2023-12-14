@@ -751,7 +751,7 @@ int main() {
     value += 3;
 
     const char *content = R"(
-<loop value="val1_" sort="ascend">{var:val1_} </loop>
+<loop value="_val1" sort="ascend">{var:_val1} </loop>
     )";
 
     std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
@@ -760,7 +760,7 @@ int main() {
     */
 
     content = R"(
-<loop value="val1_" sort="descend">{var:val1_} </loop>
+<loop value="_val1" sort="descend">{var:_val1} </loop>
     )";
 
     std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
@@ -788,8 +788,8 @@ int main() {
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
 
     const char *content = R"(
-<loop value="val1_" group="year" sort="ascend">Year({var:val1_}):
-    <loop set="val1_" value="val2_">Month({var:val2_[month]})
+<loop value="_val1" group="year" sort="ascend">Year({var:_val1}):
+    <loop set="_val1" value="_val2">Month({var:_val2[month]})
     </loop>
 </loop>
     )";
@@ -815,8 +815,8 @@ int main() {
 
     // Without values names.
     const char *content2 = R"(
-<loop value="val1_" group="year" sort="ascend">Year({var:val1_}):
-    <loop set="val1_" value="val2_">Month(<loop set="val2_" value="val3_">{var:val3_}</loop>)
+<loop value="_val1" group="year" sort="ascend">Year({var:_val1}):
+    <loop set="_val1" value="_val2">Month(<loop set="_val2" value="_val3">{var:_val3}</loop>)
     </loop>
 </loop>
     )";

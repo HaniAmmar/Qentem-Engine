@@ -24,8 +24,8 @@
 #include "Platform.hpp"
 #include "StringUtils.hpp"
 
-#ifndef QENTEM_ENGINE_H_
-#define QENTEM_ENGINE_H_
+#ifndef _QENTEM_ENGINE_H
+#define _QENTEM_ENGINE_H
 
 namespace Qentem {
 
@@ -44,30 +44,30 @@ class Engine {
     /*
      * Returns the (index+1) of a given character.
      */
-    template <typename Char_T_, typename Number_T_>
-    static Number_T_ FindOne(const Char_T_ char_1, const Char_T_ *content, Number_T_ offset, const Number_T_ end_offset,
-                             Number_T_ full_length = 0) noexcept {
+    template <typename _Char_T, typename _Number_T>
+    static _Number_T FindOne(const _Char_T char_1, const _Char_T *content, _Number_T offset, const _Number_T end_offset,
+                             _Number_T full_length = 0) noexcept {
 #if defined(QENTEM_SIMD_ENABLED) && (QENTEM_SIMD_ENABLED == 1)
         if (offset < end_offset) {
-            Number_T_ m_size =
+            _Number_T m_size =
                 ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
 
-            if (m_size != Number_T_{0}) {
+            if (m_size != _Number_T{0}) {
                 const Platform::SIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
 
                 do {
                     const Platform::SIMD::VAR_T m_content =
                         Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content + offset));
-                    const Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_char_1, m_content);
+                    const Platform::SIMD::Number_T bits = Platform::SMIDCompare<_Char_T>(m_char_1, m_content);
 
                     if (bits != Platform::SIMD::Number_T{0}) {
-                        const Number_T_ simd_offset = Number_T_(Platform::FindFirstBit(bits) + offset + Number_T_{1});
-                        return ((simd_offset <= end_offset) ? simd_offset : Number_T_{0});
+                        const _Number_T simd_offset = _Number_T(Platform::FindFirstBit(bits) + offset + _Number_T{1});
+                        return ((simd_offset <= end_offset) ? simd_offset : _Number_T{0});
                     }
 
-                    offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+                    offset += Platform::SMIDNextOffset<_Char_T, _Number_T>();
                     --m_size;
-                } while ((m_size != Number_T_{0}) && (offset < end_offset));
+                } while ((m_size != _Number_T{0}) && (offset < end_offset));
             }
         }
 #else
@@ -83,45 +83,45 @@ class Engine {
             return offset;
         }
 
-        return Number_T_{0};
+        return _Number_T{0};
     }
 
     /*
      * Returns the (index+length) of a given pattern.
      * 'pattern_length' should be greater than 1;
      */
-    template <typename Char_T_, typename Number_T_>
-    static Number_T_ Find(const Char_T_ *pattern, const Number_T_ pattern_length, const Char_T_ *content,
-                          Number_T_ offset, Number_T_ end_offset, Number_T_ full_length = 0) noexcept {
+    template <typename _Char_T, typename _Number_T>
+    static _Number_T Find(const _Char_T *pattern, const _Number_T pattern_length, const _Char_T *content,
+                          _Number_T offset, _Number_T end_offset, _Number_T full_length = 0) noexcept {
         if ((offset < end_offset) && ((offset + pattern_length) <= end_offset)) {
-            const Number_T_ len_one_less = (pattern_length - Number_T_{1});
-            const Char_T_   pattern_last = pattern[len_one_less];
+            const _Number_T len_one_less = (pattern_length - _Number_T{1});
+            const _Char_T   pattern_last = pattern[len_one_less];
             end_offset -= len_one_less;
 
 #if defined(QENTEM_SIMD_ENABLED) && (QENTEM_SIMD_ENABLED == 1)
-            Number_T_ m_size = ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
+            _Number_T m_size = ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
                                 Platform::SIMD::Shift);
 
-            if (m_size != Number_T_{0}) {
-                const Char_T_              *content_ofs     = (content + offset);
+            if (m_size != _Number_T{0}) {
+                const _Char_T              *content_ofs     = (content + offset);
                 const Platform::SIMD::VAR_T m_pattern_first = Platform::SMIDSetToOne(*pattern);
                 const Platform::SIMD::VAR_T m_pattern_last  = Platform::SMIDSetToOne(pattern_last);
 
                 do {
                     Platform::SIMD::VAR_T m_content =
                         Platform::SIMD::Load(Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs));
-                    Platform::SIMD::Number_T bits = Platform::SMIDCompare<Char_T_>(m_content, m_pattern_first);
+                    Platform::SIMD::Number_T bits = Platform::SMIDCompare<_Char_T>(m_content, m_pattern_first);
 
                     m_content = Platform::SIMD::Load(
                         Memory::ChangePointer<const Platform::SIMD::VAR_T>(content_ofs + len_one_less));
-                    bits &= Platform::SMIDCompare<Char_T_>(m_content, m_pattern_last);
+                    bits &= Platform::SMIDCompare<_Char_T>(m_content, m_pattern_last);
 
                     while (bits != Platform::SIMD::Number_T{0}) {
-                        const Number_T_ index         = Number_T_(Platform::FindFirstBit(bits));
-                        const Number_T_ pattern_index = (index + offset);
+                        const _Number_T index         = _Number_T(Platform::FindFirstBit(bits));
+                        const _Number_T pattern_index = (index + offset);
 
                         if ((index + offset) > end_offset) {
-                            return Number_T_{0};
+                            return _Number_T{0};
                         }
 
                         if (StringUtils::IsEqual(pattern, (content_ofs + index), len_one_less)) {
@@ -131,10 +131,10 @@ class Engine {
                         bits ^= (Platform::SIMD::Number_T{1} << index);
                     }
 
-                    offset += Platform::SMIDNextOffset<Char_T_, Number_T_>();
-                    content_ofs += Platform::SMIDNextOffset<Char_T_, Number_T_>();
+                    offset += Platform::SMIDNextOffset<_Char_T, _Number_T>();
+                    content_ofs += Platform::SMIDNextOffset<_Char_T, _Number_T>();
                     --m_size;
-                } while ((m_size != Number_T_{0}) && (offset < end_offset));
+                } while ((m_size != _Number_T{0}) && (offset < end_offset));
             }
 #else
             (void)full_length;
@@ -142,7 +142,7 @@ class Engine {
 
             while (offset < end_offset) {
                 if ((*pattern == content[offset]) && (pattern_last == content[offset + len_one_less])) {
-                    Number_T_ tmp_offset{1};
+                    _Number_T tmp_offset{1};
 
                     while ((tmp_offset < len_one_less) && (pattern[tmp_offset] == content[tmp_offset + offset])) {
                         ++tmp_offset;
@@ -159,7 +159,7 @@ class Engine {
             }
         }
 
-        return Number_T_{0};
+        return _Number_T{0};
     }
 
     /*
@@ -168,16 +168,16 @@ class Engine {
      *
      * 'prefix_length' and 'suffix_length' should be greater than 1;
      */
-    template <typename Char_T_, typename Number_T_>
-    static Number_T_ SkipInnerPatterns(const Char_T_ *prefix, Number_T_ prefix_length, const Char_T_ *suffix,
-                                       SizeT suffix_length, const Char_T_ *content, Number_T_ offset,
-                                       const Number_T_ end_offset, Number_T_ full_length = 0) noexcept {
-        Number_T_ offset2 = offset;
+    template <typename _Char_T, typename _Number_T>
+    static _Number_T SkipInnerPatterns(const _Char_T *prefix, _Number_T prefix_length, const _Char_T *suffix,
+                                       SizeT suffix_length, const _Char_T *content, _Number_T offset,
+                                       const _Number_T end_offset, _Number_T full_length = 0) noexcept {
+        _Number_T offset2 = offset;
 
         do {
             offset2 = Find(suffix, suffix_length, content, offset2, end_offset, full_length);
             offset  = Find(prefix, prefix_length, content, offset, offset2, full_length);
-        } while (offset != Number_T_{0});
+        } while (offset != _Number_T{0});
 
         return offset2;
     }
@@ -190,16 +190,16 @@ class Engine {
      *
      */
 
-    template <typename Char_T_, typename Number_T_>
-    static Number_T_ SkipInnerPatterns(const Char_T_ prefix, const Char_T_ suffix, const Char_T_ *content,
-                                       Number_T_ offset, const Number_T_ end_offset,
-                                       Number_T_ full_length = 0) noexcept {
-        Number_T_ offset2 = offset;
+    template <typename _Char_T, typename _Number_T>
+    static _Number_T SkipInnerPatterns(const _Char_T prefix, const _Char_T suffix, const _Char_T *content,
+                                       _Number_T offset, const _Number_T end_offset,
+                                       _Number_T full_length = 0) noexcept {
+        _Number_T offset2 = offset;
 
         do {
             offset2 = FindOne(suffix, content, offset2, end_offset, full_length);
             offset  = FindOne(prefix, content, offset, offset2, full_length);
-        } while (offset != Number_T_{0});
+        } while (offset != _Number_T{0});
 
         return offset2;
     }

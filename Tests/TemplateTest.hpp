@@ -25,8 +25,8 @@
 #include "JSON.hpp"
 #include "Template.hpp"
 
-#ifndef QENTEM_TEMPLATE_TESTS_H_
-#define QENTEM_TEMPLATE_TESTS_H_
+#ifndef _QENTEM_TEMPLATE_TESTS_H
+#define _QENTEM_TEMPLATE_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -3051,13 +3051,13 @@ static void TestLoopTag3(QTest &helper) {
     )");
 
     content =
-        R"(<loop value="val1_" group="year111" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">{var:val3_}</loop></loop></loop>)";
+        R"(<loop value="_val1" group="year111" sort="descend"><loop set="_val1" value="_val2"><loop set="_val2" value="_val3">{var:_val3}</loop></loop></loop>)";
 
     helper.EqualsTrue(Template::Render(content, value, ss) == R"()", "(Render())", __LINE__);
     ss.Clear();
 
     content =
-        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_"><loop set="val2_" value="val3_">{var:val3_}</loop></loop></loop>)";
+        R"(<loop value="_val1" group="year" sort="descend"><loop set="_val1" value="_val2"><loop set="_val2" value="_val3">{var:_val3}</loop></loop></loop>)";
 
     helper.EqualsTrue(Template::Render(content, value, ss) ==
                           R"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)",
@@ -3065,14 +3065,14 @@ static void TestLoopTag3(QTest &helper) {
     ss.Clear();
 
     content =
-        R"(<loop value="val1_" group="year" sort="descend"><loop set="val1_" value="val2_" group="quarter" sort="ascend"><loop set="val2_" value="val3_"><loop set="val3_" value="val4_">{var:val4_}</loop></loop></loop></loop>)";
+        R"(<loop value="_val1" group="year" sort="descend"><loop set="_val1" value="_val2" group="quarter" sort="ascend"><loop set="_val2" value="_val3"><loop set="_val3" value="_val4">{var:_val4}</loop></loop></loop></loop>)";
 
     helper.EqualsTrue(Template::Render(content, value, ss) == R"(1400145014501100112512002300120023002300)",
                       "(Render())", __LINE__);
     ss.Clear();
 
     content =
-        R"(<loop value="val1_" group="year" sort="descend">-- {var:val1_}-<loop set="val1_" value="val2_" group="quarter" sort="ascend">{var:val2_}-<loop set="val2_" value="val3_" group="week" sort="ascend">{var:val2_}:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> {var:val5_}</loop></loop></loop></loop></loop>)";
+        R"(<loop value="_val1" group="year" sort="descend">-- {var:_val1}-<loop set="_val1" value="_val2" group="quarter" sort="ascend">{var:_val2}-<loop set="_val2" value="_val3" group="week" sort="ascend">{var:_val2}:<loop set="_val3" value="_val4"><loop set="_val4" value="_val5"> {var:_val5}</loop></loop></loop></loop></loop>)";
 
     helper.EqualsTrue(
         Template::Render(content, value, ss) ==
@@ -3081,7 +3081,7 @@ static void TestLoopTag3(QTest &helper) {
     ss.Clear();
 
     content =
-        R"(<loop value="val1_" group="year">-- {var:val1_}-<loop set="val1_" value="val2_" group="quarter">{var:val2_}-<loop set="val2_" value="val3_" group="week">{var:val2_}:<loop set="val3_" value="val4_"><loop set="val4_" value="val5_"> {var:val5_}</loop></loop></loop></loop></loop>)";
+        R"(<loop value="_val1" group="year">-- {var:_val1}-<loop set="_val1" value="_val2" group="quarter">{var:_val2}-<loop set="_val2" value="_val3" group="week">{var:_val2}:<loop set="_val3" value="_val4"><loop set="_val4" value="_val5"> {var:_val5}</loop></loop></loop></loop></loop>)";
 
     helper.EqualsTrue(
         Template::Render(content, value, ss) ==
@@ -3101,12 +3101,12 @@ static void TestLoopTag3(QTest &helper) {
     value += 7;
     value += 6;
 
-    content = R"(<loop value="val1_" sort="a">{var:val1_}</loop>)";
+    content = R"(<loop value="_val1" sort="a">{var:_val1}</loop>)";
 
     helper.EqualsTrue(Template::Render(content, value, ss) == R"(1234567)", "(Render())", __LINE__);
     ss.Clear();
 
-    content = R"(<loop value="val1_" sort="d">{var:val1_}</loop>)";
+    content = R"(<loop value="_val1" sort="d">{var:_val1}</loop>)";
 
     helper.EqualsTrue(Template::Render(content, value, ss) == R"(7654321)", "(Render())", __LINE__);
     ss.Clear();
@@ -3516,7 +3516,7 @@ static void TestRender2(QTest &helper) {
                       "(Render())", __LINE__);
     ss.Clear();
 
-    content = R"(<loop set="numbers" value="val_">{var:val_}</loop>)";
+    content = R"(<loop set="numbers" value="_val">{var:_val}</loop>)";
     helper.EqualsTrue(Template::Render(content, value, ss) == R"()", "(Render())", __LINE__);
     ss.Clear();
 

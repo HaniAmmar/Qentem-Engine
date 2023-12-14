@@ -23,8 +23,8 @@
 
 #include "Common.hpp"
 
-#ifndef QENTEM_VARIABLE_TAG_H_
-#define QENTEM_VARIABLE_TAG_H_
+#ifndef _QENTEM_VARIABLE_TAG_H
+#define _QENTEM_VARIABLE_TAG_H
 
 namespace Qentem {
 namespace Tags {

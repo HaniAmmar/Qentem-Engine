@@ -23,8 +23,8 @@
 #include "QTest.hpp"
 #include "StringStream.hpp"
 
-#ifndef QENTEM_STRINGSTREAM_TESTS_H_
-#define QENTEM_STRINGSTREAM_TESTS_H_
+#ifndef _QENTEM_STRINGSTREAM_TESTS_H
+#define _QENTEM_STRINGSTREAM_TESTS_H
 
 namespace Qentem {
 namespace Test {

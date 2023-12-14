@@ -22,8 +22,8 @@
 
 #include "Common.hpp"
 
-#ifndef QENTEM_UNICODE_H_
-#define QENTEM_UNICODE_H_
+#ifndef _QENTEM_UNICODE_H
+#define _QENTEM_UNICODE_H
 
 namespace Qentem {
 namespace Unicode {
@@ -31,15 +31,15 @@ namespace Unicode {
 template <typename, typename, SizeT32>
 struct UnicodeToUTF {};
 
-template <typename Char_T_, typename Stream_T_>
-static void ToUTF(SizeT32 unicode, Stream_T_ &stream) {
-    UnicodeToUTF<Char_T_, Stream_T_, sizeof(Char_T_)>::ToUTF(unicode, stream);
+template <typename _Char_T, typename _Stream_T>
+static void ToUTF(SizeT32 unicode, _Stream_T &stream) {
+    UnicodeToUTF<_Char_T, _Stream_T, sizeof(_Char_T)>::ToUTF(unicode, stream);
 }
 
 // UTF8
-template <typename Char_T_, typename Stream_T_>
-struct UnicodeToUTF<Char_T_, Stream_T_, 1U> {
-    static void ToUTF(SizeT32 unicode, Stream_T_ &stream) {
+template <typename _Char_T, typename _Stream_T>
+struct UnicodeToUTF<_Char_T, _Stream_T, 1U> {
+    static void ToUTF(SizeT32 unicode, _Stream_T &stream) {
         /*
          * ToUTF(0xC3D, stream);
          * ToUTF(0x00A1, stream);
@@ -48,43 +48,43 @@ struct UnicodeToUTF<Char_T_, Stream_T_, 1U> {
          */
 
         if (unicode < 0x80U) {
-            stream += Char_T_(unicode);
+            stream += _Char_T(unicode);
         } else {
             if (unicode < 0x800U) {
-                stream += Char_T_(0xC0U | (unicode >> 6U));
+                stream += _Char_T(0xC0U | (unicode >> 6U));
             } else if (unicode < 0x10000U) {
-                stream += Char_T_(0xE0U | (unicode >> 12U));
-                stream += Char_T_(0x80U | ((unicode >> 6U) & 0x3FU));
+                stream += _Char_T(0xE0U | (unicode >> 12U));
+                stream += _Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
             } else {
-                stream += Char_T_(0xF0U | (unicode >> 18U));
-                stream += Char_T_(0x80U | ((unicode >> 12U) & 0x3FU));
-                stream += Char_T_(0x80U | ((unicode >> 6U) & 0x3FU));
+                stream += _Char_T(0xF0U | (unicode >> 18U));
+                stream += _Char_T(0x80U | ((unicode >> 12U) & 0x3FU));
+                stream += _Char_T(0x80U | ((unicode >> 6U) & 0x3FU));
             }
 
-            stream += Char_T_(0x80U | (unicode & 0x3FU));
+            stream += _Char_T(0x80U | (unicode & 0x3FU));
         }
     }
 };
 
 // UTF16
-template <typename Char_T_, typename Stream_T_>
-struct UnicodeToUTF<Char_T_, Stream_T_, 2U> {
-    static void ToUTF(SizeT32 unicode, Stream_T_ &stream) {
+template <typename _Char_T, typename _Stream_T>
+struct UnicodeToUTF<_Char_T, _Stream_T, 2U> {
+    static void ToUTF(SizeT32 unicode, _Stream_T &stream) {
         if (unicode < 0x10000U) {
-            stream += Char_T_(unicode);
+            stream += _Char_T(unicode);
         } else {
             unicode -= 0x10000U;
-            stream += Char_T_(0xD800U | (unicode >> 10U));
-            stream += Char_T_(0xDC00U | (unicode & 0x3FFU));
+            stream += _Char_T(0xD800U | (unicode >> 10U));
+            stream += _Char_T(0xDC00U | (unicode & 0x3FFU));
         }
     }
 };
 
 // UTF32
-template <typename Char_T_, typename Stream_T_>
-struct UnicodeToUTF<Char_T_, Stream_T_, 4U> {
-    static void ToUTF(SizeT32 unicode, Stream_T_ &stream) {
-        stream += Char_T_(unicode);
+template <typename _Char_T, typename _Stream_T>
+struct UnicodeToUTF<_Char_T, _Stream_T, 4U> {
+    static void ToUTF(SizeT32 unicode, _Stream_T &stream) {
+        stream += _Char_T(unicode);
     }
 };
 

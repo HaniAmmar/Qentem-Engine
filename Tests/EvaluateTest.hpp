@@ -25,8 +25,8 @@
 #include "Value.hpp"
 #include "StringStream.hpp"
 
-#ifndef QENTEM_EVALUATE_TESTS_H_
-#define QENTEM_EVALUATE_TESTS_H_
+#ifndef _QENTEM_EVALUATE_TESTS_H
+#define _QENTEM_EVALUATE_TESTS_H
 
 namespace Qentem {
 namespace Test {

@@ -24,8 +24,8 @@
 #include "Array.hpp"
 #include "String.hpp"
 
-#ifndef QENTEM_ARRAY_TESTS_H_
-#define QENTEM_ARRAY_TESTS_H_
+#ifndef _QENTEM_ARRAY_TESTS_H
+#define _QENTEM_ARRAY_TESTS_H
 
 namespace Qentem {
 namespace Test {

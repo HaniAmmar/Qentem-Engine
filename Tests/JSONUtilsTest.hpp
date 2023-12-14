@@ -24,8 +24,8 @@
 #include "JSONUtils.hpp"
 #include "StringStream.hpp"
 
-#ifndef QENTEM_JSON_UTILS_TESTS_H_
-#define QENTEM_JSON_UTILS_TESTS_H_
+#ifndef _QENTEM_JSON_UTILS_TESTS_H
+#define _QENTEM_JSON_UTILS_TESTS_H
 
 namespace Qentem {
 namespace Test {

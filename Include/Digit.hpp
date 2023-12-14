@@ -24,8 +24,8 @@
 #include "DigitUtils.hpp"
 #include "StringUtils.hpp"
 
-#ifndef QENTEM_DIGIT_H_
-#define QENTEM_DIGIT_H_
+#ifndef _QENTEM_DIGIT_H
+#define _QENTEM_DIGIT_H
 
 /*
  * For converting numbers from and to strings.
@@ -60,25 +60,25 @@ struct Digit {
         RealFormatType Type{RealFormatType::Default};
     };
     /////////////////////////////////////////////////////////////////
-    template <bool Reverse_V_ = false, typename Stream_T_, typename Number_T_>
-    inline static void NumberToString(Stream_T_ &stream, Number_T_ number) {
-        constexpr SizeT32 n_size = sizeof(Number_T_);
-        using Char_T_            = typename Stream_T_::CharType;
-        using QNumberType_T      = typename QNumberAutoTypeT<Number_T_, n_size>::QNumberType_T;
+    template <bool _Reverse_V = false, typename _Stream_T, typename _Number_T>
+    inline static void NumberToString(_Stream_T &stream, _Number_T number) {
+        constexpr SizeT32 n_size = sizeof(_Number_T);
+        using _Char_T            = typename _Stream_T::CharType;
+        using QNumberType_T      = typename QNumberAutoTypeT<_Number_T, n_size>::QNumberType_T;
 
         constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000U) + 1U);
-        Char_T_           storage[max_number_of_digits];
+        _Char_T           storage[max_number_of_digits];
 
         QNumberType_T qn{number};
 
-        if (!IsUnsigned<Number_T_>()) {
-            if (number < Number_T_{0}) {
+        if (!IsUnsigned<_Number_T>()) {
+            if (number < _Number_T{0}) {
                 qn.Integer = -qn.Integer;
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
         }
 
-        if (Reverse_V_) {
+        if (_Reverse_V) {
             stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), qn.Natural));
         } else {
             const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
@@ -86,23 +86,23 @@ struct Digit {
         }
     }
 
-    template <typename Stream_T_, typename Number_T_>
-    inline static void NumberToString(Stream_T_ &stream, Number_T_ number, RealFormatInfo format) {
-        constexpr SizeT32 n_size = sizeof(Number_T_);
-        using QNumberType_T      = typename QNumberAutoTypeT<Number_T_, n_size>::QNumberType_T;
+    template <typename _Stream_T, typename _Number_T>
+    inline static void NumberToString(_Stream_T &stream, _Number_T number, RealFormatInfo format) {
+        constexpr SizeT32 n_size = sizeof(_Number_T);
+        using QNumberType_T      = typename QNumberAutoTypeT<_Number_T, n_size>::QNumberType_T;
 
-        realToString<Number_T_>(stream, QNumberType_T{number}.Natural, format);
+        realToString<_Number_T>(stream, QNumberType_T{number}.Natural, format);
     }
     /////////////////////////////////////////////////////////////////
-    template <typename Char_T_>
-    static SizeT32 HexStringToNumber(const Char_T_ *value, const SizeT length) noexcept {
+    template <typename _Char_T>
+    static SizeT32 HexStringToNumber(const _Char_T *value, const SizeT length) noexcept {
         using Uint_Char_T = SizeT32;
 
         SizeT32 number{0};
         SizeT32 offset{0};
 
         while (offset < length) {
-            const Char_T_ digit = value[offset];
+            const _Char_T digit = value[offset];
             number <<= 4U;
 
             if ((digit >= DigitUtils::DigitChars::OneChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
@@ -121,41 +121,41 @@ struct Digit {
         return number;
     }
     /////////////////////////////////////////////////////////////////
-    template <typename Number_T_, typename Char_T_>
-    static void FastStringToNumber(Number_T_ &number, const Char_T_ *content, SizeT length) noexcept {
+    template <typename _Number_T, typename _Char_T>
+    static void FastStringToNumber(_Number_T &number, const _Char_T *content, SizeT length) noexcept {
         SizeT offset = 0;
         number       = 0;
 
         if (offset < length) {
-            number += Number_T_(content[offset]);
-            number -= Number_T_{DigitUtils::DigitChars::ZeroChar};
+            number += _Number_T(content[offset]);
+            number -= _Number_T{DigitUtils::DigitChars::ZeroChar};
             ++offset;
 
             while (offset < length) {
-                number *= Number_T_{10};
-                number += Number_T_(content[offset]);
-                number -= Number_T_{DigitUtils::DigitChars::ZeroChar};
+                number *= _Number_T{10};
+                number += _Number_T(content[offset]);
+                number -= _Number_T{DigitUtils::DigitChars::ZeroChar};
                 ++offset;
             }
         }
     }
 
-    template <typename Char_T_>
-    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T_ *content, SizeT &offset,
+    template <typename _Char_T>
+    inline static QNumberType StringToNumber(QNumber64 &number, const _Char_T *content, SizeT &offset,
                                              SizeT end_offset) noexcept {
         return stringToNumber(number, content, offset, end_offset);
     }
 
-    template <typename Char_T_>
-    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T_ *content, SizeT end_offset) noexcept {
+    template <typename _Char_T>
+    inline static QNumberType StringToNumber(QNumber64 &number, const _Char_T *content, SizeT end_offset) noexcept {
         SizeT offset{0};
         return stringToNumber(number, content, offset, end_offset);
     }
 
     //////////// Private ////////////
   private:
-    template <typename Char_T_>
-    static QNumberType stringToNumber(QNumber64 &number, const Char_T_ *content, SizeT &offset,
+    template <typename _Char_T>
+    static QNumberType stringToNumber(QNumber64 &number, const _Char_T *content, SizeT &offset,
                                       SizeT end_offset) noexcept {
         using Number_T = decltype(number.Natural);
 
@@ -167,7 +167,7 @@ struct Digit {
             SizeT   exp_offset   = 0;
             SizeT   start_offset = 0;
             SizeT   tmp_offset;
-            Char_T_ digit         = content[offset];
+            _Char_T digit         = content[offset];
             bool    is_negative   = false;
             bool    is_real       = false;
             bool    has_dot       = false;
@@ -476,8 +476,8 @@ struct Digit {
         return QNumberType::NotANumber;
     }
     /////////////////////////////////////////
-    template <typename Number_T_>
-    static void powerOfNegativeTen(Number_T_ &number, SizeT32 exponent) noexcept {
+    template <typename _Number_T>
+    static void powerOfNegativeTen(_Number_T &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SizeT64;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
@@ -537,24 +537,24 @@ struct Digit {
             shifted = (bit - shifted);
             exp += shifted;
 
-            number += (number & Number_T_{1});
+            number += (number & _Number_T{1});
             number >>= 1U;
-            exp += (number > Number_T_{0x1FFFFFFFFFFFFF});
+            exp += (number > _Number_T{0x1FFFFFFFFFFFFF});
         } else {
             shifted -= bit;
 
             if (exp > shifted) {
                 exp -= shifted;
-                number += (number & Number_T_{1});
+                number += (number & _Number_T{1});
                 number >>= 1U;
-                exp += (number > Number_T_{0x1FFFFFFFFFFFFF});
+                exp += (number > _Number_T{0x1FFFFFFFFFFFFF});
             } else {
                 shifted -= exp;
                 ++shifted;
                 number >>= shifted;
-                number += (number & Number_T_{1});
+                number += (number & _Number_T{1});
                 number >>= 1U;
-                exp = (number > Number_T_{0xFFFFFFFFFFFFF});
+                exp = (number > _Number_T{0xFFFFFFFFFFFFF});
             }
         }
 
@@ -562,8 +562,8 @@ struct Digit {
         number |= (SizeT64(exp) << 52U);
     }
     /////////////////////////////////////////
-    template <typename Number_T_>
-    static void powerOfPositiveTen(Number_T_ &number, SizeT32 exponent) noexcept {
+    template <typename _Number_T>
+    static void powerOfPositiveTen(_Number_T &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SystemIntType;
         using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
@@ -595,9 +595,9 @@ struct Digit {
         } else {
             bint >>= (bit - 53U);
             number = SizeT64(bint);
-            number += (number & Number_T_{1});
+            number += (number & _Number_T{1});
             number >>= 1U;
-            shifted += SizeT32(number > Number_T_{0x1FFFFFFFFFFFFF});
+            shifted += SizeT32(number > _Number_T{0x1FFFFFFFFFFFFF});
         }
         //////////////////////////////////////////////////////////////
         SizeT64 exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
@@ -608,8 +608,8 @@ struct Digit {
         number |= exp;
     }
     /////////////////////////////////////////
-    template <typename Char_T_>
-    static bool parseExponent(const Char_T_ *content, SizeT32 &exponent, bool &is_negative_exp, SizeT &offset,
+    template <typename _Char_T>
+    static bool parseExponent(const _Char_T *content, SizeT32 &exponent, bool &is_negative_exp, SizeT &offset,
                               const SizeT end_offset) noexcept {
         bool sign_set{false};
 
@@ -639,7 +639,7 @@ struct Digit {
                     const SizeT o_offset = offset;
 
                     while (offset < end_offset) {
-                        const Char_T_ digit = content[offset];
+                        const _Char_T digit = content[offset];
 
                         if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
                             (digit <= DigitUtils::DigitChars::NineChar)) {
@@ -660,40 +660,40 @@ struct Digit {
         return false;
     }
     /////////////////////////////////////////
-    template <bool Reverse_V_ = false, typename Char_T_, typename Number_T_>
-    static SizeT intToString(Char_T_ *storage, Number_T_ number) noexcept {
-        const Char_T_ *str = storage;
+    template <bool _Reverse_V = false, typename _Char_T, typename _Number_T>
+    static SizeT intToString(_Char_T *storage, _Number_T number) noexcept {
+        const _Char_T *str = storage;
 
-        if (!Reverse_V_) {
-            while (number >= Number_T_{10}) {
-                const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
-                number /= Number_T_{100};
+        if (!_Reverse_V) {
+            while (number >= _Number_T{10}) {
+                const SizeT index = (SizeT(number % _Number_T{100}) * SizeT{2});
+                number /= _Number_T{100};
 
                 --storage;
-                *storage = Char_T_(DigitUtils::DigitTable1[index + SizeT{1}]);
+                *storage = _Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
                 --storage;
-                *storage = Char_T_(DigitUtils::DigitTable1[index]);
+                *storage = _Char_T(DigitUtils::DigitTable1[index]);
             }
 
-            if ((number != Number_T_{0}) || (str == storage)) {
+            if ((number != _Number_T{0}) || (str == storage)) {
                 --storage;
-                *storage = Char_T_(DigitUtils::DigitTable2[number]);
+                *storage = _Char_T(DigitUtils::DigitTable2[number]);
             }
 
             return SizeT(str - storage);
         } else {
-            while (number >= Number_T_{10}) {
-                const SizeT index = (SizeT(number % Number_T_{100}) * SizeT{2});
-                number /= Number_T_{100};
+            while (number >= _Number_T{10}) {
+                const SizeT index = (SizeT(number % _Number_T{100}) * SizeT{2});
+                number /= _Number_T{100};
 
-                *storage = Char_T_(DigitUtils::DigitTable1[index + SizeT{1}]);
+                *storage = _Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
                 ++storage;
-                *storage = Char_T_(DigitUtils::DigitTable1[index]);
+                *storage = _Char_T(DigitUtils::DigitTable1[index]);
                 ++storage;
             }
 
-            if ((number != Number_T_{0}) || (str == storage)) {
-                *storage = Char_T_(DigitUtils::DigitTable2[number]);
+            if ((number != _Number_T{0}) || (str == storage)) {
+                *storage = _Char_T(DigitUtils::DigitTable2[number]);
                 ++storage;
             }
 
@@ -701,28 +701,28 @@ struct Digit {
         }
     }
     /////////////////////////////////////////
-    template <typename Float_T_, typename Stream_T_, typename Number_T_>
-    static void realToString(Stream_T_ &stream, const Number_T_ number, const RealFormatInfo format) {
-        using Char_T_ = typename Stream_T_::CharType;
-        using Info_T  = DigitUtils::RealNumberInfo<Float_T_, sizeof(number)>;
+    template <typename _Float_T, typename _Stream_T, typename _Number_T>
+    static void realToString(_Stream_T &stream, const _Number_T number, const RealFormatInfo format) {
+        using _Char_T = typename _Stream_T::CharType;
+        using Info_T  = DigitUtils::RealNumberInfo<_Float_T, sizeof(number)>;
 
-        const Number_T_ bias = (number & Info_T::ExponentMask);
+        const _Number_T bias = (number & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
-            if ((number & Info_T::SignMask) != Number_T_{0}) {
+            if ((number & Info_T::SignMask) != _Number_T{0}) {
                 stream += DigitUtils::DigitChars::NegativeChar;
             }
 
-            Number_T_ mantissa = (number & Info_T::MantissaMask);
+            _Number_T mantissa = (number & Info_T::MantissaMask);
 
-            if ((mantissa != Number_T_{0}) || (bias != Number_T_{0})) {
-                if (bias != Number_T_{0}) {
+            if ((mantissa != _Number_T{0}) || (bias != _Number_T{0})) {
+                if (bias != _Number_T{0}) {
                     mantissa |= Info_T::LeadingBit;
                 } else {
                     mantissa <<= 1U;
                 }
 
-                BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(Number_T_) * 8U * 3U))> bint{mantissa};
+                BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(_Number_T) * 8U * 3U))> bint{mantissa};
                 using DigitLimit = DigitUtils::DigitLimit<bint.SizeOfType()>;
                 /////////////////////////////////////
                 const SizeT32 first_shift      = Platform::FindFirstBit(mantissa);
@@ -730,7 +730,7 @@ struct Digit {
                 const bool    is_positive_exp  = (exponent >= 0);
                 const SizeT32 positive_exp     = SizeT32(is_positive_exp ? exponent : -exponent);
                 const SizeT32 first_bit        = (Info_T::MantissaSize - first_shift);
-                const SizeT32 exp_actual_value = (positive_exp + ((bias == Number_T_{0}) * first_bit));
+                const SizeT32 exp_actual_value = (positive_exp + ((bias == _Number_T{0}) * first_bit));
                 const SizeT32 digits           = (((exp_actual_value * 30103U) / 100000U) + 1U);
                 SizeT32       fraction_length  = 0;
                 const bool    extra_digits     = (digits > format.Precision);
@@ -811,32 +811,32 @@ struct Digit {
                 stream += DigitUtils::DigitChars::ZeroChar;
             }
         } else {
-            constexpr SizeT32 size = sizeof(Char_T_);
+            constexpr SizeT32 size = sizeof(_Char_T);
 
-            if ((number & Info_T::MantissaMask) == Number_T_{0}) {
-                if ((number & Info_T::SignMask) != Number_T_{0}) {
+            if ((number & Info_T::MantissaMask) == _Number_T{0}) {
+                if ((number & Info_T::SignMask) != _Number_T{0}) {
                     stream += DigitUtils::DigitChars::NegativeChar;
                 }
 
-                // stream.Write(DigitUtils::DigitStrings<Char_T_, size>::InfinityString,
-                //              StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T_, size>::InfinityString));
+                // stream.Write(DigitUtils::DigitStrings<_Char_T, size>::InfinityString,
+                //              StringUtils::ConstCount(DigitUtils::DigitStrings<_Char_T, size>::InfinityString));
 
-                stream.Write(DigitUtils::DigitStrings<Char_T_, size>::InfinityString, SizeT{3});
+                stream.Write(DigitUtils::DigitStrings<_Char_T, size>::InfinityString, SizeT{3});
             } else {
-                // stream.Write(DigitUtils::DigitStrings<Char_T_, size>::NANString,
-                //              StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T_, size>::NANString));
+                // stream.Write(DigitUtils::DigitStrings<_Char_T, size>::NANString,
+                //              StringUtils::ConstCount(DigitUtils::DigitStrings<_Char_T, size>::NANString));
 
-                stream.Write(DigitUtils::DigitStrings<Char_T_, size>::NANString, SizeT{3});
+                stream.Write(DigitUtils::DigitStrings<_Char_T, size>::NANString, SizeT{3});
             }
         }
     }
 
-    template <typename Stream_T_, typename Number_T_>
-    static void insertPowerOfTen(Stream_T_ &stream, Number_T_ power_of_ten, bool positive) {
+    template <typename _Stream_T, typename _Number_T>
+    static void insertPowerOfTen(_Stream_T &stream, _Number_T power_of_ten, bool positive) {
         stream += DigitUtils::DigitChars::E_Char;
         stream += (positive ? DigitUtils::DigitChars::PositiveChar : DigitUtils::DigitChars::NegativeChar);
 
-        if (power_of_ten < Number_T_{10}) {
+        if (power_of_ten < _Number_T{10}) {
             // e+01,e+09
             stream += DigitUtils::DigitChars::ZeroChar;
         }
@@ -844,16 +844,16 @@ struct Digit {
         NumberToString(stream, power_of_ten);
     }
 
-    template <typename Stream_T_>
-    inline static void insertZeros(Stream_T_ &stream, const SizeT length) {
-        using Char_T_          = typename Stream_T_::CharType;
-        constexpr SizeT32 size = sizeof(Char_T_);
-        stream.Write(DigitUtils::DigitStrings<Char_T_, size>::ZeroesString, length);
+    template <typename _Stream_T>
+    inline static void insertZeros(_Stream_T &stream, const SizeT length) {
+        using _Char_T          = typename _Stream_T::CharType;
+        constexpr SizeT32 size = sizeof(_Char_T);
+        stream.Write(DigitUtils::DigitStrings<_Char_T, size>::ZeroesString, length);
     }
 
-    template <typename Stream_T_, typename BigInt_T_>
-    static void bigIntToString(Stream_T_ &stream, BigInt_T_ &bint) {
-        using DigitLimit = DigitUtils::DigitLimit<BigInt_T_::SizeOfType()>;
+    template <typename _Stream_T, typename _BigInt_T>
+    static void bigIntToString(_Stream_T &stream, _BigInt_T &bint) {
+        using DigitLimit = DigitUtils::DigitLimit<_BigInt_T::SizeOfType()>;
 
         while (bint.IsBig()) {
             const SizeT length = stream.Length();
@@ -868,9 +868,9 @@ struct Digit {
         }
     }
 
-    template <typename BigInt_T_>
-    inline static void bigIntDropDigits(BigInt_T_ &bint, SizeT32 drop) noexcept {
-        using DigitLimit = DigitUtils::DigitLimit<BigInt_T_::SizeOfType()>;
+    template <typename _BigInt_T>
+    inline static void bigIntDropDigits(_BigInt_T &bint, SizeT32 drop) noexcept {
+        using DigitLimit = DigitUtils::DigitLimit<_BigInt_T::SizeOfType()>;
 
         while (drop >= DigitLimit::MaxPowerOfFive) {
             bint /= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
@@ -882,11 +882,11 @@ struct Digit {
         }
     }
 
-    template <typename Stream_T_>
-    static void formatStringNumber(Stream_T_ &stream, const SizeT started_at, const SizeT32 precision,
+    template <typename _Stream_T>
+    static void formatStringNumber(_Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                    const SizeT32 calculated_digits, SizeT32 fraction_length, const bool is_positive_exp,
                                    const bool round_up) {
-        using Char_T_             = typename Stream_T_::CharType;
+        using _Char_T             = typename _Stream_T::CharType;
         const SizeT stream_length = (stream.Length() - started_at);
         SizeT       index         = started_at;
         SizeT       power;
@@ -937,8 +937,8 @@ struct Digit {
         const bool display_exp =
             ((is_positive_exp && ((power + SizeT{1}) > precision)) || (!is_positive_exp && (power > SizeT{4})));
         /////////////////////////////////////////////////////
-        Char_T_       *number = (stream.Storage() + index);
-        const Char_T_ *last   = stream.Last();
+        _Char_T       *number = (stream.Storage() + index);
+        const _Char_T *last   = stream.Last();
 
         if (display_exp || (fraction_length != SizeT32{0})) {
             while ((number < last) && (*number == DigitUtils::DigitChars::ZeroChar)) {
@@ -974,12 +974,12 @@ struct Digit {
         }
     }
 
-    template <typename Stream_T_>
-    static void roundStringNumber(Stream_T_ &stream, SizeT &index, bool &is_power_increased, bool round_up) noexcept {
-        using Char_T_ = typename Stream_T_::CharType;
+    template <typename _Stream_T>
+    static void roundStringNumber(_Stream_T &stream, SizeT &index, bool &is_power_increased, bool round_up) noexcept {
+        using _Char_T = typename _Stream_T::CharType;
 
-        const Char_T_ *last   = stream.Last();
-        Char_T_       *number = (stream.Storage() + index);
+        const _Char_T *last   = stream.Last();
+        _Char_T       *number = (stream.Storage() + index);
 
         ++index;
 

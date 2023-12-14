@@ -22,28 +22,28 @@
 
 #include "Common.hpp"
 
-#ifndef QENTEM_Q_POINTER_H_
-#define QENTEM_Q_POINTER_H_
+#ifndef _QENTEM_Q_POINTER_H
+#define _QENTEM_Q_POINTER_H
 
 namespace Qentem {
 
-template <typename Type_T_>
+template <typename _Type_T>
 union PointerNumber {
-    inline explicit PointerNumber(Type_T_ *pointer) noexcept : Pointer{pointer} {
+    inline explicit PointerNumber(_Type_T *pointer) noexcept : Pointer{pointer} {
     }
 
     inline explicit PointerNumber(SystemIntType number) noexcept : Number{number} {
     }
 
-    Type_T_      *Pointer;
+    _Type_T      *Pointer;
     SystemIntType Number{0};
 };
 
-template <typename Type_T_, bool>
+template <typename _Type_T, bool>
 struct QPointerData;
 
-template <typename Type_T_>
-struct QPointerData<Type_T_, true> {
+template <typename _Type_T>
+struct QPointerData<_Type_T, true> {
     // With Tag
     QPointerData() noexcept  = default;
     ~QPointerData() noexcept = default;
@@ -56,19 +56,19 @@ struct QPointerData<Type_T_, true> {
         src.Pointer = nullptr;
     }
 
-    inline explicit QPointerData(Type_T_ *pointer) noexcept : Pointer{pointer} {
+    inline explicit QPointerData(_Type_T *pointer) noexcept : Pointer{pointer} {
     }
 
-    inline void SetPointer(Type_T_ *pointer) noexcept {
-        PointerNumber<Type_T_> pn{pointer};
+    inline void SetPointer(_Type_T *pointer) noexcept {
+        PointerNumber<_Type_T> pn{pointer};
         PtrNumber &= 0xFFFF000000000000ULL;
         pn.Pointer = pointer;
         pn.Number &= 0xFFFFFFFFFFFFULL;
         PtrNumber |= pn.Number;
     }
 
-    inline Type_T_ *GetPointer() const noexcept {
-        return PointerNumber<Type_T_>{PtrNumber & 0xFFFFFFFFFFFFULL}.Pointer;
+    inline _Type_T *GetPointer() const noexcept {
+        return PointerNumber<_Type_T>{PtrNumber & 0xFFFFFFFFFFFFULL}.Pointer;
     }
 
     inline void MovePointerOnly(QPointerData &src) noexcept {
@@ -105,13 +105,13 @@ struct QPointerData<Type_T_, true> {
     }
 
     union {
-        Type_T_ *Pointer{nullptr};
+        _Type_T *Pointer{nullptr};
         SizeT64  PtrNumber;
     };
 };
 
-template <typename Type_T_>
-struct QPointerData<Type_T_, false> {
+template <typename _Type_T>
+struct QPointerData<_Type_T, false> {
     // Without Tag
     QPointerData() noexcept  = default;
     ~QPointerData() noexcept = default;
@@ -124,14 +124,14 @@ struct QPointerData<Type_T_, false> {
         src.Pointer = nullptr;
     }
 
-    inline explicit QPointerData(Type_T_ *pointer) noexcept : Pointer{pointer} {
+    inline explicit QPointerData(_Type_T *pointer) noexcept : Pointer{pointer} {
     }
 
-    inline void SetPointer(Type_T_ *pointer) noexcept {
+    inline void SetPointer(_Type_T *pointer) noexcept {
         Pointer = pointer;
     }
 
-    inline Type_T_ *GetPointer() const noexcept {
+    inline _Type_T *GetPointer() const noexcept {
         return Pointer;
     }
 
@@ -156,10 +156,10 @@ struct QPointerData<Type_T_, false> {
         return 0;
     }
 
-    Type_T_ *Pointer{nullptr};
+    _Type_T *Pointer{nullptr};
 };
 
-template <typename Type_T_>
+template <typename _Type_T>
 class QPointer {
   public:
     QPointer() noexcept                      = default;
@@ -168,52 +168,52 @@ class QPointer {
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
-    inline explicit QPointer(Type_T_ *pointer) noexcept : data_{pointer} {
+    inline explicit QPointer(_Type_T *pointer) noexcept : _data{pointer} {
     }
 
     inline QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
-            data_.Pointer     = src.data_.Pointer;
-            src.data_.Pointer = nullptr;
+            _data.Pointer     = src._data.Pointer;
+            src._data.Pointer = nullptr;
         }
 
         return *this;
     }
 
-    inline void SetPointer(Type_T_ *pointer) noexcept {
-        data_.SetPointer(pointer);
+    inline void SetPointer(_Type_T *pointer) noexcept {
+        _data.SetPointer(pointer);
     }
 
-    inline Type_T_ *GetPointer() const noexcept {
-        return data_.GetPointer();
+    inline _Type_T *GetPointer() const noexcept {
+        return _data.GetPointer();
     }
 
     inline void MovePointerOnly(QPointer &src) noexcept {
-        data_.MovePointerOnly(src.data_);
+        _data.MovePointerOnly(src._data);
     }
 
     inline void SetHighByte(SizeT8 byte) noexcept {
-        data_.SetHighByte(byte);
+        _data.SetHighByte(byte);
     }
 
     inline void SetLowByte(SizeT8 byte) noexcept {
-        data_.SetLowByte(byte);
+        _data.SetLowByte(byte);
     }
 
     inline SizeT8 GetLowByte() const noexcept {
-        return data_.GetLowByte();
+        return _data.GetLowByte();
     }
 
     inline SizeT8 GetHighByte() const noexcept {
-        return data_.GetHighByte();
+        return _data.GetHighByte();
     }
 
     inline void Reset() noexcept {
-        data_.Pointer = nullptr;
+        _data.Pointer = nullptr;
     }
 
   private:
-    QPointerData<Type_T_, Config::PointerTagging> data_;
+    QPointerData<_Type_T, Config::PointerTagging> _data;
 };
 
 } // namespace Qentem
