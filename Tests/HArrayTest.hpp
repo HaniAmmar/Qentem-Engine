@@ -995,7 +995,7 @@ static void TestHArraySort(QTest &helper) {
     SizeT total = 0;
 
     for (const auto &item : strings) {
-        total += item.Value;
+        total = SizeT(total + item.Value);
     }
 
     helper.Equal(total, 10095U, "total", __LINE__);

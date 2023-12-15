@@ -391,7 +391,7 @@ class String {
         if ((str != nullptr) && (len != SizeT{0})) {
             constexpr SizeT32 size    = sizeof(_Char_T);
             const SizeT       src_len = Length();
-            SizeT             new_len = ((src_len + len) + SizeT{1});
+            SizeT             new_len = SizeT((src_len + len) + SizeT{1});
             _Char_T          *src     = getStorage(src_len);
             _Char_T          *ns;
 

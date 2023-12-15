@@ -886,27 +886,25 @@ struct Digit {
     static void formatStringNumber(_Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                    const SizeT32 calculated_digits, SizeT32 fraction_length, const bool is_positive_exp,
                                    const bool round_up) {
-        using _Char_T             = typename _Stream_T::CharType;
-        const SizeT stream_length = (stream.Length() - started_at);
-        SizeT       index         = started_at;
-        SizeT       power;
-        SizeT       length;
-        const SizeT precision_plus_one = SizeT(precision + SizeT{1});
+        using _Char_T                    = typename _Stream_T::CharType;
+        const SizeT   stream_length      = (stream.Length() - started_at);
+        SizeT         index              = started_at;
+        const SizeT32 precision_plus_one = (precision + SizeT32{1});
+        SizeT32       length;
+        SizeT32       power;
 
         if (is_positive_exp) {
-            length =
-                SizeT(stream_length +
+            length = (stream_length +
                       ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
                       fraction_length);
-            power = (length - SizeT{1});
+            power  = (length - SizeT32{1});
         } else {
             length = stream_length;
-            power =
-                (((fraction_length > stream_length) ? SizeT(fraction_length - stream_length) : SizeT{0}) + SizeT{1});
+            power = (((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT32{0}) + SizeT32{1});
         }
 
         if (stream_length > precision_plus_one) {
-            index += (stream_length - precision_plus_one);
+            index += SizeT(stream_length - precision_plus_one);
         }
 
         if (stream_length > precision) {
@@ -921,12 +919,12 @@ struct Digit {
                     ++power;
 
                     if (power < precision) {
-                        SizeT power_index = power;
+                        SizeT32 power_index = power;
 
                         do {
                             --index;
                             stream.Storage()[index] = DigitUtils::DigitChars::ZeroChar;
-                        } while (--power_index != SizeT{0});
+                        } while (--power_index != SizeT32{0});
                     }
                 } else {
                     --power;
@@ -960,7 +958,7 @@ struct Digit {
                 }
             }
         } else if ((stream_length - SizeT{1}) != index2) {
-            stream.InsertAt(DigitUtils::DigitChars::DotChar, (stream.Length() - 1U));
+            stream.InsertAt(DigitUtils::DigitChars::DotChar, (stream.Length() - SizeT{1}));
         }
 
         stream.Reverse(started_at);

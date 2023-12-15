@@ -546,7 +546,10 @@ class HArray {
         SizeT           size = 0;
 
         while (item < end) {
-            size += SizeT(item->Hash != SizeT{0});
+            if (item->Hash != SizeT{0}) {
+                ++size;
+            }
+
             ++item;
         }
 

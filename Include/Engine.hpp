@@ -50,7 +50,7 @@ class Engine {
 #if defined(QENTEM_SIMD_ENABLED) && (QENTEM_SIMD_ENABLED == 1)
         if (offset < end_offset) {
             _Number_T m_size =
-                ((((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
+                (_Number_T(((full_length > end_offset) ? full_length : end_offset) - offset) >> Platform::SIMD::Shift);
 
             if (m_size != _Number_T{0}) {
                 const Platform::SIMD::VAR_T m_char_1 = Platform::SMIDSetToOne(char_1);
@@ -99,8 +99,9 @@ class Engine {
             end_offset -= len_one_less;
 
 #if defined(QENTEM_SIMD_ENABLED) && (QENTEM_SIMD_ENABLED == 1)
-            _Number_T m_size = ((((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
-                                Platform::SIMD::Shift);
+            _Number_T m_size =
+                (_Number_T(((full_length > end_offset) ? (full_length - len_one_less) : end_offset) - offset) >>
+                 Platform::SIMD::Shift);
 
             if (m_size != _Number_T{0}) {
                 const _Char_T              *content_ofs     = (content + offset);

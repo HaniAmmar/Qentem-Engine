@@ -34,7 +34,7 @@ using SizeT64I = long long;
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
-using SizeT = SizeT32;
+using SizeT = SizeT16;
 #endif
 
 #ifndef QENTEM_ENABLE_FLOAT_16

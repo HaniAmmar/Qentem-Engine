@@ -346,7 +346,7 @@ static void TestArray3(QTest &helper) {
     numbers1 += 4;
     numbers1 += 2;
 
-    SizeT32 *storage = numbers1.Storage();
+    SizeT *storage = numbers1.Storage();
     numbers1.Swap(storage[3], storage[6]);
     numbers1.Swap(storage[0], storage[6]);
     numbers1.Swap(storage[3], storage[1]);

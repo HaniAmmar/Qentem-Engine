@@ -935,13 +935,13 @@ struct TemplateSub {
 
         SizeT offset2     = getQuotedValue(offset, loop_content_offset);
         SizeT last_offset = offset;
-        offset -= 6U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
+        offset = SizeT(offset - SizeT{6}); // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
         while ((offset2 != SizeT{0}) && (offset < loop_content_offset)) {
             switch (_content[offset]) {
                 case TagPatterns::SetChar: {
                     const SizeT set_offset = last_offset;
-                    const SizeT set_length = ((offset2 - SizeT{1}) - last_offset);
+                    const SizeT set_length = SizeT((offset2 - SizeT{1}) - last_offset);
 
                     VariableTag set_var{};
                     parseVariableTag(set_offset, (set_offset + set_length), set_var);
@@ -1012,7 +1012,7 @@ struct TemplateSub {
         SizeT true_end_offset  = 0;
         SizeT false_end_offset = 0;
 
-        offset -= 5U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
+        offset = SizeT(offset - SizeT{5}); // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
         while ((offset2 != SizeT{0}) && (offset < end_offset)) {
             switch (_content[offset]) {
@@ -1021,7 +1021,7 @@ struct TemplateSub {
                     offset      = offset2;
                     offset2     = getQuotedValue(offset, end_offset);
                     last_offset = offset;
-                    offset -= 5U;
+                    offset      = SizeT(offset - SizeT{5});
                     break;
                 }
 
@@ -1031,7 +1031,7 @@ struct TemplateSub {
                     offset          = offset2;
                     offset2         = getQuotedValue(offset, end_offset);
                     last_offset     = offset;
-                    offset -= 5U;
+                    offset          = SizeT(offset - SizeT{5});
                     break;
                 }
 
@@ -1041,7 +1041,7 @@ struct TemplateSub {
                     offset           = offset2;
                     offset2          = getQuotedValue(offset, end_offset);
                     last_offset      = offset;
-                    offset -= 5U;
+                    offset           = SizeT(offset - SizeT{5});
                     break;
                 }
 
@@ -1101,7 +1101,7 @@ struct TemplateSub {
 
                 parse(sub_tags, content_offset, (else_offset - TagPatterns::ElsePrefixLength));
                 tag.Cases += IfTagCase{parseExpressions(offset, case_end_offset), Memory::Move(sub_tags),
-                                       content_offset, (else_offset - TagPatterns::ElsePrefixLength)};
+                                       content_offset, SizeT(else_offset - TagPatterns::ElsePrefixLength)};
 
                 if ((_content[else_offset] != TagPatterns::ElseIfChar)) {
                     else_offset = Engine::FindOne<_Char_T>(TagPatterns::MultiLineSuffix, _content, else_offset,
