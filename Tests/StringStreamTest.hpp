@@ -270,8 +270,8 @@ static void TestStringStream(QTest &helper) {
     helper.Equal(ss2, "12345678", "StringStream", __LINE__);
 
     struct SimpleStream {
-        char          str[16]{0};
-        const SizeT32 max = 16U;
+        char          str[32]{0};
+        const SizeT32 max = 32U;
         SizeT32       index{0};
 
         void operator<<(const char *string) noexcept {
@@ -296,10 +296,12 @@ static void TestStringStream(QTest &helper) {
     helper.Equal(ss2, "1234567812345678", "StringStream", __LINE__);
     helper.Equal(ss2.Capacity(), SizeT{32}, "Capacity", __LINE__);
 
+    ss2 << "1234567812345678";
     sis.index = SizeT{0};
     sis << ss2;
 
-    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "1234567812345678", SizeT{16}), "SimpleStream", __LINE__);
+    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678123456781234567812345678", SizeT{32}),
+                      "SimpleStream", __LINE__);
 
     ss2.StepBack(1);
     sis.index = SizeT{0};
