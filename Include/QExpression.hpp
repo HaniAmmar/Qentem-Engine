@@ -716,14 +716,7 @@ struct QExpression {
         }
     }
 
-    // struct _Bucket {
-    //     SizeT            padding1{0};
-    //     SizeT            padding2{0};
-    //     QPointer<SizeT> *padding3{};
-    // };
-
     union {
-        // _Bucket           _bucket;
         Array<QExpression> SubExpressions{};
         ExpressionValue    Number;
         Tags::VariableTag  Variable; // {var:...}
