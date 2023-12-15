@@ -894,13 +894,15 @@ struct Digit {
         SizeT32       power;
 
         if (is_positive_exp) {
-            length = (stream_length +
-                      ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
-                      fraction_length);
-            power  = (length - SizeT32{1});
+            length = SizeT32(
+                stream_length +
+                ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
+                fraction_length);
+            power = (length - SizeT32{1});
         } else {
-            length = stream_length;
-            power = (((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT32{0}) + SizeT32{1});
+            length = SizeT32(stream_length);
+            power  = SizeT32(((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT32{0}) +
+                             SizeT32{1});
         }
 
         if (stream_length > precision_plus_one) {
