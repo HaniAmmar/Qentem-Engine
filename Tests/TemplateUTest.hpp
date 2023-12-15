@@ -2595,6 +2595,18 @@ static void TestInlineIfUTag(QTest &helper) {
         uR"({if case=" {var:4}-{var:3} != {var:2} " true="{math: {var:3}+{var:4} } " false=" {math: {var:2}+{var:4} } "})";
     helper.Equal(Template::Render(content, value2, ss), uR"( 25 )", render, __LINE__);
     ss.Clear();
+
+    content = uR"({if case="1" true="{v}" false="F"})";
+    helper.Equal(Template::Render(content, value, ss), uR"({v})", render, __LINE__);
+    ss.Clear();
+
+    content = uR"({if case="1" true="{r}" false="F"})";
+    helper.Equal(Template::Render(content, value, ss), uR"({r})", render, __LINE__);
+    ss.Clear();
+
+    content = uR"({if case="1" true="{m}" false="F"})";
+    helper.Equal(Template::Render(content, value, ss), uR"({m})", render, __LINE__);
+    ss.Clear();
 }
 
 static void TestLoopUTag1(QTest &helper) {

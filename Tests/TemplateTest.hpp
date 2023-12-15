@@ -2588,6 +2588,18 @@ static void TestInlineIfTag(QTest &helper) {
         R"({if case=" {var:4}-{var:3} != {var:2} " true="{math: {var:3}+{var:4} } " false=" {math: {var:2}+{var:4} } "})";
     helper.Equal(Template::Render(content, value2, ss), R"( 25 )", render, __LINE__);
     ss.Clear();
+
+    content = R"({if case="1" true="{v}" false="F"})";
+    helper.Equal(Template::Render(content, value, ss), R"({v})", render, __LINE__);
+    ss.Clear();
+
+    content = R"({if case="1" true="{r}" false="F"})";
+    helper.Equal(Template::Render(content, value, ss), R"({r})", render, __LINE__);
+    ss.Clear();
+
+    content = R"({if case="1" true="{m}" false="F"})";
+    helper.Equal(Template::Render(content, value, ss), R"({m})", render, __LINE__);
+    ss.Clear();
 }
 
 static void TestLoopTag1(QTest &helper) {
