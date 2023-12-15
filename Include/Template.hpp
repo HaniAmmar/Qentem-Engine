@@ -278,7 +278,7 @@ struct TemplateSub {
     using LoopTagOptions  = Tags::LoopTagOptions;
     using InLineIfTag     = Tags::InLineIfTag;
     using IfTagCase       = Tags::IfTagCase;
-    using IfTag           = Array<IfTagCase>;
+    using IfTag           = Tags::IfTag;
     using TagBit          = Tags::TagBit;
     using QExpressions    = Array<QExpression>;
     using QOperation      = QExpression::QOperation;
@@ -288,49 +288,8 @@ struct TemplateSub {
 
   public:
     void Render(const TagBit *tag, const TagBit *end) const {
-        while (tag < end) {
-            switch (tag->GetType()) {
-                case TagType::Variable: {
-                    renderVariable(tag->GeVariableTag());
-                    break;
-                }
-
-                case TagType::RawVariable: {
-                    renderRawVariable(tag->GeRawVariableTag());
-                    break;
-                }
-
-                case TagType::Math: {
-                    renderMath(tag->GetMathTag());
-                    break;
-                }
-
-                case TagType::Loop: {
-                    renderLoop(tag->GetLoopTag());
-                    break;
-                }
-
-                case TagType::InLineIf: {
-                    renderInLineIf(tag->GetInLineIfTag());
-                    break;
-                }
-
-                case TagType::If: {
-                    renderIf(tag->GetIfTag());
-                    break;
-                }
-
-                case TagType::RawText: {
-                    renderRawText(tag);
-                    break;
-                }
-
-                default: {
-                }
-            }
-
-            ++tag;
-        }
+        SizeT offset{0};
+        render(tag, end, offset, _length);
     }
 
     inline void Parse(Array<TagBit> &tags_cache) const {
@@ -352,33 +311,74 @@ struct TemplateSub {
     }
 
   private:
-    void parse(Array<TagBit> &tags_cache, SizeT offset, const SizeT end_offset) const {
-        SizeT last_offset = offset;
+    void render(const TagBit *tag, const TagBit *end, SizeT offset, SizeT end_offset) const {
+        while (tag < end) {
+            switch (tag->GetType()) {
+                case TagType::Variable: {
+                    renderVariable(tag->GeVariableTag(), offset);
+                    break;
+                }
 
+                case TagType::RawVariable: {
+                    renderRawVariable(tag->GeRawVariableTag(), offset);
+                    break;
+                }
+
+                case TagType::Math: {
+                    renderMath(tag->GetMathTag(), offset);
+                    break;
+                }
+
+                case TagType::Loop: {
+                    renderLoop(tag->GetLoopTag(), offset);
+                    break;
+                }
+
+                case TagType::InLineIf: {
+                    renderInLineIf(tag->GetInLineIfTag(), offset);
+                    break;
+                }
+
+                case TagType::If: {
+                    renderIf(tag->GetIfTag(), offset);
+                    break;
+                }
+
+                default: {
+                }
+            }
+
+            ++tag;
+        }
+
+        _stream->Write((_content + offset), (end_offset - offset));
+    }
+
+    void parse(Array<TagBit> &tags_cache, SizeT offset, const SizeT end_offset) const {
         while (offset < end_offset) {
             if (_content[offset] == TagPatterns::InLinePrefix) {
-                const SizeT current_offset = (offset + SizeT{1});
+                SizeT current_offset = offset;
+                ++current_offset;
 
                 switch (_content[current_offset]) {
                     case TagPatterns::Var_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::VariablePrefix + SizeT{2}),
-                                                 (_content + current_offset + SizeT{1}),
-                                                 (TagPatterns::VariablePrefixLength - SizeT{2}))) {
-                            const SizeT v_end_offset = Engine::FindOne<_Char_T>(
-                                TagPatterns::InLineSuffix, _content,
-                                SizeT(current_offset + TagPatterns::VariablePrefixLength), end_offset, _length);
+                        static constexpr const _Char_T *var_prefix_p_2 = (TagPatterns::VariablePrefix + SizeT{2});
+                        constexpr SizeT var_prefix_length_m_2          = (TagPatterns::VariablePrefixLength - SizeT{2});
+                        constexpr SizeT var_prefix_length_m_1          = (TagPatterns::VariablePrefixLength - SizeT{1});
+                        ++current_offset;
 
-                            if (v_end_offset != SizeT{0}) {
-                                if (last_offset != offset) {
-                                    tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
-                                }
+                        if (StringUtils::IsEqual(var_prefix_p_2, (_content + current_offset), var_prefix_length_m_2)) {
+                            current_offset += var_prefix_length_m_1;
+                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                      current_offset, end_offset, _length);
+
+                            if (current_offset != SizeT{0}) {
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
 
                                 offset += TagPatterns::VariablePrefixLength;
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
-                                parseVariableTag(offset, (v_end_offset - TagPatterns::InLineSuffixLength),
+                                parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GeVariableTag());
-                                last_offset = v_end_offset;
-                                offset      = v_end_offset;
+                                offset = current_offset;
                                 continue;
                             }
                         }
@@ -387,24 +387,24 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::Raw_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::RawVariablePrefix + SizeT{2}),
-                                                 (_content + current_offset + SizeT{1}),
-                                                 (TagPatterns::RawVariablePrefixLength - SizeT{2}))) {
-                            const SizeT r_end_offset = Engine::FindOne<_Char_T>(
-                                TagPatterns::InLineSuffix, _content,
-                                SizeT(current_offset + TagPatterns::RawVariablePrefixLength), end_offset, _length);
+                        static constexpr const _Char_T *r_var_prefix_p_2 = (TagPatterns::RawVariablePrefix + SizeT{2});
+                        constexpr SizeT r_var_prefix_length_m_2 = (TagPatterns::RawVariablePrefixLength - SizeT{2});
+                        constexpr SizeT r_var_prefix_length_m_1 = (TagPatterns::RawVariablePrefixLength - SizeT{1});
+                        ++current_offset;
 
-                            if (r_end_offset != SizeT{0}) {
-                                if (last_offset != offset) {
-                                    tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
-                                }
+                        if (StringUtils::IsEqual(r_var_prefix_p_2, (_content + current_offset),
+                                                 r_var_prefix_length_m_2)) {
+                            current_offset += r_var_prefix_length_m_1;
+                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                      current_offset, end_offset, _length);
+
+                            if (current_offset != SizeT{0}) {
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
 
                                 offset += TagPatterns::RawVariablePrefixLength;
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
-                                parseVariableTag(offset, (r_end_offset - TagPatterns::InLineSuffixLength),
+                                parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
                                                  tag.GeRawVariableTag());
-                                last_offset = r_end_offset;
-                                offset      = r_end_offset;
+                                offset = current_offset;
                                 continue;
                             }
                         }
@@ -413,24 +413,22 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::Math_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::MathPrefix + SizeT{2}),
-                                                 (_content + current_offset + SizeT{1}),
-                                                 (TagPatterns::MathPrefixLength - SizeT{2}))) {
-                            const SizeT m_end_offset = Engine::SkipInnerPatterns<_Char_T>(
-                                TagPatterns::InLinePrefix, TagPatterns::InLineSuffix, _content,
-                                SizeT(current_offset + TagPatterns::MathPrefixLength - SizeT{1}), end_offset, _length);
+                        static constexpr const _Char_T *math_prefix_p_2 = (TagPatterns::MathPrefix + SizeT{2});
+                        constexpr SizeT math_prefix_length_m_2          = (TagPatterns::MathPrefixLength - SizeT{2});
+                        ++current_offset;
 
-                            if (m_end_offset != SizeT{0}) {
-                                if (last_offset != offset) {
-                                    tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
-                                }
+                        if (StringUtils::IsEqual(math_prefix_p_2, (_content + current_offset),
+                                                 math_prefix_length_m_2)) {
+                            current_offset += math_prefix_length_m_2;
+                            current_offset =
+                                Engine::SkipInnerPatterns<_Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                   _content, current_offset, end_offset, _length);
 
-                                offset += TagPatterns::MathPrefixLength;
+                            if (current_offset != SizeT{0}) {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
-                                parseMathTag(offset, (m_end_offset - TagPatterns::InLineSuffixLength),
-                                             tag.GetMathTag());
-                                last_offset = m_end_offset;
-                                offset      = m_end_offset;
+
+                                parseMathTag(offset, current_offset, tag.GetMathTag());
+                                offset = current_offset;
                                 continue;
                             }
                         }
@@ -439,25 +437,22 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::InlineIf_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::InLineIfPrefix + SizeT{2}),
-                                                 (_content + current_offset + SizeT{1}),
-                                                 (TagPatterns::InLineIfPrefixLength - SizeT{2}))) {
-                            const SizeT ii_end_offset = Engine::SkipInnerPatterns<_Char_T>(
-                                TagPatterns::InLinePrefix, TagPatterns::InLineSuffix, _content,
-                                SizeT(current_offset + TagPatterns::InLineIfPrefixLength - SizeT{1}), end_offset,
-                                _length);
+                        static constexpr const _Char_T *ii_if_prefix_p_2 = (TagPatterns::InLineIfPrefix + SizeT{2});
+                        constexpr SizeT ii_if_prefix_length_m_2 = (TagPatterns::InLineIfPrefixLength - SizeT{2});
+                        ++current_offset;
 
-                            if (ii_end_offset != SizeT{0}) {
-                                if (last_offset != offset) {
-                                    tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
-                                }
+                        if (StringUtils::IsEqual(ii_if_prefix_p_2, (_content + current_offset),
+                                                 ii_if_prefix_length_m_2)) {
+                            current_offset += ii_if_prefix_length_m_2;
+                            current_offset =
+                                Engine::SkipInnerPatterns<_Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                   _content, current_offset, end_offset, _length);
 
-                                offset += TagPatterns::InLineIfPrefixLength;
+                            if (current_offset != SizeT{0}) {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::InLineIf});
-                                parseInLineIfTag(offset, (ii_end_offset - TagPatterns::InLineSuffixLength),
-                                                 tag.GetInLineIfTag());
-                                last_offset = ii_end_offset;
-                                offset      = ii_end_offset;
+
+                                parseInLineIfTag(offset, current_offset, tag.GetInLineIfTag());
+                                offset = current_offset;
                                 continue;
                             }
                         }
@@ -469,47 +464,44 @@ struct TemplateSub {
                     }
                 }
             } else if (_content[offset] == TagPatterns::MultiLinePrefix) { // <loop or <if
-                const SizeT current_offset = (offset + SizeT{1});
+                SizeT current_offset = offset;
+                ++current_offset;
 
                 if (_content[current_offset] == TagPatterns::Loop_2ND_Char) { // <loop
-                    if (StringUtils::IsEqual((TagPatterns::LoopPrefix + SizeT{2}),
-                                             (_content + current_offset + SizeT{1}),
-                                             (TagPatterns::LoopPrefixLength - SizeT{2}))) {
-                        const SizeT l_end_offset = Engine::SkipInnerPatterns<_Char_T>(
+                    static constexpr const _Char_T *loop_prefix_p_2        = (TagPatterns::LoopPrefix + SizeT{2});
+                    constexpr SizeT                 loop_prefix_length_m_2 = (TagPatterns::LoopPrefixLength - SizeT{2});
+                    ++current_offset;
+
+                    if (StringUtils::IsEqual(loop_prefix_p_2, (_content + current_offset), loop_prefix_length_m_2)) {
+                        current_offset += loop_prefix_length_m_2;
+                        current_offset = Engine::SkipInnerPatterns<_Char_T>(
                             TagPatterns::LoopPrefix, TagPatterns::LoopPrefixLength, TagPatterns::LoopSuffix,
-                            TagPatterns::LoopSuffixLength, _content,
-                            SizeT(current_offset + TagPatterns::InLineIfPrefixLength - SizeT{1}), end_offset, _length);
+                            TagPatterns::LoopSuffixLength, _content, current_offset, end_offset, _length);
 
-                        if (l_end_offset != SizeT{0}) {
-                            if (last_offset != offset) {
-                                tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
-                            }
-
-                            offset += TagPatterns::InLineIfPrefixLength;
+                        if (current_offset != SizeT{0}) {
                             const TagBit &tag = tags_cache.Insert(TagBit{TagType::Loop});
-                            parseLoopTag(offset, (l_end_offset - TagPatterns::LoopSuffixLength), tag.GetLoopTag());
-                            last_offset = l_end_offset;
-                            offset      = l_end_offset;
+
+                            parseLoopTag(offset, current_offset, tag.GetLoopTag());
+                            offset = current_offset;
                             continue;
                         }
                     }
                 } else if (_content[current_offset] == TagPatterns::If_2ND_Char) { // <if
-                    if (StringUtils::IsEqual((TagPatterns::IfPrefix + SizeT{2}), (_content + current_offset + SizeT{1}),
-                                             (TagPatterns::IfPrefixLength - SizeT{2}))) {
-                        const SizeT i_end_offset = Engine::SkipInnerPatterns<_Char_T>(
+                    static constexpr const _Char_T *if_prefix_p_2        = (TagPatterns::IfPrefix + SizeT{2});
+                    constexpr SizeT                 if_prefix_length_m_2 = (TagPatterns::IfPrefixLength - SizeT{2});
+                    ++current_offset;
+
+                    if (StringUtils::IsEqual(if_prefix_p_2, (_content + current_offset), if_prefix_length_m_2)) {
+                        current_offset += if_prefix_length_m_2;
+                        current_offset = Engine::SkipInnerPatterns<_Char_T>(
                             TagPatterns::IfPrefix, TagPatterns::IfPrefixLength, TagPatterns::IfSuffix,
                             TagPatterns::IfSuffixLength, _content, current_offset, end_offset, _length);
 
-                        if (i_end_offset != SizeT{0}) {
-                            if (last_offset != offset) {
-                                tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
-                            }
-
-                            offset += TagPatterns::IfPrefixLength;
+                        if (current_offset != SizeT{0}) {
                             const TagBit &tag = tags_cache.Insert(TagBit{TagType::If});
-                            parseIfTag(offset, (i_end_offset - TagPatterns::IfSuffixLength), tag.GetIfTag());
-                            last_offset = i_end_offset;
-                            offset      = i_end_offset;
+
+                            parseIfTag(offset, current_offset, tag.GetIfTag());
+                            offset = current_offset;
                             continue;
                         }
                     }
@@ -518,89 +510,94 @@ struct TemplateSub {
 
             ++offset;
         }
-
-        if (last_offset != end_offset) {
-            tags_cache += TagBit{last_offset, SizeT(end_offset - last_offset)};
-        }
     }
 
     // Part of parse()
     void lightParse(Array<TagBit> &tags_cache, SizeT offset, const SizeT end_offset) const {
-        SizeT last_offset = offset;
-
         while (true) {
             offset = Engine::FindOne<_Char_T>(TagPatterns::InLinePrefix, _content, offset, end_offset, _length);
 
             if (offset != 0) {
                 switch (_content[offset]) {
                     case TagPatterns::Var_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::VariablePrefix + SizeT{2}),
-                                                 (_content + offset + SizeT{1}),
-                                                 (TagPatterns::VariablePrefixLength - SizeT{2}))) {
-                            const SizeT v_end_offset = Engine::FindOne<_Char_T>(
-                                TagPatterns::InLineSuffix, _content, SizeT(offset + TagPatterns::VariablePrefixLength),
-                                end_offset, _length);
-                            offset -= TagPatterns::InLinePrefixLength;
+                        static constexpr const _Char_T *var_prefix_p_2 = (TagPatterns::VariablePrefix + SizeT{2});
+                        constexpr SizeT var_prefix_length_m_2          = (TagPatterns::VariablePrefixLength - SizeT{2});
+                        constexpr SizeT var_prefix_length_m_1          = (TagPatterns::VariablePrefixLength - SizeT{1});
+                        SizeT           current_offset                 = offset;
+                        ++current_offset;
 
-                            if (last_offset != offset) {
-                                tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
+                        if (StringUtils::IsEqual(var_prefix_p_2, (_content + current_offset), var_prefix_length_m_2)) {
+                            current_offset += var_prefix_length_m_1;
+                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                      current_offset, end_offset, _length);
+
+                            if (current_offset != SizeT{0}) {
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
+
+                                offset -= TagPatterns::InLinePrefixLength;
+                                offset += TagPatterns::VariablePrefixLength;
+                                parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
+                                                 tag.GeVariableTag());
+                                offset = current_offset;
+                                continue;
                             }
-
-                            offset += TagPatterns::VariablePrefixLength;
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
-                            parseVariableTag(offset, (v_end_offset - TagPatterns::InLineSuffixLength),
-                                             tag.GeVariableTag());
-                            last_offset = v_end_offset;
-                            offset      = v_end_offset;
                         }
 
-                        continue;
+                        break;
                     }
 
                     case TagPatterns::Raw_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::RawVariablePrefix + SizeT{2}),
-                                                 (_content + offset + SizeT{1}),
-                                                 (TagPatterns::RawVariablePrefixLength - SizeT{2}))) {
-                            const SizeT r_end_offset = Engine::FindOne<_Char_T>(
-                                TagPatterns::InLineSuffix, _content,
-                                SizeT(offset + TagPatterns::RawVariablePrefixLength), end_offset, _length);
-                            offset -= TagPatterns::InLinePrefixLength;
+                        static constexpr const _Char_T *r_var_prefix_p_2 = (TagPatterns::RawVariablePrefix + SizeT{2});
+                        constexpr SizeT r_var_prefix_length_m_2 = (TagPatterns::RawVariablePrefixLength - SizeT{2});
+                        constexpr SizeT r_var_prefix_length_m_1 = (TagPatterns::RawVariablePrefixLength - SizeT{1});
+                        SizeT           current_offset          = offset;
+                        ++current_offset;
 
-                            if (last_offset != offset) {
-                                tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
+                        if (StringUtils::IsEqual(r_var_prefix_p_2, (_content + current_offset),
+                                                 r_var_prefix_length_m_2)) {
+                            current_offset += r_var_prefix_length_m_1;
+                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                      current_offset, end_offset, _length);
+
+                            if (current_offset != SizeT{0}) {
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
+
+                                offset -= TagPatterns::InLinePrefixLength;
+                                offset += TagPatterns::RawVariablePrefixLength;
+                                parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
+                                                 tag.GeRawVariableTag());
+                                offset = current_offset;
+                                continue;
                             }
-
-                            offset += TagPatterns::RawVariablePrefixLength;
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
-                            parseVariableTag(offset, (r_end_offset - TagPatterns::InLineSuffixLength),
-                                             tag.GeRawVariableTag());
-                            last_offset = r_end_offset;
-                            offset      = r_end_offset;
                         }
 
-                        continue;
+                        break;
                     }
 
                     case TagPatterns::Math_2ND_Char: {
-                        if (StringUtils::IsEqual((TagPatterns::MathPrefix + SizeT{2}), (_content + offset + SizeT{1}),
-                                                 (TagPatterns::MathPrefixLength - SizeT{2}))) {
-                            const SizeT m_end_offset = Engine::SkipInnerPatterns<_Char_T>(
-                                TagPatterns::InLinePrefix, TagPatterns::InLineSuffix, _content,
-                                SizeT(offset + TagPatterns::MathPrefixLength - SizeT{1}), end_offset, _length);
-                            offset -= TagPatterns::InLinePrefixLength;
+                        static constexpr const _Char_T *math_prefix_p_2 = (TagPatterns::MathPrefix + SizeT{2});
+                        constexpr SizeT math_prefix_length_m_2          = (TagPatterns::MathPrefixLength - SizeT{2});
+                        SizeT           current_offset                  = offset;
+                        ++current_offset;
 
-                            if (last_offset != offset) {
-                                tags_cache += TagBit{last_offset, SizeT(offset - last_offset)};
+                        if (StringUtils::IsEqual(math_prefix_p_2, (_content + current_offset),
+                                                 math_prefix_length_m_2)) {
+                            current_offset += math_prefix_length_m_2;
+                            current_offset =
+                                Engine::SkipInnerPatterns<_Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                   _content, current_offset, end_offset, _length);
+
+                            if (current_offset != SizeT{0}) {
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
+
+                                offset -= TagPatterns::InLinePrefixLength;
+                                parseMathTag(offset, current_offset, tag.GetMathTag());
+                                offset = current_offset;
+                                continue;
                             }
-
-                            offset += TagPatterns::MathPrefixLength;
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
-                            parseMathTag(offset, (m_end_offset - TagPatterns::InLineSuffixLength), tag.GetMathTag());
-                            last_offset = m_end_offset;
-                            offset      = m_end_offset;
                         }
 
-                        continue;
+                        break;
                     }
 
                     default: {
@@ -610,112 +607,107 @@ struct TemplateSub {
 
             break;
         }
-
-        if (last_offset != end_offset) {
-            tags_cache += TagBit{last_offset, SizeT(end_offset - last_offset)};
-        }
     }
 
-    static void escapeHTMLSpecialChars(_StringStream_T *stream, const _Char_T *str, SizeT length) {
-        SizeT offset = 0;
-        SizeT index  = 0;
+    static void escapeHTMLSpecialChars(_StringStream_T &stream, const _Char_T *str, SizeT length) {
+        if (Config::AutoEscapeHTML) {
+            SizeT offset = 0;
+            SizeT index  = 0;
 
-        while (index < length) {
-            switch (str[index]) {
-                case '&': {
-                    stream->Write((str + offset), (index - offset));
-                    stream->Write(TagPatterns::HTMLAnd, TagPatterns::HTMLAndLength);
-                    ++index;
-                    offset = index;
-                    break;
-                }
+            while (index < length) {
+                switch (str[index]) {
+                    case '&': {
+                        stream.Write((str + offset), (index - offset));
+                        stream.Write(TagPatterns::HTMLAnd, TagPatterns::HTMLAndLength);
+                        ++index;
+                        offset = index;
+                        break;
+                    }
 
-                case '<': {
-                    stream->Write((str + offset), (index - offset));
-                    stream->Write(TagPatterns::HTMLLess, TagPatterns::HTMLLessLength);
-                    ++index;
-                    offset = index;
-                    break;
-                }
+                    case '<': {
+                        stream.Write((str + offset), (index - offset));
+                        stream.Write(TagPatterns::HTMLLess, TagPatterns::HTMLLessLength);
+                        ++index;
+                        offset = index;
+                        break;
+                    }
 
-                case '>': {
-                    stream->Write((str + offset), (index - offset));
-                    stream->Write(TagPatterns::HTMLGreater, TagPatterns::HTMLGreaterLength);
-                    ++index;
-                    offset = index;
-                    break;
-                }
+                    case '>': {
+                        stream.Write((str + offset), (index - offset));
+                        stream.Write(TagPatterns::HTMLGreater, TagPatterns::HTMLGreaterLength);
+                        ++index;
+                        offset = index;
+                        break;
+                    }
 
-                case '"': {
-                    stream->Write((str + offset), (index - offset));
-                    stream->Write(TagPatterns::HTMLQuote, TagPatterns::HTMLQuoteLength);
-                    ++index;
-                    offset = index;
-                    break;
-                }
+                    case '"': {
+                        stream.Write((str + offset), (index - offset));
+                        stream.Write(TagPatterns::HTMLQuote, TagPatterns::HTMLQuoteLength);
+                        ++index;
+                        offset = index;
+                        break;
+                    }
 
-                case '\'': {
-                    stream->Write((str + offset), (index - offset));
-                    stream->Write(TagPatterns::HTMLSingleQuote, TagPatterns::HTMLSingleQuoteLength);
-                    ++index;
-                    offset = index;
-                    break;
-                }
+                    case '\'': {
+                        stream.Write((str + offset), (index - offset));
+                        stream.Write(TagPatterns::HTMLSingleQuote, TagPatterns::HTMLSingleQuoteLength);
+                        ++index;
+                        offset = index;
+                        break;
+                    }
 
-                default: {
-                    ++index;
+                    default: {
+                        ++index;
+                    }
                 }
             }
-        }
 
-        stream->Write((str + offset), (length - offset));
+            stream.Write((str + offset), (length - offset));
+        } else {
+            stream.Write(str, length);
+        }
     }
 
-    void renderVariable(const VariableTag &tag) const {
+    void renderVariable(const VariableTag &tag, SizeT &offset) const {
+        const SizeT t_offset = (tag.Offset - TagPatterns::VariablePrefixLength);
+        const SizeT length   = (tag.Length + TagPatterns::VariableFullLength);
+
+        _stream->Write((_content + offset), (t_offset - offset));
+        offset = t_offset;
+        offset += length;
+
         const _Value_T *value = getValue(tag);
 
-        if (value != nullptr) {
-            if (Config::AutoEscapeHTML) {
-                if (value->IsString()) {
-                    const _Char_T *str;
-                    SizeT          len;
-                    value->SetCharAndLength(str, len);
-                    escapeHTMLSpecialChars(_stream, str, len);
-                    return;
-                }
-            }
-
-            if (value->CopyValueTo(*_stream, Config::TemplatePrecision)) {
-                return;
-            }
-
-            if ((tag.IsLoopValue == 1) && (_loop_key != nullptr)) {
-                if (Config::AutoEscapeHTML) {
-                    escapeHTMLSpecialChars(_stream, _loop_key, _loop_key_length);
-                } else {
-                    _stream->Write(_loop_key, _loop_key_length);
-                }
-
-                return;
+        if ((value == nullptr) || !(value->CopyValueTo(*_stream, Config::TemplatePrecision, &escapeHTMLSpecialChars))) {
+            if ((_loop_key != nullptr) && (tag.IsLoopValue == SizeT8{1})) {
+                escapeHTMLSpecialChars(*_stream, _loop_key, _loop_key_length);
+            } else {
+                _stream->Write((_content + t_offset), length);
             }
         }
-
-        _stream->Write((_content + (tag.Offset - TagPatterns::VariablePrefixLength)),
-                       (tag.Length + TagPatterns::VariableFullLength));
     }
 
-    void renderRawVariable(const VariableTag &tag) const {
+    void renderRawVariable(const VariableTag &tag, SizeT &offset) const {
+        const SizeT t_offset = (tag.Offset - TagPatterns::RawVariablePrefixLength);
+        const SizeT length   = (tag.Length + TagPatterns::RawVariableFullLength);
+
+        _stream->Write((_content + offset), (t_offset - offset));
+        offset = t_offset;
+        offset += length;
+
         const _Value_T *value = getValue(tag);
 
         if ((value == nullptr) || !(value->CopyValueTo(*_stream, Config::TemplatePrecision))) {
-            _stream->Write((_content + (tag.Offset - TagPatterns::RawVariablePrefixLength)),
-                           (tag.Length + TagPatterns::RawVariableFullLength));
+            _stream->Write((_content + t_offset), length);
         }
     }
 
-    void renderMath(const MathTag &tag) const {
+    void renderMath(const MathTag &tag, SizeT &offset) const {
         const QExpression *expr = tag.Expressions.First();
         QExpression        result;
+
+        _stream->Write((_content + offset), (tag.Offset - offset));
+        offset = tag.EndOffset;
 
         if (tag.Expressions.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
             switch (result.Type) {
@@ -738,14 +730,17 @@ struct TemplateSub {
                 }
             }
         } else {
-            _stream->Write((_content + (tag.Offset - TagPatterns::MathPrefixLength)),
-                           ((tag.EndOffset - tag.Offset) + TagPatterns::MathFullLength));
+            _stream->Write((_content + tag.Offset), (tag.EndOffset - tag.Offset));
         }
     }
 
-    void renderLoop(const LoopTag &tag) const {
+    void renderLoop(const LoopTag &tag, SizeT &offset) const {
         _Value_T        grouped_set;
         const _Value_T *loop_set;
+
+        _stream->Write((_content + offset), (tag.Offset - offset));
+        offset = tag.EndOffset;
+        offset += TagPatterns::LoopSuffixLength;
 
         // Set (Array|Object)
         if (tag.SetLength != 0) {
@@ -794,7 +789,7 @@ struct TemplateSub {
                                                 loop_template._loop_key_length);
 
                     if (loop_template._loop_value != nullptr) {
-                        loop_template.Render(s_tag, s_end);
+                        loop_template.render(s_tag, s_end, tag.ContentOffset, tag.EndOffset);
                     }
 
                     ++loop_index;
@@ -804,7 +799,7 @@ struct TemplateSub {
                     loop_template._loop_value = loop_set->GetValue(loop_index);
 
                     if (loop_template._loop_value != nullptr) {
-                        loop_template.Render(s_tag, s_end);
+                        loop_template.render(s_tag, s_end, tag.ContentOffset, tag.EndOffset);
                     }
 
                     ++loop_index;
@@ -813,9 +808,13 @@ struct TemplateSub {
         }
     }
 
-    void renderInLineIf(const InLineIfTag &tag) const {
+    void renderInLineIf(const InLineIfTag &tag, SizeT &offset) const {
         const QExpression *expr = tag.Case.First();
         QExpression        result;
+
+        _stream->Write((_content + offset), (tag.Offset - offset));
+        offset = tag.Offset;
+        offset += tag.Length;
 
         if (tag.Case.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
             const TagBit *s_tag     = tag.SubTags.First();
@@ -827,25 +826,32 @@ struct TemplateSub {
             }
 
             if (result > 0U) {
-                if (true_size != SizeT{0}) {
-                    if (tag.SubTags.Size() != true_size) {
-                        s_end -= true_size;
-                    }
-
-                    Render(s_tag, s_end);
+                if (tag.SubTags.Size() != true_size) {
+                    s_end -= true_size;
                 }
+
+                const SizeT true_offset     = (tag.Offset + tag.TrueOffset);
+                const SizeT true_end_offset = (true_offset + tag.TrueLength);
+
+                render(s_tag, s_end, true_offset, true_end_offset);
             } else {
                 s_tag += true_size;
 
-                Render(s_tag, s_end);
+                const SizeT false_offset     = (tag.Offset + tag.FalseOffset);
+                const SizeT false_end_offset = (false_offset + tag.FalseLength);
+
+                render(s_tag, s_end, false_offset, false_end_offset);
             }
         }
     }
 
-    void renderIf(const IfTag &tag) const {
-        const IfTagCase *item = tag.First();
-        const IfTagCase *end  = (item + tag.Size());
+    void renderIf(const IfTag &tag, SizeT &offset) const {
+        const IfTagCase *item = tag.Cases.First();
+        const IfTagCase *end  = (item + tag.Cases.Size());
         QExpression      result;
+
+        _stream->Write((_content + offset), (tag.Offset - offset));
+        offset = tag.EndOffset;
 
         if ((item != nullptr) && item->Case.IsNotEmpty()) { // First case should not be empty
             do {
@@ -855,17 +861,13 @@ struct TemplateSub {
                 if (item->Case.IsEmpty() || (evaluate(result, expr, QOperation::NoOp) && (result > 0U))) {
                     const TagBit *s_tag = item->SubTags.First();
                     const TagBit *s_end = (s_tag + item->SubTags.Size());
-                    Render(s_tag, s_end);
+                    render(s_tag, s_end, item->Offset, item->EndOffset);
                     break;
                 }
 
                 ++item;
             } while (item < end);
         }
-    }
-
-    void renderRawText(const TagBit *tag) const {
-        _stream->Write((_content + tag->GetOffset()), SizeT(tag->GetLength()));
     }
 
     void parseVariableTag(SizeT offset, SizeT end_offset, VariableTag &tag) const noexcept {
@@ -895,10 +897,14 @@ struct TemplateSub {
         }
     }
 
-    void parseMathTag(const SizeT offset, const SizeT end_offset, MathTag &tag) const {
-        tag.Offset      = offset;
-        tag.EndOffset   = end_offset;
-        tag.Expressions = parseExpressions(tag.Offset, tag.EndOffset);
+    void parseMathTag(SizeT offset, SizeT end_offset, MathTag &tag) const {
+        tag.Offset    = offset;
+        tag.EndOffset = end_offset;
+
+        offset += TagPatterns::MathPrefixLength;
+        end_offset -= TagPatterns::InLineSuffixLength;
+
+        tag.Expressions = parseExpressions(offset, end_offset);
     }
 
     /*
@@ -915,11 +921,19 @@ struct TemplateSub {
     }
 
     void parseLoopTag(SizeT offset, SizeT end_offset, LoopTag &tag) const {
-        const SizeT loop_content_offset =
+        const SizeT16 level = (_level + 1);
+        const SizeT   loop_content_offset =
             Engine::FindOne<_Char_T>(TagPatterns::MultiLineSuffix, _content, offset, end_offset, _length);
 
+        TemplateSub loop_template{_content, _length, nullptr, nullptr, this, level};
+
+        tag.Offset = offset;
+        offset += TagPatterns::LoopPrefixLength;
+        end_offset -= TagPatterns::LoopSuffixLength;
+        tag.EndOffset     = end_offset;
+        tag.ContentOffset = loop_content_offset;
+
         SizeT offset2     = getQuotedValue(offset, loop_content_offset);
-        tag.Offset        = offset;
         SizeT last_offset = offset;
         offset -= 6U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
@@ -944,11 +958,13 @@ struct TemplateSub {
                 }
 
                 case TagPatterns::ValueChar: {
-                    tag.ValueOffset = SizeT8(last_offset - tag.Offset);
-                    tag.ValueLength = SizeT8((offset2 - SizeT{1}) - last_offset);
-                    offset          = offset2;
-                    offset2         = getQuotedValue(offset, loop_content_offset);
-                    last_offset     = offset;
+                    tag.ValueOffset                  = SizeT8(last_offset - tag.Offset);
+                    tag.ValueLength                  = SizeT8((offset2 - SizeT{1}) - last_offset);
+                    loop_template._loop_value_offset = last_offset;
+                    loop_template._loop_value_length = tag.ValueLength;
+                    offset                           = offset2;
+                    offset2                          = getQuotedValue(offset, loop_content_offset);
+                    last_offset                      = offset;
                     offset -= SizeT{6};
                     break;
                 }
@@ -979,21 +995,22 @@ struct TemplateSub {
             }
         }
 
-        const SizeT16 level = (_level + 1);
-        TemplateSub   loop_template{_content, _length, nullptr, nullptr, this, level};
-        loop_template._loop_value_offset = (tag.Offset + tag.ValueOffset);
-        loop_template._loop_value_length = tag.ValueLength;
         loop_template.parse(tag.SubTags, loop_content_offset, end_offset);
     }
 
     void parseInLineIfTag(SizeT offset, SizeT end_offset, InLineIfTag &tag) const {
-        SizeT true_offset      = 0;
-        SizeT true_end_offset  = 0;
-        SizeT false_offset     = 0;
-        SizeT false_end_offset = 0;
+        tag.Offset = offset;
+        tag.Length = SizeT16(end_offset - offset);
 
-        SizeT offset2     = getQuotedValue(offset, end_offset);
-        SizeT last_offset = offset;
+        offset += TagPatterns::InLineIfPrefixLength;
+        end_offset -= TagPatterns::InLineSuffixLength;
+
+        SizeT offset2          = getQuotedValue(offset, end_offset);
+        SizeT last_offset      = offset;
+        SizeT true_offset      = 0;
+        SizeT false_offset     = 0;
+        SizeT true_end_offset  = 0;
+        SizeT false_end_offset = 0;
 
         offset -= 5U; // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
 
@@ -1038,16 +1055,28 @@ struct TemplateSub {
             if (true_offset != true_end_offset) {
                 lightParse(tag.SubTags, true_offset, true_end_offset);
                 QExpression &expr   = tag.Case.Insert(QExpression{});
-                expr.Number.Natural = tag.SubTags.Size(); // To use only one heap for true and false.
+                expr.Number.Natural = tag.SubTags.Size(); // To use one heap for true and false.
+
+                tag.TrueOffset = SizeT16(true_offset - tag.Offset);
+                tag.TrueLength = SizeT16(true_end_offset - true_offset);
             }
 
             if (false_offset != false_end_offset) {
                 lightParse(tag.SubTags, false_offset, false_end_offset);
+
+                tag.FalseOffset = SizeT16(false_offset - tag.Offset);
+                tag.FalseLength = SizeT16(false_end_offset - false_offset);
             }
         }
     }
 
-    void parseIfTag(SizeT offset, const SizeT end_offset, IfTag &tag) const {
+    void parseIfTag(SizeT offset, SizeT end_offset, IfTag &tag) const {
+        tag.Offset    = offset;
+        tag.EndOffset = end_offset;
+
+        offset += TagPatterns::IfPrefixLength;
+        end_offset -= TagPatterns::IfSuffixLength;
+
         Array<TagBit> sub_tags;
         SizeT         offset2 = getQuotedValue(offset, end_offset);
         SizeT         case_end_offset;
@@ -1064,13 +1093,15 @@ struct TemplateSub {
 
                 if (else_offset == SizeT{0}) {
                     parse(sub_tags, content_offset, end_offset);
-                    tag.Insert(IfTagCase{Memory::Move(sub_tags), parseExpressions(offset, case_end_offset)});
+                    tag.Cases += IfTagCase{parseExpressions(offset, case_end_offset), Memory::Move(sub_tags),
+                                           content_offset, end_offset};
 
                     break;
                 }
 
                 parse(sub_tags, content_offset, (else_offset - TagPatterns::ElsePrefixLength));
-                tag.Insert(IfTagCase{Memory::Move(sub_tags), parseExpressions(offset, case_end_offset)});
+                tag.Cases += IfTagCase{parseExpressions(offset, case_end_offset), Memory::Move(sub_tags),
+                                       content_offset, (else_offset - TagPatterns::ElsePrefixLength)};
 
                 if ((_content[else_offset] != TagPatterns::ElseIfChar)) {
                     else_offset = Engine::FindOne<_Char_T>(TagPatterns::MultiLineSuffix, _content, else_offset,
@@ -1078,7 +1109,8 @@ struct TemplateSub {
 
                     if (else_offset != SizeT{0}) {
                         parse(sub_tags, else_offset, end_offset);
-                        tag.Insert(IfTagCase{Memory::Move(sub_tags), QExpressions{}}); // else without if
+                        tag.Cases += IfTagCase{QExpressions{}, Memory::Move(sub_tags), else_offset,
+                                               end_offset}; // else without if
                     }
 
                     break;
@@ -1125,7 +1157,7 @@ struct TemplateSub {
         return else_offset;
     }
 
-    const _Value_T *getValue(const VariableTag &variable) const noexcept {
+    inline const _Value_T *getValue(const VariableTag &variable) const noexcept {
         return getValue(variable.Offset, variable.Length, variable.Level, variable.IsLoopValue);
     }
 

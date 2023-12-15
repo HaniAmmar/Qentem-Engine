@@ -32,7 +32,7 @@ namespace Tags {
 struct MathTag;
 struct LoopTag;
 struct InLineIfTag;
-struct IfTagCase;
+struct IfTag;
 //////////////////////
 enum class TagType : SizeT8 {
     None = 0,
@@ -41,8 +41,7 @@ enum class TagType : SizeT8 {
     Math,        // {math:x}
     Loop,        // <loop ...></loop>
     InLineIf,    // {if x}
-    If,          // <if case="..."></if>
-    RawText
+    If           // <if case="..."></if>
 };
 
 struct TagBit {
@@ -52,15 +51,7 @@ struct TagBit {
     TagBit &operator=(const TagBit &) = delete;
     TagBit &operator=(TagBit &&)      = delete;
 
-    TagBit(TagBit &&tag) noexcept : _content{tag._content}, _type{tag._type} {
-        constexpr bool is_smaller = sizeof(_Content_T) < sizeof(void *);
-
-        if (is_smaller) {
-            if ((_type != TagType::RawText)) {
-                _info = tag._info;
-            }
-        }
-
+    TagBit(TagBit &&tag) noexcept : _info{tag._info}, _type{tag._type} {
         tag._type = TagType::None;
     }
 
@@ -88,16 +79,13 @@ struct TagBit {
             }
 
             case TagType::If: {
-                _info = Memory::AllocateInit<Array<IfTagCase>>();
+                _info = Memory::AllocateInit<IfTag>();
                 break;
             }
 
             default: {
             }
         }
-    }
-
-    TagBit(SizeT offset, SizeT length) noexcept : _content{offset, length}, _type{TagType::RawText} {
     }
 
     ~TagBit() {
@@ -127,7 +115,7 @@ struct TagBit {
             }
 
             case TagType::If: {
-                Memory::Dispose((Array<IfTagCase> *)(getInfo()));
+                Memory::Dispose((IfTag *)(getInfo()));
                 Memory::Deallocate(getInfo());
                 break;
             }
@@ -157,20 +145,12 @@ struct TagBit {
         return *(Memory::ChangePointer<InLineIfTag>(getInfo()));
     }
 
-    inline Array<IfTagCase> &GetIfTag() const noexcept {
-        return *(Memory::ChangePointer<Array<IfTagCase>>(getInfo()));
+    inline IfTag &GetIfTag() const noexcept {
+        return *(Memory::ChangePointer<IfTag>(getInfo()));
     }
 
     inline TagType GetType() const noexcept {
         return _type;
-    }
-
-    inline SizeT GetOffset() const noexcept {
-        return _content.offset;
-    }
-
-    inline SizeT GetLength() const noexcept {
-        return _content.length;
     }
 
   private:
@@ -178,16 +158,7 @@ struct TagBit {
         return _info;
     }
 
-    struct _Content_T {
-        SizeT offset;
-        SizeT length;
-    };
-
-    union {
-        void      *_info;
-        _Content_T _content{0, 0};
-    };
-
+    void   *_info;
     TagType _type{TagType::None};
 };
 
@@ -200,16 +171,18 @@ struct MathTag {
 
 // LoopTagOptions -------------------------------------------
 struct LoopTagOptions {
-    static constexpr SizeT8 None           = 0;
-    static constexpr SizeT8 SetIsLoopValue = 1;
-    static constexpr SizeT8 SortAscend     = 2;
-    static constexpr SizeT8 SortDescend    = 4;
+    static constexpr SizeT8 None{0};
+    static constexpr SizeT8 SetIsLoopValue{1};
+    static constexpr SizeT8 SortAscend{2};
+    static constexpr SizeT8 SortDescend{4};
 };
 
 // LoopTagOptions -------------------------------------------
 struct LoopTag {
     Array<TagBit> SubTags;
     SizeT         Offset;
+    SizeT         EndOffset;
+    SizeT         ContentOffset;
     SizeT8        SetOffset;
     SizeT8        SetLength;
     SizeT8        SetLevel;
@@ -222,14 +195,28 @@ struct LoopTag {
 
 // InLineIfTag -------------------------------------------
 struct InLineIfTag {
-    Array<TagBit>      SubTags;
     Array<QExpression> Case;
+    Array<TagBit>      SubTags;
+    SizeT              Offset;
+    SizeT16            Length;
+    SizeT16            TrueOffset;
+    SizeT16            TrueLength;
+    SizeT16            FalseOffset;
+    SizeT16            FalseLength;
 };
 
 // IfTag -------------------------------------------
 struct IfTagCase {
-    Array<TagBit>      SubTags;
     Array<QExpression> Case;
+    Array<TagBit>      SubTags;
+    SizeT              Offset;
+    SizeT              EndOffset;
+};
+
+struct IfTag {
+    Array<IfTagCase> Cases;
+    SizeT            Offset;
+    SizeT            EndOffset;
 };
 
 template <typename, SizeT32>
