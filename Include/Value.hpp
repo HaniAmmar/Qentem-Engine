@@ -1321,10 +1321,19 @@ class Value {
     }
 
     template <typename _StringStream_T>
-    bool CopyValueTo(_StringStream_T &stream, SizeT32 precision = Config::DoublePrecision) const {
+    using _CopyValueToStringFunction_T = void(_StringStream_T, const _Char_T *, SizeT);
+
+    template <typename _StringStream_T, typename _StringFunction_T = _CopyValueToStringFunction_T<_StringStream_T>>
+    bool CopyValueTo(_StringStream_T &stream, SizeT32 precision = Config::DoublePrecision,
+                     _StringFunction_T *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
-                stream.Write(_data.VString.First(), _data.VString.Length());
+                if (string_function != nullptr) {
+                    string_function(stream, _data.VString.First(), _data.VString.Length());
+                } else {
+                    stream.Write(_data.VString.First(), _data.VString.Length());
+                }
+
                 break;
             }
 
