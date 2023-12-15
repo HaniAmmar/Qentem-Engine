@@ -38,6 +38,7 @@
 
 namespace Qentem {
 
+#if (defined(_MSVC_LANG) && (_MSVC_LANG > 201703L)) || (defined(__cplusplus) && (__cplusplus > 201703L))
 std::wostream &operator<<(std::wostream &ss, const char16_t *str) {
     if (str != nullptr) {
         while (*str != char16_t{'\0'}) {
@@ -49,6 +50,7 @@ std::wostream &operator<<(std::wostream &ss, const char16_t *str) {
 
     return ss;
 }
+#endif
 
 struct TestOutPut {
     TestOutPut()                              = delete;
