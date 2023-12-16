@@ -46,50 +46,50 @@ struct StringStream {
         }
     }
 
-    StringStream(StringStream &&src) noexcept
-        : _length{src.Length()}, _capacity{src.Capacity()}, _storage{src.Storage()} {
-        src.setLength(SizeT{0});
-        src.setCapacity(SizeT{0});
-        src.clearStorage();
+    StringStream(StringStream &&stream) noexcept
+        : _storage{stream.Storage()}, _length{stream.Length()}, _capacity{stream.Capacity()} {
+        stream.setCapacity(SizeT{0});
+        stream.setLength(SizeT{0});
+        stream.clearStorage();
     }
 
-    StringStream(const StringStream &src) {
-        if (src.Length() != SizeT{0}) {
-            allocate(src.Length());
-            write(src.First(), src.Length());
+    StringStream(const StringStream &stream) {
+        if (stream.Length() != SizeT{0}) {
+            allocate(stream.Length());
+            write(stream.First(), stream.Length());
         }
     }
 
-    StringStream &operator=(StringStream &&src) noexcept {
-        if (this != &src) {
+    StringStream &operator=(StringStream &&stream) noexcept {
+        if (this != &stream) {
             Memory::Deallocate(Storage());
-            setStorage(src.Storage());
-            setLength(src.Length());
-            setCapacity(src.Capacity());
+            setStorage(stream.Storage());
+            setLength(stream.Length());
+            setCapacity(stream.Capacity());
 
-            src.setLength(SizeT{0});
-            src.setCapacity(SizeT{0});
-            src.clearStorage();
+            stream.setCapacity(SizeT{0});
+            stream.setLength(SizeT{0});
+            stream.clearStorage();
         }
 
         return *this;
     }
 
-    StringStream &operator=(const StringStream &src) {
-        if (this != &src) {
-            setLength(SizeT{0});
+    StringStream &operator=(const StringStream &stream) {
+        if (this != &stream) {
             setCapacity(SizeT{0});
+            setLength(SizeT{0});
             Memory::Deallocate(Storage());
             clearStorage();
-            write(src.First(), src.Length());
+            write(stream.First(), stream.Length());
         }
 
         return *this;
     }
 
     StringStream &operator=(const _Char_T *str) {
-        setLength(SizeT{0});
         setCapacity(SizeT{0});
+        setLength(SizeT{0});
         Memory::Deallocate(Storage());
         clearStorage();
         write(str, StringUtils::Count(str));
@@ -97,18 +97,21 @@ struct StringStream {
         return *this;
     }
 
-    StringStream &operator=(const String<_Char_T> &src) {
-        setLength(SizeT{0});
+    StringStream &operator=(const String<_Char_T> &string) {
         setCapacity(SizeT{0});
+        setLength(SizeT{0});
         Memory::Deallocate(Storage());
         clearStorage();
-        write(src.First(), src.Length());
+
+        const SizeT len = string.Length();
+        write(string.getStorage(len), len);
 
         return *this;
     }
 
     void operator+=(_Char_T one_char) {
         const SizeT len = Length();
+
         ++_length;
 
         if (Capacity() == len) {
@@ -118,12 +121,13 @@ struct StringStream {
         Storage()[len] = one_char;
     }
 
-    inline void operator+=(const StringStream<_Char_T> &src) {
-        write(src.First(), src.Length());
+    inline void operator+=(const StringStream<_Char_T> &stream) {
+        write(stream.First(), stream.Length());
     }
 
-    inline void operator+=(const String<_Char_T> &src) {
-        write(src.First(), src.Length());
+    inline void operator+=(const String<_Char_T> &string) {
+        const SizeT len = string.Length();
+        write(string.getStorage(len), len);
     }
 
     inline void operator+=(const _Char_T *str) {
@@ -131,14 +135,14 @@ struct StringStream {
     }
 
     template <typename _Stream_T>
-    friend _Stream_T &operator<<(_Stream_T &out, const StringStream &src) {
-        const SizeT len = src.Length();
+    friend _Stream_T &operator<<(_Stream_T &out, const StringStream &stream) {
+        const SizeT len = stream.Length();
 
-        if (src.Capacity() > len) {
-            src.Storage()[len] = _Char_T{0};
-            out << src.First();
+        if (stream.Capacity() > len) {
+            stream.Storage()[len] = _Char_T{0};
+            out << stream.First();
         } else {
-            StringStream n_src = src;
+            StringStream n_src = stream;
             n_src += _Char_T{0};
             out << n_src.First();
         }
@@ -146,13 +150,15 @@ struct StringStream {
         return out;
     }
 
-    inline friend StringStream &operator<<(StringStream &out, const StringStream &src) {
-        out.write(src.First(), src.Length());
+    inline friend StringStream &operator<<(StringStream &out, const StringStream &stream) {
+        out.write(stream.First(), stream.Length());
         return out;
     }
 
-    inline friend StringStream &operator<<(StringStream &out, const String<_Char_T> &src) {
-        out.write(src.First(), src.Length());
+    inline friend StringStream &operator<<(StringStream &out, const String<_Char_T> &string) {
+        const SizeT len = string.Length();
+
+        out.write(string.getStorage(len), len);
         return out;
     }
 
@@ -171,11 +177,14 @@ struct StringStream {
     }
 
     inline bool operator==(const String<_Char_T> &string) const noexcept {
-        return ((Length() == string.Length()) && StringUtils::IsEqual(First(), string.First(), Length()));
+        const SizeT len = string.Length();
+
+        return ((Length() == len) && StringUtils::IsEqual(First(), string.getStorage(len), Length()));
     }
 
     inline bool operator==(const _Char_T *str) const noexcept {
         const SizeT len = StringUtils::Count(str);
+
         return ((Length() == len) && StringUtils::IsEqual(First(), str, len));
     }
 
@@ -204,8 +213,8 @@ struct StringStream {
     }
 
     void Reset() noexcept {
-        setLength(SizeT{0});
         setCapacity(SizeT{0});
+        setLength(SizeT{0});
         Memory::Deallocate(Storage());
         clearStorage();
     }
@@ -269,8 +278,8 @@ struct StringStream {
     }
 
     _Char_T *Detach() noexcept {
-        setLength(SizeT{0});
         setCapacity(SizeT{0});
+        setLength(SizeT{0});
         _Char_T *str = Storage();
         clearStorage();
 
@@ -343,8 +352,8 @@ struct StringStream {
     inline _Char_T *end() noexcept {
         return (Storage() + Length());
     }
-    //////////// Private ////////////
 
+    //////////// Private ////////////
   private:
     void setStorage(_Char_T *new_storage) noexcept {
         _storage = new_storage;
@@ -383,16 +392,16 @@ struct StringStream {
     void expand(const SizeT new_capacity) {
         constexpr SizeT32 size    = sizeof(_Char_T);
         const SizeT       src_cap = Capacity();
-        _Char_T          *src     = Storage();
+        _Char_T          *str     = Storage();
         allocate(new_capacity);
 
-        Memory::Copy<size>(Storage(), src, (src_cap * size));
-        Memory::Deallocate(src);
+        Memory::Copy<size>(Storage(), str, (src_cap * size));
+        Memory::Deallocate(str);
     }
 
+    _Char_T *_storage{nullptr};
     SizeT    _length{0};
     SizeT    _capacity{0};
-    _Char_T *_storage{nullptr};
 };
 
 } // namespace Qentem
