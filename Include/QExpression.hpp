@@ -30,7 +30,7 @@ namespace Qentem {
 
 struct QExpression {
     // ExpressionType -------------------------------------------
-    enum class ExpressionType : SizeT8 {
+    enum struct ExpressionType : SizeT8 {
         Empty = 0,
         RealNumber,
         NaturalNumber,
@@ -41,7 +41,7 @@ struct QExpression {
     };
 
     // QOperation -------------------------------------------
-    enum class QOperation : SizeT8 {
+    enum struct QOperation : SizeT8 {
         NoOp = 0,
         Or,             // ||
         And,            // &&
@@ -76,13 +76,13 @@ struct QExpression {
     QExpression &operator=(const QExpression &) = delete;
     QExpression &operator=(QExpression &&)      = delete;
 
-    QExpression() noexcept : Number{}, Type{ExpressionType::Empty}, Operation{QOperation::NoOp} {};
+    QExpression() noexcept : Number{}, Operation{QOperation::NoOp}, Type{ExpressionType::Empty} {};
 
-    QExpression(ExpressionType type, QOperation operation) noexcept : Number{}, Type{type}, Operation{operation} {
+    QExpression(ExpressionType type, QOperation operation) noexcept : Number{}, Operation{operation}, Type{type} {
     }
 
     QExpression(Array<QExpression> &&subExpressions, QOperation operation) noexcept
-        : SubExpressions{Memory::Move(subExpressions)}, Type{ExpressionType::SubOperation}, Operation{operation} {
+        : SubExpressions{Memory::Move(subExpressions)}, Operation{operation}, Type{ExpressionType::SubOperation} {
     }
 
     ~QExpression() {
@@ -91,7 +91,7 @@ struct QExpression {
         }
     }
 
-    QExpression(QExpression &&expr) noexcept : Number{expr.Number}, Type{expr.Type}, Operation{expr.Operation} {
+    QExpression(QExpression &&expr) noexcept : Number{expr.Number}, Operation{expr.Operation}, Type{expr.Type} {
         expr.Type = ExpressionType::Empty;
         // expr.Number  = QExpression{};
     }
@@ -722,8 +722,8 @@ struct QExpression {
         Tags::VariableTag  Variable; // {var:...}
     };
 
-    ExpressionType Type;
     QOperation     Operation;
+    ExpressionType Type;
 };
 
 template <typename _Char_T>
