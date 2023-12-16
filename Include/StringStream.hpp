@@ -48,7 +48,7 @@ class StringStream {
     }
 
     StringStream(StringStream &&src) noexcept
-        : _storage{src.Storage()}, _length{src.Length()}, _capacity{src.Capacity()} {
+        : _length{src.Length()}, _capacity{src.Capacity()}, _storage{src.Storage()} {
         src.setLength(SizeT{0});
         src.setCapacity(SizeT{0});
         src.clearStorage();
@@ -391,9 +391,9 @@ class StringStream {
         Memory::Deallocate(src);
     }
 
-    _Char_T *_storage{nullptr};
     SizeT    _length{0};
     SizeT    _capacity{0};
+    _Char_T *_storage{nullptr};
 };
 
 } // namespace Qentem
