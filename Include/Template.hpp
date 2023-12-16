@@ -47,9 +47,9 @@ namespace Qentem {
  *      - var|e|n: Raw variable, Equation or Number.
  *
  *
- *  - {if case="var|s" true="var|var|s" false="var|var|s"}
+ *  - {if case="var|s" true="rvar|var|s" false="rvar|var|s"}
  *
- *      - Inline if,  var: Raw variable, var: Variable, s: String.
+ *      - Inline if,  rvar: Raw variable, var: Variable, s: String.
  *
  *
  *  <...>
