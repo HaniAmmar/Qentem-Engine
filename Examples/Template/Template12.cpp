@@ -14,17 +14,17 @@ int main() {
     {
         "major": "Computer Science",
         "students": [
-            { "Name": "Oliver", "GPA": 3.2 },
-            { "Name": "Jonah", "GPA": 3.8 },
-            { "Name": "Jack", "GPA": 2.8 }
+            { "Name": "Student1", "GPA": 3.2 },
+            { "Name": "Student2", "GPA": 3.8 },
+            { "Name": "Student3", "GPA": 2.8 }
         ]
     },
     {
         "major": "Math",
         "students": [
-            { "Name": "Maxim", "GPA": 3.0 },
-            { "Name": "Cole", "GPA": 2.5 },
-            { "Name": "Claire", "GPA": 2.4 }
+            { "Name": "Student4", "GPA": 3.0 },
+            { "Name": "Student5", "GPA": 2.5 },
+            { "Name": "Student6", "GPA": 2.4 }
         ]
     }
 ]
