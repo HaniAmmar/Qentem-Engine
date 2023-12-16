@@ -668,6 +668,9 @@ struct String {
         setLength(len);
     }
 
+    template <typename>
+    friend struct StringStream;
+
     static constexpr SizeT8                  _not_short_value = 255;
     StringData<_Char_T, Config::IsBigEndian> _data;
 };
