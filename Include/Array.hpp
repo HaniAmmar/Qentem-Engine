@@ -66,7 +66,7 @@ struct ArrayData<_Type_T, true> {
     // Big-Endian
     ArrayData() noexcept = default;
 
-    ArrayData(ArrayData &&src) noexcept : Storage{Memory::Move(src.Storage)}, Index{src.Index}, Capacity{src.Capacity} {
+    ArrayData(ArrayData &&src) noexcept : Storage{Memory::Move(src.Storage)}, Capacity{src.Capacity}, Index{src.Index} {
         src.Index    = SizeT{0};
         src.Capacity = SizeT{0};
     }
@@ -85,8 +85,8 @@ struct ArrayData<_Type_T, true> {
     }
 
     QPointer<_Type_T> Storage{};
-    SizeT             Index{0};
     SizeT             Capacity{0};
+    SizeT             Index{0};
 };
 
 template <typename _Type_T>

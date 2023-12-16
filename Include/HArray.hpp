@@ -102,7 +102,7 @@ struct HArrayData<_HAItem_T, true> {
     HArrayData() noexcept = default;
 
     HArrayData(HArrayData &&src) noexcept
-        : HashTable{Memory::Move(src.HashTable)}, Index{src.Index}, Capacity{src.Capacity} {
+        : HashTable{Memory::Move(src.HashTable)}, Capacity{src.Capacity}, Index{src.Index} {
         src.Index    = 0;
         src.Capacity = 0;
     }
@@ -127,8 +127,8 @@ struct HArrayData<_HAItem_T, true> {
     }
 
     QPointer<SizeT> HashTable{};
-    SizeT           Index{0};
     SizeT           Capacity{0};
+    SizeT           Index{0};
 };
 ///////////////////////////////////////////////
 template <typename _Value_T, typename _Char_T>
