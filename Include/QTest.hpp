@@ -50,6 +50,18 @@ std::wostream &operator<<(std::wostream &ss, const char16_t *str) {
 
     return ss;
 }
+
+std::wostream &operator<<(std::wostream &ss, const char32_t *str) {
+    if (str != nullptr) {
+        while (*str != char16_t{'\0'}) {
+            // it's fine for PrintErrorMessage().
+            ss << char(*str);
+            ++str;
+        }
+    }
+
+    return ss;
+}
 #endif
 
 struct TestOutPut {

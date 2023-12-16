@@ -62,9 +62,9 @@ static int PrintResult(int passed, int failed) {
 static void SelfTestLeak(QTest &helper, char *&ptr) {
     ptr = Memory::Allocate<char>(8U);
 
-    helper.EqualsTrue(false, "EqualsTrue", 1);
-    helper.EqualsFalse(true, "EqualsFalse", 2);
-    helper.Equal(true, false, "Equal2", 4);
+    helper.EqualsTrue(false, u"EqualsTrue", 1);
+    helper.EqualsFalse(true, L"EqualsFalse", 2);
+    helper.Equal(true, false, U"Equal2", 4);
     helper.Equal(true, false, "Equal1", true, 3);
     helper.NotEqual(true, true, "NotEqual1", 5);
     helper.NotEqual(true, true, "NotEqual2", true, 6);
