@@ -49,6 +49,8 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
     -   Data sorting.
     -   `Value` size: 16 bytes on 64-bit.
 
+**Note:** `iostream` is used in tests only at the moment.
+
 ## Requirements
 
 C++ 11+ compiler.
