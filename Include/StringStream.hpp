@@ -28,11 +28,10 @@
 namespace Qentem {
 
 /*
- * String Stream class without the null terminator.
+ * String Stream struct without the null terminator.
  */
 template <typename _Char_T>
-class StringStream {
-  public:
+struct StringStream {
     using CharType = _Char_T;
 
     StringStream() = default;

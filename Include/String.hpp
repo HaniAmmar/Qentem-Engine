@@ -103,8 +103,7 @@ struct StringData<_Char_T, true> {
 };
 
 template <typename _Char_T>
-class String {
-  public:
+struct String {
     using CharType = _Char_T;
 
     // Two numbers, and one pointer -2 for tagging bytes (see QPointer).
