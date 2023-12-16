@@ -45,7 +45,7 @@ struct StringData<_Char_T, false> {
     ~StringData() noexcept = default;
 
     StringData(StringData &&src) noexcept
-        : Padding{src.Padding}, Length{src.Length}, Storage{Memory::Move(src.Storage)} {
+        : Length{src.Length}, Padding{src.Padding}, Storage{Memory::Move(src.Storage)} {
         src.Length = 0;
     }
 
@@ -54,15 +54,15 @@ struct StringData<_Char_T, false> {
     StringData &operator=(const StringData &) = delete;
 
     inline _Char_T *GetShortStorage() noexcept {
-        return Memory::ChangePointer<_Char_T>(&Padding);
+        return Memory::ChangePointer<_Char_T>(&Length);
     }
 
     inline const _Char_T *GetShortStorage() const noexcept {
-        return Memory::ChangePointer<const _Char_T>(&Padding);
+        return Memory::ChangePointer<const _Char_T>(&Length);
     }
 
-    SizeT             Padding{0};
     SizeT             Length{0};
+    SizeT             Padding{0};
     QPointer<_Char_T> Storage{};
 };
 
@@ -157,8 +157,8 @@ class String {
             deallocate();
 
             if (Config::ShortStringOptimization) {
-                _data.Padding = src._data.Padding;
                 _data.Length  = src._data.Length;
+                _data.Padding = src._data.Padding;
                 setLength(src.Length());
             } else {
                 _data.Length = src._data.Length;
@@ -397,7 +397,7 @@ class String {
 
             if (Config::ShortStringOptimization) {
                 if (new_len <= ShortStringMax) {
-                    ns = Memory::ChangePointer<_Char_T>(&(_data.Padding));
+                    ns = _data.GetShortStorage();
 
                 } else {
                     ns = Memory::Allocate<_Char_T>(new_len);
