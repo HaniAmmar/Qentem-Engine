@@ -39,8 +39,6 @@ struct StringData;
 template <typename _Char_T>
 struct StringData<_Char_T, false> {
     // Little-Endian
-    static constexpr SizeT8 _not_short_value = 255;
-
     StringData() noexcept  = default;
     ~StringData() noexcept = default;
 
@@ -69,8 +67,6 @@ struct StringData<_Char_T, false> {
 template <typename _Char_T>
 struct StringData<_Char_T, true> {
     // Big-Endian
-    static constexpr SizeT8 _not_short_value = 255;
-
     StringData() noexcept  = default;
     ~StringData() noexcept = default;
 
@@ -156,9 +152,9 @@ struct String {
             deallocate();
 
             if (Config::ShortStringOptimization) {
-                _data.Length  = src._data.Length;
-                _data.Padding = src._data.Padding;
+                _data.Length = src._data.Length;
                 setLength(src.Length());
+                _data.Padding = src._data.Padding;
             } else {
                 _data.Length = src._data.Length;
             }
@@ -318,8 +314,8 @@ struct String {
 
     void Reset() noexcept {
         deallocate();
-        clearLength();
         clearStorage();
+        clearLength();
     }
 
     _Char_T *Detach() {
@@ -342,8 +338,8 @@ struct String {
             str = Storage();
         }
 
-        clearLength();
         clearStorage();
+        clearLength();
 
         return str;
     }
@@ -671,7 +667,8 @@ struct String {
     template <typename>
     friend struct StringStream;
 
-    static constexpr SizeT8                  _not_short_value = 255;
+    static constexpr SizeT8 _not_short_value = 255;
+
     StringData<_Char_T, Config::IsBigEndian> _data;
 };
 
