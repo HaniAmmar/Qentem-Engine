@@ -104,7 +104,7 @@ struct StringStream {
         clearStorage();
 
         const SizeT len = string.Length();
-        write(string.getStorage(len), len);
+        write(string.Storage(len), len);
 
         return *this;
     }
@@ -127,7 +127,7 @@ struct StringStream {
 
     inline void operator+=(const String<_Char_T> &string) {
         const SizeT len = string.Length();
-        write(string.getStorage(len), len);
+        write(string.Storage(len), len);
     }
 
     inline void operator+=(const _Char_T *str) {
@@ -158,7 +158,7 @@ struct StringStream {
     inline friend StringStream &operator<<(StringStream &out, const String<_Char_T> &string) {
         const SizeT len = string.Length();
 
-        out.write(string.getStorage(len), len);
+        out.write(string.Storage(len), len);
         return out;
     }
 
@@ -179,7 +179,7 @@ struct StringStream {
     inline bool operator==(const String<_Char_T> &string) const noexcept {
         const SizeT len = string.Length();
 
-        return ((Length() == len) && StringUtils::IsEqual(First(), string.getStorage(len), Length()));
+        return ((Length() == len) && StringUtils::IsEqual(First(), string.Storage(len), Length()));
     }
 
     inline bool operator==(const _Char_T *str) const noexcept {
