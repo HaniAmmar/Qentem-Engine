@@ -30,7 +30,7 @@
 
 namespace Qentem {
 
-enum class ValueType : SizeT8 {
+enum struct ValueType : SizeT8 {
     Undefined = 0,
     Object,
     Array,
@@ -319,13 +319,12 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
 };
 
 template <typename _Char_T>
-class Value {
+struct Value {
     using JSONotation = _JSONotation_T<_Char_T>;
     using VObjectT    = HArray<Value, _Char_T>;
     using VArrayT     = Array<Value>;
     using VStringT    = String<_Char_T>;
 
-  public:
     Value() noexcept  = default;
     ~Value() noexcept = default;
 
@@ -1263,8 +1262,9 @@ class Value {
         const VStringT *val = GetKey(index);
 
         if (val != nullptr) {
-            key    = val->First();
-            length = _Number_T(val->Length());
+            const SizeT len = val->Length();
+            key             = val->Storage(len);
+            length          = _Number_T(len);
             return true;
         }
 
@@ -1279,9 +1279,10 @@ class Value {
             value = nullptr;
 
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
-                value  = &(item->Value);
-                key    = item->Key.First();
-                length = _Number_T(item->Key.Length());
+                const SizeT len = item->Key.Length();
+                value           = &(item->Value);
+                key             = item->Key.Storage(len);
+                length          = _Number_T(len);
             }
         }
     }
@@ -1291,8 +1292,9 @@ class Value {
     bool SetCharAndLength(const _Char_T *&key, _Number_T &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
-                key    = _data.VString.First();
-                length = _Number_T{_data.VString.Length()};
+                const SizeT len = _data.VString.Length();
+                key             = _data.VString.Storage(len);
+                length          = _Number_T{len};
                 return true;
             }
 
@@ -1328,10 +1330,12 @@ class Value {
                      _StringFunction_T *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
+                const SizeT len = _data.VString.Length();
+
                 if (string_function != nullptr) {
-                    string_function(stream, _data.VString.First(), _data.VString.Length());
+                    string_function(stream, _data.VString.Storage(len), len);
                 } else {
-                    stream.Write(_data.VString.First(), _data.VString.Length());
+                    stream.Write(_data.VString.Storage(len), len);
                 }
 
                 break;
@@ -1485,7 +1489,7 @@ class Value {
             case ValueType::String: {
                 SizeT             offset = 0;
                 const SizeT       length = _data.VString.Length();
-                const QNumberType n_type = Digit::StringToNumber(number, _data.VString.First(), offset, length);
+                const QNumberType n_type = Digit::StringToNumber(number, _data.VString.Storage(length), offset, length);
 
                 if (offset == length) {
                     return n_type;
@@ -1553,7 +1557,8 @@ class Value {
     }
 
     inline void Remove(const VStringT &key) const noexcept {
-        Remove(key.First(), key.Length());
+        const SizeT length = _data.VString.Length();
+        Remove(key.Storage(length), length);
     }
 
     inline void Remove(const _Char_T *key) const noexcept {
@@ -1734,16 +1739,22 @@ class Value {
 
         stream += JSONotation::SCurlyChar;
 
-        for (const _V_item *h_item = obj.First(), *end = (h_item + obj.Size()); h_item != end; h_item++) {
+        const _V_item *h_item = obj.First();
+        const _V_item *end    = (h_item + obj.Size());
+
+        while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 stream += JSONotation::QuoteChar;
-                EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
+                const SizeT length = h_item->Key.Length();
+                EscapeJSON(h_item->Key.Storage(length), length, stream);
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 
                 stringifyValue(h_item->Value, stream, precision);
                 stream += JSONotation::CommaChar;
             }
+
+            ++h_item;
         }
 
         _Char_T *last = stream.Last();
@@ -1759,11 +1770,16 @@ class Value {
     static void stringifyArray(const VArrayT &arr, _Stream_T &stream, SizeT32 precision) {
         stream += JSONotation::SSquareChar;
 
-        for (const Value *item = arr.First(), *end = (item + arr.Size()); item != end; item++) {
+        const Value *item = arr.First();
+        const Value *end  = (item + arr.Size());
+
+        while (item != end) {
             if (!(item->IsUndefined())) {
                 stringifyValue(*item, stream, precision);
                 stream += JSONotation::CommaChar;
             }
+
+            ++item;
         }
 
         _Char_T *last = stream.Last();
