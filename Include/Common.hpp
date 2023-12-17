@@ -31,12 +31,31 @@ using SizeT16  = unsigned short;
 using SizeT32  = unsigned int;
 using SizeT64  = unsigned long long;
 using SizeT64I = long long;
+///////////////////////////////////////////////
+template <SizeT32>
+struct SystemIntTypeT {};
+
+template <>
+struct SystemIntTypeT<8U> {
+    // 64-bit
+    using _NumberType = SizeT64;
+    using _SizeType   = SizeT32;
+};
+
+template <>
+struct SystemIntTypeT<4U> {
+    // 32-bit
+    using _NumberType = SizeT32;
+    using _SizeType   = SizeT16;
+};
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
-using SizeT = SizeT32;
+using SizeT = typename SystemIntTypeT<sizeof(void *)>::_SizeType;
 #endif
 
+using SystemIntType = typename SystemIntTypeT<sizeof(void *)>::_NumberType;
+///////////////////////////////////////////////
 #ifndef QENTEM_ENABLE_FLOAT_16
 // Requires c++23
 #define QENTEM_ENABLE_FLOAT_16 0
@@ -54,7 +73,7 @@ using SizeT = SizeT32;
 #ifndef QENTEM_TEMPLATE_PRECISION
 #define QENTEM_TEMPLATE_PRECISION 3U
 #endif
-
+///////////////////////////////////////////////
 struct Config {
     static constexpr SizeT32 DoublePrecision{QENTEM_DOUBLE_PRECISION};
     static constexpr SizeT32 TemplatePrecision{QENTEM_TEMPLATE_PRECISION};
@@ -154,23 +173,8 @@ using FloatT16 = decltype(0.0F16);
 using BFloatT16 = decltype(0.0BF16);
 #endif
 ///////////////////////////////////////////////
-template <SizeT32>
-struct SystemIntTypeT {};
-
-template <>
-struct SystemIntTypeT<8U> {
-    using _NumberType = SizeT64;
-};
-
-template <>
-struct SystemIntTypeT<4U> {
-    using _NumberType = SizeT32;
-};
-
-using SystemIntType = typename SystemIntTypeT<Config::PointerSize>::_NumberType;
-
 enum struct QNumberType : SizeT8 {
-    NotANumber = 0,
+    NotANumber = 0, // NAN
     Real       = 1, // double
     Natural    = 2, // unsigned
     Integer    = 3  // signed
