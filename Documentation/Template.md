@@ -646,8 +646,6 @@ int main() {
         value["list"] += i;
     }
 
-    value["size"] = 5;
-
     const char *content = R"(<loop set="list" value="loop1-value">{var:loop1-value}</loop>)";
 
     std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
