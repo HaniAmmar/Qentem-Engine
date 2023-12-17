@@ -13,24 +13,23 @@ environment:
     appveyor_build_worker_image: Visual Studio 2019
     platform: x64
 
-  - job_name: Windows ARM
-    appveyor_build_worker_image: Visual Studio 2022
-    platform: ARM
+  # - job_name: Windows ARM
+  #   appveyor_build_worker_image: Visual Studio 2022
+  #   platform: ARM
 
-  - job_name: Windows x86
-    appveyor_build_worker_image: Visual Studio 2019
-    platform: x86
+  # - job_name: Windows x86
+  #   appveyor_build_worker_image: Visual Studio 2019
+  #   platform: x86
 
   - job_name: Linux x64
     appveyor_build_worker_image: Ubuntu2204
     platform: x64
 
+  - job_name: Linux x86
+    appveyor_build_worker_image: Ubuntu2204
+
   - job_name: macOS Monterey
     appveyor_build_worker_image: macos-monterey
-
-  # - job_name: Linux x86
-  #   appveyor_build_worker_image: Ubuntu2204
-  #   platform: x86
 
   - job_name: Codecov
     appveyor_build_worker_image: Ubuntu2204
@@ -53,33 +52,33 @@ for:
     test_script:
     - cmd: ctest -C Debug
 
-  -
-    matrix:
-      only:
-        - job_name: Windows ARM
+  # -
+  #   matrix:
+  #     only:
+  #       - job_name: Windows ARM
 
-    build_script:
-    - cmd: mkdir Build
-    - cmd: cd Build
-    - cmd: cmake ..
-    - cmd: cmake --build .
+  #   build_script:
+  #   - cmd: mkdir Build
+  #   - cmd: cd Build
+  #   - cmd: cmake ..
+  #   - cmd: cmake --build .
 
-    test_script:
-    - cmd: ctest -C Debug
+  #   test_script:
+  #   - cmd: ctest -C Debug
 
-  -
-    matrix:
-      only:
-        - job_name: Windows x86
+  # -
+  #   matrix:
+  #     only:
+  #       - job_name: Windows x86
 
-    build_script:
-    - cmd: mkdir Build
-    - cmd: cd Build
-    - cmd: cmake ..
-    - cmd: cmake --build .
+  #   build_script:
+  #   - cmd: mkdir Build
+  #   - cmd: cd Build
+  #   - cmd: cmake ..
+  #   - cmd: cmake --build .
 
-    test_script:
-    - cmd: ctest -C Debug
+  #   test_script:
+  #   - cmd: ctest -C Debug
 
   -
     matrix:
@@ -93,17 +92,21 @@ for:
     test_script:
     - sh: ./Build/QTest.bin
 
-  # -
-  #   matrix:
-  #     only:
-  #       - job_name: Linux x86
+  -
+    matrix:
+      only:
+        - job_name: Linux x86
 
-  #   build_script:
-  #   - sh: mkdir Build
-  #   - sh: g++ -std=c++11 -g -O0 -m32 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+    install:
+      - sudo apt update
+      - sudo apt -y install g++-multilib
 
-  #   test_script:
-  #   - sh: ./Build/QTest.bin
+    build_script:
+    - sh: mkdir Build
+    - sh: g++ -std=c++11 -g -O0 -m32 -Wall -Wextra -fno-exceptions -march=native ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
+
+    test_script:
+    - sh: ./Build/QTest.bin
 
   -
     matrix:
@@ -123,7 +126,7 @@ for:
         - job_name: Codecov
 
     install:
-      - sudo apt install --yes lcov
+      - sudo apt -y install lcov
     build_script:
     - sh: mkdir Build
     - sh: g++ -std=c++20 -g -O0 --coverage -fPIC -fprofile-arcs -ftest-coverage -fno-inline -fno-exceptions -march=native -D QENTEM_SSE2=1 ./Tests/Test.cpp -I ./Include -o ./Build/QTest.bin
