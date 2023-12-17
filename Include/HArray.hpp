@@ -68,8 +68,8 @@ struct HArrayData<_HAItem_T, false> {
 
     HArrayData(HArrayData &&src) noexcept
         : Index{src.Index}, Capacity{src.Capacity}, HashTable{Memory::Move(src.HashTable)} {
-        src.Index    = 0;
         src.Capacity = 0;
+        src.Index    = 0;
     }
 
     HArrayData(const HArrayData &)            = delete;
@@ -156,8 +156,8 @@ struct HArray {
             SizeT      *ht      = _data.GetHashTable();
             const SizeT size    = Size();
 
-            setSize(src.Size());
             setCapacity(src.Capacity());
+            setSize(src.Size());
             src.setSize(SizeT{0});
             src.setCapacity(SizeT{0});
             _data.HashTable.MovePointerOnly(src._data.HashTable);
@@ -214,10 +214,10 @@ struct HArray {
             ++src_item;
         }
 
-        src.setCapacity(SizeT{0});
-        src.setSize(SizeT{0});
         Memory::Deallocate(src._data.GetHashTable());
         src.clearHashTable();
+        src.setCapacity(SizeT{0});
+        src.setSize(SizeT{0});
     }
 
     void operator+=(const HArray &src) {

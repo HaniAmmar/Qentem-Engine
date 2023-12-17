@@ -39,8 +39,8 @@ struct ArrayData<_Type_T, false> {
     ArrayData() noexcept = default;
 
     ArrayData(ArrayData &&src) noexcept : Index{src.Index}, Capacity{src.Capacity}, Storage{Memory::Move(src.Storage)} {
-        src.Index    = SizeT{0};
         src.Capacity = SizeT{0};
+        src.Index    = SizeT{0};
     }
 
     ArrayData(const ArrayData &)            = delete;
@@ -90,8 +90,7 @@ struct ArrayData<_Type_T, true> {
 };
 
 template <typename _Type_T>
-class Array {
-  public:
+struct Array {
     Array() noexcept            = default;
     Array(Array &&src) noexcept = default;
     ~Array()                    = default;
@@ -116,8 +115,8 @@ class Array {
             _Type_T    *storage = Storage();
             const SizeT size    = Size();
 
-            setSize(src.Size());
             setCapacity(src.Capacity());
+            setSize(src.Size());
             src.setSize(SizeT{0});
             src.setCapacity(SizeT{0});
             _data.Storage.MovePointerOnly(src._data.Storage);
@@ -136,8 +135,8 @@ class Array {
             const SizeT size    = Size();
 
             setStorage(nullptr);
-            setSize(SizeT{0});
             setCapacity(src.Size());
+            setSize(SizeT{0});
             copyArray(src);
 
             // Just in case the copied array is not a child array.
@@ -150,9 +149,9 @@ class Array {
 
     void operator+=(Array &&src) {
         if (Capacity() == SizeT{0}) {
-            setSize(src.Size());
-            setCapacity(src.Capacity());
             setStorage(src.Storage());
+            setCapacity(src.Capacity());
+            setSize(src.Size());
         } else {
             const SizeT n_size = (Size() + src.Size());
 
@@ -168,9 +167,9 @@ class Array {
             Memory::Deallocate(src.Storage());
         }
 
-        src.setSize(SizeT{0});
-        src.setCapacity(SizeT{0});
         src.clearStorage();
+        src.setCapacity(SizeT{0});
+        src.setSize(SizeT{0});
     }
 
     void operator+=(const Array &src) {
@@ -244,15 +243,15 @@ class Array {
         Memory::Dispose(storage, (storage + Size()));
         Memory::Deallocate(storage);
         clearStorage();
-        setSize(SizeT{0});
         setCapacity(SizeT{0});
+        setSize(SizeT{0});
     }
 
     _Type_T *Detach() noexcept {
-        setSize(SizeT{0});
-        setCapacity(SizeT{0});
         _Type_T *tmp = Storage();
+        setCapacity(SizeT{0});
         clearStorage();
+        setSize(SizeT{0});
 
         return tmp;
     }
