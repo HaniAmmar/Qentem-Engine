@@ -132,11 +132,10 @@ struct HArrayData<_HAItem_T, true> {
 };
 ///////////////////////////////////////////////
 template <typename _Value_T, typename _Char_T>
-class HArray {
+struct HArray {
     using HAItem_T = _HAItem_T<_Value_T, _Char_T>;
     using Key_T    = String<_Char_T>;
 
-  public:
     HArray() noexcept             = default;
     HArray(HArray &&src) noexcept = default;
     ~HArray()                     = default;
@@ -199,8 +198,9 @@ class HArray {
 
         while (src_item < src_end) {
             if (src_item->Hash != SizeT{0}) {
-                SizeT    *index;
-                HAItem_T *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
+                SizeT      *index;
+                const SizeT length       = src_item->Key.Length();
+                HAItem_T   *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Memory::Move(src_item->Key), src_item->Hash);
@@ -231,8 +231,9 @@ class HArray {
 
         while (src_item < src_end) {
             if (src_item->Hash != SizeT{0}) {
-                SizeT    *index;
-                HAItem_T *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
+                const SizeT length = src_item->Key.Length();
+                SizeT      *index;
+                HAItem_T   *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Key_T(src_item->Key), src_item->Hash);
@@ -254,8 +255,8 @@ class HArray {
             expand();
         }
 
-        const _Char_T *str = key.First();
         const SizeT    len = key.Length();
+        const _Char_T *str = key.Storage(len);
 
         const SizeT hash = StringUtils::Hash(str, len);
         SizeT      *index;
@@ -273,8 +274,8 @@ class HArray {
             expand();
         }
 
-        const _Char_T *str = key.First();
         const SizeT    len = key.Length();
+        const _Char_T *str = key.Storage(len);
 
         const SizeT hash = StringUtils::Hash(str, len);
         SizeT      *index;
@@ -308,8 +309,8 @@ class HArray {
             expand();
         }
 
-        const _Char_T *str = key.First();
         const SizeT    len = key.Length();
+        const _Char_T *str = key.Storage(len);
 
         const SizeT hash = StringUtils::Hash(str, len);
         SizeT      *index;
@@ -323,7 +324,8 @@ class HArray {
     }
 
     inline _Value_T *GetValue(const Key_T &key) const noexcept {
-        return GetValue(key.First(), key.Length());
+        const SizeT len = key.Length();
+        return GetValue(key.Storage(len), len);
     }
 
     _Value_T *GetValue(const SizeT index) const noexcept {
@@ -362,8 +364,8 @@ class HArray {
     }
 
     inline const HAItem_T *GetItem(const Key_T &key) const noexcept {
-        const _Char_T *str = key.First();
         const SizeT    len = key.Length();
+        const _Char_T *str = key.Storage(len);
 
         return GetItem(str, len, StringUtils::Hash(str, len));
     }
@@ -410,8 +412,8 @@ class HArray {
     }
 
     inline void Remove(const Key_T &key) const noexcept {
-        const _Char_T *str = key.First();
         const SizeT    len = key.Length();
+        const _Char_T *str = key.Storage(len);
 
         remove(str, len, StringUtils::Hash(str, len));
     }
@@ -421,7 +423,8 @@ class HArray {
             const HAItem_T *item = (Storage() + index);
 
             if (item->Hash != SizeT{0}) {
-                remove(item->Key.First(), item->Key.Length(), item->Hash);
+                const SizeT len = item->Key.Length();
+                remove(item->Key.Storage(len), len, item->Hash);
             }
         }
     }
@@ -433,20 +436,20 @@ class HArray {
     bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         if (Size() != SizeT{0}) {
             HAItem_T      *item;
-            const _Char_T *from_str = from.First();
+            const SizeT    from_len = from.Length();
+            SizeT          to_len;
+            const _Char_T *from_str = from.Storage(from_len);
             const _Char_T *to_str;
             SizeT         *left_index;
             SizeT         *right_index;
-            const SizeT    from_len = from.Length();
-            SizeT          to_len;
             SizeT          to_hash;
             SizeT          offset;
 
             find(left_index, from_str, from_len, StringUtils::Hash(from_str, from_len));
 
             if (*left_index != SizeT{0}) {
-                to_str = to.First();
                 to_len = to.Length();
+                to_str = to.Storage(to_len);
 
                 to_hash = StringUtils::Hash(to_str, to_len);
 

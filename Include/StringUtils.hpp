@@ -41,7 +41,7 @@ struct StringUtils {
         _Number_T len = 0;
 
         if (str != nullptr) {
-            while (*str != _Char_T{'\0'}) {
+            while (*str != _Char_T{0}) {
                 ++str;
                 ++len;
             }
@@ -56,7 +56,7 @@ struct StringUtils {
     //     _Number_T      len   = 0;
 
     //     if (str_2 != nullptr) {
-    //         while (*str_2 != _Char_T{'\0'}) {
+    //         while (*str_2 != _Char_T{0}) {
     //             ++str_2;
     //             ++len;
     //         }

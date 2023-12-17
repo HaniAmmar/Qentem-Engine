@@ -221,7 +221,7 @@ struct JSON {
                     do {
                     } while ((content[++offset] == *(++true_string)));
 
-                    if (*(true_string) == _Char_T{'\0'}) {
+                    if (*(true_string) == _Char_T{0}) {
                         value = true;
                         return;
                     }
@@ -235,7 +235,7 @@ struct JSON {
                     do {
                     } while ((content[++offset] == *(++false_string)));
 
-                    if (*(false_string) == _Char_T{'\0'}) {
+                    if (*(false_string) == _Char_T{0}) {
                         value = false;
                         return;
                     }
@@ -249,7 +249,7 @@ struct JSON {
                     do {
                     } while ((content[++offset] == *(++null_string)));
 
-                    if (*(null_string) == _Char_T{'\0'}) {
+                    if (*(null_string) == _Char_T{0}) {
                         value = nullptr;
                         return;
                     }
