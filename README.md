@@ -297,7 +297,7 @@ int main() {
 
 ## Tests
 
-There are over 22k lines of code for testing; 5 times the size of the library. To run the tests:
+There are over 22k lines of code for testing; 5 times the size of the library. To run the tests that take less than 0.01s to finish:
 
 -   cmake
     ```shell
