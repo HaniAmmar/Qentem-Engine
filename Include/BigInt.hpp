@@ -63,9 +63,9 @@ struct BigInt {
 
     template <typename _N_Number_T>
     inline BigInt &operator=(const _N_Number_T number) noexcept {
-        while (_index_id != _Number_T{0}) {
-            _big_int[_index_id] = _Number_T{0};
-            --_index_id;
+        while (_index != _Number_T{0}) {
+            _storage[_index] = _Number_T{0};
+            --_index;
         }
 
         multiOperation<BigIntOperation::Set>(number);
@@ -80,26 +80,26 @@ struct BigInt {
         constexpr bool    is_smaller_size = (n_size < BitSize());
 
         if (is_same_size) {
-            return _big_int[0];
+            return _storage[0];
         } else if (is_smaller_size) {
-            return _N_Number_T(_big_int[0]);
+            return _N_Number_T(_storage[0]);
         } else {
             _N_Number_T num   = 0;
             SizeT32     count = (n_size / BitSize());
 
-            while ((--count != SizeT32{0}) && (count >= _index_id)) {
-                num |= _big_int[1];
+            while ((--count != SizeT32{0}) && (count >= _index)) {
+                num |= _storage[1];
                 num <<= BitSize();
             }
 
-            num |= _big_int[0];
+            num |= _storage[0];
 
             return num;
         }
     }
 
     inline friend bool operator<(const BigInt &out, const _Number_T number) noexcept {
-        return (((out._index_id == _Number_T{0}) && (out._big_int[0U] < number)));
+        return (((out._index == _Number_T{0}) && (out._storage[0U] < number)));
     }
 
     inline friend bool operator<(const _Number_T number, const BigInt &out) noexcept {
@@ -107,7 +107,7 @@ struct BigInt {
     }
 
     inline friend bool operator<=(const BigInt &out, const _Number_T number) noexcept {
-        return (((out._index_id == _Number_T{0}) && (out._big_int[0U] <= number)));
+        return (((out._index == _Number_T{0}) && (out._storage[0U] <= number)));
     }
 
     inline friend bool operator<=(const _Number_T number, const BigInt &out) noexcept {
@@ -115,7 +115,7 @@ struct BigInt {
     }
 
     inline friend bool operator>(const BigInt &out, const _Number_T number) noexcept {
-        return (((out._index_id != _Number_T{0}) || (out._big_int[0U] > number)));
+        return (((out._index != _Number_T{0}) || (out._storage[0U] > number)));
     }
 
     inline friend bool operator>(const _Number_T number, const BigInt &out) noexcept {
@@ -123,7 +123,7 @@ struct BigInt {
     }
 
     inline friend bool operator>=(const BigInt &out, const _Number_T number) noexcept {
-        return (((out._index_id != _Number_T{0}) || (out._big_int[0U] >= number)));
+        return (((out._index != _Number_T{0}) || (out._storage[0U] >= number)));
     }
 
     inline friend bool operator>=(const _Number_T number, const BigInt &out) noexcept {
@@ -131,7 +131,7 @@ struct BigInt {
     }
 
     inline friend bool operator==(const BigInt &out, const _Number_T number) noexcept {
-        return (((out._index_id == _Number_T{0}) && (out._big_int[0U] == number)));
+        return (((out._index == _Number_T{0}) && (out._storage[0U] == number)));
     }
 
     inline friend bool operator==(const _Number_T number, const BigInt &out) noexcept {
@@ -139,7 +139,7 @@ struct BigInt {
     }
 
     inline friend bool operator!=(const BigInt &out, const _Number_T number) noexcept {
-        return (((out._index_id != _Number_T{0}) || (out._big_int[0U] != number)));
+        return (((out._index != _Number_T{0}) || (out._storage[0U] != number)));
     }
 
     inline friend bool operator!=(const _Number_T number, const BigInt &out) noexcept {
@@ -185,10 +185,10 @@ struct BigInt {
     void Add(_Number_T number, _Number_T index = 0) noexcept {
         if (number != _Number_T{0}) {
             while (index <= MaxIndex()) {
-                const _Number_T tmp = _big_int[index];
-                _big_int[index] += number;
+                const _Number_T tmp = _storage[index];
+                _storage[index] += number;
 
-                if (_big_int[index] > tmp) {
+                if (_storage[index] > tmp) {
                     break;
                 }
 
@@ -197,17 +197,17 @@ struct BigInt {
                 ++index;
             }
 
-            _index_id += ((index > _index_id) && (index <= MaxIndex()));
+            _index += ((index > _index) && (index <= MaxIndex()));
         }
     }
 
     inline void Subtract(_Number_T number, _Number_T index = 0) noexcept {
         if (number != _Number_T{0}) {
             while (index <= MaxIndex()) {
-                const _Number_T tmp = _big_int[index];
-                _big_int[index] -= number;
+                const _Number_T tmp = _storage[index];
+                _storage[index] -= number;
 
-                if (_big_int[index] < tmp) {
+                if (_storage[index] < tmp) {
                     break;
                 }
 
@@ -216,24 +216,24 @@ struct BigInt {
                 ++index;
             }
 
-            _index_id -= ((index > _Number_T{0}) && (_big_int[_index_id] == _Number_T{0}));
+            _index -= ((index > _Number_T{0}) && (_storage[_index] == _Number_T{0}));
         }
     }
     ////////////////////////////////////////////////////
     inline void Multiply(_Number_T multiplier) noexcept {
-        _Number_T index = (_index_id + _Number_T{1});
+        _Number_T index = (_index + _Number_T{1});
 
         do {
             --index;
-            Add(DoubleSize<_Number_T, BitSize()>::Multiply(_big_int[index], multiplier), (index + _Number_T{1}));
+            Add(DoubleSize<_Number_T, BitSize()>::Multiply(_storage[index], multiplier), (index + _Number_T{1}));
         } while (index != _Number_T{0});
     }
     ////////////////////////////////////////////////////
     inline _Number_T Divide(const _Number_T divisor) noexcept {
         constexpr bool is_size_64b = (BitSize() == 64U);
-        _Number_T      index       = _index_id;
-        _Number_T      remainder   = (_big_int[_index_id] % divisor);
-        _big_int[_index_id] /= divisor;
+        _Number_T      index       = _index;
+        _Number_T      remainder   = (_storage[_index] % divisor);
+        _storage[_index] /= divisor;
 
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
             if (is_size_64b) {
@@ -245,10 +245,10 @@ struct BigInt {
 
         while (index != _Number_T{0}) {
             --index;
-            DoubleSize<_Number_T, BitSize()>::Divide(remainder, _big_int[index], divisor, initial_shift);
+            DoubleSize<_Number_T, BitSize()>::Divide(remainder, _storage[index], divisor, initial_shift);
         }
 
-        _index_id -= ((_index_id > _Number_T{0}) && (_big_int[_index_id] == _Number_T{0}));
+        _index -= ((_index > _Number_T{0}) && (_storage[_index] == _Number_T{0}));
 
         return remainder;
     }
@@ -257,13 +257,13 @@ struct BigInt {
         _Number_T index = 0U;
 
         while (offset >= BitSize()) {
-            while (index < _index_id) {
-                _big_int[index] = _big_int[index + _Number_T{1}];
+            while (index < _index) {
+                _storage[index] = _storage[index + _Number_T{1}];
                 ++index;
             }
 
-            _big_int[_index_id] = _Number_T{0};
-            _index_id -= (_index_id != _Number_T{0});
+            _storage[_index] = _Number_T{0};
+            _index -= (_index != _Number_T{0});
 
             index = _Number_T{0};
             offset -= BitSize();
@@ -272,48 +272,48 @@ struct BigInt {
         if (offset != _Number_T{0}) {
             const SizeT32 shift_size = (BitSize() - offset);
 
-            _big_int[_Number_T{0}] >>= offset;
+            _storage[_Number_T{0}] >>= offset;
 
-            while (index < _index_id) {
-                _big_int[index] |= (_big_int[index + _Number_T{1}] << shift_size);
+            while (index < _index) {
+                _storage[index] |= (_storage[index + _Number_T{1}] << shift_size);
                 ++index;
-                _big_int[index] >>= offset;
+                _storage[index] >>= offset;
             }
 
-            _index_id -= ((_index_id != _Number_T{0}) && (_big_int[_index_id] == _Number_T{0}));
+            _index -= ((_index != _Number_T{0}) && (_storage[_index] == _Number_T{0}));
         }
     }
 
     inline void ShiftLeft(SizeT32 offset) noexcept {
-        _Number_T index = _index_id;
+        _Number_T index = _index;
 
         while (offset >= BitSize()) {
-            _index_id += ((_big_int[index] != _Number_T{0}) && (_index_id < MaxIndex()));
-            _big_int[_index_id] = _big_int[index];
+            _index += ((_storage[index] != _Number_T{0}) && (_index < MaxIndex()));
+            _storage[_index] = _storage[index];
 
             while (index != _Number_T{0}) {
-                _big_int[index] = _big_int[index - _Number_T{1}];
+                _storage[index] = _storage[index - _Number_T{1}];
                 --index;
             }
 
-            _big_int[0U] = _Number_T{0};
-            index        = _index_id;
+            _storage[0U] = _Number_T{0};
+            index        = _index;
             offset -= BitSize();
         }
 
         if (offset != _Number_T{0}) {
             const SizeT32 shift_size = (BitSize() - offset);
 
-            const _Number_T carry = (_big_int[index] >> shift_size);
-            _big_int[index] <<= offset;
+            const _Number_T carry = (_storage[index] >> shift_size);
+            _storage[index] <<= offset;
 
-            _index_id += ((carry != _Number_T{0}) && (_index_id < MaxIndex()));
-            _big_int[_index_id] |= carry;
+            _index += ((carry != _Number_T{0}) && (_index < MaxIndex()));
+            _storage[_index] |= carry;
 
             while (index != _Number_T{0}) {
-                _big_int[index] |= (_big_int[index - _Number_T{1}] >> shift_size);
+                _storage[index] |= (_storage[index - _Number_T{1}] >> shift_size);
                 --index;
-                _big_int[index] <<= offset;
+                _storage[index] <<= offset;
             }
         }
     }
@@ -321,39 +321,23 @@ struct BigInt {
     inline SizeT32 FindFirstBit() const noexcept {
         _Number_T index = _Number_T{0};
 
-        while ((_big_int[index] == _Number_T{0}) && (index <= _index_id)) {
+        while ((_storage[index] == _Number_T{0}) && (index <= _index)) {
             ++index;
         }
 
-        return (Platform::FindFirstBit(_big_int[_index_id]) + (index * BitSize()));
+        return (Platform::FindFirstBit(_storage[_index]) + (index * BitSize()));
     }
 
     inline SizeT32 FindLastBit() const noexcept {
-        return (Platform::FindLastBit(_big_int[_index_id]) + SizeT32(_index_id * BitSize()));
+        return (Platform::FindLastBit(_storage[_index]) + SizeT32(_index * BitSize()));
     }
     ////////////////////////////////////////////////////
     inline _Number_T Number() const noexcept {
-        return _big_int[0U];
-    }
-
-    inline _Number_T const *Bucket(const SizeT32 index) const noexcept {
-        if (index <= _index_id) {
-            return (_big_int + index);
-        }
-
-        return nullptr;
-    }
-
-    inline _Number_T *Bucket(const SizeT32 index) noexcept {
-        if (index <= _index_id) {
-            return (_big_int + index);
-        }
-
-        return nullptr;
+        return _storage[0U];
     }
 
     inline _Number_T Index() const noexcept {
-        return _index_id;
+        return _index;
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
@@ -374,7 +358,7 @@ struct BigInt {
     }
 
     inline bool IsBig() const noexcept {
-        return (_index_id != _Number_T{0});
+        return (_index != _Number_T{0});
     }
 
     inline bool NotZero() const noexcept {
@@ -385,17 +369,21 @@ struct BigInt {
         return (*this == _Number_T{0});
     }
 
-    inline void SetIndex(_Number_T id) noexcept {
-        _index_id = id;
+    inline void SetIndex(_Number_T index) noexcept {
+        _index = index;
     }
 
     inline _Number_T *Storage() noexcept {
-        return _big_int;
+        return _storage;
+    }
+
+    inline const _Number_T *Storage() const noexcept {
+        return _storage;
     }
 
   private:
-    _Number_T _big_int[MaxIndex() + _Number_T{1}]{0};
-    _Number_T _index_id{0};
+    _Number_T _storage[MaxIndex() + _Number_T{1}]{0};
+    _Number_T _index{0};
 
     template <BigIntOperation Operation>
     inline void multiOperation(_Number_T number) noexcept {
@@ -411,17 +399,17 @@ struct BigInt {
             }
 
             case BigIntOperation::Or: {
-                _big_int[0U] |= number;
+                _storage[0U] |= number;
                 break;
             }
 
             case BigIntOperation::And: {
-                _big_int[0U] &= number;
+                _storage[0U] &= number;
                 break;
             }
 
             default: {
-                _big_int[0U] = number;
+                _storage[0U] = number;
             }
         }
     }
@@ -443,17 +431,17 @@ struct BigInt {
             }
 
             case BigIntOperation::Or: {
-                _big_int[0U] |= _Number_T(number);
+                _storage[0U] |= _Number_T(number);
                 break;
             }
 
             case BigIntOperation::And: {
-                _big_int[0U] &= _Number_T(number);
+                _storage[0U] &= _Number_T(number);
                 break;
             }
 
             default: {
-                _big_int[0U] = _Number_T(number);
+                _storage[0U] = _Number_T(number);
             }
         }
 
@@ -461,31 +449,31 @@ struct BigInt {
             number >>= BitSize();
 
             while (number != _N_Number_T{0}) {
-                ++_index_id;
+                ++_index;
 
                 switch (Operation) {
                     case BigIntOperation::Add: {
-                        Add(_Number_T(number), _index_id);
+                        Add(_Number_T(number), _index);
                         break;
                     }
 
                     case BigIntOperation::Subtract: {
-                        Subtract(_Number_T(number), _index_id);
+                        Subtract(_Number_T(number), _index);
                         break;
                     }
 
                     case BigIntOperation::Or: {
-                        _big_int[_index_id] |= _Number_T(number);
+                        _storage[_index] |= _Number_T(number);
                         break;
                     }
 
                     case BigIntOperation::And: {
-                        _big_int[_index_id] &= _Number_T(number);
+                        _storage[_index] &= _Number_T(number);
                         break;
                     }
 
                     default: {
-                        _big_int[_index_id] = _Number_T(number);
+                        _storage[_index] = _Number_T(number);
                     }
                 }
 
