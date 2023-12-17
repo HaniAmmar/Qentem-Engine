@@ -160,8 +160,7 @@ struct QPointerData<_Type_T, false> {
 };
 
 template <typename _Type_T>
-class QPointer {
-  public:
+struct QPointer {
     QPointer() noexcept                      = default;
     inline QPointer(QPointer &&src) noexcept = default;
     ~QPointer() noexcept                     = default;

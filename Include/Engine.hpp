@@ -30,10 +30,9 @@
 namespace Qentem {
 
 /*
- * A fast search class for nest/sub-matching.
+ * A fast search for nest/sub-matching.
  */
-class Engine {
-  public:
+struct Engine {
     Engine()                          = delete;
     Engine(Engine &&)                 = delete;
     Engine(const Engine &)            = delete;

@@ -34,7 +34,7 @@ struct LoopTag;
 struct InLineIfTag;
 struct IfTag;
 //////////////////////
-enum class TagType : SizeT8 {
+enum struct TagType : SizeT8 {
     None = 0,
     Variable,    // {var:x}
     RawVariable, // {raw:x}

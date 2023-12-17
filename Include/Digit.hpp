@@ -32,7 +32,7 @@
  */
 namespace Qentem {
 struct Digit {
-    enum class RealFormatType : SizeT8 { Default = 0, Fixed = 1, Scientific = 2 };
+    enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, Scientific = 2 };
 
     struct RealFormatInfo {
         RealFormatInfo() noexcept = default;

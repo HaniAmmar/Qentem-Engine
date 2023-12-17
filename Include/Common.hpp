@@ -169,7 +169,7 @@ struct SystemIntTypeT<4U> {
 
 using SystemIntType = typename SystemIntTypeT<Config::PointerSize>::_NumberType;
 
-enum class QNumberType : SizeT8 {
+enum struct QNumberType : SizeT8 {
     NotANumber = 0,
     Real       = 1, // double
     Natural    = 2, // unsigned
