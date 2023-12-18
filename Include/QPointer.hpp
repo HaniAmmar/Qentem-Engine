@@ -39,11 +39,11 @@ union PointerNumber {
     SystemIntType Number{0};
 };
 
-template <typename _Type_T, bool>
+template <typename _Type_T, bool _Is64Bit, bool>
 struct QPointerData;
 
 template <typename _Type_T>
-struct QPointerData<_Type_T, true> {
+struct QPointerData<_Type_T, true, true> {
     // With Tag
     QPointerData() noexcept  = default;
     ~QPointerData() noexcept = default;
@@ -97,6 +97,7 @@ struct QPointerData<_Type_T, true> {
         byte64 <<= 48U;
         PtrNumber |= byte64;
     }
+
     inline SizeT8 GetLowByte() const noexcept {
         SizeT64 byte64 = PtrNumber;
         byte64 &= 0x00FF000000000000ULL;
@@ -105,13 +106,75 @@ struct QPointerData<_Type_T, true> {
     }
 
     union {
-        _Type_T *Pointer{nullptr};
-        SizeT64  PtrNumber;
+        _Type_T      *Pointer{nullptr};
+        SystemIntType PtrNumber;
     };
 };
 
 template <typename _Type_T>
-struct QPointerData<_Type_T, false> {
+struct QPointerData<_Type_T, false, true> {
+    // 32-bit with Tag, devices with less than 16 megabytes of memory
+    QPointerData() noexcept  = default;
+    ~QPointerData() noexcept = default;
+
+    QPointerData(const QPointerData &)            = delete;
+    QPointerData &operator=(QPointerData &&)      = delete;
+    QPointerData &operator=(const QPointerData &) = delete;
+
+    inline QPointerData(QPointerData &&src) noexcept : Pointer{src.Pointer} {
+        src.Pointer = nullptr;
+    }
+
+    inline explicit QPointerData(_Type_T *pointer) noexcept : Pointer{pointer} {
+    }
+
+    inline void SetPointer(_Type_T *pointer) noexcept {
+        PointerNumber<_Type_T> pn{pointer};
+        PtrNumber &= 0xFF000000U;
+        pn.Pointer = pointer;
+        pn.Number &= 0xFFFFFFU;
+        PtrNumber |= pn.Number;
+    }
+
+    inline _Type_T *GetPointer() const noexcept {
+        return PointerNumber<_Type_T>{PtrNumber & 0xFFFFFFU}.Pointer;
+    }
+
+    inline void MovePointerOnly(QPointerData &src) noexcept {
+        PtrNumber &= 0xFF000000U;
+        PtrNumber |= (src.PtrNumber & 0xFFFFFFU);
+        src.PtrNumber = 0;
+    }
+
+    inline void SetHighByte(SizeT8 byte) noexcept {
+        SizeT64 byte64 = byte;
+        PtrNumber &= 0xFFFFFFU;
+        byte64 <<= 24U;
+        PtrNumber |= byte64;
+    }
+
+    inline SizeT8 GetHighByte() const noexcept {
+        SizeT64 byte64 = PtrNumber;
+        byte64 &= 0xFF000000U;
+        byte64 >>= 24U;
+        return SizeT8(byte64);
+    }
+
+    inline void SetLowByte(SizeT8) noexcept {
+    }
+
+    inline SizeT8 GetLowByte() const noexcept {
+        return 0;
+    }
+
+    union {
+        _Type_T      *Pointer{nullptr};
+        SystemIntType PtrNumber;
+    };
+};
+
+template <typename _Type_T, bool _Is64Bit>
+struct QPointerData<_Type_T, _Is64Bit, false> {
     // Without Tag
     QPointerData() noexcept  = default;
     ~QPointerData() noexcept = default;
@@ -140,16 +203,14 @@ struct QPointerData<_Type_T, false> {
         src.Pointer = nullptr;
     }
 
-    inline void SetHighByte(SizeT8 byte) noexcept {
-        (void)byte;
+    inline void SetHighByte(SizeT8) noexcept {
     }
 
     inline SizeT8 GetHighByte() const noexcept {
         return 0;
     }
 
-    inline void SetLowByte(SizeT8 byte) noexcept {
-        (void)byte;
+    inline void SetLowByte(SizeT8) noexcept {
     }
 
     inline SizeT8 GetLowByte() const noexcept {
@@ -212,7 +273,7 @@ struct QPointer {
     }
 
   private:
-    QPointerData<_Type_T, Config::PointerTagging> _data;
+    QPointerData<_Type_T, Config::Is64bit, Config::PointerTagging> _data;
 };
 
 } // namespace Qentem
