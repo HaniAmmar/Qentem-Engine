@@ -1613,9 +1613,11 @@ struct Value {
     }
 
     void Compress() {
+        using _V_item = _HAItem_T<Value, _Char_T>;
+
         if (IsArray()) {
             Value       *src_val = _data.VArray.Storage();
-            const Value *src_end = _data.VArray.End();
+            const Value *src_end = (src_val + _data.VArray.Size());
             SizeT        size    = 0;
 
             while (src_val < src_end) {
@@ -1637,7 +1639,7 @@ struct Value {
                     return;
                 }
 
-                VArrayT new_array(size);
+                VArrayT new_array{size};
                 src_val = _data.VArray.Storage();
 
                 do {
@@ -1650,8 +1652,30 @@ struct Value {
 
                 _data.VArray = Memory::Move(new_array);
             }
+
+            src_val = _data.VArray.Storage();
+            src_end = (src_val + _data.VArray.Size());
+
+            while (src_val < src_end) {
+                if (src_val->IsArray() || src_val->IsObject()) {
+                    src_val->Compress();
+                }
+
+                ++src_val;
+            }
         } else if (IsObject()) {
             _data.VObject.Compress();
+
+            _V_item       *src_val = _data.VObject.Storage();
+            const _V_item *src_end = (src_val + _data.VObject.Size());
+
+            while (src_val < src_end) {
+                if (src_val->Value.IsArray() || src_val->Value.IsObject()) {
+                    src_val->Value.Compress();
+                }
+
+                ++src_val;
+            }
         }
     }
 
