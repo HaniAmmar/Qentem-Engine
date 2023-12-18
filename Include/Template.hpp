@@ -190,31 +190,7 @@ struct Template {
     // template <typename _Char_T, typename _Value_T, typename _StringStream_T>
     // inline static void CachedRender(const _Char_T *content, const SizeT length, const _Value_T &value,
     //                                 _StringStream_T &stream, const _Char_T *name, const SizeT name_length) {
-    //     // This is not a thread safe function, and its here to show how to cache processed tags.
-    //     // Can be used in a single threaded process to build on.
-
-    //     // Usage:
-    //     // #include "HArray.hpp"
-    //     // #include "Value.hpp"
-    //     // #include "Template.hpp"
-    //     //
-    //     // CachedRender("<html>...</html>", 16, value, stringstream, "page1", 5);
-
-    //     using TemplateSubCV = TemplateSub<_Char_T, _Value_T, _StringStream_T>;
-
-    //     const TemplateSubCV temp{content, length, &stream, &value};
-
-    //     static HArray<Array<Tags::TagBit>, _Char_T> cache;
-
-    //     Array<Tags::TagBit> &tags = cache.Get(name, name_length);
-
-    //     if (tags.IsEmpty()) {
-    //         temp.Parse(tags);
-    //     }
-
-    //     const Tags::TagBit *tag = tags.First();
-    //     const Tags::TagBit *end = (tag + tags.Size());
-    //     temp.Render(tag, end);
+    //     // See Examples/Template/Template17.cpp
     // }
 
     template <typename _Char_T, typename _Value_T, typename _StringStream_T>
