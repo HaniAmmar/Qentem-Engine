@@ -40,20 +40,28 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
 
     while (offset < length) {
         switch (content[offset]) {
-            case JSONotation::BSlashChar: {
-                if (offset > offset2) {
+            case JSONotation::QuoteChar: {
+                if (stream.IsNotEmpty()) {
                     stream.Write((content + offset2), (offset - offset2));
                 }
 
                 ++offset;
+                return offset;
+            }
+
+            case JSONotation::BSlashChar: {
+                stream.Write((content + offset2), (offset - offset2));
+
+                ++offset;
                 offset2 = offset;
                 ++offset2;
+                const _Char_T ch = content[offset];
 
-                switch (content[offset]) {
+                switch (ch) {
                     case JSONotation::QuoteChar:
                     case JSONotation::BSlashChar:
                     case JSONotation::SlashChar: {
-                        stream += content[offset];
+                        stream += ch;
                         break;
                     }
 
@@ -62,8 +70,8 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
                         break;
                     }
 
-                    case JSONotation::F_Char: {
-                        stream += JSONotation::FormfeedControlChar;
+                    case JSONotation::T_Char: {
+                        stream += JSONotation::TabControlChar;
                         break;
                     }
 
@@ -71,13 +79,14 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
                         stream += JSONotation::LineControlChar;
                         break;
                     }
-                    case JSONotation::R_Char: {
-                        stream += JSONotation::CarriageControlChar;
+
+                    case JSONotation::F_Char: {
+                        stream += JSONotation::FormfeedControlChar;
                         break;
                     }
 
-                    case JSONotation::T_Char: {
-                        stream += JSONotation::TabControlChar;
+                    case JSONotation::R_Char: {
+                        stream += JSONotation::CarriageControlChar;
                         break;
                     }
 
@@ -122,15 +131,6 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
                 break;
             }
 
-            case JSONotation::QuoteChar: {
-                if (stream.IsNotEmpty()) {
-                    stream.Write((content + offset2), (offset - offset2));
-                }
-
-                ++offset;
-                return offset;
-            }
-
             case JSONotation::LineControlChar:
             case JSONotation::TabControlChar:
             case JSONotation::CarriageControlChar: {
@@ -159,68 +159,34 @@ static void EscapeJSON(const _Char_T *content, SizeT length, _Stream_T &stream) 
     SizeT offset2 = 0;
 
     while (offset < length) {
-        switch (content[offset]) {
+        const _Char_T ch = content[offset];
+
+        switch (ch) {
             case JSONotation::QuoteChar:
             case JSONotation::BSlashChar:
-            case JSONotation::SlashChar:
-            case JSONotation::BackSpaceControlChar:
-            case JSONotation::FormfeedControlChar:
-            case JSONotation::LineControlChar:
-            case JSONotation::CarriageControlChar:
-            case JSONotation::TabControlChar: {
-                if (offset > offset2) {
-                    stream.Write((content + offset2), (offset - offset2));
-                }
+            case JSONotation::SlashChar: {
+                stream.Write((content + offset2), (offset - offset2));
 
                 stream += JSONotation::BSlashChar;
                 offset2 = offset;
                 ++offset2;
 
-                switch (content[offset]) {
-                    case JSONotation::QuoteChar: {
-                        stream += JSONotation::QuoteChar;
-                        break;
-                    }
+                stream += ch;
+                break;
+            }
 
-                    case JSONotation::BSlashChar: {
-                        stream += JSONotation::BSlashChar;
-                        break;
-                    }
+            case JSONotation::BackSpaceControlChar:
+            case JSONotation::TabControlChar:
+            case JSONotation::LineControlChar:
+            case JSONotation::FormfeedControlChar:
+            case JSONotation::CarriageControlChar: {
+                stream.Write((content + offset2), (offset - offset2));
 
-                    case JSONotation::SlashChar: {
-                        stream += JSONotation::SlashChar;
-                        break;
-                    }
+                stream += JSONotation::BSlashChar;
+                offset2 = offset;
+                ++offset2;
 
-                    case JSONotation::BackSpaceControlChar: {
-                        stream += JSONotation::B_Char;
-                        break;
-                    }
-
-                    case JSONotation::FormfeedControlChar: {
-                        stream += JSONotation::F_Char;
-                        break;
-                    }
-
-                    case JSONotation::LineControlChar: {
-                        stream += JSONotation::N_Char;
-                        break;
-                    }
-
-                    case JSONotation::CarriageControlChar: {
-                        stream += JSONotation::R_Char;
-                        break;
-                    }
-
-                    case JSONotation::TabControlChar: {
-                        stream += JSONotation::T_Char;
-                        break;
-                    }
-
-                    default: {
-                    }
-                }
-
+                stream += JSONotation::GetReplacementChar(SizeT32(ch));
                 break;
             }
 
@@ -256,21 +222,25 @@ struct _JSONotation_T {
     static constexpr _Char_T DotChar      = '.';
     static constexpr _Char_T NegativeChar = '-';
 
-    static constexpr _Char_T LineControlChar      = '\n';
-    static constexpr _Char_T TabControlChar       = '\t';
-    static constexpr _Char_T CarriageControlChar  = '\r';
     static constexpr _Char_T BackSpaceControlChar = '\b';
+    static constexpr _Char_T TabControlChar       = '\t';
+    static constexpr _Char_T LineControlChar      = '\n';
     static constexpr _Char_T FormfeedControlChar  = '\f';
+    static constexpr _Char_T CarriageControlChar  = '\r';
 
-    static constexpr _Char_T N_Char  = 'n';
-    static constexpr _Char_T T_Char  = 't';
-    static constexpr _Char_T R_Char  = 'r';
+    static _Char_T GetReplacementChar(SizeT32 index) noexcept {
+        static constexpr _Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
+
+        return ReplaceList[index];
+    }
+
     static constexpr _Char_T B_Char  = 'b';
+    static constexpr _Char_T T_Char  = 't';
+    static constexpr _Char_T N_Char  = 'n';
     static constexpr _Char_T F_Char  = 'f';
+    static constexpr _Char_T R_Char  = 'r';
     static constexpr _Char_T U_Char  = 'u';
     static constexpr _Char_T CU_Char = 'U';
-    static constexpr _Char_T E_Char  = 'e';
-    static constexpr _Char_T CE_Char = 'E';
 
     static constexpr SizeT          TrueStringLength = SizeT{4};
     static constexpr const _Char_T *TrueString       = &(JSONotationStrings<_Char_T, _size>::TrueString[0]);
