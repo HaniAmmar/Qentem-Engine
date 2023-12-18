@@ -100,6 +100,7 @@ struct Config {
 #endif
 ///////////////////////////////////////////////
 #if defined(QENTEM_FORCED_POINTER_TAGGING) && (QENTEM_FORCED_POINTER_TAGGING == 1)
+    // Devices with less than 16 megabyte of RAM
     static constexpr bool ForcedPointerTagging{true};
 #undef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
