@@ -99,6 +99,14 @@ struct Config {
     static constexpr bool IsBigEndian{false};
 #endif
 ///////////////////////////////////////////////
+#if defined(QENTEM_FORCED_POINTER_TAGGING) && (QENTEM_FORCED_POINTER_TAGGING == 1)
+    static constexpr bool ForcedPointerTagging{true};
+#undef QENTEM_POINTER_TAGGING
+#define QENTEM_POINTER_TAGGING 1
+#else
+    static constexpr bool ForcedPointerTagging{false};
+#endif
+///////////////////////////////////////////////
 #ifndef QENTEM_POINTER_TAGGING
 #define QENTEM_POINTER_TAGGING 1
 #endif
@@ -108,9 +116,9 @@ struct Config {
 #endif
 ///////////////////////////////////////////////
 #if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    static constexpr bool PointerTagging{Is64bit};
+    static constexpr bool PointerTagging{Is64bit || ForcedPointerTagging};
 #if defined(QENTEM_SSO) && (QENTEM_SSO == 1)
-    static constexpr bool ShortStringOptimization{PointerTagging && (sizeof(SizeT) >= 4U)};
+    static constexpr bool ShortStringOptimization{Is64bit && PointerTagging && (sizeof(SizeT) >= 4U)};
 #else
     static constexpr bool ShortStringOptimization{false};
 #undef QENTEM_SSO
