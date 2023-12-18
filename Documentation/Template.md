@@ -107,7 +107,10 @@ int main() {
     value["version"]    = 3.0;
     const char *content = R"({var:name}, {var:version})";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -175,7 +178,10 @@ int main() {
 9 % 5 = {math:9 % 5}
 )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -334,7 +340,10 @@ Not zero or one or two.
 </if>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -377,7 +386,10 @@ Zero!
 </if>
 )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -455,7 +467,10 @@ int main() {
 {var:loop1-value[name]}: {var:loop1-value[value]}</loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -490,7 +505,10 @@ int main() {
 {var:loop1-value}</loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -525,7 +543,10 @@ int main() {
 {var:loop1-value}</loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -566,7 +587,10 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -618,7 +642,10 @@ int main() {
     const char *content =
         R"(<loop value="loop1-value"><loop value="loop2-value"><loop value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -648,7 +675,10 @@ int main() {
 
     const char *content = R"(<loop set="list" value="loop1-value">{var:loop1-value}</loop>)";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -711,7 +741,10 @@ int main() {
 {var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]}</loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:
@@ -752,16 +785,22 @@ int main() {
 <loop value="_val1" sort="ascend">{var:_val1} </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
     /*
         Output: 1 2 3 4 5 6 7
     */
 
-    content = R"(
+    const char *content2 = R"( = R"(
 <loop value="_val1" sort="descend">{var:_val1} </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    stream.Clear();
+
+    Template::Render(content2, value, stream);
+    std::cout << stream << '\n';
     /*
         Output: 7 6 5 4 3 2 1
     */
@@ -792,7 +831,10 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
     /*
         Output:
             Year(2017):
@@ -894,7 +936,10 @@ int main() {
 </html>
 )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 }
 ```
 
@@ -1034,6 +1079,9 @@ int main() {
 </html>
 )HTML";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 }
 ```

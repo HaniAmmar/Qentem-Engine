@@ -16,7 +16,10 @@ int main() {
 
     const char *content = R"(<loop set="list" value="loop1-value">{var:loop1-value}</loop>)";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:

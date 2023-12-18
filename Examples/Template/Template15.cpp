@@ -19,7 +19,10 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
     /*
         Output:
             Year(2017):
@@ -46,5 +49,7 @@ int main() {
 </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content2, value) << '\n';
+    stream.Clear();
+    Template::Render(content2, value, stream);
+    std::cout << stream << '\n';
 }

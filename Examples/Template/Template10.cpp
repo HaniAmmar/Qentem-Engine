@@ -45,7 +45,10 @@ Not zero or one or two.
 </if>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:

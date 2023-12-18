@@ -49,7 +49,10 @@ int main() {
 {var:item[0]} {var:item[1]} {var:item[2]} {var:item[3]}</loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
 
     /*
         Output:

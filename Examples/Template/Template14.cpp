@@ -22,16 +22,22 @@ int main() {
 <loop value="_val1" sort="ascend">{var:_val1} </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
     /*
         Output: 1 2 3 4 5 6 7
     */
 
-    content = R"(
+    const char *content2 = R"(
 <loop value="_val1" sort="descend">{var:_val1} </loop>
     )";
 
-    std::cout << Template::Render<StringStream<char>>(content, value) << '\n';
+    stream.Clear();
+
+    Template::Render(content2, value, stream);
+    std::cout << stream << '\n';
     /*
         Output: 7 6 5 4 3 2 1
     */
