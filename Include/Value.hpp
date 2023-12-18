@@ -174,7 +174,7 @@ struct VNumberT {
         SizeT    _padding[2]{0}; // Just in case SizeT is set to long
     };
 
-    VNumberData<Number_T, Config::IsBigEndian, Config::Is64bit> _data{};
+    VNumberData<Number_T, Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) > 2U))> _data{};
 };
 ///////////////////////////////////////////////
 template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
