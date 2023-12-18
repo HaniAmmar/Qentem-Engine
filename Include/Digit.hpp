@@ -35,7 +35,8 @@ struct Digit {
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, Scientific = 2 };
 
     struct RealFormatInfo {
-        RealFormatInfo() noexcept = default;
+        RealFormatInfo() noexcept : Precision{6U}, Type{RealFormatType::Default} {
+        }
 
         RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
         }
@@ -87,7 +88,7 @@ struct Digit {
     }
 
     template <typename _Stream_T, typename _Number_T>
-    inline static void NumberToString(_Stream_T &stream, _Number_T number, RealFormatInfo format) {
+    inline static void NumberToString(_Stream_T &stream, _Number_T number, const RealFormatInfo format) {
         constexpr SizeT32 n_size = sizeof(_Number_T);
         using QNumberType_T      = typename QNumberAutoTypeT<_Number_T, n_size>::QNumberType_T;
 
