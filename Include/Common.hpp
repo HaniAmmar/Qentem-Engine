@@ -29,32 +29,38 @@ using NullType = decltype(nullptr);
 using SizeT8   = unsigned char;
 using SizeT16  = unsigned short;
 using SizeT32  = unsigned int;
+using SizeT32I = int;
 using SizeT64  = unsigned long long;
 using SizeT64I = long long;
 ///////////////////////////////////////////////
 template <SizeT32>
-struct SystemIntTypeT {};
+struct _SystemIntTypeT {};
 
 template <>
-struct SystemIntTypeT<8U> {
+struct _SystemIntTypeT<8U> {
     // 64-bit
-    using _NumberType = SizeT64;
-    using _SizeType   = SizeT32;
+    using _NumberType  = SizeT64;
+    using _NumberTypeI = SizeT64I;
+    using _SizeType    = SizeT32;
 };
 
 template <>
-struct SystemIntTypeT<4U> {
+struct _SystemIntTypeT<4U> {
     // 32-bit
-    using _NumberType = SizeT32;
-    using _SizeType   = SizeT16;
+    using _NumberType  = SizeT32;
+    using _NumberTypeI = SizeT32I;
+    using _SizeType    = SizeT16;
 };
+
+using SystemIntType_All = _SystemIntTypeT<sizeof(void *)>;
 
 #ifndef QENTEM_SIZE_T
 #define QENTEM_SIZE_T
-using SizeT = typename SystemIntTypeT<sizeof(void *)>::_SizeType;
+using SizeT = SystemIntType_All::_SizeType;
 #endif
 
-using SystemIntType = typename SystemIntTypeT<sizeof(void *)>::_NumberType;
+using SystemIntType  = SystemIntType_All::_NumberType;
+using SystemIntTypeI = SystemIntType_All::_NumberTypeI;
 ///////////////////////////////////////////////
 #ifndef QENTEM_ENABLE_FLOAT_16
 // Requires c++23
