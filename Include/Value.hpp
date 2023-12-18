@@ -43,11 +43,11 @@ enum struct ValueType : SizeT8 {
     Null
 };
 ///////////////////////////////////////////////
-template <typename _Number_T, bool>
+template <typename _Number_T, bool, bool>
 struct VNumberData;
 
 template <typename _Number_T>
-struct VNumberData<_Number_T, false> {
+struct VNumberData<_Number_T, false, true> {
     // Little-Endian
     VNumberData() = default;
 
@@ -58,12 +58,17 @@ struct VNumberData<_Number_T, false> {
     explicit VNumberData(_Type number) noexcept : Number{number} {
     }
 
+    inline void Clear() noexcept {
+        Number.ull = SizeT64{0};
+        PtrNumber  = SystemIntType{0};
+    }
+
     _Number_T     Number{SizeT64{0}};
     SystemIntType PtrNumber{0};
 };
 
 template <typename _Number_T>
-struct VNumberData<_Number_T, true> {
+struct VNumberData<_Number_T, true, true> {
     // Big-Endian
     VNumberData() = default;
 
@@ -74,8 +79,32 @@ struct VNumberData<_Number_T, true> {
     explicit VNumberData(_Type number) noexcept : Number{number} {
     }
 
+    inline void Clear() noexcept {
+        Number.ull = SizeT64{0};
+        PtrNumber  = SystemIntType{0};
+    }
+
     SystemIntType PtrNumber{0};
     _Number_T     Number{SizeT64{0}};
+};
+
+template <typename _Number_T, bool _Endian_T>
+struct VNumberData<_Number_T, _Endian_T, false> {
+    // 32-bit only
+    VNumberData() = default;
+
+    VNumberData(_Number_T number) noexcept : Number{number} {
+    }
+
+    template <typename _Type>
+    explicit VNumberData(_Type number) noexcept : Number{number} {
+    }
+
+    inline void Clear() noexcept {
+        Number.ull = SizeT64{0};
+    }
+
+    _Number_T Number{SizeT64{0}};
 };
 
 struct VNumberT {
@@ -84,15 +113,13 @@ struct VNumberT {
     VNumberT(const VNumberT &)       = default;
     ~VNumberT()                      = default;
 
-    VNumberT(VNumberT &&v_num) noexcept : _data{v_num._data.Number, v_num._data.PtrNumber} {
-        v_num._data.Number.ull = SizeT64{0};
-        v_num._data.PtrNumber  = SystemIntType{0};
+    VNumberT(VNumberT &&v_num) noexcept : _data{v_num._data} {
+        v_num.Clear();
     }
 
     VNumberT &operator=(const VNumberT &v_num) noexcept {
         if (this != &v_num) {
-            _data.Number    = v_num._data.Number;
-            _data.PtrNumber = v_num._data.PtrNumber;
+            _data = v_num._data;
         }
 
         return *this;
@@ -126,11 +153,8 @@ struct VNumberT {
         return _data.Number.ddl;
     }
 
-    inline void ClearAll() noexcept {
-        if (Config::PointerTagging) {
-            _data.Number.ull = SizeT64{0};
-            _data.PtrNumber  = SystemIntType{0};
-        }
+    inline void Clear() noexcept {
+        _data.Clear();
     }
 
   private:
@@ -150,7 +174,7 @@ struct VNumberT {
         SizeT    _padding[2]{0}; // Just in case SizeT is set to long
     };
 
-    VNumberData<Number_T, Config::IsBigEndian> _data{};
+    VNumberData<Number_T, Config::IsBigEndian, Config::Is64bit> _data{};
 };
 ///////////////////////////////////////////////
 template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
@@ -433,7 +457,7 @@ struct Value {
             const ValueType t_type = val.Type();
 
             if (Config::PointerTagging) {
-                val._data.VNumber.ClearAll();
+                val._data.VNumber.Clear();
             } else {
                 val.setTypeToUndefined();
             }
@@ -489,7 +513,7 @@ struct Value {
                 reset();
 
                 if (Config::PointerTagging) {
-                    _data.VNumber.ClearAll();
+                    _data.VNumber.Clear();
                 } else {
                     setTypeToUndefined();
                 }
@@ -1582,7 +1606,7 @@ struct Value {
         reset();
 
         if (Config::PointerTagging) {
-            _data.VNumber.ClearAll();
+            _data.VNumber.Clear();
         } else {
             setTypeToUndefined();
         }
