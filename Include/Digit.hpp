@@ -35,7 +35,7 @@ struct Digit {
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, Scientific = 2 };
 
     struct RealFormatInfo {
-        RealFormatInfo() noexcept : Precision{6U}, Type{RealFormatType::Default} {
+        RealFormatInfo() noexcept {
         }
 
         RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
@@ -62,7 +62,8 @@ struct Digit {
     };
     /////////////////////////////////////////////////////////////////
     template <bool _Reverse_V = false, typename _Stream_T, typename _Number_T>
-    inline static void NumberToString(_Stream_T &stream, _Number_T number) {
+    inline static void NumberToString(_Stream_T &stream, _Number_T number,
+                                      const RealFormatInfo format = RealFormatInfo{}) {
         constexpr SizeT32 n_size = sizeof(_Number_T);
         using _Char_T            = typename _Stream_T::CharType;
         using QNumberType_T      = typename QNumberAutoTypeT<_Number_T, n_size>::QNumberType_T;
@@ -72,27 +73,23 @@ struct Digit {
 
         QNumberType_T qn{number};
 
-        if (!IsUnsigned<_Number_T>()) {
-            if (number < _Number_T{0}) {
-                qn.Integer = -qn.Integer;
-                stream += DigitUtils::DigitChars::NegativeChar;
+        if (IsFloat<_Number_T>()) {
+            realToString<_Number_T>(stream, QNumberType_T{number}.Natural, format);
+        } else {
+            if (!IsUnsigned<_Number_T>()) {
+                if (number < _Number_T{0}) {
+                    qn.Integer = -qn.Integer;
+                    stream += DigitUtils::DigitChars::NegativeChar;
+                }
+            }
+
+            if (_Reverse_V) {
+                stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), qn.Natural));
+            } else {
+                const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
+                stream.Write(&(storage[max_number_of_digits - offset]), offset);
             }
         }
-
-        if (_Reverse_V) {
-            stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), qn.Natural));
-        } else {
-            const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
-            stream.Write(&(storage[max_number_of_digits - offset]), offset);
-        }
-    }
-
-    template <typename _Stream_T, typename _Number_T>
-    inline static void NumberToString(_Stream_T &stream, _Number_T number, const RealFormatInfo format) {
-        constexpr SizeT32 n_size = sizeof(_Number_T);
-        using QNumberType_T      = typename QNumberAutoTypeT<_Number_T, n_size>::QNumberType_T;
-
-        realToString<_Number_T>(stream, QNumberType_T{number}.Natural, format);
     }
     /////////////////////////////////////////////////////////////////
     template <typename _Char_T>
