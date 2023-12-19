@@ -78,7 +78,7 @@ struct TestOutPut {
 #if __cplusplus > 201402L
             (std::wcout << ... << values);
 #else
-            int dummy[sizeof...(Values_T)] = {(std::wcout << values, 0)...};
+            const int dummy[sizeof...(Values_T)] = {(std::wcout << values, 0)...};
             (void)dummy;
 #endif
 
@@ -86,7 +86,7 @@ struct TestOutPut {
 #if __cplusplus > 201402L
             ((*getCachedStream()) << ... << values);
 #else
-            int dummy[sizeof...(Values_T)] = {((*getCachedStream()) << values, 0)...};
+            const int dummy[sizeof...(Values_T)] = {((*getCachedStream()) << values, 0)...};
             (void)dummy;
 #endif
         }

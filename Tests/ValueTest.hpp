@@ -5476,14 +5476,18 @@ static void TestCompressValue(QTest &helper) {
     const VArray *arr = value.GetArray();
 
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    }
 
     value.Compress();
 
     arr = value.GetArray();
 
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    }
 
     value.Reset();
 
@@ -5501,13 +5505,19 @@ static void TestCompressValue(QTest &helper) {
 
     arr = value["key1"].GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    }
     arr = value["key2"].GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    }
     arr = value["key3"].GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    }
 
     value["key4"][0] = 1;
     value["key5"][0] = 1;
@@ -5525,23 +5535,32 @@ static void TestCompressValue(QTest &helper) {
 
     const VHArray *obj = value.GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
-
+    if (obj != nullptr) {
+        helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    }
     value.Compress();
 
     obj = value.GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+    if (obj != nullptr) {
+        helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+    }
 
     arr = value["key1"].GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    }
     arr = value["key2"].GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    }
     arr = value["key3"].GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    }
 
     value.Reset();
 
@@ -5554,7 +5573,9 @@ static void TestCompressValue(QTest &helper) {
 
     obj = value[0].GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    if (obj != nullptr) {
+        helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    }
 
     value[1]["key1"] = 1;
     value[1]["key2"] = 1;
@@ -5571,11 +5592,15 @@ static void TestCompressValue(QTest &helper) {
 
     obj = value[0].GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    if (obj != nullptr) {
+        helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    }
 
     obj = value[1].GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    if (obj != nullptr) {
+        helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+    }
 
     value[2] = 0;
     value.RemoveIndex(2U);
@@ -5583,15 +5608,21 @@ static void TestCompressValue(QTest &helper) {
 
     arr = value.GetArray();
     helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
-    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    if (arr != nullptr) {
+        helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    }
 
     obj = value[0].GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+    if (obj != nullptr) {
+        helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+    }
 
     obj = value[1].GetObject();
     helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
-    helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+    if (obj != nullptr) {
+        helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+    }
 }
 
 static void TestSortValue(QTest &helper) {
