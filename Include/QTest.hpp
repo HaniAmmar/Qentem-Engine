@@ -201,12 +201,12 @@ struct MemoryRecord {
 
         TestOutPut::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
 
-        const SizeT remaining_deallocations = (storage.allocations - storage.deallocations);
+        const SizeT remaining_allocations = (storage.allocations - storage.deallocations);
 
-        if (remaining_deallocations != 0) {
+        if (remaining_allocations != 0) {
             TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_deallocations,
-                              " Remaining deallocations.\n\n");
+                              TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_allocations,
+                              " remaining allocations.\n\n");
         }
     }
 
@@ -317,17 +317,18 @@ struct QTest {
     template <typename _Char_T>
     QENTEM_NOINLINE void PrintErrorMessage1(bool equal, const _Char_T *name, unsigned long line) {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n', _file_fullname, ":",
-                          line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `true`\n\n");
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n');
+        TestOutPut::Print(_file_fullname, ":", line, ":\n`", name, "` should", (equal ? " not " : " "),
+                          "equal: `true`\n\n");
     }
 
     template <typename _Char_T, typename _Value1_T, typename _Value2_T>
     QENTEM_NOINLINE void PrintErrorMessage2(bool equal, const _Char_T *name, const _Value1_T &value1,
                                             const _Value2_T &value2, unsigned long line) {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n', _file_fullname, ":",
-                          line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `", value2,
-                          "`\n Returned Value: `", value1, "`\n\n");
+                          TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n');
+        TestOutPut::Print(_file_fullname, ":", line, ":\n`", name, "` should", (equal ? " not " : " "), "equal: `",
+                          value2, "`\n Returned Value: `", value1, "`\n\n");
     }
 
     inline void ContinueOnError(bool continue_on_error) noexcept {
@@ -394,13 +395,13 @@ struct QTest {
         }
 
         if (test_for_leaks) {
-            const SizeT remaining_deallocations = MemoryRecord::CheckSubMemory();
+            const SizeT remaining_allocations = MemoryRecord::CheckSubMemory();
             MemoryRecord::ResetSubMemory();
 
-            if (remaining_deallocations != 0) {
+            if (remaining_allocations != 0) {
                 TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Leak detected",
-                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_deallocations,
-                                  " Remaining deallocations.\n");
+                                  TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_allocations,
+                                  " remaining allocations.\n");
             }
         }
     }

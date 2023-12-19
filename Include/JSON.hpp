@@ -139,7 +139,7 @@ struct JSON {
                 }
             } else {
                 ++offset;
-                value = VValue{ValueType::Object};
+                value = ValueType::Object;
             }
         }
 
@@ -159,7 +159,6 @@ struct JSON {
 
                     if (c == JSONotation::ESquareChar) {
                         ++offset;
-                        // arr.Compress();
                         value = Memory::Move(arr);
                         break;
                     }
@@ -173,7 +172,7 @@ struct JSON {
                 }
             } else {
                 ++offset;
-                value = VValue{ValueType::Array};
+                value = ValueType::Array;
             }
         }
 
