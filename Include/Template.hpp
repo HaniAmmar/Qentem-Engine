@@ -264,8 +264,7 @@ struct TemplateSub {
 
   public:
     void Render(const TagBit *tag, const TagBit *end) const {
-        SizeT offset{0};
-        render(tag, end, offset, _length);
+        render(tag, end, SizeT{0}, _length);
     }
 
     inline void Parse(Array<TagBit> &tags_cache) const {

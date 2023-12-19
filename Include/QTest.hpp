@@ -154,7 +154,7 @@ struct MemoryRecord {
     }
 
     inline static SizeT CheckSubMemory() noexcept {
-        static MemoryRecordData &storage = getStorage();
+        static const MemoryRecordData &storage = getStorage();
 
         return (storage.subAllocations - storage.subDeallocations);
     }
@@ -194,7 +194,7 @@ struct MemoryRecord {
     }
 
     QENTEM_NOINLINE static void PrintMemoryStatus() {
-        static MemoryRecordData &storage = getStorage();
+        static const MemoryRecordData &storage = getStorage();
 
         TestOutPut::Print("\nMemory: ", (double(storage.remainingSize) / 1024),
                           " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
