@@ -242,8 +242,8 @@ template <typename, SizeT32>
 struct RealNumberInfo {};
 
 // double
-template <>
-struct RealNumberInfo<double, 8U> {
+template <typename Number_T>
+struct RealNumberInfo<Number_T, 8U> {
     static constexpr const SizeT32 Bias         = 1023U;
     static constexpr const SizeT32 ExponentSize = 11U;
     static constexpr const SizeT32 MantissaSize = 52U;
@@ -255,8 +255,8 @@ struct RealNumberInfo<double, 8U> {
 };
 
 // float32
-template <>
-struct RealNumberInfo<float, 4U> {
+template <typename Number_T>
+struct RealNumberInfo<Number_T, 4U> {
     static constexpr const SizeT32 Bias         = 127U;
     static constexpr const SizeT32 ExponentSize = 8U;
     static constexpr const SizeT32 MantissaSize = 23U;
@@ -267,26 +267,9 @@ struct RealNumberInfo<float, 4U> {
     static constexpr const SizeT32 MaxCut       = 30U;
 };
 
-#if defined(QENTEM_ENABLE_FLOAT_128) && (QENTEM_ENABLE_FLOAT_128 == 1)
-// float128_t, _Float128
-template <>
-struct RealNumberInfo<FloatT128, 16U> {
-    // Not ready!
-    static constexpr const SizeT32  Bias         = 16383U;
-    static constexpr const SizeT32  ExponentSize = 15U;
-    static constexpr const SizeT32  MantissaSize = 112U;
-    static constexpr const SizeT128 SignMask     = 0x80000000000000000000000000000000;
-    static constexpr const SizeT128 ExponentMask = 0X7FFF0000000000000000000000000000;
-    static constexpr const SizeT128 MantissaMask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-    static constexpr const SizeT128 LeadingBit   = 0x10000000000000000000000000000;
-    static constexpr const SizeT32  MaxCut       = 300U;
-};
-#endif
-
-#if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
 // float16_t, _Float16
-template <>
-struct RealNumberInfo<FloatT16, 2U> {
+template <typename Number_T>
+struct RealNumberInfo<Number_T, 2U> {
     static constexpr const SizeT32 Bias         = 15U;
     static constexpr const SizeT32 ExponentSize = 5U;
     static constexpr const SizeT32 MantissaSize = 10U;
@@ -296,7 +279,6 @@ struct RealNumberInfo<FloatT16, 2U> {
     static constexpr const SizeT16 LeadingBit   = 0x400U;
     static constexpr const SizeT32 MaxCut       = 0U;
 };
-#endif
 
 #if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
 // bfloat16_t
@@ -312,6 +294,35 @@ struct RealNumberInfo<BFloatT16, 2U> {
     static constexpr const SizeT32 MaxCut       = 0U;
 };
 #endif
+
+#if defined(QENTEM_ENABLE_FLOAT_128) && (QENTEM_ENABLE_FLOAT_128 == 1)
+// float128_t, _Float128
+template <typename Number_T>
+struct RealNumberInfo<Number_T, 16U> {
+    // Not ready!
+    static constexpr const SizeT32  Bias         = 16383U;
+    static constexpr const SizeT32  ExponentSize = 15U;
+    static constexpr const SizeT32  MantissaSize = 112U;
+    static constexpr const SizeT128 SignMask     = 0x80000000000000000000000000000000;
+    static constexpr const SizeT128 ExponentMask = 0X7FFF0000000000000000000000000000;
+    static constexpr const SizeT128 MantissaMask = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    static constexpr const SizeT128 LeadingBit   = 0x10000000000000000000000000000;
+    static constexpr const SizeT32  MaxCut       = 300U;
+};
+#endif
+
+template <typename Number_T>
+struct RealNumberInfo<Number_T, 1U> {
+    // Dummy
+    static constexpr const SizeT32 Bias         = 1U;
+    static constexpr const SizeT32 ExponentSize = 1U;
+    static constexpr const SizeT32 MantissaSize = 1U;
+    static constexpr const SizeT16 SignMask     = 1U;
+    static constexpr const SizeT16 ExponentMask = 1U;
+    static constexpr const SizeT16 MantissaMask = 1U;
+    static constexpr const SizeT16 LeadingBit   = 1U;
+    static constexpr const SizeT32 MaxCut       = 1U;
+};
 
 } // namespace DigitUtils
 } // namespace Qentem

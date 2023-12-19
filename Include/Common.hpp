@@ -178,11 +178,6 @@ struct Config {
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
 ///////////////////////////////////////////////
-#if defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)
-// float16_t, _Float16
-using FloatT16 = decltype(0.0F16);
-#endif
-
 #if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
 // bfloat16_t
 using BFloatT16 = decltype(0.0BF16);
