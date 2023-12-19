@@ -182,7 +182,8 @@ struct ValueData;
 
 template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT>
 struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
-    ValueData() noexcept = default;
+    ValueData() noexcept : VNumber{} {
+    }
 
     ValueData(const ValueData &)            = delete;
     ValueData &operator=(ValueData &&)      = delete;
@@ -255,13 +256,14 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
         VObjectT VObject;
         VArrayT  VArray;
         VStringT VString;
-        VNumberT VNumber{};
+        VNumberT VNumber;
     };
 };
 
 template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT>
 struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
-    ValueData() noexcept = default;
+    ValueData() noexcept : VNumber{} {
+    }
 
     ValueData(const ValueData &)            = delete;
     ValueData &operator=(ValueData &&)      = delete;
@@ -334,7 +336,7 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
         VObjectT VObject;
         VArrayT  VArray;
         VStringT VString;
-        VNumberT VNumber{};
+        VNumberT VNumber;
     };
 
     ValueType VType{ValueType::Undefined};
