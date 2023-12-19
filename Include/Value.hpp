@@ -25,8 +25,8 @@
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
 
-#ifndef _QENTEM_VALUE_H
-#define _QENTEM_VALUE_H
+#ifndef QENTEM_VALUE_H
+#define QENTEM_VALUE_H
 
 namespace Qentem {
 
@@ -43,19 +43,19 @@ enum struct ValueType : SizeT8 {
     Null
 };
 ///////////////////////////////////////////////
-template <typename _Number_T, bool, bool>
+template <typename Number_T, bool, bool>
 struct VNumberData;
 
-template <typename _Number_T>
-struct VNumberData<_Number_T, false, true> {
+template <typename Number_T>
+struct VNumberData<Number_T, false, true> {
     // Little-Endian
     VNumberData() = default;
 
-    VNumberData(_Number_T number, SystemIntType ptr_number) noexcept : Number{number}, PtrNumber{ptr_number} {
+    VNumberData(Number_T number, SystemIntType ptr_number) noexcept : Number{number}, PtrNumber{ptr_number} {
     }
 
-    template <typename _Type>
-    explicit VNumberData(_Type number) noexcept : Number{number} {
+    template <typename Type_T>
+    explicit VNumberData(Type_T number) noexcept : Number{number} {
     }
 
     inline void Clear() noexcept {
@@ -63,20 +63,20 @@ struct VNumberData<_Number_T, false, true> {
         PtrNumber  = SystemIntType{0};
     }
 
-    _Number_T     Number{SizeT64{0}};
+    Number_T      Number{SizeT64{0}};
     SystemIntType PtrNumber{0};
 };
 
-template <typename _Number_T>
-struct VNumberData<_Number_T, true, true> {
+template <typename Number_T>
+struct VNumberData<Number_T, true, true> {
     // Big-Endian
     VNumberData() = default;
 
-    VNumberData(_Number_T number, SystemIntType ptr_number) noexcept : PtrNumber{ptr_number}, Number{number} {
+    VNumberData(Number_T number, SystemIntType ptr_number) noexcept : PtrNumber{ptr_number}, Number{number} {
     }
 
-    template <typename _Type>
-    explicit VNumberData(_Type number) noexcept : Number{number} {
+    template <typename Type_T>
+    explicit VNumberData(Type_T number) noexcept : Number{number} {
     }
 
     inline void Clear() noexcept {
@@ -85,26 +85,26 @@ struct VNumberData<_Number_T, true, true> {
     }
 
     SystemIntType PtrNumber{0};
-    _Number_T     Number{SizeT64{0}};
+    Number_T      Number{SizeT64{0}};
 };
 
-template <typename _Number_T, bool _Endian_T>
-struct VNumberData<_Number_T, _Endian_T, false> {
+template <typename Number_T, bool Endian_T>
+struct VNumberData<Number_T, Endian_T, false> {
     // 32-bit only
     VNumberData() = default;
 
-    VNumberData(_Number_T number) noexcept : Number{number} {
+    VNumberData(Number_T number) noexcept : Number{number} {
     }
 
-    template <typename _Type>
-    explicit VNumberData(_Type number) noexcept : Number{number} {
+    template <typename Type_T>
+    explicit VNumberData(Type_T number) noexcept : Number{number} {
     }
 
     inline void Clear() noexcept {
         Number.ull = SizeT64{0};
     }
 
-    _Number_T Number{SizeT64{0}};
+    Number_T Number{SizeT64{0}};
 };
 
 struct VNumberT {
@@ -125,8 +125,8 @@ struct VNumberT {
         return *this;
     }
 
-    template <typename _Number_T>
-    explicit VNumberT(const _Number_T &num) noexcept : _data{num} {
+    template <typename Number_T>
+    explicit VNumberT(const Number_T &num) noexcept : _data{num} {
     }
 
     inline void SetNumber(double num) noexcept {
@@ -177,11 +177,11 @@ struct VNumberT {
     VNumberData<Number_T, Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) > 2U))> _data{};
 };
 ///////////////////////////////////////////////
-template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
+template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
 struct ValueData;
 
-template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT>
-struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
+template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT>
+struct ValueData<Char_T, VObjectT, VArrayT, VStringT, true> {
     ValueData() noexcept : VNumber{} {
     }
 
@@ -232,7 +232,7 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
     explicit ValueData(const VStringT &str) noexcept : VString{str} {
     }
 
-    explicit ValueData(const _Char_T *str, SizeT length) : VString{str, length} {
+    explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
     }
 
     explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
@@ -260,8 +260,8 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
     };
 };
 
-template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT>
-struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
+template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT>
+struct ValueData<Char_T, VObjectT, VArrayT, VStringT, false> {
     ValueData() noexcept : VNumber{} {
     }
 
@@ -312,7 +312,7 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
     explicit ValueData(const VStringT &str) noexcept : VString{str} {
     }
 
-    explicit ValueData(const _Char_T *str, SizeT length) : VString{str, length} {
+    explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
     }
 
     explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
@@ -342,12 +342,12 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
     ValueType VType{ValueType::Undefined};
 };
 
-template <typename _Char_T>
+template <typename Char_T>
 struct Value {
-    using JSONotation = _JSONotation_T<_Char_T>;
-    using VObjectT    = HArray<Value, _Char_T>;
+    using JSONotation = JSONotation_T<Char_T>;
+    using VObjectT    = HArray<Value, Char_T>;
     using VArrayT     = Array<Value>;
-    using VStringT    = String<_Char_T>;
+    using VStringT    = String<Char_T>;
 
     Value() noexcept  = default;
     ~Value() noexcept = default;
@@ -391,7 +391,7 @@ struct Value {
         setTypeToString();
     }
 
-    explicit Value(const _Char_T *str, SizeT length) : _data{str, length} {
+    explicit Value(const Char_T *str, SizeT length) : _data{str, length} {
         setTypeToString();
     }
 
@@ -407,12 +407,12 @@ struct Value {
         setTypeToDouble();
     }
 
-    template <typename _Number_T>
-    explicit Value(_Number_T num) noexcept {
-        if (IsFloat<_Number_T>()) {
+    template <typename Number_T>
+    explicit Value(Number_T num) noexcept {
+        if (IsFloat<Number_T>()) {
             _data.VNumber.SetNumber(double(num));
             setTypeToDouble();
-        } else if (IsUnsigned<_Number_T>()) {
+        } else if (IsUnsigned<Number_T>()) {
             _data.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
@@ -601,7 +601,7 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(const _Char_T *str) {
+    Value &operator=(const Char_T *str) {
         if (IsString()) {
             _data.VString = VStringT{str};
             return *this;
@@ -615,16 +615,16 @@ struct Value {
         return *this;
     }
 
-    template <typename _Number_T>
-    inline Value &operator=(_Number_T num) noexcept {
+    template <typename Number_T>
+    inline Value &operator=(Number_T num) noexcept {
         if (!IsNumber()) {
             reset();
         }
 
-        if (IsFloat<_Number_T>()) {
+        if (IsFloat<Number_T>()) {
             _data.VNumber.SetNumber(double(num));
             setTypeToDouble();
-        } else if (IsUnsigned<_Number_T>()) {
+        } else if (IsUnsigned<Number_T>()) {
             _data.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
@@ -725,12 +725,12 @@ struct Value {
         *this += VStringT(str);
     }
 
-    void operator+=(const _Char_T *str) {
+    void operator+=(const Char_T *str) {
         *this += VStringT(str);
     }
 
-    template <typename _Number_T>
-    void operator+=(_Number_T num) {
+    template <typename Number_T>
+    void operator+=(Number_T num) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -757,7 +757,7 @@ struct Value {
         _data.VArray += Value{is_true};
     }
 
-    Value &operator[](const _Char_T *key) {
+    Value &operator[](const Char_T *key) {
         if (!IsObject()) {
             Reset();
             initObject();
@@ -817,8 +817,8 @@ struct Value {
         return (_data.VArray.Storage()[index]);
     }
 
-    template <typename _Type_T>
-    Value &operator[](_Type_T index) {
+    template <typename Type_T>
+    Value &operator[](Type_T index) {
         return (*this)[SizeT(index)];
     }
 
@@ -1190,7 +1190,7 @@ struct Value {
         }
     }
 
-    Value *GetValue(const _Char_T *key, SizeT length) const noexcept {
+    Value *GetValue(const Char_T *key, SizeT length) const noexcept {
         switch (Type()) {
             case ValueType::Object: {
                 Value *val = _data.VObject.GetValue(key, length);
@@ -1254,7 +1254,7 @@ struct Value {
         return nullptr;
     }
 
-    const _Char_T *StringStorage() const noexcept {
+    const Char_T *StringStorage() const noexcept {
         if (IsString()) {
             return (_data.VString.First());
         }
@@ -1271,24 +1271,24 @@ struct Value {
     }
 
     // To get a pointer to a key and its length.
-    template <typename _Number_T>
-    bool SetKeyCharAndLength(SizeT index, const _Char_T *&key, _Number_T &length) const noexcept {
+    template <typename Number_T>
+    bool SetKeyCharAndLength(SizeT index, const Char_T *&key, Number_T &length) const noexcept {
         const VStringT *val = GetKey(index);
 
         if (val != nullptr) {
             const SizeT len = val->Length();
             key             = val->Storage(len);
-            length          = _Number_T(len);
+            length          = Number_T(len);
             return true;
         }
 
         return false;
     }
 
-    template <typename _Number_T>
-    void SetValueKeyLength(SizeT index, const Value *&value, const _Char_T *&key, _Number_T &length) const noexcept {
+    template <typename Number_T>
+    void SetValueKeyLength(SizeT index, const Value *&value, const Char_T *&key, Number_T &length) const noexcept {
         if (IsObject()) {
-            const _HAItem_T<Value, _Char_T> *item = _data.VObject.GetItem(index);
+            const HAItem_T<Value, Char_T> *item = _data.VObject.GetItem(index);
 
             value = nullptr;
 
@@ -1296,19 +1296,19 @@ struct Value {
                 const SizeT len = item->Key.Length();
                 value           = &(item->Value);
                 key             = item->Key.Storage(len);
-                length          = _Number_T(len);
+                length          = Number_T(len);
             }
         }
     }
 
     // To get a pointer to a string value and its length.
-    template <typename _Number_T>
-    bool SetCharAndLength(const _Char_T *&key, _Number_T &length) const noexcept {
+    template <typename Number_T>
+    bool SetCharAndLength(const Char_T *&key, Number_T &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
                 const SizeT len = _data.VString.Length();
                 key             = _data.VString.Storage(len);
-                length          = _Number_T{len};
+                length          = Number_T{len};
                 return true;
             }
 
@@ -1336,12 +1336,12 @@ struct Value {
         }
     }
 
-    template <typename _StringStream_T>
-    using _CopyValueToStringFunction_T = void(_StringStream_T, const _Char_T *, SizeT);
+    template <typename StringStream_T>
+    using CopyValueToStringFunction_T = void(StringStream_T, const Char_T *, SizeT);
 
-    template <typename _StringStream_T, typename _StringFunction_T = _CopyValueToStringFunction_T<_StringStream_T>>
-    bool CopyValueTo(_StringStream_T &stream, SizeT32 precision = Config::DoublePrecision,
-                     _StringFunction_T *string_function = nullptr) const {
+    template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
+    bool CopyValueTo(StringStream_T &stream, SizeT32 precision = Config::DoublePrecision,
+                     StringFunction_T *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
                 const SizeT len = _data.VString.Length();
@@ -1393,8 +1393,8 @@ struct Value {
         return true;
     }
 
-    template <typename _StringStream_T>
-    bool CopyKeyByIndexTo(_StringStream_T &stream, SizeT index) const {
+    template <typename StringStream_T>
+    bool CopyKeyByIndexTo(StringStream_T &stream, SizeT index) const {
         if (IsObject()) {
             const VStringT *key = _data.VObject.GetKey(index);
 
@@ -1564,7 +1564,7 @@ struct Value {
         return false;
     }
 
-    inline void Remove(const _Char_T *key, SizeT length) const noexcept {
+    inline void Remove(const Char_T *key, SizeT length) const noexcept {
         if (IsObject()) {
             _data.VObject.Remove(key, length);
         }
@@ -1575,7 +1575,7 @@ struct Value {
         Remove(key.Storage(length), length);
     }
 
-    inline void Remove(const _Char_T *key) const noexcept {
+    inline void Remove(const Char_T *key) const noexcept {
         Remove(key, StringUtils::Count(key));
     }
 
@@ -1587,8 +1587,8 @@ struct Value {
         }
     }
 
-    template <typename _Number_T>
-    inline void RemoveIndex(_Number_T index) const noexcept {
+    template <typename Number_T>
+    inline void RemoveIndex(Number_T index) const noexcept {
         RemoveIndex(SizeT(index));
     }
 
@@ -1603,7 +1603,7 @@ struct Value {
     }
 
     void Compress() {
-        using _V_item = _HAItem_T<Value, _Char_T>;
+        using V_item = HAItem_T<Value, Char_T>;
 
         if (IsArray()) {
             Value       *src_val = _data.VArray.Storage();
@@ -1656,8 +1656,8 @@ struct Value {
         } else if (IsObject()) {
             _data.VObject.Compress();
 
-            _V_item       *src_val = _data.VObject.Storage();
-            const _V_item *src_end = (src_val + _data.VObject.Size());
+            V_item       *src_val = _data.VObject.Storage();
+            const V_item *src_end = (src_val + _data.VObject.Size());
 
             while (src_val < src_end) {
                 if (src_val->Value.IsArray() || src_val->Value.IsObject()) {
@@ -1673,13 +1673,13 @@ struct Value {
         return _data.GetType();
     }
 
-    bool GroupBy(Value &groupedValue, const _Char_T *key, const SizeT length) const {
-        using _V_item = _HAItem_T<Value, _Char_T>;
-        StringStream<_Char_T> stream;
-        VObjectT              new_sub_obj;
-        const _Char_T        *str     = nullptr;
-        SizeT                 str_len = 0;
-        SizeT                 grouped_key_index;
+    bool GroupBy(Value &groupedValue, const Char_T *key, const SizeT length) const {
+        using V_item = HAItem_T<Value, Char_T>;
+        StringStream<Char_T> stream;
+        VObjectT             new_sub_obj;
+        const Char_T        *str     = nullptr;
+        SizeT                str_len = 0;
+        SizeT                grouped_key_index;
 
         if (IsArray()) {
             groupedValue.Reset();
@@ -1695,8 +1695,8 @@ struct Value {
                     if ((_item != nullptr) && _item->IsObject()) {
                         SizeT count = 0;
 
-                        const _V_item *obj_item = _item->_data.VObject.First();
-                        const _V_item *obj_end  = _item->_data.VObject.End();
+                        const V_item *obj_item = _item->_data.VObject.First();
+                        const V_item *obj_end  = _item->_data.VObject.End();
 
                         while (obj_item != obj_end) {
                             if ((obj_item != nullptr) && !(obj_item->Value.IsUndefined())) {
@@ -1737,7 +1737,7 @@ struct Value {
         return false;
     }
 
-    bool GroupBy(Value &groupedValue, const _Char_T *key) const {
+    bool GroupBy(Value &groupedValue, const Char_T *key) const {
         return GroupBy(groupedValue, key, StringUtils::Count(key));
     }
 
@@ -1752,8 +1752,8 @@ struct Value {
         }
     }
 
-    template <typename _Stream_T>
-    inline _Stream_T &Stringify(_Stream_T &stream, SizeT32 precision = Config::DoublePrecision) const {
+    template <typename Stream_T>
+    inline Stream_T &Stringify(Stream_T &stream, SizeT32 precision = Config::DoublePrecision) const {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
@@ -1766,19 +1766,19 @@ struct Value {
     }
 
     inline VStringT Stringify(SizeT32 precision = Config::DoublePrecision) const {
-        StringStream<_Char_T> stream;
+        StringStream<Char_T> stream;
         return Stringify(stream, precision).GetString();
     }
 
   private:
-    template <typename _Stream_T>
-    static void stringifyObject(const VObjectT &obj, _Stream_T &stream, SizeT32 precision) {
-        using _V_item = _HAItem_T<Value, _Char_T>;
+    template <typename Stream_T>
+    static void stringifyObject(const VObjectT &obj, Stream_T &stream, SizeT32 precision) {
+        using V_item = HAItem_T<Value, Char_T>;
 
         stream += JSONotation::SCurlyChar;
 
-        const _V_item *h_item = obj.First();
-        const _V_item *end    = (h_item + obj.Size());
+        const V_item *h_item = obj.First();
+        const V_item *end    = (h_item + obj.Size());
 
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
@@ -1795,7 +1795,7 @@ struct Value {
             ++h_item;
         }
 
-        _Char_T *last = stream.Last();
+        Char_T *last = stream.Last();
 
         if ((last != nullptr) && (*last == JSONotation::CommaChar)) {
             *last = JSONotation::ECurlyChar;
@@ -1804,8 +1804,8 @@ struct Value {
         }
     }
 
-    template <typename _Stream_T>
-    static void stringifyArray(const VArrayT &arr, _Stream_T &stream, SizeT32 precision) {
+    template <typename Stream_T>
+    static void stringifyArray(const VArrayT &arr, Stream_T &stream, SizeT32 precision) {
         stream += JSONotation::SSquareChar;
 
         const Value *item = arr.First();
@@ -1820,7 +1820,7 @@ struct Value {
             ++item;
         }
 
-        _Char_T *last = stream.Last();
+        Char_T *last = stream.Last();
 
         if ((last != nullptr) && (*last == JSONotation::CommaChar)) {
             *last = JSONotation::ESquareChar;
@@ -1829,8 +1829,8 @@ struct Value {
         }
     }
 
-    template <typename _Stream_T>
-    static void stringifyValue(const Value &val, _Stream_T &stream, SizeT32 precision) {
+    template <typename Stream_T>
+    static void stringifyValue(const Value &val, Stream_T &stream, SizeT32 precision) {
         switch (val.Type()) {
             case ValueType::Object: {
                 stringifyObject(val._data.VObject, stream, precision);
@@ -2019,7 +2019,7 @@ struct Value {
         }
     }
 
-    ValueData<_Char_T, VObjectT, VArrayT, VStringT, Config::PointerTagging> _data;
+    ValueData<Char_T, VObjectT, VArrayT, VStringT, Config::PointerTagging> _data;
 };
 
 } // namespace Qentem

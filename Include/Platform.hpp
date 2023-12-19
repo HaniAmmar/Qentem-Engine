@@ -22,8 +22,8 @@
 
 #include "Common.hpp"
 
-#ifndef _QENTEM_PLATFORM_H
-#define _QENTEM_PLATFORM_H
+#ifndef QENTEM_PLATFORM_H
+#define QENTEM_PLATFORM_H
 
 #if (QENTEM_AVX2 == 1) || (QENTEM_SSE2 == 1) || (QENTEM_MSIMD128 == 1)
 #if (QENTEM_MSIMD128 == 1)
@@ -239,10 +239,10 @@ struct SIMD {
 #pragma intrinsic(_BitScanReverse)
 #endif
 
-template <typename _Number_T>
-inline static SizeT32 FindFirstBit(_Number_T value) noexcept {
+template <typename Number_T>
+inline static SizeT32 FindFirstBit(Number_T value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr bool is_size_8 = (sizeof(_Number_T) == 8U);
+    constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
     unsigned long  index     = 0;
 
 #ifdef _M_X64
@@ -275,10 +275,10 @@ inline static SizeT32 FindFirstBit(_Number_T value) noexcept {
 #endif
 }
 
-template <typename _Number_T>
-inline static SizeT32 FindLastBit(_Number_T value) noexcept {
+template <typename Number_T>
+inline static SizeT32 FindLastBit(Number_T value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr bool is_size_8 = (sizeof(_Number_T) == 8U);
+    constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
     unsigned long  index     = 0;
 
 #ifdef _M_X64
@@ -297,7 +297,7 @@ inline static SizeT32 FindLastBit(_Number_T value) noexcept {
         const unsigned long lower_bits = (unsigned long)(value);
         value >>= int_size;
 
-        if (value == _Number_T{0}) {
+        if (value == Number_T{0}) {
             _BitScanReverse(&index, lower_bits);
             return SizeT32(index);
         }
@@ -313,10 +313,10 @@ inline static SizeT32 FindLastBit(_Number_T value) noexcept {
 
 #else
 
-template <typename _Number_T>
-inline static SizeT32 FindFirstBit(_Number_T value) noexcept {
+template <typename Number_T>
+inline static SizeT32 FindFirstBit(Number_T value) noexcept {
     // 'value' should be bigger than zero.
-    constexpr bool is_size_8 = (sizeof(_Number_T) == 8U);
+    constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
 
     if (Config::Is64bit) {
         if (is_size_8) {
@@ -343,12 +343,12 @@ inline static SizeT32 FindFirstBit(_Number_T value) noexcept {
     }
 }
 
-template <typename _Number_T>
-inline static SizeT32 FindLastBit(_Number_T value) noexcept {
+template <typename Number_T>
+inline static SizeT32 FindLastBit(Number_T value) noexcept {
     // 'value' should be bigger than zero.
     constexpr SizeT32 int_size    = (sizeof(int) * 8U);
     constexpr SizeT32 taken_size  = (int_size - 1U);
-    constexpr SizeT32 size        = ((sizeof(_Number_T) * 8U) - 1U);
+    constexpr SizeT32 size        = ((sizeof(Number_T) * 8U) - 1U);
     constexpr bool    is_size_63b = (size == 63U);
 
     if (Config::Is64bit) {
@@ -363,7 +363,7 @@ inline static SizeT32 FindLastBit(_Number_T value) noexcept {
             const SizeT32 lower_bits = SizeT32(value);
             value >>= int_size;
 
-            if (value == _Number_T{0}) {
+            if (value == Number_T{0}) {
                 return (taken_size - SizeT32(__builtin_clz(lower_bits)));
             }
 
@@ -378,22 +378,22 @@ inline static SizeT32 FindLastBit(_Number_T value) noexcept {
 template <typename, typename, SizeT32>
 struct SMIDCompare_T {};
 
-template <typename _Char_T, typename SIMDValue>
+template <typename Char_T, typename SIMDValue>
 inline static constexpr Platform::SIMD::Number_T SMIDCompare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
-    return SMIDCompare_T<_Char_T, SIMDValue, sizeof(_Char_T)>::Compare(val1, val2);
+    return SMIDCompare_T<Char_T, SIMDValue, sizeof(Char_T)>::Compare(val1, val2);
 }
 
 // char
-template <typename _Char_T, typename SIMDValue>
-struct SMIDCompare_T<_Char_T, SIMDValue, 1U> {
+template <typename Char_T, typename SIMDValue>
+struct SMIDCompare_T<Char_T, SIMDValue, 1U> {
     inline constexpr static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         return Platform::SIMD::Compare8Bit(val1, val2);
     }
 };
 
 // char16
-template <typename _Char_T, typename SIMDValue>
-struct SMIDCompare_T<_Char_T, SIMDValue, 2U> {
+template <typename Char_T, typename SIMDValue>
+struct SMIDCompare_T<Char_T, SIMDValue, 2U> {
     inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         Platform::SIMD::Number_T bits16 = Platform::SIMD::Compare16Bit(val1, val2);
         Platform::SIMD::Number_T bits   = 0;
@@ -416,8 +416,8 @@ struct SMIDCompare_T<_Char_T, SIMDValue, 2U> {
 };
 
 // char32_t
-template <typename _Char_T, typename SIMDValue>
-struct SMIDCompare_T<_Char_T, SIMDValue, 4U> {
+template <typename Char_T, typename SIMDValue>
+struct SMIDCompare_T<Char_T, SIMDValue, 4U> {
     inline static Platform::SIMD::Number_T Compare(const SIMDValue &val1, const SIMDValue &val2) noexcept {
         Platform::SIMD::Number_T bits32 = Platform::SIMD::Compare32Bit(val1, val2);
         Platform::SIMD::Number_T bits   = 0;
@@ -444,38 +444,38 @@ struct SMIDCompare_T<_Char_T, SIMDValue, 4U> {
 template <typename, SizeT32>
 struct SMIDSetToOne_T {};
 
-template <typename _Char_T>
-inline static constexpr Platform::SIMD::VAR_T SMIDSetToOne(const _Char_T value) noexcept {
-    return SMIDSetToOne_T<_Char_T, sizeof(_Char_T)>::Set(value);
+template <typename Char_T>
+inline static constexpr Platform::SIMD::VAR_T SMIDSetToOne(const Char_T value) noexcept {
+    return SMIDSetToOne_T<Char_T, sizeof(Char_T)>::Set(value);
 }
 
 // char
-template <typename _Char_T>
-struct SMIDSetToOne_T<_Char_T, 1U> {
-    inline static constexpr Platform::SIMD::VAR_T Set(const _Char_T value) noexcept {
+template <typename Char_T>
+struct SMIDSetToOne_T<Char_T, 1U> {
+    inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
         return Platform::SIMD::SetToOne8Bit(value);
     }
 };
 
 // char16
-template <typename _Char_T>
-struct SMIDSetToOne_T<_Char_T, 2U> {
-    inline static constexpr Platform::SIMD::VAR_T Set(const _Char_T value) noexcept {
+template <typename Char_T>
+struct SMIDSetToOne_T<Char_T, 2U> {
+    inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
         return Platform::SIMD::SetToOne16Bit(short(value));
     }
 };
 
 // char32_t
-template <typename _Char_T>
-struct SMIDSetToOne_T<_Char_T, 4U> {
-    inline static constexpr Platform::SIMD::VAR_T Set(const _Char_T value) noexcept {
+template <typename Char_T>
+struct SMIDSetToOne_T<Char_T, 4U> {
+    inline static constexpr Platform::SIMD::VAR_T Set(const Char_T value) noexcept {
         return Platform::SIMD::SetToOne32Bit(int(value));
     }
 };
 
-template <typename _Char_T, typename _Number_T>
-inline static constexpr _Number_T SMIDNextOffset() noexcept {
-    return (Platform::SIMD::Size / sizeof(_Char_T));
+template <typename Char_T, typename Number_T>
+inline static constexpr Number_T SMIDNextOffset() noexcept {
+    return (Platform::SIMD::Size / sizeof(Char_T));
 }
 
 } // namespace Platform

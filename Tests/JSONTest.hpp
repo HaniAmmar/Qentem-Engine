@@ -23,8 +23,8 @@
 #include "QTest.hpp"
 #include "JSON.hpp"
 
-#ifndef _QENTEM_JSON_TESTS_H
-#define _QENTEM_JSON_TESTS_H
+#ifndef QENTEM_JSON_TESTS_H
+#define QENTEM_JSON_TESTS_H
 
 namespace Qentem {
 namespace Test {

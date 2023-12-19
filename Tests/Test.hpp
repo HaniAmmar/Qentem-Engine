@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-#ifndef _QENTEM_TEST_H
-#define _QENTEM_TEST_H
+#ifndef QENTEM_TEST_H
+#define QENTEM_TEST_H
 
 // clang-format off
 #include "QTest.hpp"

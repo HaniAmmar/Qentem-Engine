@@ -26,8 +26,8 @@
 #include "Engine.hpp"
 #include "StringStream.hpp"
 
-#ifndef _QENTEM_ENGINE_TESTS_H
-#define _QENTEM_ENGINE_TESTS_H
+#ifndef QENTEM_ENGINE_TESTS_H
+#define QENTEM_ENGINE_TESTS_H
 
 namespace Qentem {
 namespace Test {

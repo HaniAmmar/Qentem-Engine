@@ -22,33 +22,33 @@
 
 #include "Value.hpp"
 
-#ifndef _QENTEM_JSON_H
-#define _QENTEM_JSON_H
+#ifndef QENTEM_JSON_H
+#define QENTEM_JSON_H
 
 namespace Qentem {
 struct JSON {
     template <typename, typename>
     struct JSONParser;
 
-    template <typename _Char_T, typename _Number_T, typename _Stream_T>
-    inline static Value<_Char_T> Parse(_Stream_T &stream, const _Char_T *content, _Number_T length) {
-        return JSONParser<_Char_T, _Stream_T>::Parse(stream, content, SizeT(length));
+    template <typename Char_T, typename Number_T, typename Stream_T>
+    inline static Value<Char_T> Parse(Stream_T &stream, const Char_T *content, Number_T length) {
+        return JSONParser<Char_T, Stream_T>::Parse(stream, content, SizeT(length));
     }
 
-    template <typename _Char_T, typename _Number_T>
-    inline static Value<_Char_T> Parse(const _Char_T *content, _Number_T length) {
-        StringStream<_Char_T> stream{};
+    template <typename Char_T, typename Number_T>
+    inline static Value<Char_T> Parse(const Char_T *content, Number_T length) {
+        StringStream<Char_T> stream{};
         return Parse(stream, content, SizeT(length));
     }
 
-    template <typename _Char_T>
-    inline static Value<_Char_T> Parse(const _Char_T *content) {
+    template <typename Char_T>
+    inline static Value<Char_T> Parse(const Char_T *content) {
         return Parse(content, StringUtils::Count(content));
     }
 
-    template <typename _Char_T, typename _Stream_T>
+    template <typename Char_T, typename Stream_T>
     struct JSONParser {
-        using VValue = Value<_Char_T>;
+        using VValue = Value<Char_T>;
 
         JSONParser()                              = delete;
         JSONParser(JSONParser &&)                 = delete;
@@ -57,7 +57,7 @@ struct JSON {
         JSONParser &operator=(const JSONParser &) = delete;
         ~JSONParser()                             = delete;
 
-        static VValue Parse(_Stream_T &stream, const _Char_T *content, SizeT length) {
+        static VValue Parse(Stream_T &stream, const Char_T *content, SizeT length) {
             VValue value{};
 
             if (length != SizeT{0}) {
@@ -75,12 +75,12 @@ struct JSON {
         }
 
       private:
-        using JSONotation = _JSONotation_T<_Char_T>;
-        using VObject     = HArray<VValue, _Char_T>;
+        using JSONotation = JSONotation_T<Char_T>;
+        using VObject     = HArray<VValue, Char_T>;
         using VArray      = Array<VValue>;
-        using VString     = String<_Char_T>;
+        using VString     = String<Char_T>;
 
-        static void parseObject(VValue &value, _Stream_T &stream, const _Char_T *content, SizeT &offset,
+        static void parseObject(VValue &value, Stream_T &stream, const Char_T *content, SizeT &offset,
                                 const SizeT length) {
             StringUtils::TrimLeft(content, offset, length);
 
@@ -94,8 +94,8 @@ struct JSON {
                     }
 
                     ++offset;
-                    const _Char_T *str = (content + offset);
-                    SizeT          len = UnEscapeJSON(str, length, stream);
+                    const Char_T *str = (content + offset);
+                    SizeT         len = UnEscapeJSON(str, length, stream);
 
                     if (len == SizeT{0}) {
                         break;
@@ -122,7 +122,7 @@ struct JSON {
                     parseValue(obj_value, stream, content, offset, length);
                     StringUtils::TrimLeft(content, offset, length);
 
-                    const _Char_T c = content[offset];
+                    const Char_T c = content[offset];
 
                     if (c == JSONotation::ECurlyChar) {
                         ++offset;
@@ -143,7 +143,7 @@ struct JSON {
             }
         }
 
-        static void parseArray(VValue &value, _Stream_T &stream, const _Char_T *content, SizeT &offset,
+        static void parseArray(VValue &value, Stream_T &stream, const Char_T *content, SizeT &offset,
                                const SizeT length) {
             StringUtils::TrimLeft(content, offset, length);
 
@@ -155,7 +155,7 @@ struct JSON {
                     arr += Memory::Move(value);
                     StringUtils::TrimLeft(content, offset, length);
 
-                    const _Char_T c = content[offset];
+                    const Char_T c = content[offset];
 
                     if (c == JSONotation::ESquareChar) {
                         ++offset;
@@ -176,7 +176,7 @@ struct JSON {
             }
         }
 
-        static void parseValue(VValue &value, _Stream_T &stream, const _Char_T *content, SizeT &offset,
+        static void parseValue(VValue &value, Stream_T &stream, const Char_T *content, SizeT &offset,
                                const SizeT length) {
             switch (content[offset]) {
                 case JSONotation::SCurlyChar: {
@@ -194,8 +194,8 @@ struct JSON {
                 case JSONotation::QuoteChar: {
                     ++offset;
 
-                    const _Char_T *str = (content + offset);
-                    SizeT          len = UnEscapeJSON(str, (length - offset), stream);
+                    const Char_T *str = (content + offset);
+                    SizeT         len = UnEscapeJSON(str, (length - offset), stream);
 
                     if (len == SizeT{0}) {
                         break;
@@ -215,12 +215,12 @@ struct JSON {
                 }
 
                 case JSONotation::T_Char: {
-                    const _Char_T *true_string = JSONotation::TrueString;
+                    const Char_T *true_string = JSONotation::TrueString;
 
                     do {
                     } while ((content[++offset] == *(++true_string)));
 
-                    if (*(true_string) == _Char_T{0}) {
+                    if (*(true_string) == Char_T{0}) {
                         value = true;
                         return;
                     }
@@ -229,12 +229,12 @@ struct JSON {
                 }
 
                 case JSONotation::F_Char: {
-                    const _Char_T *false_string = JSONotation::FalseString;
+                    const Char_T *false_string = JSONotation::FalseString;
 
                     do {
                     } while ((content[++offset] == *(++false_string)));
 
-                    if (*(false_string) == _Char_T{0}) {
+                    if (*(false_string) == Char_T{0}) {
                         value = false;
                         return;
                     }
@@ -243,12 +243,12 @@ struct JSON {
                 }
 
                 case JSONotation::N_Char: {
-                    const _Char_T *null_string = JSONotation::NullString;
+                    const Char_T *null_string = JSONotation::NullString;
 
                     do {
                     } while ((content[++offset] == *(++null_string)));
 
-                    if (*(null_string) == _Char_T{0}) {
+                    if (*(null_string) == Char_T{0}) {
                         value = nullptr;
                         return;
                     }

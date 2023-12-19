@@ -25,8 +25,8 @@
 #include "JSON.hpp"
 #include "Template.hpp"
 
-#ifndef _QENTEM_TEMPLATE_L_TESTS_H
-#define _QENTEM_TEMPLATE_L_TESTS_H
+#ifndef QENTEM_TEMPLATE_L_TESTS_H
+#define QENTEM_TEMPLATE_L_TESTS_H
 
 namespace Qentem {
 namespace Test {

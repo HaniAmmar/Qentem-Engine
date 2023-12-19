@@ -23,8 +23,8 @@
 #include "VariableTag.hpp"
 #include "Array.hpp"
 
-#ifndef _QENTEM_Q_EXPRESSION_H
-#define _QENTEM_Q_EXPRESSION_H
+#ifndef QENTEM_Q_EXPRESSION_H
+#define QENTEM_Q_EXPRESSION_H
 
 namespace Qentem {
 
@@ -527,8 +527,8 @@ struct QExpression {
         return result;
     }
 
-    template <typename _Number_T>
-    bool operator>(const _Number_T number) const noexcept {
+    template <typename Number_T>
+    bool operator>(const Number_T number) const noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 return (Number.Natural > SizeT64(number));
@@ -699,8 +699,8 @@ struct QExpression {
         return (Number.Real == right.Number.Real);
     }
 
-    template <typename _Number_T>
-    bool operator!=(const _Number_T number) const noexcept {
+    template <typename Number_T>
+    bool operator!=(const Number_T number) const noexcept {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 return (Number.Natural != SizeT64(number));
@@ -726,29 +726,29 @@ struct QExpression {
     ExpressionType Type;
 };
 
-template <typename _Char_T>
-struct _QOperationSymbol_T {
+template <typename Char_T>
+struct QOperationSymbol_T {
   public:
-    static constexpr _Char_T RemainderExp = '%';
-    static constexpr _Char_T MultipleExp  = '*';
-    static constexpr _Char_T DivideExp    = '/';
-    static constexpr _Char_T AddExp       = '+';
-    static constexpr _Char_T SubtractExp  = '-';
-    static constexpr _Char_T EqualExp     = '=';
-    static constexpr _Char_T NotExp       = '!';
-    static constexpr _Char_T LessExp      = '<';
-    static constexpr _Char_T GreaterExp   = '>';
-    static constexpr _Char_T AndExp       = '&';
-    static constexpr _Char_T OrExp        = '|';
+    static constexpr Char_T RemainderExp = '%';
+    static constexpr Char_T MultipleExp  = '*';
+    static constexpr Char_T DivideExp    = '/';
+    static constexpr Char_T AddExp       = '+';
+    static constexpr Char_T SubtractExp  = '-';
+    static constexpr Char_T EqualExp     = '=';
+    static constexpr Char_T NotExp       = '!';
+    static constexpr Char_T LessExp      = '<';
+    static constexpr Char_T GreaterExp   = '>';
+    static constexpr Char_T AndExp       = '&';
+    static constexpr Char_T OrExp        = '|';
 
-    static constexpr _Char_T ParenthesesStart = '(';
-    static constexpr _Char_T ParenthesesEnd   = ')';
-    static constexpr _Char_T BracketStart     = '{';
-    static constexpr _Char_T BracketEnd       = '}';
-    static constexpr _Char_T ExponentExp      = '^';
-    static constexpr _Char_T SpaceChar        = ' ';
-    static constexpr _Char_T ColonChar        = ':';
-    static constexpr _Char_T SlashChar        = '/';
+    static constexpr Char_T ParenthesesStart = '(';
+    static constexpr Char_T ParenthesesEnd   = ')';
+    static constexpr Char_T BracketStart     = '{';
+    static constexpr Char_T BracketEnd       = '}';
+    static constexpr Char_T ExponentExp      = '^';
+    static constexpr Char_T SpaceChar        = ' ';
+    static constexpr Char_T ColonChar        = ':';
+    static constexpr Char_T SlashChar        = '/';
 };
 
 } // namespace Qentem

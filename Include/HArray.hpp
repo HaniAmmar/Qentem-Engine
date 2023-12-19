@@ -22,8 +22,8 @@
 
 #include "String.hpp"
 
-#ifndef _QENTEM_HARRAY_H
-#define _QENTEM_HARRAY_H
+#ifndef QENTEM_HARRAY_H
+#define QENTEM_HARRAY_H
 
 namespace Qentem {
 
@@ -42,27 +42,27 @@ namespace Qentem {
 /*| 0, 1 , 2, ... n-1  | item 0, item 1, ...  |*/
 /*|____________________|______________________|*/
 
-template <typename _Value_T, typename _Char_T>
-struct _HAItem_T {
-    SizeT           Hash;
-    SizeT           Next;
-    String<_Char_T> Key;
-    _Value_T        Value;
+template <typename Value_T, typename Char_T>
+struct HAItem_T {
+    SizeT          Hash;
+    SizeT          Next;
+    String<Char_T> Key;
+    Value_T        Value;
 
-    inline bool operator<(const _HAItem_T &item) const noexcept {
+    inline bool operator<(const HAItem_T &item) const noexcept {
         return (Key < item.Key);
     }
 
-    inline bool operator>(const _HAItem_T &item) const noexcept {
+    inline bool operator>(const HAItem_T &item) const noexcept {
         return (Key > item.Key);
     }
 };
 ///////////////////////////////////////////////
-template <typename _HAItem_T, bool BigEndian>
+template <typename, bool BigEndian>
 struct HArrayData;
 
-template <typename _HAItem_T>
-struct HArrayData<_HAItem_T, false> {
+template <typename HAItem_T>
+struct HArrayData<HAItem_T, false> {
     // Little-Endian
     HArrayData() noexcept = default;
 
@@ -80,13 +80,13 @@ struct HArrayData<_HAItem_T, false> {
         return HashTable.GetPointer();
     }
 
-    inline _HAItem_T *GetStorage(SizeT *hashTable) const noexcept {
-        return Memory::ChangePointer<_HAItem_T>(hashTable + Capacity);
+    inline HAItem_T *GetStorage(SizeT *hashTable) const noexcept {
+        return Memory::ChangePointer<HAItem_T>(hashTable + Capacity);
     }
 
     ~HArrayData() {
-        SizeT     *hashTable = GetHashTable();
-        _HAItem_T *storage   = GetStorage(hashTable);
+        SizeT    *hashTable = GetHashTable();
+        HAItem_T *storage   = GetStorage(hashTable);
         Memory::Dispose(storage, (storage + Index));
         Memory::Deallocate(hashTable);
     }
@@ -96,8 +96,8 @@ struct HArrayData<_HAItem_T, false> {
     QPointer<SizeT> HashTable{};
 };
 
-template <typename _HAItem_T>
-struct HArrayData<_HAItem_T, true> {
+template <typename HAItem_T>
+struct HArrayData<HAItem_T, true> {
     // Big-Endian
     HArrayData() noexcept = default;
 
@@ -115,13 +115,13 @@ struct HArrayData<_HAItem_T, true> {
         return HashTable.GetPointer();
     }
 
-    inline _HAItem_T *GetStorage(SizeT *hashTable) const noexcept {
-        return Memory::ChangePointer<_HAItem_T>(hashTable + Capacity);
+    inline HAItem_T *GetStorage(SizeT *hashTable) const noexcept {
+        return Memory::ChangePointer<HAItem_T>(hashTable + Capacity);
     }
 
     ~HArrayData() {
-        SizeT     *hashTable = GetHashTable();
-        _HAItem_T *storage   = GetStorage(hashTable);
+        SizeT    *hashTable = GetHashTable();
+        HAItem_T *storage   = GetStorage(hashTable);
         Memory::Dispose(storage, (storage + Index));
         Memory::Deallocate(hashTable);
     }
@@ -131,10 +131,10 @@ struct HArrayData<_HAItem_T, true> {
     SizeT           Index{0};
 };
 ///////////////////////////////////////////////
-template <typename _Value_T, typename _Char_T>
+template <typename Value_T, typename Char_T>
 struct HArray {
-    using HAItem_T = _HAItem_T<_Value_T, _Char_T>;
-    using Key_T    = String<_Char_T>;
+    using HAItem = HAItem_T<Value_T, Char_T>;
+    using Key_T  = String<Char_T>;
 
     HArray() noexcept             = default;
     HArray(HArray &&src) noexcept = default;
@@ -152,7 +152,7 @@ struct HArray {
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
-            HAItem_T   *storage = Storage();
+            HAItem     *storage = Storage();
             SizeT      *ht      = _data.GetHashTable();
             const SizeT size    = Size();
 
@@ -171,7 +171,7 @@ struct HArray {
 
     HArray &operator=(const HArray &src) {
         if (this != &src) {
-            HAItem_T   *storage = Storage();
+            HAItem     *storage = Storage();
             SizeT      *ht      = _data.GetHashTable();
             const SizeT size    = Size();
 
@@ -188,9 +188,9 @@ struct HArray {
     }
 
     void operator+=(HArray &&src) {
-        const SizeT     n_size   = (Size() + src.Size());
-        HAItem_T       *src_item = src.Storage();
-        const HAItem_T *src_end  = (src_item + src.Size());
+        const SizeT   n_size   = (Size() + src.Size());
+        HAItem       *src_item = src.Storage();
+        const HAItem *src_end  = (src_item + src.Size());
 
         if (n_size > Capacity()) {
             resize(n_size);
@@ -200,7 +200,7 @@ struct HArray {
             if (src_item->Hash != SizeT{0}) {
                 SizeT      *index;
                 const SizeT length       = src_item->Key.Length();
-                HAItem_T   *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
+                HAItem     *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Memory::Move(src_item->Key), src_item->Hash);
@@ -221,9 +221,9 @@ struct HArray {
     }
 
     void operator+=(const HArray &src) {
-        const SizeT     n_size   = (Size() + src.Size());
-        const HAItem_T *src_item = src.First();
-        const HAItem_T *src_end  = src_item + src.Size();
+        const SizeT   n_size   = (Size() + src.Size());
+        const HAItem *src_item = src.First();
+        const HAItem *src_end  = src_item + src.Size();
 
         if (n_size > Capacity()) {
             resize(n_size);
@@ -233,34 +233,34 @@ struct HArray {
             if (src_item->Hash != SizeT{0}) {
                 const SizeT length = src_item->Key.Length();
                 SizeT      *index;
-                HAItem_T   *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
+                HAItem     *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Key_T(src_item->Key), src_item->Hash);
                 }
 
-                storage_item->Value = _Value_T(src_item->Value);
+                storage_item->Value = Value_T(src_item->Value);
             }
 
             ++src_item;
         }
     }
 
-    _Value_T &operator[](const _Char_T *key) {
+    Value_T &operator[](const Char_T *key) {
         return Get(key, StringUtils::Count(key));
     }
 
-    _Value_T &operator[](Key_T &&key) {
+    Value_T &operator[](Key_T &&key) {
         if (Size() == Capacity()) {
             expand();
         }
 
-        const SizeT    len = key.Length();
-        const _Char_T *str = key.Storage(len);
+        const SizeT   len = key.Length();
+        const Char_T *str = key.Storage(len);
 
         const SizeT hash = StringUtils::Hash(str, len);
         SizeT      *index;
-        HAItem_T   *item = find(index, str, len, hash);
+        HAItem     *item = find(index, str, len, hash);
 
         if (item != nullptr) {
             return item->Value;
@@ -269,17 +269,17 @@ struct HArray {
         return insert(index, Memory::Move(key), hash)->Value;
     }
 
-    _Value_T &operator[](const Key_T &key) {
+    Value_T &operator[](const Key_T &key) {
         if (Size() == Capacity()) {
             expand();
         }
 
-        const SizeT    len = key.Length();
-        const _Char_T *str = key.Storage(len);
+        const SizeT   len = key.Length();
+        const Char_T *str = key.Storage(len);
 
         const SizeT hash = StringUtils::Hash(str, len);
         SizeT      *index;
-        HAItem_T   *item = find(index, str, len, hash);
+        HAItem     *item = find(index, str, len, hash);
 
         if (item != nullptr) {
             return item->Value;
@@ -288,14 +288,14 @@ struct HArray {
         return insert(index, Key_T(key), hash)->Value;
     }
 
-    _Value_T &Get(const _Char_T *key, const SizeT len) {
+    Value_T &Get(const Char_T *key, const SizeT len) {
         if (Size() == Capacity()) {
             expand();
         }
 
         const SizeT hash = StringUtils::Hash(key, len);
         SizeT      *index;
-        HAItem_T   *item = find(index, key, len, hash);
+        HAItem     *item = find(index, key, len, hash);
 
         if (item != nullptr) {
             return item->Value;
@@ -304,17 +304,17 @@ struct HArray {
         return insert(index, Key_T(key, len), hash)->Value;
     }
 
-    void Insert(Key_T &&key, _Value_T &&val) {
+    void Insert(Key_T &&key, Value_T &&val) {
         if (Size() == Capacity()) {
             expand();
         }
 
-        const SizeT    len = key.Length();
-        const _Char_T *str = key.Storage(len);
+        const SizeT   len = key.Length();
+        const Char_T *str = key.Storage(len);
 
         const SizeT hash = StringUtils::Hash(str, len);
         SizeT      *index;
-        HAItem_T   *item = find(index, str, len, hash);
+        HAItem     *item = find(index, str, len, hash);
 
         if (item == nullptr) {
             item = insert(index, Memory::Move(key), hash);
@@ -323,13 +323,13 @@ struct HArray {
         item->Value = Memory::Move(val);
     }
 
-    inline _Value_T *GetValue(const Key_T &key) const noexcept {
+    inline Value_T *GetValue(const Key_T &key) const noexcept {
         const SizeT len = key.Length();
         return GetValue(key.Storage(len), len);
     }
 
-    _Value_T *GetValue(const SizeT index) const noexcept {
-        HAItem_T *src = Storage();
+    Value_T *GetValue(const SizeT index) const noexcept {
+        HAItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
             return &((src + index)->Value);
@@ -338,13 +338,13 @@ struct HArray {
         return nullptr;
     }
 
-    _Value_T *GetValue(const _Char_T *key, const SizeT length) const noexcept {
+    Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
         return GetValue(key, length, StringUtils::Hash(key, length));
     }
 
-    _Value_T *GetValue(const _Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT    *index;
-        HAItem_T *item = find(index, key, length, hash);
+    Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT  *index;
+        HAItem *item = find(index, key, length, hash);
 
         if (item != nullptr) {
             return &(item->Value);
@@ -354,7 +354,7 @@ struct HArray {
     }
 
     const Key_T *GetKey(const SizeT index) const noexcept {
-        const HAItem_T *src = Storage();
+        const HAItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
             return &((src + index)->Key);
@@ -363,16 +363,16 @@ struct HArray {
         return nullptr;
     }
 
-    inline const HAItem_T *GetItem(const Key_T &key) const noexcept {
-        const SizeT    len = key.Length();
-        const _Char_T *str = key.Storage(len);
+    inline const HAItem *GetItem(const Key_T &key) const noexcept {
+        const SizeT   len = key.Length();
+        const Char_T *str = key.Storage(len);
 
         return GetItem(str, len, StringUtils::Hash(str, len));
     }
 
-    const HAItem_T *GetItem(const _Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT          *index;
-        const HAItem_T *item = find(index, key, length, hash);
+    const HAItem *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT        *index;
+        const HAItem *item = find(index, key, length, hash);
 
         if (item != nullptr) {
             return item;
@@ -381,8 +381,8 @@ struct HArray {
         return nullptr;
     }
 
-    const HAItem_T *GetItem(const SizeT index) const noexcept {
-        const HAItem_T *src = Storage();
+    const HAItem *GetItem(const SizeT index) const noexcept {
+        const HAItem *src = Storage();
 
         if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
             return (src + index);
@@ -391,7 +391,7 @@ struct HArray {
         return nullptr;
     }
 
-    bool GetKeyIndex(SizeT &index, const _Char_T *str, const SizeT len) const noexcept {
+    bool GetKeyIndex(SizeT &index, const Char_T *str, const SizeT len) const noexcept {
         SizeT *sub_index;
         if (find(sub_index, str, len, StringUtils::Hash(str, len)) != nullptr) {
             index = *sub_index;
@@ -403,24 +403,24 @@ struct HArray {
         return false;
     }
 
-    inline void Remove(const _Char_T *key) const noexcept {
+    inline void Remove(const Char_T *key) const noexcept {
         Remove(key, StringUtils::Count(key));
     }
 
-    inline void Remove(const _Char_T *key, SizeT length) const noexcept {
+    inline void Remove(const Char_T *key, SizeT length) const noexcept {
         remove(key, length, StringUtils::Hash(key, length));
     }
 
     inline void Remove(const Key_T &key) const noexcept {
-        const SizeT    len = key.Length();
-        const _Char_T *str = key.Storage(len);
+        const SizeT   len = key.Length();
+        const Char_T *str = key.Storage(len);
 
         remove(str, len, StringUtils::Hash(str, len));
     }
 
     void RemoveIndex(const SizeT index) const noexcept {
         if (index < Size()) {
-            const HAItem_T *item = (Storage() + index);
+            const HAItem *item = (Storage() + index);
 
             if (item->Hash != SizeT{0}) {
                 const SizeT len = item->Key.Length();
@@ -435,15 +435,15 @@ struct HArray {
      */
     bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         if (Size() != SizeT{0}) {
-            HAItem_T      *item;
-            const SizeT    from_len = from.Length();
-            SizeT          to_len;
-            const _Char_T *from_str = from.Storage(from_len);
-            const _Char_T *to_str;
-            SizeT         *left_index;
-            SizeT         *right_index;
-            SizeT          to_hash;
-            SizeT          offset;
+            HAItem       *item;
+            const SizeT   from_len = from.Length();
+            SizeT         to_len;
+            const Char_T *from_str = from.Storage(from_len);
+            const Char_T *to_str;
+            SizeT        *left_index;
+            SizeT        *right_index;
+            SizeT         to_hash;
+            SizeT         offset;
 
             find(left_index, from_str, from_len, StringUtils::Hash(from_str, from_len));
 
@@ -489,7 +489,7 @@ struct HArray {
     }
 
     void Reset() noexcept {
-        HAItem_T *storage = Storage();
+        HAItem *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
         Memory::Deallocate(_data.GetHashTable());
         clearHashTable();
@@ -505,7 +505,7 @@ struct HArray {
 
         if (Size() > new_size) {
             // Shrink
-            HAItem_T *storage = Storage();
+            HAItem *storage = Storage();
             Memory::Dispose((storage + new_size), (storage + Size()));
             setSize(new_size);
         }
@@ -523,7 +523,7 @@ struct HArray {
             Memory::Sort<false>(Storage(), SizeT{0}, Size());
         }
 
-        Memory::SetToZero<size>(_data.GetHashTable(), (size * Capacity()));
+        Memory::SetToZero(_data.GetHashTable(), (size * Capacity()));
         generateHash();
     }
 
@@ -544,9 +544,9 @@ struct HArray {
 
     // Returns the actual number of items.
     SizeT ActualSize() const noexcept {
-        const HAItem_T *item = Storage();
-        const HAItem_T *end  = (item + Size());
-        SizeT           size = 0;
+        const HAItem *item = Storage();
+        const HAItem *end  = (item + Size());
+        SizeT         size = 0;
 
         while (item < end) {
             if (item->Hash != SizeT{0}) {
@@ -567,15 +567,15 @@ struct HArray {
         return _data.Capacity;
     }
 
-    inline HAItem_T *Storage() const noexcept {
+    inline HAItem *Storage() const noexcept {
         return _data.GetStorage(_data.GetHashTable());
     }
 
-    inline const HAItem_T *First() const noexcept {
+    inline const HAItem *First() const noexcept {
         return Storage();
     }
 
-    inline HAItem_T *Last() const noexcept {
+    inline HAItem *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Size() - SizeT{1}));
         }
@@ -583,7 +583,7 @@ struct HArray {
         return nullptr;
     }
 
-    inline const HAItem_T *End() const noexcept {
+    inline const HAItem *End() const noexcept {
         return (First() + Size());
     }
 
@@ -612,19 +612,19 @@ struct HArray {
     }
 
     // For STL
-    inline const HAItem_T *begin() const noexcept {
+    inline const HAItem *begin() const noexcept {
         return First();
     }
 
-    inline const HAItem_T *end() const noexcept {
+    inline const HAItem *end() const noexcept {
         return End();
     }
 
-    inline HAItem_T *begin() noexcept {
+    inline HAItem *begin() noexcept {
         return Storage();
     }
 
-    inline HAItem_T *end() noexcept {
+    inline HAItem *end() noexcept {
         return (Storage() + Size());
     }
 
@@ -639,9 +639,9 @@ struct HArray {
         _data.HashTable.SetPointer(ptr);
     }
 
-    HAItem_T *allocate(SizeT new_capacity) {
+    HAItem *allocate(SizeT new_capacity) {
         constexpr SizeT32 size     = sizeof(SizeT);
-        constexpr SizeT   size_sum = SizeT{size + sizeof(HAItem_T)};
+        constexpr SizeT   size_sum = SizeT{size + sizeof(HAItem)};
 
         if (new_capacity < SizeT{2}) {
             new_capacity = SizeT{2};
@@ -651,9 +651,9 @@ struct HArray {
         setCapacity(new_capacity);
         SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
         setHashTable(ht);
-        Memory::SetToZero<size>(ht, (size * new_capacity));
+        Memory::SetToZero(ht, (size * new_capacity));
 
-        return Memory::ChangePointer<HAItem_T>(ht + Capacity());
+        return Memory::ChangePointer<HAItem>(ht + Capacity());
     }
 
     inline void clearHashTable() noexcept {
@@ -672,8 +672,8 @@ struct HArray {
         resize(((Capacity() != SizeT{0}) ? (Capacity() * SizeT{2}) : SizeT{2}));
     }
 
-    HAItem_T *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
-        HAItem_T *item = (Storage() + Size());
+    HAItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
+        HAItem *item = (Storage() + Size());
         ++(_data.Index);
         *index = Size();
 
@@ -685,10 +685,10 @@ struct HArray {
         return item;
     }
 
-    void remove(const _Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+    void remove(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
         if (Size() != SizeT{0}) {
-            SizeT    *index;
-            HAItem_T *item = find(index, key, length, hash);
+            SizeT  *index;
+            HAItem *item = find(index, key, length, hash);
 
             if (item != nullptr) {
                 *index     = item->Next;
@@ -696,17 +696,17 @@ struct HArray {
                 item->Hash = SizeT{0};
 
                 item->Key   = Key_T{};
-                item->Value = _Value_T{};
+                item->Value = Value_T{};
             }
         }
     }
 
     void copyTable(const HArray &src) {
         if (src.Size() != SizeT{0}) {
-            const HAItem_T *src_item = src.First();
-            const HAItem_T *src_end  = (src_item + src.Size());
-            HAItem_T       *storage  = allocate(src.Size());
-            SizeT           len      = 0;
+            const HAItem *src_item = src.First();
+            const HAItem *src_end  = (src_item + src.Size());
+            HAItem       *storage  = allocate(src.Size());
+            SizeT         len      = 0;
 
             do {
                 if (src_item->Hash != SizeT{0}) {
@@ -724,12 +724,12 @@ struct HArray {
     }
 
     void resize(const SizeT new_size) {
-        SizeT          *ht      = _data.GetHashTable();
-        HAItem_T       *src     = Storage();
-        HAItem_T       *storage = allocate(new_size);
-        HAItem_T       *item    = src;
-        const HAItem_T *end     = (item + Size());
-        SizeT           len     = 0;
+        SizeT        *ht      = _data.GetHashTable();
+        HAItem       *src     = Storage();
+        HAItem       *storage = allocate(new_size);
+        HAItem       *item    = src;
+        const HAItem *end     = (item + Size());
+        SizeT         len     = 0;
 
         while (item < end) {
             if (item->Hash != SizeT{0}) {
@@ -746,10 +746,10 @@ struct HArray {
         generateHash();
     }
 
-    HAItem_T *find(SizeT *&index, const _Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT    *ht      = _data.GetHashTable();
-        HAItem_T *storage = Memory::ChangePointer<HAItem_T>(ht + Capacity());
-        HAItem_T *item;
+    HAItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
+        SizeT  *ht      = _data.GetHashTable();
+        HAItem *storage = Memory::ChangePointer<HAItem>(ht + Capacity());
+        HAItem *item;
         index = (ht + (hash & getBase()));
 
         while (*index != SizeT{0}) {
@@ -768,13 +768,13 @@ struct HArray {
     }
 
     void generateHash() const noexcept {
-        SizeT          *ht   = _data.GetHashTable();
-        HAItem_T       *src  = Storage();
-        HAItem_T       *item = src;
-        const HAItem_T *end  = (item + Size());
-        SizeT          *index;
-        SizeT           i    = 1;
-        const SizeT     base = getBase();
+        SizeT        *ht   = _data.GetHashTable();
+        HAItem       *src  = Storage();
+        HAItem       *item = src;
+        const HAItem *end  = (item + Size());
+        SizeT        *index;
+        SizeT         i    = 1;
+        const SizeT   base = getBase();
 
         while (item < end) {
             item->Next = SizeT{0};
@@ -790,7 +790,7 @@ struct HArray {
         }
     }
 
-    HArrayData<HAItem_T, Config::IsBigEndian> _data{};
+    HArrayData<HAItem, Config::IsBigEndian> _data{};
 };
 
 } // namespace Qentem

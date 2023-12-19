@@ -14,18 +14,18 @@ using Qentem::Template;
 using Qentem::TemplateSub;
 using Qentem::Value;
 
-template <typename _Char_T, typename _Value_T, typename _StringStream_T>
-inline static void CachedRender(const _Char_T *content, const SizeT length, const _Value_T &value,
-                                _StringStream_T &stream, const _Char_T *name, const SizeT name_length) {
+template <typename Char_T, typename Value_T, typename StringStream_T>
+inline static void CachedRender(const Char_T *content, const SizeT length, const Value_T &value, StringStream_T &stream,
+                                const Char_T *name, const SizeT name_length) {
     // This is not a thread safe function, and its here to show how to cache processed tags.
     // Can be used in a single threaded process to build on. One easy way is to Parse() all templates
     // before starting multi-threading process.
 
-    using TemplateSubCV = TemplateSub<_Char_T, _Value_T, _StringStream_T>;
+    using TemplateSubCV = TemplateSub<Char_T, Value_T, StringStream_T>;
 
     const TemplateSubCV temp{content, length, &stream, &value};
 
-    static HArray<Array<Qentem::Tags::TagBit>, _Char_T> cache;
+    static HArray<Array<Qentem::Tags::TagBit>, Char_T> cache;
 
     Array<Qentem::Tags::TagBit> &tags = cache.Get(name, name_length);
 

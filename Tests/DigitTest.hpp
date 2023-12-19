@@ -24,16 +24,16 @@
 #include "Digit.hpp"
 #include "StringStream.hpp"
 
-// #define _QENTEM_COMPARE_DIGIT_WITH_STL true
+// #define QENTEM_COMPARE_DIGIT_WITH_STL true
 
-#ifdef _QENTEM_COMPARE_DIGIT_WITH_STL
+#ifdef QENTEM_COMPARE_DIGIT_WITH_STL
 #include <iomanip>
 #include <sstream>
 #include <string>
 #endif
 
-#ifndef _QENTEM_DIGIT_TESTS_H
-#define _QENTEM_DIGIT_TESTS_H
+#ifndef QENTEM_DIGIT_TESTS_H
+#define QENTEM_DIGIT_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -42,20 +42,20 @@ static SizeT32 HexStringToNumber(const char *str) noexcept {
     return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
 }
 
-template <typename _Number_T>
-QENTEM_NOINLINE static void IntToStreamEqual(QTest &helper, StringStream<char> &stream, _Number_T number,
+template <typename Number_T>
+QENTEM_NOINLINE static void IntToStreamEqual(QTest &helper, StringStream<char> &stream, Number_T number,
                                              const char *expected, const char *name, unsigned long line) {
     Digit::NumberToString(stream, number);
     helper.Equal(stream, expected, name, line);
     stream.Clear();
 }
 
-template <typename _Stream_T, typename _Number_T>
-QENTEM_NOINLINE static void RealToStreamEqual(QTest &helper, _Stream_T &stream, _Number_T number,
+template <typename Stream_T, typename Number_T>
+QENTEM_NOINLINE static void RealToStreamEqual(QTest &helper, Stream_T &stream, Number_T number,
                                               Digit::RealFormatInfo format, const char *expected, const char *name,
                                               unsigned long line) {
     if (!helper.HasError() || helper.IsContinueOnError()) {
-#ifdef _QENTEM_COMPARE_DIGIT_WITH_STL
+#ifdef QENTEM_COMPARE_DIGIT_WITH_STL
         std::ostringstream out;
         out.precision(format.Precision);
         out << number;
@@ -73,8 +73,8 @@ QENTEM_NOINLINE static void RealToStreamEqual(QTest &helper, _Stream_T &stream, 
     }
 }
 
-template <typename _Number_T>
-QENTEM_NOINLINE static bool StringToNumber(const QTest &helper, _Number_T &num, const char *str) noexcept {
+template <typename Number_T>
+QENTEM_NOINLINE static bool StringToNumber(const QTest &helper, Number_T &num, const char *str) noexcept {
     QNumber64   number;
     SizeT       offset = 0;
     const SizeT length = StringUtils::Count(str);
@@ -82,17 +82,17 @@ QENTEM_NOINLINE static bool StringToNumber(const QTest &helper, _Number_T &num, 
     if (!helper.HasError() || helper.IsContinueOnError()) {
         switch (Digit::StringToNumber(number, str, offset, length)) {
             case QNumberType::Natural: {
-                num = _Number_T(number.Natural);
+                num = Number_T(number.Natural);
                 break;
             }
 
             case QNumberType::Integer: {
-                num = _Number_T(number.Integer);
+                num = Number_T(number.Integer);
                 break;
             }
 
             case QNumberType::Real: {
-                num = _Number_T(number.Real);
+                num = Number_T(number.Real);
                 break;
             }
 
@@ -2091,8 +2091,8 @@ static void TestHexStringToNumber(QTest &helper) {
     helper.Equal(number, 39321U, "number", __LINE__);
 }
 
-template <typename _Stream_T>
-static void TestIntToString1(QTest &helper, _Stream_T &stream) {
+template <typename Stream_T>
+static void TestIntToString1(QTest &helper, Stream_T &stream) {
     IntToStreamEqual(helper, stream, SizeT8{255}, "255", "return", __LINE__);
     IntToStreamEqual(helper, stream, char{-127}, "-127", "return", __LINE__);
 
@@ -2119,8 +2119,8 @@ static void TestIntToString1(QTest &helper, _Stream_T &stream) {
     IntToStreamEqual(helper, stream, 18446744073709551615ULL, "18446744073709551615", "return", __LINE__);
 }
 
-template <typename _Stream_T>
-static void TestDoubleToString1(QTest &helper, _Stream_T &stream) {
+template <typename Stream_T>
+static void TestDoubleToString1(QTest &helper, Stream_T &stream) {
     RealToStreamEqual(helper, stream, -0.0, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0, 6U, "0", "return", __LINE__);
 
@@ -2767,8 +2767,8 @@ static void TestDoubleToString1(QTest &helper, _Stream_T &stream) {
                       "340282366920938463463374607431768211456", "return", __LINE__);
 }
 
-template <typename _Stream_T>
-static void TestDoubleToString2(QTest &helper, _Stream_T &stream) {
+template <typename Stream_T>
+static void TestDoubleToString2(QTest &helper, Stream_T &stream) {
     RealToStreamEqual(helper, stream, -0.0, 15U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0, 15U, "0", "return", __LINE__);
 
@@ -3249,8 +3249,8 @@ static void TestDoubleToString2(QTest &helper, _Stream_T &stream) {
     RealToStreamEqual(helper, stream, 8.005, 15U, "8.005", "return", __LINE__);
 }
 
-template <typename _Stream_T>
-static void TestDoubleToString3(QTest &helper, _Stream_T &stream) {
+template <typename Stream_T>
+static void TestDoubleToString3(QTest &helper, Stream_T &stream) {
     RealToStreamEqual(helper, stream, -1.0, 6U, "-1", "return", __LINE__);
 
     RealToStreamEqual(helper, stream, 70.0, 6U, "70", "return", __LINE__);
@@ -3319,8 +3319,8 @@ static void TestDoubleToString3(QTest &helper, _Stream_T &stream) {
         "return", __LINE__);
 }
 
-template <typename _Stream_T>
-static void TestFloatToString1(QTest &helper, _Stream_T &stream) {
+template <typename Stream_T>
+static void TestFloatToString1(QTest &helper, Stream_T &stream) {
     RealToStreamEqual(helper, stream, -0.0F, 6U, "-0", "return", __LINE__);
     RealToStreamEqual(helper, stream, 0.0F, 6U, "0", "return", __LINE__);
 
@@ -3849,8 +3849,8 @@ static void TestFloatToString1(QTest &helper, _Stream_T &stream) {
                       "return", __LINE__);
 }
 
-template <typename _Stream_T>
-static void TestFloatToString2(QTest &helper, _Stream_T &stream) {
+template <typename Stream_T>
+static void TestFloatToString2(QTest &helper, Stream_T &stream) {
     RealToStreamEqual(helper, stream, -1.0F, 6U, "-1", "return", __LINE__);
 
     RealToStreamEqual(helper, stream, 70.0F, 6U, "70", "return", __LINE__);

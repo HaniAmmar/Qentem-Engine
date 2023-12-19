@@ -23,17 +23,17 @@
 #include "Digit.hpp"
 #include "Unicode.hpp"
 
-#ifndef _QENTEM_JSON_UTILS_H
-#define _QENTEM_JSON_UTILS_H
+#ifndef QENTEM_JSON_UTILS_H
+#define QENTEM_JSON_UTILS_H
 
 namespace Qentem {
 
 template <typename>
-struct _JSONotation_T;
+struct JSONotation_T;
 
-template <typename _Char_T, typename _Stream_T>
-static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &stream) {
-    using JSONotation = _JSONotation_T<_Char_T>;
+template <typename Char_T, typename Stream_T>
+static SizeT UnEscapeJSON(const Char_T *content, SizeT length, Stream_T &stream) {
+    using JSONotation = JSONotation_T<Char_T>;
 
     SizeT offset  = 0;
     SizeT offset2 = 0;
@@ -55,7 +55,7 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
                 ++offset;
                 offset2 = offset;
                 ++offset2;
-                const _Char_T ch = content[offset];
+                const Char_T ch = content[offset];
 
                 switch (ch) {
                     case JSONotation::QuoteChar:
@@ -100,7 +100,7 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
                             offset2 = offset;
 
                             if ((code >> 8U) != 0xD8U) {
-                                Unicode::ToUTF<_Char_T>(code, stream);
+                                Unicode::ToUTF<Char_T>(code, stream);
                                 continue;
                             }
 
@@ -112,7 +112,7 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
                                 code += Digit::HexStringToNumber((content + offset), SizeT{4}) & 0x3FFU;
                                 code += 0x10000U;
 
-                                Unicode::ToUTF<_Char_T>(code, stream);
+                                Unicode::ToUTF<Char_T>(code, stream);
 
                                 offset += SizeT{4};
                                 offset2 = offset;
@@ -151,15 +151,15 @@ static SizeT UnEscapeJSON(const _Char_T *content, SizeT length, _Stream_T &strea
     return offset;
 }
 
-template <typename _Char_T, typename _Stream_T>
-static void EscapeJSON(const _Char_T *content, SizeT length, _Stream_T &stream) {
-    using JSONotation = _JSONotation_T<_Char_T>;
+template <typename Char_T, typename Stream_T>
+static void EscapeJSON(const Char_T *content, SizeT length, Stream_T &stream) {
+    using JSONotation = JSONotation_T<Char_T>;
 
     SizeT offset  = 0;
     SizeT offset2 = 0;
 
     while (offset < length) {
-        const _Char_T ch = content[offset];
+        const Char_T ch = content[offset];
 
         switch (ch) {
             case JSONotation::QuoteChar:
@@ -203,77 +203,77 @@ static void EscapeJSON(const _Char_T *content, SizeT length, _Stream_T &stream) 
 template <typename, SizeT32>
 struct JSONotationStrings;
 
-template <typename _Char_T>
-struct _JSONotation_T {
+template <typename Char_T>
+struct JSONotation_T {
   private:
-    static constexpr SizeT32 _size = sizeof(_Char_T);
+    static constexpr SizeT32 _size = sizeof(Char_T);
 
   public:
-    static constexpr _Char_T QuoteChar    = '"';
-    static constexpr _Char_T CommaChar    = ',';
-    static constexpr _Char_T ColonChar    = ':';
-    static constexpr _Char_T SCurlyChar   = '{'; // Start
-    static constexpr _Char_T ECurlyChar   = '}'; // End
-    static constexpr _Char_T SSquareChar  = '['; // Start
-    static constexpr _Char_T ESquareChar  = ']'; // End
-    static constexpr _Char_T SlashChar    = '/';
-    static constexpr _Char_T BSlashChar   = '\\';
-    static constexpr _Char_T SpaceChar    = ' ';
-    static constexpr _Char_T DotChar      = '.';
-    static constexpr _Char_T NegativeChar = '-';
+    static constexpr Char_T QuoteChar    = '"';
+    static constexpr Char_T CommaChar    = ',';
+    static constexpr Char_T ColonChar    = ':';
+    static constexpr Char_T SCurlyChar   = '{'; // Start
+    static constexpr Char_T ECurlyChar   = '}'; // End
+    static constexpr Char_T SSquareChar  = '['; // Start
+    static constexpr Char_T ESquareChar  = ']'; // End
+    static constexpr Char_T SlashChar    = '/';
+    static constexpr Char_T BSlashChar   = '\\';
+    static constexpr Char_T SpaceChar    = ' ';
+    static constexpr Char_T DotChar      = '.';
+    static constexpr Char_T NegativeChar = '-';
 
-    static constexpr _Char_T BackSpaceControlChar = '\b';
-    static constexpr _Char_T TabControlChar       = '\t';
-    static constexpr _Char_T LineControlChar      = '\n';
-    static constexpr _Char_T FormfeedControlChar  = '\f';
-    static constexpr _Char_T CarriageControlChar  = '\r';
+    static constexpr Char_T BackSpaceControlChar = '\b';
+    static constexpr Char_T TabControlChar       = '\t';
+    static constexpr Char_T LineControlChar      = '\n';
+    static constexpr Char_T FormfeedControlChar  = '\f';
+    static constexpr Char_T CarriageControlChar  = '\r';
 
-    static _Char_T GetReplacementChar(SizeT32 index) noexcept {
-        static constexpr _Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
+    static Char_T GetReplacementChar(SizeT32 index) noexcept {
+        static constexpr Char_T ReplaceList[] = {0, 0, 0, 0, 0, 0, 0, 0, 'b', 't', 'n', 0, 'f', 'r'};
 
         return ReplaceList[index];
     }
 
-    static constexpr _Char_T B_Char  = 'b';
-    static constexpr _Char_T T_Char  = 't';
-    static constexpr _Char_T N_Char  = 'n';
-    static constexpr _Char_T F_Char  = 'f';
-    static constexpr _Char_T R_Char  = 'r';
-    static constexpr _Char_T U_Char  = 'u';
-    static constexpr _Char_T CU_Char = 'U';
+    static constexpr Char_T B_Char  = 'b';
+    static constexpr Char_T T_Char  = 't';
+    static constexpr Char_T N_Char  = 'n';
+    static constexpr Char_T F_Char  = 'f';
+    static constexpr Char_T R_Char  = 'r';
+    static constexpr Char_T U_Char  = 'u';
+    static constexpr Char_T CU_Char = 'U';
 
-    static constexpr SizeT          TrueStringLength = SizeT{4};
-    static constexpr const _Char_T *TrueString       = &(JSONotationStrings<_Char_T, _size>::TrueString[0]);
+    static constexpr SizeT         TrueStringLength = SizeT{4};
+    static constexpr const Char_T *TrueString       = &(JSONotationStrings<Char_T, _size>::TrueString[0]);
 
-    static constexpr SizeT          FalseStringLength = SizeT{5};
-    static constexpr const _Char_T *FalseString       = &(JSONotationStrings<_Char_T, _size>::FalseString[0]);
+    static constexpr SizeT         FalseStringLength = SizeT{5};
+    static constexpr const Char_T *FalseString       = &(JSONotationStrings<Char_T, _size>::FalseString[0]);
 
-    static constexpr SizeT          NullStringLength = SizeT{4};
-    static constexpr const _Char_T *NullString       = &(JSONotationStrings<_Char_T, _size>::NullString[0]);
+    static constexpr SizeT         NullStringLength = SizeT{4};
+    static constexpr const Char_T *NullString       = &(JSONotationStrings<Char_T, _size>::NullString[0]);
 };
 
 // char
-template <typename _Char_T>
-struct JSONotationStrings<_Char_T, 1U> {
-    static constexpr const _Char_T *FalseString = "false";
-    static constexpr const _Char_T *TrueString  = "true";
-    static constexpr const _Char_T *NullString  = "null";
+template <typename Char_T>
+struct JSONotationStrings<Char_T, 1U> {
+    static constexpr const Char_T *FalseString = "false";
+    static constexpr const Char_T *TrueString  = "true";
+    static constexpr const Char_T *NullString  = "null";
 };
 
 // char16_t
-template <typename _Char_T>
-struct JSONotationStrings<_Char_T, 2U> {
-    static constexpr const _Char_T *FalseString = u"false";
-    static constexpr const _Char_T *TrueString  = u"true";
-    static constexpr const _Char_T *NullString  = u"null";
+template <typename Char_T>
+struct JSONotationStrings<Char_T, 2U> {
+    static constexpr const Char_T *FalseString = u"false";
+    static constexpr const Char_T *TrueString  = u"true";
+    static constexpr const Char_T *NullString  = u"null";
 };
 
 // char32_t
-template <typename _Char_T>
-struct JSONotationStrings<_Char_T, 4U> {
-    static constexpr const _Char_T *FalseString = U"false";
-    static constexpr const _Char_T *TrueString  = U"true";
-    static constexpr const _Char_T *NullString  = U"null";
+template <typename Char_T>
+struct JSONotationStrings<Char_T, 4U> {
+    static constexpr const Char_T *FalseString = U"false";
+    static constexpr const Char_T *TrueString  = U"true";
+    static constexpr const Char_T *NullString  = U"null";
 };
 
 // wchar_t size = 4

@@ -22,26 +22,26 @@
 
 #include "Common.hpp"
 
-#ifndef _QENTEM_STRING_UTILS_H
-#define _QENTEM_STRING_UTILS_H
+#ifndef QENTEM_STRING_UTILS_H
+#define QENTEM_STRING_UTILS_H
 
 namespace Qentem {
 
 struct StringUtils {
-    template <typename _Char_T>
-    struct _WhiteSpaceChars_T {
-        static constexpr _Char_T SpaceChar           = ' ';
-        static constexpr _Char_T LineControlChar     = '\n';
-        static constexpr _Char_T TabControlChar      = '\t';
-        static constexpr _Char_T CarriageControlChar = '\r';
+    template <typename Char_T>
+    struct WhiteSpaceChars_T {
+        static constexpr Char_T SpaceChar           = ' ';
+        static constexpr Char_T LineControlChar     = '\n';
+        static constexpr Char_T TabControlChar      = '\t';
+        static constexpr Char_T CarriageControlChar = '\r';
     };
 
-    template <typename _Char_T, typename _Number_T = SizeT>
-    static _Number_T Count(const _Char_T *str) noexcept {
-        _Number_T len = 0;
+    template <typename Char_T, typename Number_T = SizeT>
+    static Number_T Count(const Char_T *str) noexcept {
+        Number_T len = 0;
 
         if (str != nullptr) {
-            while (*str != _Char_T{0}) {
+            while (*str != Char_T{0}) {
                 ++str;
                 ++len;
             }
@@ -50,13 +50,13 @@ struct StringUtils {
         return len;
     }
 
-    // template <typename _Char_T, typename _Number_T = SizeT>
-    // static constexpr _Number_T ConstCount(const _Char_T *str) noexcept {
-    //     const _Char_T *str_2 = str;
-    //     _Number_T      len   = 0;
+    // template <typename Char_T, typename Number_T = SizeT>
+    // static constexpr Number_T ConstCount(const Char_T *str) noexcept {
+    //     const Char_T *str_2 = str;
+    //     Number_T      len   = 0;
 
     //     if (str_2 != nullptr) {
-    //         while (*str_2 != _Char_T{0}) {
+    //         while (*str_2 != Char_T{0}) {
     //             ++str_2;
     //             ++len;
     //         }
@@ -65,9 +65,9 @@ struct StringUtils {
     //     return len;
     // }
 
-    template <typename _Char_T, typename _Number_T>
-    static void TrimLeft(const _Char_T *str, _Number_T &offset, const _Number_T end_offset) noexcept {
-        using WhiteSpaceChars = _WhiteSpaceChars_T<_Char_T>;
+    template <typename Char_T, typename Number_T>
+    static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
+        using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
 
         while (offset < end_offset) {
             switch (str[offset]) {
@@ -86,9 +86,9 @@ struct StringUtils {
         }
     }
 
-    template <typename _Char_T, typename _Number_T>
-    static void TrimRight(const _Char_T *str, const _Number_T offset, _Number_T &end_offset) noexcept {
-        using WhiteSpaceChars = _WhiteSpaceChars_T<_Char_T>;
+    template <typename Char_T, typename Number_T>
+    static void TrimRight(const Char_T *str, const Number_T offset, Number_T &end_offset) noexcept {
+        using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
 
         if (end_offset > offset) {
             do {
@@ -113,18 +113,18 @@ struct StringUtils {
 
     // offset: the starting offset
     // length: the number of characters
-    template <typename _Char_T, typename _Number_T>
-    static void Trim(const _Char_T *str, _Number_T &offset, _Number_T &length) noexcept {
-        if (length != _Number_T{0}) {
-            _Number_T end_offset = (length + offset);
+    template <typename Char_T, typename Number_T>
+    static void Trim(const Char_T *str, Number_T &offset, Number_T &length) noexcept {
+        if (length != Number_T{0}) {
+            Number_T end_offset = (length + offset);
             TrimLeft(str, offset, end_offset);
             TrimRight(str, offset, end_offset);
             length = (end_offset - offset);
         }
     }
 
-    template <typename _Char_T>
-    static bool IsLess(const _Char_T *left, const _Char_T *right, SizeT left_length, SizeT right_length,
+    template <typename Char_T>
+    static bool IsLess(const Char_T *left, const Char_T *right, SizeT left_length, SizeT right_length,
                        bool orEqual) noexcept {
         SizeT offset = 0;
 
@@ -143,8 +143,8 @@ struct StringUtils {
         return (orEqual && (left_length == right_length));
     }
 
-    template <typename _Char_T>
-    static bool IsGreater(const _Char_T *left, const _Char_T *right, SizeT left_length, SizeT right_length,
+    template <typename Char_T>
+    static bool IsGreater(const Char_T *left, const Char_T *right, SizeT left_length, SizeT right_length,
                           bool orEqual) noexcept {
         SizeT offset = 0;
 
@@ -163,8 +163,8 @@ struct StringUtils {
         return (orEqual && (left_length == right_length));
     }
 
-    template <typename _Char_T>
-    static bool IsEqual(const _Char_T *left, const _Char_T *right, SizeT length) noexcept {
+    template <typename Char_T>
+    static bool IsEqual(const Char_T *left, const Char_T *right, SizeT length) noexcept {
         SizeT offset = 0;
 
         // if ((left != nullptr) && (right != nullptr)) {
@@ -176,8 +176,8 @@ struct StringUtils {
         return (length == offset);
     }
 
-    template <typename _Char_T>
-    static SizeT Hash(const _Char_T *key, SizeT length) noexcept {
+    template <typename Char_T>
+    static SizeT Hash(const Char_T *key, SizeT length) noexcept {
         constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
 
         SizeT hash   = SizeT{11};

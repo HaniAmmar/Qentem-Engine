@@ -4,8 +4,8 @@
 ///////////////////////////////////////
 using Qentem::BigInt;
 ///////////////////////////////////////
-template <typename _BigInt_T>
-static void StreamDigits(char *bits, unsigned int &index, _BigInt_T &bint) {
+template <typename BigInt_T>
+static void StreamDigits(char *bits, unsigned int &index, BigInt_T &bint) {
     index = 0;
 
     while (bint != 0) {
@@ -14,8 +14,8 @@ static void StreamDigits(char *bits, unsigned int &index, _BigInt_T &bint) {
     }
 }
 
-template <typename _BigInt_T>
-static void PrintDigits(_BigInt_T bint) {
+template <typename BigInt_T>
+static void PrintDigits(BigInt_T bint) {
     constexpr unsigned int max   = 309U;
     unsigned int           index = 0;
     static char            bits[max]{0};

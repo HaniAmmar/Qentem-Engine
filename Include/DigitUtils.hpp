@@ -22,8 +22,8 @@
 
 #include "Common.hpp"
 
-#ifndef _QENTEM_DIGIT_UTILS_H
-#define _QENTEM_DIGIT_UTILS_H
+#ifndef QENTEM_DIGIT_UTILS_H
+#define QENTEM_DIGIT_UTILS_H
 
 namespace Qentem {
 namespace DigitUtils {
@@ -32,27 +32,27 @@ template <typename, SizeT32>
 struct DigitStrings {};
 
 // char
-template <typename _Char_T>
-struct DigitStrings<_Char_T, 1U> {
-    static constexpr const _Char_T *InfinityString = "inf";
-    static constexpr const _Char_T *NANString      = "nan";
-    static constexpr const _Char_T *ZeroesString   = "0000000000000000000";
+template <typename Char_T>
+struct DigitStrings<Char_T, 1U> {
+    static constexpr const Char_T *InfinityString = "inf";
+    static constexpr const Char_T *NANString      = "nan";
+    static constexpr const Char_T *ZeroesString   = "0000000000000000000";
 };
 
 // char16_t
-template <typename _Char_T>
-struct DigitStrings<_Char_T, 2U> {
-    static constexpr const _Char_T *InfinityString = u"inf";
-    static constexpr const _Char_T *NANString      = u"nan";
-    static constexpr const _Char_T *ZeroesString   = u"0000000000000000000";
+template <typename Char_T>
+struct DigitStrings<Char_T, 2U> {
+    static constexpr const Char_T *InfinityString = u"inf";
+    static constexpr const Char_T *NANString      = u"nan";
+    static constexpr const Char_T *ZeroesString   = u"0000000000000000000";
 };
 
 // char32_t
-template <typename _Char_T>
-struct DigitStrings<_Char_T, 4U> {
-    static constexpr const _Char_T *InfinityString = U"inf";
-    static constexpr const _Char_T *NANString      = U"nan";
-    static constexpr const _Char_T *ZeroesString   = U"0000000000000000000";
+template <typename Char_T>
+struct DigitStrings<Char_T, 4U> {
+    static constexpr const Char_T *InfinityString = U"inf";
+    static constexpr const Char_T *NANString      = U"nan";
+    static constexpr const Char_T *ZeroesString   = U"0000000000000000000";
 };
 
 // wchar_t size = 4

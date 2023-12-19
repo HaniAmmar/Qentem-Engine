@@ -22,17 +22,17 @@
 
 #include "String.hpp"
 
-#ifndef _QENTEM_STRINGSTREAM_H
-#define _QENTEM_STRINGSTREAM_H
+#ifndef QENTEM_STRINGSTREAM_H
+#define QENTEM_STRINGSTREAM_H
 
 namespace Qentem {
 
 /*
  * String Stream struct without the null terminator.
  */
-template <typename _Char_T>
+template <typename Char_T>
 struct StringStream {
-    using CharType = _Char_T;
+    using CharType = Char_T;
 
     StringStream() = default;
 
@@ -87,7 +87,7 @@ struct StringStream {
         return *this;
     }
 
-    StringStream &operator=(const _Char_T *str) {
+    StringStream &operator=(const Char_T *str) {
         setCapacity(SizeT{0});
         setLength(SizeT{0});
         Memory::Deallocate(Storage());
@@ -97,7 +97,7 @@ struct StringStream {
         return *this;
     }
 
-    StringStream &operator=(const String<_Char_T> &string) {
+    StringStream &operator=(const String<Char_T> &string) {
         setCapacity(SizeT{0});
         setLength(SizeT{0});
         Memory::Deallocate(Storage());
@@ -109,7 +109,7 @@ struct StringStream {
         return *this;
     }
 
-    void operator+=(_Char_T one_char) {
+    void operator+=(Char_T one_char) {
         const SizeT len = Length();
 
         ++_length;
@@ -121,29 +121,29 @@ struct StringStream {
         Storage()[len] = one_char;
     }
 
-    inline void operator+=(const StringStream<_Char_T> &stream) {
+    inline void operator+=(const StringStream<Char_T> &stream) {
         write(stream.First(), stream.Length());
     }
 
-    inline void operator+=(const String<_Char_T> &string) {
+    inline void operator+=(const String<Char_T> &string) {
         const SizeT len = string.Length();
         write(string.Storage(len), len);
     }
 
-    inline void operator+=(const _Char_T *str) {
+    inline void operator+=(const Char_T *str) {
         write(str, StringUtils::Count(str));
     }
 
-    template <typename _Stream_T>
-    friend _Stream_T &operator<<(_Stream_T &out, const StringStream &stream) {
+    template <typename Stream_T>
+    friend Stream_T &operator<<(Stream_T &out, const StringStream &stream) {
         const SizeT len = stream.Length();
 
         if (stream.Capacity() > len) {
-            stream.Storage()[len] = _Char_T{0};
+            stream.Storage()[len] = Char_T{0};
             out << stream.First();
         } else {
             StringStream n_src = stream;
-            n_src += _Char_T{0};
+            n_src += Char_T{0};
             out << n_src.First();
         }
 
@@ -155,19 +155,19 @@ struct StringStream {
         return out;
     }
 
-    inline friend StringStream &operator<<(StringStream &out, const String<_Char_T> &string) {
+    inline friend StringStream &operator<<(StringStream &out, const String<Char_T> &string) {
         const SizeT len = string.Length();
 
         out.write(string.Storage(len), len);
         return out;
     }
 
-    inline friend StringStream &operator<<(StringStream &out, _Char_T ch) {
+    inline friend StringStream &operator<<(StringStream &out, Char_T ch) {
         out += ch;
         return out;
     }
 
-    inline friend StringStream &operator<<(StringStream &out, const _Char_T *str) {
+    inline friend StringStream &operator<<(StringStream &out, const Char_T *str) {
         out.write(str, StringUtils::Count(str));
         return out;
     }
@@ -176,19 +176,19 @@ struct StringStream {
         return ((Length() == stream.Length()) && StringUtils::IsEqual(First(), stream.First(), Length()));
     }
 
-    inline bool operator==(const String<_Char_T> &string) const noexcept {
+    inline bool operator==(const String<Char_T> &string) const noexcept {
         const SizeT len = string.Length();
 
         return ((Length() == len) && StringUtils::IsEqual(First(), string.Storage(len), Length()));
     }
 
-    inline bool operator==(const _Char_T *str) const noexcept {
+    inline bool operator==(const Char_T *str) const noexcept {
         const SizeT len = StringUtils::Count(str);
 
         return ((Length() == len) && StringUtils::IsEqual(First(), str, len));
     }
 
-    inline bool IsEqual(const _Char_T *str, const SizeT length) const noexcept {
+    inline bool IsEqual(const Char_T *str, const SizeT length) const noexcept {
         return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
     }
 
@@ -196,15 +196,15 @@ struct StringStream {
         return (!(*this == stream));
     }
 
-    inline bool operator!=(const String<_Char_T> &string) const noexcept {
+    inline bool operator!=(const String<Char_T> &string) const noexcept {
         return (!(*this == string));
     }
 
-    inline bool operator!=(const _Char_T *str) const noexcept {
+    inline bool operator!=(const Char_T *str) const noexcept {
         return (!(*this == str));
     }
 
-    inline void Write(const _Char_T *str, const SizeT length) {
+    inline void Write(const Char_T *str, const SizeT length) {
         write(str, length);
     }
 
@@ -229,7 +229,7 @@ struct StringStream {
         SizeT end = Length();
 
         while (index < end) {
-            const _Char_T tmp = Storage()[index];
+            const Char_T tmp = Storage()[index];
 
             --end;
             Storage()[index] = Storage()[end];
@@ -238,14 +238,14 @@ struct StringStream {
         }
     }
 
-    inline void InsertAt(_Char_T ch, SizeT index) {
+    inline void InsertAt(Char_T ch, SizeT index) {
         if (index < Length()) {
-            _Char_T       *first  = (Storage() + index);
-            _Char_T       *second = first;
-            const _Char_T *end    = End();
+            Char_T       *first  = (Storage() + index);
+            Char_T       *second = first;
+            const Char_T *end    = End();
 
-            _Char_T tmp = *first;
-            *first      = ch;
+            Char_T tmp = *first;
+            *first     = ch;
 
             while (++second < end) {
                 ch      = *second;
@@ -258,7 +258,7 @@ struct StringStream {
     }
 
     // Set the needed length to write directly to the buffer,
-    inline _Char_T *Buffer(const SizeT len) {
+    inline Char_T *Buffer(const SizeT len) {
         const SizeT current_offset = Length();
         _length += len;
 
@@ -277,30 +277,30 @@ struct StringStream {
         }
     }
 
-    _Char_T *Detach() noexcept {
+    Char_T *Detach() noexcept {
         setCapacity(SizeT{0});
         setLength(SizeT{0});
-        _Char_T *str = Storage();
+        Char_T *str = Storage();
         clearStorage();
 
         return str;
     }
 
-    String<_Char_T> GetString() {
+    String<Char_T> GetString() {
         const SizeT len = Length();
 
         if (Capacity() > len) {
-            Storage()[len] = _Char_T{0};
-            return String<_Char_T>(Detach(), len);
+            Storage()[len] = Char_T{0};
+            return String<Char_T>(Detach(), len);
         }
 
-        String<_Char_T> str{First(), len};
+        String<Char_T> str{First(), len};
         Reset();
 
         return str;
     }
 
-    inline _Char_T *Storage() const noexcept {
+    inline Char_T *Storage() const noexcept {
         return _storage;
     }
 
@@ -312,11 +312,11 @@ struct StringStream {
         return _capacity;
     }
 
-    inline const _Char_T *First() const noexcept {
+    inline const Char_T *First() const noexcept {
         return Storage();
     }
 
-    inline _Char_T *Last() const noexcept {
+    inline Char_T *Last() const noexcept {
         if (IsNotEmpty()) {
             return (Storage() + (Length() - SizeT{1}));
         }
@@ -324,7 +324,7 @@ struct StringStream {
         return nullptr;
     }
 
-    inline const _Char_T *End() const noexcept {
+    inline const Char_T *End() const noexcept {
         return (First() + Length());
     }
 
@@ -337,25 +337,25 @@ struct StringStream {
     }
 
     // For STL
-    inline const _Char_T *begin() const noexcept {
+    inline const Char_T *begin() const noexcept {
         return First();
     }
 
-    inline const _Char_T *end() const noexcept {
+    inline const Char_T *end() const noexcept {
         return End();
     }
 
-    inline _Char_T *begin() noexcept {
+    inline Char_T *begin() noexcept {
         return Storage();
     }
 
-    inline _Char_T *end() noexcept {
+    inline Char_T *end() noexcept {
         return (Storage() + Length());
     }
 
     //////////// Private ////////////
   private:
-    void setStorage(_Char_T *new_storage) noexcept {
+    void setStorage(Char_T *new_storage) noexcept {
         _storage = new_storage;
     }
 
@@ -374,11 +374,11 @@ struct StringStream {
     void allocate(SizeT size) {
         size = Memory::AlignSize(size * SizeT{4});
         setCapacity(size);
-        setStorage(Memory::Allocate<_Char_T>(size));
+        setStorage(Memory::Allocate<Char_T>(size));
     }
 
-    inline void write(const _Char_T *str, const SizeT len) {
-        constexpr SizeT32 size           = sizeof(_Char_T);
+    inline void write(const Char_T *str, const SizeT len) {
+        constexpr SizeT32 size           = sizeof(Char_T);
         const SizeT       current_offset = Length();
         _length += len;
 
@@ -386,22 +386,22 @@ struct StringStream {
             expand(_length);
         }
 
-        Memory::Copy<size>((Storage() + current_offset), str, (len * size));
+        Memory::Copy((Storage() + current_offset), str, (len * size));
     }
 
     void expand(const SizeT new_capacity) {
-        constexpr SizeT32 size    = sizeof(_Char_T);
+        constexpr SizeT32 size    = sizeof(Char_T);
         const SizeT       src_cap = Capacity();
-        _Char_T          *str     = Storage();
+        Char_T           *str     = Storage();
         allocate(new_capacity);
 
-        Memory::Copy<size>(Storage(), str, (src_cap * size));
+        Memory::Copy(Storage(), str, (src_cap * size));
         Memory::Deallocate(str);
     }
 
-    _Char_T *_storage{nullptr};
-    SizeT    _length{0};
-    SizeT    _capacity{0};
+    Char_T *_storage{nullptr};
+    SizeT   _length{0};
+    SizeT   _capacity{0};
 };
 
 } // namespace Qentem

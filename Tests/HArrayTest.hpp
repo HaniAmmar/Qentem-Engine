@@ -24,8 +24,8 @@
 #include "Digit.hpp"
 #include "HArray.hpp"
 
-#ifndef _QENTEM_HARRAY_TESTS_H
-#define _QENTEM_HARRAY_TESTS_H
+#ifndef QENTEM_HARRAY_TESTS_H
+#define QENTEM_HARRAY_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -96,11 +96,11 @@ static void TestHArray1(QTest &helper) {
 }
 
 static void TestHArray2(QTest &helper) {
-    HashArray                       numbers1(8);
-    HashArray                       numbers2;
-    const String<char>             *key;
-    const char                     *str_c;
-    const _HAItem_T<SizeT32, char> *storage;
+    HashArray                      numbers1(8);
+    HashArray                      numbers2;
+    const String<char>            *key;
+    const char                    *str_c;
+    const HAItem_T<SizeT32, char> *storage;
 
     numbers1["key1"] = 1;
     helper.Equal(numbers1.Size(), 1U, "Size", __LINE__);
@@ -258,11 +258,11 @@ static void TestHArray2(QTest &helper) {
 }
 
 static void TestHArray3(QTest &helper) {
-    HashArray                       numbers1(8);
-    HashArray                       numbers2;
-    const String<char>             *key;
-    const char                     *str_c;
-    const _HAItem_T<SizeT32, char> *storage;
+    HashArray                      numbers1(8);
+    HashArray                      numbers2;
+    const String<char>            *key;
+    const char                    *str_c;
+    const HAItem_T<SizeT32, char> *storage;
 
     numbers2["key4"] = 40;
     numbers2["key1"] = 10;
@@ -303,11 +303,11 @@ static void TestHArray3(QTest &helper) {
 }
 
 static void TestHArray4(QTest &helper) {
-    HashArray                       numbers1;
-    HashArray                       numbers2;
-    HashArray                       numbers3(3);
-    const _HAItem_T<SizeT32, char> *storage;
-    SizeT32                        *value;
+    HashArray                      numbers1;
+    HashArray                      numbers2;
+    HashArray                      numbers3(3);
+    const HAItem_T<SizeT32, char> *storage;
+    SizeT32                       *value;
 
     numbers1["key1"] = 10;
     numbers1["key2"] = 20;
@@ -592,10 +592,10 @@ static void TestHArray5(QTest &helper) {
 }
 
 static void TestHArray6(QTest &helper) {
-    SizeT                                id;
-    HArray<String<char>, char>           strings1;
-    HArray<String<char>, char>           strings2;
-    const _HAItem_T<String<char>, char> *storage;
+    SizeT                               id;
+    HArray<String<char>, char>          strings1;
+    HArray<String<char>, char>          strings2;
+    const HAItem_T<String<char>, char> *storage;
 
     String<char> key1("k-1-ABCDEF0123456789ABCDEF0123456789");
     String<char> key2("k-2-ABCDEF0123456789ABCDEF0123456789");
@@ -795,10 +795,10 @@ static void TestHArray8(QTest &helper) {
 static void TestHArray9(QTest &helper) {
     constexpr SizeT id = 10;
 
-    HArray<SizeT, char>                   list(id);
-    const Qentem::_HAItem_T<SizeT, char> *item;
-    const Qentem::_HAItem_T<SizeT, char> *item2;
-    const SizeT                          *value;
+    HArray<SizeT, char>                  list(id);
+    const Qentem::HAItem_T<SizeT, char> *item;
+    const Qentem::HAItem_T<SizeT, char> *item2;
+    const SizeT                         *value;
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
@@ -889,7 +889,7 @@ static void TestHArray10(QTest &helper) {
         Digit::NumberToString(key, i);
         list[key] = i;
 
-        const Qentem::_HAItem_T<SizeT, char> *item = list.GetItem(key);
+        const Qentem::HAItem_T<SizeT, char> *item = list.GetItem(key);
 
         helper.NotEqual(item, nullptr, "item", "null", __LINE__);
         helper.Equal(item->Value, i, "index", __LINE__);

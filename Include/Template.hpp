@@ -24,8 +24,8 @@
 #include "Digit.hpp"
 #include "Tags.hpp"
 
-#ifndef _QENTEM_TEMPLATE_H
-#define _QENTEM_TEMPLATE_H
+#ifndef QENTEM_TEMPLATE_H
+#define QENTEM_TEMPLATE_H
 
 namespace Qentem {
 
@@ -174,10 +174,10 @@ template <typename, typename, typename>
 struct TemplateSub;
 
 template <typename>
-struct _TemplatePatterns_T;
+struct TemplatePatterns_T;
 
 template <typename>
-struct _QOperationSymbol_T;
+struct QOperationSymbol_T;
 
 struct Template {
     Template()                            = delete;
@@ -187,16 +187,16 @@ struct Template {
     Template &operator=(const Template &) = delete;
     ~Template()                           = delete;
 
-    // template <typename _Char_T, typename _Value_T, typename _StringStream_T>
-    // inline static void CachedRender(const _Char_T *content, const SizeT length, const _Value_T &value,
-    //                                 _StringStream_T &stream, const _Char_T *name, const SizeT name_length) {
+    // template <typename Char_T, typename Value_T, typename StringStream_T>
+    // inline static void CachedRender(const Char_T *content, const SizeT length, const Value_T &value,
+    //                                 StringStream_T &stream, const Char_T *name, const SizeT name_length) {
     //     // See Examples/Template/Template17.cpp
     // }
 
-    template <typename _Char_T, typename _Value_T, typename _StringStream_T>
-    inline static _StringStream_T &Render(const _Char_T *content, SizeT length, const _Value_T &value,
-                                          _StringStream_T &stream, Array<Tags::TagBit> &tags_cache) {
-        using TemplateSubCV = TemplateSub<_Char_T, _Value_T, _StringStream_T>;
+    template <typename Char_T, typename Value_T, typename StringStream_T>
+    inline static StringStream_T &Render(const Char_T *content, SizeT length, const Value_T &value,
+                                         StringStream_T &stream, Array<Tags::TagBit> &tags_cache) {
+        using TemplateSubCV = TemplateSub<Char_T, Value_T, StringStream_T>;
         const TemplateSubCV temp{content, length, &stream, &value};
 
         if (tags_cache.IsEmpty()) {
@@ -209,39 +209,39 @@ struct Template {
         return stream;
     }
 
-    template <typename _Char_T, typename _Value_T, typename _StringStream_T>
-    inline static _StringStream_T &Render(const _Char_T *content, const SizeT length, const _Value_T &value,
-                                          _StringStream_T &stream) {
+    template <typename Char_T, typename Value_T, typename StringStream_T>
+    inline static StringStream_T &Render(const Char_T *content, const SizeT length, const Value_T &value,
+                                         StringStream_T &stream) {
         Array<Tags::TagBit> tags_cache;
         Render(content, length, value, stream, tags_cache);
         return stream;
     }
 
-    template <typename _Char_T, typename _Value_T, typename _StringStream_T>
-    inline static _StringStream_T &Render(const _Char_T *content, const _Value_T &value, _StringStream_T &stream) {
+    template <typename Char_T, typename Value_T, typename StringStream_T>
+    inline static StringStream_T &Render(const Char_T *content, const Value_T &value, StringStream_T &stream) {
         Array<Tags::TagBit> tags_cache;
         Render(content, StringUtils::Count(content), value, stream, tags_cache);
         return stream;
     }
 
-    template <typename _StringStream_T, typename _Char_T, typename _Value_T>
-    inline static _StringStream_T Render(const _Char_T *content, const SizeT length, const _Value_T &value) {
-        _StringStream_T stream;
+    template <typename StringStream_T, typename Char_T, typename Value_T>
+    inline static StringStream_T Render(const Char_T *content, const SizeT length, const Value_T &value) {
+        StringStream_T stream;
         Render(content, length, value, stream);
         return stream;
     }
 
-    template <typename _StringStream_T, typename _Char_T, typename _Value_T>
-    inline static _StringStream_T Render(const _Char_T *content, const _Value_T &value) {
-        return Render<_StringStream_T>(content, StringUtils::Count(content), value);
+    template <typename StringStream_T, typename Char_T, typename Value_T>
+    inline static StringStream_T Render(const Char_T *content, const Value_T &value) {
+        return Render<StringStream_T>(content, StringUtils::Count(content), value);
     }
 };
 
-template <typename _Char_T, typename _Value_T, typename _StringStream_T>
+template <typename Char_T, typename Value_T, typename StringStream_T>
 struct TemplateSub {
     TemplateSub() = delete;
 
-    TemplateSub(const _Char_T *content, SizeT length, _StringStream_T *stream, const _Value_T *root_value,
+    TemplateSub(const Char_T *content, SizeT length, StringStream_T *stream, const Value_T *root_value,
                 const TemplateSub *parent = nullptr, const SizeT16 level = 0) noexcept
         : _content{content}, _stream{stream}, _value{root_value}, _parent{parent}, _length{length}, _level{level} {
     }
@@ -260,7 +260,7 @@ struct TemplateSub {
     using QOperation      = QExpression::QOperation;
     using ExpressionType  = QExpression::ExpressionType;
     using ExpressionValue = QExpression::ExpressionValue;
-    using TagPatterns     = Tags::_TagPatterns_T<_Char_T>;
+    using TagPatterns     = Tags::TagPatterns_T<Char_T>;
 
   public:
     void Render(const TagBit *tag, const TagBit *end) const {
@@ -337,15 +337,15 @@ struct TemplateSub {
 
                 switch (_content[current_offset]) {
                     case TagPatterns::Var_2ND_Char: {
-                        static constexpr const _Char_T *var_prefix_p_2 = (TagPatterns::VariablePrefix + SizeT{2});
-                        constexpr SizeT var_prefix_length_m_2          = (TagPatterns::VariablePrefixLength - SizeT{2});
-                        constexpr SizeT var_prefix_length_m_1          = (TagPatterns::VariablePrefixLength - SizeT{1});
+                        static constexpr const Char_T *var_prefix_p_2 = (TagPatterns::VariablePrefix + SizeT{2});
+                        constexpr SizeT var_prefix_length_m_2         = (TagPatterns::VariablePrefixLength - SizeT{2});
+                        constexpr SizeT var_prefix_length_m_1         = (TagPatterns::VariablePrefixLength - SizeT{1});
                         ++current_offset;
 
                         if (StringUtils::IsEqual(var_prefix_p_2, (_content + current_offset), var_prefix_length_m_2)) {
                             current_offset += var_prefix_length_m_1;
-                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
-                                                                      current_offset, end_offset, _length);
+                            current_offset = Engine::FindOne<Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                     current_offset, end_offset, _length);
 
                             if (current_offset != SizeT{0}) {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
@@ -362,7 +362,7 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::Raw_2ND_Char: {
-                        static constexpr const _Char_T *r_var_prefix_p_2 = (TagPatterns::RawVariablePrefix + SizeT{2});
+                        static constexpr const Char_T *r_var_prefix_p_2 = (TagPatterns::RawVariablePrefix + SizeT{2});
                         constexpr SizeT r_var_prefix_length_m_2 = (TagPatterns::RawVariablePrefixLength - SizeT{2});
                         constexpr SizeT r_var_prefix_length_m_1 = (TagPatterns::RawVariablePrefixLength - SizeT{1});
                         ++current_offset;
@@ -370,8 +370,8 @@ struct TemplateSub {
                         if (StringUtils::IsEqual(r_var_prefix_p_2, (_content + current_offset),
                                                  r_var_prefix_length_m_2)) {
                             current_offset += r_var_prefix_length_m_1;
-                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
-                                                                      current_offset, end_offset, _length);
+                            current_offset = Engine::FindOne<Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                     current_offset, end_offset, _length);
 
                             if (current_offset != SizeT{0}) {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
@@ -388,16 +388,16 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::Math_2ND_Char: {
-                        static constexpr const _Char_T *math_prefix_p_2 = (TagPatterns::MathPrefix + SizeT{2});
-                        constexpr SizeT math_prefix_length_m_2          = (TagPatterns::MathPrefixLength - SizeT{2});
+                        static constexpr const Char_T *math_prefix_p_2 = (TagPatterns::MathPrefix + SizeT{2});
+                        constexpr SizeT math_prefix_length_m_2         = (TagPatterns::MathPrefixLength - SizeT{2});
                         ++current_offset;
 
                         if (StringUtils::IsEqual(math_prefix_p_2, (_content + current_offset),
                                                  math_prefix_length_m_2)) {
                             current_offset += math_prefix_length_m_2;
                             current_offset =
-                                Engine::SkipInnerPatterns<_Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
-                                                                   _content, current_offset, end_offset, _length);
+                                Engine::SkipInnerPatterns<Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                  _content, current_offset, end_offset, _length);
 
                             if (current_offset != SizeT{0}) {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
@@ -412,7 +412,7 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::InlineIf_2ND_Char: {
-                        static constexpr const _Char_T *ii_if_prefix_p_2 = (TagPatterns::InLineIfPrefix + SizeT{2});
+                        static constexpr const Char_T *ii_if_prefix_p_2 = (TagPatterns::InLineIfPrefix + SizeT{2});
                         constexpr SizeT ii_if_prefix_length_m_2 = (TagPatterns::InLineIfPrefixLength - SizeT{2});
                         ++current_offset;
 
@@ -420,8 +420,8 @@ struct TemplateSub {
                                                  ii_if_prefix_length_m_2)) {
                             current_offset += ii_if_prefix_length_m_2;
                             current_offset =
-                                Engine::SkipInnerPatterns<_Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
-                                                                   _content, current_offset, end_offset, _length);
+                                Engine::SkipInnerPatterns<Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                  _content, current_offset, end_offset, _length);
 
                             if (current_offset != SizeT{0}) {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::InLineIf});
@@ -443,13 +443,13 @@ struct TemplateSub {
                 ++current_offset;
 
                 if (_content[current_offset] == TagPatterns::Loop_2ND_Char) { // <loop
-                    static constexpr const _Char_T *loop_prefix_p_2        = (TagPatterns::LoopPrefix + SizeT{2});
-                    constexpr SizeT                 loop_prefix_length_m_2 = (TagPatterns::LoopPrefixLength - SizeT{2});
+                    static constexpr const Char_T *loop_prefix_p_2        = (TagPatterns::LoopPrefix + SizeT{2});
+                    constexpr SizeT                loop_prefix_length_m_2 = (TagPatterns::LoopPrefixLength - SizeT{2});
                     ++current_offset;
 
                     if (StringUtils::IsEqual(loop_prefix_p_2, (_content + current_offset), loop_prefix_length_m_2)) {
                         current_offset += loop_prefix_length_m_2;
-                        current_offset = Engine::SkipInnerPatterns<_Char_T>(
+                        current_offset = Engine::SkipInnerPatterns<Char_T>(
                             TagPatterns::LoopPrefix, TagPatterns::LoopPrefixLength, TagPatterns::LoopSuffix,
                             TagPatterns::LoopSuffixLength, _content, current_offset, end_offset, _length);
 
@@ -462,13 +462,13 @@ struct TemplateSub {
                         }
                     }
                 } else if (_content[current_offset] == TagPatterns::If_2ND_Char) { // <if
-                    static constexpr const _Char_T *if_prefix_p_2        = (TagPatterns::IfPrefix + SizeT{2});
-                    constexpr SizeT                 if_prefix_length_m_2 = (TagPatterns::IfPrefixLength - SizeT{2});
+                    static constexpr const Char_T *if_prefix_p_2        = (TagPatterns::IfPrefix + SizeT{2});
+                    constexpr SizeT                if_prefix_length_m_2 = (TagPatterns::IfPrefixLength - SizeT{2});
                     ++current_offset;
 
                     if (StringUtils::IsEqual(if_prefix_p_2, (_content + current_offset), if_prefix_length_m_2)) {
                         current_offset += if_prefix_length_m_2;
-                        current_offset = Engine::SkipInnerPatterns<_Char_T>(
+                        current_offset = Engine::SkipInnerPatterns<Char_T>(
                             TagPatterns::IfPrefix, TagPatterns::IfPrefixLength, TagPatterns::IfSuffix,
                             TagPatterns::IfSuffixLength, _content, current_offset, end_offset, _length);
 
@@ -490,21 +490,21 @@ struct TemplateSub {
     // Part of parse()
     void lightParse(Array<TagBit> &tags_cache, SizeT offset, const SizeT end_offset) const {
         while (true) {
-            offset = Engine::FindOne<_Char_T>(TagPatterns::InLinePrefix, _content, offset, end_offset, _length);
+            offset = Engine::FindOne<Char_T>(TagPatterns::InLinePrefix, _content, offset, end_offset, _length);
 
             if (offset != 0) {
                 switch (_content[offset]) {
                     case TagPatterns::Var_2ND_Char: {
-                        static constexpr const _Char_T *var_prefix_p_2 = (TagPatterns::VariablePrefix + SizeT{2});
-                        constexpr SizeT var_prefix_length_m_2          = (TagPatterns::VariablePrefixLength - SizeT{2});
-                        constexpr SizeT var_prefix_length_m_1          = (TagPatterns::VariablePrefixLength - SizeT{1});
-                        SizeT           current_offset                 = offset;
+                        static constexpr const Char_T *var_prefix_p_2 = (TagPatterns::VariablePrefix + SizeT{2});
+                        constexpr SizeT var_prefix_length_m_2         = (TagPatterns::VariablePrefixLength - SizeT{2});
+                        constexpr SizeT var_prefix_length_m_1         = (TagPatterns::VariablePrefixLength - SizeT{1});
+                        SizeT           current_offset                = offset;
                         ++current_offset;
 
                         if (StringUtils::IsEqual(var_prefix_p_2, (_content + current_offset), var_prefix_length_m_2)) {
                             current_offset += var_prefix_length_m_1;
-                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
-                                                                      current_offset, end_offset, _length);
+                            current_offset = Engine::FindOne<Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                     current_offset, end_offset, _length);
 
                             const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
 
@@ -520,7 +520,7 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::Raw_2ND_Char: {
-                        static constexpr const _Char_T *r_var_prefix_p_2 = (TagPatterns::RawVariablePrefix + SizeT{2});
+                        static constexpr const Char_T *r_var_prefix_p_2 = (TagPatterns::RawVariablePrefix + SizeT{2});
                         constexpr SizeT r_var_prefix_length_m_2 = (TagPatterns::RawVariablePrefixLength - SizeT{2});
                         constexpr SizeT r_var_prefix_length_m_1 = (TagPatterns::RawVariablePrefixLength - SizeT{1});
                         SizeT           current_offset          = offset;
@@ -529,8 +529,8 @@ struct TemplateSub {
                         if (StringUtils::IsEqual(r_var_prefix_p_2, (_content + current_offset),
                                                  r_var_prefix_length_m_2)) {
                             current_offset += r_var_prefix_length_m_1;
-                            current_offset = Engine::FindOne<_Char_T>(TagPatterns::InLineSuffix, _content,
-                                                                      current_offset, end_offset, _length);
+                            current_offset = Engine::FindOne<Char_T>(TagPatterns::InLineSuffix, _content,
+                                                                     current_offset, end_offset, _length);
 
                             const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
 
@@ -546,17 +546,17 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::Math_2ND_Char: {
-                        static constexpr const _Char_T *math_prefix_p_2 = (TagPatterns::MathPrefix + SizeT{2});
-                        constexpr SizeT math_prefix_length_m_2          = (TagPatterns::MathPrefixLength - SizeT{2});
-                        SizeT           current_offset                  = offset;
+                        static constexpr const Char_T *math_prefix_p_2 = (TagPatterns::MathPrefix + SizeT{2});
+                        constexpr SizeT math_prefix_length_m_2         = (TagPatterns::MathPrefixLength - SizeT{2});
+                        SizeT           current_offset                 = offset;
                         ++current_offset;
 
                         if (StringUtils::IsEqual(math_prefix_p_2, (_content + current_offset),
                                                  math_prefix_length_m_2)) {
                             current_offset += math_prefix_length_m_2;
                             current_offset =
-                                Engine::SkipInnerPatterns<_Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
-                                                                   _content, current_offset, end_offset, _length);
+                                Engine::SkipInnerPatterns<Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                  _content, current_offset, end_offset, _length);
 
                             const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
 
@@ -578,7 +578,7 @@ struct TemplateSub {
         }
     }
 
-    static void escapeHTMLSpecialChars(_StringStream_T &stream, const _Char_T *str, SizeT length) {
+    static void escapeHTMLSpecialChars(StringStream_T &stream, const Char_T *str, SizeT length) {
         if (Config::AutoEscapeHTML) {
             SizeT offset = 0;
             SizeT index  = 0;
@@ -645,7 +645,7 @@ struct TemplateSub {
         offset = t_offset;
         offset += length;
 
-        const _Value_T *value = getValue(tag);
+        const Value_T *value = getValue(tag);
 
         if ((value == nullptr) || !(value->CopyValueTo(*_stream, Config::TemplatePrecision, &escapeHTMLSpecialChars))) {
             if ((_loop_key != nullptr) && (tag.IsLoopValue == SizeT8{1})) {
@@ -664,7 +664,7 @@ struct TemplateSub {
         offset = t_offset;
         offset += length;
 
-        const _Value_T *value = getValue(tag);
+        const Value_T *value = getValue(tag);
 
         if ((value == nullptr) || !(value->CopyValueTo(*_stream, Config::TemplatePrecision))) {
             _stream->Write((_content + t_offset), length);
@@ -704,8 +704,8 @@ struct TemplateSub {
     }
 
     void renderLoop(const LoopTag &tag, SizeT &offset) const {
-        _Value_T        grouped_set;
-        const _Value_T *loop_set;
+        Value_T        grouped_set;
+        const Value_T *loop_set;
 
         _stream->Write((_content + offset), (tag.Offset - offset));
         offset = tag.EndOffset;
@@ -841,7 +841,7 @@ struct TemplateSub {
 
     void parseVariableTag(SizeT offset, SizeT end_offset, VariableTag &tag) const noexcept {
         tag.Offset = offset;
-        tag.Length = ((end_offset - offset) & SizeT{0xFF}); // Limit var length to 255 meter per second.
+        tag.Length = SizeT16((end_offset - offset) & SizeT16{0xFF}); // Limit var length to 255 meter per second.
 
         if (_loop_value_length != 0) {
             const TemplateSub *temp = this;
@@ -856,7 +856,7 @@ struct TemplateSub {
 
                 if (StringUtils::IsEqual((_content + offset), (_content + l_offset), length)) {
                     tag.IsLoopValue = 1;
-                    tag.Level       = (level & 0xFFU);
+                    tag.Level       = SizeT16(level & SizeT16{0xFF});
                     break;
                 }
 
@@ -880,10 +880,10 @@ struct TemplateSub {
      * Gets everything between "..."
      */
     SizeT getQuotedValue(SizeT &offset, SizeT end_offset) const noexcept {
-        offset = Engine::FindOne<_Char_T>(TagPatterns::QuoteChar, _content, offset, end_offset, _length);
+        offset = Engine::FindOne<Char_T>(TagPatterns::QuoteChar, _content, offset, end_offset, _length);
 
         if (offset != SizeT{0}) {
-            end_offset = Engine::FindOne<_Char_T>(TagPatterns::QuoteChar, _content, offset, end_offset, _length);
+            end_offset = Engine::FindOne<Char_T>(TagPatterns::QuoteChar, _content, offset, end_offset, _length);
         }
 
         return end_offset;
@@ -892,7 +892,7 @@ struct TemplateSub {
     void parseLoopTag(SizeT offset, SizeT end_offset, LoopTag &tag) const {
         const SizeT16 level = (_level + 1);
         const SizeT   loop_content_offset =
-            Engine::FindOne<_Char_T>(TagPatterns::MultiLineSuffix, _content, offset, end_offset, _length);
+            Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, _content, offset, end_offset, _length);
 
         TemplateSub loop_template{_content, _length, nullptr, nullptr, this, level};
 
@@ -1055,7 +1055,7 @@ struct TemplateSub {
         while ((offset2 != SizeT{0}) && (offset < end_offset)) {
             case_end_offset = (offset2 - SizeT{1});
             content_offset =
-                Engine::FindOne<_Char_T>(TagPatterns::MultiLineSuffix, _content, offset2, end_offset, _length);
+                Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, _content, offset2, end_offset, _length);
 
             if (content_offset != SizeT{0}) {
                 else_offset = nextElse(content_offset, end_offset);
@@ -1073,8 +1073,8 @@ struct TemplateSub {
                                        content_offset, SizeT(else_offset - TagPatterns::ElsePrefixLength)};
 
                 if ((_content[else_offset] != TagPatterns::ElseIfChar)) {
-                    else_offset = Engine::FindOne<_Char_T>(TagPatterns::MultiLineSuffix, _content, else_offset,
-                                                           end_offset, _length);
+                    else_offset = Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, _content, else_offset,
+                                                          end_offset, _length);
 
                     if (else_offset != SizeT{0}) {
                         parse(sub_tags, else_offset, end_offset);
@@ -1098,24 +1098,24 @@ struct TemplateSub {
         SizeT else_offset = 0;
 
         while (true) {
-            else_offset = Engine::Find<_Char_T>(TagPatterns::ElsePrefix, TagPatterns::ElsePrefixLength, _content,
-                                                offset, end_offset, _length);
+            else_offset = Engine::Find<Char_T>(TagPatterns::ElsePrefix, TagPatterns::ElsePrefixLength, _content, offset,
+                                               end_offset, _length);
 
             if (else_offset == SizeT{0}) {
                 // No <else.
                 break;
             }
 
-            const SizeT next_if = Engine::Find<_Char_T>(TagPatterns::IfPrefix, TagPatterns::IfPrefixLength, _content,
-                                                        offset, end_offset, _length);
+            const SizeT next_if = Engine::Find<Char_T>(TagPatterns::IfPrefix, TagPatterns::IfPrefixLength, _content,
+                                                       offset, end_offset, _length);
 
             if ((next_if == SizeT{0}) || (else_offset < next_if)) {
                 // No nesting <ifs or <else before a sub-if.
                 break;
             }
 
-            offset = Engine::Find<_Char_T>(TagPatterns::IfSuffix, TagPatterns::IfSuffixLength, _content, next_if,
-                                           end_offset, _length);
+            offset = Engine::Find<Char_T>(TagPatterns::IfSuffix, TagPatterns::IfSuffixLength, _content, next_if,
+                                          end_offset, _length);
 
             if (else_offset > offset) {
                 // <else is after a sub-if.
@@ -1126,16 +1126,16 @@ struct TemplateSub {
         return else_offset;
     }
 
-    inline const _Value_T *getValue(const VariableTag &variable) const noexcept {
+    inline const Value_T *getValue(const VariableTag &variable) const noexcept {
         return getValue(variable.Offset, variable.Length, variable.Level, variable.IsLoopValue);
     }
 
-    const _Value_T *getValue(SizeT v_offset, SizeT16 v_length, SizeT8 v_level, SizeT8 v_is_loop_value) const noexcept {
-        const _Value_T *value     = nullptr;
-        const _Char_T  *id        = (_content + v_offset);
-        const SizeT     length    = v_length;
-        SizeT           offset    = 0;
-        const bool      has_index = (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix);
+    const Value_T *getValue(SizeT v_offset, SizeT16 v_length, SizeT8 v_level, SizeT8 v_is_loop_value) const noexcept {
+        const Value_T *value     = nullptr;
+        const Char_T  *id        = (_content + v_offset);
+        const SizeT    length    = v_length;
+        SizeT          offset    = 0;
+        const bool     has_index = (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix);
 
         if (v_is_loop_value != SizeT8{1}) {
             if (!has_index) {
@@ -1243,7 +1243,7 @@ struct TemplateSub {
 
             case ExpressionType::Variable: {
                 if (not_equal) {
-                    const _Value_T *val = getValue(expr->Variable);
+                    const Value_T *val = getValue(expr->Variable);
 
                     if (val != nullptr) {
                         QNumber64 val_number;
@@ -1388,15 +1388,15 @@ struct TemplateSub {
     }
 
     bool isEqual(QExpression &left, QExpression &right) const noexcept {
-        QNumber64       val_number;
-        const _Value_T *left_value        = nullptr;
-        const _Value_T *right_value       = nullptr;
-        const _Char_T  *left_content      = nullptr;
-        const _Char_T  *right_content     = nullptr;
-        SizeT           left_length       = 0;
-        SizeT           right_length      = 0;
-        bool            left_is_a_number  = false;
-        bool            right_is_a_number = false;
+        QNumber64      val_number;
+        const Value_T *left_value        = nullptr;
+        const Value_T *right_value       = nullptr;
+        const Char_T  *left_content      = nullptr;
+        const Char_T  *right_content     = nullptr;
+        SizeT          left_length       = 0;
+        SizeT          right_length      = 0;
+        bool           left_is_a_number  = false;
+        bool           right_is_a_number = false;
 
         switch (left.Type) {
             case ExpressionType::RealNumber:
@@ -1610,7 +1610,7 @@ struct TemplateSub {
 
     bool parseValue(QExpressions &exprs, const QOperation oper, const QOperation last_oper, SizeT offset,
                     SizeT end_offset) const {
-        using QOperationSymbol = _QOperationSymbol_T<_Char_T>;
+        using QOperationSymbol = QOperationSymbol_T<Char_T>;
 
         StringUtils::TrimLeft(_content, offset, end_offset);
         StringUtils::TrimRight(_content, offset, end_offset);
@@ -1697,7 +1697,7 @@ struct TemplateSub {
     }
 
     QOperation getOperation(SizeT &offset, const SizeT end_offset) const noexcept {
-        using QOperationSymbol = _QOperationSymbol_T<_Char_T>;
+        using QOperationSymbol = QOperationSymbol_T<Char_T>;
 
         while (offset < end_offset) {
             switch (_content[offset]) {
@@ -1783,9 +1783,9 @@ struct TemplateSub {
 
                 case QOperationSymbol::ParenthesesStart: {
                     ++offset;
-                    offset = Engine::SkipInnerPatterns<_Char_T>(QOperationSymbol::ParenthesesStart,
-                                                                QOperationSymbol::ParenthesesEnd, _content, offset,
-                                                                end_offset, _length);
+                    offset = Engine::SkipInnerPatterns<Char_T>(QOperationSymbol::ParenthesesStart,
+                                                               QOperationSymbol::ParenthesesEnd, _content, offset,
+                                                               end_offset, _length);
 
                     if (offset != SizeT{0}) {
                         continue;
@@ -1797,7 +1797,7 @@ struct TemplateSub {
                 case QOperationSymbol::BracketStart: {
                     ++offset;
                     offset =
-                        Engine::FindOne<_Char_T>(QOperationSymbol::BracketEnd, _content, offset, end_offset, _length);
+                        Engine::FindOne<Char_T>(QOperationSymbol::BracketEnd, _content, offset, end_offset, _length);
 
                     if (offset != SizeT{0}) {
                         continue;
@@ -1818,7 +1818,7 @@ struct TemplateSub {
     }
 
     bool isExpression(SizeT offset) const noexcept {
-        using QOperationSymbol = _QOperationSymbol_T<_Char_T>;
+        using QOperationSymbol = QOperationSymbol_T<Char_T>;
 
         while (offset != SizeT{0}) {
             --offset;
@@ -1836,7 +1836,7 @@ struct TemplateSub {
 
                 default: {
                     // A number
-                    const _Char_T ch = _content[offset];
+                    const Char_T ch = _content[offset];
                     return ((ch < QOperationSymbol::ColonChar) && (ch > QOperationSymbol::SlashChar));
                 }
             }
@@ -1845,12 +1845,12 @@ struct TemplateSub {
         return false;
     }
 
-    const _Char_T     *_content;
-    _StringStream_T   *_stream;
-    const _Value_T    *_value;
+    const Char_T      *_content;
+    StringStream_T    *_stream;
+    const Value_T     *_value;
     const TemplateSub *_parent;
-    const _Value_T    *_loop_value{nullptr};
-    const _Char_T     *_loop_key{nullptr};
+    const Value_T     *_loop_value{nullptr};
+    const Char_T      *_loop_key{nullptr};
     SizeT              _loop_key_length{0};
     SizeT              _loop_value_offset{0};
     const SizeT        _length;
