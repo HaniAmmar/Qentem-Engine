@@ -171,7 +171,7 @@ struct VNumberT {
         SizeT64  ull;
         SizeT64I sll;
         double   ddl;
-        SizeT    _padding[2]{0}; // Just in case SizeT is set to long
+        SizeT    _padding[2]; // Just in case SizeT is set to long
     };
 
     VNumberData<Number_T, Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) > 2U))> _data{};
@@ -182,8 +182,7 @@ struct ValueData;
 
 template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT>
 struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
-    ValueData() noexcept : VNumber{} {
-    }
+    ValueData() noexcept = default;
 
     ValueData(const ValueData &)            = delete;
     ValueData &operator=(ValueData &&)      = delete;
@@ -256,14 +255,13 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, true> {
         VObjectT VObject;
         VArrayT  VArray;
         VStringT VString;
-        VNumberT VNumber;
+        VNumberT VNumber{};
     };
 };
 
 template <typename _Char_T, typename VObjectT, typename VArrayT, typename VStringT>
 struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
-    ValueData() noexcept : VNumber{} {
-    }
+    ValueData() noexcept = default;
 
     ValueData(const ValueData &)            = delete;
     ValueData &operator=(ValueData &&)      = delete;
@@ -336,7 +334,7 @@ struct ValueData<_Char_T, VObjectT, VArrayT, VStringT, false> {
         VObjectT VObject;
         VArrayT  VArray;
         VStringT VString;
-        VNumberT VNumber;
+        VNumberT VNumber{};
     };
 
     ValueType VType{ValueType::Undefined};
@@ -364,26 +362,7 @@ struct Value {
     }
 
     explicit Value(ValueType type) noexcept {
-        switch (type) {
-            case ValueType::Object: {
-                initObject();
-                return;
-            }
-
-            case ValueType::Array: {
-                initArray();
-                return;
-            }
-
-            case ValueType::String: {
-                initString();
-                return;
-            }
-
-            default: {
-                setType(type);
-            }
-        }
+        setType(type);
     }
 
     explicit Value(VObjectT &&obj) noexcept : _data{Memory::Move(obj)} {
@@ -443,6 +422,7 @@ struct Value {
     explicit Value(NullType) noexcept {
         setTypeToNull();
     }
+
     explicit Value(bool bl) noexcept {
         if (bl) {
             setTypeToTrue();
@@ -451,8 +431,16 @@ struct Value {
         }
     }
 
+    Value &operator=(ValueType type) noexcept {
+        setType(type);
+        return *this;
+    }
+
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
+            // The value has to be cleared before setting the current one,
+            // just incase either the new value or the current one has parent-child relationship.
+
             const VNumberT  tmp    = val._data.VNumber;
             const ValueType t_type = val.Type();
 
