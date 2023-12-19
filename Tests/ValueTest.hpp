@@ -1356,7 +1356,7 @@ static void TestObjectValue2(QTest &helper) {
     helper.Equal(value3.Size(), 3U, "value3.Size()", __LINE__);
 
     value3.Compress();
-    helper.NotEqual(value3.GetObject(), nullptr, "GetArray()", "null", __LINE__);
+    helper.NotEqual(value3.GetObject(), nullptr, "GetObject()", "null", __LINE__);
     helper.Equal(value3.GetObject()->Size(), 3U, "Size()", __LINE__);
     helper.EqualsTrue(value3.GetObject()->Capacity() >= 3U, "GetObject()->Capacity() >= 3", __LINE__);
 }
@@ -5464,6 +5464,137 @@ static void TestDeleteValue(QTest &helper) {
     helper.Equal(value.Stringify(ss), R"({})", "value.Stringify()", __LINE__);
 }
 
+static void TestCompressValue(QTest &helper) {
+    StringStream<char> ss;
+    ValueC             value;
+
+    value[0] = 1;
+    value[1] = 1;
+    value[2] = 1;
+    value[3] = 1;
+    value[4] = 1;
+
+    const VArray *arr = value.GetArray();
+
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+
+    value.Compress();
+
+    arr = value.GetArray();
+
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+
+    value.Reset();
+
+    value["key1"][0] = 1;
+
+    value["key2"][0] = 1;
+    value["key2"][1] = 1;
+    value["key2"][2] = 1;
+
+    value["key3"][0] = 1;
+    value["key3"][1] = 1;
+    value["key3"][2] = 1;
+    value["key3"][3] = 1;
+    value["key3"][4] = 1;
+
+    arr = value["key1"].GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    arr = value["key2"].GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+    arr = value["key3"].GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.EqualsTrue(arr->Capacity() > arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+
+    value["key4"][0] = 1;
+    value["key5"][0] = 1;
+    value["key6"][0] = 1;
+    value["key7"][0] = 1;
+    value["key8"][0] = 1;
+    value["key9"][0] = 1;
+
+    value.Remove("key4");
+    value.Remove("key5");
+    value.Remove("key6");
+    value.Remove("key7");
+    value.Remove("key8");
+    value.Remove("key9");
+
+    const VHArray *obj = value.GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+
+    value.Compress();
+
+    obj = value.GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+
+    arr = value["key1"].GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    arr = value["key2"].GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+    arr = value["key3"].GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() > arr->Size()", __LINE__);
+
+    value.Reset();
+
+    value[0]["key1"] = 1;
+    value[0]["key2"] = 1;
+    value[0]["key3"] = 1;
+    value[0]["key4"] = 1;
+    value[0].Remove("key3");
+    value[0].Remove("key4");
+
+    obj = value[0].GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+
+    value[1]["key1"] = 1;
+    value[1]["key2"] = 1;
+    value[1]["key3"] = 1;
+    value[1]["key4"] = 1;
+    value[1]["key5"] = 1;
+    value[1]["key6"] = 1;
+    value[1]["key7"] = 1;
+    value[1]["key8"] = 1;
+    value[1].Remove("key5");
+    value[1].Remove("key6");
+    value[1].Remove("key7");
+    value[1].Remove("key8");
+
+    obj = value[0].GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+
+    obj = value[1].GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.EqualsTrue(obj->Size() > obj->ActualSize(), "obj->Capacity() > obj->Size()", __LINE__);
+
+    value[2] = 0;
+    value.RemoveIndex(2U);
+    value.Compress();
+
+    arr = value.GetArray();
+    helper.EqualsTrue(arr != nullptr, "arr != nullptr", __LINE__);
+    helper.Equal(arr->Capacity(), arr->Size(), "arr->Capacity() == arr->Size()", __LINE__);
+
+    obj = value[0].GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+
+    obj = value[1].GetObject();
+    helper.EqualsTrue(obj != nullptr, "obj != nullptr", __LINE__);
+    helper.Equal(obj->Size(), obj->ActualSize(), "obj->Capacity() == obj->Size()", __LINE__);
+}
+
 static void TestSortValue(QTest &helper) {
     StringStream<char> ss;
     ValueC             value;
@@ -5947,6 +6078,7 @@ static int RunValueTests() {
     helper.Test("Stringify Test 4", TestStringify4);
 
     helper.Test("Delete Value Test", TestDeleteValue);
+    helper.Test("Compress Value Test", TestCompressValue);
 
     helper.Test("Sort Value Test", TestSortValue);
     helper.Test("Group Value Test", TestGroupValue);
