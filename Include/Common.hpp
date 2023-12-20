@@ -167,7 +167,11 @@ struct Config {
 #endif
 };
 ///////////////////////////////////////////////
-
+#if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
+// bfloat16_t
+using BFloatT16 = decltype(0.0BF16);
+#endif
+///////////////////////////////////////////////
 #ifdef _MSC_VER
 #define QENTEM_NOINLINE __declspec(noinline)
 #define QENTEM_INLINE __forceinline
@@ -177,149 +181,6 @@ struct Config {
 #define QENTEM_INLINE __attribute__((always_inline))
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
-///////////////////////////////////////////////
-#if defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1)
-// bfloat16_t
-using BFloatT16 = decltype(0.0BF16);
-#endif
-///////////////////////////////////////////////
-enum struct QNumberType : SizeT8 {
-    NotANumber = 0, // NAN
-    Real       = 1, // double
-    Natural    = 2, // unsigned
-    Integer    = 3  // signed
-};
-///////////////////////////////////////////////
-template <typename Type_T>
-static constexpr bool IsFloat() {
-    return (Type_T(0.5) != 0);
-}
-
-template <typename Type_T>
-static constexpr bool IsUnsigned() {
-    return (Type_T(-1) > 0);
-}
-///////////////////////////////////////////////
-union QNumber64 {
-    QNumber64() noexcept                             = default;
-    QNumber64(QNumber64 &&) noexcept                 = default;
-    QNumber64(const QNumber64 &) noexcept            = default;
-    QNumber64 &operator=(QNumber64 &&) noexcept      = default;
-    QNumber64 &operator=(const QNumber64 &) noexcept = default;
-    ~QNumber64() noexcept                            = default;
-
-    template <typename Number_T>
-    explicit QNumber64(Number_T num) noexcept {
-        if (IsFloat<Number_T>()) {
-            Real = double(num);
-        } else if (IsUnsigned<Number_T>()) {
-            Natural = SizeT64(num);
-        } else {
-            Integer = SizeT64I(num);
-        }
-    }
-
-    SizeT64  Natural{0};
-    SizeT64I Integer;
-    double   Real;
-};
-
-union QNumber32 {
-    QNumber32() noexcept                             = default;
-    QNumber32(QNumber32 &&) noexcept                 = default;
-    QNumber32(const QNumber32 &) noexcept            = default;
-    QNumber32 &operator=(QNumber32 &&) noexcept      = default;
-    QNumber32 &operator=(const QNumber32 &) noexcept = default;
-    ~QNumber32() noexcept                            = default;
-
-    template <typename Number_T>
-    explicit QNumber32(Number_T num) noexcept {
-        if (IsFloat<Number_T>()) {
-            Real = float(num);
-        } else if (IsUnsigned<Number_T>()) {
-            Natural = SizeT32(num);
-        } else {
-            Integer = int(num);
-        }
-    }
-
-    SizeT32 Natural{0};
-    int     Integer;
-    float   Real;
-};
-
-template <typename Number_T>
-union QNumber16 {
-    QNumber16() noexcept                             = default;
-    QNumber16(QNumber16 &&) noexcept                 = default;
-    QNumber16(const QNumber16 &) noexcept            = default;
-    QNumber16 &operator=(QNumber16 &&) noexcept      = default;
-    QNumber16 &operator=(const QNumber16 &) noexcept = default;
-    ~QNumber16() noexcept                            = default;
-
-    explicit QNumber16(Number_T num) noexcept {
-#if (defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)) ||                                              \
-    (defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1))
-        if (IsFloat<Number_T>()) {
-            Real = Number_T(num);
-        } else
-#endif
-            if (IsUnsigned<Number_T>()) {
-            Natural = SizeT16(num);
-        } else {
-            Integer = short(num);
-        }
-    }
-
-    SizeT16  Natural{0};
-    short    Integer;
-    Number_T Real; // float16 or whatever.
-};
-
-union QNumber8 {
-    QNumber8() noexcept                            = default;
-    QNumber8(QNumber8 &&) noexcept                 = default;
-    QNumber8(const QNumber8 &) noexcept            = default;
-    QNumber8 &operator=(QNumber8 &&) noexcept      = default;
-    QNumber8 &operator=(const QNumber8 &) noexcept = default;
-    ~QNumber8() noexcept                           = default;
-
-    template <typename Number_T>
-    explicit QNumber8(Number_T num) noexcept {
-        if (IsUnsigned<Number_T>()) {
-            Natural = SizeT8(num);
-        } else {
-            Integer = char(num);
-        }
-    }
-
-    SizeT8 Natural{0};
-    char   Integer;
-};
-///////////////////////////////////////////////
-template <typename Number_T, SizeT32>
-struct QNumberAutoTypeT {};
-
-template <typename Number_T>
-struct QNumberAutoTypeT<Number_T, 1U> {
-    using QNumberType_T = QNumber8;
-};
-
-template <typename Number_T>
-struct QNumberAutoTypeT<Number_T, 2U> {
-    using QNumberType_T = QNumber16<Number_T>;
-};
-
-template <typename Number_T>
-struct QNumberAutoTypeT<Number_T, 4U> {
-    using QNumberType_T = QNumber32;
-};
-
-template <typename Number_T>
-struct QNumberAutoTypeT<Number_T, 8U> {
-    using QNumberType_T = QNumber64;
-};
-
 } // namespace Qentem
 
 #endif
