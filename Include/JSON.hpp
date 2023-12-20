@@ -218,9 +218,11 @@ struct JSON {
                     const Char_T *true_string = JSONotation::TrueString;
 
                     do {
-                    } while ((content[++offset] == *(++true_string)));
+                        ++offset;
+                        ++true_string;
+                    } while ((content[offset] == *true_string));
 
-                    if (*(true_string) == Char_T{0}) {
+                    if (*true_string == Char_T{0}) {
                         value = true;
                         return;
                     }
@@ -232,9 +234,11 @@ struct JSON {
                     const Char_T *false_string = JSONotation::FalseString;
 
                     do {
-                    } while ((content[++offset] == *(++false_string)));
+                        ++offset;
+                        ++false_string;
+                    } while ((content[offset] == *false_string));
 
-                    if (*(false_string) == Char_T{0}) {
+                    if (*false_string == Char_T{0}) {
                         value = false;
                         return;
                     }
@@ -246,9 +250,11 @@ struct JSON {
                     const Char_T *null_string = JSONotation::NullString;
 
                     do {
-                    } while ((content[++offset] == *(++null_string)));
+                        ++offset;
+                        ++null_string;
+                    } while ((content[offset] == *null_string));
 
-                    if (*(null_string) == Char_T{0}) {
+                    if (*null_string == Char_T{0}) {
                         value = nullptr;
                         return;
                     }
