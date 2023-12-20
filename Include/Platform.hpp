@@ -52,7 +52,7 @@ struct SIMD {
         _mm256_storeu_si256(left, right);
     }
 
-    static const VAR_T Zero() noexcept {
+    static VAR_T Zero() noexcept {
         return _mm256_setzero_si256();
     }
 
@@ -100,7 +100,7 @@ struct SIMD {
         _mm_storeu_si128(left, right);
     }
 
-    static const VAR_T Zero() noexcept {
+    static VAR_T Zero() noexcept {
         return _mm_setzero_si128();
     }
 
@@ -148,7 +148,7 @@ struct SIMD {
         wasm_v128_store(left, right);
     }
 
-    static const VAR_T Zero() noexcept {
+    static VAR_T Zero() noexcept {
         return wasm_i64x2_const_splat(0);
     }
 
