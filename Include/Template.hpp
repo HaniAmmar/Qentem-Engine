@@ -856,7 +856,7 @@ struct TemplateSub {
 
                 if (StringUtils::IsEqual((_content + offset), (_content + l_offset), length)) {
                     tag.IsLoopValue = 1;
-                    tag.Level       = SizeT16(level & SizeT16{0xFF});
+                    tag.Level       = SizeT8(level);
                     break;
                 }
 
