@@ -40,9 +40,9 @@ inline static void SetToZero(void *pointer, Number_T size) noexcept {
             offset = m_size;
             offset <<= Platform::SIMD::Shift;
 
-            constexpr Platform::SIMD::VAR_T m_zero    = Platform::SIMD::Zero();
-            Platform::SIMD::VAR_T          *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
-            const Platform::SIMD::VAR_T    *end       = (m_pointer + m_size);
+            const Platform::SIMD::VAR_T  m_zero    = Platform::SIMD::Zero();
+            Platform::SIMD::VAR_T       *m_pointer = (Platform::SIMD::VAR_T *)(pointer);
+            const Platform::SIMD::VAR_T *end       = (m_pointer + m_size);
 
             do {
                 Platform::SIMD::Store(m_pointer, m_zero);
