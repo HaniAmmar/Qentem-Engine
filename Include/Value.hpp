@@ -1146,6 +1146,14 @@ struct Value {
         return nullptr;
     }
 
+    VObjectT *GetObject() noexcept {
+        if (IsObject()) {
+            return &(_data.VObject);
+        }
+
+        return nullptr;
+    }
+
     const VArrayT *GetArray() const noexcept {
         if (IsArray()) {
             return &(_data.VArray);
@@ -1154,7 +1162,23 @@ struct Value {
         return nullptr;
     }
 
+    VArrayT *GetArray() noexcept {
+        if (IsArray()) {
+            return &(_data.VArray);
+        }
+
+        return nullptr;
+    }
+
     const VStringT *GetString() const noexcept {
+        if (IsString()) {
+            return &(_data.VString);
+        }
+
+        return nullptr;
+    }
+
+    VStringT *GetString() noexcept {
         if (IsString()) {
             return &(_data.VString);
         }
