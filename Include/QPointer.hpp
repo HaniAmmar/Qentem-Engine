@@ -113,7 +113,7 @@ struct QPointerData<Type_T, true, true> {
 
 template <typename Type_T>
 struct QPointerData<Type_T, false, true> {
-    // 32-bit with Tag, devices with less than 16 megabytes of memory
+    // 32-bit with Tag, devices with less than 16 megabytes of RAM
     QPointerData() noexcept  = default;
     ~QPointerData() noexcept = default;
 
