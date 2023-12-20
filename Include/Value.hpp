@@ -62,16 +62,25 @@ struct VNumberData<false, true> {
     }
 
     inline void Clear() noexcept {
-        Number.Natural = SizeT64{0};
-        PtrNumber      = SystemIntType{0};
+        PtrNumber = SystemIntType{0};
+
+        if (!is_8) {
+            Number.Natural = SizeT64{0};
+        } else {
+            Padding[0] = SizeT{0};
+            Padding[1] = SizeT{0};
+        }
     }
 
     union {
         QNumber64 Number{0};
-        SizeT     _padding[2];
+        SizeT     Padding[2];
     };
 
     SystemIntType PtrNumber{0};
+
+  private:
+    static constexpr bool is_8 = (sizeof(SizeT) == 8U);
 };
 
 template <>
@@ -89,16 +98,25 @@ struct VNumberData<true, true> {
     }
 
     inline void Clear() noexcept {
-        Number.Natural = SizeT64{0};
-        PtrNumber      = SystemIntType{0};
+        if (!is_8) {
+            Number.Natural = SizeT64{0};
+        } else {
+            Padding[0] = SizeT{0};
+            Padding[1] = SizeT{0};
+        }
+
+        PtrNumber = SystemIntType{0};
     }
 
     SystemIntType PtrNumber{0};
 
     union {
         QNumber64 Number{0};
-        SizeT     _padding[2];
+        SizeT     Padding[2];
     };
+
+  private:
+    static constexpr bool is_8 = (sizeof(SizeT) == 8U);
 };
 
 template <bool Endian_T>
@@ -162,7 +180,7 @@ struct VNumberT {
     }
 
   private:
-    VNumberData<Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) > 2U))> _data{};
+    VNumberData<Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) >= 4U))> _data{};
 };
 ///////////////////////////////////////////////
 template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
@@ -428,11 +446,11 @@ struct Value {
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            // The value has to be cleared before setting the current one,
+            // val has to be cleared before setting the current one,
             // just in case the values or have parent-child relationship.
 
-            const VNumberT  tmp    = val._data.VNumber;
-            const ValueType t_type = val.Type();
+            const VNumberT  val_VNumber = val._data.VNumber;
+            const ValueType val_type    = val.Type();
 
             if (Config::PointerTagging) {
                 val._data.VNumber.Clear();
@@ -440,17 +458,12 @@ struct Value {
                 val.setTypeToUndefined();
             }
 
-            if (!IsUndefined()) {
-                reset();
-            }
+            reset();
+            _data.VNumber = val_VNumber;
 
             if (!Config::PointerTagging) {
-                setType(t_type);
-            } else {
-                (void)t_type;
+                setType(val_type);
             }
-
-            _data.VNumber = tmp;
         }
 
         return *this;
@@ -458,48 +471,8 @@ struct Value {
 
     Value &operator=(const Value &val) {
         if (this != &val) {
-            const ValueType type = Type();
-
-            if (type == val.Type()) {
-                switch (type) {
-                    case ValueType::Object: {
-                        _data.VObject = val._data.VObject;
-                        break;
-                    }
-
-                    case ValueType::Array: {
-                        _data.VArray = val._data.VArray;
-                        break;
-                    }
-
-                    case ValueType::String: {
-                        _data.VString = val._data.VString;
-                        break;
-                    }
-
-                    case ValueType::UIntLong:
-                    case ValueType::IntLong:
-                    case ValueType::Double: {
-                        _data.VNumber = val._data.VNumber;
-                        break;
-                    }
-
-                    default: {
-                    }
-                }
-            } else {
-                reset();
-
-                if (Config::PointerTagging) {
-                    _data.VNumber.Clear();
-                } else {
-                    setTypeToUndefined();
-                }
-
-                if (!(val.IsUndefined())) {
-                    copyValue(val);
-                }
-            }
+            reset();
+            copyValue(val);
         }
 
         return *this;
@@ -510,129 +483,68 @@ struct Value {
     }
 
     inline void operator=(VObjectT &&obj) noexcept {
-        if (IsObject()) {
-            _data.VObject = Memory::Move(obj);
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(Memory::Move(obj));
+        reset();
+        _data.VObject = Memory::Move(obj);
+        setTypeToObject();
     }
 
     inline void operator=(const VObjectT &obj) {
-        if (IsObject()) {
-            _data.VObject = obj;
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(obj);
+        reset();
+        _data.VObject = obj;
+        setTypeToObject();
     }
 
     inline void operator=(VArrayT &&arr) noexcept {
-        if (IsArray()) {
-            _data.VArray = Memory::Move(arr);
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(Memory::Move(arr));
+        reset();
+        _data.VArray = Memory::Move(arr);
+        setTypeToArray();
     }
 
     inline void operator=(const VArrayT &arr) {
-        if (IsArray()) {
-            _data.VArray = arr;
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(arr);
+        reset();
+        _data.VArray = arr;
+        setTypeToArray();
     }
 
     inline void operator=(VStringT &&str) noexcept {
-        if (IsString()) {
-            _data.VString = Memory::Move(str);
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(Memory::Move(str));
+        reset();
+        _data.VString = Memory::Move(str);
+        setTypeToString();
     }
 
     inline void operator=(const VStringT &str) {
-        if (IsString()) {
-            _data.VString = str;
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(str);
+        reset();
+        _data.VString = str;
+        setTypeToString();
     }
 
     inline void operator=(const Char_T *str) {
-        if (IsString()) {
-            _data.VString = VStringT{str};
-            return;
-        }
-
-        if (!IsUndefined()) {
-            reset();
-        }
-
-        initValue(VStringT{str});
+        reset();
+        _data.VString = VStringT{str};
+        setTypeToString();
     }
 
     inline void operator=(SizeT64 num) noexcept {
-        if (!IsNumber()) {
-            reset();
-        }
-
+        reset();
         _data.VNumber = num;
         setTypeToUInt64();
     }
 
     inline void operator=(SizeT64I num) noexcept {
-        if (!IsNumber()) {
-            reset();
-        }
-
+        reset();
         _data.VNumber = num;
         setTypeToInt64();
     }
 
     inline void operator=(double num) noexcept {
-        if (!IsNumber()) {
-            reset();
-        }
-
+        reset();
         _data.VNumber = num;
         setTypeToDouble();
     }
 
     template <typename Number_T>
     inline void operator=(Number_T num) noexcept {
-        if (!IsNumber()) {
-            reset();
-        }
-
+        reset();
         _data.VNumber = num;
 
         if (IsFloat<Number_T>()) {
@@ -645,17 +557,12 @@ struct Value {
     }
 
     inline void operator=(NullType) noexcept {
-        if (!IsUndefined()) {
-            reset();
-        }
-
+        reset();
         setTypeToNull();
     }
 
     inline void operator=(bool is_true) noexcept {
-        if (!IsUndefined()) {
-            reset();
-        }
+        reset();
 
         if (is_true) {
             setTypeToTrue();
@@ -666,19 +573,18 @@ struct Value {
 
     inline void operator+=(Value &&val) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         _data.VArray += Memory::Move(val);
-
         val.Reset();
     }
 
     inline void operator+=(const Value &val) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         _data.VArray += val;
@@ -689,8 +595,8 @@ struct Value {
             _data.VObject += Memory::Move(obj);
         } else {
             if (!IsArray()) {
-                Reset();
-                initArray();
+                reset();
+                setTypeToArray();
             }
 
             _data.VArray += Value{Memory::Move(obj)};
@@ -703,8 +609,8 @@ struct Value {
 
     inline void operator+=(VArrayT &&arr) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         if (arr.Size() != SizeT{0}) {
@@ -720,8 +626,8 @@ struct Value {
 
     inline void operator+=(VStringT &&str) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         _data.VArray += Value{Memory::Move(str)};
@@ -738,8 +644,8 @@ struct Value {
     template <typename Number_T>
     inline void operator+=(Number_T num) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         _data.VArray += Value{num};
@@ -747,8 +653,8 @@ struct Value {
 
     inline void operator+=(NullType) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         _data.VArray += Value{nullptr};
@@ -756,8 +662,8 @@ struct Value {
 
     inline void operator+=(bool is_true) {
         if (!IsArray()) {
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         _data.VArray += Value{is_true};
@@ -765,8 +671,8 @@ struct Value {
 
     inline Value &operator[](const Char_T *key) {
         if (!IsObject()) {
-            Reset();
-            initObject();
+            reset();
+            setTypeToObject();
         }
 
         return (_data.VObject[key]);
@@ -774,8 +680,8 @@ struct Value {
 
     inline Value &operator[](VStringT &&key) {
         if (!IsObject()) {
-            Reset();
-            initObject();
+            reset();
+            setTypeToObject();
         }
 
         return (_data.VObject[Memory::Move(key)]);
@@ -783,8 +689,8 @@ struct Value {
 
     inline Value &operator[](const VStringT &key) {
         if (!IsObject()) {
-            Reset();
-            initObject();
+            reset();
+            setTypeToObject();
         }
 
         return (_data.VObject[key]);
@@ -806,8 +712,8 @@ struct Value {
                 }
             }
 
-            Reset();
-            initArray();
+            reset();
+            setTypeToArray();
         }
 
         if (_data.VArray.Size() == index) {
@@ -1121,7 +1027,7 @@ struct Value {
 
     void Merge(Value &&val) {
         if (IsUndefined()) {
-            initArray();
+            setTypeToArray();
         }
 
         if (IsArray() && val.IsArray()) {
@@ -1144,7 +1050,7 @@ struct Value {
 
     void Merge(const Value &val) {
         if (IsUndefined()) {
-            initArray();
+            setTypeToArray();
         }
 
         if (IsArray() && val.IsArray()) {
@@ -1596,12 +1502,7 @@ struct Value {
 
     void Reset() noexcept {
         reset();
-
-        if (Config::PointerTagging) {
-            _data.VNumber.Clear();
-        } else {
-            setTypeToUndefined();
-        }
+        setTypeToUndefined();
     }
 
     void Compress() {
@@ -1684,10 +1585,9 @@ struct Value {
         SizeT                grouped_key_index;
 
         if (IsArray()) {
-            groupedValue.Reset();
-            groupedValue.initObject();
-
             const Value *_item = _data.VArray.First();
+            groupedValue.reset();
+            groupedValue.setTypeToObject();
 
             if ((_item != nullptr) && _item->IsObject() &&
                 _item->_data.VObject.GetKeyIndex(grouped_key_index, key, length)) {
@@ -1930,51 +1830,6 @@ struct Value {
         setType(ValueType::Null);
     }
 
-    inline void initObject() noexcept {
-        Memory::Initialize(&(_data.VObject));
-        setTypeToObject();
-    }
-
-    inline void initArray() noexcept {
-        Memory::Initialize(&(_data.VArray));
-        setTypeToArray();
-    }
-
-    inline void initString() noexcept {
-        Memory::Initialize(&(_data.VString));
-        setTypeToString();
-    }
-
-    inline void initValue(VObjectT &&obj) noexcept {
-        Memory::Initialize(&(_data.VObject), Memory::Move(obj));
-        setTypeToObject();
-    }
-
-    inline void initValue(const VObjectT &obj) {
-        Memory::Initialize(&(_data.VObject), obj);
-        setTypeToObject();
-    }
-
-    inline void initValue(VArrayT &&arr) noexcept {
-        Memory::Initialize(&(_data.VArray), Memory::Move(arr));
-        setTypeToArray();
-    }
-
-    inline void initValue(const VArrayT &arr) {
-        Memory::Initialize(&(_data.VArray), arr);
-        setTypeToArray();
-    }
-
-    inline void initValue(VStringT &&str) noexcept {
-        Memory::Initialize(&(_data.VString), Memory::Move(str));
-        setTypeToString();
-    }
-
-    inline void initValue(const VStringT &str) {
-        Memory::Initialize(&(_data.VString), str);
-        setTypeToString();
-    }
-
     void reset() noexcept {
         switch (Type()) {
             case ValueType::Object: {
@@ -1993,6 +1848,7 @@ struct Value {
             }
 
             default: {
+                _data.VNumber.Clear();
             }
         }
     }
@@ -2000,25 +1856,26 @@ struct Value {
     void copyValue(const Value &val) {
         switch (val.Type()) {
             case ValueType::Object: {
-                initValue(val._data.VObject);
+                _data.VObject = val._data.VObject;
                 break;
             }
 
             case ValueType::Array: {
-                initValue(val._data.VArray);
+                _data.VArray = val._data.VArray;
                 break;
             }
 
             case ValueType::String: {
-                initValue(val._data.VString);
+                _data.VString = val._data.VString;
                 break;
             }
 
             default: {
                 _data.VNumber = val._data.VNumber;
-                setType(val.Type());
             }
         }
+
+        setType(val.Type());
     }
 
     ValueData<Char_T, VObjectT, VArrayT, VStringT, Config::PointerTagging> _data;
