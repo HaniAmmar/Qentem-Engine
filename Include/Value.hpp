@@ -21,6 +21,7 @@
  */
 #include "StringStream.hpp"
 
+#include "QNumber.hpp"
 #include "Array.hpp"
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
@@ -43,114 +44,117 @@ enum struct ValueType : SizeT8 {
     Null
 };
 ///////////////////////////////////////////////
-template <typename Number_T, bool, bool>
+template <bool, bool>
 struct VNumberData;
 
-template <typename Number_T>
-struct VNumberData<Number_T, false, true> {
+template <>
+struct VNumberData<false, true> {
     // Little-Endian
-    VNumberData() = default;
+    VNumberData()                               = default;
+    VNumberData(VNumberData &&)                 = default;
+    VNumberData(const VNumberData &)            = default;
+    VNumberData &operator=(VNumberData &&)      = default;
+    VNumberData &operator=(const VNumberData &) = default;
+    ~VNumberData()                              = default;
 
-    VNumberData(Number_T number, SystemIntType ptr_number) noexcept : Number{number}, PtrNumber{ptr_number} {
-    }
-
-    template <typename Type_T>
-    explicit VNumberData(Type_T number) noexcept : Number{number} {
+    template <typename Number_T>
+    inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
     }
 
     inline void Clear() noexcept {
-        Number.ull = SizeT64{0};
-        PtrNumber  = SystemIntType{0};
+        Number.Natural = SizeT64{0};
+        PtrNumber      = SystemIntType{0};
     }
 
-    Number_T      Number{SizeT64{0}};
+    union {
+        QNumber64 Number{0};
+        SizeT     _padding[2];
+    };
+
     SystemIntType PtrNumber{0};
 };
 
-template <typename Number_T>
-struct VNumberData<Number_T, true, true> {
+template <>
+struct VNumberData<true, true> {
     // Big-Endian
-    VNumberData() = default;
+    VNumberData()                               = default;
+    VNumberData(VNumberData &&)                 = default;
+    VNumberData(const VNumberData &)            = default;
+    VNumberData &operator=(VNumberData &&)      = default;
+    VNumberData &operator=(const VNumberData &) = default;
+    ~VNumberData()                              = default;
 
-    VNumberData(Number_T number, SystemIntType ptr_number) noexcept : PtrNumber{ptr_number}, Number{number} {
-    }
-
-    template <typename Type_T>
-    explicit VNumberData(Type_T number) noexcept : Number{number} {
+    template <typename Number_T>
+    inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
     }
 
     inline void Clear() noexcept {
-        Number.ull = SizeT64{0};
-        PtrNumber  = SystemIntType{0};
+        Number.Natural = SizeT64{0};
+        PtrNumber      = SystemIntType{0};
     }
 
     SystemIntType PtrNumber{0};
-    Number_T      Number{SizeT64{0}};
+
+    union {
+        QNumber64 Number{0};
+        SizeT     _padding[2];
+    };
 };
 
-template <typename Number_T, bool Endian_T>
-struct VNumberData<Number_T, Endian_T, false> {
+template <bool Endian_T>
+struct VNumberData<Endian_T, false> {
     // 32-bit only
-    VNumberData() = default;
+    VNumberData()                               = default;
+    VNumberData(VNumberData &&)                 = default;
+    VNumberData(const VNumberData &)            = default;
+    VNumberData &operator=(VNumberData &&)      = default;
+    VNumberData &operator=(const VNumberData &) = default;
+    ~VNumberData()                              = default;
 
-    VNumberData(Number_T number) noexcept : Number{number} {
-    }
-
-    template <typename Type_T>
-    explicit VNumberData(Type_T number) noexcept : Number{number} {
+    template <typename Number_T>
+    inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
     }
 
     inline void Clear() noexcept {
-        Number.ull = SizeT64{0};
+        Number.Natural = SizeT64{0};
     }
 
-    Number_T Number{SizeT64{0}};
+    union {
+        QNumber64 Number{0};
+        SizeT     _padding[2];
+    };
 };
 
 struct VNumberT {
-    VNumberT()                       = default;
-    VNumberT &operator=(VNumberT &&) = default;
-    VNumberT(const VNumberT &)       = default;
-    ~VNumberT()                      = default;
+    VNumberT()                            = default;
+    VNumberT(const VNumberT &)            = default;
+    VNumberT &operator=(VNumberT &&)      = default;
+    VNumberT &operator=(const VNumberT &) = default;
+    ~VNumberT()                           = default;
 
-    VNumberT(VNumberT &&v_num) noexcept : _data{v_num._data} {
+    VNumberT(VNumberT &&v_num) noexcept : _data{Memory::Move(v_num._data)} {
         v_num.Clear();
     }
 
-    VNumberT &operator=(const VNumberT &v_num) noexcept {
-        if (this != &v_num) {
-            _data = v_num._data;
-        }
-
-        return *this;
+    template <typename Number_T>
+    inline explicit VNumberT(const Number_T num) noexcept : _data{num} {
     }
 
     template <typename Number_T>
-    explicit VNumberT(const Number_T &num) noexcept : _data{num} {
-    }
-
-    inline void SetNumber(double num) noexcept {
-        _data.Number.ddl = num;
-    }
-
-    inline void SetNumber(SizeT64 num) noexcept {
-        _data.Number.ull = num;
-    }
-
-    inline void SetNumber(SizeT64I num) noexcept {
-        _data.Number.sll = num;
+    inline void operator=(Number_T num) noexcept {
+        _data.Number = num;
     }
 
     inline SizeT64 GetUInt64() const noexcept {
-        return _data.Number.ull;
+        return _data.Number.Natural;
     }
 
     inline SizeT64I GetInt64() const noexcept {
-        return _data.Number.sll;
+        return _data.Number.Integer;
     }
 
     inline double GetDouble() const noexcept {
-        return _data.Number.ddl;
+        return _data.Number.Real;
     }
 
     inline void Clear() noexcept {
@@ -158,23 +162,7 @@ struct VNumberT {
     }
 
   private:
-    union Number_T {
-        explicit Number_T(SizeT64 num) noexcept : ull{num} {
-        }
-
-        explicit Number_T(SizeT64I num) noexcept : sll{num} {
-        }
-
-        explicit Number_T(double num) noexcept : ddl{num} {
-        }
-
-        SizeT64  ull;
-        SizeT64I sll;
-        double   ddl;
-        SizeT    _padding[2]; // Just in case SizeT is set to long
-    };
-
-    VNumberData<Number_T, Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) > 2U))> _data{};
+    VNumberData<Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) > 2U))> _data{};
 };
 ///////////////////////////////////////////////
 template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
@@ -214,34 +202,38 @@ struct ValueData<Char_T, VObjectT, VArrayT, VStringT, true> {
         }
     }
 
-    explicit ValueData(VObjectT &&obj) noexcept : VObject{Memory::Move(obj)} {
+    inline explicit ValueData(VObjectT &&obj) noexcept : VObject{Memory::Move(obj)} {
     }
 
-    explicit ValueData(VArrayT &&arr) noexcept : VArray{Memory::Move(arr)} {
+    inline explicit ValueData(VArrayT &&arr) noexcept : VArray{Memory::Move(arr)} {
     }
 
-    explicit ValueData(VStringT &&str) noexcept : VString{Memory::Move(str)} {
+    inline explicit ValueData(VStringT &&str) noexcept : VString{Memory::Move(str)} {
     }
 
-    explicit ValueData(const VObjectT &obj) noexcept : VObject{obj} {
+    inline explicit ValueData(const VObjectT &obj) noexcept : VObject{obj} {
     }
 
-    explicit ValueData(const VArrayT &arr) noexcept : VArray{arr} {
+    inline explicit ValueData(const VArrayT &arr) noexcept : VArray{arr} {
     }
 
-    explicit ValueData(const VStringT &str) noexcept : VString{str} {
+    inline explicit ValueData(const VStringT &str) noexcept : VString{str} {
     }
 
-    explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
+    inline explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
     }
 
-    explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
+    inline explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
     }
 
-    explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
+    inline explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
     }
 
-    explicit ValueData(double num) noexcept : VNumber{num} {
+    inline explicit ValueData(double num) noexcept : VNumber{num} {
+    }
+
+    template <typename Number_T>
+    inline explicit ValueData(Number_T num) noexcept : VNumber{num} {
     }
 
     inline ValueType GetType() const noexcept {
@@ -294,34 +286,38 @@ struct ValueData<Char_T, VObjectT, VArrayT, VStringT, false> {
         }
     }
 
-    explicit ValueData(VObjectT &&obj) noexcept : VObject{Memory::Move(obj)} {
+    inline explicit ValueData(VObjectT &&obj) noexcept : VObject{Memory::Move(obj)} {
     }
 
-    explicit ValueData(VArrayT &&arr) noexcept : VArray{Memory::Move(arr)} {
+    inline explicit ValueData(VArrayT &&arr) noexcept : VArray{Memory::Move(arr)} {
     }
 
-    explicit ValueData(VStringT &&str) noexcept : VString{Memory::Move(str)} {
+    inline explicit ValueData(VStringT &&str) noexcept : VString{Memory::Move(str)} {
     }
 
-    explicit ValueData(const VObjectT &obj) noexcept : VObject{obj} {
+    inline explicit ValueData(const VObjectT &obj) noexcept : VObject{obj} {
     }
 
-    explicit ValueData(const VArrayT &arr) noexcept : VArray{arr} {
+    inline explicit ValueData(const VArrayT &arr) noexcept : VArray{arr} {
     }
 
-    explicit ValueData(const VStringT &str) noexcept : VString{str} {
+    inline explicit ValueData(const VStringT &str) noexcept : VString{str} {
     }
 
-    explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
+    inline explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
     }
 
-    explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
+    inline explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
     }
 
-    explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
+    inline explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
     }
 
-    explicit ValueData(double num) noexcept : VNumber{num} {
+    inline explicit ValueData(double num) noexcept : VNumber{num} {
+    }
+
+    template <typename Number_T>
+    inline explicit ValueData(Number_T num) noexcept : VNumber{num} {
     }
 
     inline ValueType GetType() const noexcept {
@@ -363,60 +359,57 @@ struct Value {
         copyValue(val);
     }
 
-    explicit Value(ValueType type) noexcept {
+    inline explicit Value(ValueType type) noexcept {
         setType(type);
     }
 
-    explicit Value(VObjectT &&obj) noexcept : _data{Memory::Move(obj)} {
+    inline explicit Value(VObjectT &&obj) noexcept : _data{Memory::Move(obj)} {
         setTypeToObject();
     }
 
-    explicit Value(VArrayT &&arr) noexcept : _data{Memory::Move(arr)} {
+    inline explicit Value(VArrayT &&arr) noexcept : _data{Memory::Move(arr)} {
         setTypeToArray();
     }
 
-    explicit Value(VStringT &&str) noexcept : _data{Memory::Move(str)} {
+    inline explicit Value(VStringT &&str) noexcept : _data{Memory::Move(str)} {
         setTypeToString();
     }
 
-    explicit Value(const VObjectT &obj) noexcept : _data{obj} {
+    inline explicit Value(const VObjectT &obj) noexcept : _data{obj} {
         setTypeToObject();
     }
 
-    explicit Value(const VArrayT &arr) noexcept : _data{arr} {
+    inline explicit Value(const VArrayT &arr) noexcept : _data{arr} {
         setTypeToArray();
     }
 
-    explicit Value(const VStringT &str) noexcept : _data{str} {
+    inline explicit Value(const VStringT &str) noexcept : _data{str} {
         setTypeToString();
     }
 
-    explicit Value(const Char_T *str, SizeT length) : _data{str, length} {
+    inline explicit Value(const Char_T *str, SizeT length) : _data{str, length} {
         setTypeToString();
     }
 
-    explicit Value(SizeT64 num) noexcept : _data{num} {
+    inline explicit Value(SizeT64 num) noexcept : _data{num} {
         setTypeToUInt64();
     }
 
-    explicit Value(SizeT64I num) noexcept : _data{num} {
+    inline explicit Value(SizeT64I num) noexcept : _data{num} {
         setTypeToInt64();
     }
 
-    explicit Value(double num) noexcept : _data{num} {
+    inline explicit Value(double num) noexcept : _data{num} {
         setTypeToDouble();
     }
 
     template <typename Number_T>
-    explicit Value(Number_T num) noexcept {
+    explicit Value(Number_T num) noexcept : _data{num} {
         if (IsFloat<Number_T>()) {
-            _data.VNumber.SetNumber(double(num));
             setTypeToDouble();
         } else if (IsUnsigned<Number_T>()) {
-            _data.VNumber.SetNumber(SizeT64(num));
             setTypeToUInt64();
         } else {
-            _data.VNumber.SetNumber(SizeT64I(num));
             setTypeToInt64();
         }
     }
@@ -433,15 +426,10 @@ struct Value {
         }
     }
 
-    Value &operator=(ValueType type) noexcept {
-        setType(type);
-        return *this;
-    }
-
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
             // The value has to be cleared before setting the current one,
-            // just incase either the new value or the current one has parent-child relationship.
+            // just in case the values or have parent-child relationship.
 
             const VNumberT  tmp    = val._data.VNumber;
             const ValueType t_type = val.Type();
@@ -517,10 +505,14 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(VObjectT &&obj) noexcept {
+    inline void operator=(ValueType type) noexcept {
+        setType(type);
+    }
+
+    inline void operator=(VObjectT &&obj) noexcept {
         if (IsObject()) {
             _data.VObject = Memory::Move(obj);
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -528,13 +520,12 @@ struct Value {
         }
 
         initValue(Memory::Move(obj));
-        return *this;
     }
 
-    Value &operator=(const VObjectT &obj) {
+    inline void operator=(const VObjectT &obj) {
         if (IsObject()) {
             _data.VObject = obj;
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -542,13 +533,12 @@ struct Value {
         }
 
         initValue(obj);
-        return *this;
     }
 
-    Value &operator=(VArrayT &&arr) noexcept {
+    inline void operator=(VArrayT &&arr) noexcept {
         if (IsArray()) {
             _data.VArray = Memory::Move(arr);
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -556,13 +546,12 @@ struct Value {
         }
 
         initValue(Memory::Move(arr));
-        return *this;
     }
 
-    Value &operator=(const VArrayT &arr) {
+    inline void operator=(const VArrayT &arr) {
         if (IsArray()) {
             _data.VArray = arr;
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -570,13 +559,12 @@ struct Value {
         }
 
         initValue(arr);
-        return *this;
     }
 
-    Value &operator=(VStringT &&str) noexcept {
+    inline void operator=(VStringT &&str) noexcept {
         if (IsString()) {
             _data.VString = Memory::Move(str);
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -584,13 +572,12 @@ struct Value {
         }
 
         initValue(Memory::Move(str));
-        return *this;
     }
 
-    Value &operator=(const VStringT &str) {
+    inline void operator=(const VStringT &str) {
         if (IsString()) {
             _data.VString = str;
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -598,13 +585,12 @@ struct Value {
         }
 
         initValue(str);
-        return *this;
     }
 
-    Value &operator=(const Char_T *str) {
+    inline void operator=(const Char_T *str) {
         if (IsString()) {
             _data.VString = VStringT{str};
-            return *this;
+            return;
         }
 
         if (!IsUndefined()) {
@@ -612,39 +598,61 @@ struct Value {
         }
 
         initValue(VStringT{str});
-        return *this;
     }
 
-    template <typename Number_T>
-    inline Value &operator=(Number_T num) noexcept {
+    inline void operator=(SizeT64 num) noexcept {
         if (!IsNumber()) {
             reset();
         }
 
-        if (IsFloat<Number_T>()) {
-            _data.VNumber.SetNumber(double(num));
-            setTypeToDouble();
-        } else if (IsUnsigned<Number_T>()) {
-            _data.VNumber.SetNumber(SizeT64(num));
-            setTypeToUInt64();
-        } else {
-            _data.VNumber.SetNumber(SizeT64I(num));
-            setTypeToInt64();
-        }
-
-        return *this;
+        _data.VNumber = num;
+        setTypeToUInt64();
     }
 
-    Value &operator=(NullType) noexcept {
+    inline void operator=(SizeT64I num) noexcept {
+        if (!IsNumber()) {
+            reset();
+        }
+
+        _data.VNumber = num;
+        setTypeToInt64();
+    }
+
+    inline void operator=(double num) noexcept {
+        if (!IsNumber()) {
+            reset();
+        }
+
+        _data.VNumber = num;
+        setTypeToDouble();
+    }
+
+    template <typename Number_T>
+    inline void operator=(Number_T num) noexcept {
+        if (!IsNumber()) {
+            reset();
+        }
+
+        _data.VNumber = num;
+
+        if (IsFloat<Number_T>()) {
+            setTypeToDouble();
+        } else if (IsUnsigned<Number_T>()) {
+            setTypeToUInt64();
+        } else {
+            setTypeToInt64();
+        }
+    }
+
+    inline void operator=(NullType) noexcept {
         if (!IsUndefined()) {
             reset();
         }
 
         setTypeToNull();
-        return *this;
     }
 
-    Value &operator=(bool is_true) noexcept {
+    inline void operator=(bool is_true) noexcept {
         if (!IsUndefined()) {
             reset();
         }
@@ -654,11 +662,9 @@ struct Value {
         } else {
             setTypeToFalse();
         }
-
-        return *this;
     }
 
-    void operator+=(Value &&val) {
+    inline void operator+=(Value &&val) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -669,7 +675,7 @@ struct Value {
         val.Reset();
     }
 
-    void operator+=(const Value &val) {
+    inline void operator+=(const Value &val) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -678,7 +684,7 @@ struct Value {
         _data.VArray += val;
     }
 
-    void operator+=(VObjectT &&obj) {
+    inline void operator+=(VObjectT &&obj) {
         if (IsObject()) {
             _data.VObject += Memory::Move(obj);
         } else {
@@ -691,11 +697,11 @@ struct Value {
         }
     }
 
-    void operator+=(const VObjectT &obj) {
+    inline void operator+=(const VObjectT &obj) {
         *this += VObjectT(obj);
     }
 
-    void operator+=(VArrayT &&arr) {
+    inline void operator+=(VArrayT &&arr) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -708,11 +714,11 @@ struct Value {
         }
     }
 
-    void operator+=(const VArrayT &arr) {
+    inline void operator+=(const VArrayT &arr) {
         (*this) += VArrayT(arr);
     }
 
-    void operator+=(VStringT &&str) {
+    inline void operator+=(VStringT &&str) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -721,16 +727,16 @@ struct Value {
         _data.VArray += Value{Memory::Move(str)};
     }
 
-    void operator+=(const VStringT &str) {
+    inline void operator+=(const VStringT &str) {
         *this += VStringT(str);
     }
 
-    void operator+=(const Char_T *str) {
+    inline void operator+=(const Char_T *str) {
         *this += VStringT(str);
     }
 
     template <typename Number_T>
-    void operator+=(Number_T num) {
+    inline void operator+=(Number_T num) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -739,7 +745,7 @@ struct Value {
         _data.VArray += Value{num};
     }
 
-    void operator+=(NullType) {
+    inline void operator+=(NullType) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -748,7 +754,7 @@ struct Value {
         _data.VArray += Value{nullptr};
     }
 
-    void operator+=(bool is_true) {
+    inline void operator+=(bool is_true) {
         if (!IsArray()) {
             Reset();
             initArray();
@@ -757,7 +763,7 @@ struct Value {
         _data.VArray += Value{is_true};
     }
 
-    Value &operator[](const Char_T *key) {
+    inline Value &operator[](const Char_T *key) {
         if (!IsObject()) {
             Reset();
             initObject();
@@ -766,7 +772,7 @@ struct Value {
         return (_data.VObject[key]);
     }
 
-    Value &operator[](VStringT &&key) {
+    inline Value &operator[](VStringT &&key) {
         if (!IsObject()) {
             Reset();
             initObject();
@@ -775,7 +781,7 @@ struct Value {
         return (_data.VObject[Memory::Move(key)]);
     }
 
-    Value &operator[](const VStringT &key) {
+    inline Value &operator[](const VStringT &key) {
         if (!IsObject()) {
             Reset();
             initObject();
@@ -805,13 +811,9 @@ struct Value {
         }
 
         if (_data.VArray.Size() == index) {
-            // if (_data.VArray.Capacity() == _data.VArray.Size()) {
-            //     _data.VArray.Resize((index + SizeT{1}) * SizeT{2});
-            // }
-
             _data.VArray += Value{};
         } else {
-            _data.VArray.ResizeAndInitialize(index + 1);
+            _data.VArray.ResizeAndInitialize(index + SizeT{1});
         }
 
         return (_data.VArray.Storage()[index]);
@@ -1044,17 +1046,17 @@ struct Value {
     inline QNumberType GetNumberType() const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
-                // Natural number.
+                // unsigned number.
                 return QNumberType::Natural;
             }
 
             case ValueType::IntLong: {
-                // Integer number.
+                // signed number.
                 return QNumberType::Integer;
             }
 
             case ValueType::Double: {
-                // Real number.
+                // float number.
                 return QNumberType::Real;
             }
 
