@@ -74,7 +74,7 @@ struct TestOutPut {
 
     template <typename... Values_T>
     inline static void Print(const Values_T &...values) {
-        if (getCachedStream() == nullptr) {
+        if (GetStreamCache() == nullptr) {
 #if __cplusplus > 201402L
             (std::wcout << ... << values);
 #else
@@ -84,9 +84,9 @@ struct TestOutPut {
 
         } else {
 #if __cplusplus > 201402L
-            ((*getCachedStream()) << ... << values);
+            ((*GetStreamCache()) << ... << values);
 #else
-            const int dummy[sizeof...(Values_T)] = {((*getCachedStream()) << values, 0)...};
+            const int dummy[sizeof...(Values_T)] = {((*GetStreamCache()) << values, 0)...};
             (void)dummy;
 #endif
         }
@@ -111,8 +111,8 @@ struct TestOutPut {
         return "";
     }
 
-    static void SetCachedStream(std::wstringstream *wss) noexcept {
-        getCachedStream() = wss;
+    static void SetStreamCache(std::wstringstream *wss) noexcept {
+        GetStreamCache() = wss;
     }
 
     static bool &IsColored() noexcept {
@@ -121,8 +121,7 @@ struct TestOutPut {
         return isColored;
     }
 
-  private:
-    static std::wstringstream *&getCachedStream() noexcept {
+    static std::wstringstream *&GetStreamCache() noexcept {
         static std::wstringstream *wss{nullptr};
 
         return wss;

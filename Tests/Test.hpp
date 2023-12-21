@@ -72,7 +72,7 @@ static void SelfTestLeak(QTest &helper, char *&ptr) {
 
 static void SelfTest() {
     std::wstringstream wss{};
-    TestOutPut::SetCachedStream(&wss);
+    TestOutPut::SetStreamCache(&wss);
 
     const bool is_colored = TestOutPut::IsColored();
 
@@ -95,7 +95,7 @@ static void SelfTest() {
     }
 
     TestOutPut::IsColored() = is_colored;
-    TestOutPut::SetCachedStream(nullptr);
+    TestOutPut::SetStreamCache(nullptr);
 }
 
 static int RunTests() {
