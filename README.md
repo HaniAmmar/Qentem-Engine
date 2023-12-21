@@ -47,13 +47,25 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
     -   Fast stringify.
     -   Data grouping.
     -   Data sorting.
-    -   `Value` size: 16 bytes (64-bit), 12 bytes (32-bit) and 8 bytes (embedded microcontrollers < 16MB of RAM).
+    -   Value size: *check the table below*.
 
-**Note:** `iostream` is used in tests only at the moment.
+| sizeof(Value) | Arch   | Type of SizeT | Pointer Tagging |
+|---------------|--------|---------------|---------------- |
+| 16 bytes      | 64-bit | SizeT32       | Enabled         |
+| 24 bytes      | 64-bit | SizeT32       | Disabled        |
+| 24 bytes      | 64-bit | SizeT64       | Enabled         |
+| 32 bytes      | 64-bit | SizeT64       | Disabled        |
+| 12 bytes      | 32-bit | SizeT16       | Disabled        |
+| 16 bytes      | 32-bit | SizeT32       | Disabled        |
+| 8 bytes       | 32-bit | SizeT16       | Enabled (Forced) |
+| 12 bytes      | 32-bit | SizeT32       | Enabled (Forced) |
+
+*Note:* `Forced` Pointer Tagging is only for embedded microcontrollers with less than 16MB of RAM.
 
 ## Requirements
 
 C++ 11+ compiler.
+*Note*: `iostream` is used in tests at the moment.
 
 ## Documentation
 
