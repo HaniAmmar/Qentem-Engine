@@ -156,12 +156,13 @@ struct HArray {
             SizeT      *ht      = _data.GetHashTable();
             const SizeT size    = Size();
 
+            _data.HashTable.MovePointerOnly(src._data.HashTable);
             setCapacity(src.Capacity());
             setSize(src.Size());
             src.setSize(SizeT{0});
             src.setCapacity(SizeT{0});
-            _data.HashTable.MovePointerOnly(src._data.HashTable);
 
+            // Just in case the copied array is not a child array, do this last.
             Memory::Dispose(storage, (storage + size));
             Memory::Deallocate(ht);
         }

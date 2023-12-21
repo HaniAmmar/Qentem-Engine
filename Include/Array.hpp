@@ -115,13 +115,13 @@ struct Array {
             Type_T     *storage = Storage();
             const SizeT size    = Size();
 
+            _data.Storage.MovePointerOnly(src._data.Storage);
             setCapacity(src.Capacity());
             setSize(src.Size());
             src.setSize(SizeT{0});
             src.setCapacity(SizeT{0});
-            _data.Storage.MovePointerOnly(src._data.Storage);
 
-            // Just in case the copied array is not a child array.
+            // Just in case the copied array is not a child array, do this last.
             Memory::Dispose(storage, (storage + size));
             Memory::Deallocate(storage);
         }
