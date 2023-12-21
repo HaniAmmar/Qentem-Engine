@@ -55,10 +55,10 @@ struct SystemIntTypeT<4U> {
 using SystemIntType_All = SystemIntTypeT<sizeof(void *)>;
 
 #ifndef QENTEM_SIZE_T
-#define QENTEM_SIZE_T
-using SizeT = SystemIntType_All::SizeType;
+#define QENTEM_SIZE_T SystemIntType_All::SizeType
 #endif
 
+using SizeT          = QENTEM_SIZE_T;
 using SystemIntType  = SystemIntType_All::NumberType;
 using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 ///////////////////////////////////////////////
