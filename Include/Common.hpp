@@ -57,9 +57,8 @@ using SystemIntType_All = SystemIntTypeT<sizeof(void *)>;
 #if defined(QENTEM_FORCED_POINTER_TAGGING) && (QENTEM_FORCED_POINTER_TAGGING == 1)
 // Set SizeT = SizeT16 on embedded microcontrollers with less than 16MB of RAM.
 // if "#define QENTEM_FORCED_POINTER_TAGGING 1" is set before including this file.
-#ifndef QENTEM_SIZE_T
+#undef QENTEM_SIZE_T
 #define QENTEM_SIZE_T SizeT16
-#endif
 #endif
 ///////////////////////////////////////////////
 #ifndef QENTEM_SIZE_T
