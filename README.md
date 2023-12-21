@@ -57,10 +57,6 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
 | 32 bytes      | 64-bit | SizeT64       | Disabled        |
 | 12 bytes      | 32-bit | SizeT16       | Disabled        |
 | 16 bytes      | 32-bit | SizeT32       | Disabled        |
-| 8 bytes       | 32-bit | SizeT16       | Enabled (Forced) |
-| 12 bytes      | 32-bit | SizeT32       | Enabled (Forced) |
-
-*Note:* `Forced` Pointer Tagging is only for embedded microcontrollers with less than 16MB of RAM.
 
 ## Requirements
 
