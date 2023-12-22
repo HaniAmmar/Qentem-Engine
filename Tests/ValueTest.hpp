@@ -4319,6 +4319,72 @@ static void TestAddition6(QTest &helper) {
     helper.Equal(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), true,
                  "value2[\"k3\"].StringStorage()", "IsEqual", __LINE__);
     /////////////////////////////
+
+    value1.Reset();
+    value2.Reset();
+
+    value1["k1"]  = 10;
+    value1["k2"]  = 2;
+    value1["k3"]  = 30;
+    value1["k7"]  = 7;
+    value1["k8"]  = 80;
+    value1["k10"] = 100;
+
+    ValueC value3 = value1;
+
+    value2["k0"] = 99;
+    value2["k1"] = 1;
+    value2["k3"] = 3;
+    value2["k4"] = 4;
+    value2["k5"] = 5;
+    value2["k6"] = 6;
+    value2["k8"] = 8;
+    value2["k9"] = 9;
+
+    value1 += value2;
+
+    helper.EqualsTrue(value2.IsObject(), "value2.IsObject()", __LINE__);
+    helper.Equal(value2.Size(), 8U, "value1.Size()", __LINE__);
+    helper.Equal(value2["k0"].GetNumber(), 99, "[k0].GetNumber()", __LINE__);
+    helper.Equal(value2["k1"].GetNumber(), 1, "[k1].GetNumber()", __LINE__);
+    helper.Equal(value2["k3"].GetNumber(), 3, "[k3].GetNumber()", __LINE__);
+    helper.Equal(value2["k4"].GetNumber(), 4, "[k4].GetNumber()", __LINE__);
+    helper.Equal(value2["k5"].GetNumber(), 5, "[k5].GetNumber()", __LINE__);
+    helper.Equal(value2["k6"].GetNumber(), 6, "[k6].GetNumber()", __LINE__);
+    helper.Equal(value2["k8"].GetNumber(), 8, "[k8].GetNumber()", __LINE__);
+    helper.Equal(value2["k9"].GetNumber(), 9, "[k9].GetNumber()", __LINE__);
+
+    helper.EqualsTrue(value1.IsObject(), "value1.IsObject()", __LINE__);
+    helper.Equal(value1.Size(), 11U, "value1.Size()", __LINE__);
+    helper.Equal(value1["k0"].GetNumber(), 99, "[k0].GetNumber()", __LINE__);
+    helper.Equal(value1["k1"].GetNumber(), 1, "[k1].GetNumber()", __LINE__);
+    helper.Equal(value1["k2"].GetNumber(), 2, "[k2].GetNumber()", __LINE__);
+    helper.Equal(value1["k3"].GetNumber(), 3, "[k3].GetNumber()", __LINE__);
+    helper.Equal(value1["k4"].GetNumber(), 4, "[k4].GetNumber()", __LINE__);
+    helper.Equal(value1["k5"].GetNumber(), 5, "[k5].GetNumber()", __LINE__);
+    helper.Equal(value1["k6"].GetNumber(), 6, "[k6].GetNumber()", __LINE__);
+    helper.Equal(value1["k7"].GetNumber(), 7, "[k7].GetNumber()", __LINE__);
+    helper.Equal(value1["k8"].GetNumber(), 8, "[k8].GetNumber()", __LINE__);
+    helper.Equal(value1["k9"].GetNumber(), 9, "[k9].GetNumber()", __LINE__);
+    helper.Equal(value1["k10"].GetNumber(), 100, "[k9].GetNumber()", __LINE__);
+
+    value3 += Memory::Move(value2);
+
+    helper.Equal(value2.Size(), 0U, "value2.Size()", __LINE__);
+    helper.EqualsTrue(value2.IsUndefined(), "value2.IsUndefined()", __LINE__);
+    helper.EqualsTrue(value3.IsObject(), "value3.IsObject()", __LINE__);
+    helper.Equal(value3.Size(), 11U, "value3.Size()", __LINE__);
+    helper.Equal(value3["k0"].GetNumber(), 99, "[k0].GetNumber()", __LINE__);
+    helper.Equal(value3["k1"].GetNumber(), 1, "[k1].GetNumber()", __LINE__);
+    helper.Equal(value3["k2"].GetNumber(), 2, "[k2].GetNumber()", __LINE__);
+    helper.Equal(value3["k3"].GetNumber(), 3, "[k3].GetNumber()", __LINE__);
+    helper.Equal(value3["k4"].GetNumber(), 4, "[k4].GetNumber()", __LINE__);
+    helper.Equal(value3["k5"].GetNumber(), 5, "[k5].GetNumber()", __LINE__);
+    helper.Equal(value3["k6"].GetNumber(), 6, "[k6].GetNumber()", __LINE__);
+    helper.Equal(value3["k7"].GetNumber(), 7, "[k7].GetNumber()", __LINE__);
+    helper.Equal(value3["k8"].GetNumber(), 8, "[k8].GetNumber()", __LINE__);
+    helper.Equal(value3["k9"].GetNumber(), 9, "[k9].GetNumber()", __LINE__);
+    helper.Equal(value3["k10"].GetNumber(), 100, "[k9].GetNumber()", __LINE__);
 }
 
 static void TestStringify1(QTest &helper) {
