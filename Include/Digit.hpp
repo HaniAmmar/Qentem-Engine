@@ -68,14 +68,14 @@ struct Digit {
         using Char_T             = typename Stream_T::CharType;
         using QNumberType_T      = typename QNumberAutoTypeT<Number_T, n_size>::QNumberType_T;
 
-        constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000U) + 1U);
-        Char_T            storage[max_number_of_digits];
-
         QNumberType_T qn{number};
 
         if (IsFloat<Number_T>()) {
             realToString<Number_T>(stream, QNumberType_T{number}.Natural, format);
         } else {
+            constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000U) + 1U);
+            Char_T            storage[max_number_of_digits];
+
             if (!IsUnsigned<Number_T>()) {
                 if (number < Number_T{0}) {
                     qn.Integer = -qn.Integer;
