@@ -19,7 +19,7 @@ int main() {
     v_arr[0] = "text"; // Overwrite
 
     v_arr += abc; // Add sub-array
-    v_arr.Merge(JSON::Parse(R"([100,200,300])"));
+    v_arr += JSON::Parse(R"([100,200,300])");
 
     std::cout << v_arr.Stringify() << '\n';
     /* Output:
@@ -53,8 +53,8 @@ int main() {
 
     v_obj["key6"] = abc; // Add sub-array
 
-    // Add the value if the key does not exist, or replace it otherwise.
-    v_obj.Merge(JSON::Parse(R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})"));
+    // Replace any value with the same key, or add it if it does not exist.
+    v_obj += JSON::Parse(R"({"key0": "text", "key4": true, "key5": 500, "key7": [1,2,3,4], "key8": null})");
 
     std::cout << v_obj.Stringify() << '\n';
     /* Output:
@@ -109,44 +109,52 @@ int main() {
     // Grouping
 
     v_arr = JSON::Parse(
-        R"([{"year":2019,"month":4},{"year":2020,"month":5},{"year":2017,"month":1},{"year":2020,"month":6},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
+        R"([
+            {"year":2019,"month":4},
+            {"year":2020,"month":5},
+            {"year":2017,"month":1},
+            {"year":2020,"month":6},
+            {"year":2018,"month":2},
+            {"year":2020,"month":7},
+            {"year":2018,"month":3}])");
 
     Value v_arr2;
     if (v_arr.GroupBy(v_arr2, "year")) {
+        v_arr2.Sort();
         std::cout << v_arr2.Stringify() << '\n';
     }
 
     /* Output:
-     {
-         "2019": [
-             {
-                 "month": 4
-             }
-         ],
-         "2020": [
-             {
-                 "month": 5
-             },
-             {
-                 "month": 6
-             },
-             {
-                 "month": 7
-             }
-         ],
-         "2017": [
-             {
-                 "month": 1
-             }
-         ],
-         "2018": [
-             {
-                 "month": 2
-             },
-             {
-                 "month": 3
-             }
-         ]
-     }
- */
+    {
+        "2017": [
+            {
+                "month": 1
+            }
+        ],
+        "2018": [
+            {
+                "month": 2
+            },
+            {
+                "month": 3
+            }
+        ],
+        "2019": [
+            {
+                "month": 4
+            }
+        ],
+        "2020": [
+            {
+                "month": 5
+            },
+            {
+                "month": 6
+            },
+            {
+                "month": 7
+            }
+        ]
+    }
+    */
 }
