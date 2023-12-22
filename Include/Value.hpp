@@ -574,6 +574,7 @@ struct Value {
     inline void operator+=(Value &&val) {
         if (IsObject() && val.IsObject()) {
             _data.VObject += Memory::Move(val._data.VObject);
+            val.setTypeToUndefined();
         } else {
             if (!IsArray()) {
                 reset();
@@ -582,8 +583,6 @@ struct Value {
 
             _data.VArray += Memory::Move(val);
         }
-
-        val.Reset();
     }
 
     inline void operator+=(const Value &val) {
