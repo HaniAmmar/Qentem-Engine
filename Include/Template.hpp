@@ -680,17 +680,17 @@ struct TemplateSub {
         if (tag.Expressions.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
             switch (result.Type) {
                 case ExpressionType::NaturalNumber: {
-                    Digit::NumberToString(*_stream, result.Value.Natural);
+                    Digit::NumberToString(*_stream, result.Value.Number.Natural);
                     break;
                 }
 
                 case ExpressionType::IntegerNumber: {
-                    Digit::NumberToString(*_stream, result.Value.Integer);
+                    Digit::NumberToString(*_stream, result.Value.Number.Integer);
                     break;
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit::NumberToString(*_stream, result.Value.Real, Config::TemplatePrecision);
+                    Digit::NumberToString(*_stream, result.Value.Number.Real, Config::TemplatePrecision);
                     break;
                 }
 
@@ -790,7 +790,7 @@ struct TemplateSub {
             SizeT         true_size = 0;
 
             if (++expr != tag.Case.End()) {
-                true_size = SizeT(expr->Value.Natural);
+                true_size = SizeT(expr->Value.Number.Natural);
             }
 
             if (result > 0U) {
@@ -1022,8 +1022,8 @@ struct TemplateSub {
         if (tag.Case.IsNotEmpty()) {
             if (true_offset != true_end_offset) {
                 lightParse(tag.SubTags, true_offset, true_end_offset);
-                QExpression &expr  = tag.Case.Insert(QExpression{});
-                expr.Value.Natural = tag.SubTags.Size(); // To use one heap for true and false.
+                QExpression &expr         = tag.Case.Insert(QExpression{});
+                expr.Value.Number.Natural = tag.SubTags.Size(); // To use one heap for true and false.
 
                 tag.TrueOffset = SizeT16(true_offset - tag.Offset);
                 tag.TrueLength = SizeT16(true_end_offset - true_offset);
@@ -1245,24 +1245,19 @@ struct TemplateSub {
                     const Value_T *val = getValue(expr->Variable);
 
                     if (val != nullptr) {
-                        QNumber64 val_number;
-
-                        switch (val->SetNumber(val_number)) {
+                        switch (val->SetNumber(number.Value.Number)) {
                             case QNumberType::Natural: {
-                                number.Value.Natural = val_number.Natural;
-                                number.Type          = ExpressionType::NaturalNumber;
+                                number.Type = ExpressionType::NaturalNumber;
                                 return true;
                             }
 
                             case QNumberType::Integer: {
-                                number.Value.Integer = val_number.Integer;
-                                number.Type          = ExpressionType::IntegerNumber;
+                                number.Type = ExpressionType::IntegerNumber;
                                 return true;
                             }
 
                             case QNumberType::Real: {
-                                number.Value.Real = val_number.Real;
-                                number.Type       = ExpressionType::RealNumber;
+                                number.Type = ExpressionType::RealNumber;
                                 return true;
                             }
 
@@ -1296,8 +1291,8 @@ struct TemplateSub {
             }
 
             case QOperation::Remainder: { // %
-                left.Value.Integer = (left % right);
-                left.Type          = ExpressionType::IntegerNumber;
+                left.Value.Number.Integer = (left % right);
+                left.Type                 = ExpressionType::IntegerNumber;
                 break;
             }
 
@@ -1326,38 +1321,38 @@ struct TemplateSub {
             }
 
             case QOperation::Less: { // <
-                left.Value.Natural = SizeT64(left < right);
-                left.Type          = ExpressionType::NaturalNumber;
+                left.Value.Number.Natural = SizeT64(left < right);
+                left.Type                 = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::LessOrEqual: { // <=
-                left.Value.Natural = SizeT64(left <= right);
-                left.Type          = ExpressionType::NaturalNumber;
+                left.Value.Number.Natural = SizeT64(left <= right);
+                left.Type                 = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Greater: { // >
-                left.Value.Natural = SizeT64(left > right);
-                left.Type          = ExpressionType::NaturalNumber;
+                left.Value.Number.Natural = SizeT64(left > right);
+                left.Type                 = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::GreaterOrEqual: { // >=
-                left.Value.Natural = SizeT64(left >= right);
-                left.Type          = ExpressionType::NaturalNumber;
+                left.Value.Number.Natural = SizeT64(left >= right);
+                left.Type                 = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::And: { // &&
-                left.Value.Natural = SizeT64((left > 0U) && (right > 0U));
-                left.Type          = ExpressionType::NaturalNumber;
+                left.Value.Number.Natural = SizeT64((left > 0U) && (right > 0U));
+                left.Type                 = ExpressionType::NaturalNumber;
                 break;
             }
 
             case QOperation::Or: { // ||
-                left.Value.Natural = SizeT64((left > 0U) || (right > 0U));
-                left.Type          = ExpressionType::NaturalNumber;
+                left.Value.Number.Natural = SizeT64((left > 0U) || (right > 0U));
+                left.Type                 = ExpressionType::NaturalNumber;
                 break;
             }
 
@@ -1371,7 +1366,7 @@ struct TemplateSub {
 
             case QOperation::NotEqual: { // !=
                 if (isEqual(left, right)) {
-                    left.Value.Natural = (left.Value.Natural ^ 1ULL);
+                    left.Value.Number.Natural = (left.Value.Number.Natural ^ 1ULL);
                     break;
                 }
 
@@ -1387,7 +1382,6 @@ struct TemplateSub {
     }
 
     bool isEqual(QExpression &left, QExpression &right) const noexcept {
-        QNumber64      val_number;
         const Value_T *left_value        = nullptr;
         const Value_T *right_value       = nullptr;
         const Char_T  *left_content      = nullptr;
@@ -1412,22 +1406,19 @@ struct TemplateSub {
                     if (left_value->GetNumberType() != QNumberType::NotANumber) {
                         left_is_a_number = true;
 
-                        switch (left_value->SetNumber(val_number)) {
+                        switch (left_value->SetNumber(left.Value.Number)) {
                             case QNumberType::Natural: {
-                                left.Value.Natural = val_number.Natural;
-                                left.Type          = ExpressionType::NaturalNumber;
+                                left.Type = ExpressionType::NaturalNumber;
                                 break;
                             }
 
                             case QNumberType::Integer: {
-                                left.Value.Integer = val_number.Integer;
-                                left.Type          = ExpressionType::IntegerNumber;
+                                left.Type = ExpressionType::IntegerNumber;
                                 break;
                             }
 
                             case QNumberType::Real: {
-                                left.Value.Real = val_number.Real;
-                                left.Type       = ExpressionType::RealNumber;
+                                left.Type = ExpressionType::RealNumber;
                                 break;
                             }
 
@@ -1465,22 +1456,19 @@ struct TemplateSub {
                     if (right_value->GetNumberType() != QNumberType::NotANumber) {
                         right_is_a_number = true;
 
-                        switch (right_value->SetNumber(val_number)) {
+                        switch (right_value->SetNumber(right.Value.Number)) {
                             case QNumberType::Natural: {
-                                right.Value.Natural = val_number.Natural;
-                                right.Type          = ExpressionType::NaturalNumber;
+                                right.Type = ExpressionType::NaturalNumber;
                                 break;
                             }
 
                             case QNumberType::Integer: {
-                                right.Value.Integer = val_number.Integer;
-                                right.Type          = ExpressionType::IntegerNumber;
+                                right.Type = ExpressionType::IntegerNumber;
                                 break;
                             }
 
                             case QNumberType::Real: {
-                                right.Value.Real = val_number.Real;
-                                right.Type       = ExpressionType::RealNumber;
+                                right.Type = ExpressionType::RealNumber;
                                 break;
                             }
 
@@ -1507,22 +1495,19 @@ struct TemplateSub {
         if (left_is_a_number || right_is_a_number) {
             if (!left_is_a_number) {
                 if (left_value != nullptr) {
-                    switch (left_value->SetNumber(val_number)) {
+                    switch (left_value->SetNumber(left.Value.Number)) {
                         case QNumberType::Natural: {
-                            left.Value.Natural = val_number.Natural;
-                            left.Type          = ExpressionType::NaturalNumber;
+                            left.Type = ExpressionType::NaturalNumber;
                             break;
                         }
 
                         case QNumberType::Integer: {
-                            left.Value.Integer = val_number.Integer;
-                            left.Type          = ExpressionType::IntegerNumber;
+                            left.Type = ExpressionType::IntegerNumber;
                             break;
                         }
 
                         case QNumberType::Real: {
-                            left.Value.Real = val_number.Real;
-                            left.Type       = ExpressionType::RealNumber;
+                            left.Type = ExpressionType::RealNumber;
                             break;
                         }
 
@@ -1537,22 +1522,19 @@ struct TemplateSub {
 
             if (!right_is_a_number) {
                 if (right_value != nullptr) {
-                    switch (right_value->SetNumber(val_number)) {
+                    switch (right_value->SetNumber(right.Value.Number)) {
                         case QNumberType::Natural: {
-                            right.Value.Natural = val_number.Natural;
-                            right.Type          = ExpressionType::NaturalNumber;
+                            right.Type = ExpressionType::NaturalNumber;
                             break;
                         }
 
                         case QNumberType::Integer: {
-                            right.Value.Integer = val_number.Integer;
-                            right.Type          = ExpressionType::IntegerNumber;
+                            right.Type = ExpressionType::IntegerNumber;
                             break;
                         }
 
                         case QNumberType::Real: {
-                            right.Value.Real = val_number.Real;
-                            right.Type       = ExpressionType::RealNumber;
+                            right.Type = ExpressionType::RealNumber;
                             break;
                         }
 
@@ -1565,12 +1547,12 @@ struct TemplateSub {
                 }
             }
 
-            left.Value.Natural = SizeT64(left == right);
-            left.Type          = ExpressionType::NaturalNumber;
+            left.Value.Number.Natural = SizeT64(left == right);
+            left.Type                 = ExpressionType::NaturalNumber;
             return true;
         }
 
-        left.Value.Natural =
+        left.Value.Number.Natural =
             ((left_length == right_length) && StringUtils::IsEqual(left_content, right_content, right_length));
         left.Type = ExpressionType::NaturalNumber;
 
@@ -1646,28 +1628,24 @@ struct TemplateSub {
                 default: {
                     const SizeT original_offset = offset;
                     QExpression expr;
-                    QNumber64   number;
                     expr.Operation = oper;
 
-                    const QNumberType n_type = Digit::StringToNumber(number, _content, offset, end_offset);
+                    const QNumberType n_type = Digit::StringToNumber(expr.Value.Number, _content, offset, end_offset);
 
                     if ((n_type != QNumberType::NotANumber) && (offset == end_offset)) {
                         switch (n_type) {
                             case QNumberType::Natural: {
-                                expr.Value.Natural = number.Natural;
-                                expr.Type          = ExpressionType::NaturalNumber;
+                                expr.Type = ExpressionType::NaturalNumber;
                                 break;
                             }
 
                             case QNumberType::Integer: {
-                                expr.Value.Integer = number.Integer;
-                                expr.Type          = ExpressionType::IntegerNumber;
+                                expr.Type = ExpressionType::IntegerNumber;
                                 break;
                             }
 
                             case QNumberType::Real: {
-                                expr.Value.Real = number.Real;
-                                expr.Type       = ExpressionType::RealNumber;
+                                expr.Type = ExpressionType::RealNumber;
                                 break;
                             }
 
