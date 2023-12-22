@@ -633,7 +633,10 @@ struct HArray {
 
   private:
     inline SizeT getBase() const noexcept {
-        return (Capacity() - SizeT{1});
+        SizeT base = Capacity();
+        --base;
+
+        return base;
     }
 
     inline void setHashTable(SizeT *ptr) noexcept {
@@ -730,19 +733,18 @@ struct HArray {
         HAItem       *storage = allocate(new_size);
         HAItem       *item    = src;
         const HAItem *end     = (item + Size());
-        SizeT         len     = 0;
+        _data.Index           = SizeT{0};
 
         while (item < end) {
             if (item->Hash != SizeT{0}) {
                 Memory::Initialize(storage, Memory::Move(*item));
                 ++storage;
-                ++len;
+                ++(_data.Index);
             }
 
             ++item;
         }
 
-        setSize(len);
         Memory::Deallocate(ht);
         generateHash();
     }
@@ -774,7 +776,7 @@ struct HArray {
         HAItem       *item = src;
         const HAItem *end  = (item + Size());
         SizeT        *index;
-        SizeT         i    = 1;
+        SizeT         i    = SizeT{1};
         const SizeT   base = getBase();
 
         while (item < end) {

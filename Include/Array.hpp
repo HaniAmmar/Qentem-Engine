@@ -43,6 +43,9 @@ struct ArrayData<Type_T, false> {
         src.Index    = SizeT{0};
     }
 
+    explicit ArrayData(SizeT size) noexcept : Capacity{size} {
+    }
+
     ArrayData(const ArrayData &)            = delete;
     ArrayData &operator=(ArrayData &&)      = delete;
     ArrayData &operator=(const ArrayData &) = delete;
@@ -51,9 +54,6 @@ struct ArrayData<Type_T, false> {
         Type_T *storage = Storage.GetPointer();
         Memory::Dispose(storage, (storage + Index));
         Memory::Deallocate(storage);
-    }
-
-    explicit ArrayData(SizeT size) noexcept : Capacity{size} {
     }
 
     SizeT            Index{0};
@@ -107,7 +107,10 @@ struct Array {
     }
 
     Array(const Array &src) : _data{src.Size()} {
-        copyArray(src);
+        if (src.Size() != SizeT{0}) {
+            setSize(src.Size());
+            copyArray(src);
+        }
     }
 
     Array &operator=(Array &&src) noexcept {
@@ -136,8 +139,11 @@ struct Array {
 
             setStorage(nullptr);
             setCapacity(src.Size());
-            setSize(SizeT{0});
-            copyArray(src);
+            setSize(src.Size());
+
+            if (Size() != SizeT{0}) {
+                copyArray(src);
+            }
 
             // Just in case the copied array is not a child array.
             Memory::Dispose(storage, (storage + size));
@@ -153,18 +159,17 @@ struct Array {
             setCapacity(src.Capacity());
             setSize(src.Size());
         } else {
-            const SizeT n_size = (Size() + src.Size());
+            constexpr SizeT32 type_size = sizeof(Type_T);
+            const SizeT       n_size    = (Size() + src.Size());
 
             if (n_size > Capacity()) {
                 resize(n_size);
             }
 
-            if (src.IsNotEmpty()) {
-                Memory::Copy((Storage() + Size()), src.First(), src.Size() * sizeof(Type_T));
-            }
-
+            Type_T *n_storage = src.Storage();
+            Memory::Copy((Storage() + Size()), n_storage, (src.Size() * type_size));
+            Memory::Deallocate(n_storage);
             setSize(n_size);
-            Memory::Deallocate(src.Storage());
         }
 
         src.clearStorage();
@@ -413,29 +418,23 @@ struct Array {
     }
 
     void resize(SizeT new_size) {
-        Type_T *src = Storage();
+        constexpr SizeT32 type_size = sizeof(Type_T);
+        Type_T           *src       = Storage();
         setCapacity(new_size);
         Type_T *des = allocate();
-
-        if (IsNotEmpty()) {
-            Memory::Copy(des, src, (Size() * sizeof(Type_T)));
-        }
-
+        Memory::Copy(des, src, (Size() * type_size));
         Memory::Deallocate(src);
     }
 
     void copyArray(const Array &src) {
-        if (Capacity() != SizeT{0}) {
-            setSize(src.Size());
-            Type_T       *storage  = allocate();
-            const Type_T *src_item = src.First();
-            const Type_T *src_end  = (src_item + src.Size());
+        Type_T       *storage  = allocate();
+        const Type_T *src_item = src.First();
+        const Type_T *src_end  = (src_item + src.Size());
 
-            while (src_item < src_end) {
-                Memory::Initialize(storage, *src_item);
-                ++storage;
-                ++src_item;
-            }
+        while (src_item < src_end) {
+            Memory::Initialize(storage, *src_item);
+            ++storage;
+            ++src_item;
         }
     }
 
