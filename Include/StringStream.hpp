@@ -40,7 +40,7 @@ struct StringStream {
         Memory::Deallocate(Storage());
     }
 
-    explicit StringStream(SizeT size) {
+    inline explicit StringStream(SizeT size) {
         if (size != SizeT{0}) {
             allocate(size);
         }
@@ -109,7 +109,7 @@ struct StringStream {
         return *this;
     }
 
-    void operator+=(Char_T one_char) {
+    inline void operator+=(Char_T one_char) {
         const SizeT len = Length();
 
         ++_length;
@@ -253,7 +253,7 @@ struct StringStream {
                 tmp     = ch;
             }
 
-            write(&tmp, SizeT{1});
+            *this += tmp;
         }
     }
 
