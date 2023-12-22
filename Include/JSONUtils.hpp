@@ -96,7 +96,7 @@ static SizeT UnEscapeJSON(const Char_T *content, SizeT length, Stream_T &stream)
 
                         if ((length - offset) > SizeT{3}) {
                             SizeT32 code = Digit::HexStringToNumber((content + offset), SizeT{4});
-                            offset += SizeT32{4};
+                            offset += SizeT{4};
                             offset2 = offset;
 
                             if ((code >> 8U) != 0xD8U) {
