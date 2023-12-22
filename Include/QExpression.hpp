@@ -329,7 +329,6 @@ struct QExpression {
     }
 
     bool operator^=(const QExpression &right) noexcept {
-        SizeT64 num_left       = 0;
         SizeT64 num_right      = 0;
         bool    left_negative  = false;
         bool    right_negative = false;
@@ -337,7 +336,6 @@ struct QExpression {
         switch (Type) {
             case ExpressionType::NaturalNumber: {
                 left_negative = false;
-                num_left      = Value.Number.Natural;
                 break;
             }
 
@@ -348,7 +346,6 @@ struct QExpression {
                     Value.Number.Integer = -Value.Number.Integer;
                 }
 
-                num_left = Value.Number.Natural;
                 break;
             }
 
@@ -366,7 +363,7 @@ struct QExpression {
                     return false;
                 }
 
-                num_left = QNumber64{SizeT64I(Value.Number.Real)}.Natural;
+                Value.Number.Natural = QNumber64{SizeT64I(Value.Number.Real)}.Natural;
                 break;
             }
 
@@ -415,15 +412,15 @@ struct QExpression {
             }
         }
 
-        if (num_left != SizeT64{0}) {
+        if (Value.Number.Natural != SizeT64{0}) {
             if (num_right != SizeT64{0}) {
                 const bool right_odd = ((num_right & SizeT64{1}) == SizeT64{1});
 
-                PowerOf(num_left, num_right);
+                PowerOf(Value.Number.Natural, num_right);
 
                 if (right_negative) {
-                    Value.Number.Real = double(num_left);
-                    Value.Number.Real = 1.0 / Value.Number.Real;
+                    Value.Number.Real = double(Value.Number.Natural);
+                    Value.Number.Real = (1.0 / Value.Number.Real);
                     Type              = ExpressionType::RealNumber;
 
                     if (left_negative) {
@@ -431,12 +428,10 @@ struct QExpression {
                     }
 
                 } else if (left_negative && right_odd) {
-                    Value.Number.Natural = num_left;
                     Value.Number.Integer = -Value.Number.Integer;
                     Type                 = ExpressionType::IntegerNumber;
                 } else {
-                    Value.Number.Natural = num_left;
-                    Type                 = ExpressionType::NaturalNumber;
+                    Type = ExpressionType::NaturalNumber;
                 }
 
                 return true;
