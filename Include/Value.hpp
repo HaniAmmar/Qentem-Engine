@@ -572,22 +572,31 @@ struct Value {
     }
 
     inline void operator+=(Value &&val) {
-        if (!IsArray()) {
-            reset();
-            setTypeToArray();
+        if (IsObject() && val.IsObject()) {
+            _data.VObject += Memory::Move(val._data.VObject);
+        } else {
+            if (!IsArray()) {
+                reset();
+                setTypeToArray();
+            }
+
+            _data.VArray += Memory::Move(val);
         }
 
-        _data.VArray += Memory::Move(val);
         val.Reset();
     }
 
     inline void operator+=(const Value &val) {
-        if (!IsArray()) {
-            reset();
-            setTypeToArray();
-        }
+        if (IsObject() && val.IsObject()) {
+            _data.VObject += val._data.VObject;
+        } else {
+            if (!IsArray()) {
+                reset();
+                setTypeToArray();
+            }
 
-        _data.VArray += val;
+            _data.VArray += val;
+        }
     }
 
     inline void operator+=(VObjectT &&obj) {
