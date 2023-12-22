@@ -9,7 +9,7 @@ using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    auto value = JSON::Parse(R"(
+    Value<char> value = JSON::Parse(R"(
 [
     {
         "major": "Computer Science",

@@ -85,7 +85,7 @@ using Qentem::Value;
 using Qentem::JSON;
 
 int main() {
-    auto value = JSON::Parse(R"(
+    Value<char> value = JSON::Parse(R"(
 [
     {
         "major": "Computer Science",
@@ -159,8 +159,7 @@ using Value    = Qentem::Value<char>;
 using Qentem::JSON;
 
 int main() {
- Value abc = JSON::Parse(R"(["A","B","C"])");
-
+    Value abc = JSON::Parse(R"(["A","B","C"])");
     Value v_arr; // To be used as an array.
 
     v_arr += 0;
