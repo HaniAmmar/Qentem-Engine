@@ -41,17 +41,17 @@ QENTEM_NOINLINE static bool TestEvaluate(double &number, const char *content, co
     if (temp.Evaluate(result, exprs)) {
         switch (result.Type) {
             case QExpression::ExpressionType::NaturalNumber: {
-                number = double(result.Number.Natural);
+                number = double(result.Value.Natural);
                 break;
             }
 
             case QExpression::ExpressionType::IntegerNumber: {
-                number = double(result.Number.Integer);
+                number = double(result.Value.Integer);
                 break;
             }
 
             case QExpression::ExpressionType::RealNumber: {
-                number = result.Number.Real;
+                number = result.Value.Real;
                 break;
             }
 
