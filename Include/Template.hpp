@@ -1233,11 +1233,11 @@ struct TemplateSub {
         return false;
     }
 
-    bool GetExpressionValue(QExpression &number, const QExpression *expr, bool not_equal) const noexcept {
+    bool GetExpressionValue(QExpression &result, const QExpression *expr, bool not_equal) const noexcept {
         switch (expr->Type) {
             case ExpressionType::SubOperation: {
                 const QExpression *sub_expr = expr->SubExpressions.First();
-                return evaluate(number, sub_expr, QOperation::NoOp);
+                return evaluate(result, sub_expr, QOperation::NoOp);
             }
 
             case ExpressionType::Variable: {
@@ -1245,19 +1245,19 @@ struct TemplateSub {
                     const Value_T *val = getValue(expr->Variable);
 
                     if (val != nullptr) {
-                        switch (val->SetNumber(number.Value.Number)) {
+                        switch (val->SetNumber(result.Value.Number)) {
                             case QNumberType::Natural: {
-                                number.Type = ExpressionType::NaturalNumber;
+                                result.Type = ExpressionType::NaturalNumber;
                                 return true;
                             }
 
                             case QNumberType::Integer: {
-                                number.Type = ExpressionType::IntegerNumber;
+                                result.Type = ExpressionType::IntegerNumber;
                                 return true;
                             }
 
                             case QNumberType::Real: {
-                                number.Type = ExpressionType::RealNumber;
+                                result.Type = ExpressionType::RealNumber;
                                 return true;
                             }
 
@@ -1268,20 +1268,18 @@ struct TemplateSub {
                     } else {
                         return false;
                     }
-                } else {
-                    number.Value = expr->Value;
-                    number.Type  = expr->Type;
                 }
 
-                return true;
+                break;
             }
 
             default: {
-                number.Value = expr->Value;
-                number.Type  = expr->Type;
-                return true;
             }
         }
+
+        result.Value = expr->Value;
+        result.Type  = expr->Type;
+        return true;
     }
 
     bool evaluateExpression(QExpression &left, QExpression &right, const QOperation oper) const noexcept {
