@@ -37,7 +37,7 @@ struct JSON {
 
     template <typename Char_T, typename Number_T>
     inline static Value<Char_T> Parse(const Char_T *content, Number_T length) {
-        StringStream<Char_T> stream{8};
+        StringStream<Char_T> stream;
         return Parse(stream, content, SizeT(length));
     }
 
