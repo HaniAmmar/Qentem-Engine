@@ -1884,6 +1884,16 @@ static void TestStringToNumber7(QTest &helper) {
     double      d_number = 0;
     bool        valid;
 
+    str   = "1234567891234567891.5";
+    valid = StringToNumber(helper, d_number, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(d_number, 1234567891234567891.5, "number", __LINE__);
+
+    str   = "12345678912345678912.5";
+    valid = StringToNumber(helper, d_number, str);
+    helper.EqualsTrue(valid, "valid", __LINE__);
+    helper.Equal(d_number, 12345678912345678912.5, "number", __LINE__);
+
     str   = "5e-1";
     valid = StringToNumber(helper, d_number, str);
     helper.EqualsTrue(valid, "valid", __LINE__);
