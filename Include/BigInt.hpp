@@ -75,9 +75,9 @@ struct BigInt {
 
     template <typename N_Number_T>
     inline explicit operator N_Number_T() const noexcept {
-        constexpr SizeT32 n_size          = (sizeof(N_Number_T) * 8U);
-        constexpr bool    is_same_size    = (n_size == BitSize());
-        constexpr bool    is_smaller_size = (n_size < BitSize());
+        constexpr SizeT32 n_width         = (sizeof(N_Number_T) * 8U);
+        constexpr bool    is_same_size    = (n_width == TypeWidth());
+        constexpr bool    is_smaller_size = (n_width < TypeWidth());
 
         if (is_same_size) {
             return _storage[0];
@@ -85,11 +85,11 @@ struct BigInt {
             return N_Number_T(_storage[0]);
         } else {
             N_Number_T num   = 0;
-            SizeT32    count = (n_size / BitSize());
+            SizeT32    count = (n_width / TypeWidth());
 
             while ((--count != SizeT32{0}) && (count >= _index)) {
                 num |= _storage[1];
-                num <<= BitSize();
+                num <<= TypeWidth();
             }
 
             num |= _storage[0];
@@ -225,19 +225,19 @@ struct BigInt {
 
         do {
             --index;
-            Add(DoubleSize<Number_T, BitSize()>::Multiply(_storage[index], multiplier), (index + Number_T{1}));
+            Add(DoubleSize<Number_T, TypeWidth()>::Multiply(_storage[index], multiplier), (index + Number_T{1}));
         } while (index != Number_T{0});
     }
     ////////////////////////////////////////////////////
     inline Number_T Divide(const Number_T divisor) noexcept {
-        constexpr bool is_size_64b = (BitSize() == 64U);
+        constexpr bool is_size_64b = (TypeWidth() == 64U);
         Number_T       index       = _index;
         Number_T       remainder   = (_storage[_index] % divisor);
         _storage[_index] /= divisor;
 
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
             if (is_size_64b) {
-                return ((BitSize() - 1U) - Platform::FindLastBit(divisor));
+                return ((TypeWidth() - 1U) - Platform::FindLastBit(divisor));
             } else {
                 return 0U;
             }
@@ -245,7 +245,7 @@ struct BigInt {
 
         while (index != Number_T{0}) {
             --index;
-            DoubleSize<Number_T, BitSize()>::Divide(remainder, _storage[index], divisor, initial_shift);
+            DoubleSize<Number_T, TypeWidth()>::Divide(remainder, _storage[index], divisor, initial_shift);
         }
 
         _index -= ((_index > Number_T{0}) && (_storage[_index] == Number_T{0}));
@@ -256,7 +256,7 @@ struct BigInt {
     inline void ShiftRight(SizeT32 offset) noexcept {
         Number_T index = 0U;
 
-        while (offset >= BitSize()) {
+        while (offset >= TypeWidth()) {
             while (index < _index) {
                 _storage[index] = _storage[index + Number_T{1}];
                 ++index;
@@ -266,11 +266,11 @@ struct BigInt {
             _index -= (_index != Number_T{0});
 
             index = Number_T{0};
-            offset -= BitSize();
+            offset -= TypeWidth();
         }
 
         if (offset != Number_T{0}) {
-            const SizeT32 shift_size = (BitSize() - offset);
+            const SizeT32 shift_size = (TypeWidth() - offset);
 
             _storage[Number_T{0}] >>= offset;
 
@@ -287,7 +287,7 @@ struct BigInt {
     inline void ShiftLeft(SizeT32 offset) noexcept {
         Number_T index = _index;
 
-        while (offset >= BitSize()) {
+        while (offset >= TypeWidth()) {
             _index += ((_storage[index] != Number_T{0}) && (_index < MaxIndex()));
             _storage[_index] = _storage[index];
 
@@ -298,11 +298,11 @@ struct BigInt {
 
             _storage[0U] = Number_T{0};
             index        = _index;
-            offset -= BitSize();
+            offset -= TypeWidth();
         }
 
         if (offset != Number_T{0}) {
-            const SizeT32 shift_size = (BitSize() - offset);
+            const SizeT32 shift_size = (TypeWidth() - offset);
 
             const Number_T carry = (_storage[index] >> shift_size);
             _storage[index] <<= offset;
@@ -325,11 +325,11 @@ struct BigInt {
             ++index;
         }
 
-        return (Platform::FindFirstBit(_storage[_index]) + (index * BitSize()));
+        return (Platform::FindFirstBit(_storage[_index]) + (index * TypeWidth()));
     }
 
     inline SizeT32 FindLastBit() const noexcept {
-        return (Platform::FindLastBit(_storage[_index]) + SizeT32(_index * BitSize()));
+        return (Platform::FindLastBit(_storage[_index]) + SizeT32(_index * TypeWidth()));
     }
     ////////////////////////////////////////////////////
     inline Number_T Number() const noexcept {
@@ -341,11 +341,12 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
-        return (((BitSize() * (TotalBits() / BitSize())) == TotalBits()) ? (TotalBits() / BitSize())
-                                                                         : ((TotalBits() / BitSize()) + SizeT32{1}));
+        return (((TypeWidth() * (TotalBits() / TypeWidth())) == TotalBits())
+                    ? (TotalBits() / TypeWidth())
+                    : ((TotalBits() / TypeWidth()) + SizeT32{1}));
     }
 
-    inline static constexpr SizeT32 BitSize() noexcept {
+    inline static constexpr SizeT32 TypeWidth() noexcept {
         return (SizeOfType() * 8U);
     }
 
@@ -416,7 +417,7 @@ struct BigInt {
 
     template <BigIntOperation Operation, typename N_Number_T>
     inline void multiOperation(N_Number_T number) noexcept {
-        constexpr SizeT32 n_size         = ((sizeof(N_Number_T) * 8U) / BitSize());
+        constexpr SizeT32 n_size         = ((sizeof(N_Number_T) * 8U) / TypeWidth());
         constexpr bool    is_bigger_size = (n_size > 1U);
 
         switch (Operation) {
@@ -446,7 +447,7 @@ struct BigInt {
         }
 
         if (is_bigger_size) {
-            number >>= BitSize();
+            number >>= TypeWidth();
 
             while (number != N_Number_T{0}) {
                 ++_index;
@@ -477,7 +478,7 @@ struct BigInt {
                     }
                 }
 
-                number >>= BitSize();
+                number >>= TypeWidth();
             }
         }
     }
