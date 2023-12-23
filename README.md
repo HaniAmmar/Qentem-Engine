@@ -141,6 +141,7 @@ int main() {
     std::cout << stream << '\n';
 }
 ```
+*Note*: the template does not have to be HTML.
 
 ### Modules
 
