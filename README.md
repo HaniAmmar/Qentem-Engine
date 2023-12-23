@@ -318,7 +318,14 @@ int main() {
 
 ## Tests
 
-There are over 22k lines of code for testing; 5 times the size of the library. To run the tests that take less than 0.01s to finish:
+There are over 23k lines of code for testing; 5 times the library. To run the tests that take less than 0.01s to finish:
+
+-   gcc/clang
+    ```shell
+    mkdir Build
+    c++ -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
+    ./Build/QTest.bin
+    ```
 
 -   cmake
     ```shell
@@ -327,13 +334,6 @@ There are over 22k lines of code for testing; 5 times the size of the library. T
     cmake ..
     cmake --build .
     ctest -C Debug
-    ```
-
--   gcc/clang
-    ```shell
-    mkdir Build
-    c++ -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
-    ./Build/QTest.bin
     ```
 
 ## License
