@@ -29,18 +29,18 @@
 namespace Qentem {
 namespace Test {
 
-using String8 = String<char>;
+using QString = String<char>;
 
 static void TestString1(QTest &helper) {
     SizeT length;
     char *str_ptr;
 
-    String8 str1;
+    QString str1;
     helper.Equal(str1.Length(), SizeT{0U}, "Length", __LINE__);
     helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.Last(), nullptr, "Last()", "null", __LINE__);
 
-    String8 str2{"0123456789"};
+    QString str2{"0123456789"};
     helper.Equal(str2.Length(), SizeT{10U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.NotEqual(str2.Last(), nullptr, "Last()", "null", __LINE__);
@@ -51,20 +51,20 @@ static void TestString1(QTest &helper) {
     helper.Equal(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str2.Last(), nullptr, "Last()", "null", __LINE__);
 
-    str1 = String8("abcd");
+    str1 = QString("abcd");
     helper.Equal(str1.Length(), SizeT{4U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcd", "str1", __LINE__);
     helper.NotEqual(str1, "abcdef", "str1", "abcdef", __LINE__);
 
-    str1 = String8("abcd-bcd");
+    str1 = QString("abcd-bcd");
     helper.Equal(str1.Length(), SizeT{8U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abcd-bcd", "str1", __LINE__);
 
-    str1 = String8("abcd", 2U);
+    str1 = QString("abcd", 2U);
     helper.Equal(str1.Length(), SizeT{2U}, "Length", __LINE__);
     helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
@@ -78,7 +78,7 @@ static void TestString1(QTest &helper) {
     str_ptr = str1.Detach();
     helper.NotEqual(str_ptr, nullptr, "Detach", "null", __LINE__);
 
-    str2 = String8(str_ptr, length); // Manage
+    str2 = QString(str_ptr, length); // Manage
     helper.Equal(str2.First(), str_ptr, "First()", "str_ptr", __LINE__);
     helper.Equal(str2.Length(), length, "Length", __LINE__);
 
@@ -103,20 +103,20 @@ static void TestString1(QTest &helper) {
 
     str2.Reset();
     str1 = "efg";         // Copy
-    str2 = String8(str1); // Copy
+    str2 = QString(str1); // Copy
     helper.Equal(str2.Length(), str1.Length(), "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.NotEqual(str2.First(), str1.First(), "First()", str1.First(), __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual", __LINE__);
 
     str1 = "hig";         // Copy
-    str2 = String8(str1); // Copy over a value
+    str2 = QString(str1); // Copy over a value
     helper.Equal(str2.Length(), str1.Length(), "Length", __LINE__);
     helper.NotEqual(str2.First(), str1.First(), "First()", str1.First(), __LINE__);
     helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), "IsEqual", __LINE__);
 
     length = str1.Length();
-    str2   = String8(Memory::Move(str1));
+    str2   = QString(Memory::Move(str1));
     helper.Equal(str1.Storage(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str1.Length(), SizeT{0U}, "Length", __LINE__);
@@ -129,7 +129,7 @@ static void TestString1(QTest &helper) {
     Memory::Deallocate(str_ptr);
 
     char         *tmp_size_2 = Memory::Allocate<char>(2);
-    const String8 str_size_2 = String8(tmp_size_2, 2U);
+    const QString str_size_2 = QString(tmp_size_2, 2U);
 
     if (Config::ShortStringOptimization) {
         helper.NotEqual(str_size_2.First(), tmp_size_2, "First()", "tmp_size_2", __LINE__);
@@ -139,8 +139,8 @@ static void TestString1(QTest &helper) {
 }
 
 static void TestStringCompare(QTest &helper) {
-    String8     str1("a");
-    String8     str2("a");
+    QString     str1("a");
+    QString     str2("a");
     const char *str3 = "a";
 
     helper.Equal(str1, str2, "str1", "str2", __LINE__);
@@ -247,8 +247,8 @@ static void TestStringCompare(QTest &helper) {
 }
 
 static void TestString2(QTest &helper) {
-    String8 str1;
-    String8 str2;
+    QString str1;
+    QString str2;
 
     str1.Write("a", 1U);
     helper.Equal(str1.Length(), SizeT{1U}, "Length", __LINE__);
@@ -268,19 +268,19 @@ static void TestString2(QTest &helper) {
     helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str1, "abc", "str1", __LINE__);
 
-    str2 = String8::Merge(str1, String8("def"));
+    str2 = QString::Merge(str1, QString("def"));
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
-    str2 = String8::Merge(str2, String8(""));
+    str2 = QString::Merge(str2, QString(""));
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
     helper.Equal(str2, "abcdef", "str2", __LINE__);
 
-    str2 = String8::Merge(String8(""), str2);
+    str2 = QString::Merge(QString(""), str2);
     helper.Equal(str2.Length(), SizeT{6U}, "Length", __LINE__);
     helper.NotEqual(str2.First(), nullptr, "First()", "null", __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, "First()[Length]", __LINE__);
@@ -289,23 +289,23 @@ static void TestString2(QTest &helper) {
     if (Config::ShortStringOptimization) {
         char sstr[32];
         str1.Reset();
-        for (SizeT i = 0; i < String8::ShortStringMax; i++) {
+        for (SizeT i = 0; i < QString::ShortStringMax; i++) {
             str1 += "A";
             sstr[i] = 'A';
         }
 
         str1 += "_";
-        sstr[String8::ShortStringMax]     = '_';
-        sstr[String8::ShortStringMax + 1] = '\0';
+        sstr[QString::ShortStringMax]     = '_';
+        sstr[QString::ShortStringMax + 1] = '\0';
 
-        helper.Equal(str1.Length(), (String8::ShortStringMax + 1U), "Length", __LINE__);
+        helper.Equal(str1.Length(), (QString::ShortStringMax + 1U), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
 
         str1.Reset();
         SizeT sso_x = 0;
-        for (SizeT i = 3; i < String8::ShortStringMax; i++) {
+        for (SizeT i = 3; i < QString::ShortStringMax; i++) {
             str1 += "A";
             sstr[sso_x] = 'A';
             ++sso_x;
@@ -314,7 +314,7 @@ static void TestString2(QTest &helper) {
         str1 += "_";
         sstr[sso_x]   = '_';
         sstr[++sso_x] = '\0';
-        helper.Equal(str1.Length(), (String8::ShortStringMax - 2U), "Length", __LINE__);
+        helper.Equal(str1.Length(), (QString::ShortStringMax - 2U), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
@@ -322,7 +322,7 @@ static void TestString2(QTest &helper) {
         str1 += "B";
         sstr[sso_x]   = 'B';
         sstr[++sso_x] = '\0';
-        helper.Equal(str1.Length(), (String8::ShortStringMax - 1), "Length", __LINE__);
+        helper.Equal(str1.Length(), (QString::ShortStringMax - 1), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
@@ -331,7 +331,7 @@ static void TestString2(QTest &helper) {
         sstr[sso_x]   = '_';
         sstr[++sso_x] = 'C';
         sstr[++sso_x] = '\0';
-        helper.Equal(str1.Length(), (String8::ShortStringMax + 1), "Length", __LINE__);
+        helper.Equal(str1.Length(), (QString::ShortStringMax + 1), "Length", __LINE__);
         helper.NotEqual(str1.First(), nullptr, "First()", "null", __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, "First()[Length]", __LINE__);
         helper.Equal(str1, &(sstr[0]), "str1", __LINE__);
@@ -496,94 +496,163 @@ static void TestString2(QTest &helper) {
     helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
 }
 
-static void TestStringTrim(QTest &helper) {
-    String8 str1("");
+static void TestString3(QTest &helper) {
+    QString str1;
 
-    str1 = String8::Trim(str1);
+    str1 = "123";
+
+    str1.Reverse();
+    helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
+    helper.Equal(str1, "321", "str1", __LINE__);
+
+    str1.Reverse(0);
+    helper.Equal(str1.Length(), SizeT{3U}, "Length", __LINE__);
+    helper.Equal(str1, "123", "str1", __LINE__);
+
+    str1 = "0123456789";
+
+    str1.Reverse();
+    helper.Equal(str1.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(str1, "9876543210", "str1", __LINE__);
+
+    str1.Reverse();
+    helper.Equal(str1.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(str1, "0123456789", "str1", __LINE__);
+
+    str1.Reverse(3);
+    helper.Equal(str1.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(str1, "0129876543", "str1", __LINE__);
+
+    str1.Reverse(7);
+    helper.Equal(str1.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(str1, "0129876345", "str1", __LINE__);
+
+    str1.Reverse(100); // Nothing will happened
+    helper.Equal(str1.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(str1, "0129876345", "str1", __LINE__);
+    ////////////////////////////////////////////
+    str1 = "9";
+
+    str1.InsertAt('0', 0);
+    helper.Equal(str1.Length(), SizeT{2}, "Length", __LINE__);
+    helper.Equal(str1, "09", "str1", __LINE__);
+
+    str1.InsertAt('4', 1);
+    helper.Equal(str1.Length(), SizeT{3}, "Length", __LINE__);
+    helper.Equal(str1, "049", "str1", __LINE__);
+
+    str1.InsertAt('4', 10); // Nothing will happened
+    helper.Equal(str1.Length(), SizeT{3}, "Length", __LINE__);
+    helper.Equal(str1, "049", "str1", __LINE__);
+
+    str1.InsertAt('2', 1);
+    str1.InsertAt('1', 1);
+
+    helper.Equal(str1.Length(), SizeT{5}, "Length", __LINE__);
+    helper.Equal(str1, "01249", "str1", __LINE__);
+
+    str1.InsertAt('3', 3);
+    str1.InsertAt('5', 5);
+
+    helper.Equal(str1.Length(), SizeT{7}, "Length", __LINE__);
+    helper.Equal(str1, "0123459", "str1", __LINE__);
+
+    str1.InsertAt('8', 6);
+    str1.InsertAt('7', 6);
+    str1.InsertAt('6', 6);
+
+    helper.Equal(str1.Length(), SizeT{10}, "Length", __LINE__);
+    helper.Equal(str1, "0123456789", "str1", __LINE__);
+}
+
+static void TestStringTrim(QTest &helper) {
+    QString str1("");
+
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{0U}, "length", __LINE__);
 
     str1 = " ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{0U}, "length", __LINE__);
 
     str1 = "  ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{0U}, "length", __LINE__);
 
     str1 = "                    ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{0U}, "length", __LINE__);
 
     str1 = " a";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "a ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = " a ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "  a";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "a  ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "  a  ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "                      a";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "a                      ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = "                      a                      ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{1U}, "length", __LINE__);
 
     str1 = " abcd";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "abcd ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = " abcd ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "  abcd";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "abcd  ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "  abcd  ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "                      abcd";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "abcd                      ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 
     str1 = "                      abcd                      ";
-    str1 = String8::Trim(str1);
+    str1 = QString::Trim(str1);
     helper.Equal(str1.Length(), SizeT{4U}, "length", __LINE__);
 }
 
@@ -595,6 +664,7 @@ static int RunStringTests() {
     helper.Test("String Test 1", TestString1);
     helper.Test("String::Compare", TestStringCompare);
     helper.Test("String Test 2", TestString2);
+    helper.Test("String Test 2", TestString3);
     helper.Test("String::Trim", TestStringTrim);
 
     return helper.EndTests();

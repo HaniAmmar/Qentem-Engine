@@ -29,7 +29,7 @@
 namespace Qentem {
 namespace Test {
 
-static void TestStringStream(QTest &helper) {
+static void TestStringStream1(QTest &helper) {
     StringStream<char> ss1;
     StringStream<char> ss2{10}; // Preset size
     String<char>       str;
@@ -309,12 +309,82 @@ static void TestStringStream(QTest &helper) {
     helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "1234567", SizeT{7}), "SimpleStream", __LINE__);
 }
 
+static void TestStringStream2(QTest &helper) {
+    StringStream<char> stream;
+
+    stream = "123";
+
+    stream.Reverse();
+    helper.Equal(stream.Length(), SizeT{3U}, "Length", __LINE__);
+    helper.Equal(stream, "321", "stream", __LINE__);
+
+    stream.Reverse(0);
+    helper.Equal(stream.Length(), SizeT{3U}, "Length", __LINE__);
+    helper.Equal(stream, "123", "stream", __LINE__);
+
+    stream = "0123456789";
+
+    stream.Reverse();
+    helper.Equal(stream.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(stream, "9876543210", "stream", __LINE__);
+
+    stream.Reverse();
+    helper.Equal(stream.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(stream, "0123456789", "stream", __LINE__);
+
+    stream.Reverse(3);
+    helper.Equal(stream.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(stream, "0129876543", "stream", __LINE__);
+
+    stream.Reverse(7);
+    helper.Equal(stream.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(stream, "0129876345", "stream", __LINE__);
+
+    stream.Reverse(15); // Nothing will happened
+    helper.Equal(stream.Length(), SizeT{10U}, "Length", __LINE__);
+    helper.Equal(stream, "0129876345", "stream", __LINE__);
+    ///////////////////////////////
+    stream = "9";
+
+    stream.InsertAt('0', 0);
+    helper.Equal(stream.Length(), SizeT{2}, "Length", __LINE__);
+    helper.Equal(stream, "09", "stream", __LINE__);
+
+    stream.InsertAt('4', 1);
+    helper.Equal(stream.Length(), SizeT{3}, "Length", __LINE__);
+    helper.Equal(stream, "049", "stream", __LINE__);
+
+    stream.InsertAt('4', 10); // Nothing will happened
+    helper.Equal(stream.Length(), SizeT{3}, "Length", __LINE__);
+    helper.Equal(stream, "049", "stream", __LINE__);
+
+    stream.InsertAt('2', 1);
+    stream.InsertAt('1', 1);
+
+    helper.Equal(stream.Length(), SizeT{5}, "Length", __LINE__);
+    helper.Equal(stream, "01249", "stream", __LINE__);
+
+    stream.InsertAt('3', 3);
+    stream.InsertAt('5', 5);
+
+    helper.Equal(stream.Length(), SizeT{7}, "Length", __LINE__);
+    helper.Equal(stream, "0123459", "stream", __LINE__);
+
+    stream.InsertAt('8', 6);
+    stream.InsertAt('7', 6);
+    stream.InsertAt('6', 6);
+
+    helper.Equal(stream.Length(), SizeT{10}, "Length", __LINE__);
+    helper.Equal(stream, "0123456789", "stream", __LINE__);
+}
+
 static int RunStringStreamTests() {
     QTest helper{"StringStream.hpp", __FILE__};
 
     helper.PrintGroupName();
 
-    helper.Test("StringStream Test", TestStringStream);
+    helper.Test("StringStream Test 1", TestStringStream1);
+    helper.Test("StringStream Test 2", TestStringStream2);
 
     return helper.EndTests();
 }
