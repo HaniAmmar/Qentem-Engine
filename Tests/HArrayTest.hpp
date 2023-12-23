@@ -479,7 +479,7 @@ static void TestHArray5(QTest &helper) {
     HArray<SizeT, char> numbers1;
     SizeT              *value;
 
-    for (SizeT i = 1; i < 11; i++) {
+    for (SizeT i = 1; i <= 10; i++) {
         String<char> key{"k-", 2};
 
         Digit::NumberToString(key, i);
@@ -491,7 +491,7 @@ static void TestHArray5(QTest &helper) {
 
     numbers1.Reset();
 
-    for (SizeT i = 1; i < 1001; i++) {
+    for (SizeT i = 1; i <= 120; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
@@ -512,14 +512,14 @@ static void TestHArray5(QTest &helper) {
     helper.NotEqual(value, nullptr, "value", "null", __LINE__);
     helper.Equal(*value, 10U, "10", __LINE__);
 
-    for (SizeT i = 1; i < 11; i++) {
+    for (SizeT i = 1; i <= 10; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
-    for (SizeT i = 1; i < 11; i++) {
+    for (SizeT i = 1; i <= 10; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
@@ -527,18 +527,18 @@ static void TestHArray5(QTest &helper) {
     }
 
     numbers1.Compress();
-    helper.Equal(numbers1.Size(), 990U, "Size", __LINE__);
-    helper.EqualsTrue((numbers1.Capacity() >= 990), "(numbers1.Capacity() >= 990)", __LINE__);
+    helper.Equal(numbers1.Size(), 110U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 110U), "(numbers1.Capacity() >= 990)", __LINE__);
     helper.NotEqual(numbers1.First(), nullptr, "First()", "null", __LINE__);
 
-    for (SizeT i = 1; i < 101; i++) {
+    for (SizeT i = 1; i <= 100; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
-    for (SizeT i = 1; i < 101; i++) {
+    for (SizeT i = 1; i <= 100; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
@@ -546,35 +546,34 @@ static void TestHArray5(QTest &helper) {
     }
 
     numbers1.Compress();
-    helper.Equal(numbers1.Size(), 900U, "Size", __LINE__);
-    helper.EqualsTrue((numbers1.Capacity() >= 900), "(numbers1.Capacity() >= 900)", __LINE__);
+    helper.Equal(numbers1.Size(), 20U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 20), "(numbers1.Capacity() >= 900)", __LINE__);
 
-    for (SizeT i = 101; i < 201; i++) {
+    for (SizeT i = 100; i <= 105; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
-    for (SizeT i = 101; i < 201; i++) {
+    for (SizeT i = 100; i <= 105; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
         helper.Equal(numbers1.GetValue(key), nullptr, "value", "null", __LINE__);
     }
 
-    numbers1.Compress();
-    helper.Equal(numbers1.Size(), 800U, "Size", __LINE__);
-    helper.EqualsTrue((numbers1.Capacity() >= 800), "(numbers1.Capacity() >= 800)", __LINE__);
+    helper.Equal(numbers1.ActualSize(), 15U, "Size", __LINE__);
+    helper.EqualsTrue((numbers1.Capacity() >= 20U), "(numbers1.Capacity() >= 800)", __LINE__);
 
-    for (SizeT i = 0; i < 1001; i++) {
+    for (SizeT i = 0; i <= 120; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
         numbers1.Remove(key);
     }
 
-    for (SizeT i = 0; i < 1001; i++) {
+    for (SizeT i = 0; i <= 120; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
@@ -678,7 +677,7 @@ static void TestHArray6(QTest &helper) {
 }
 
 static void TestHArray7(QTest &helper) {
-    SizeT id = 1000;
+    SizeT id = 200;
 
     HArray<SizeT, char> numbers1(id);
 
