@@ -16,16 +16,16 @@
 
 ## Introduction
 
-Qentem Engine is a self-contained library for rendering HTML templates, designed to work in the back-end or the font-end, and because it has no specific requirement and easy to use, it can be includes in any C++ or C project, or even JAVA. There are a few modules made for PHP, Python and Javascript, in case rendering HTML in C++ is not the norm. The library has a built-in fast JSON parser, and has its own logic and arithmetic evaluator for evaluating `if`, or calculating long algorithms. In addition to all of that, it can be compiled to `WASM`, and tested directly in the browser, with all of its features like: nested loops, nested if conditions, inline if and variable replacement with auto-escape for HTML special characters.
+Qentem Engine is a self-contained lightweight library for rendering templates, designed to work in the back-end or the font-end, and because it has no specific requirements and is easy to use, it can be easily included in C++/C projects or even Java. There are modules made for PHP, Python, and Javascript, in case rendering templates in C++ is not the norm. The library has a fast JSON parser and its own logic and arithmetic evaluator for evaluating `if`, or calculating long algorithms. Also, it can be compiled to `WASM`, and tested directly in the browser, with all of its features like nested loops, nested if conditions, inline if, and variable replacement with auto-escape for HTML special characters.
 
 ## Features
 
 -   General
 
     -   Cross-platform, header-only and self-contained; no external libraries are needed (including STL).
-    -   Fast string to number and number to string (Does not use CPU FPU).
-    -   Supports 32-bit and 64-bit architecture, little and big-endian.
-    -   No exceptions (try, catch and throw).
+    -   Fast string to number and number to string (does not use CPU FPU).
+    -   Supports 32-bit and 64-bit architectures, little and big-endian.
+    -   No exceptions (try-catch and throw).
     -   Supports UTF-8, UTF-16 and UTF-32.
     -   Short string optimization.
     -   Low memory usage.
@@ -34,7 +34,7 @@ Qentem Engine is a self-contained library for rendering HTML templates, designed
 
     -   Fast template rendering.
     -   Safe evaluation.
-    -   Variable replacement with HTML auto-escape (Optional: on by default).
+    -   Variable replacement with HTML auto-escape (optional: on by default).
     -   Raw variable replacement **without** HTML auto-escape.
     -   Nested loops (with data grouping and sorting).
     -   Nested if conditions.
