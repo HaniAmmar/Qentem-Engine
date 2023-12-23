@@ -46,7 +46,8 @@ static void TestVariableUTag1(QTest &helper) {
     value += sub_value;
 
     content = uR"({var:0})";
-    helper.Equal(Template::Render(content, value, ss), uR"(A)", render, __LINE__);
+    helper.Equal(Template::Render<StringStream<char16_t>>(content, value), uR"(A)", render, __LINE__);
+
     ss.Clear();
 
     content = uR"({var:1})";

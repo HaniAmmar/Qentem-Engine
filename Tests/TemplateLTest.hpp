@@ -46,7 +46,7 @@ static void TestVariableLTag1(QTest &helper) {
     value += sub_value;
 
     content = LR"({var:0})";
-    helper.Equal(Template::Render(content, value, ss), LR"(A)", render, __LINE__);
+    helper.Equal(Template::Render<StringStream<wchar_t>>(content, value), LR"(A)", render, __LINE__);
     ss.Clear();
 
     content = LR"({var:1})";
