@@ -9,7 +9,7 @@ using Qentem::Template;
 using Qentem::Value;
 
 int main() {
-    auto value = JSON::Parse(R"css(
+    auto value = JSON::Parse(R"data(
 {
     "dir": "ltr",
     "title": "Wishful News",
@@ -83,7 +83,7 @@ int main() {
         }
     ]
 }
-    )css");
+    )data");
 
     const char *content = R"HTML(
 <html dir="{var:dir}">
