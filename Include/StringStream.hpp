@@ -77,10 +77,7 @@ struct StringStream {
 
     StringStream &operator=(const StringStream &stream) {
         if (this != &stream) {
-            setCapacity(SizeT{0});
-            setLength(SizeT{0});
-            Memory::Deallocate(Storage());
-            clearStorage();
+            Clear();
             write(stream.First(), stream.Length());
         }
 
@@ -88,22 +85,16 @@ struct StringStream {
     }
 
     StringStream &operator=(const Char_T *str) {
-        setCapacity(SizeT{0});
-        setLength(SizeT{0});
-        Memory::Deallocate(Storage());
-        clearStorage();
+        Clear();
         write(str, StringUtils::Count(str));
 
         return *this;
     }
 
     StringStream &operator=(const String<Char_T> &string) {
-        setCapacity(SizeT{0});
-        setLength(SizeT{0});
-        Memory::Deallocate(Storage());
-        clearStorage();
-
         const SizeT len = string.Length();
+
+        Clear();
         write(string.Storage(len), len);
 
         return *this;
