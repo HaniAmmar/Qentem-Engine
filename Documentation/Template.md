@@ -220,7 +220,7 @@ int main() {
 {if case="..." true="..." false="..."}
 ```
 
-Inline condition. [ALE](https://github.com/HaniAmmar/Qentem-Engine/blob/main/Documentation/ALE.md) takes the `case` value to evaluate it, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false`'s value is used.
+Inline if condition uses the `case` value for evaluation, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false`'s value is used.
 
 ```txt
 {if case="1" true="one" false="not one"} // Fine.
@@ -257,7 +257,7 @@ With variables:
 
 ### Inline If Tag Note
 
-`true` and `false` only accept Variable tag, Raw variable tag and Math tag.
+`true` and `false` only accept Variable tags, Raw variable tags and Math tags.
 
 ## If Condition
 
@@ -288,7 +288,7 @@ With variables:
 <if case="...">...<elseif case="..." />...<else />...</if>
 ```
 
-Similar to `{if case="..." ...}`, but capable of branching, and nesting.
+Similar to `{if case="..." ...}`, but capable of branching and nesting.
 
 ### If Example 1
 
@@ -402,10 +402,10 @@ Zero!
 
 ### Evaluation Note
 
-Evaluate uses 1 for `true`, 0 for `false` and `null`. if the operation is equal, Template will try the following:
+Evaluate uses 1 for `true`, 0 for `false`. if the operation is equal `==`, Template will try the following:
 
--   If one of the variables is a number, it will convert the other part to a number: ({var:one} == 1)
--   If none of the variables are numbers, it will convert them to strings: ({var:bool} == true)
+-   If one of the variables is a number, it will try to  convert the other one to a number: ({var:one} == 1)
+-   If none of the variables are numbers, it will try to convert them to strings: ({var:bool} == true)
 
 To force converting the variables to numbers, use parentheses: {math:({var:bool}) == 1}
 
@@ -429,7 +429,7 @@ To force converting the variables to numbers, use parentheses: {math:({var:bool}
 <loop set="..." value="..." group="..." sort="...">...</loop>
 ```
 
-Loops over a set and replaces the values with the string inside `value`. The size can be set using `repeat` option. and the index can start from the value of `index`. The options `repeat` and `index` can be numbers or a variable tag. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accept only strings; for matching and replacing of the values inside the loop. `group` groups the giving array by sub-value of an object. `sort` will sort the set in ascending or descending order.
+Loops over a set and replaces the values with the string inside `value`. the `set` works like `{var:...}` and can be used to point to a sub-array. `value` accepts only strings for matching and replacing the values inside the loop. The `group` option groups the given array by a sub-value of an object. `sort` will sort the set in ascending or descending order.
 
 ### Loop Example 1 (unordered set)
 
@@ -957,7 +957,7 @@ using Qentem::Value;
 using Qentem::JSON;
 
 int main() {
-    auto value = JSON::Parse(R"css(
+    auto value = JSON::Parse(R"data(
 {
     "dir": "ltr",
     "title": "Wishful News",
@@ -1031,7 +1031,7 @@ int main() {
         }
     ]
 }
-    )css");
+    )data");
 
     const char *content = R"HTML(
 <!DOCTYPE html>
