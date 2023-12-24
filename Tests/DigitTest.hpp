@@ -2104,7 +2104,7 @@ static void TestHexStringToNumber(QTest &helper) {
 template <typename Stream_T>
 static void TestIntToString1(QTest &helper, Stream_T &stream) {
     IntToStreamEqual(helper, stream, SizeT8{255}, "255", "return", __LINE__);
-    IntToStreamEqual(helper, stream, char{-127}, "-127", "return", __LINE__);
+    IntToStreamEqual(helper, stream, (signed char)(-100), "-100", "return", __LINE__);
 
     IntToStreamEqual(helper, stream, SizeT16{65535}, "65535", "return", __LINE__);
     IntToStreamEqual(helper, stream, short{-32767}, "-32767", "return", __LINE__);
@@ -3934,7 +3934,7 @@ static int RunDigitTests() {
 
     helper.Test("HexStringToNumber Test", TestHexStringToNumber);
 
-    SStream stream{64};
+    SStream stream{8};
 
     helper.Test("IntToString Test 1", TestIntToString1<SStream>, false, stream);
 
