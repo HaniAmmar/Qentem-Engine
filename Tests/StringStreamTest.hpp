@@ -36,40 +36,40 @@ static void TestStringStream1(QTest &helper) {
 
     helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
     helper.Equal(ss1.Capacity(), SizeT{0}, __LINE__);
-    helper.Equal(ss1.First(), nullptr, "null", __LINE__);
-    helper.Equal(ss1.Last(), nullptr, "null", __LINE__);
+    helper.IsNull(ss1.First(), __LINE__);
+    helper.IsNull(ss1.Last(), __LINE__);
 
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{10}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{10}), __LINE__);
     helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
-    helper.NotEqual(ss2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(ss2.First(), __LINE__);
 
     ss2.Reset();
     helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
     helper.Equal(ss2.Capacity(), SizeT{0}, __LINE__);
-    helper.Equal(ss2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(ss2.First(), __LINE__);
 
     ss1 = StringStream<char>(1);
     ss1 += 'a';
     helper.Equal(ss1.Length(), SizeT{1}, __LINE__);
-    helper.EqualsTrue((ss1.Capacity() >= SizeT{1}), __LINE__);
-    helper.NotEqual(ss1.First(), nullptr, "null", __LINE__);
-    helper.NotEqual(ss1.Last(), nullptr, "null", __LINE__);
+    helper.IsTrue((ss1.Capacity() >= SizeT{1}), __LINE__);
+    helper.IsNotNull(ss1.First(), __LINE__);
+    helper.IsNotNull(ss1.Last(), __LINE__);
     helper.Equal(ss1.First()[0], 'a', __LINE__);
     helper.Equal(ss1.GetString(), "a", __LINE__);
     helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
     helper.Equal(ss1.Capacity(), SizeT{0}, __LINE__);
-    helper.Equal(ss1.First(), nullptr, "null", __LINE__);
+    helper.IsNull(ss1.First(), __LINE__);
 
     ss2 += String<char>("a");
     helper.Equal(ss2.Length(), SizeT{1}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
     helper.Equal(ss2.GetString(), "a", __LINE__);
     helper.NotEqual(ss2.GetString(), "aa", __LINE__);
 
     str = String<char>("a");
     ss2 += str;
     helper.Equal(ss2.Length(), SizeT{1}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
     helper.Equal(ss2, "a", __LINE__);
     helper.NotEqual(ss2, "aa", __LINE__);
 
@@ -77,27 +77,27 @@ static void TestStringStream1(QTest &helper) {
 
     ss2 += "abc";
     helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss2.GetString(), "abc", __LINE__);
     const String<char> sss;
 
     ss2 += String<char>("abc");
     helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss2, "abc", __LINE__);
     ss2.Reset();
 
     str = String<char>("abc");
     ss2 += str;
     helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss2, "abc", __LINE__);
     ss2.Reset();
 
     ss2 += String<char>("abc");
     ss1 = ss2; // Copy
     helper.Equal(ss1.Length(), ss2.Length(), __LINE__);
-    helper.EqualsTrue((ss1.Capacity() >= ss2.Length()), __LINE__);
+    helper.IsTrue((ss1.Capacity() >= ss2.Length()), __LINE__);
     helper.Equal(ss1, "abc", __LINE__);
     ss1.Reset();
 
@@ -110,54 +110,54 @@ static void TestStringStream1(QTest &helper) {
     ss1.Reset();
     ss1 = Memory::Move(ss2); // Move
     helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss1, "abc", __LINE__);
-    helper.Equal(ss2.Storage(), nullptr, "null", __LINE__);
+    helper.IsNull(ss2.Storage(), __LINE__);
     helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
     helper.Equal(ss2.Capacity(), SizeT{0}, __LINE__);
-    helper.Equal(ss2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(ss2.First(), __LINE__);
 
     ss2 += 'a';
     ss1.Reset();
     ss1 = Memory::Move(ss2); // Move
     helper.Equal(ss1.Length(), SizeT{1}, __LINE__);
-    helper.EqualsTrue((ss1.Capacity() >= SizeT{4}), __LINE__);
+    helper.IsTrue((ss1.Capacity() >= SizeT{4}), __LINE__);
     helper.Equal(ss1, "a", __LINE__);
     ss1.Reset();
 
     ss1 += "abc";
     ss2 = StringStream<char>(ss1); // Copy
     helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss1, "abc", __LINE__);
     helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss2, "abc", __LINE__);
     ss1.Reset();
     ss2.Reset();
 
     ss1 += "efg";
     ss2 = StringStream<char>(Memory::Move(ss1)); // Move
-    helper.Equal(ss1.Storage(), nullptr, "null", __LINE__);
+    helper.IsNull(ss1.Storage(), __LINE__);
     helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
-    helper.EqualsTrue((ss1.Capacity() == SizeT{0}), __LINE__);
-    helper.Equal(ss1.First(), nullptr, "null", __LINE__);
+    helper.IsTrue((ss1.Capacity() == SizeT{0}), __LINE__);
+    helper.IsNull(ss1.First(), __LINE__);
     helper.Equal(ss2, "efg", __LINE__);
     helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss2.First()[2], 'g', __LINE__);
 
     ss2.Reset();
     ss2.Write("a", SizeT{1});
     helper.Equal(ss2.Length(), SizeT{1}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
-    helper.NotEqual(ss2.First(), nullptr, "null", __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
+    helper.IsNotNull(ss2.First(), __LINE__);
     helper.Equal(ss2.First()[0], 'a', __LINE__);
 
     ss2.Write("bc", SizeT{2});
     helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
     helper.Equal(ss2, "abc", __LINE__);
     ss2.Reset();
 
@@ -169,7 +169,7 @@ static void TestStringStream1(QTest &helper) {
     const bool is_equal = StringUtils::IsEqual(e_str, "abc", SizeT{3});
     Memory::Deallocate(e_str);
 
-    helper.EqualsTrue(is_equal, __LINE__);
+    helper.IsTrue(is_equal, __LINE__);
 
     ss2 += "abcdef";
     ss2.StepBack(10);
@@ -199,7 +199,7 @@ static void TestStringStream1(QTest &helper) {
     ss2 += "123456789";
 
     helper.Equal(ss2.Length(), SizeT{117}, __LINE__);
-    helper.EqualsTrue((ss2.Capacity() >= SizeT{117}), __LINE__);
+    helper.IsTrue((ss2.Capacity() >= SizeT{117}), __LINE__);
     helper.Equal(
         ss2,
         "123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789",
@@ -218,7 +218,7 @@ static void TestStringStream1(QTest &helper) {
     const char *ab = "ab";
 
     helper.Equal(ss1.Length(), SizeT{2}, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(ss1.First(), ab, SizeT{2}), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(ss1.First(), ab, SizeT{2}), __LINE__);
 
     buffer = ss1.Buffer(1);
     helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
@@ -226,7 +226,7 @@ static void TestStringStream1(QTest &helper) {
     buffer[0]       = 'c';
     const char *ab2 = "abc";
     helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(ss1.First(), ab2, SizeT{3}), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(ss1.First(), ab2, SizeT{3}), __LINE__);
 
     ss2.Clear();
     ss2 += "ab";
@@ -290,7 +290,7 @@ static void TestStringStream1(QTest &helper) {
 
     SimpleStream sis;
     sis << ss2;
-    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", SizeT{8}), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", SizeT{8}), __LINE__);
 
     ss2 << n_str;
     helper.Equal(ss2, "1234567812345678", __LINE__);
@@ -300,12 +300,12 @@ static void TestStringStream1(QTest &helper) {
     sis.index = SizeT{0};
     sis << ss2;
 
-    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678123456781234567812345678", SizeT{32}), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678123456781234567812345678", SizeT{32}), __LINE__);
 
     ss2.StepBack(1);
     sis.index = SizeT{0};
     sis << ss2;
-    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "1234567", SizeT{7}), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(&(sis.str[0]), "1234567", SizeT{7}), __LINE__);
 }
 
 static void TestStringStream2(QTest &helper) {

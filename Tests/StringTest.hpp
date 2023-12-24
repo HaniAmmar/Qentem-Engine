@@ -37,46 +37,46 @@ static void TestString1(QTest &helper) {
 
     QString str1;
     helper.Equal(str1.Length(), SizeT{0U}, __LINE__);
-    helper.Equal(str1.First(), nullptr, "null", __LINE__);
-    helper.Equal(str1.Last(), nullptr, "null", __LINE__);
+    helper.IsNull(str1.First(), __LINE__);
+    helper.IsNull(str1.Last(), __LINE__);
 
     QString str2{"0123456789"};
     helper.Equal(str2.Length(), SizeT{10U}, __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
-    helper.NotEqual(str2.Last(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
+    helper.IsNotNull(str2.Last(), __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, __LINE__);
 
     str2.Reset();
     helper.Equal(str2.Length(), SizeT{0U}, __LINE__);
-    helper.Equal(str2.First(), nullptr, "null", __LINE__);
-    helper.Equal(str2.Last(), nullptr, "null", __LINE__);
+    helper.IsNull(str2.First(), __LINE__);
+    helper.IsNull(str2.Last(), __LINE__);
 
     str1 = QString("abcd");
     helper.Equal(str1.Length(), SizeT{4U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcd", __LINE__);
-    helper.NotEqual(str1, "abcdef", "abcdef", __LINE__);
+    helper.NotEqual(str1, "abcdef", __LINE__);
 
     str1 = QString("abcd-bcd");
     helper.Equal(str1.Length(), SizeT{8U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcd-bcd", __LINE__);
 
     str1 = QString("abcd", 2U);
     helper.Equal(str1.Length(), SizeT{2U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "ab", __LINE__);
-    helper.NotEqual(str1, "abcd", "abcd", __LINE__);
+    helper.NotEqual(str1, "abcd", __LINE__);
 
     str1 = "ABCDEF0123456789ABCDEF0123456789";
     helper.Equal(str1.Length(), SizeT{32U}, __LINE__);
 
     length  = str1.Length();
     str_ptr = str1.Detach();
-    helper.NotEqual(str_ptr, nullptr, "null", __LINE__);
+    helper.IsNotNull(str_ptr, __LINE__);
 
     str2 = QString(str_ptr, length); // Manage
     helper.Equal(str2.First(), str_ptr, __LINE__);
@@ -85,47 +85,47 @@ static void TestString1(QTest &helper) {
     str1 = Memory::Move(str2); // Move
     helper.Equal(str1.First(), str_ptr, __LINE__);
     helper.Equal(str1.Length(), length, __LINE__);
-    helper.Equal(str2.Storage(), nullptr, "null", __LINE__);
+    helper.IsNull(str2.Storage(), __LINE__);
     helper.Equal(str2.Length(), SizeT{0U}, __LINE__);
-    helper.Equal(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(str2.First(), __LINE__);
 
     str2 = "abcdef"; // Copy
     helper.Equal(str2.Length(), SizeT{6U}, __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), "abcdef", 5U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(str2.First(), "abcdef", 5U), __LINE__);
 
     str2 = str1; // Copy
     helper.Equal(str2.Length(), str1.Length(), __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
-    helper.NotEqual(str2.First(), str1.First(), str1.First(), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
+    helper.NotEqual(str2.First(), str1.First(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
 
     str2.Reset();
     str1 = "efg";         // Copy
     str2 = QString(str1); // Copy
     helper.Equal(str2.Length(), str1.Length(), __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
-    helper.NotEqual(str2.First(), str1.First(), str1.First(), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
+    helper.NotEqual(str2.First(), str1.First(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
 
     str1 = "hig";         // Copy
     str2 = QString(str1); // Copy over a value
     helper.Equal(str2.Length(), str1.Length(), __LINE__);
-    helper.NotEqual(str2.First(), str1.First(), str1.First(), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
+    helper.NotEqual(str2.First(), str1.First(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(str2.First(), str1.First(), str2.Length()), __LINE__);
 
     length = str1.Length();
     str2   = QString(Memory::Move(str1));
-    helper.Equal(str1.Storage(), nullptr, "null", __LINE__);
-    helper.Equal(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNull(str1.Storage(), __LINE__);
+    helper.IsNull(str1.First(), __LINE__);
     helper.Equal(str1.Length(), SizeT{0U}, __LINE__);
     helper.Equal(str2.Length(), length, __LINE__);
 
     str1 = "A";
     helper.Equal(str1.Length(), SizeT{1U}, __LINE__);
     str_ptr = str1.Detach();
-    helper.Equal(str_ptr[0], 'A', "A", __LINE__);
+    helper.Equal(str_ptr[0], 'A', __LINE__);
     Memory::Deallocate(str_ptr);
 
     char         *tmp_size_2 = Memory::Allocate<char>(2);
@@ -145,105 +145,105 @@ static void TestStringCompare(QTest &helper) {
 
     helper.Equal(str1, str2, __LINE__);
     helper.Equal(str2, str1, __LINE__);
-    helper.Equal(str1, str3, "str3", __LINE__);
-    helper.Equal(str2, str3, "str3", __LINE__);
+    helper.Equal(str1, str3, __LINE__);
+    helper.Equal(str2, str3, __LINE__);
 
     str1 = "abc";
     str2 = "abc";
     str3 = "abc";
     helper.Equal(str1, str2, __LINE__);
     helper.Equal(str2, str1, __LINE__);
-    helper.Equal(str1, str3, "str3", __LINE__);
-    helper.Equal(str2, str3, "str3", __LINE__);
+    helper.Equal(str1, str3, __LINE__);
+    helper.Equal(str2, str3, __LINE__);
 
     str1 = "a";
     str2 = "b";
     str3 = "c";
     helper.NotEqual(str1, str2, __LINE__);
     helper.NotEqual(str2, str1, __LINE__);
-    helper.NotEqual(str1, str3, "str3", __LINE__);
-    helper.NotEqual(str2, str3, "str3", __LINE__);
+    helper.NotEqual(str1, str3, __LINE__);
+    helper.NotEqual(str2, str3, __LINE__);
 
     str1 = "abc";
     str2 = "efg";
     str3 = "hij";
     helper.NotEqual(str1, str2, __LINE__);
     helper.NotEqual(str2, str1, __LINE__);
-    helper.NotEqual(str1, str3, "str3", __LINE__);
-    helper.NotEqual(str2, str3, "str3", __LINE__);
+    helper.NotEqual(str1, str3, __LINE__);
+    helper.NotEqual(str2, str3, __LINE__);
 
     str1 = "a";
     str2 = "ef";
     str3 = "abc";
     helper.NotEqual(str1, str2, __LINE__);
     helper.NotEqual(str2, str1, __LINE__);
-    helper.NotEqual(str1, str3, "str3", __LINE__);
-    helper.NotEqual(str2, str3, "str3", __LINE__);
+    helper.NotEqual(str1, str3, __LINE__);
+    helper.NotEqual(str2, str3, __LINE__);
 
     str1 = "";
-    helper.EqualsFalse(str1.IsEqual(" ", 1U), __LINE__);
+    helper.IsFalse(str1.IsEqual(" ", 1U), __LINE__);
 
     str1 = "";
     str2 = "";
-    helper.EqualsTrue((str1 >= str2), __LINE__);
-    helper.EqualsTrue((str1 <= str2), __LINE__);
-    helper.EqualsFalse((str1 > str2), __LINE__);
-    helper.EqualsFalse((str1 < str2), __LINE__);
+    helper.IsTrue((str1 >= str2), __LINE__);
+    helper.IsTrue((str1 <= str2), __LINE__);
+    helper.IsFalse((str1 > str2), __LINE__);
+    helper.IsFalse((str1 < str2), __LINE__);
 
     str1 = "a";
     str2 = "a";
-    helper.EqualsTrue((str1 >= str2), __LINE__);
-    helper.EqualsTrue((str1 <= str2), __LINE__);
-    helper.EqualsFalse((str1 > str2), __LINE__);
-    helper.EqualsFalse((str1 < str2), __LINE__);
+    helper.IsTrue((str1 >= str2), __LINE__);
+    helper.IsTrue((str1 <= str2), __LINE__);
+    helper.IsFalse((str1 > str2), __LINE__);
+    helper.IsFalse((str1 < str2), __LINE__);
 
     str1 = "a";
     str2 = "A";
-    helper.EqualsTrue((str1 >= str2), __LINE__);
-    helper.EqualsTrue((str1 > str2), __LINE__);
-    helper.EqualsFalse((str1 <= str2), __LINE__);
-    helper.EqualsFalse((str1 < str2), __LINE__);
+    helper.IsTrue((str1 >= str2), __LINE__);
+    helper.IsTrue((str1 > str2), __LINE__);
+    helper.IsFalse((str1 <= str2), __LINE__);
+    helper.IsFalse((str1 < str2), __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), __LINE__);
-    helper.EqualsFalse((str2 > str1), __LINE__);
-    helper.EqualsTrue((str2 <= str1), __LINE__);
-    helper.EqualsTrue((str2 < str1), __LINE__);
+    helper.IsFalse((str2 >= str1), __LINE__);
+    helper.IsFalse((str2 > str1), __LINE__);
+    helper.IsTrue((str2 <= str1), __LINE__);
+    helper.IsTrue((str2 < str1), __LINE__);
 
     str1 = "a";
     str2 = "B";
-    helper.EqualsTrue((str1 >= str2), __LINE__);
-    helper.EqualsTrue((str1 > str2), __LINE__);
-    helper.EqualsFalse((str1 <= str2), __LINE__);
-    helper.EqualsFalse((str1 < str2), __LINE__);
+    helper.IsTrue((str1 >= str2), __LINE__);
+    helper.IsTrue((str1 > str2), __LINE__);
+    helper.IsFalse((str1 <= str2), __LINE__);
+    helper.IsFalse((str1 < str2), __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), __LINE__);
-    helper.EqualsFalse((str2 > str1), __LINE__);
-    helper.EqualsTrue((str2 <= str1), __LINE__);
-    helper.EqualsTrue((str2 < str1), __LINE__);
+    helper.IsFalse((str2 >= str1), __LINE__);
+    helper.IsFalse((str2 > str1), __LINE__);
+    helper.IsTrue((str2 <= str1), __LINE__);
+    helper.IsTrue((str2 < str1), __LINE__);
 
     str1 = "aa";
     str2 = "aA";
-    helper.EqualsTrue((str1 >= str2), __LINE__);
-    helper.EqualsTrue((str1 > str2), __LINE__);
-    helper.EqualsFalse((str1 <= str2), __LINE__);
-    helper.EqualsFalse((str1 < str2), __LINE__);
+    helper.IsTrue((str1 >= str2), __LINE__);
+    helper.IsTrue((str1 > str2), __LINE__);
+    helper.IsFalse((str1 <= str2), __LINE__);
+    helper.IsFalse((str1 < str2), __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), __LINE__);
-    helper.EqualsFalse((str2 > str1), __LINE__);
-    helper.EqualsTrue((str2 <= str1), __LINE__);
-    helper.EqualsTrue((str2 < str1), __LINE__);
+    helper.IsFalse((str2 >= str1), __LINE__);
+    helper.IsFalse((str2 > str1), __LINE__);
+    helper.IsTrue((str2 <= str1), __LINE__);
+    helper.IsTrue((str2 < str1), __LINE__);
 
     str1 = "2021";
     str2 = "2018";
-    helper.EqualsTrue((str1 >= str2), __LINE__);
-    helper.EqualsTrue((str1 > str2), __LINE__);
-    helper.EqualsFalse((str1 <= str2), __LINE__);
-    helper.EqualsFalse((str1 < str2), __LINE__);
+    helper.IsTrue((str1 >= str2), __LINE__);
+    helper.IsTrue((str1 > str2), __LINE__);
+    helper.IsFalse((str1 <= str2), __LINE__);
+    helper.IsFalse((str1 < str2), __LINE__);
     //
-    helper.EqualsFalse((str2 >= str1), __LINE__);
-    helper.EqualsFalse((str2 > str1), __LINE__);
-    helper.EqualsTrue((str2 <= str1), __LINE__);
-    helper.EqualsTrue((str2 < str1), __LINE__);
+    helper.IsFalse((str2 >= str1), __LINE__);
+    helper.IsFalse((str2 > str1), __LINE__);
+    helper.IsTrue((str2 <= str1), __LINE__);
+    helper.IsTrue((str2 < str1), __LINE__);
 }
 
 static void TestString2(QTest &helper) {
@@ -252,37 +252,37 @@ static void TestString2(QTest &helper) {
 
     str1.Write("a", 1U);
     helper.Equal(str1.Length(), SizeT{1U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "a", __LINE__);
 
     str1.Write("bc", 2U);
     helper.Equal(str1.Length(), SizeT{3U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abc", __LINE__);
 
     str1.Write("", 0U);
     helper.Equal(str1.Length(), SizeT{3U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abc", __LINE__);
 
     str2 = QString::Merge(str1, QString("def"));
     helper.Equal(str2.Length(), SizeT{6U}, __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, __LINE__);
     helper.Equal(str2, "abcdef", __LINE__);
 
     str2 = QString::Merge(str2, QString(""));
     helper.Equal(str2.Length(), SizeT{6U}, __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, __LINE__);
     helper.Equal(str2, "abcdef", __LINE__);
 
     str2 = QString::Merge(QString(""), str2);
     helper.Equal(str2.Length(), SizeT{6U}, __LINE__);
-    helper.NotEqual(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str2.First(), __LINE__);
     helper.Equal(str2.First()[str2.Length()], char{0}, __LINE__);
     helper.Equal(str2, "abcdef", __LINE__);
 
@@ -299,7 +299,7 @@ static void TestString2(QTest &helper) {
         sstr[QString::ShortStringMax + 1] = '\0';
 
         helper.Equal(str1.Length(), (QString::ShortStringMax + 1U), __LINE__);
-        helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+        helper.IsNotNull(str1.First(), __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
         helper.Equal(str1, &(sstr[0]), __LINE__);
 
@@ -315,7 +315,7 @@ static void TestString2(QTest &helper) {
         sstr[sso_x]   = '_';
         sstr[++sso_x] = '\0';
         helper.Equal(str1.Length(), (QString::ShortStringMax - 2U), __LINE__);
-        helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+        helper.IsNotNull(str1.First(), __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
         helper.Equal(str1, &(sstr[0]), __LINE__);
 
@@ -323,7 +323,7 @@ static void TestString2(QTest &helper) {
         sstr[sso_x]   = 'B';
         sstr[++sso_x] = '\0';
         helper.Equal(str1.Length(), (QString::ShortStringMax - 1), __LINE__);
-        helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+        helper.IsNotNull(str1.First(), __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
         helper.Equal(str1, &(sstr[0]), __LINE__);
 
@@ -332,7 +332,7 @@ static void TestString2(QTest &helper) {
         sstr[++sso_x] = 'C';
         sstr[++sso_x] = '\0';
         helper.Equal(str1.Length(), (QString::ShortStringMax + 1), __LINE__);
-        helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+        helper.IsNotNull(str1.First(), __LINE__);
         helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
         helper.Equal(str1, &(sstr[0]), __LINE__);
     }
@@ -340,48 +340,48 @@ static void TestString2(QTest &helper) {
     str1.Reset();
     str1 += "a";
     helper.Equal(str1.Length(), SizeT{1U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "a", __LINE__);
 
     str1 += "bc";
     helper.Equal(str1.Length(), SizeT{3U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abc", __LINE__);
 
     str2 = "def";
     str1 += str2;
     helper.Equal(str1.Length(), SizeT{6U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcdef", __LINE__);
 
     str2 = "ghi";
     str1 += Memory::Move(str2);
     helper.Equal(str1.Length(), SizeT{9U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcdefghi", __LINE__);
     helper.Equal(str2.Length(), SizeT{0U}, __LINE__);
-    helper.Equal(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(str2.First(), __LINE__);
 
     str1 = str1 + "";
     helper.Equal(str1.Length(), SizeT{9U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcdefghi", __LINE__);
 
     str1 = str1 + "gkl";
     helper.Equal(str1.Length(), SizeT{12U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcdefghigkl", __LINE__);
 
     str2 = "123";
     str1 = str1 + str2;
     helper.Equal(str1.Length(), SizeT{15U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "abcdefghigkl123", __LINE__);
 
@@ -398,7 +398,7 @@ static void TestString2(QTest &helper) {
     str1 = "aaaaaaaaaaaaaaaaaaaaaaaa";
     str1 += "aaaaaaaaaaaaaaaaaaaaaaaa";
     helper.Equal(str1.Length(), SizeT{48U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", __LINE__);
 
@@ -407,11 +407,11 @@ static void TestString2(QTest &helper) {
     str2 = "5678";
     str1 = str1 + Memory::Move(str2);
     helper.Equal(str1.Length(), SizeT{8U}, __LINE__);
-    helper.NotEqual(str1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(str1.First(), __LINE__);
     helper.Equal(str1.First()[str1.Length()], char{0}, __LINE__);
     helper.Equal(str1, "12345678", __LINE__);
     helper.Equal(str2.Length(), SizeT{0U}, __LINE__);
-    helper.Equal(str2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(str2.First(), __LINE__);
 
     struct SimpleStream {
         char          str[8]{0};
@@ -430,7 +430,7 @@ static void TestString2(QTest &helper) {
     SimpleStream sis;
     sis << str1;
 
-    helper.EqualsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", 8U), __LINE__);
 
     str1.Reset();
     str1 = "1234";

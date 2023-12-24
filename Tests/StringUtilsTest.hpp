@@ -36,38 +36,38 @@ static void TestHash(QTest &helper) {
     SizeT hash4;
 
     hash = StringUtils::Hash("", 0U);
-    helper.NotEqual(hash, 0U, "0", __LINE__);
+    helper.NotEqual(hash, 0U, __LINE__);
 
     hash  = StringUtils::Hash("1", 1U);
     hash2 = StringUtils::Hash("0", 1U);
-    helper.NotEqual(hash, 0U, "0", __LINE__);
-    helper.NotEqual(hash2, 0U, "0", __LINE__);
-    helper.NotEqual(hash, hash2, "hash2", __LINE__);
+    helper.NotEqual(hash, 0U, __LINE__);
+    helper.NotEqual(hash2, 0U, __LINE__);
+    helper.NotEqual(hash, hash2, __LINE__);
 
     hash3 = StringUtils::Hash("10", 2U);
     hash4 = StringUtils::Hash("01", 2U);
-    helper.NotEqual(hash3, 0U, "0", __LINE__);
-    helper.NotEqual(hash4, 0U, "0", __LINE__);
-    helper.NotEqual(hash, hash3, "hash3", __LINE__);
-    helper.NotEqual(hash2, hash3, "hash3", __LINE__);
-    helper.NotEqual(hash, hash4, "hash4", __LINE__);
-    helper.NotEqual(hash2, hash4, "hash4", __LINE__);
-    helper.NotEqual(hash3, hash4, "hash4", __LINE__);
+    helper.NotEqual(hash3, 0U, __LINE__);
+    helper.NotEqual(hash4, 0U, __LINE__);
+    helper.NotEqual(hash, hash3, __LINE__);
+    helper.NotEqual(hash2, hash3, __LINE__);
+    helper.NotEqual(hash, hash4, __LINE__);
+    helper.NotEqual(hash2, hash4, __LINE__);
+    helper.NotEqual(hash3, hash4, __LINE__);
 
     hash  = StringUtils::Hash("100", 3U);
     hash2 = StringUtils::Hash("001", 3U);
-    helper.NotEqual(hash, 0U, "0", __LINE__);
-    helper.NotEqual(hash2, 0U, "0", __LINE__);
-    helper.NotEqual(hash, hash3, "hash3", __LINE__);
-    helper.NotEqual(hash2, hash3, "hash3", __LINE__);
-    helper.NotEqual(hash, hash4, "hash4", __LINE__);
-    helper.NotEqual(hash2, hash4, "hash4", __LINE__);
+    helper.NotEqual(hash, 0U, __LINE__);
+    helper.NotEqual(hash2, 0U, __LINE__);
+    helper.NotEqual(hash, hash3, __LINE__);
+    helper.NotEqual(hash2, hash3, __LINE__);
+    helper.NotEqual(hash, hash4, __LINE__);
+    helper.NotEqual(hash2, hash4, __LINE__);
 
     hash  = StringUtils::Hash("abc", 3U);
     hash2 = StringUtils::Hash("cba", 3U);
-    helper.NotEqual(hash, hash2, "hash2", __LINE__);
-    helper.NotEqual(hash, 0U, "0", __LINE__);
-    helper.NotEqual(hash2, 0U, "0", __LINE__);
+    helper.NotEqual(hash, hash2, __LINE__);
+    helper.NotEqual(hash, 0U, __LINE__);
+    helper.NotEqual(hash2, 0U, __LINE__);
 }
 
 static void TestCount(QTest &helper) {
@@ -670,137 +670,137 @@ static void TestTrim(QTest &helper) {
 }
 
 static void TestIsEqual(QTest &helper) {
-    helper.EqualsTrue(StringUtils::IsEqual("", "", 0U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("a", "a", 1U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("ab", "ab", 2U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("abcdefgh", "abcdefgh", 8U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("a", "abcdefgh", 1U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("abc", "abcdefgh", 3U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("abcdefgh", "a", 1U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("abcdefgh", "abc", 3U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("0123456789123456", "0123456789123456", 16U), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("01234567891234560123456789123456", "01234567891234560123456789123456", 32U),
-                      __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("0123456789123456012345678912345601234567891234560123456789123456",
-                                           "0123456789123456012345678912345601234567891234560123456789123456", 64U),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("", "", 0U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("a", "a", 1U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("ab", "ab", 2U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("abcdefgh", "abcdefgh", 8U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("a", "abcdefgh", 1U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("abc", "abcdefgh", 3U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("abcdefgh", "a", 1U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("abcdefgh", "abc", 3U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("0123456789123456", "0123456789123456", 16U), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("01234567891234560123456789123456", "01234567891234560123456789123456", 32U),
+                  __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("0123456789123456012345678912345601234567891234560123456789123456",
+                                       "0123456789123456012345678912345601234567891234560123456789123456", 64U),
+                  __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsEqual("a", "b", 1U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("ab", "ba", 2U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("abcdefgh", "--------", 8U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("h", "abcdefgh", 1U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("abc", "def", 3U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("abcdefgh", "b", 1U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("abcdefgh", "cde", 3U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("a", "b", 1U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("ab", "ba", 2U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("abcdefgh", "--------", 8U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("h", "abcdefgh", 1U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("abc", "def", 3U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("abcdefgh", "b", 1U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("abcdefgh", "cde", 3U), __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsEqual("01234567891234568", "0123456789123456", 17U), __LINE__);
-    helper.EqualsFalse(
-        StringUtils::IsEqual("012345678912345601234567891234567", "012345678912345601234567891234568", 33U), __LINE__);
-    helper.EqualsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
-                                            "00234567829123456012345678912345601234567891234560123456789123456", 65U),
-                       __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("01234567891234568", "0123456789123456", 17U), __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("012345678912345601234567891234567", "012345678912345601234567891234568", 33U),
+                   __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                        "00234567829123456012345678912345601234567891234560123456789123456", 65U),
+                   __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
-                                            "01234567829123456012345678912345601234567891234560123456789123457", 65U),
-                       __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                        "01234567829123456012345678912345601234567891234560123456789123457", 65U),
+                   __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
-                                            "01234567829123456012345678912345601234567891235560123456789123456", 65U),
-                       __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                        "01234567829123456012345678912345601234567891235560123456789123456", 65U),
+                   __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
-                                            "01234567829123456012335678912345601234567891234560123456789123456", 65U),
-                       __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("01234567829123456012345678912345601234567891234560123456789123456",
+                                        "01234567829123456012335678912345601234567891234560123456789123456", 65U),
+                   __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsEqual("a2345678912345678912345678912345612340678912345678912345678912345w",
-                                            "a2345678912345678912345678912345612345678912345678912345678912345w", 65U),
-                       __LINE__);
+    helper.IsFalse(StringUtils::IsEqual("a2345678912345678912345678912345612340678912345678912345678912345w",
+                                        "a2345678912345678912345678912345612345678912345678912345678912345w", 65U),
+                   __LINE__);
 }
 
 static void TestIsGreater(QTest &helper) {
-    helper.EqualsTrue(StringUtils::IsGreater("", "", 0U, 0U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("b", "a", 1U, 1U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("a", "a", 1U, 1U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("a", "A", 1U, 1U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("a", "A", 1U, 1U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("aa", "aA", 2U, 2U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("aa", "aA", 2U, 2U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("abcdefgh", "aBcdefgh", 8U, 8U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("abcdefgh", "aBcdefgh", 8U, 8U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("abcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("201811111", "20189999", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("2018", "2018", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("201911111", "20189999", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("2019", "2018", 4U, 4U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("201911111", "20189999", 4U, 4U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("2019", "2018", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("2019", "2018", 3U, 3U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("2021", "2018", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsGreater("2021", "2018", 4U, 4U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("", "", 0U, 0U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("b", "a", 1U, 1U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("a", "a", 1U, 1U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("a", "A", 1U, 1U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("a", "A", 1U, 1U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("aa", "aA", 2U, 2U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("aa", "aA", 2U, 2U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("abcdefgh", "aBcdefgh", 8U, 8U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("abcdefgh", "aBcdefgh", 8U, 8U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("abcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("201811111", "20189999", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("2018", "2018", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("201911111", "20189999", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("2019", "2018", 4U, 4U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("201911111", "20189999", 4U, 4U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("2019", "2018", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("2019", "2018", 3U, 3U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("2021", "2018", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsGreater("2021", "2018", 4U, 4U, false), __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsGreater("", "", 0U, 0U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("a", "a", 1U, 1U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("a", "b", 1U, 1U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("A", "a", 1U, 1U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("A", "a", 1U, 1U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("aA", "aa", 2U, 2U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("aA", "aa", 2U, 2U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("aBcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("aBcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("abcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("201811111", "20189999", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2018", "2018", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("20189999", "201911111", 4U, 4U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2018", "2019", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("20189999", "201911111", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2018", "2019", 4U, 4U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2018", "2019", 3U, 3U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2019", "2018", 3U, 3U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("", "", 0U, 0U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("a", "a", 1U, 1U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("a", "b", 1U, 1U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("A", "a", 1U, 1U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("A", "a", 1U, 1U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("aA", "aa", 2U, 2U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("aA", "aa", 2U, 2U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("aBcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("aBcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("abcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("201811111", "20189999", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2018", "2018", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("20189999", "201911111", 4U, 4U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2018", "2019", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("20189999", "201911111", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2018", "2019", 4U, 4U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2018", "2019", 3U, 3U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2019", "2018", 3U, 3U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsGreater("2018", "2021", 4U, 4U, false), __LINE__);
 }
 
 static void TestIsLess(QTest &helper) {
-    helper.EqualsTrue(StringUtils::IsLess("", "", 0U, 0U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("a", "b", 1U, 1U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("a", "a", 1U, 1U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("A", "a", 1U, 1U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("A", "a", 1U, 1U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("aA", "aa", 2U, 2U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("aA", "aa", 2U, 2U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("aBcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("aBcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("abcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("20189999", "201811111", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("2018", "2018", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("20189999", "201911111", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("2018", "2019", 4U, 4U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("20189999", "201911111", 4U, 4U, false), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("2018", "2019", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("2018", "2019", 3U, 3U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("2018", "2021", 4U, 4U, true), __LINE__);
-    helper.EqualsTrue(StringUtils::IsLess("2018", "2021", 4U, 4U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("", "", 0U, 0U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("a", "b", 1U, 1U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("a", "a", 1U, 1U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("A", "a", 1U, 1U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("A", "a", 1U, 1U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("aA", "aa", 2U, 2U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("aA", "aa", 2U, 2U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("aBcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("aBcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("abcdefgh", "abcdefgh", 8U, 8U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("20189999", "201811111", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("2018", "2018", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("20189999", "201911111", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("2018", "2019", 4U, 4U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("20189999", "201911111", 4U, 4U, false), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("2018", "2019", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("2018", "2019", 3U, 3U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("2018", "2021", 4U, 4U, true), __LINE__);
+    helper.IsTrue(StringUtils::IsLess("2018", "2021", 4U, 4U, false), __LINE__);
 
-    helper.EqualsFalse(StringUtils::IsLess("", "", 0U, 0U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("a", "a", 1U, 1U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("b", "a", 1U, 1U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("a", "A", 1U, 1U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("a", "A", 1U, 1U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("aa", "aA", 2U, 2U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("aa", "aA", 2U, 2U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8U, 8U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8U, 8U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("abcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("201811111", "20189999", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2018", "2018", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("20199999", "201811111", 4U, 4U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2019", "2018", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("201911111", "20189999", 4U, 4U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2019", "2018", 4U, 4U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2019", "2018", 3U, 3U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2018", "2019", 3U, 3U, false), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2021", "2018", 4U, 4U, true), __LINE__);
-    helper.EqualsFalse(StringUtils::IsLess("2021", "2018", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("", "", 0U, 0U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("a", "a", 1U, 1U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("b", "a", 1U, 1U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("a", "A", 1U, 1U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("a", "A", 1U, 1U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("aa", "aA", 2U, 2U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("aa", "aA", 2U, 2U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8U, 8U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("abcdefgh", "aBcdefgh", 8U, 8U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("abcdefgh", "abcdefgh", 8U, 8U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("201811111", "20189999", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2018", "2018", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("20199999", "201811111", 4U, 4U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2019", "2018", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("201911111", "20189999", 4U, 4U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2019", "2018", 4U, 4U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2019", "2018", 3U, 3U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2018", "2019", 3U, 3U, false), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2021", "2018", 4U, 4U, true), __LINE__);
+    helper.IsFalse(StringUtils::IsLess("2021", "2018", 4U, 4U, false), __LINE__);
 }
 
 static int RunStringUtilsTests() {

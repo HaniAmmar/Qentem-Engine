@@ -1255,117 +1255,117 @@ static void TestParse4(QTest &helper) {
 
     content = R"(["\r"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\r", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\r", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"x":   "\n"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\n", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\n", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"\""   :"x"       })";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\"", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\"", key_ptr->First(), value[0].Length()), __LINE__);
 
     content = R"({    "\n":   "\f"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\n", key_ptr->First(), value[0].Length()), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\f", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\n", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\f", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"(["\/\/"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("//", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("//", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"x":"\r\r"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\r\r", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\r\r", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"\b\b":"x"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\b\b", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\b\b", key_ptr->First(), value[0].Length()), __LINE__);
 
     content = R"({"\\\\":"\"\""})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(R"(\\)", key_ptr->First(), value[0].Length()), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(R"("")", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(R"(\\)", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(R"("")", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"(["\t\t\t"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\t\t\t", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\t\t\t", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"x":"\f\f\f"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\f\f\f", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\f\f\f", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"\\\\\\":"x"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(R"(\\\)", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(R"(\\\)", key_ptr->First(), value[0].Length()), __LINE__);
 
     content = R"({"\/\/\/":"\n\n\n"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("///", key_ptr->First(), value[0].Length()), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("///", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\n\n\n", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"([" \""])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual(" \"", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(" \"", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"([" \t "])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual(" \t ", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(" \t ", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"(["\\ \\"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\\ \\", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\\ \\", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"(["\"\\\/\b\f\n\r\t"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"x":"\t\r\n\f\b\/\\\""})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(StringUtils::IsEqual("\t\r\n\f\b/\\\"", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\t\r\n\f\b/\\\"", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"({"\t\r\n\f\b\/\\\"":"\"\\\/\b\f\n\r\t"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     key_ptr = value.GetKey(0);
-    helper.NotEqual(key_ptr, nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\t\r\n\f\b/\\\"", key_ptr->First(), value[0].Length()), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsNotNull(key_ptr, __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\t\r\n\f\b/\\\"", key_ptr->First(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("\"\\/\b\f\n\r\t", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"(["\u003D"])";
     value   = JSON::Parse(content);
-    helper.EqualsTrue(StringUtils::IsEqual("=", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("=", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     content = R"(["\u00a1"])";
     value   = JSON::Parse(content, 10);
-    helper.EqualsTrue(StringUtils::IsEqual("¡", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("¡", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     String<char> str(R"(["\u08A7"])");
     value = JSON::Parse(str.First(), str.Length());
-    helper.EqualsTrue(StringUtils::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("ࢧ", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     str   = R"(["\ud802\uDE7B"])";
     value = JSON::Parse(str.First(), str.Length());
-    helper.EqualsTrue(StringUtils::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("𐩻", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     str   = R"(["\uD83E\uFC59"])";
     value = JSON::Parse(str.First(), str.Length());
-    helper.EqualsTrue(StringUtils::IsEqual("🡙", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("🡙", value[0].StringStorage(), value[0].Length()), __LINE__);
 
     str   = R"(["\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7"])";
     value = JSON::Parse(str.First(), str.Length());
-    helper.EqualsTrue(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ", value[0].StringStorage(), value[0].Length()), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("𐊃W=W𐊃¡🡙ࢧ", value[0].StringStorage(), value[0].Length()), __LINE__);
 }
 
 static void TestParse5(QTest &helper) {
@@ -1375,239 +1375,239 @@ static void TestParse5(QTest &helper) {
 
     content = R"([1   ]    ])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a":1   }    })";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([f])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([t])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([n])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([falsE])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([truE])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([nulL])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([false-])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([true-])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([null-])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1,])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1,   ])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1   ,   ])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([,])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["1",,"2"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([,1])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([,"1"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["1"]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([["1"]]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([  []]  ])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w"],1])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" o  , 1])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"w": "a" o  , "b": "x"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" ] ,1])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["x"]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["aa"],"s"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["x":"s"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([{"x"::"s"}])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([]")";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({}")";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({},)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([],)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([[[[[[[[[001]]]]]]]]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a":{"b":{"c":001}}})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([w])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({x:"x"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":001})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":4)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["x")";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([4,])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x" 4})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x" "4"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x" {}})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x" []})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x",4})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([4,])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":4,})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([4,,])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":4,,})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":"w" w})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":"w" true})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" true])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\w"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([""]")";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 }
 
 static void TestParse6(QTest &helper) {
@@ -1617,192 +1617,192 @@ static void TestParse6(QTest &helper) {
 
     content = R"(["\"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["""])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["a",)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a":"c",)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     value = JSON::Parse("[\"abc\n\"]");
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({{}})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({[]})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([123e])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
     stream.Clear();
 
     content = R"([123e--4])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     value = JSON::Parse("[\"\ta\"]");
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\uaaa"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\uaa"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\ua"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\u"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["\uD83E\uFC5"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([[{} {}]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([{} {}])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([[] []])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" "w"])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" {}])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([4    {}])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({a "a":[]})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a":a []})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a"a :[]})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":"w" "w"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":"w" "u":"w"})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([{} 0])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([["x" 0]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([{} 1])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([[{} 0]])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([[] false])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" null])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"(["w" 3])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([4    4])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":"w" 7})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"x":"w" 5})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({1)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([2)";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a":h, "b": a})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"({"a":{})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     value = JSON::Parse("{\"\na\":{}");
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     value = JSON::Parse("[\"WHAT?\"}");
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1e])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1e+])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1e-])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1e++])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 
     content = R"([1e--])";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    helper.EqualsTrue(value.IsUndefined(), __LINE__);
+    helper.IsTrue(value.IsUndefined(), __LINE__);
 }
 
 static int RunJSONTests() {

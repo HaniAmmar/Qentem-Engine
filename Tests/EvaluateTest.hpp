@@ -61,195 +61,195 @@ static void TestEvaluate1(QTest &helper) {
 
     content  = "";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "               ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "()";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "( )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(  )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(        )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " ()";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " ( )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " (  )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " (        )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "() ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "( ) ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(  ) ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(        ) ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "  ()";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "  ( )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "  (  )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "  (        )";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "()  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "( )  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(  )  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(        )  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " () ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " ( ) ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " (  ) ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = " (        ) ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "   ()   ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "   ( )   ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "   (  )   ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "   (        )   ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "a";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "10/0";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "10/(2-2)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "fj";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "fgh";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "5f2s4s5dg";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(d)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(oo)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(www46fs5d4f5ds)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "() ()";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(())";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "() (()) ()";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(()) (()()) ((()())())";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3()";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3(1)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3(1+1)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 }
 
 static void TestEvaluate2(QTest &helper) {
@@ -261,164 +261,164 @@ static void TestEvaluate2(QTest &helper) {
     content  = "1";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     // NOTE: Implement power of fraction.
     content  = "2^0.2";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
     // helper.Equal(number.Natural, 1.148698355,  __LINE__);
-    // helper.EqualsTrue(is_valid,  __LINE__);
+    // helper.IsTrue(is_valid,  __LINE__);
 
     content  = " 4";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 4ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 5ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " 10 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 10ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " 7 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 7ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "100";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 100ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " 40";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 40ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "5000 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 5000ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " 1004 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1004ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " 714 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 714ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(1)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " (4)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 4ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(5) ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 5ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " (10) ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 10ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " (7) ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 7ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(100)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 100ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " (40)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 40ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(5000) ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 5000ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " (1004) ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1004ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " ( 714 ) ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 714ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "((1))";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " (( 4))";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 4ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "((5     ) )";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 5ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "( 10 )";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 10ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "( (((       7   ))) )";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 7ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(100)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 100ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "( 40)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 40ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(5000 )";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 5000ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(((((((((( 1004 ))))))))))";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1004ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "( 714 )";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 714ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "0^10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate3(QTest &helper) {
@@ -462,7 +462,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "5==2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "5==5";
     number  = TestEvaluate(content, value);
@@ -475,12 +475,12 @@ static void TestEvaluate3(QTest &helper) {
     content  = "10!=10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "1>5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "5>=1";
     number  = TestEvaluate(content, value);
@@ -493,7 +493,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "5>=7";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "4<8";
     number  = TestEvaluate(content, value);
@@ -502,12 +502,12 @@ static void TestEvaluate3(QTest &helper) {
     content  = "7<7";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "10<9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "3<=16";
     number  = TestEvaluate(content, value);
@@ -520,7 +520,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "17<=3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "1&&1";
     number  = TestEvaluate(content, value);
@@ -533,12 +533,12 @@ static void TestEvaluate3(QTest &helper) {
     content  = "0&&5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "0&&0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "8||6";
     number  = TestEvaluate(content, value);
@@ -555,7 +555,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "0||0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   3   ^2   ";
     number  = TestEvaluate(content, value);
@@ -580,7 +580,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = " 5 == 2 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " 5 == 5 ";
     number  = TestEvaluate(content, value);
@@ -593,7 +593,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = " 10 != 10 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " 5 - 2 ";
     number  = TestEvaluate(content, value);
@@ -606,12 +606,12 @@ static void TestEvaluate3(QTest &helper) {
     content  = "   2   >2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "1>   5   ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " 5   >=1   ";
     number  = TestEvaluate(content, value);
@@ -624,7 +624,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "5   >=   7";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   4   <8   ";
     number  = TestEvaluate(content, value);
@@ -633,12 +633,12 @@ static void TestEvaluate3(QTest &helper) {
     content  = "   7<   7   ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "   10<   0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   3   <=   16";
     number  = TestEvaluate(content, value);
@@ -651,7 +651,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "   17   <=3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   1   &&   1";
     number  = TestEvaluate(content, value);
@@ -664,12 +664,12 @@ static void TestEvaluate3(QTest &helper) {
     content  = "   0&&5  ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "   0   &&0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   8   ||   6  ";
     number  = TestEvaluate(content, value);
@@ -686,7 +686,7 @@ static void TestEvaluate3(QTest &helper) {
     content  = "   0   ||0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate4(QTest &helper) {
@@ -774,22 +774,22 @@ static void TestEvaluate4(QTest &helper) {
     content  = " 5 == -5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " 5 ==-5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " -5 == 5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = " -5 == 5 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " -5 != 2 ";
     number  = TestEvaluate(content, value);
@@ -822,7 +822,7 @@ static void TestEvaluate4(QTest &helper) {
     content  = "-2 > 2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "-2 > -11";
     number  = TestEvaluate(content, value);
@@ -831,7 +831,7 @@ static void TestEvaluate4(QTest &helper) {
     content  = "-1>5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "5 >=-19";
     number  = TestEvaluate(content, value);
@@ -848,17 +848,17 @@ static void TestEvaluate4(QTest &helper) {
     content  = "-5 >= 7";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "3 <-2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "10 < -10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "-2 < 2";
     number  = TestEvaluate(content, value);
@@ -867,7 +867,7 @@ static void TestEvaluate4(QTest &helper) {
     content  = "-2 < -11";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "-1<5";
     number  = TestEvaluate(content, value);
@@ -876,16 +876,16 @@ static void TestEvaluate4(QTest &helper) {
     content  = "5 <=-19";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "5 - <=-19";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "-5 <=-19 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "-8 <= -8";
     number  = TestEvaluate(content, value);
@@ -898,22 +898,22 @@ static void TestEvaluate4(QTest &helper) {
     content  = "-1 && 1";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "1 &&   -800";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "0 && -5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "-8 && -9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "-8 || 6";
     number  = TestEvaluate(content, value);
@@ -926,12 +926,12 @@ static void TestEvaluate4(QTest &helper) {
     content  = "0 ||           -9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "-7 || -500";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate5(QTest &helper) {
@@ -1019,17 +1019,17 @@ static void TestEvaluate5(QTest &helper) {
     content  = "+5==2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "5==+2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "+5==+2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+5==+5";
     number  = TestEvaluate(content, value);
@@ -1042,17 +1042,17 @@ static void TestEvaluate5(QTest &helper) {
     content  = "+10!=+10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "+10!=10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "10!=+10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "3 >+2";
     number  = TestEvaluate(content, value);
@@ -1061,12 +1061,12 @@ static void TestEvaluate5(QTest &helper) {
     content  = "10 > +10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "+2 > 2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+11 > +2";
     number  = TestEvaluate(content, value);
@@ -1075,7 +1075,7 @@ static void TestEvaluate5(QTest &helper) {
     content  = "+1>5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+19 >=5";
     number  = TestEvaluate(content, value);
@@ -1084,7 +1084,7 @@ static void TestEvaluate5(QTest &helper) {
     content  = "+1 >=+100 ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+8 >=  +8 ";
     number  = TestEvaluate(content, value);
@@ -1092,17 +1092,17 @@ static void TestEvaluate5(QTest &helper) {
 
     content  = "7+ >= 5";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3 <+2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "10 < +10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+1 < 2";
     number  = TestEvaluate(content, value);
@@ -1119,12 +1119,12 @@ static void TestEvaluate5(QTest &helper) {
     content  = "+19 <=5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "+5 <=+19";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+8 <= +8";
     number  = TestEvaluate(content, value);
@@ -1137,22 +1137,22 @@ static void TestEvaluate5(QTest &helper) {
     content  = "+1 && 1";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "1&&+800";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "0 && +5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "+8 && +9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "+8 || 6";
     number  = TestEvaluate(content, value);
@@ -1172,12 +1172,12 @@ static void TestEvaluate5(QTest &helper) {
     content  = "0 || +9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "+7 || +500";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate6(QTest &helper) {
@@ -1189,7 +1189,7 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(0)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(1)";
     number  = TestEvaluate(content, value);
@@ -1286,7 +1286,7 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(1+2)== 2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(6-1) ==5";
     number  = TestEvaluate(content, value);
@@ -1299,12 +1299,12 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(20/2) != 10";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(  10  -  +9  )>5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(15%10)>=1             ";
     number  = TestEvaluate(content, value);
@@ -1317,7 +1317,7 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(4*1.5)>=7";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(0.999999+0.1)<8";
     number  = TestEvaluate(content, value);
@@ -1326,12 +1326,12 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(20*0.5)<7";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(4^2)<9";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(9/2)<=16";
     number  = TestEvaluate(content, value);
@@ -1344,7 +1344,7 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(20-8)<=3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(1*1)&&1";
     number  = TestEvaluate(content, value);
@@ -1361,12 +1361,12 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(0*10)&&5";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(8%2)&&0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(4/2)||6";
     number  = TestEvaluate(content, value);
@@ -1383,7 +1383,7 @@ static void TestEvaluate6(QTest &helper) {
     content  = "(0||0)||0";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate7(QTest &helper) {
@@ -1427,7 +1427,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "3== (3-1)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(5) ==(10-5)";
     number  = TestEvaluate(content, value);
@@ -1440,12 +1440,12 @@ static void TestEvaluate7(QTest &helper) {
     content  = "10 != (20/2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "1>(3+2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "5>=(100^0)             ";
     number  = TestEvaluate(content, value);
@@ -1458,7 +1458,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "6>=(14/2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "1<(4+2)";
     number  = TestEvaluate(content, value);
@@ -1467,12 +1467,12 @@ static void TestEvaluate7(QTest &helper) {
     content  = "10<(10-3)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "16<(18/2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "4.5<=(4*4)";
     number  = TestEvaluate(content, value);
@@ -1485,7 +1485,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "12<=(3*1)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "1&&(1^10)";
     number  = TestEvaluate(content, value);
@@ -1502,12 +1502,12 @@ static void TestEvaluate7(QTest &helper) {
     content  = "0&&(2+2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "0&&(0^0)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "9||        (3*2)";
     number  = TestEvaluate(content, value);
@@ -1524,7 +1524,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "        0||(10&&0)          ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(2*3)^(8/2)";
     number  = TestEvaluate(content, value);
@@ -1561,7 +1561,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(1+2)== (3-1)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(6-1) ==(10-5)";
     number  = TestEvaluate(content, value);
@@ -1574,12 +1574,12 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(20/2) != (20/2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(  10-+9  )>(3+2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(15%10)>=(100^0)             ";
     number  = TestEvaluate(content, value);
@@ -1592,7 +1592,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(4*1.5)>=(14/2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(0.999999+0.1)<(4+2)";
     number  = TestEvaluate(content, value);
@@ -1601,12 +1601,12 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(20*0.5)<(10-3)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(4^2)<(18/2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(9/2)<=(4*4)";
     number  = TestEvaluate(content, value);
@@ -1619,7 +1619,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(20-8)<=(3*1)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(1*1)&&(1^10)";
     number  = TestEvaluate(content, value);
@@ -1636,12 +1636,12 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(0*10)&&(2+2)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(8%2)&&(0^0)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(4/2)||(3*2)";
     number  = TestEvaluate(content, value);
@@ -1658,7 +1658,7 @@ static void TestEvaluate7(QTest &helper) {
     content  = "(0||0)||(10&&0)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate8(QTest &helper) {
@@ -1770,12 +1770,12 @@ static void TestEvaluate8(QTest &helper) {
     content  = "7!=10-3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "7-10!=-3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "3+4>=7";
     number  = TestEvaluate(content, value);
@@ -2043,12 +2043,12 @@ static void TestEvaluate9(QTest &helper) {
     content  = "(7!=10-3)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(7-10!=-3)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(3+4>=7)";
     number  = TestEvaluate(content, value);
@@ -2316,12 +2316,12 @@ static void TestEvaluate10(QTest &helper) {
     content  = "7!=(10)-3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "7-(10)!=-3";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "3+(4)>=7";
     number  = TestEvaluate(content, value);
@@ -2589,12 +2589,12 @@ static void TestEvaluate11(QTest &helper) {
     content  = "(7!=(10)-3)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(7-(10)!=-3)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "(3+(4)>=7)";
     number  = TestEvaluate(content, value);
@@ -2858,7 +2858,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "a==c";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "a!=b";
     number  = TestEvaluate(content, value);
@@ -2867,7 +2867,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "a!=a";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "a == a";
     number  = TestEvaluate(content, value);
@@ -2876,7 +2876,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "a == c";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "a != b";
     number  = TestEvaluate(content, value);
@@ -2885,7 +2885,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "a != a";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " a == a ";
     number  = TestEvaluate(content, value);
@@ -2894,7 +2894,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = " a == c ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " a != b ";
     number  = TestEvaluate(content, value);
@@ -2903,7 +2903,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = " a != a ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "  a    == a";
     number  = TestEvaluate(content, value);
@@ -2928,7 +2928,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "   a      == c         ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   a !=         b";
     number  = TestEvaluate(content, value);
@@ -2937,7 +2937,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "   a!=a      ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "AbcDEF==AbcDEF";
     number  = TestEvaluate(content, value);
@@ -2946,7 +2946,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "AbcDEF==zwx";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "AbcDEF!=BBBB";
     number  = TestEvaluate(content, value);
@@ -2955,7 +2955,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "AbcDEF!=AbcDEF";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "AbcDEF == AbcDEF";
     number  = TestEvaluate(content, value);
@@ -2964,7 +2964,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "AbcDEF == zwx";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "AbcDEF != BBBB";
     number  = TestEvaluate(content, value);
@@ -2973,7 +2973,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "AbcDEF != AbcDEF";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " AbcDEF == AbcDEF ";
     number  = TestEvaluate(content, value);
@@ -2982,7 +2982,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = " AbcDEF == zwx ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = " AbcDEF != BBBB ";
     number  = TestEvaluate(content, value);
@@ -2991,7 +2991,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = " AbcDEF != AbcDEF ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "  AbcDEF    == AbcDEF";
     number  = TestEvaluate(content, value);
@@ -3016,7 +3016,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "   AbcDEF      == zwx         ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "   AbcDEF !=         BBBB";
     number  = TestEvaluate(content, value);
@@ -3025,7 +3025,7 @@ static void TestEvaluate12(QTest &helper) {
     content  = "   AbcDEF!=AbcDEF      ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate13(QTest &helper) {
@@ -3036,67 +3036,67 @@ static void TestEvaluate13(QTest &helper) {
 
     content  = "{var:1} + 5";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3 + {var:9}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "10 == A";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "A == 10";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "10 == (A)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(A) == 10";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:A} == A";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:A} != A";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "A=={var:A}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "A==";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "A!={var:A}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(4+3";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "4+3*(3";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(4+(2)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{4+5";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:A}>4";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content = "a";
     number  = TestEvaluate(content, value);
@@ -3144,7 +3144,7 @@ static void TestEvaluate13(QTest &helper) {
     content  = "   {var:AB} <6";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "{var:A}  >=4";
     number  = TestEvaluate(content, value);
@@ -3157,7 +3157,7 @@ static void TestEvaluate13(QTest &helper) {
     content  = "{var:AB} && 0  ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "{var:A} && 1";
     number  = TestEvaluate(content, value);
@@ -3202,7 +3202,7 @@ static void TestEvaluate13(QTest &helper) {
     content  = "   8 >{var:AB}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "3  <={var:A}";
     number  = TestEvaluate(content, value);
@@ -3215,7 +3215,7 @@ static void TestEvaluate13(QTest &helper) {
     content  = "0 && {var:AB}  ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "1 && {var:A}";
     number  = TestEvaluate(content, value);
@@ -3231,19 +3231,19 @@ static void TestEvaluate13(QTest &helper) {
 
     content  = "{var:d} +5  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:w}*0  ";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:}&&0";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "aa > 0";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 }
 
 static void TestEvaluate14(QTest &helper) {
@@ -3366,17 +3366,17 @@ static void TestEvaluate14(QTest &helper) {
     content  = "7!=({var:AB}-6)";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "(4-{var:A})!=-2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "4-{var:A}!=-2";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "3+{var:ABC}>=7";
     number  = TestEvaluate(content, value);
@@ -3505,7 +3505,7 @@ static void TestEvaluate14(QTest &helper) {
     content  = "1>{var:ABC}&&1";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content = "10>={var:A}&&1";
     number  = TestEvaluate(content, value);
@@ -3560,163 +3560,163 @@ static void TestEvaluate15(QTest &helper) {
     content  = "{var:Q}   ==Qentem";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:QA}==     Qentem Evaluate";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "        {var:Q}   ==Qentem";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "             {var:QA}==     Qentem Evaluate";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:Q}==          Qentem";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:QA}==Qentem Evaluate        ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:Q}==    Qentem          ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "  {var:QA}    ==     Qentem Evaluate     ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:10}==Qentem";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:Q}!=Qentem";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:QA}!=Qentem Evaluate";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:2}!=Qentem Evaluate";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:Q}==Qente";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:QA}==Evaluate";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:Q}!=Qente";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:QA}!=Evaluate";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem   =={var:Q}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem Evaluate==     {var:QA}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "        Qentem   =={var:Q}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "             Qentem Evaluate==     {var:QA}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem==          {var:Q}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem Evaluate=={var:QA}        ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem==    {var:Q}          ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "  Qentem Evaluate    ==     {var:QA}     ";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem=={var:10}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "Qentem!={var:Q}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem Evaluate!={var:QA}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qentem Evaluate!={var:2}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "Qente=={var:Q}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Evaluate=={var:QA}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 0ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Qente!={var:Q}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "Evaluate!={var:QA}";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 
     content  = "{var:A}==6";
     is_valid = TestEvaluate(number, content, value);
     helper.Equal(number.Natural, 1ULL, __LINE__);
-    helper.EqualsTrue(is_valid, __LINE__);
+    helper.IsTrue(is_valid, __LINE__);
 }
 
 static void TestEvaluate16(QTest &helper) {
@@ -3734,71 +3734,71 @@ static void TestEvaluate16(QTest &helper) {
 
     content  = "2      {var:A}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "7{var:ABC}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:AB}3";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:AB} 9";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:AB}  &  5";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "(3)3";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3(3)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "4+3(7)";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "1!#1";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "1|#1";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:Q}=={A}+1";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "1U0=={var:A}+4";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:A}=={Q}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:A}==1U0";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "5+{var:QA}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "3=={var:Q}";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     content  = "{var:Q}==2";
     is_valid = TestEvaluate(number, content, value);
-    helper.EqualsFalse(is_valid, __LINE__);
+    helper.IsFalse(is_valid, __LINE__);
 
     value.Reset();
     value += -2;
@@ -4621,7 +4621,7 @@ static void TestEvaluate19(QTest &helper) {
     value += 12.0F;
 
     content = "{var:6}^{var:1}";
-    helper.EqualsFalse(TestEvaluate(number, content, value), __LINE__);
+    helper.IsFalse(TestEvaluate(number, content, value), __LINE__);
 
     content = "{var:0}^{var:0}";
     number  = TestEvaluate(content, value);

@@ -351,7 +351,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\\)";
@@ -359,7 +359,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\/)";
@@ -367,7 +367,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\b)";
@@ -375,7 +375,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\f)";
@@ -383,7 +383,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\n)";
@@ -391,7 +391,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\r)";
@@ -399,7 +399,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\t)";
@@ -407,7 +407,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\"\")";
@@ -415,7 +415,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\\\\)";
@@ -423,7 +423,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\/\/)";
@@ -431,7 +431,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\b\b)";
@@ -439,7 +439,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\f\f)";
@@ -447,7 +447,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\n\n)";
@@ -455,7 +455,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\r\r)";
@@ -463,7 +463,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\t\t)";
@@ -471,7 +471,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\"\"\")";
@@ -479,7 +479,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\\\\\\)";
@@ -487,7 +487,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\/\/\/)";
@@ -495,7 +495,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\b\b\b)";
@@ -503,7 +503,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\f\f\f)";
@@ -511,7 +511,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\n\n\n)";
@@ -519,7 +519,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\r\r\r)";
@@ -527,7 +527,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\t\t\t)";
@@ -535,7 +535,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \")";
@@ -543,7 +543,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \\)";
@@ -551,7 +551,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \/)";
@@ -559,7 +559,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \b)";
@@ -567,7 +567,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \f)";
@@ -575,7 +575,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \n)";
@@ -583,7 +583,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \r)";
@@ -591,7 +591,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \t)";
@@ -599,7 +599,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\" )";
@@ -607,7 +607,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\\ )";
@@ -615,7 +615,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\/ )";
@@ -623,7 +623,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\b )";
@@ -631,7 +631,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\f )";
@@ -639,7 +639,7 @@ static void TestUnEscapeJSON1(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 }
 
@@ -655,7 +655,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\r )";
@@ -663,7 +663,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\t )";
@@ -671,7 +671,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \" )";
@@ -679,7 +679,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \\ )";
@@ -687,7 +687,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \/ )";
@@ -695,7 +695,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \b )";
@@ -703,7 +703,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \f )";
@@ -711,7 +711,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \n )";
@@ -719,7 +719,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \r )";
@@ -727,7 +727,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"( \t )";
@@ -735,7 +735,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\" \")";
@@ -743,7 +743,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\\ \\)";
@@ -751,7 +751,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\/ \/)";
@@ -759,7 +759,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\b \b)";
@@ -767,7 +767,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\f \f)";
@@ -775,7 +775,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\n \n)";
@@ -783,7 +783,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\r \r)";
@@ -791,7 +791,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\t \t)";
@@ -799,7 +799,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\"\\\/\b\f\n\r\t)";
@@ -807,7 +807,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\t\r\n\f\b\/\\\")";
@@ -815,7 +815,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\u003D)";
@@ -823,7 +823,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\u00a1)";
@@ -831,7 +831,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\u08A7)";
@@ -839,7 +839,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\ud802\uDE7B)";
@@ -847,7 +847,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\uD83E\uFC59)";
@@ -855,7 +855,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\UD800\UDE83W\U003DW\UD800\UDE83\U00A1\UD83E\UFC59\U08A7)";
@@ -863,7 +863,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = "";
@@ -871,7 +871,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = "abcd";
@@ -886,7 +886,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(abcd\"efgh\"1234)";
@@ -894,7 +894,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(abcd\""asd)";
@@ -902,7 +902,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, 7U, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(a\"bcd"asd)";
@@ -910,7 +910,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, 7U, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(")";
@@ -918,7 +918,7 @@ static void TestUnEscapeJSON2(QTest &helper) {
     len1 = StringUtils::Count(str1);
     len2 = UnEscapeJSON(str1, len1, buffer);
     helper.Equal(len2, len1, __LINE__);
-    helper.EqualsTrue((buffer == str2), __LINE__);
+    helper.IsTrue((buffer == str2), __LINE__);
     buffer.Clear();
 
     str1 = R"(\uD83E\uFC5)";

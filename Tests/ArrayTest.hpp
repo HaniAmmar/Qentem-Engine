@@ -36,62 +36,62 @@ static void TestArray1(QTest &helper) {
     Array<SizeT> numbers2(8);
 
     helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.EqualsTrue(numbers1.IsEmpty(), __LINE__);
-    helper.EqualsFalse(numbers1.IsNotEmpty(), __LINE__);
+    helper.IsTrue(numbers1.IsEmpty(), __LINE__);
+    helper.IsFalse(numbers1.IsNotEmpty(), __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers1.First(), nullptr, "null", __LINE__);
-    helper.Equal(numbers1.Last(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers1.First(), __LINE__);
+    helper.IsNull(numbers1.Last(), __LINE__);
 
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 8U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Reset();
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(5);
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 5U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers1.Reserve(10);
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 10U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers1.Resize(18);
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 18U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     storage = numbers1.First();
     numbers1.Resize(4);
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 4U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.NotEqual(numbers1.First(), storage, __LINE__);
 
     numbers2.Resize(5);
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 5U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(2);
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 2U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(0);
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(0);
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers1.First(), __LINE__);
 
     numbers1.Reset();
     numbers2.Reset();
@@ -99,10 +99,10 @@ static void TestArray1(QTest &helper) {
     numbers1.ResizeAndInitialize(8);
     storage = numbers1.First();
     helper.Equal(numbers1.Size(), 8U, __LINE__);
-    helper.EqualsFalse(numbers1.IsEmpty(), __LINE__);
-    helper.EqualsTrue(numbers1.IsNotEmpty(), __LINE__);
+    helper.IsFalse(numbers1.IsEmpty(), __LINE__);
+    helper.IsTrue(numbers1.IsNotEmpty(), __LINE__);
     helper.Equal(numbers1.Capacity(), 8U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers1.ResizeAndInitialize(4);
     helper.NotEqual(numbers1.First(), storage, __LINE__);
@@ -111,22 +111,22 @@ static void TestArray1(QTest &helper) {
     numbers2 = numbers1;
     helper.Equal(numbers1.Size(), 4U, __LINE__);
     helper.Equal(numbers1.Capacity(), 4U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.Equal(numbers2.Size(), 4U, __LINE__);
     helper.Equal(numbers2.Capacity(), 4U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
     helper.NotEqual(numbers2.First(), storage, __LINE__);
 
     numbers1.ResizeAndInitialize(16);
     helper.Equal(numbers1.Size(), 16U, __LINE__);
     helper.Equal(numbers1.Capacity(), 16U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     storage  = numbers1.First();
     numbers2 = numbers1;
     helper.Equal(numbers2.Size(), 16U, __LINE__);
     helper.Equal(numbers2.Capacity(), 16U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
     helper.NotEqual(numbers2.First(), storage, __LINE__);
 
     numbers2 = Memory::Move(numbers1);
@@ -134,33 +134,33 @@ static void TestArray1(QTest &helper) {
     helper.Equal(numbers2.Capacity(), 16U, __LINE__);
     helper.Equal(numbers2.First(), storage, __LINE__);
 
-    helper.Equal(numbers1.Storage(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers1.Storage(), __LINE__);
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers1.First(), __LINE__);
 
     storage  = numbers1.First();
     numbers1 = Array<SizeT>(numbers2);
     helper.Equal(numbers1.Size(), 16U, __LINE__);
     helper.Equal(numbers1.Capacity(), 16U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.NotEqual(numbers1.First(), storage, __LINE__);
 
     storage  = numbers2.First();
     numbers1 = Array<SizeT>(Memory::Move(numbers2));
     helper.Equal(numbers1.Size(), 16U, __LINE__);
     helper.Equal(numbers1.Capacity(), 16U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.Equal(numbers1.First(), storage, __LINE__);
-    helper.Equal(numbers2.Storage(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers2.Storage(), __LINE__);
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers2.First(), __LINE__);
 
     numbers1.Clear();
     helper.Equal(numbers1.Size(), 0U, __LINE__);
     helper.Equal(numbers1.Capacity(), 16U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers1.ResizeAndInitialize(3);
     numbers2.ResizeAndInitialize(5);
@@ -169,18 +169,18 @@ static void TestArray1(QTest &helper) {
     numbers1 += numbers2;
     helper.Equal(numbers1.Size(), 8U, __LINE__);
     helper.Equal(numbers1.Capacity(), 8U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.NotEqual(numbers1.First(), storage, __LINE__);
 
     storage = numbers1.First();
     numbers1 += Memory::Move(numbers2);
     helper.Equal(numbers1.Size(), 13U, __LINE__);
     helper.Equal(numbers1.Capacity(), 13U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.NotEqual(numbers1.First(), storage, __LINE__);
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers2.First(), __LINE__);
 
     numbers2.ResizeAndInitialize(5);
     numbers1.Resize(18);
@@ -188,20 +188,20 @@ static void TestArray1(QTest &helper) {
     numbers1 += Memory::Move(numbers2);
     helper.Equal(numbers1.Size(), 18U, __LINE__);
     helper.Equal(numbers1.Capacity(), 18U, __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
     helper.Equal(numbers1.First(), storage, __LINE__);
 
     storage = numbers1.First();
     numbers2 += Memory::Move(numbers1);
     helper.Equal(numbers2.Size(), 18U, __LINE__);
     helper.Equal(numbers2.Capacity(), 18U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
     helper.Equal(numbers2.First(), storage, __LINE__);
 
     SizeT *tmp = numbers2.Detach();
     helper.Equal(numbers2.Size(), 0U, __LINE__);
     helper.Equal(numbers2.Capacity(), 0U, __LINE__);
-    helper.Equal(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNull(numbers2.First(), __LINE__);
     helper.Equal(tmp, storage, __LINE__);
 
     Memory::Deallocate(tmp);
@@ -218,29 +218,29 @@ static void TestArray2(QTest &helper) {
     numbers2.Insert(numbers1);
     helper.Equal(numbers2.Size(), 4U, __LINE__);
     helper.Equal(numbers2.Capacity(), 4U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
     helper.Equal(numbers2.First(), storage, __LINE__);
     helper.Equal(numbers2.Last(), (storage + 3), __LINE__);
-    helper.NotEqual(numbers1.Last(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers1.Last(), __LINE__);
 
     numbers1.Reserve(10);
     numbers2.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
     helper.Equal(numbers2.Size(), 4U, __LINE__);
     helper.Equal(numbers2.Capacity(), 4U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers1.ResizeAndInitialize(4);
     numbers2.Insert(numbers1);
     helper.Equal(numbers2.Size(), 8U, __LINE__);
     helper.Equal(numbers2.Capacity(), 8U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
 
     storage = numbers1.First();
     numbers2.Insert(Memory::Move(numbers1));
     helper.Equal(numbers2.Size(), 12U, __LINE__);
     helper.Equal(numbers2.Capacity(), 12U, __LINE__);
-    helper.NotEqual(numbers2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(numbers2.First(), __LINE__);
     helper.NotEqual(numbers2.First(), storage, __LINE__);
 }
 
@@ -257,15 +257,15 @@ static void TestArray3(QTest &helper) {
     const SizeT *storage2 = numbers1.Storage();
 
     helper.Equal(numbers1.Size(), 8U, __LINE__);
-    helper.EqualsTrue((numbers1.Capacity() >= 8), __LINE__);
-    helper.NotEqual(numbers1.First(), nullptr, "null", __LINE__);
+    helper.IsTrue((numbers1.Capacity() >= 8), __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
 
     SizeT sum = 0;
     for (const SizeT &num : numbers1) {
         sum += num;
     }
 
-    helper.Equal(sum, 28U, "sum", __LINE__);
+    helper.Equal(sum, 28U, __LINE__);
 
     numbers2.Insert(storage1[0]);
     numbers2.Insert(storage1[1]);
@@ -320,7 +320,7 @@ static void TestArray3(QTest &helper) {
     SizeT &nu1 = numbers1.Insert(5);
     ++nu1;
 
-    helper.Equal(*(numbers1.First()), SizeT{6}, "6", __LINE__);
+    helper.Equal(*(numbers1.First()), SizeT{6}, __LINE__);
 
     /////////////////////
     numbers1.Clear();
@@ -330,7 +330,7 @@ static void TestArray3(QTest &helper) {
         num += 10;
     }
 
-    helper.Equal(*(numbers1.First()), SizeT{11}, "11", __LINE__);
+    helper.Equal(*(numbers1.First()), SizeT{11}, __LINE__);
     /////////////////////
     const Array<SizeT> numbers_init{8U, true};
     helper.Equal(numbers_init.Size(), 8U, __LINE__);
@@ -380,7 +380,7 @@ static void TestArray4(QTest &helper) {
     String<char> *storage2 = strings2.Storage();
 
     helper.Equal(strings2.Size(), 2U, __LINE__);
-    helper.NotEqual(strings2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(strings2.First(), __LINE__);
     helper.NotEqual(storage2[0].First(), str1_cstr, __LINE__);
     helper.NotEqual(storage2[1].First(), str2_cstr, __LINE__);
 
@@ -389,7 +389,7 @@ static void TestArray4(QTest &helper) {
     storage2 = strings2.Storage();
 
     helper.Equal(strings2.Size(), 2U, __LINE__);
-    helper.NotEqual(strings2.First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(strings2.First(), __LINE__);
     helper.Equal(storage2[0].First(), str1_cstr, __LINE__);
     helper.Equal(storage2[1].First(), str2_cstr, __LINE__);
 

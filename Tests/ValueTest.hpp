@@ -44,55 +44,55 @@ static void TestEmptyValue(QTest &helper) {
     SizeT         c_str_len;
     bool          bool_var;
 
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
-    helper.EqualsFalse(value1.IsObject(), __LINE__);
-    helper.EqualsFalse(value1.IsArray(), __LINE__);
-    helper.EqualsFalse(value1.IsString(), __LINE__);
-    helper.EqualsFalse(value1.IsNumber(), __LINE__);
-    helper.EqualsFalse(value1.IsTrue(), __LINE__);
-    helper.EqualsFalse(value1.IsFalse(), __LINE__);
-    helper.EqualsFalse(value1.IsNull(), __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::Undefined, __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsFalse(value1.IsObject(), __LINE__);
+    helper.IsFalse(value1.IsArray(), __LINE__);
+    helper.IsFalse(value1.IsString(), __LINE__);
+    helper.IsFalse(value1.IsNumber(), __LINE__);
+    helper.IsFalse(value1.IsTrue(), __LINE__);
+    helper.IsFalse(value1.IsFalse(), __LINE__);
+    helper.IsFalse(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::Undefined, __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetValue(10), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetValue("", 0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetKey(10), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetValue(10), __LINE__);
+    helper.IsNull(value1.GetValue("", 0), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetKey(10), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsFalse(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsFalse(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    helper.EqualsFalse(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
+    helper.IsFalse(value1.GetBool(bool_var), __LINE__);
     helper.Equal(value1.Stringify(), "", __LINE__);
 
     value1 = ValueC{ValueType::Object};
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
 
     value1 = ValueC{ValueType::Array};
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
 
     value1 = ValueC{ValueType::String};
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
 
     value1 = ValueC{ValueType::UIntLong};
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
 
     value1 = ValueC{ValueType::IntLong};
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
 
     value1 = ValueC{ValueType::Double};
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
 }
 
 static void TestTrueValue(QTest &helper) {
@@ -106,59 +106,59 @@ static void TestTrueValue(QTest &helper) {
     bool          bool_var;
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::True, __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::True, __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("true", c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("true", c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "true", __LINE__);
     helper.Equal(value1.GetNumber(), 1.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 1U, __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
     helper.Equal(value1.Stringify(), "", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = true;
     value2 = true;
     value2 = value1;
-    helper.EqualsTrue(value2.IsTrue(), __LINE__);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value2.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
 
     value1 = true;
     value2 = ValueC{value1};
-    helper.EqualsTrue(value2.IsTrue(), __LINE__);
+    helper.IsTrue(value2.IsTrue(), __LINE__);
 
     value2.Reset();
     value2 = Memory::Move(value1);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
-    helper.EqualsTrue(value2.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value2.IsTrue(), __LINE__);
 
     value1 = true;
     ValueC value3{Memory::Move(value1)};
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
-    helper.EqualsTrue(value3.IsTrue(), __LINE__);
+    helper.IsTrue(value3.IsTrue(), __LINE__);
 
     value3 = true;
-    helper.EqualsTrue(value3.IsTrue(), __LINE__);
+    helper.IsTrue(value3.IsTrue(), __LINE__);
 
     value3 = ValueC{ValueType::True};
-    helper.EqualsTrue(value3.IsTrue(), __LINE__);
+    helper.IsTrue(value3.IsTrue(), __LINE__);
 }
 
 static void TestFalseValue(QTest &helper) {
@@ -172,59 +172,59 @@ static void TestFalseValue(QTest &helper) {
     bool          bool_var;
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::False, __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::False, __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("false", c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("false", c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "false", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 0U, __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
     helper.Equal(value1.Stringify(), "", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = false;
     value2 = false;
     value2 = value1;
-    helper.EqualsTrue(value2.IsFalse(), __LINE__);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value2.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
 
     value1 = false;
     value2 = ValueC{value1};
-    helper.EqualsTrue(value2.IsFalse(), __LINE__);
+    helper.IsTrue(value2.IsFalse(), __LINE__);
 
     value2.Reset();
     value2 = Memory::Move(value1);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
-    helper.EqualsTrue(value2.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value2.IsFalse(), __LINE__);
 
     value1 = false;
     ValueC value3(Memory::Move(value1));
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
-    helper.EqualsTrue(value3.IsFalse(), __LINE__);
+    helper.IsTrue(value3.IsFalse(), __LINE__);
 
     value3 = false;
-    helper.EqualsTrue(value3.IsFalse(), __LINE__);
+    helper.IsTrue(value3.IsFalse(), __LINE__);
 
     value3 = ValueC{ValueType::False};
-    helper.EqualsTrue(value3.IsFalse(), __LINE__);
+    helper.IsTrue(value3.IsFalse(), __LINE__);
 }
 
 static void TestNullValue(QTest &helper) {
@@ -238,59 +238,59 @@ static void TestNullValue(QTest &helper) {
     bool          bool_var;
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::Null, __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::Null, __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual("null", c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual("null", c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "null", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 0U, __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
     helper.Equal(value1.Stringify(), "", __LINE__);
     ss_var.Reset();
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = nullptr;
     value2 = nullptr;
     value2 = value1;
-    helper.EqualsTrue(value2.IsNull(), __LINE__);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value2.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
 
     value1 = nullptr;
     value2 = ValueC{value1};
-    helper.EqualsTrue(value2.IsNull(), __LINE__);
+    helper.IsTrue(value2.IsNull(), __LINE__);
 
     value2.Reset();
     value2 = Memory::Move(value1);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
-    helper.EqualsTrue(value2.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value2.IsNull(), __LINE__);
 
     value1 = nullptr;
     ValueC value3(Memory::Move(value1));
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
-    helper.EqualsTrue(value3.IsNull(), __LINE__);
+    helper.IsTrue(value3.IsNull(), __LINE__);
 
     value3 = nullptr;
-    helper.EqualsTrue(value3.IsNull(), __LINE__);
+    helper.IsTrue(value3.IsNull(), __LINE__);
 
     value3 = ValueC{ValueType::Null};
-    helper.EqualsTrue(value3.IsNull(), __LINE__);
+    helper.IsTrue(value3.IsNull(), __LINE__);
 }
 
 static void TestNumberValue1(QTest &helper) {
@@ -304,43 +304,43 @@ static void TestNumberValue1(QTest &helper) {
     bool          bool_var;
 
     value1 = 33;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "33", __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, 33, __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
     helper.Equal(value1.Stringify(), "", __LINE__);
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = 45;
     value2 = -10;
     value2 = value1;
-    helper.EqualsTrue(value2.IsNumber(), __LINE__);
-    helper.EqualsTrue(value2.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value2.IsNumber(), __LINE__);
+    helper.IsTrue(value2.GetNumberType() == QNumberType::Integer, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value2.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value2.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "45", __LINE__);
     helper.Equal(value2.GetNumber(), 45.0, __LINE__);
-    helper.EqualsTrue(value2.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value2.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, 45, __LINE__);
-    helper.EqualsTrue(value2.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value2.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
     helper.Equal(value1.GetNumber(), 45U, __LINE__);
 
     value1.Reset();
@@ -352,7 +352,7 @@ static void TestNumberValue1(QTest &helper) {
 
     value2.Reset();
     value2 = Memory::Move(value1);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
     helper.Equal(value2.GetNumber(), 10.0, __LINE__);
 
     value2 = 1213;
@@ -363,15 +363,15 @@ static void TestNumberValue1(QTest &helper) {
     helper.Equal(value2.GetNumber(), 785.0, __LINE__);
 
     value2 = SizeT32{0};
-    helper.EqualsTrue(value2.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value2.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
 
     value2 = int{-8};
-    helper.EqualsTrue(value2.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value2.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
 
     value2 = ValueC{double{3.75}};
-    helper.EqualsTrue(value2.IsNumber(), __LINE__);
+    helper.IsTrue(value2.IsNumber(), __LINE__);
     helper.Equal(value2.GetNumber(), 3.75, __LINE__);
 }
 
@@ -386,53 +386,53 @@ static void TestNumberValue2(QTest &helper) {
     /////////////////// unsigned
 
     value1 = ValueC{SizeT16{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::UIntLong, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
-    helper.EqualsFalse(value1.IsInt64(), __LINE__);
-    helper.EqualsFalse(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::UIntLong, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsFalse(value1.IsInt64(), __LINE__);
+    helper.IsFalse(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 10U, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "10", __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
     value1.Reset();
 
     value1 = ValueC{SizeT32{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 10U, __LINE__);
     value1.Reset();
 
     value1 = ValueC{vu_long{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 10U, __LINE__);
     value1.Reset();
 
     value1 = ValueC{SizeT64{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 10U, __LINE__);
     value1.Reset();
 }
@@ -446,96 +446,96 @@ static void TestNumberValue3(QTest &helper) {
     /////////////////// signed
 
     value1 = ValueC{short{-10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::IntLong, __LINE__);
-    helper.EqualsFalse(value1.IsUInt64(), __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
-    helper.EqualsFalse(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::IntLong, __LINE__);
+    helper.IsFalse(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
+    helper.IsFalse(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, -10, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "-10", __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
     value1.Reset();
 
     value1 = ValueC{short{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, 10, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "10", __LINE__);
     value1.Reset();
 
     value1 = ValueC{int{-10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, -10, __LINE__);
     value1.Reset();
 
     value1 = ValueC{int{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, 10U, __LINE__);
     value1.Reset();
 
     value1 = ValueC{long{-10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, -10, __LINE__);
     value1.Reset();
 
     value1 = ValueC{long{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, 10U, __LINE__);
     value1.Reset();
 
     value1 = ValueC{long{-10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, -10, __LINE__);
     value1.Reset();
 
     value1 = ValueC{SizeT64I{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, 10U, __LINE__);
     value1.Reset();
 }
@@ -549,109 +549,109 @@ static void TestNumberValue4(QTest &helper) {
     /////////////////// float
 
     value1 = ValueC{float{10.5}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::Double, __LINE__);
-    helper.EqualsFalse(value1.IsUInt64(), __LINE__);
-    helper.EqualsFalse(value1.IsInt64(), __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::Double, __LINE__);
+    helper.IsFalse(value1.IsUInt64(), __LINE__);
+    helper.IsFalse(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.5, __LINE__);
     helper.Equal(value1.GetDouble(), 10.5, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, 10.5, __LINE__);
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "10.5", __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
     value1.Reset();
 
     value1 = ValueC{float{-10.5}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.5, __LINE__);
     helper.Equal(value1.GetDouble(), -10.5, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, -10.5, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "-10.5", __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
     value1.Reset();
 
     value1 = ValueC{float{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, 10U, __LINE__);
     value1.Reset();
 
     value1 = ValueC{float{-10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, -10, __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{10.5}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.5, __LINE__);
     helper.Equal(value1.GetDouble(), 10.5, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, 10.5, __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{-10.5}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.5, __LINE__);
     helper.Equal(value1.GetDouble(), -10.5, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, -10.5, __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
     helper.Equal(value1.GetDouble(), 10.0, __LINE__);
     helper.Equal(value1.GetInt64(), 10, __LINE__);
     helper.Equal(value1.GetUInt64(), 10U, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, 10.0, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "10", __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
     value1.Reset();
 
     value1 = ValueC{double{-10}};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
     helper.Equal(value1.GetDouble(), -10.0, __LINE__);
     helper.Equal(value1.GetInt64(), -10, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Real, __LINE__);
     helper.Equal(num_var.Real, -10, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "-10", __LINE__);
-    helper.EqualsTrue(value1.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value1.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
     value1.Reset();
 }
 
@@ -661,58 +661,58 @@ static void TestNumberValue5(QTest &helper) {
     ValueC value1;
 
     value1 = SizeT16{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 
     value1 = -10;
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
 
     value1 = -10.5;
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.5, __LINE__);
 
     value1 = SizeT32{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 
     value1 = float{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 
     value1 = int{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 
     value1 = vu_long{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 
     value1 = long{-10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
 
     value1 = SizeT64{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
-    helper.EqualsTrue(value1.IsUInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.IsUInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 
     value1 = double{-10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
-    helper.EqualsTrue(value1.IsDouble(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Real, __LINE__);
+    helper.IsTrue(value1.IsDouble(), __LINE__);
     helper.Equal(value1.GetNumber(), -10.0, __LINE__);
 
     value1 = SizeT64I{10};
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
-    helper.EqualsTrue(value1.IsInt64(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value1.IsInt64(), __LINE__);
     helper.Equal(value1.GetNumber(), 10.0, __LINE__);
 }
 
@@ -728,118 +728,118 @@ static void TestStringValue(QTest &helper) {
     bool          bool_var;
 
     value1 = "-ABCDEF0123456789ABCDEF0123456789-";
-    helper.EqualsTrue(value1.IsString(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::String, __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::String, __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetUInt64(), SizeT64{0}, "null", __LINE__);
-    helper.Equal(value1.GetInt64(), 0, "null", __LINE__);
-    helper.Equal(value1.GetDouble(), 0.0, "null", __LINE__);
-    helper.NotEqual(value1.GetString(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsTrue(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1.StringStorage(), c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.Equal(value1.GetUInt64(), SizeT64{0}, __LINE__);
+    helper.Equal(value1.GetInt64(), 0, __LINE__);
+    helper.Equal(value1.GetDouble(), 0.0, __LINE__);
+    helper.IsNotNull(value1.GetString(), __LINE__);
     helper.Equal(*(value1.GetString()), "-ABCDEF0123456789ABCDEF0123456789-", __LINE__);
-    helper.NotEqual(value1.StringStorage(), nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1.StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsNotNull(value1.StringStorage(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1.StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     helper.Equal(value1.Length(), 34U, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    helper.EqualsFalse(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
+    helper.IsFalse(value1.GetBool(bool_var), __LINE__);
     helper.Equal(value1.Stringify(), "", __LINE__);
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = "45";
     value2 = "-50";
-    helper.EqualsTrue(value2.SetNumber(num_var) == QNumberType::Integer, __LINE__);
+    helper.IsTrue(value2.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     helper.Equal(num_var.Integer, -50, __LINE__);
     helper.Equal(value2.GetNumber(), -50.0, __LINE__);
 
     value2 = value1;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
-    helper.NotEqual(value1.GetString(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
+    helper.IsNotNull(value1.GetString(), __LINE__);
     helper.Equal(*(value1.GetString()), "45", __LINE__);
-    helper.NotEqual(value1.StringStorage(), nullptr, "null", __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1.StringStorage(), "45", 2), __LINE__);
+    helper.IsNotNull(value1.StringStorage(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1.StringStorage(), "45", 2), __LINE__);
     helper.Equal(value1.Length(), 2U, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "45", __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     helper.Equal(num_var.Natural, 45U, __LINE__);
     helper.Equal(value1.GetNumber(), 45.0, __LINE__);
-    helper.EqualsFalse(value1.GetBool(bool_var), __LINE__);
+    helper.IsFalse(value1.GetBool(bool_var), __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "45", __LINE__);
 
     value1 = "true";
     value2 = ValueC{value1};
     ss_var.Clear();
-    helper.EqualsTrue(value2.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value2.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "true", __LINE__);
     helper.Equal(value2.GetNumber(), 0.0, __LINE__);
     bool_var = false;
-    helper.EqualsTrue(value2.GetBool(bool_var), __LINE__);
-    helper.EqualsTrue(bool_var, __LINE__);
+    helper.IsTrue(value2.GetBool(bool_var), __LINE__);
+    helper.IsTrue(bool_var, __LINE__);
 
     ss_var.Clear();
-    helper.EqualsTrue(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "true", __LINE__);
 
     value2.Reset();
     value2 = Memory::Move(value1);
     ss_var.Clear();
-    helper.EqualsTrue(value2.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value2.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "true", __LINE__);
 
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value1 = "false";
     ValueC value3(Memory::Move(value1));
     helper.Equal(value3.Length(), 5U, __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value3.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "false", __LINE__);
     bool_var = true;
-    helper.EqualsTrue(value3.GetBool(bool_var), __LINE__);
-    helper.EqualsFalse(bool_var, __LINE__);
+    helper.IsTrue(value3.GetBool(bool_var), __LINE__);
+    helper.IsFalse(bool_var, __LINE__);
 
     str_var           = "qen";
     const char *c_str = str_var.First();
     value3            = str_var;
     ss_var.Clear();
-    helper.EqualsTrue(value3.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "qen", __LINE__);
     helper.NotEqual(value3.StringStorage(), c_str, __LINE__);
 
     value3 = ValueC{VString("ABC")};
-    helper.EqualsTrue(value3.IsString(), __LINE__);
-    helper.NotEqual(value3.GetString(), nullptr, "null", __LINE__);
+    helper.IsTrue(value3.IsString(), __LINE__);
+    helper.IsNotNull(value3.GetString(), __LINE__);
     helper.Equal(*(value3.GetString()), "ABC", __LINE__);
 
     value3 = VString("123");
     ss_var.Clear();
-    helper.EqualsTrue(value3.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "123", __LINE__);
 
     value3 = 321.25;
     value3 = "321.25";
-    helper.EqualsTrue(value3.IsString(), __LINE__);
+    helper.IsTrue(value3.IsString(), __LINE__);
     ss_var.Clear();
-    helper.EqualsTrue(value3.CopyValueTo(ss_var), __LINE__);
+    helper.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
     helper.Equal(ss_var, "321.25", __LINE__);
 }
 
@@ -860,26 +860,26 @@ static void TestArrayValue(QTest &helper) {
     storage = arr_var.First();
 
     value1 = arr_var; // Copy.
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::Array, __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::Array, __LINE__);
     helper.Equal(value1.Size(), 5U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetValue(4), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.EqualsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.Equal(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetValue(4), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), storage, __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsFalse(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsFalse(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    helper.EqualsFalse(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
+    helper.IsFalse(value1.GetBool(bool_var), __LINE__);
     helper.Equal(value1.Stringify(), "[]", __LINE__);
 
     arr_var.Reset();
@@ -887,7 +887,7 @@ static void TestArrayValue(QTest &helper) {
     helper.Equal(value1.Stringify(), "[]", __LINE__);
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(10);
@@ -899,17 +899,17 @@ static void TestArrayValue(QTest &helper) {
     value1 = Memory::Move(arr_var); // Move
     value2 = Memory::Move(arr_var2);
     value2 = value1;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 10U, __LINE__);
-    helper.Equal(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetValue(9), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetValue(0), __LINE__);
+    helper.IsNull(value1.GetValue(9), __LINE__);
+    helper.IsNull(value1.GetKey(0), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), storage, __LINE__);
 
     helper.Equal(value2.Size(), 10U, __LINE__);
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
     helper.NotEqual(value2.GetArray()->First(), storage, __LINE__);
 
     arr_var.Reset();
@@ -918,22 +918,22 @@ static void TestArrayValue(QTest &helper) {
     value1  = Memory::Move(arr_var);
 
     value2 = ValueC{value1};
-    helper.EqualsTrue(value2.IsArray(), __LINE__);
+    helper.IsTrue(value2.IsArray(), __LINE__);
     helper.Equal(value2.Size(), 7U, __LINE__);
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
     helper.NotEqual(value2.GetArray()->First(), storage, __LINE__);
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 7U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
     helper.Equal(value1.GetArray()->First(), storage, __LINE__);
 
     value2.Reset();
     value2 = Memory::Move(value1);
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
     helper.Equal(value2.GetArray()->First(), storage, __LINE__);
 
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(7);
@@ -941,35 +941,35 @@ static void TestArrayValue(QTest &helper) {
     value1  = Memory::Move(arr_var);
 
     ValueC value3(Memory::Move(value1));
-    helper.NotEqual(value3.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value3.GetArray(), __LINE__);
     helper.Equal(value3.GetArray()->First(), storage, __LINE__);
 
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(3);
     storage = arr_var.First();
     value3  = arr_var; // Copy
     helper.Equal(value3.Size(), 3U, __LINE__);
-    helper.NotEqual(value3.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value3.GetArray(), __LINE__);
     helper.NotEqual(value3.GetArray()->First(), storage, __LINE__);
 
     arr_var.Reset();
     arr_var.ResizeAndInitialize(13);
     storage = arr_var.First();
     value3  = Memory::Move(arr_var); // Move
-    helper.NotEqual(value3.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value3.GetArray(), __LINE__);
     helper.Equal(value3.GetArray()->First(), storage, __LINE__);
 
     value3 = ValueC{VArray(3)};
-    helper.EqualsTrue(value3.IsArray(), __LINE__);
-    helper.NotEqual(value3.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value3.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value3.IsArray(), __LINE__);
+    helper.IsNotNull(value3.GetArray(), __LINE__);
+    helper.IsNotNull(value3.GetArray()->First(), __LINE__);
     helper.Equal(value3.GetArray()->Capacity(), 3U, __LINE__);
 
     value1[0] = 1;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
     helper.Equal(value1[0].GetNumber(), 1.0, __LINE__);
 
@@ -1016,8 +1016,8 @@ static void TestArrayValue(QTest &helper) {
     helper.Equal(value2[1].GetNumber(), 22.0, __LINE__);
     helper.NotEqual(value2[2].StringStorage(), c_str_var, __LINE__);
     helper.Equal(StringUtils::IsEqual(value2[2].StringStorage(), "Qen", 3), true, __LINE__);
-    helper.Equal(value2.GetValue(3), nullptr, "null", __LINE__);
-    helper.Equal(value2.GetValue(4), nullptr, "null", __LINE__);
+    helper.IsNull(value2.GetValue(3), __LINE__);
+    helper.IsNull(value2.GetValue(4), __LINE__);
 
     ////////////////////
     str_var   = "-ABCDEF0123456789ABCDEF0123456789-";
@@ -1037,22 +1037,21 @@ static void TestArrayValue(QTest &helper) {
     helper.Equal(value2[1].GetNumber(), 20.0, __LINE__);
     helper.Equal(value2[2].GetNumber(), 30.0, __LINE__);
     helper.NotEqual(value2[3].StringStorage(), c_str_var, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value2[3].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.Equal(value2.GetValue(4), nullptr, "null", __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value2[3].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsNull(value2.GetValue(4), __LINE__);
 
     ////////////////////
 
     arr_var.Clear();
     arr_var.Resize(5);
     value2 = Memory::Move(arr_var);
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
     helper.Equal(value2.GetArray()->Capacity(), 5U, __LINE__);
 
     value2 += 1;
 
     value2.Compress();
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
     helper.Equal(value2.GetArray()->Capacity(), 1U, __LINE__);
     helper.Equal(value2.GetArray()->Size(), 1U, __LINE__);
 
@@ -1060,7 +1059,7 @@ static void TestArrayValue(QTest &helper) {
     arr_var.Reserve(10);
     value2 = Memory::Move(arr_var);
     value2.Compress();
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
     helper.Equal(value2.GetArray()->Capacity(), 0U, __LINE__);
     helper.Equal(value2.GetArray()->Size(), 0U, __LINE__);
 }
@@ -1088,35 +1087,35 @@ static void TestObjectValue1(QTest &helper) {
     storage = h_arr_var.First();
 
     value1 = h_arr_var; // Copy.
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.EqualsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
-    helper.EqualsTrue(value1.Type() == ValueType::Object, __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
+    helper.IsTrue(value1.Type() == ValueType::Object, __LINE__);
     helper.Equal(value1.Size(), 5U, __LINE__);
-    helper.NotEqual(value1.GetValue(0), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetValue(4), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetKey(0), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetKey(4), nullptr, "null", __LINE__);
-    helper.EqualsTrue(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
-    helper.EqualsTrue(value1.CopyKeyByIndexTo(ss_var, 4), __LINE__);
-    helper.EqualsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetValue(0), __LINE__);
+    helper.IsNotNull(value1.GetValue(4), __LINE__);
+    helper.IsNotNull(value1.GetKey(0), __LINE__);
+    helper.IsNotNull(value1.GetKey(4), __LINE__);
+    helper.IsTrue(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
+    helper.IsTrue(value1.CopyKeyByIndexTo(ss_var, 4), __LINE__);
+    helper.IsFalse(value1.SetCharAndLength(c_str_var, c_str_len), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), storage, __LINE__);
-    helper.Equal(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetString(), nullptr, "null", __LINE__);
-    helper.Equal(value1.StringStorage(), nullptr, "null", __LINE__);
+    helper.IsNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetString(), __LINE__);
+    helper.IsNull(value1.StringStorage(), __LINE__);
     helper.Equal(value1.Length(), 0U, __LINE__);
-    helper.EqualsFalse(value1.CopyValueTo(ss_var), __LINE__);
+    helper.IsFalse(value1.CopyValueTo(ss_var), __LINE__);
     helper.Equal(value1.GetNumber(), 0.0, __LINE__);
-    helper.EqualsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    helper.EqualsFalse(value1.GetBool(bool_var), __LINE__);
+    helper.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
+    helper.IsFalse(value1.GetBool(bool_var), __LINE__);
 
     h_arr_var.Reset();
     value1 = h_arr_var;
     helper.Equal(value1.Stringify(), "{}", __LINE__);
 
     value1.Reset();
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     value2 = h_arr_var;
 
@@ -1131,15 +1130,15 @@ static void TestObjectValue1(QTest &helper) {
 
     value1 = Memory::Move(h_arr_var); // Move
     value2 = value1;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
     helper.Equal(value1.Size(), 10U, __LINE__);
     helper.Equal(value1.GetObject()->First(), storage, __LINE__);
 
     value1 = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
     helper.Equal(value1.Stringify(), "{}", __LINE__);
 
-    helper.EqualsTrue(value2.IsObject(), __LINE__);
+    helper.IsTrue(value2.IsObject(), __LINE__);
     helper.NotEqual(value2.GetObject()->First(), storage, __LINE__);
 
     h_arr_var.Reset();
@@ -1164,19 +1163,19 @@ static void TestObjectValue1(QTest &helper) {
     value1  = Memory::Move(h_arr_var);
 
     value2 = ValueC{value1};
-    helper.EqualsTrue(value2.IsObject(), __LINE__);
+    helper.IsTrue(value2.IsObject(), __LINE__);
     helper.Equal(value2.Size(), 7U, __LINE__);
     helper.NotEqual(value2.GetObject()->First(), storage, __LINE__);
 
     h_arr_var.Reset();
     value2 = h_arr_var;
-    helper.EqualsTrue(value2.IsObject(), __LINE__);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value2.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
     helper.Equal(value1.GetObject()->First(), storage, __LINE__);
 
     h_arr_var.Reset();
     value1 = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
 
     for (SizeT32 i = 0; i < 7; i++) {
         VString key("_Key");
@@ -1189,13 +1188,13 @@ static void TestObjectValue1(QTest &helper) {
 
     value2.Reset();
     value2 = Memory::Move(value1);
-    helper.EqualsTrue(value2.IsObject(), __LINE__);
+    helper.IsTrue(value2.IsObject(), __LINE__);
     helper.Equal(value2.GetObject()->First(), storage, __LINE__);
 
     h_arr_var.Reset();
     value2 = h_arr_var;
     helper.Equal(value2.Stringify(), "{}", __LINE__);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 }
 
 static void TestObjectValue2(QTest &helper) {
@@ -1219,14 +1218,14 @@ static void TestObjectValue2(QTest &helper) {
     value1  = Memory::Move(h_arr_var);
 
     ValueC value3(Memory::Move(value1));
-    helper.EqualsTrue(value3.IsObject(), __LINE__);
+    helper.IsTrue(value3.IsObject(), __LINE__);
     helper.Equal(value3.Size(), 7U, __LINE__);
     helper.Equal(value3.GetObject()->First(), storage, __LINE__);
 
     h_arr_var.Reset();
     value3 = h_arr_var;
     helper.Equal(value3.Stringify(), "{}", __LINE__);
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 3; i++) {
@@ -1238,8 +1237,8 @@ static void TestObjectValue2(QTest &helper) {
     storage = h_arr_var.First();
     value3  = h_arr_var; // Copy
     helper.Equal(value3.Size(), 3U, __LINE__);
-    helper.NotEqual(value3.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value3.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value3.GetObject(), __LINE__);
+    helper.IsNotNull(value3.GetObject()->First(), __LINE__);
     helper.NotEqual(value3.GetObject()->First(), storage, __LINE__);
 
     for (SizeT32 i = 0; i < 13; i++) {
@@ -1250,22 +1249,22 @@ static void TestObjectValue2(QTest &helper) {
 
     storage = h_arr_var.First();
     value3  = Memory::Move(h_arr_var); // Move
-    helper.EqualsTrue(value3.IsObject(), __LINE__);
+    helper.IsTrue(value3.IsObject(), __LINE__);
     helper.Equal(value3.Size(), 13U, __LINE__);
-    helper.NotEqual(value3.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value3.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value3.GetObject(), __LINE__);
+    helper.IsNotNull(value3.GetObject()->First(), __LINE__);
     helper.Equal(value3.GetObject()->First(), storage, __LINE__);
 
     value3 = ValueC{VHArray(4)};
-    helper.EqualsTrue(value3.IsObject(), __LINE__);
-    helper.NotEqual(value3.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value3.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value3.IsObject(), __LINE__);
+    helper.IsNotNull(value3.GetObject(), __LINE__);
+    helper.IsNotNull(value3.GetObject()->First(), __LINE__);
     helper.Equal(value3.GetObject()->Capacity(), 4U, __LINE__);
 
     value1.Reset();
     value1[""] = 1;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
     helper.Equal(value1[""].GetNumber(), 1.0, __LINE__);
 
@@ -1294,7 +1293,7 @@ static void TestObjectValue2(QTest &helper) {
     helper.Equal(value3["k1"].GetNumber(), 11.0, __LINE__);
     helper.Equal(value3["k2"].GetNumber(), 22.0, __LINE__);
     helper.NotEqual(value3["k3"].StringStorage(), c_str_var, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), __LINE__);
 
     value3["k4"] = 44;
     value3["k5"] = 55;
@@ -1302,7 +1301,7 @@ static void TestObjectValue2(QTest &helper) {
     helper.Equal(value3["k1"].GetNumber(), 11.0, __LINE__);
     helper.Equal(value3["k2"].GetNumber(), 22.0, __LINE__);
     helper.NotEqual(value3["k3"].StringStorage(), c_str_var, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), __LINE__);
     helper.Equal(value3["k4"].GetNumber(), 44U, __LINE__);
     helper.Equal(value3["k5"].GetNumber(), 55U, __LINE__);
 
@@ -1310,11 +1309,11 @@ static void TestObjectValue2(QTest &helper) {
     helper.Equal(value3.Size(), 3U, __LINE__);
     helper.Equal(value3["k1"].GetNumber(), 11.0, __LINE__);
     helper.Equal(value3["k2"].GetNumber(), 22.0, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), __LINE__);
-    helper.Equal(value3.GetValue("k4", 2), nullptr, "null", __LINE__);
-    helper.Equal(value3.GetValue(3), nullptr, "null", __LINE__);
-    helper.Equal(value3.GetValue("k5", 2), nullptr, "null", __LINE__);
-    helper.Equal(value3.GetValue(4), nullptr, "null", __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value3["k3"].StringStorage(), "Qen", 3), __LINE__);
+    helper.IsNull(value3.GetValue("k4", 2), __LINE__);
+    helper.IsNull(value3.GetValue(3), __LINE__);
+    helper.IsNull(value3.GetValue("k5", 2), __LINE__);
+    helper.IsNull(value3.GetValue(4), __LINE__);
 
     ////////////////////
     h_arr_var[VString("w1")] = 10;
@@ -1330,10 +1329,10 @@ static void TestObjectValue2(QTest &helper) {
     helper.Equal(value3["w2"].GetNumber(), 20.0, __LINE__);
     helper.Equal(value3["w3"].GetNumber(), 30.0, __LINE__);
     helper.NotEqual(value3["w4"].StringStorage(), c_str_var, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.Equal(value3.GetValue("k5", 2), nullptr, "null", __LINE__);
-    helper.Equal(value3.GetValue(4), nullptr, "null", __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
+                  __LINE__);
+    helper.IsNull(value3.GetValue("k5", 2), __LINE__);
+    helper.IsNull(value3.GetValue(4), __LINE__);
     ////////////////////
 
     h_arr_var.Reserve(10);
@@ -1345,9 +1344,9 @@ static void TestObjectValue2(QTest &helper) {
     helper.Equal(value3.Size(), 3U, __LINE__);
 
     value3.Compress();
-    helper.NotEqual(value3.GetObject(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value3.GetObject(), __LINE__);
     helper.Equal(value3.GetObject()->Size(), 3U, __LINE__);
-    helper.EqualsTrue(value3.GetObject()->Capacity() >= 3U, __LINE__);
+    helper.IsTrue(value3.GetObject()->Capacity() >= 3U, __LINE__);
 }
 
 static void TestMoveValue1(QTest &helper) {
@@ -1371,21 +1370,21 @@ static void TestMoveValue1(QTest &helper) {
     value1 = true;
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = true;
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = true;
 
     value1 = 11;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 11.0, __LINE__);
     value1.Reset();
 
@@ -1395,7 +1394,7 @@ static void TestMoveValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = Memory::Move(str_var);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1405,9 +1404,9 @@ static void TestMoveValue1(QTest &helper) {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = Memory::Move(arr_var);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1417,9 +1416,9 @@ static void TestMoveValue1(QTest &helper) {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = Memory::Move(h_arr_var);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1428,21 +1427,21 @@ static void TestMoveValue1(QTest &helper) {
     value1 = false;
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = false;
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = false;
 
     value1 = -90;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), -90.0, __LINE__);
     value1.Reset();
 
@@ -1452,7 +1451,7 @@ static void TestMoveValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = Memory::Move(str_var);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1462,9 +1461,9 @@ static void TestMoveValue1(QTest &helper) {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = Memory::Move(arr_var);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1474,9 +1473,9 @@ static void TestMoveValue1(QTest &helper) {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = Memory::Move(h_arr_var);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1485,21 +1484,21 @@ static void TestMoveValue1(QTest &helper) {
     value1 = nullptr;
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = nullptr;
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = nullptr;
 
     value1 = 7.5;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 7.5, __LINE__);
     value1.Reset();
 
@@ -1509,7 +1508,7 @@ static void TestMoveValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = Memory::Move(str_var);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1519,9 +1518,9 @@ static void TestMoveValue1(QTest &helper) {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = Memory::Move(arr_var);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1531,9 +1530,9 @@ static void TestMoveValue1(QTest &helper) {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = Memory::Move(h_arr_var);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1542,21 +1541,21 @@ static void TestMoveValue1(QTest &helper) {
     value1 = 13;
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = 40;
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = 33;
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1565,7 +1564,7 @@ static void TestMoveValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = Memory::Move(str_var);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1575,9 +1574,9 @@ static void TestMoveValue1(QTest &helper) {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = Memory::Move(arr_var);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1587,9 +1586,9 @@ static void TestMoveValue1(QTest &helper) {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = Memory::Move(h_arr_var);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1598,28 +1597,28 @@ static void TestMoveValue1(QTest &helper) {
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
     value1 = 4;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 4.0, __LINE__);
     value1.Reset();
 
@@ -1629,9 +1628,9 @@ static void TestMoveValue1(QTest &helper) {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = Memory::Move(arr_var);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1641,9 +1640,9 @@ static void TestMoveValue1(QTest &helper) {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = Memory::Move(h_arr_var);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1652,28 +1651,28 @@ static void TestMoveValue1(QTest &helper) {
     value1 = VArray(1);
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VArray(1);
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VArray(1);
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VArray(1);
 
     value1 = 33;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
 
@@ -1683,7 +1682,7 @@ static void TestMoveValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = Memory::Move(str_var);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1693,9 +1692,9 @@ static void TestMoveValue1(QTest &helper) {
     h_arr_var     = VHArray(1);
     h_arr_storage = h_arr_var.First();
     value1        = Memory::Move(h_arr_var);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1720,28 +1719,28 @@ static void TestMoveValue2(QTest &helper) {
     value1 = VHArray(1);
 
     value1 = true;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VHArray(1);
 
     value1 = false;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VHArray(1);
 
     value1 = nullptr;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
     value1 = VHArray(1);
 
     value1 = 33;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
 
@@ -1751,7 +1750,7 @@ static void TestMoveValue2(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = Memory::Move(str_var);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1761,9 +1760,9 @@ static void TestMoveValue2(QTest &helper) {
     arr_var     = VArray(1);
     arr_storage = arr_var.First();
     value1      = Memory::Move(arr_var);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1793,7 +1792,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = false;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1801,7 +1800,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1809,7 +1808,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = 11;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 11.0, __LINE__);
     value1.Reset();
 
@@ -1820,7 +1819,7 @@ static void TestMoveValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1831,9 +1830,9 @@ static void TestMoveValue3(QTest &helper) {
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1844,9 +1843,9 @@ static void TestMoveValue3(QTest &helper) {
     h_arr_storage = h_arr_var.First();
     value2        = Memory::Move(h_arr_var);
     value1        = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1856,7 +1855,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = true;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1864,7 +1863,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1872,7 +1871,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = -90;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), -90.0, __LINE__);
     value1.Reset();
 
@@ -1883,7 +1882,7 @@ static void TestMoveValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1894,9 +1893,9 @@ static void TestMoveValue3(QTest &helper) {
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1907,9 +1906,9 @@ static void TestMoveValue3(QTest &helper) {
     h_arr_storage = h_arr_var.First();
     value2        = Memory::Move(h_arr_var);
     value1        = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1919,7 +1918,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = true;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1927,7 +1926,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = false;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1935,7 +1934,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = 7.5;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 7.5, __LINE__);
     value1.Reset();
 
@@ -1946,7 +1945,7 @@ static void TestMoveValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -1957,9 +1956,9 @@ static void TestMoveValue3(QTest &helper) {
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -1970,9 +1969,9 @@ static void TestMoveValue3(QTest &helper) {
     h_arr_storage = h_arr_var.First();
     value2        = Memory::Move(h_arr_var);
     value1        = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -1982,7 +1981,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = true;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1990,7 +1989,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = false;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -1998,7 +1997,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2008,7 +2007,7 @@ static void TestMoveValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2019,9 +2018,9 @@ static void TestMoveValue3(QTest &helper) {
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2032,9 +2031,9 @@ static void TestMoveValue3(QTest &helper) {
     h_arr_storage = h_arr_var.First();
     value2        = Memory::Move(h_arr_var);
     value1        = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2044,7 +2043,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = true;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2052,7 +2051,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = false;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2060,7 +2059,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2068,7 +2067,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = 4;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 4.0, __LINE__);
     value1.Reset();
 
@@ -2079,9 +2078,9 @@ static void TestMoveValue3(QTest &helper) {
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2092,9 +2091,9 @@ static void TestMoveValue3(QTest &helper) {
     h_arr_storage = h_arr_var.First();
     value2        = Memory::Move(h_arr_var);
     value1        = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2104,7 +2103,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = true;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2112,7 +2111,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = false;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2120,7 +2119,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2128,7 +2127,7 @@ static void TestMoveValue3(QTest &helper) {
 
     value2 = 33;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
 
@@ -2139,7 +2138,7 @@ static void TestMoveValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2150,9 +2149,9 @@ static void TestMoveValue3(QTest &helper) {
     h_arr_storage = h_arr_var.First();
     value2        = Memory::Move(h_arr_var);
     value1        = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.Equal(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2179,7 +2178,7 @@ static void TestMoveValue4(QTest &helper) {
 
     value2 = true;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2187,7 +2186,7 @@ static void TestMoveValue4(QTest &helper) {
 
     value2 = false;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2195,7 +2194,7 @@ static void TestMoveValue4(QTest &helper) {
 
     value2 = nullptr;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2203,7 +2202,7 @@ static void TestMoveValue4(QTest &helper) {
 
     value2 = 33;
     value1 = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
 
@@ -2214,7 +2213,7 @@ static void TestMoveValue4(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.Equal(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2225,9 +2224,9 @@ static void TestMoveValue4(QTest &helper) {
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.Equal(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2257,7 +2256,7 @@ static void TestCopyValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2267,9 +2266,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2278,9 +2277,9 @@ static void TestCopyValue1(QTest &helper) {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2290,9 +2289,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2308,9 +2307,9 @@ static void TestCopyValue1(QTest &helper) {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2321,7 +2320,7 @@ static void TestCopyValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2331,9 +2330,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2342,9 +2341,9 @@ static void TestCopyValue1(QTest &helper) {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2354,9 +2353,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2372,9 +2371,9 @@ static void TestCopyValue1(QTest &helper) {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2385,7 +2384,7 @@ static void TestCopyValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2395,9 +2394,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -2406,9 +2405,9 @@ static void TestCopyValue1(QTest &helper) {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2418,9 +2417,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -2436,9 +2435,9 @@ static void TestCopyValue1(QTest &helper) {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2449,7 +2448,7 @@ static void TestCopyValue1(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2459,9 +2458,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = 33;
 
@@ -2470,9 +2469,9 @@ static void TestCopyValue1(QTest &helper) {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2482,9 +2481,9 @@ static void TestCopyValue1(QTest &helper) {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = 34;
 
@@ -2500,9 +2499,9 @@ static void TestCopyValue1(QTest &helper) {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2531,9 +2530,9 @@ static void TestCopyValue2(QTest &helper) {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -2542,9 +2541,9 @@ static void TestCopyValue2(QTest &helper) {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2554,9 +2553,9 @@ static void TestCopyValue2(QTest &helper) {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -2572,9 +2571,9 @@ static void TestCopyValue2(QTest &helper) {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2585,7 +2584,7 @@ static void TestCopyValue2(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2595,9 +2594,9 @@ static void TestCopyValue2(QTest &helper) {
     // No values
     h_arr_var = VHArray(1);
     value1    = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = VArray(1);
 
@@ -2613,9 +2612,9 @@ static void TestCopyValue2(QTest &helper) {
 
     h_arr_storage = h_arr_var.First();
     value1        = h_arr_var;
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2626,7 +2625,7 @@ static void TestCopyValue2(QTest &helper) {
     str_var   = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
     c_str_var = str_var.First();
     value1    = str_var;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2636,9 +2635,9 @@ static void TestCopyValue2(QTest &helper) {
     // No values
     arr_var = VArray(1);
     value1  = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = VHArray(1);
 
@@ -2647,9 +2646,9 @@ static void TestCopyValue2(QTest &helper) {
     arr_var.ResizeAndInitialize(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
     ////////////////////////////////////////////
@@ -2678,7 +2677,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = false;
     value1 = value2;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2686,7 +2685,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2694,7 +2693,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = 11;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 11.0, __LINE__);
     value1.Reset();
 
@@ -2705,7 +2704,7 @@ static void TestCopyValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = value2;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2716,9 +2715,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2729,9 +2728,9 @@ static void TestCopyValue3(QTest &helper) {
     value2      = Memory::Move(arr_var);
     value1      = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2742,9 +2741,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VHArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = true;
 
@@ -2762,9 +2761,9 @@ static void TestCopyValue3(QTest &helper) {
     value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2774,7 +2773,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = true;
     value1 = value2;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2782,7 +2781,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2790,7 +2789,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = -90;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), -90.0, __LINE__);
     value1.Reset();
 
@@ -2801,7 +2800,7 @@ static void TestCopyValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = value2;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2812,9 +2811,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2825,9 +2824,9 @@ static void TestCopyValue3(QTest &helper) {
     value2      = Memory::Move(arr_var);
     value1      = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2838,9 +2837,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VHArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = false;
 
@@ -2858,9 +2857,9 @@ static void TestCopyValue3(QTest &helper) {
     value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2870,7 +2869,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = true;
     value1 = value2;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2878,7 +2877,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = false;
     value1 = value2;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2886,7 +2885,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = 7.5;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 7.5, __LINE__);
     value1.Reset();
 
@@ -2897,7 +2896,7 @@ static void TestCopyValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = value2;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -2908,9 +2907,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -2921,9 +2920,9 @@ static void TestCopyValue3(QTest &helper) {
     value2      = Memory::Move(arr_var);
     value1      = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -2934,9 +2933,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VHArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = nullptr;
 
@@ -2954,9 +2953,9 @@ static void TestCopyValue3(QTest &helper) {
     value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -2966,7 +2965,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = true;
     value1 = value2;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2974,7 +2973,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = false;
     value1 = value2;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2982,7 +2981,7 @@ static void TestCopyValue3(QTest &helper) {
 
     value2 = nullptr;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -2992,7 +2991,7 @@ static void TestCopyValue3(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = value2;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -3003,9 +3002,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = 10e10;
 
@@ -3016,9 +3015,9 @@ static void TestCopyValue3(QTest &helper) {
     value2      = Memory::Move(arr_var);
     value1      = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -3029,9 +3028,9 @@ static void TestCopyValue3(QTest &helper) {
     value2 = VHArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = 9.1;
 
@@ -3049,9 +3048,9 @@ static void TestCopyValue3(QTest &helper) {
     value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -3081,7 +3080,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = true;
     value1 = value2;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3089,7 +3088,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = false;
     value1 = value2;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3097,7 +3096,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = nullptr;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3105,7 +3104,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = 4;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 4.0, __LINE__);
     value1.Reset();
 
@@ -3116,9 +3115,9 @@ static void TestCopyValue4(QTest &helper) {
     value2 = VArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -3129,9 +3128,9 @@ static void TestCopyValue4(QTest &helper) {
     value2      = Memory::Move(arr_var);
     value1      = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -3142,9 +3141,9 @@ static void TestCopyValue4(QTest &helper) {
     value2 = VHArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
 
@@ -3162,9 +3161,9 @@ static void TestCopyValue4(QTest &helper) {
     value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -3174,7 +3173,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = true;
     value1 = value2;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3182,7 +3181,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = false;
     value1 = value2;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3190,7 +3189,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = nullptr;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3198,7 +3197,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = 33;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
 
@@ -3209,7 +3208,7 @@ static void TestCopyValue4(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = value2;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -3220,9 +3219,9 @@ static void TestCopyValue4(QTest &helper) {
     value2 = VHArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNull(value1.GetObject()->First(), __LINE__);
     value1.Reset();
     value1 = VArray(1);
 
@@ -3240,9 +3239,9 @@ static void TestCopyValue4(QTest &helper) {
     value2        = Memory::Move(h_arr_var);
     value1        = value2;
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
-    helper.NotEqual(value1.GetObject(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetObject()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject(), __LINE__);
+    helper.IsNotNull(value1.GetObject()->First(), __LINE__);
     helper.NotEqual(value1.GetObject()->First(), h_arr_storage, __LINE__);
     value1.Reset();
 
@@ -3252,7 +3251,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = true;
     value1 = value2;
-    helper.EqualsTrue(value1.IsTrue(), __LINE__);
+    helper.IsTrue(value1.IsTrue(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3260,7 +3259,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = false;
     value1 = value2;
-    helper.EqualsTrue(value1.IsFalse(), __LINE__);
+    helper.IsTrue(value1.IsFalse(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3268,7 +3267,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = nullptr;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNull(), __LINE__);
+    helper.IsTrue(value1.IsNull(), __LINE__);
     value1.Reset();
 
     /////////////
@@ -3276,7 +3275,7 @@ static void TestCopyValue4(QTest &helper) {
 
     value2 = 33;
     value1 = value2;
-    helper.EqualsTrue(value1.IsNumber(), __LINE__);
+    helper.IsTrue(value1.IsNumber(), __LINE__);
     helper.Equal(value1.GetNumber(), 33.0, __LINE__);
     value1.Reset();
 
@@ -3287,7 +3286,7 @@ static void TestCopyValue4(QTest &helper) {
     c_str_var = str_var.First();
     value2    = Memory::Move(str_var);
     value1    = value2;
-    helper.EqualsTrue(value1.IsString(), __LINE__);
+    helper.IsTrue(value1.IsString(), __LINE__);
     helper.NotEqual(value1.StringStorage(), c_str_var, __LINE__);
     value1.Reset();
 
@@ -3298,9 +3297,9 @@ static void TestCopyValue4(QTest &helper) {
     value2 = VArray(1);
     value1 = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value1.GetArray()->First(), __LINE__);
     value1.Reset();
     value1 = VHArray(1);
 
@@ -3311,9 +3310,9 @@ static void TestCopyValue4(QTest &helper) {
     value2      = Memory::Move(arr_var);
     value1      = value2;
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
     value1.Reset();
 
@@ -3328,17 +3327,17 @@ static void TestIndexOperator1(QTest &helper) {
     value = VHArray(1); // Test changing type
 
     value[0] = 5;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 5.0, __LINE__);
 
     value[0] = 20;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 20.0, __LINE__);
 
     value[1] = 30;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
     helper.Equal(value[0].GetNumber(), 20.0, __LINE__);
     helper.Equal(value[1].GetNumber(), 30.0, __LINE__);
@@ -3350,7 +3349,7 @@ static void TestIndexOperator1(QTest &helper) {
     value[SizeT64{4}] = 400;
     value[SizeT32{5}] = 500;
 
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 6U, __LINE__);
     helper.Equal(value[0].GetNumber(), 50.0, __LINE__);
     helper.Equal(value[1].GetNumber(), 100.0, __LINE__);
@@ -3358,39 +3357,39 @@ static void TestIndexOperator1(QTest &helper) {
     helper.Equal(value[3].GetNumber(), 300.0, __LINE__);
     helper.Equal(value[4].GetNumber(), 400.0, __LINE__);
     helper.Equal(value[5].GetNumber(), 500.0, __LINE__);
-    helper.NotEqual(value.GetValue(0), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(1), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(2), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(3), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(4), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(5), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue("5", 1), nullptr, "null", __LINE__);
-    helper.Equal(value.GetValue("50", 2), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetValue(0), __LINE__);
+    helper.IsNotNull(value.GetValue(1), __LINE__);
+    helper.IsNotNull(value.GetValue(2), __LINE__);
+    helper.IsNotNull(value.GetValue(3), __LINE__);
+    helper.IsNotNull(value.GetValue(4), __LINE__);
+    helper.IsNotNull(value.GetValue(5), __LINE__);
+    helper.IsNotNull(value.GetValue("5", 1), __LINE__);
+    helper.IsNull(value.GetValue("50", 2), __LINE__);
     helper.Equal(value.GetValue(0)->GetNumber(), 50.0, __LINE__);
     helper.Equal(value.GetValue(1)->GetNumber(), 100.0, __LINE__);
     helper.Equal(value.GetValue(2)->GetNumber(), 200.0, __LINE__);
     helper.Equal(value.GetValue(3)->GetNumber(), 300.0, __LINE__);
     helper.Equal(value.GetValue(4)->GetNumber(), 400.0, __LINE__);
     helper.Equal(value.GetValue(5)->GetNumber(), 500.0, __LINE__);
-    helper.Equal(value.GetValue(6), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetValue(6), __LINE__);
 
     //////////////////////////////////////////
     value.Reset();
 
     value["A"] = 7.5;
-    helper.EqualsTrue(value.IsObject(), __LINE__);
+    helper.IsTrue(value.IsObject(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 7.5, __LINE__);
     helper.Equal(value["A"].GetNumber(), 7.5, __LINE__);
 
     value["A"] = 59;
-    helper.EqualsTrue(value.IsObject(), __LINE__);
+    helper.IsTrue(value.IsObject(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 59.0, __LINE__);
     helper.Equal(value["A"].GetNumber(), 59.0, __LINE__);
 
     value["B"] = 60;
-    helper.EqualsTrue(value.IsObject(), __LINE__);
+    helper.IsTrue(value.IsObject(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
     helper.Equal(value[0].GetNumber(), 59.0, __LINE__);
     helper.Equal(value["A"].GetNumber(), 59.0, __LINE__);
@@ -3404,7 +3403,7 @@ static void TestIndexOperator1(QTest &helper) {
     value["EFEFE"]             = 400;
     value[VString("FGHIGKLM")] = 500;
 
-    helper.EqualsTrue(value.IsObject(), __LINE__);
+    helper.IsTrue(value.IsObject(), __LINE__);
     helper.Equal(value.Size(), 6U, __LINE__);
     helper.Equal(value[0].GetNumber(), 50.0, __LINE__);
     helper.Equal(value[1].GetNumber(), 100.0, __LINE__);
@@ -3418,12 +3417,12 @@ static void TestIndexOperator1(QTest &helper) {
     helper.Equal(value["D"].GetNumber(), 300.0, __LINE__);
     helper.Equal(value["EFEFE"].GetNumber(), 400.0, __LINE__);
     helper.Equal(value["FGHIGKLM"].GetNumber(), 500.0, __LINE__);
-    helper.NotEqual(value.GetValue(0), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(1), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(2), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(3), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(4), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetValue(5), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetValue(0), __LINE__);
+    helper.IsNotNull(value.GetValue(1), __LINE__);
+    helper.IsNotNull(value.GetValue(2), __LINE__);
+    helper.IsNotNull(value.GetValue(3), __LINE__);
+    helper.IsNotNull(value.GetValue(4), __LINE__);
+    helper.IsNotNull(value.GetValue(5), __LINE__);
     helper.Equal(value.GetValue(0)->GetNumber(), 50.0, __LINE__);
     helper.Equal(value.GetValue(1)->GetNumber(), 100.0, __LINE__);
     helper.Equal(value.GetValue(2)->GetNumber(), 200.0, __LINE__);
@@ -3431,26 +3430,26 @@ static void TestIndexOperator1(QTest &helper) {
     helper.Equal(value.GetValue(4)->GetNumber(), 400.0, __LINE__);
     helper.Equal(value.GetValue(5)->GetNumber(), 500.0, __LINE__);
 
-    helper.NotEqual(value.GetKey(0), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetKey(1), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetKey(2), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetKey(3), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetKey(4), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetKey(5), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetKey(0), __LINE__);
+    helper.IsNotNull(value.GetKey(1), __LINE__);
+    helper.IsNotNull(value.GetKey(2), __LINE__);
+    helper.IsNotNull(value.GetKey(3), __LINE__);
+    helper.IsNotNull(value.GetKey(4), __LINE__);
+    helper.IsNotNull(value.GetKey(5), __LINE__);
 
-    helper.EqualsTrue(value.GetKey(0)->IsEqual("A", 1), __LINE__);
-    helper.EqualsTrue(value.GetKey(1)->IsEqual("B", 1), __LINE__);
-    helper.EqualsTrue(value.GetKey(2)->IsEqual("C", 1), __LINE__);
-    helper.EqualsTrue(value.GetKey(3)->IsEqual("D", 1), __LINE__);
-    helper.EqualsTrue(value.GetKey(4)->IsEqual("EFEFE", 5), __LINE__);
-    helper.EqualsTrue(value.GetKey(5)->IsEqual("FGHIGKLM", 8), __LINE__);
+    helper.IsTrue(value.GetKey(0)->IsEqual("A", 1), __LINE__);
+    helper.IsTrue(value.GetKey(1)->IsEqual("B", 1), __LINE__);
+    helper.IsTrue(value.GetKey(2)->IsEqual("C", 1), __LINE__);
+    helper.IsTrue(value.GetKey(3)->IsEqual("D", 1), __LINE__);
+    helper.IsTrue(value.GetKey(4)->IsEqual("EFEFE", 5), __LINE__);
+    helper.IsTrue(value.GetKey(5)->IsEqual("FGHIGKLM", 8), __LINE__);
 
-    helper.Equal(value.GetValue(6), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetValue(6), __LINE__);
 
     value.Reset();
 
     value[VString("C")] = 4;
-    helper.EqualsTrue(value.IsObject(), __LINE__);
+    helper.IsTrue(value.IsObject(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 4.0, __LINE__);
     helper.Equal(value[VString("C")].GetNumber(), 4.0, __LINE__);
@@ -3458,7 +3457,7 @@ static void TestIndexOperator1(QTest &helper) {
     value.Reset();
 
     value[str2] = 5;
-    helper.EqualsTrue(value.IsObject(), __LINE__);
+    helper.IsTrue(value.IsObject(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 5.0, __LINE__);
     helper.Equal(value[str2].GetNumber(), 5.0, __LINE__);
@@ -3475,27 +3474,26 @@ static void TestIndexOperator2(QTest &helper) {
     value["CCCC"] = 30;
 
     value_ptr = value.GetValue("A", 1);
-    helper.NotEqual(value_ptr, nullptr, "null", __LINE__);
+    helper.IsNotNull(value_ptr, __LINE__);
     helper.Equal(value_ptr->GetNumber(), 10.0, __LINE__);
 
     value_ptr = value.GetValue("ABCDEF", 1);
-    helper.NotEqual(value_ptr, nullptr, "null", __LINE__);
+    helper.IsNotNull(value_ptr, __LINE__);
     helper.Equal(value_ptr->GetNumber(), 10.0, __LINE__);
 
     value_ptr = value.GetValue("BB", 2);
-    helper.NotEqual(value_ptr, nullptr, "null", __LINE__);
+    helper.IsNotNull(value_ptr, __LINE__);
     helper.Equal(value_ptr->GetNumber(), 20.0, __LINE__);
 
     value_ptr = value.GetValue("CCCC", 4);
-    helper.NotEqual(value_ptr, nullptr, "null", __LINE__);
+    helper.IsNotNull(value_ptr, __LINE__);
     helper.Equal(value_ptr->GetNumber(), 30.0, __LINE__);
     ////////////////////
-    helper.Equal(value.GetValue("a", 1), nullptr, "null", __LINE__);
-    helper.Equal(value.GetValue("ABCDEF", 6), nullptr, "null", __LINE__);
-    helper.Equal(value.GetValue("b", 1), nullptr, "null", __LINE__);
-    helper.Equal(value.GetValue("bb", 2), nullptr, "null", __LINE__);
-
-    helper.Equal(value.GetValue("CCC", 3), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetValue("a", 1), __LINE__);
+    helper.IsNull(value.GetValue("ABCDEF", 6), __LINE__);
+    helper.IsNull(value.GetValue("b", 1), __LINE__);
+    helper.IsNull(value.GetValue("bb", 2), __LINE__);
+    helper.IsNull(value.GetValue("CCC", 3), __LINE__);
     ////////////////////
 }
 
@@ -3505,12 +3503,12 @@ static void TestAddition1(QTest &helper) {
     const VString str2("DEFG");
 
     value += 20;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
     helper.Equal(value[0].GetNumber(), 20.0, __LINE__);
 
     value += 30;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
     helper.Equal(value[0].GetNumber(), 20.0, __LINE__);
     helper.Equal(value[1].GetNumber(), 30.0, __LINE__);
@@ -3522,7 +3520,7 @@ static void TestAddition1(QTest &helper) {
     value += SizeT64{400};
     value += double{500};
 
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 6U, __LINE__);
     helper.Equal(value[0].GetNumber(), 50.0, __LINE__);
     helper.Equal(value[1].GetNumber(), 100.0, __LINE__);
@@ -3534,11 +3532,11 @@ static void TestAddition1(QTest &helper) {
     value.Reset();
 
     value[10] = 100;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 11U, __LINE__);
-    helper.EqualsTrue(value[3].IsUndefined(), __LINE__);
-    helper.EqualsTrue(value[4].IsUndefined(), __LINE__);
-    helper.EqualsTrue(value[5].IsUndefined(), __LINE__);
+    helper.IsTrue(value[3].IsUndefined(), __LINE__);
+    helper.IsTrue(value[4].IsUndefined(), __LINE__);
+    helper.IsTrue(value[5].IsUndefined(), __LINE__);
     helper.Equal(value[10].GetNumber(), 100.0, __LINE__);
     //////////////////////////////////////////
 }
@@ -3550,128 +3548,119 @@ static void TestAddition2(QTest &helper) {
     /////////////////
 
     value += true;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsTrue(), __LINE__);
+    helper.IsTrue(value[0].IsTrue(), __LINE__);
 
     value += true;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsTrue(), __LINE__);
-    helper.EqualsTrue(value[1].IsTrue(), __LINE__);
+    helper.IsTrue(value[0].IsTrue(), __LINE__);
+    helper.IsTrue(value[1].IsTrue(), __LINE__);
 
     value.Reset();
     /////////////////
 
     value += false;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsFalse(), __LINE__);
+    helper.IsTrue(value[0].IsFalse(), __LINE__);
 
     value += false;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value[1].IsFalse(), __LINE__);
+    helper.IsTrue(value[0].IsFalse(), __LINE__);
+    helper.IsTrue(value[1].IsFalse(), __LINE__);
 
     value.Reset();
     /////////////////
 
     value += nullptr;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsNull(), __LINE__);
+    helper.IsTrue(value[0].IsNull(), __LINE__);
 
     value += nullptr;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsNull(), __LINE__);
-    helper.EqualsTrue(value[1].IsNull(), __LINE__);
+    helper.IsTrue(value[0].IsNull(), __LINE__);
+    helper.IsTrue(value[1].IsNull(), __LINE__);
 
     value.Reset();
     /////////////////
 
     value += "-ABCDEF0123456789ABCDEF0123456789-";
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsString(), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(value[0].IsString(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     value += "^ABCDEF0123456789ABCDEF0123456789^";
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsString(), __LINE__);
-    helper.EqualsTrue(value[1].IsString(), __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[1].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
-                      __LINE__);
+    helper.IsTrue(value[0].IsString(), __LINE__);
+    helper.IsTrue(value[1].IsString(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[1].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34), __LINE__);
     value.Reset();
     /////////////////
     str               = VString("-ABCDEF0123456789ABCDEF0123456789-");
     const char *c_str = str.First();
     value += Memory::Move(str);
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsString(), __LINE__);
     helper.Equal(value[0].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value += Memory::Move(str);
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsString(), __LINE__);
-    helper.EqualsTrue(value[1].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsString(), __LINE__);
+    helper.IsTrue(value[1].IsString(), __LINE__);
     helper.Equal(value[0].StringStorage(), c_str, __LINE__);
     helper.Equal(value[1].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
     value.Reset();
     /////////////////
 
     str   = VString("-ABCDEF0123456789ABCDEF0123456789-");
     c_str = str.First();
     value += str;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsString(), __LINE__);
     helper.NotEqual(value[0].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     str    = VString("#0123456789ABCDEF0123456789ABCDEF#");
     c_str2 = str.First();
     value += str;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsString(), __LINE__);
-    helper.EqualsTrue(value[1].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsString(), __LINE__);
+    helper.IsTrue(value[1].IsString(), __LINE__);
     helper.NotEqual(value[0].StringStorage(), c_str, __LINE__);
     helper.NotEqual(value[1].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
     value.Reset();
 
     //////////////
 
     value += VHArray{};
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value[0].IsObject(), __LINE__);
+    helper.IsTrue(value[0].IsObject(), __LINE__);
 
     value += VHArray{};
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value[0].IsObject(), __LINE__);
-    helper.EqualsTrue(value[1].IsObject(), __LINE__);
+    helper.IsTrue(value[0].IsObject(), __LINE__);
+    helper.IsTrue(value[1].IsObject(), __LINE__);
 
     //////////////////////////////////////////
 }
@@ -3685,19 +3674,19 @@ static void TestAddition3(QTest &helper) {
     /////////////////
     arr_var = VArray(1);
     value += arr_var;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
 
     value.Reset();
 
     arr_var = VArray(3);
     value += arr_var;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
 
     value.Reset();
     ///
@@ -3709,17 +3698,16 @@ static void TestAddition3(QTest &helper) {
     c_str       = arr_storage[2].StringStorage();
 
     value += arr_var;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 3U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
     helper.NotEqual(value.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value[2].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsFalse(), __LINE__);
+    helper.IsTrue(value[1].IsTrue(), __LINE__);
+    helper.IsTrue(value[2].IsString(), __LINE__);
     helper.NotEqual(value[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     arr_var.Reset();
     arr_var += ValueC{nullptr};
@@ -3729,40 +3717,38 @@ static void TestAddition3(QTest &helper) {
     c_str2      = arr_storage[2].StringStorage();
 
     value += arr_var;
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 6U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
     helper.NotEqual(value.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value[2].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsFalse(), __LINE__);
+    helper.IsTrue(value[1].IsTrue(), __LINE__);
+    helper.IsTrue(value[2].IsString(), __LINE__);
     helper.NotEqual(value[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(value[3].IsNull(), __LINE__);
-    helper.EqualsTrue(value[4].IsNumber(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(value[3].IsNull(), __LINE__);
+    helper.IsTrue(value[4].IsNumber(), __LINE__);
     helper.Equal(value[4].GetNumber(), 14.0, __LINE__);
-    helper.EqualsTrue(value[5].IsString(), __LINE__);
+    helper.IsTrue(value[5].IsString(), __LINE__);
     helper.NotEqual(value[5].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34), __LINE__);
 
     value.Reset();
     /////////////////
     value += VArray(1);
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
 
     value.Reset();
 
     value += VArray(3);
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 1U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
 
     value.Reset();
     arr_var.Reset();
@@ -3774,17 +3760,16 @@ static void TestAddition3(QTest &helper) {
     c_str       = arr_storage[2].StringStorage();
 
     value += Memory::Move(arr_var);
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 3U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
     helper.Equal(value.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value[2].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsFalse(), __LINE__);
+    helper.IsTrue(value[1].IsTrue(), __LINE__);
+    helper.IsTrue(value[2].IsString(), __LINE__);
     helper.Equal(value[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
 
     arr_var += ValueC{nullptr};
     arr_var += ValueC{14};
@@ -3793,26 +3778,24 @@ static void TestAddition3(QTest &helper) {
     c_str2      = arr_storage[2].StringStorage();
 
     value += Memory::Move(arr_var);
-    helper.Equal(arr_var.First(), nullptr, "null", __LINE__);
+    helper.IsNull(arr_var.First(), __LINE__);
 
-    helper.EqualsTrue(value.IsArray(), __LINE__);
+    helper.IsTrue(value.IsArray(), __LINE__);
     helper.Equal(value.Size(), 6U, __LINE__);
-    helper.NotEqual(value.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value.GetArray(), __LINE__);
+    helper.IsNotNull(value.GetArray()->First(), __LINE__);
     helper.NotEqual(value.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value[2].IsString(), __LINE__);
+    helper.IsTrue(value[0].IsFalse(), __LINE__);
+    helper.IsTrue(value[1].IsTrue(), __LINE__);
+    helper.IsTrue(value[2].IsString(), __LINE__);
     helper.Equal(value[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
-    helper.EqualsTrue(value[3].IsNull(), __LINE__);
-    helper.EqualsTrue(value[4].IsNumber(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[2].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
+    helper.IsTrue(value[3].IsNull(), __LINE__);
+    helper.IsTrue(value[4].IsNumber(), __LINE__);
     helper.Equal(value[4].GetNumber(), 14.0, __LINE__);
-    helper.EqualsTrue(value[5].IsString(), __LINE__);
+    helper.IsTrue(value[5].IsString(), __LINE__);
     helper.Equal(value[5].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value[5].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value[5].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     //////////////////////////////////////////
 }
 
@@ -3827,48 +3810,48 @@ static void TestAddition4(QTest &helper) {
 
     value2 = true;
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsTrue(), __LINE__);
+    helper.IsTrue(value1[0].IsTrue(), __LINE__);
 
     value2 = true;
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsTrue(), __LINE__);
-    helper.EqualsTrue(value1[1].IsTrue(), __LINE__);
+    helper.IsTrue(value1[0].IsTrue(), __LINE__);
+    helper.IsTrue(value1[1].IsTrue(), __LINE__);
 
     value1.Reset();
     /////////////////
 
     value2 = false;
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
 
     value2 = false;
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value1[1].IsFalse(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[1].IsFalse(), __LINE__);
 
     value1.Reset();
     /////////////////
 
     value2 = nullptr;
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsNull(), __LINE__);
+    helper.IsTrue(value1[0].IsNull(), __LINE__);
 
     value2 = nullptr;
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsNull(), __LINE__);
-    helper.EqualsTrue(value1[1].IsNull(), __LINE__);
+    helper.IsTrue(value1[0].IsNull(), __LINE__);
+    helper.IsTrue(value1[1].IsNull(), __LINE__);
 
     value1.Reset();
     /////////////////
@@ -3877,58 +3860,55 @@ static void TestAddition4(QTest &helper) {
     value2            = Memory::Move(str);
 
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsString(), __LINE__);
     helper.NotEqual(value1[0].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = Memory::Move(str);
 
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsString(), __LINE__);
-    helper.EqualsTrue(value1[1].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsString(), __LINE__);
+    helper.IsTrue(value1[1].IsString(), __LINE__);
     helper.NotEqual(value1[0].StringStorage(), c_str, __LINE__);
     helper.NotEqual(value1[1].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
     value1.Reset();
     /////////////////
 
     value2 = VArray(1);
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
 
     value1.Reset();
 
     value2 = VArray(10);
     value1 += value2;
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
 
     value1.Reset();
 
     value2 = VArray(1);
     value1.Merge(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
 
     value2 = VArray(10);
     value1.Merge(Memory::Move(value2));
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
 
     value1.Reset();
     ///
@@ -3941,17 +3921,16 @@ static void TestAddition4(QTest &helper) {
     value2      = Memory::Move(arr_var);
 
     value1.Merge(Memory::Move(value2));
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 3U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value1[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value1[2].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[1].IsTrue(), __LINE__);
+    helper.IsTrue(value1[2].IsString(), __LINE__);
     helper.Equal(value1[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     arr_var.Reset();
     arr_var += ValueC{ValueType::Null};
@@ -3962,24 +3941,22 @@ static void TestAddition4(QTest &helper) {
     value2      = Memory::Move(arr_var);
 
     value1.Merge(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 6U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value1[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value1[2].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[1].IsTrue(), __LINE__);
+    helper.IsTrue(value1[2].IsString(), __LINE__);
     helper.Equal(value1[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(value1[3].IsNull(), __LINE__);
-    helper.EqualsTrue(value1[4].IsNumber(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(value1[3].IsNull(), __LINE__);
+    helper.IsTrue(value1[4].IsNumber(), __LINE__);
     helper.Equal(value1[4].GetNumber(), 14.0, __LINE__);
-    helper.EqualsTrue(value1[5].IsString(), __LINE__);
+    helper.IsTrue(value1[5].IsString(), __LINE__);
     helper.NotEqual(value1[5].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[5].StringStorage(), "^ABCDEF0123456789ABCDEF0123456789^", 34), __LINE__);
 
     value1.Reset();
 
@@ -3996,13 +3973,13 @@ static void TestAddition5(QTest &helper) {
     /////////////////
 
     value2 = true;
-    helper.EqualsTrue(value2.IsTrue(), __LINE__);
+    helper.IsTrue(value2.IsTrue(), __LINE__);
 
     value1 += Memory::Move(value2);
 
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsTrue(), __LINE__);
+    helper.IsTrue(value1[0].IsTrue(), __LINE__);
 
     value2 += true;
     value2 += false;
@@ -4014,10 +3991,10 @@ static void TestAddition5(QTest &helper) {
 
     value2 = true;
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsTrue(), __LINE__);
-    helper.EqualsTrue(value1[1].IsTrue(), __LINE__);
+    helper.IsTrue(value1[0].IsTrue(), __LINE__);
+    helper.IsTrue(value1[1].IsTrue(), __LINE__);
 
     value1.Reset();
     /////////////////
@@ -4025,32 +4002,32 @@ static void TestAddition5(QTest &helper) {
     value2 = false;
 
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
 
     value2 = false;
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value1[1].IsFalse(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[1].IsFalse(), __LINE__);
 
     value1.Reset();
     /////////////////
 
     value2 = nullptr;
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsNull(), __LINE__);
+    helper.IsTrue(value1[0].IsNull(), __LINE__);
 
     value2 = nullptr;
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsNull(), __LINE__);
-    helper.EqualsTrue(value1[1].IsNull(), __LINE__);
+    helper.IsTrue(value1[0].IsNull(), __LINE__);
+    helper.IsTrue(value1[1].IsNull(), __LINE__);
 
     value1.Reset();
     /////////////////
@@ -4059,44 +4036,41 @@ static void TestAddition5(QTest &helper) {
     value2            = Memory::Move(str);
 
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 1U, __LINE__);
-    helper.EqualsTrue(value1[0].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsString(), __LINE__);
     helper.Equal(value1[0].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     str                = VString("#0123456789ABCDEF0123456789ABCDEF#");
     const char *c_str2 = str.First();
     value2             = Memory::Move(str);
 
     value1 += Memory::Move(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 2U, __LINE__);
-    helper.EqualsTrue(value1[0].IsString(), __LINE__);
-    helper.EqualsTrue(value1[1].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsString(), __LINE__);
+    helper.IsTrue(value1[1].IsString(), __LINE__);
     helper.Equal(value1[0].StringStorage(), c_str, __LINE__);
     helper.Equal(value1[1].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[0].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[1].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
     value1.Reset();
     /////////////////
 
     value2 = VArray(1);
     value1.Merge(value2);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value2.GetArray(), __LINE__);
 
     value2 = VArray(1);
     value1.Merge(Memory::Move(value2));
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 0U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.Equal(value2.GetArray(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNull(value2.GetArray(), __LINE__);
 
     value1.Reset();
     ///
@@ -4109,17 +4083,16 @@ static void TestAddition5(QTest &helper) {
     value2      = Memory::Move(arr_var);
 
     value1.Merge(Memory::Move(value2));
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 3U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value1[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value1[2].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[1].IsTrue(), __LINE__);
+    helper.IsTrue(value1[2].IsString(), __LINE__);
     helper.Equal(value1[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
 
     arr_var.Reset();
     arr_var += ValueC{ValueType::Null};
@@ -4130,25 +4103,23 @@ static void TestAddition5(QTest &helper) {
     value2      = Memory::Move(arr_var);
 
     value1.Merge(Memory::Move(value2));
-    helper.EqualsTrue(value2.IsUndefined(), __LINE__);
-    helper.EqualsTrue(value1.IsArray(), __LINE__);
+    helper.IsTrue(value2.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsArray(), __LINE__);
     helper.Equal(value1.Size(), 6U, __LINE__);
-    helper.NotEqual(value1.GetArray(), nullptr, "null", __LINE__);
-    helper.NotEqual(value1.GetArray()->First(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value1.GetArray(), __LINE__);
+    helper.IsNotNull(value1.GetArray()->First(), __LINE__);
     helper.NotEqual(value1.GetArray()->First(), arr_storage, __LINE__);
-    helper.EqualsTrue(value1[0].IsFalse(), __LINE__);
-    helper.EqualsTrue(value1[1].IsTrue(), __LINE__);
-    helper.EqualsTrue(value1[2].IsString(), __LINE__);
+    helper.IsTrue(value1[0].IsFalse(), __LINE__);
+    helper.IsTrue(value1[1].IsTrue(), __LINE__);
+    helper.IsTrue(value1[2].IsString(), __LINE__);
     helper.Equal(value1[2].StringStorage(), c_str, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                      __LINE__);
-    helper.EqualsTrue(value1[3].IsNull(), __LINE__);
-    helper.EqualsTrue(value1[4].IsNumber(), __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[2].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
+    helper.IsTrue(value1[3].IsNull(), __LINE__);
+    helper.IsTrue(value1[4].IsNumber(), __LINE__);
     helper.Equal(value1[4].GetNumber(), 14.0, __LINE__);
-    helper.EqualsTrue(value1[5].IsString(), __LINE__);
+    helper.IsTrue(value1[5].IsString(), __LINE__);
     helper.Equal(value1[5].StringStorage(), c_str2, __LINE__);
-    helper.EqualsTrue(StringUtils::IsEqual(value1[5].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34),
-                      __LINE__);
+    helper.IsTrue(StringUtils::IsEqual(value1[5].StringStorage(), "#0123456789ABCDEF0123456789ABCDEF#", 34), __LINE__);
     value1.Reset();
     //////////////////////////////////////////
 }
@@ -4184,7 +4155,7 @@ static void TestAddition6(QTest &helper) {
     value2 = VHArray{};   // Setting to object type.
     value2.Merge(value1); // Copy
     helper.Equal(value2.Size(), 3U, __LINE__);
-    helper.NotEqual(value2.GetObject(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetObject(), __LINE__);
     helper.NotEqual(value2.GetObject()->First(), h_arr_storage1, __LINE__);
     helper.Equal(value2["k1"].GetNumber(), 11.0, __LINE__);
     helper.Equal(value2["k2"].GetNumber(), 22.0, __LINE__);
@@ -4195,7 +4166,7 @@ static void TestAddition6(QTest &helper) {
     value2 = VHArray{};  // Clearing and  Setting to object type.
     value2 += h_arr_var; // Copy
     helper.Equal(value2.Size(), 4U, __LINE__);
-    helper.NotEqual(value2.GetObject(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetObject(), __LINE__);
     helper.NotEqual(value2.GetObject()->First(), h_arr_storage2, __LINE__);
     helper.Equal(value2["w1"].GetNumber(), 10.0, __LINE__);
     helper.Equal(value2["w2"].GetNumber(), 20.0, __LINE__);
@@ -4203,15 +4174,15 @@ static void TestAddition6(QTest &helper) {
     helper.NotEqual(value2["w4"].StringStorage(), str_c2, __LINE__);
     helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
                  __LINE__);
-    helper.Equal(value2.GetValue(4), nullptr, "null", __LINE__);
+    helper.IsNull(value2.GetValue(4), __LINE__);
 
     ////
 
     value2 = VHArray{};                 // Clearing and  Setting to object type.
     value2.Merge(Memory::Move(value1)); // Move
-    helper.EqualsTrue(value1.IsUndefined(), __LINE__);
+    helper.IsTrue(value1.IsUndefined(), __LINE__);
     helper.Equal(value2.Size(), 3U, __LINE__);
-    helper.NotEqual(value2.GetObject(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetObject(), __LINE__);
     helper.NotEqual(value2.GetObject()->First(), h_arr_storage2, __LINE__);
     helper.Equal(value2["k1"].GetNumber(), 11.0, __LINE__);
     helper.Equal(value2["k2"].GetNumber(), 22.0, __LINE__);
@@ -4224,9 +4195,9 @@ static void TestAddition6(QTest &helper) {
 
     value2 = VHArray{};                // Clearing and  Setting to object type.
     value2 += Memory::Move(h_arr_var); // Move
-    helper.Equal(h_arr_var.First(), nullptr, "null", __LINE__);
+    helper.IsNull(h_arr_var.First(), __LINE__);
     helper.Equal(value2.Size(), 4U, __LINE__);
-    helper.NotEqual(value2.GetObject(), nullptr, "null", __LINE__);
+    helper.IsNotNull(value2.GetObject(), __LINE__);
     helper.NotEqual(value2.GetObject()->First(), h_arr_storage2, __LINE__);
     helper.Equal(value2["w1"].GetNumber(), 10.0, __LINE__);
     helper.Equal(value2["w2"].GetNumber(), 20.0, __LINE__);
@@ -4234,7 +4205,7 @@ static void TestAddition6(QTest &helper) {
     helper.Equal(value2["w4"].StringStorage(), str_c2, __LINE__);
     helper.Equal(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), true,
                  __LINE__);
-    helper.Equal(value2.GetValue(4), nullptr, "null", __LINE__);
+    helper.IsNull(value2.GetValue(4), __LINE__);
 
     if (value2.GetObject() != nullptr) {
         h_arr_var = *(value2.GetObject()); // Copying back the values.
@@ -4332,7 +4303,7 @@ static void TestAddition6(QTest &helper) {
 
     value1 += value2;
 
-    helper.EqualsTrue(value2.IsObject(), __LINE__);
+    helper.IsTrue(value2.IsObject(), __LINE__);
     helper.Equal(value2.Size(), 8U, __LINE__);
     helper.Equal(value2["k0"].GetNumber(), 99, __LINE__);
     helper.Equal(value2["k1"].GetNumber(), 1, __LINE__);
@@ -4343,7 +4314,7 @@ static void TestAddition6(QTest &helper) {
     helper.Equal(value2["k8"].GetNumber(), 8, __LINE__);
     helper.Equal(value2["k9"].GetNumber(), 9, __LINE__);
 
-    helper.EqualsTrue(value1.IsObject(), __LINE__);
+    helper.IsTrue(value1.IsObject(), __LINE__);
     helper.Equal(value1.Size(), 11U, __LINE__);
     helper.Equal(value1["k0"].GetNumber(), 99, __LINE__);
     helper.Equal(value1["k1"].GetNumber(), 1, __LINE__);
@@ -4360,8 +4331,8 @@ static void TestAddition6(QTest &helper) {
     value3 += Memory::Move(value2);
 
     helper.Equal(value2.Size(), 0U, __LINE__);
-    helper.EqualsTrue(value2.IsUndefined(), __LINE__);
-    helper.EqualsTrue(value3.IsObject(), __LINE__);
+    helper.IsTrue(value2.IsUndefined(), __LINE__);
+    helper.IsTrue(value3.IsObject(), __LINE__);
     helper.Equal(value3.Size(), 11U, __LINE__);
     helper.Equal(value3["k0"].GetNumber(), 99, __LINE__);
     helper.Equal(value3["k1"].GetNumber(), 1, __LINE__);
@@ -5357,13 +5328,13 @@ static void TestDeleteValue(QTest &helper) {
 
     value[0] = 1;
     value.RemoveIndex(int{0});
-    helper.Equal(value.GetValue(0), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetValue(0), __LINE__);
     helper.Equal(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
     value[0] = "c";
     value.RemoveIndex(SizeT32{0});
-    helper.Equal(value.GetValue(0), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetValue(0), __LINE__);
     helper.Equal(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
 
@@ -5454,13 +5425,13 @@ static void TestDeleteValue(QTest &helper) {
     value["A"]  = false;
     value["bb"] = true;
     value.Remove("A");
-    helper.Equal(value.GetKey(0), nullptr, "null", __LINE__);
-    helper.Equal(value.GetValue(0), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetKey(0), __LINE__);
+    helper.IsNull(value.GetValue(0), __LINE__);
     helper.Equal(value.Stringify(ss), R"({"bb":true})", __LINE__);
     ss.Clear();
     value.RemoveIndex(1);
-    helper.Equal(value.GetKey(0), nullptr, "null", __LINE__);
-    helper.Equal(value.GetValue(1), nullptr, "null", __LINE__);
+    helper.IsNull(value.GetKey(0), __LINE__);
+    helper.IsNull(value.GetValue(1), __LINE__);
     helper.Equal(value.Stringify(ss), R"({})", __LINE__);
     ss.Clear();
 
@@ -5526,16 +5497,16 @@ static void TestCompressValue(QTest &helper) {
 
     const VArray *arr = value.GetArray();
 
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
-        helper.EqualsTrue(arr->Capacity() > arr->Size(), __LINE__);
+        helper.IsTrue(arr->Capacity() > arr->Size(), __LINE__);
     }
 
     value.Compress();
 
     arr = value.GetArray();
 
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
         helper.Equal(arr->Capacity(), arr->Size(), __LINE__);
     }
@@ -5555,19 +5526,19 @@ static void TestCompressValue(QTest &helper) {
     value["key3"][4] = 1;
 
     arr = value["key1"].GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
-        helper.EqualsTrue(arr->Capacity() > arr->Size(), __LINE__);
+        helper.IsTrue(arr->Capacity() > arr->Size(), __LINE__);
     }
     arr = value["key2"].GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
-        helper.EqualsTrue(arr->Capacity() > arr->Size(), __LINE__);
+        helper.IsTrue(arr->Capacity() > arr->Size(), __LINE__);
     }
     arr = value["key3"].GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
-        helper.EqualsTrue(arr->Capacity() > arr->Size(), __LINE__);
+        helper.IsTrue(arr->Capacity() > arr->Size(), __LINE__);
     }
 
     value["key4"][0] = 1;
@@ -5585,30 +5556,30 @@ static void TestCompressValue(QTest &helper) {
     value.Remove("key9");
 
     const VHArray *obj = value.GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
-        helper.EqualsTrue(obj->Size() > obj->ActualSize(), __LINE__);
+        helper.IsTrue(obj->Size() > obj->ActualSize(), __LINE__);
     }
     value.Compress();
 
     obj = value.GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
         helper.Equal(obj->Size(), obj->ActualSize(), __LINE__);
     }
 
     arr = value["key1"].GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
         helper.Equal(arr->Capacity(), arr->Size(), __LINE__);
     }
     arr = value["key2"].GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
         helper.Equal(arr->Capacity(), arr->Size(), __LINE__);
     }
     arr = value["key3"].GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
         helper.Equal(arr->Capacity(), arr->Size(), __LINE__);
     }
@@ -5623,9 +5594,9 @@ static void TestCompressValue(QTest &helper) {
     value[0].Remove("key4");
 
     obj = value[0].GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
-        helper.EqualsTrue(obj->Size() > obj->ActualSize(), __LINE__);
+        helper.IsTrue(obj->Size() > obj->ActualSize(), __LINE__);
     }
 
     value[1]["key1"] = 1;
@@ -5642,15 +5613,15 @@ static void TestCompressValue(QTest &helper) {
     value[1].Remove("key8");
 
     obj = value[0].GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
-        helper.EqualsTrue(obj->Size() > obj->ActualSize(), __LINE__);
+        helper.IsTrue(obj->Size() > obj->ActualSize(), __LINE__);
     }
 
     obj = value[1].GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
-        helper.EqualsTrue(obj->Size() > obj->ActualSize(), __LINE__);
+        helper.IsTrue(obj->Size() > obj->ActualSize(), __LINE__);
     }
 
     value[2] = 0;
@@ -5658,19 +5629,19 @@ static void TestCompressValue(QTest &helper) {
     value.Compress();
 
     arr = value.GetArray();
-    helper.EqualsTrue(arr != nullptr, __LINE__);
+    helper.IsTrue(arr != nullptr, __LINE__);
     if (arr != nullptr) {
         helper.Equal(arr->Capacity(), arr->Size(), __LINE__);
     }
 
     obj = value[0].GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
         helper.Equal(obj->Size(), obj->ActualSize(), __LINE__);
     }
 
     obj = value[1].GetObject();
-    helper.EqualsTrue(obj != nullptr, __LINE__);
+    helper.IsTrue(obj != nullptr, __LINE__);
     if (obj != nullptr) {
         helper.Equal(obj->Size(), obj->ActualSize(), __LINE__);
     }
@@ -5819,14 +5790,14 @@ static void TestGroupValue(QTest &helper) {
     value[1]["month"] = 5;
     value[2]["month"] = 1;
 
-    helper.EqualsFalse(value.GroupBy(value2, "year"), __LINE__);
+    helper.IsFalse(value.GroupBy(value2, "year"), __LINE__);
 
     value[2].Reset();
     value.GroupBy(value2, "year");
-    helper.EqualsFalse(value.GroupBy(value2, "year"), __LINE__);
+    helper.IsFalse(value.GroupBy(value2, "year"), __LINE__);
 
     value[2]["year"] = VHArray{};
-    helper.EqualsFalse(value.GroupBy(value2, "year"), __LINE__);
+    helper.IsFalse(value.GroupBy(value2, "year"), __LINE__);
 
     ///////////////////
     ss.Clear();

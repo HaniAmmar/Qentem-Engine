@@ -62,12 +62,12 @@ static int PrintResult(int passed, int failed) {
 static void SelfTestLeak(QTest &helper, char *&ptr) {
     ptr = Memory::Allocate<char>(8U);
 
-    helper.EqualsTrue(false, 1);
-    helper.EqualsFalse(true, 2);
+    helper.IsTrue(false, 1);
+    helper.IsFalse(true, 2);
     helper.Equal(true, false, 4);
-    helper.Equal(true, false, true, 3);
+    // helper.Equal(true, false, 3);
     helper.NotEqual(true, true, 5);
-    helper.NotEqual(true, true, true, 6);
+    // helper.NotEqual(true, true, 6);
 }
 
 static void SelfTest() {
