@@ -34,41 +34,41 @@ struct DigitString {};
 // char
 template <typename Char_T>
 struct DigitString<Char_T, 1U> {
-    static constexpr const Char_T *Infinity = "inf";
-    static constexpr const Char_T *NAN      = "nan";
-    static constexpr const Char_T *Zeros    = "0000000000000000000";
+    static constexpr const Char_T *Infinity   = "inf";
+    static constexpr const Char_T *NotANumber = "nan";
+    static constexpr const Char_T *Zeros      = "0000000000000000000";
 };
 
 // char16_t
 template <typename Char_T>
 struct DigitString<Char_T, 2U> {
-    static constexpr const Char_T *Infinity = u"inf";
-    static constexpr const Char_T *NAN      = u"nan";
-    static constexpr const Char_T *Zeros    = u"0000000000000000000";
+    static constexpr const Char_T *Infinity   = u"inf";
+    static constexpr const Char_T *NotANumber = u"nan";
+    static constexpr const Char_T *Zeros      = u"0000000000000000000";
 };
 
 // char32_t
 template <typename Char_T>
 struct DigitString<Char_T, 4U> {
-    static constexpr const Char_T *Infinity = U"inf";
-    static constexpr const Char_T *NAN      = U"nan";
-    static constexpr const Char_T *Zeros    = U"0000000000000000000";
+    static constexpr const Char_T *Infinity   = U"inf";
+    static constexpr const Char_T *NotANumber = U"nan";
+    static constexpr const Char_T *Zeros      = U"0000000000000000000";
 };
 
 // wchar_t size = 4
 template <>
 struct DigitString<wchar_t, 4U> {
-    static constexpr const wchar_t *Infinity = L"inf";
-    static constexpr const wchar_t *NAN      = L"nan";
-    static constexpr const wchar_t *Zeros    = L"0000000000000000000";
+    static constexpr const wchar_t *Infinity   = L"inf";
+    static constexpr const wchar_t *NotANumber = L"nan";
+    static constexpr const wchar_t *Zeros      = L"0000000000000000000";
 };
 
 // wchar_t size = 2
 template <>
 struct DigitString<wchar_t, 2U> {
-    static constexpr const wchar_t *Infinity = L"inf";
-    static constexpr const wchar_t *NAN      = L"nan";
-    static constexpr const wchar_t *Zeros    = L"0000000000000000000";
+    static constexpr const wchar_t *Infinity   = L"inf";
+    static constexpr const wchar_t *NotANumber = L"nan";
+    static constexpr const wchar_t *Zeros      = L"0000000000000000000";
 };
 
 struct DigitChar {

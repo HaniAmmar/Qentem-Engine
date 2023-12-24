@@ -836,10 +836,10 @@ struct Digit {
 
                 stream.Write(DigitUtils::DigitString<Char_T, size>::Infinity, SizeT{3});
             } else {
-                // stream.Write(DigitUtils::DigitString<Char_T, size>::NAN,
-                //              StringUtils::ConstCount(DigitUtils::DigitString<Char_T, size>::NAN));
+                // stream.Write(DigitUtils::DigitString<Char_T, size>::NotANumber,
+                //              StringUtils::ConstCount(DigitUtils::DigitString<Char_T, size>::NotANumber));
 
-                stream.Write(DigitUtils::DigitString<Char_T, size>::NAN, SizeT{3});
+                stream.Write(DigitUtils::DigitString<Char_T, size>::NotANumber, SizeT{3});
             }
         }
     }
