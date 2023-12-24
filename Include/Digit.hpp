@@ -93,27 +93,46 @@ struct Digit {
     }
     /////////////////////////////////////////////////////////////////
     template <typename Number_T, typename Char_T>
-    static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
+    static Number_T HexStringToNumber(const Char_T *value, SizeT &offset, const SizeT end_offset) noexcept {
         Number_T number{0};
-        SizeT32  offset{0};
 
-        while (offset < length) {
+        while (offset < end_offset) {
             const Char_T digit = value[offset];
-            number <<= 4U;
 
-            if ((digit >= DigitUtils::DigitChar::One) && (digit <= DigitUtils::DigitChar::Nine)) {
-                // No need for 0
-                number |= Number_T(digit - DigitUtils::DigitChar::Zero);                               // 1-9
-            } else if ((digit >= DigitUtils::DigitChar::UA) && (digit <= DigitUtils::DigitChar::UF)) { // A-F
-                number |= Number_T(digit - DigitUtils::DigitChar::Seven);
-            } else if ((digit >= DigitUtils::DigitChar::A) && (digit <= DigitUtils::DigitChar::F)) { // a-f
-                number |= Number_T(digit - DigitUtils::DigitChar::UW);
+            if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
+                // 0-9
+                number <<= 4U;
+                ++offset;
+                number |= Number_T(digit - DigitUtils::DigitChar::Zero);
+                continue;
             }
 
-            ++offset;
+            if ((digit >= DigitUtils::DigitChar::UA) && (digit <= DigitUtils::DigitChar::UF)) {
+                // A-F
+                number <<= 4U;
+                ++offset;
+                number |= Number_T(digit - DigitUtils::DigitChar::Seven);
+                continue;
+            }
+
+            if ((digit >= DigitUtils::DigitChar::A) && (digit <= DigitUtils::DigitChar::F)) {
+                // a-f
+                number <<= 4U;
+                ++offset;
+                number |= Number_T(digit - DigitUtils::DigitChar::UW);
+                continue;
+            }
+
+            break;
         }
 
         return number;
+    }
+
+    template <typename Number_T, typename Char_T>
+    static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
+        SizeT offset{0};
+        return HexStringToNumber<Number_T>(value, offset, length);
     }
     /////////////////////////////////////////////////////////////////
     template <typename Number_T, typename Char_T>
@@ -192,7 +211,13 @@ struct Digit {
                         ++offset;
                         digit = content[offset];
 
-                        if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
+                        if ((digit == DigitUtils::DigitChar::X) || (digit == DigitUtils::DigitChar::UX)) {
+                            // Hex
+                            ++offset;
+
+                            number.Natural = HexStringToNumber<decltype(number.Natural)>(content, offset, end_offset);
+                            return QNumberType::Natural;
+                        } else if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                             // 0000xxxx
                             return QNumberType::NotANumber; // Leading zero.
                         }

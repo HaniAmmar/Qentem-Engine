@@ -87,6 +87,8 @@ struct DigitChar {
     static constexpr char A        = 'a';
     static constexpr char F        = 'f';
     static constexpr char UW       = 'W';
+    static constexpr char X        = 'x';
+    static constexpr char UX       = 'X';
 };
 ///////////////////////////////////////////////////
 static const char DigitTable1[] = {"000102030405060708091011121314151617181920212223242526272829"
