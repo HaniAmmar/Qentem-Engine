@@ -95,7 +95,7 @@ static SizeT UnEscapeJSON(const Char_T *content, SizeT length, Stream_T &stream)
                         ++offset;
 
                         if ((length - offset) > SizeT{3}) {
-                            SizeT32 code = Digit::HexStringToNumber((content + offset), SizeT{4});
+                            SizeT32 code = Digit::HexStringToNumber<SizeT32>((content + offset), SizeT{4});
                             offset += SizeT{4};
                             offset2 = offset;
 
@@ -109,7 +109,7 @@ static SizeT UnEscapeJSON(const Char_T *content, SizeT length, Stream_T &stream)
                                 code = (code ^ 0xD800U) << 10U;
                                 offset += SizeT{2};
 
-                                code += Digit::HexStringToNumber((content + offset), SizeT{4}) & 0x3FFU;
+                                code += Digit::HexStringToNumber<SizeT32>((content + offset), SizeT{4}) & 0x3FFU;
                                 code += 0x10000U;
 
                                 Unicode::ToUTF<Char_T>(code, stream);

@@ -92,12 +92,10 @@ struct Digit {
         }
     }
     /////////////////////////////////////////////////////////////////
-    template <typename Char_T>
-    static SizeT32 HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
-        using Uint_Char_T = SizeT32;
-
-        SizeT32 number{0};
-        SizeT32 offset{0};
+    template <typename Number_T, typename Char_T>
+    static Number_T HexStringToNumber(const Char_T *value, const SizeT length) noexcept {
+        Number_T number{0};
+        SizeT32  offset{0};
 
         while (offset < length) {
             const Char_T digit = value[offset];
@@ -105,12 +103,12 @@ struct Digit {
 
             if ((digit >= DigitUtils::DigitChars::OneChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
                 // No need for 0
-                number |= Uint_Char_T(digit - DigitUtils::DigitChars::ZeroChar); // 1-9
+                number |= Number_T(digit - DigitUtils::DigitChars::ZeroChar); // 1-9
             } else if ((digit >= DigitUtils::DigitChars::UA_Char) &&
                        (digit <= DigitUtils::DigitChars::UF_Char)) { // A-F
-                number |= Uint_Char_T(digit - DigitUtils::DigitChars::SevenChar);
+                number |= Number_T(digit - DigitUtils::DigitChars::SevenChar);
             } else if ((digit >= DigitUtils::DigitChars::A_Char) && (digit <= DigitUtils::DigitChars::F_Char)) { // a-f
-                number |= Uint_Char_T(digit - DigitUtils::DigitChars::UW_Char);
+                number |= Number_T(digit - DigitUtils::DigitChars::UW_Char);
             }
 
             ++offset;

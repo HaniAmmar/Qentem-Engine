@@ -38,8 +38,8 @@
 namespace Qentem {
 namespace Test {
 
-static SizeT32 HexStringToNumber(const char *str) noexcept {
-    return Digit::HexStringToNumber(str, Qentem::StringUtils::Count(str));
+static SizeT64 HexStringToNumber(const char *str) noexcept {
+    return Digit::HexStringToNumber<SizeT64>(str, Qentem::StringUtils::Count(str));
 }
 
 template <typename Number_T>
@@ -2047,7 +2047,7 @@ static void TestStringToNumber7(QTest &helper) {
 }
 
 static void TestHexStringToNumber(QTest &helper) {
-    SizeT32     number;
+    SizeT64     number;
     const char *hex = "";
 
     number = HexStringToNumber(hex);
@@ -2100,6 +2100,14 @@ static void TestHexStringToNumber(QTest &helper) {
     hex    = "9999";
     number = HexStringToNumber(hex);
     helper.IsEqual(number, 39321U, __LINE__);
+
+    hex    = "FFFFFFFFFFFFFFFF";
+    number = HexStringToNumber(hex);
+    helper.IsEqual(number, 18446744073709551615ULL, __LINE__);
+
+    hex    = "8888888881111111";
+    number = HexStringToNumber(hex);
+    helper.IsEqual(number, 9838263505853157649ULL, __LINE__);
 }
 
 template <typename Stream_T>
