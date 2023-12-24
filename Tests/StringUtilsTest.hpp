@@ -36,418 +36,418 @@ static void TestHash(QTest &helper) {
     SizeT hash4;
 
     hash = StringUtils::Hash("", 0U);
-    helper.NotEqual(hash, 0U, __LINE__);
+    helper.IsNotEqual(hash, 0U, __LINE__);
 
     hash  = StringUtils::Hash("1", 1U);
     hash2 = StringUtils::Hash("0", 1U);
-    helper.NotEqual(hash, 0U, __LINE__);
-    helper.NotEqual(hash2, 0U, __LINE__);
-    helper.NotEqual(hash, hash2, __LINE__);
+    helper.IsNotEqual(hash, 0U, __LINE__);
+    helper.IsNotEqual(hash2, 0U, __LINE__);
+    helper.IsNotEqual(hash, hash2, __LINE__);
 
     hash3 = StringUtils::Hash("10", 2U);
     hash4 = StringUtils::Hash("01", 2U);
-    helper.NotEqual(hash3, 0U, __LINE__);
-    helper.NotEqual(hash4, 0U, __LINE__);
-    helper.NotEqual(hash, hash3, __LINE__);
-    helper.NotEqual(hash2, hash3, __LINE__);
-    helper.NotEqual(hash, hash4, __LINE__);
-    helper.NotEqual(hash2, hash4, __LINE__);
-    helper.NotEqual(hash3, hash4, __LINE__);
+    helper.IsNotEqual(hash3, 0U, __LINE__);
+    helper.IsNotEqual(hash4, 0U, __LINE__);
+    helper.IsNotEqual(hash, hash3, __LINE__);
+    helper.IsNotEqual(hash2, hash3, __LINE__);
+    helper.IsNotEqual(hash, hash4, __LINE__);
+    helper.IsNotEqual(hash2, hash4, __LINE__);
+    helper.IsNotEqual(hash3, hash4, __LINE__);
 
     hash  = StringUtils::Hash("100", 3U);
     hash2 = StringUtils::Hash("001", 3U);
-    helper.NotEqual(hash, 0U, __LINE__);
-    helper.NotEqual(hash2, 0U, __LINE__);
-    helper.NotEqual(hash, hash3, __LINE__);
-    helper.NotEqual(hash2, hash3, __LINE__);
-    helper.NotEqual(hash, hash4, __LINE__);
-    helper.NotEqual(hash2, hash4, __LINE__);
+    helper.IsNotEqual(hash, 0U, __LINE__);
+    helper.IsNotEqual(hash2, 0U, __LINE__);
+    helper.IsNotEqual(hash, hash3, __LINE__);
+    helper.IsNotEqual(hash2, hash3, __LINE__);
+    helper.IsNotEqual(hash, hash4, __LINE__);
+    helper.IsNotEqual(hash2, hash4, __LINE__);
 
     hash  = StringUtils::Hash("abc", 3U);
     hash2 = StringUtils::Hash("cba", 3U);
-    helper.NotEqual(hash, hash2, __LINE__);
-    helper.NotEqual(hash, 0U, __LINE__);
-    helper.NotEqual(hash2, 0U, __LINE__);
+    helper.IsNotEqual(hash, hash2, __LINE__);
+    helper.IsNotEqual(hash, 0U, __LINE__);
+    helper.IsNotEqual(hash2, 0U, __LINE__);
 }
 
 static void TestCount(QTest &helper) {
     SizeT length = StringUtils::Count("");
-    helper.Equal(length, 0U, __LINE__);
+    helper.IsEqual(length, 0U, __LINE__);
 
     length = StringUtils::Count("a");
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     length = StringUtils::Count("abcde");
-    helper.Equal(length, 5U, __LINE__);
+    helper.IsEqual(length, 5U, __LINE__);
 
     length = StringUtils::Count("\0");
-    helper.Equal(length, 0U, __LINE__);
+    helper.IsEqual(length, 0U, __LINE__);
 
     length = StringUtils::Count("1234567");
-    helper.Equal(length, 7U, __LINE__);
+    helper.IsEqual(length, 7U, __LINE__);
 
     length = StringUtils::Count("123456781234567");
-    helper.Equal(length, 15U, __LINE__);
+    helper.IsEqual(length, 15U, __LINE__);
 
     length = StringUtils::Count("1234567812345678123456781234567");
-    helper.Equal(length, 31U, __LINE__);
+    helper.IsEqual(length, 31U, __LINE__);
 
     length = StringUtils::Count("123456781234567812345678123456781234567812345678123456781234567");
-    helper.Equal(length, 63U, __LINE__);
+    helper.IsEqual(length, 63U, __LINE__);
 }
 
 static void TestTrimLeft(QTest &helper) {
     SizeT32 offset = 0;
 
     StringUtils::TrimLeft("", offset, 0U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("", offset, 1U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("", offset, 10U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("a", offset, 1U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("abc", offset, 3U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("a ", offset, 2U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("abc ", offset, 4U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("a  ", offset, 3U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("abc  ", offset, 5U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("a   ", offset, 4U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     StringUtils::TrimLeft("abc   ", offset, 6U);
-    helper.Equal(offset, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft(" a", offset, 2U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft(" abc", offset, 4U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("  a", offset, 3U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("  abc", offset, 5U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("   a", offset, 4U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("   abc", offset, 6U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft(" a ", offset, 3U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft(" abc ", offset, 5U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("  a ", offset, 4U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("  abc ", offset, 6U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("   a  ", offset, 6U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("   abc  ", offset, 8U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft(" ", offset, 1U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("  ", offset, 2U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("   ", offset, 3U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 1;
     StringUtils::TrimLeft(" a ", offset, 3U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 1;
     StringUtils::TrimLeft(" abc ", offset, 5U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 2;
     StringUtils::TrimLeft("  a ", offset, 4U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 2;
     StringUtils::TrimLeft("  abc ", offset, 6U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 2;
     StringUtils::TrimLeft("   a  ", offset, 6U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 2;
     StringUtils::TrimLeft("   a\n\r\t", offset, 7U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 2;
     StringUtils::TrimLeft("   abc  ", offset, 8U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 1;
     StringUtils::TrimLeft("  ", offset, 2U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 
     offset = 2;
     StringUtils::TrimLeft("   ", offset, 3U);
-    helper.Equal(offset, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
 
     offset = 0;
     StringUtils::TrimLeft("  ", offset, 1U);
-    helper.Equal(offset, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
 
     offset = 1;
     StringUtils::TrimLeft("   ", offset, 2U);
-    helper.Equal(offset, 2U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
 }
 
 static void TestTrimRight(QTest &helper) {
     SizeT32 end_offset = 0;
 
     StringUtils::TrimRight("", 0U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("", 1U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("", 10U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("a", 0U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("abc", 0U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("a ", 1U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("abc ", 4U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("a  ", 3U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("abc  ", 5U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("a   ", 4U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     StringUtils::TrimRight("abc   ", 6U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     end_offset = 2;
     StringUtils::TrimRight("a ", 0U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight("abc ", 0U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("a  ", 0U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 5;
     StringUtils::TrimRight("abc  ", 0U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight("a   ", 4U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight("a   ", 0U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight("abc   ", 6U, end_offset);
-    helper.Equal(end_offset, 6U, __LINE__);
+    helper.IsEqual(end_offset, 6U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight("abc   ", 3U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight("abc   ", 2U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight("abc   ", 0U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 2;
     StringUtils::TrimRight(" a", 0U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 2;
     StringUtils::TrimRight(" a", 1U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 2;
     StringUtils::TrimRight(" a", 2U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 1;
     StringUtils::TrimRight(" a", 0U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     end_offset = 1;
     StringUtils::TrimRight(" a", 1U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight(" abc", 0U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("  a", 0U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 5;
     StringUtils::TrimRight("  abc", 0U, end_offset);
-    helper.Equal(end_offset, 5U, __LINE__);
+    helper.IsEqual(end_offset, 5U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight("   a", 0U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   a", 0U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   a", 2U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   a", 1U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight("   abc", 0U, end_offset);
-    helper.Equal(end_offset, 6U, __LINE__);
+    helper.IsEqual(end_offset, 6U, __LINE__);
 
     end_offset = 5;
     StringUtils::TrimRight("   abc", 0U, end_offset);
-    helper.Equal(end_offset, 5U, __LINE__);
+    helper.IsEqual(end_offset, 5U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight("   abc", 0U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   abc", 0U, end_offset);
-    helper.Equal(end_offset, 0U, __LINE__);
+    helper.IsEqual(end_offset, 0U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   abc", 1U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   abc", 2U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight(" a ", 0U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 5;
     StringUtils::TrimRight(" abc ", 0U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight(" a  ", 4U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 5;
     StringUtils::TrimRight(" a\n\r\t", 0U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight(" abc  ", 0U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight("  a   ", 0U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 8;
     StringUtils::TrimRight("  abc   ", 0U, end_offset);
-    helper.Equal(end_offset, 5U, __LINE__);
+    helper.IsEqual(end_offset, 5U, __LINE__);
 
     end_offset = 1;
     StringUtils::TrimRight(" ", 1U, end_offset);
-    helper.Equal(end_offset, 1U, __LINE__);
+    helper.IsEqual(end_offset, 1U, __LINE__);
 
     end_offset = 2;
     StringUtils::TrimRight("  ", 2U, end_offset);
-    helper.Equal(end_offset, 2U, __LINE__);
+    helper.IsEqual(end_offset, 2U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight("   ", 3U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 3;
     StringUtils::TrimRight(" a ", 3U, end_offset);
-    helper.Equal(end_offset, 3U, __LINE__);
+    helper.IsEqual(end_offset, 3U, __LINE__);
 
     end_offset = 5;
     StringUtils::TrimRight(" abc ", 5U, end_offset);
-    helper.Equal(end_offset, 5U, __LINE__);
+    helper.IsEqual(end_offset, 5U, __LINE__);
 
     end_offset = 4;
     StringUtils::TrimRight(" a  ", 4U, end_offset);
-    helper.Equal(end_offset, 4U, __LINE__);
+    helper.IsEqual(end_offset, 4U, __LINE__);
 
     end_offset = 6;
     StringUtils::TrimRight(" abc  ", 6U, end_offset);
-    helper.Equal(end_offset, 6U, __LINE__);
+    helper.IsEqual(end_offset, 6U, __LINE__);
 
     end_offset = 7;
     StringUtils::TrimRight("  a    ", 6U, end_offset);
-    helper.Equal(end_offset, 6U, __LINE__);
+    helper.IsEqual(end_offset, 6U, __LINE__);
 
     end_offset = 8;
     StringUtils::TrimRight("  abc   ", 4U, end_offset);
-    helper.Equal(end_offset, 5U, __LINE__);
+    helper.IsEqual(end_offset, 5U, __LINE__);
 }
 
 static void TestTrim(QTest &helper) {
@@ -455,218 +455,218 @@ static void TestTrim(QTest &helper) {
     SizeT length = 0;
 
     StringUtils::Trim("", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 0U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 0U, __LINE__);
 
     offset = 0;
     length = 1;
     StringUtils::Trim(" ", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 0U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 0U, __LINE__);
 
     offset = 0;
     length = 1;
     StringUtils::Trim("  ", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 0U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 0U, __LINE__);
 
     offset = 0;
     length = 2;
     StringUtils::Trim("  ", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 0U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 0U, __LINE__);
 
     offset = 0;
     length = 2;
     StringUtils::Trim(" a", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 4;
     StringUtils::Trim(" abc", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 1;
     length = 1;
     StringUtils::Trim(" a", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 1;
     length = 3;
     StringUtils::Trim(" abc", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 2;
     length = 1;
     StringUtils::Trim("  a", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 2;
     length = 3;
     StringUtils::Trim("  abc", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 3;
     StringUtils::Trim("  a", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 5;
     StringUtils::Trim("  abc", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 4;
     StringUtils::Trim("   a", offset, length);
-    helper.Equal(offset, 3U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 6;
     StringUtils::Trim("   abc", offset, length);
-    helper.Equal(offset, 3U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 2;
     StringUtils::Trim("a ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 4;
     StringUtils::Trim("abc ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 1;
     StringUtils::Trim("a ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 3;
     StringUtils::Trim("abc ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 1;
     StringUtils::Trim("a  ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 3;
     StringUtils::Trim("abc  ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 3;
     StringUtils::Trim("a  ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 5;
     StringUtils::Trim("abc  ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 4;
     StringUtils::Trim("a   ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 6;
     StringUtils::Trim("abc   ", offset, length);
-    helper.Equal(offset, 0U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 0U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 3;
     StringUtils::Trim(" a ", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 5;
     StringUtils::Trim(" abc ", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 5;
     StringUtils::Trim("  a  ", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 7;
     StringUtils::Trim("  abc  ", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 0;
     length = 7;
     StringUtils::Trim("   a   ", offset, length);
-    helper.Equal(offset, 3U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 0;
     length = 9;
     StringUtils::Trim("   abc   ", offset, length);
-    helper.Equal(offset, 3U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 1;
     length = 1;
     StringUtils::Trim(" a ", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 1;
     length = 3;
     StringUtils::Trim(" abc ", offset, length);
-    helper.Equal(offset, 1U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 1U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 2;
     length = 1;
     StringUtils::Trim("  a  ", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 2;
     length = 3;
     StringUtils::Trim("  abc  ", offset, length);
-    helper.Equal(offset, 2U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 2U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 
     offset = 3;
     length = 1;
     StringUtils::Trim("   a   ", offset, length);
-    helper.Equal(offset, 3U, __LINE__);
-    helper.Equal(length, 1U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
+    helper.IsEqual(length, 1U, __LINE__);
 
     offset = 3;
     length = 3;
     StringUtils::Trim("   abc   ", offset, length);
-    helper.Equal(offset, 3U, __LINE__);
-    helper.Equal(length, 3U, __LINE__);
+    helper.IsEqual(offset, 3U, __LINE__);
+    helper.IsEqual(length, 3U, __LINE__);
 }
 
 static void TestIsEqual(QTest &helper) {

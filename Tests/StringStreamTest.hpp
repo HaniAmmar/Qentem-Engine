@@ -34,131 +34,131 @@ static void TestStringStream1(QTest &helper) {
     StringStream<char> ss2{10}; // Preset size
     String<char>       str;
 
-    helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
-    helper.Equal(ss1.Capacity(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss1.Capacity(), SizeT{0}, __LINE__);
     helper.IsNull(ss1.First(), __LINE__);
     helper.IsNull(ss1.Last(), __LINE__);
 
     helper.IsTrue((ss2.Capacity() >= SizeT{10}), __LINE__);
-    helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{0}, __LINE__);
     helper.IsNotNull(ss2.First(), __LINE__);
 
     ss2.Reset();
-    helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
-    helper.Equal(ss2.Capacity(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss2.Capacity(), SizeT{0}, __LINE__);
     helper.IsNull(ss2.First(), __LINE__);
 
     ss1 = StringStream<char>(1);
     ss1 += 'a';
-    helper.Equal(ss1.Length(), SizeT{1}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{1}, __LINE__);
     helper.IsTrue((ss1.Capacity() >= SizeT{1}), __LINE__);
     helper.IsNotNull(ss1.First(), __LINE__);
     helper.IsNotNull(ss1.Last(), __LINE__);
-    helper.Equal(ss1.First()[0], 'a', __LINE__);
-    helper.Equal(ss1.GetString(), "a", __LINE__);
-    helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
-    helper.Equal(ss1.Capacity(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss1.First()[0], 'a', __LINE__);
+    helper.IsEqual(ss1.GetString(), "a", __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss1.Capacity(), SizeT{0}, __LINE__);
     helper.IsNull(ss1.First(), __LINE__);
 
     ss2 += String<char>("a");
-    helper.Equal(ss2.Length(), SizeT{1}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{1}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
-    helper.Equal(ss2.GetString(), "a", __LINE__);
-    helper.NotEqual(ss2.GetString(), "aa", __LINE__);
+    helper.IsEqual(ss2.GetString(), "a", __LINE__);
+    helper.IsNotEqual(ss2.GetString(), "aa", __LINE__);
 
     str = String<char>("a");
     ss2 += str;
-    helper.Equal(ss2.Length(), SizeT{1}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{1}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
-    helper.Equal(ss2, "a", __LINE__);
-    helper.NotEqual(ss2, "aa", __LINE__);
+    helper.IsEqual(ss2, "a", __LINE__);
+    helper.IsNotEqual(ss2, "aa", __LINE__);
 
     ss2.Reset();
 
     ss2 += "abc";
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss2.GetString(), "abc", __LINE__);
+    helper.IsEqual(ss2.GetString(), "abc", __LINE__);
     const String<char> sss;
 
     ss2 += String<char>("abc");
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss2, "abc", __LINE__);
+    helper.IsEqual(ss2, "abc", __LINE__);
     ss2.Reset();
 
     str = String<char>("abc");
     ss2 += str;
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss2, "abc", __LINE__);
+    helper.IsEqual(ss2, "abc", __LINE__);
     ss2.Reset();
 
     ss2 += String<char>("abc");
     ss1 = ss2; // Copy
-    helper.Equal(ss1.Length(), ss2.Length(), __LINE__);
+    helper.IsEqual(ss1.Length(), ss2.Length(), __LINE__);
     helper.IsTrue((ss1.Capacity() >= ss2.Length()), __LINE__);
-    helper.Equal(ss1, "abc", __LINE__);
+    helper.IsEqual(ss1, "abc", __LINE__);
     ss1.Reset();
 
     const SizeT lss = ss1.Capacity();
 
     ss1.Clear();
-    helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
-    helper.Equal(ss1.Capacity(), lss, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss1.Capacity(), lss, __LINE__);
 
     ss1.Reset();
     ss1 = Memory::Move(ss2); // Move
-    helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss1, "abc", __LINE__);
+    helper.IsEqual(ss1, "abc", __LINE__);
     helper.IsNull(ss2.Storage(), __LINE__);
-    helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
-    helper.Equal(ss2.Capacity(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss2.Capacity(), SizeT{0}, __LINE__);
     helper.IsNull(ss2.First(), __LINE__);
 
     ss2 += 'a';
     ss1.Reset();
     ss1 = Memory::Move(ss2); // Move
-    helper.Equal(ss1.Length(), SizeT{1}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{1}, __LINE__);
     helper.IsTrue((ss1.Capacity() >= SizeT{4}), __LINE__);
-    helper.Equal(ss1, "a", __LINE__);
+    helper.IsEqual(ss1, "a", __LINE__);
     ss1.Reset();
 
     ss1 += "abc";
     ss2 = StringStream<char>(ss1); // Copy
-    helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss1.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss1, "abc", __LINE__);
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss1, "abc", __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss2, "abc", __LINE__);
+    helper.IsEqual(ss2, "abc", __LINE__);
     ss1.Reset();
     ss2.Reset();
 
     ss1 += "efg";
     ss2 = StringStream<char>(Memory::Move(ss1)); // Move
     helper.IsNull(ss1.Storage(), __LINE__);
-    helper.Equal(ss1.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{0}, __LINE__);
     helper.IsTrue((ss1.Capacity() == SizeT{0}), __LINE__);
     helper.IsNull(ss1.First(), __LINE__);
-    helper.Equal(ss2, "efg", __LINE__);
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss2, "efg", __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss2.First()[2], 'g', __LINE__);
+    helper.IsEqual(ss2.First()[2], 'g', __LINE__);
 
     ss2.Reset();
     ss2.Write("a", SizeT{1});
-    helper.Equal(ss2.Length(), SizeT{1}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{1}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{1}), __LINE__);
     helper.IsNotNull(ss2.First(), __LINE__);
-    helper.Equal(ss2.First()[0], 'a', __LINE__);
+    helper.IsEqual(ss2.First()[0], 'a', __LINE__);
 
     ss2.Write("bc", SizeT{2});
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{3}), __LINE__);
-    helper.Equal(ss2, "abc", __LINE__);
+    helper.IsEqual(ss2, "abc", __LINE__);
     ss2.Reset();
 
     ss2.Write("abcdef", SizeT{1});
@@ -173,16 +173,16 @@ static void TestStringStream1(QTest &helper) {
 
     ss2 += "abcdef";
     ss2.StepBack(10);
-    helper.Equal(ss2.Length(), SizeT{6}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{6}, __LINE__);
 
     ss2.StepBack(1);
-    helper.Equal(ss2.Length(), SizeT{5}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{5}, __LINE__);
 
     ss2.StepBack(2);
-    helper.Equal(ss2.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{3}, __LINE__);
 
     ss2.StepBack(3);
-    helper.Equal(ss2.Length(), SizeT{0}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{0}, __LINE__);
 
     ss2 += "123456789";
     ss2 += "123456789";
@@ -198,9 +198,9 @@ static void TestStringStream1(QTest &helper) {
     ss2 += "123456789";
     ss2 += "123456789";
 
-    helper.Equal(ss2.Length(), SizeT{117}, __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{117}, __LINE__);
     helper.IsTrue((ss2.Capacity() >= SizeT{117}), __LINE__);
-    helper.Equal(
+    helper.IsEqual(
         ss2,
         "123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789",
         __LINE__);
@@ -210,35 +210,35 @@ static void TestStringStream1(QTest &helper) {
 
     char *buffer = ss1.Buffer(2);
 
-    helper.Equal(ss1.Length(), SizeT{2}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{2}, __LINE__);
 
     buffer[0] = 'a';
     buffer[1] = 'b';
 
     const char *ab = "ab";
 
-    helper.Equal(ss1.Length(), SizeT{2}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{2}, __LINE__);
     helper.IsTrue(StringUtils::IsEqual(ss1.First(), ab, SizeT{2}), __LINE__);
 
     buffer = ss1.Buffer(1);
-    helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{3}, __LINE__);
 
     buffer[0]       = 'c';
     const char *ab2 = "abc";
-    helper.Equal(ss1.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{3}, __LINE__);
     helper.IsTrue(StringUtils::IsEqual(ss1.First(), ab2, SizeT{3}), __LINE__);
 
     ss2.Clear();
     ss2 += "ab";
-    helper.Equal((ss1 == ss2), false, __LINE__);
+    helper.IsEqual((ss1 == ss2), false, __LINE__);
 
     ss1 += "de";
-    helper.Equal(ss1.Length(), SizeT{5}, __LINE__);
-    helper.Equal(ss1, "abcde", __LINE__);
+    helper.IsEqual(ss1.Length(), SizeT{5}, __LINE__);
+    helper.IsEqual(ss1, "abcde", __LINE__);
 
     ss2 = ss1;
-    helper.Equal(ss2.Length(), SizeT{5}, __LINE__);
-    helper.Equal(ss2, "abcde", __LINE__);
+    helper.IsEqual(ss2.Length(), SizeT{5}, __LINE__);
+    helper.IsEqual(ss2, "abcde", __LINE__);
 
     ss2.Reset();
 
@@ -246,28 +246,28 @@ static void TestStringStream1(QTest &helper) {
     ss2 += "123456789123456789123456789123456789";
     const char *ss2_p = ss2.First();
     str               = ss2.GetString();
-    helper.Equal(ss2_p, str.First(), __LINE__);
-    helper.Equal(str, "123456789123456789123456789123456789", __LINE__);
+    helper.IsEqual(ss2_p, str.First(), __LINE__);
+    helper.IsEqual(str, "123456789123456789123456789123456789", __LINE__);
 
     /////////
 
     ss2.Reset();
 
     ss1 = "abcdefgh";
-    helper.Equal(ss1, "abcdefgh", __LINE__);
+    helper.IsEqual(ss1, "abcdefgh", __LINE__);
 
     ss2 << ss1;
-    helper.Equal(ss1, "abcdefgh", __LINE__);
-    helper.Equal(ss2, "abcdefgh", __LINE__);
+    helper.IsEqual(ss1, "abcdefgh", __LINE__);
+    helper.IsEqual(ss2, "abcdefgh", __LINE__);
 
     const String<char> n_str = String<char>("12345678");
     ss1                      = n_str;
-    helper.Equal(ss1, "12345678", __LINE__);
+    helper.IsEqual(ss1, "12345678", __LINE__);
 
     ss2.Reset();
 
     ss2 << n_str;
-    helper.Equal(ss2, "12345678", __LINE__);
+    helper.IsEqual(ss2, "12345678", __LINE__);
 
     struct SimpleStream {
         char          str[32]{0};
@@ -293,8 +293,8 @@ static void TestStringStream1(QTest &helper) {
     helper.IsTrue(StringUtils::IsEqual(&(sis.str[0]), "12345678", SizeT{8}), __LINE__);
 
     ss2 << n_str;
-    helper.Equal(ss2, "1234567812345678", __LINE__);
-    helper.Equal(ss2.Capacity(), SizeT{32}, __LINE__);
+    helper.IsEqual(ss2, "1234567812345678", __LINE__);
+    helper.IsEqual(ss2.Capacity(), SizeT{32}, __LINE__);
 
     ss2 << "1234567812345678";
     sis.index = SizeT{0};
@@ -314,67 +314,67 @@ static void TestStringStream2(QTest &helper) {
     stream = "123";
 
     stream.Reverse();
-    helper.Equal(stream.Length(), SizeT{3U}, __LINE__);
-    helper.Equal(stream, "321", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{3U}, __LINE__);
+    helper.IsEqual(stream, "321", __LINE__);
 
     stream.Reverse(0);
-    helper.Equal(stream.Length(), SizeT{3U}, __LINE__);
-    helper.Equal(stream, "123", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{3U}, __LINE__);
+    helper.IsEqual(stream, "123", __LINE__);
 
     stream = "0123456789";
 
     stream.Reverse();
-    helper.Equal(stream.Length(), SizeT{10U}, __LINE__);
-    helper.Equal(stream, "9876543210", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{10U}, __LINE__);
+    helper.IsEqual(stream, "9876543210", __LINE__);
 
     stream.Reverse();
-    helper.Equal(stream.Length(), SizeT{10U}, __LINE__);
-    helper.Equal(stream, "0123456789", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{10U}, __LINE__);
+    helper.IsEqual(stream, "0123456789", __LINE__);
 
     stream.Reverse(3);
-    helper.Equal(stream.Length(), SizeT{10U}, __LINE__);
-    helper.Equal(stream, "0129876543", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{10U}, __LINE__);
+    helper.IsEqual(stream, "0129876543", __LINE__);
 
     stream.Reverse(7);
-    helper.Equal(stream.Length(), SizeT{10U}, __LINE__);
-    helper.Equal(stream, "0129876345", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{10U}, __LINE__);
+    helper.IsEqual(stream, "0129876345", __LINE__);
 
     stream.Reverse(15); // Nothing will happened
-    helper.Equal(stream.Length(), SizeT{10U}, __LINE__);
-    helper.Equal(stream, "0129876345", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{10U}, __LINE__);
+    helper.IsEqual(stream, "0129876345", __LINE__);
     ///////////////////////////////
     stream = "9";
 
     stream.InsertAt('0', 0);
-    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
-    helper.Equal(stream, "09", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{2}, __LINE__);
+    helper.IsEqual(stream, "09", __LINE__);
 
     stream.InsertAt('4', 1);
-    helper.Equal(stream.Length(), SizeT{3}, __LINE__);
-    helper.Equal(stream, "049", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(stream, "049", __LINE__);
 
     stream.InsertAt('4', 10); // Nothing will happened
-    helper.Equal(stream.Length(), SizeT{3}, __LINE__);
-    helper.Equal(stream, "049", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{3}, __LINE__);
+    helper.IsEqual(stream, "049", __LINE__);
 
     stream.InsertAt('2', 1);
     stream.InsertAt('1', 1);
 
-    helper.Equal(stream.Length(), SizeT{5}, __LINE__);
-    helper.Equal(stream, "01249", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{5}, __LINE__);
+    helper.IsEqual(stream, "01249", __LINE__);
 
     stream.InsertAt('3', 3);
     stream.InsertAt('5', 5);
 
-    helper.Equal(stream.Length(), SizeT{7}, __LINE__);
-    helper.Equal(stream, "0123459", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{7}, __LINE__);
+    helper.IsEqual(stream, "0123459", __LINE__);
 
     stream.InsertAt('8', 6);
     stream.InsertAt('7', 6);
     stream.InsertAt('6', 6);
 
-    helper.Equal(stream.Length(), SizeT{10}, __LINE__);
-    helper.Equal(stream, "0123456789", __LINE__);
+    helper.IsEqual(stream.Length(), SizeT{10}, __LINE__);
+    helper.IsEqual(stream, "0123456789", __LINE__);
 }
 
 static int RunStringStreamTests() {

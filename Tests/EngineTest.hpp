@@ -40,71 +40,71 @@ static void TestEngine1(QTest &helper) {
     const char *_find       = "ABC";
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, SizeT{1});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "A";
     content_len = 1;
     _find       = "A";
 
     ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
-    helper.Equal(ret, 1U, __LINE__);
+    helper.IsEqual(ret, 1U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "AAAAA";
     content_len = 5;
 
     ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
-    helper.Equal(ret, 2U, __LINE__);
+    helper.IsEqual(ret, 2U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, content_len, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{4}, content_len);
-    helper.Equal(ret, 5U, __LINE__);
+    helper.IsEqual(ret, 5U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{5}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "  A A        A";
     content_len = 14;
 
     ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
-    helper.Equal(ret, 5U, __LINE__);
+    helper.IsEqual(ret, 5U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{7}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
-    helper.Equal(ret, 5U, __LINE__);
+    helper.IsEqual(ret, 5U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{4}, content_len);
-    helper.Equal(ret, 5U, __LINE__);
+    helper.IsEqual(ret, 5U, __LINE__);
 
     ret = Engine::FindOne(*_find, content, SizeT{5}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     content     = "A";
     content_len = 1;
@@ -112,112 +112,112 @@ static void TestEngine1(QTest &helper) {
     find_len    = 2;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content = "AA";
     ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content = "A   A   A";
     ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content = "  A   A   A  ";
     ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "AB";
     content_len = 2;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 2U, __LINE__);
+    helper.IsEqual(ret, 2U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = " AB";
     content_len = 3;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     content     = "AAB";
     content_len = 3;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     content     = "AAAB";
     content_len = 4;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     content     = "AAAAAAAAAB";
     content_len = 10;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     content     = "  AB";
     content_len = 4;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     content     = "        AB";
     content_len = 10;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     content     = "AAAAAAAAA";
     content_len = 9;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT(content_len - SizeT{1}), content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     _find       = "ABC";
     find_len    = 3;
@@ -225,37 +225,37 @@ static void TestEngine1(QTest &helper) {
     content_len = 3;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "BCBA";
     content_len = 4;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "123456789123456CBA";
     content_len = 18;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "ADC";
     content_len = 3;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "123456789123456ADC";
     content_len = 18;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0";
     content_len = 40;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 }
 
 static void TestEngine2(QTest &helper) {
@@ -266,57 +266,57 @@ static void TestEngine2(QTest &helper) {
     const char     *_find       = "ABC";
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "ABABABABABAAABABC";
     content_len = 17;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 17U, __LINE__);
+    helper.IsEqual(ret, 17U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{15}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::Find(_find, find_len, content, SizeT{14}, content_len);
-    helper.Equal(ret, 17U, __LINE__);
+    helper.IsEqual(ret, 17U, __LINE__);
 
     content     = "ABABABABABCABAAAB";
     content_len = 17;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, SizeT{11}, __LINE__);
+    helper.IsEqual(ret, SizeT{11}, __LINE__);
 
     content     = "   ABC   ";
     content_len = 9;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 6U, __LINE__);
+    helper.IsEqual(ret, 6U, __LINE__);
 
     content     = "ABC   ";
     content_len = 6;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne('1', "00000001", SizeT{0}, SizeT{8});
-    helper.Equal(ret, 8U, __LINE__);
+    helper.IsEqual(ret, 8U, __LINE__);
 
     ret = Engine::FindOne('1', "0000000000000001", SizeT{0}, SizeT{16});
-    helper.Equal(ret, 16U, __LINE__);
+    helper.IsEqual(ret, 16U, __LINE__);
 
     ret = Engine::FindOne('1', "00000000000000000000000000000001", SizeT{0}, SizeT{32});
-    helper.Equal(ret, 32U, __LINE__);
+    helper.IsEqual(ret, 32U, __LINE__);
 
     content     = "ABC   ";
     content_len = 6;
 
     ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     content = R"(<loop value="loop1-value">loop1-value, </loop>)";
 
     ret = Engine::Find("loop1-value", SizeT{11}, content, SizeT{26}, SizeT{39}, SizeT{46});
-    helper.Equal(ret, 37U, __LINE__);
+    helper.IsEqual(ret, 37U, __LINE__);
 }
 
 static void TestEngine3(QTest &helper) {
@@ -325,67 +325,67 @@ static void TestEngine3(QTest &helper) {
     const char *content     = "";
 
     ret = Engine::SkipInnerPatterns(char{0}, char{0}, content, SizeT{0}, SizeT{0});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "   (  ";
     content_len = 6;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "((((((((";
     content_len = 8;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{6}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{7}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{8}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "()";
     content_len = 2;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{1}, content_len);
-    helper.Equal(ret, 2U, __LINE__);
+    helper.IsEqual(ret, 2U, __LINE__);
 
     content     = " ()";
     content_len = 3;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{2}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = " ()             ";
     content_len = 16;
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{2}, content_len);
-    helper.Equal(ret, 3U, __LINE__);
+    helper.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('(', ')', content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 }
 
 static void TestEngine4(QTest &helper) {
@@ -394,179 +394,179 @@ static void TestEngine4(QTest &helper) {
     const char *content     = "{{{{{{}}}}}}";
 
     ret = Engine::FindOne('}', content, SizeT{0}, content_len);
-    helper.Equal(ret, 7U, __LINE__);
+    helper.IsEqual(ret, 7U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('x', 'y', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    helper.Equal(ret, 12U, __LINE__);
+    helper.IsEqual(ret, 12U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, content_len);
-    helper.Equal(ret, 11U, __LINE__);
+    helper.IsEqual(ret, 11U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{3}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{4}, content_len);
-    helper.Equal(ret, 9U, __LINE__);
+    helper.IsEqual(ret, 9U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{5}, content_len);
-    helper.Equal(ret, 8U, __LINE__);
+    helper.IsEqual(ret, 8U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{6}, content_len);
-    helper.Equal(ret, 7U, __LINE__);
+    helper.IsEqual(ret, 7U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{7}, content_len);
-    helper.Equal(ret, 8U, __LINE__);
+    helper.IsEqual(ret, 8U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{8}, content_len);
-    helper.Equal(ret, 9U, __LINE__);
+    helper.IsEqual(ret, 9U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{9}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{10}, content_len);
-    helper.Equal(ret, 11U, __LINE__);
+    helper.IsEqual(ret, 11U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{11}, content_len);
-    helper.Equal(ret, 12U, __LINE__);
+    helper.IsEqual(ret, 12U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{12}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{13}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{14}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{100}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{7});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{8});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{9});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{10});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{11});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "{}";
     content_len = 2;
     ret         = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    helper.Equal(ret, 2U, __LINE__);
+    helper.IsEqual(ret, 2U, __LINE__);
 
     content     = "{   }";
     content_len = 5;
     ret         = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    helper.Equal(ret, 5U, __LINE__);
+    helper.IsEqual(ret, 5U, __LINE__);
 
     content     = "{{{}{{}{}{}{}}}}{}";
     content_len = 18;
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, content_len);
-    helper.Equal(ret, 16U, __LINE__);
+    helper.IsEqual(ret, 16U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, content_len);
-    helper.Equal(ret, 15U, __LINE__);
+    helper.IsEqual(ret, 15U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{3}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{4}, content_len);
-    helper.Equal(ret, 15U, __LINE__);
+    helper.IsEqual(ret, 15U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{5}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{6}, content_len);
-    helper.Equal(ret, 7U, __LINE__);
+    helper.IsEqual(ret, 7U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{7}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{8}, content_len);
-    helper.Equal(ret, 9U, __LINE__);
+    helper.IsEqual(ret, 9U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{9}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{10}, content_len);
-    helper.Equal(ret, 11U, __LINE__);
+    helper.IsEqual(ret, 11U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{11}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{12}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{13}, content_len);
-    helper.Equal(ret, 14U, __LINE__);
+    helper.IsEqual(ret, 14U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{14}, content_len);
-    helper.Equal(ret, 15U, __LINE__);
+    helper.IsEqual(ret, 15U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{15}, content_len);
-    helper.Equal(ret, 16U, __LINE__);
+    helper.IsEqual(ret, 16U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{100}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, SizeT{14});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{13});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, SizeT{12});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{3}, SizeT{11});
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{4}, SizeT{10});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{5}, SizeT{9});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{6}, SizeT{8});
-    helper.Equal(ret, 7U, __LINE__);
+    helper.IsEqual(ret, 7U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{7}, SizeT{7});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, SizeT{6});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{5});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{2}, SizeT{4});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{3});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{1}, SizeT{2});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns('{', '}', content, SizeT{0}, SizeT{1});
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 }
 
 static void TestEngine5(QTest &helper) {
@@ -575,214 +575,214 @@ static void TestEngine5(QTest &helper) {
     const char *content     = "       )          ";
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = " ()             ";
     content_len = 16;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "(())";
     content_len = 4;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 4U, __LINE__);
+    helper.IsEqual(ret, 4U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "      (())";
     content_len = 10;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{7}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{8}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{9}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{10}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "      (()) ";
     content_len = 11;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{7}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{8}, content_len);
-    helper.Equal(ret, 10U, __LINE__);
+    helper.IsEqual(ret, 10U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{9}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{10}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{11}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{12}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{13}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{255}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "( (())";
     content_len = 6;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 6U, __LINE__);
+    helper.IsEqual(ret, 6U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 6U, __LINE__);
+    helper.IsEqual(ret, 6U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "( ( ( ( ( ( (())";
     content_len = 16;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{5}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{6}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{7}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{8}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{9}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{10}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{11}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{12}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{13}, content_len);
-    helper.Equal(ret, 16U, __LINE__);
+    helper.IsEqual(ret, 16U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{14}, content_len);
-    helper.Equal(ret, 16U, __LINE__);
+    helper.IsEqual(ret, 16U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{15}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{16}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{255}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     content     = "(()";
     content_len = 3;
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("((", SizeT{2}, "))", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 }
 
 static void TestEngine6(QTest &helper) {
@@ -791,154 +791,154 @@ static void TestEngine6(QTest &helper) {
     const char     *content     = "{-{-{-     -}{-{-  -}{-   -}{- -}{- -}-}-}-}{- -}";
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{0}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{1}, content_len);
-    helper.Equal(ret, 44U, __LINE__);
+    helper.IsEqual(ret, 44U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{2}, content_len);
-    helper.Equal(ret, 44U, __LINE__);
+    helper.IsEqual(ret, 44U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{3}, content_len);
-    helper.Equal(ret, 42U, __LINE__);
+    helper.IsEqual(ret, 42U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{4}, content_len);
-    helper.Equal(ret, 42U, __LINE__);
+    helper.IsEqual(ret, 42U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{5}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{6}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{7}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{8}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{9}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{10}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{11}, content_len);
-    helper.Equal(ret, 13U, __LINE__);
+    helper.IsEqual(ret, 13U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{12}, content_len);
-    helper.Equal(ret, 42U, __LINE__);
+    helper.IsEqual(ret, 42U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{13}, content_len);
-    helper.Equal(ret, 42U, __LINE__);
+    helper.IsEqual(ret, 42U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{14}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{15}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{16}, content_len);
-    helper.Equal(ret, 21U, __LINE__);
+    helper.IsEqual(ret, 21U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{17}, content_len);
-    helper.Equal(ret, 21U, __LINE__);
+    helper.IsEqual(ret, 21U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{18}, content_len);
-    helper.Equal(ret, 21U, __LINE__);
+    helper.IsEqual(ret, 21U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{19}, content_len);
-    helper.Equal(ret, 21U, __LINE__);
+    helper.IsEqual(ret, 21U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{20}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{21}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{22}, content_len);
-    helper.Equal(ret, 28U, __LINE__);
+    helper.IsEqual(ret, 28U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{23}, content_len);
-    helper.Equal(ret, 28U, __LINE__);
+    helper.IsEqual(ret, 28U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{24}, content_len);
-    helper.Equal(ret, 28U, __LINE__);
+    helper.IsEqual(ret, 28U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{25}, content_len);
-    helper.Equal(ret, 28U, __LINE__);
+    helper.IsEqual(ret, 28U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{26}, content_len);
-    helper.Equal(ret, 28U, __LINE__);
+    helper.IsEqual(ret, 28U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{27}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{28}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{29}, content_len);
-    helper.Equal(ret, 33U, __LINE__);
+    helper.IsEqual(ret, 33U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{30}, content_len);
-    helper.Equal(ret, 33U, __LINE__);
+    helper.IsEqual(ret, 33U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{31}, content_len);
-    helper.Equal(ret, 33U, __LINE__);
+    helper.IsEqual(ret, 33U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{32}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{33}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{34}, content_len);
-    helper.Equal(ret, 38U, __LINE__);
+    helper.IsEqual(ret, 38U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{35}, content_len);
-    helper.Equal(ret, 38U, __LINE__);
+    helper.IsEqual(ret, 38U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{36}, content_len);
-    helper.Equal(ret, 38U, __LINE__);
+    helper.IsEqual(ret, 38U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{37}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{38}, content_len);
-    helper.Equal(ret, 40U, __LINE__);
+    helper.IsEqual(ret, 40U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{39}, content_len);
-    helper.Equal(ret, 42U, __LINE__);
+    helper.IsEqual(ret, 42U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{40}, content_len);
-    helper.Equal(ret, 42U, __LINE__);
+    helper.IsEqual(ret, 42U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{41}, content_len);
-    helper.Equal(ret, 44U, __LINE__);
+    helper.IsEqual(ret, 44U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{42}, content_len);
-    helper.Equal(ret, 44U, __LINE__);
+    helper.IsEqual(ret, 44U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{43}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{45}, content_len);
-    helper.Equal(ret, 49U, __LINE__);
+    helper.IsEqual(ret, 49U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{46}, content_len);
-    helper.Equal(ret, 49U, __LINE__);
+    helper.IsEqual(ret, 49U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{47}, content_len);
-    helper.Equal(ret, 49U, __LINE__);
+    helper.IsEqual(ret, 49U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{48}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{49}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 
     ret = Engine::SkipInnerPatterns("{-", SizeT{2}, "-}", SizeT{2}, content, SizeT{50}, content_len);
-    helper.Equal(ret, 0U, __LINE__);
+    helper.IsEqual(ret, 0U, __LINE__);
 }
 
 struct Item2Engine {
@@ -1036,7 +1036,7 @@ static void TestEngine7(QTest &helper) {
     to_JSON(stream, items, content);
     result =
         R"({"[[[ [[[  [[[  [[[  ]]]  ]]]  ]]] ]]]":{"O":0,"L":36,"S":{"[[[  [[[  [[[  ]]]  ]]]  ]]]":{"O":4,"L":28,"S":{"[[[  [[[  ]]]  ]]]":{"O":9,"L":18,"S":{"[[[  ]]]":{"O":14,"L":8}}}}}}},"[[[]]]":{"O":37,"L":6},"[[[[[[]]]]]]":{"O":44,"L":12,"S":{"[[[]]]":{"O":47,"L":6}}},"[[[-]]]":{"O":57,"L":7},"[[[X]]]":{"O":68,"L":7}})";
-    helper.Equal(stream, result, __LINE__);
+    helper.IsEqual(stream, result, __LINE__);
     stream.Clear();
     items.Clear();
 
@@ -1048,7 +1048,7 @@ static void TestEngine7(QTest &helper) {
     to_JSON(stream, items, content);
     result =
         R"j({"(....)":{"O":0,"L":6},"()":{"O":7,"L":2},"(( )(  )(   )(    ))":{"O":10,"L":20,"S":{"( )":{"O":11,"L":3},"(  )":{"O":14,"L":4},"(   )":{"O":18,"L":5},"(    )":{"O":23,"L":6}}},"((((((()))))))":{"O":31,"L":14,"S":{"(((((())))))":{"O":32,"L":12,"S":{"((((()))))":{"O":33,"L":10,"S":{"(((())))":{"O":34,"L":8,"S":{"((()))":{"O":35,"L":6,"S":{"(())":{"O":36,"L":4,"S":{"()":{"O":37,"L":2}}}}}}}}}}}}},"(A(B)C(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)U(V)W)":{"O":46,"L":47,"S":{"(B)":{"O":48,"L":3},"(D(E)F(G(H)I(G(K(L)M)N)O(P)Q)R(S)T)":{"O":52,"L":35,"S":{"(E)":{"O":54,"L":3},"(G(H)I(G(K(L)M)N)O(P)Q)":{"O":58,"L":23,"S":{"(H)":{"O":60,"L":3},"(G(K(L)M)N)":{"O":64,"L":11,"S":{"(K(L)M)":{"O":66,"L":7,"S":{"(L)":{"O":68,"L":3}}}}},"(P)":{"O":76,"L":3}}},"(S)":{"O":82,"L":3}}},"(V)":{"O":88,"L":3}}},"(1(2(3(4(5(6(7)8)9)10)10)12)13)":{"O":94,"L":31,"S":{"(2(3(4(5(6(7)8)9)10)10)12)":{"O":96,"L":26,"S":{"(3(4(5(6(7)8)9)10)10)":{"O":98,"L":21,"S":{"(4(5(6(7)8)9)10)":{"O":100,"L":16,"S":{"(5(6(7)8)9)":{"O":102,"L":11,"S":{"(6(7)8)":{"O":104,"L":7,"S":{"(7)":{"O":106,"L":3}}}}}}}}}}}}}})j";
-    helper.Equal(stream, result, __LINE__);
+    helper.IsEqual(stream, result, __LINE__);
     stream.Clear();
     items.Clear();
 
@@ -1057,7 +1057,7 @@ static void TestEngine7(QTest &helper) {
     content = R"((())";
     find_Engine701("(", 1U, ")", 1U, items, content, 0U, 4);
     to_JSON(stream, items, content);
-    helper.Equal(stream, "", __LINE__);
+    helper.IsEqual(stream, "", __LINE__);
     stream.Clear();
     items.Clear();
 

@@ -36,58 +36,58 @@ static void TestHArray1(QTest &helper) {
     HashArray numbers1;
     HashArray numbers2(8);
 
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers1.First(), __LINE__);
     helper.IsNull(numbers1.End(), __LINE__);
 
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
     helper.IsTrue(numbers2.Capacity() >= 8U, __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Reset();
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
-    helper.Equal(numbers2.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(5);
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 8U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 8U, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers1.Reserve(10);
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 16U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers1.Resize(18);
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 32U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 32U, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
 
     numbers2.Resize(4);
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
     helper.IsTrue(numbers2.Capacity() >= 4U, __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(5);
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
-    helper.Equal(numbers2.Capacity(), 8U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Capacity(), 8U, __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(2);
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
     helper.IsTrue(numbers2.Capacity() >= 2U, __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(0);
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers1.First(), __LINE__);
 
     numbers2.Resize(0);
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
-    helper.Equal(numbers2.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Capacity(), 0U, __LINE__);
 
     numbers1.Reset();
     numbers2.Reset();
@@ -103,36 +103,36 @@ static void TestHArray2(QTest &helper) {
     const HAItem_T<SizeT32, char> *storage;
 
     numbers1["key1"] = 1;
-    helper.Equal(numbers1.Size(), 1U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 1U, __LINE__);
     helper.IsTrue(numbers1.Capacity() >= 8U, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1.End(), (numbers1.First() + 1), __LINE__);
-    helper.Equal(numbers1["key1"], 1U, __LINE__);
+    helper.IsEqual(numbers1.End(), (numbers1.First() + 1), __LINE__);
+    helper.IsEqual(numbers1["key1"], 1U, __LINE__);
 
     const SizeT cap  = numbers1.Capacity();
     numbers1["key1"] = 20;
-    helper.Equal(numbers1.Size(), 1U, __LINE__);
-    helper.Equal(numbers1.Capacity(), cap, __LINE__);
+    helper.IsEqual(numbers1.Size(), 1U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), cap, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 20U, __LINE__);
+    helper.IsEqual(numbers1["key1"], 20U, __LINE__);
 
     numbers1["key1"] = 300;
-    helper.Equal(numbers1.Size(), 1U, __LINE__);
-    helper.Equal(numbers1.Capacity(), cap, __LINE__);
+    helper.IsEqual(numbers1.Size(), 1U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), cap, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 300U, __LINE__);
+    helper.IsEqual(numbers1["key1"], 300U, __LINE__);
 
     numbers1["key1"] = 4000;
-    helper.Equal(numbers1.Size(), 1U, __LINE__);
-    helper.Equal(numbers1.Capacity(), cap, __LINE__);
+    helper.IsEqual(numbers1.Size(), 1U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), cap, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 4000U, __LINE__);
+    helper.IsEqual(numbers1["key1"], 4000U, __LINE__);
 
     numbers1["key1"] = 10000;
-    helper.Equal(numbers1.Size(), 1U, __LINE__);
-    helper.Equal(numbers1.Capacity(), cap, __LINE__);
+    helper.IsEqual(numbers1.Size(), 1U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), cap, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 10000U, __LINE__);
+    helper.IsEqual(numbers1["key1"], 10000U, __LINE__);
 
     numbers1["key1"] = 19990;
     numbers1["key2"] = 20000;
@@ -150,16 +150,16 @@ static void TestHArray2(QTest &helper) {
 
     numbers1["ABCDEF0123456789ABCDEF0123456789"] = 70;
 
-    helper.Equal(numbers1.Size(), 7U, __LINE__);
-    helper.Equal(numbers1.Capacity(), cap, __LINE__);
+    helper.IsEqual(numbers1.Size(), 7U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), cap, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 10U, __LINE__);
-    helper.Equal(numbers1["key2"], 20U, __LINE__);
-    helper.Equal(numbers1["key3"], 30U, __LINE__);
-    helper.Equal(numbers1["key4"], 40U, __LINE__);
-    helper.Equal(numbers1["key5"], 50U, __LINE__);
-    helper.Equal(numbers1["key6"], 60U, __LINE__);
-    helper.Equal(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
+    helper.IsEqual(numbers1["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers1["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers1["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers1["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers1["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers1["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
 
     key = numbers1.GetKey(0);
     helper.IsNotNull(key, __LINE__);
@@ -188,73 +188,73 @@ static void TestHArray2(QTest &helper) {
     // Test expanding
     numbers1["key8"] = 80;
     numbers1["key9"] = 90;
-    helper.Equal(numbers1.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 9U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 10U, __LINE__);
-    helper.Equal(numbers1["key2"], 20U, __LINE__);
-    helper.Equal(numbers1["key3"], 30U, __LINE__);
-    helper.Equal(numbers1["key4"], 40U, __LINE__);
-    helper.Equal(numbers1["key5"], 50U, __LINE__);
-    helper.Equal(numbers1["key6"], 60U, __LINE__);
-    helper.Equal(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
-    helper.Equal(numbers1["key8"], 80U, __LINE__);
-    helper.Equal(numbers1["key9"], 90U, __LINE__);
+    helper.IsEqual(numbers1["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers1["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers1["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers1["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers1["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers1["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
+    helper.IsEqual(numbers1["key8"], 80U, __LINE__);
+    helper.IsEqual(numbers1["key9"], 90U, __LINE__);
 
     const String<char> *key2 = numbers1.GetKey(6);
-    helper.NotEqual(key2, key, __LINE__);
+    helper.IsNotEqual(key2, key, __LINE__);
     helper.IsNotNull(key2, __LINE__);
-    helper.Equal(key2->First(), str_c, __LINE__);
+    helper.IsEqual(key2->First(), str_c, __LINE__);
 
     storage  = numbers1.First();
     numbers2 = numbers1;
-    helper.Equal(numbers1.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 9U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers2.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 9U, __LINE__);
     helper.IsTrue((numbers2.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
-    helper.NotEqual(numbers2.First(), storage, __LINE__);
-    helper.NotEqual(numbers1.GetKey(6), numbers2.GetKey(6), __LINE__);
-    helper.NotEqual(numbers2.GetKey(6)->First(), str_c, __LINE__);
+    helper.IsNotEqual(numbers2.First(), storage, __LINE__);
+    helper.IsNotEqual(numbers1.GetKey(6), numbers2.GetKey(6), __LINE__);
+    helper.IsNotEqual(numbers2.GetKey(6)->First(), str_c, __LINE__);
 
     numbers2 = Memory::Move(numbers1);
     helper.IsNull(numbers1.Storage(), __LINE__);
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers2.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 9U, __LINE__);
     helper.IsTrue((numbers2.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
-    helper.Equal(numbers2.First(), storage, __LINE__);
-    helper.Equal(numbers2["key1"], 10U, __LINE__);
-    helper.Equal(numbers2["key2"], 20U, __LINE__);
-    helper.Equal(numbers2["key3"], 30U, __LINE__);
-    helper.Equal(numbers2["key4"], 40U, __LINE__);
-    helper.Equal(numbers2["key5"], 50U, __LINE__);
-    helper.Equal(numbers2["key6"], 60U, __LINE__);
-    helper.Equal(numbers2["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
-    helper.Equal(numbers2["key8"], 80U, __LINE__);
-    helper.Equal(numbers2["key9"], 90U, __LINE__);
+    helper.IsEqual(numbers2.First(), storage, __LINE__);
+    helper.IsEqual(numbers2["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers2["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers2["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers2["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers2["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers2["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers2["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
+    helper.IsEqual(numbers2["key8"], 80U, __LINE__);
+    helper.IsEqual(numbers2["key9"], 90U, __LINE__);
 
     numbers1 = HashArray(numbers2);
-    helper.Equal(numbers1.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 9U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers2.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 9U, __LINE__);
     helper.IsTrue((numbers2.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
-    helper.NotEqual(numbers1.First(), storage, __LINE__);
-    helper.Equal(numbers2.First(), storage, __LINE__);
-    helper.Equal(numbers1["key1"], 10U, __LINE__);
-    helper.Equal(numbers1["key2"], 20U, __LINE__);
-    helper.Equal(numbers1["key3"], 30U, __LINE__);
-    helper.Equal(numbers1["key4"], 40U, __LINE__);
-    helper.Equal(numbers1["key5"], 50U, __LINE__);
-    helper.Equal(numbers1["key6"], 60U, __LINE__);
-    helper.Equal(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
-    helper.Equal(numbers1["key8"], 80U, __LINE__);
-    helper.Equal(numbers1["key9"], 90U, __LINE__);
+    helper.IsNotEqual(numbers1.First(), storage, __LINE__);
+    helper.IsEqual(numbers2.First(), storage, __LINE__);
+    helper.IsEqual(numbers1["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers1["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers1["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers1["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers1["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers1["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers1["ABCDEF0123456789ABCDEF0123456789"], 70U, __LINE__);
+    helper.IsEqual(numbers1["key8"], 80U, __LINE__);
+    helper.IsEqual(numbers1["key9"], 90U, __LINE__);
 }
 
 static void TestHArray3(QTest &helper) {
@@ -281,24 +281,24 @@ static void TestHArray3(QTest &helper) {
     storage  = numbers2.First();
     numbers1 = Memory::Move(numbers2);
 
-    helper.Equal(numbers1.Size(), 9U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 9U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 9), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers1.First(), storage, __LINE__);
-    helper.Equal(numbers1["key1"], 10U, __LINE__);
-    helper.Equal(numbers1["key2"], 20U, __LINE__);
-    helper.Equal(numbers1["key3"], 30U, __LINE__);
-    helper.Equal(numbers1["key4"], 40U, __LINE__);
-    helper.Equal(numbers1["key5"], 50U, __LINE__);
-    helper.Equal(numbers1["key6"], 60U, __LINE__);
-    helper.Equal(numbers1["key7"], 70U, __LINE__);
-    helper.Equal(numbers1["key8"], 80U, __LINE__);
-    helper.Equal(numbers1["key9"], 90U, __LINE__);
-    helper.Equal(numbers1.GetKey(5), key, __LINE__);
-    helper.Equal(numbers1.GetKey(5)->First(), str_c, __LINE__);
+    helper.IsEqual(numbers1.First(), storage, __LINE__);
+    helper.IsEqual(numbers1["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers1["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers1["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers1["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers1["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers1["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers1["key7"], 70U, __LINE__);
+    helper.IsEqual(numbers1["key8"], 80U, __LINE__);
+    helper.IsEqual(numbers1["key9"], 90U, __LINE__);
+    helper.IsEqual(numbers1.GetKey(5), key, __LINE__);
+    helper.IsEqual(numbers1.GetKey(5)->First(), str_c, __LINE__);
 
-    helper.Equal(numbers2.Size(), 0U, __LINE__);
-    helper.Equal(numbers2.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers2.First(), __LINE__);
 }
 
@@ -321,21 +321,21 @@ static void TestHArray4(QTest &helper) {
     SizeT key_index = 100;
 
     numbers1.GetKeyIndex(key_index, "key1", 4);
-    helper.Equal(key_index, 0U, __LINE__);
+    helper.IsEqual(key_index, 0U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key2", 4);
-    helper.Equal(key_index, 1U, __LINE__);
+    helper.IsEqual(key_index, 1U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key3", 4);
-    helper.Equal(key_index, 2U, __LINE__);
+    helper.IsEqual(key_index, 2U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key4", 4);
-    helper.Equal(key_index, 3U, __LINE__);
+    helper.IsEqual(key_index, 3U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key5", 4);
-    helper.Equal(key_index, 4U, __LINE__);
+    helper.IsEqual(key_index, 4U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key6", 4);
-    helper.Equal(key_index, 5U, __LINE__);
+    helper.IsEqual(key_index, 5U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key7", 4);
-    helper.Equal(key_index, 6U, __LINE__);
+    helper.IsEqual(key_index, 6U, __LINE__);
     numbers1.GetKeyIndex(key_index, "key8", 4);
-    helper.Equal(key_index, 7U, __LINE__);
+    helper.IsEqual(key_index, 7U, __LINE__);
 
     numbers2["key1"]  = 100;
     numbers2["key3"]  = 300;
@@ -347,64 +347,64 @@ static void TestHArray4(QTest &helper) {
     numbers3 = numbers1; // Backup
 
     numbers1 += numbers2;
-    helper.Equal(numbers1.Size(), 10U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 10U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 10), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers2.Size(), 6U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 6U, __LINE__);
     helper.IsTrue((numbers2.Capacity() >= 6), __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
-    helper.NotEqual(numbers2.First(), numbers1.First(), __LINE__);
-    helper.Equal(numbers1["key1"], 100U, __LINE__);
-    helper.Equal(numbers1["key2"], 20U, __LINE__);
-    helper.Equal(numbers1["key3"], 300U, __LINE__);
-    helper.Equal(numbers1["key4"], 40U, __LINE__);
-    helper.Equal(numbers1["key5"], 50U, __LINE__);
-    helper.Equal(numbers1["key6"], 600U, __LINE__);
-    helper.Equal(numbers1["key7"], 70U, __LINE__);
-    helper.Equal(numbers1["key8"], 800U, __LINE__);
-    helper.Equal(numbers1["key9"], 900U, __LINE__);
-    helper.Equal(numbers1["key10"], 1000U, __LINE__);
+    helper.IsNotEqual(numbers2.First(), numbers1.First(), __LINE__);
+    helper.IsEqual(numbers1["key1"], 100U, __LINE__);
+    helper.IsEqual(numbers1["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers1["key3"], 300U, __LINE__);
+    helper.IsEqual(numbers1["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers1["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers1["key6"], 600U, __LINE__);
+    helper.IsEqual(numbers1["key7"], 70U, __LINE__);
+    helper.IsEqual(numbers1["key8"], 800U, __LINE__);
+    helper.IsEqual(numbers1["key9"], 900U, __LINE__);
+    helper.IsEqual(numbers1["key10"], 1000U, __LINE__);
 
     SizeT          index = 0;
     const SizeT32 *val   = numbers1.GetValue(index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 100U, __LINE__);
+    helper.IsEqual(*val, 100U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 20U, __LINE__);
+    helper.IsEqual(*val, 20U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 300U, __LINE__);
+    helper.IsEqual(*val, 300U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 40U, __LINE__);
+    helper.IsEqual(*val, 40U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 50U, __LINE__);
+    helper.IsEqual(*val, 50U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 600U, __LINE__);
+    helper.IsEqual(*val, 600U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 70U, __LINE__);
+    helper.IsEqual(*val, 70U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 800U, __LINE__);
+    helper.IsEqual(*val, 800U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 900U, __LINE__);
+    helper.IsEqual(*val, 900U, __LINE__);
 
     val = numbers1.GetValue(++index);
     helper.IsNotNull(val, __LINE__);
-    helper.Equal(*val, 1000U, __LINE__);
+    helper.IsEqual(*val, 1000U, __LINE__);
 
     val = numbers1.GetValue(SizeT{255});
     helper.IsNull(val, __LINE__);
@@ -412,52 +412,52 @@ static void TestHArray4(QTest &helper) {
     numbers1 = numbers3; // Restore
     numbers3 = numbers2; // Backup
     numbers2 += numbers1;
-    helper.Equal(numbers2["key1"], 10U, __LINE__);
-    helper.Equal(numbers2["key2"], 20U, __LINE__);
-    helper.Equal(numbers2["key3"], 30U, __LINE__);
-    helper.Equal(numbers2["key4"], 40U, __LINE__);
-    helper.Equal(numbers2["key5"], 50U, __LINE__);
-    helper.Equal(numbers2["key6"], 60U, __LINE__);
-    helper.Equal(numbers2["key7"], 70U, __LINE__);
-    helper.Equal(numbers2["key8"], 80U, __LINE__);
-    helper.Equal(numbers2["key9"], 900U, __LINE__);
-    helper.Equal(numbers2["key10"], 1000U, __LINE__);
+    helper.IsEqual(numbers2["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers2["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers2["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers2["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers2["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers2["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers2["key7"], 70U, __LINE__);
+    helper.IsEqual(numbers2["key8"], 80U, __LINE__);
+    helper.IsEqual(numbers2["key9"], 900U, __LINE__);
+    helper.IsEqual(numbers2["key10"], 1000U, __LINE__);
 
     numbers2 = numbers3; // Restore
     numbers3 = numbers1; // Backup
 
     storage = numbers1.First();
     numbers2 += Memory::Move(numbers1);
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
-    helper.Equal(numbers1.Capacity(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers1.First(), __LINE__);
-    helper.Equal(numbers2.Size(), 10U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 10U, __LINE__);
     helper.IsTrue((numbers2.Capacity() >= 10), __LINE__);
     helper.IsNotNull(numbers2.First(), __LINE__);
-    helper.NotEqual(numbers2.First(), storage, __LINE__);
-    helper.Equal(numbers2["key1"], 10U, __LINE__);
-    helper.Equal(numbers2["key2"], 20U, __LINE__);
-    helper.Equal(numbers2["key3"], 30U, __LINE__);
-    helper.Equal(numbers2["key4"], 40U, __LINE__);
-    helper.Equal(numbers2["key5"], 50U, __LINE__);
-    helper.Equal(numbers2["key6"], 60U, __LINE__);
-    helper.Equal(numbers2["key7"], 70U, __LINE__);
-    helper.Equal(numbers2["key8"], 80U, __LINE__);
-    helper.Equal(numbers2["key9"], 900U, __LINE__);
-    helper.Equal(numbers2["key10"], 1000U, __LINE__);
+    helper.IsNotEqual(numbers2.First(), storage, __LINE__);
+    helper.IsEqual(numbers2["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers2["key2"], 20U, __LINE__);
+    helper.IsEqual(numbers2["key3"], 30U, __LINE__);
+    helper.IsEqual(numbers2["key4"], 40U, __LINE__);
+    helper.IsEqual(numbers2["key5"], 50U, __LINE__);
+    helper.IsEqual(numbers2["key6"], 60U, __LINE__);
+    helper.IsEqual(numbers2["key7"], 70U, __LINE__);
+    helper.IsEqual(numbers2["key8"], 80U, __LINE__);
+    helper.IsEqual(numbers2["key9"], 900U, __LINE__);
+    helper.IsEqual(numbers2["key10"], 1000U, __LINE__);
 
     // Addition of an empty array does nothing.
     numbers2 += HashArray(10);
-    helper.Equal(numbers2.Size(), 10U, __LINE__);
+    helper.IsEqual(numbers2.Size(), 10U, __LINE__);
 
     numbers2.Resize(1);
-    helper.Equal(numbers2["key1"], 10U, __LINE__);
+    helper.IsEqual(numbers2["key1"], 10U, __LINE__);
 
     helper.IsNull(numbers2.GetKey(1), __LINE__);
 
     numbers1.Reset();
     numbers1[""] = 555;
-    helper.Equal(numbers1[""], 555U, __LINE__);
+    helper.IsEqual(numbers1[""], 555U, __LINE__);
 
     numbers1.Reset();
 
@@ -471,7 +471,7 @@ static void TestHArray4(QTest &helper) {
         numbers1.Insert(Memory::Move(key2), Memory::Move(i));
         value = numbers1.GetValue(key);
         helper.IsNotNull(value, __LINE__);
-        helper.Equal(*value, i, __LINE__);
+        helper.IsEqual(*value, i, __LINE__);
     }
 }
 
@@ -486,7 +486,7 @@ static void TestHArray5(QTest &helper) {
         numbers1[key] = i;
         value         = numbers1.GetValue(key.First(), key.Length());
         helper.IsNotNull(value, __LINE__);
-        helper.Equal(*value, i, __LINE__);
+        helper.IsEqual(*value, i, __LINE__);
     }
 
     numbers1.Reset();
@@ -498,19 +498,19 @@ static void TestHArray5(QTest &helper) {
         numbers1[key] = i;
         value         = numbers1.GetValue(key);
         helper.IsNotNull(value, __LINE__);
-        helper.Equal(*value, i, __LINE__);
+        helper.IsEqual(*value, i, __LINE__);
     }
 
     for (SizeT i = 1; i < 10; i++) {
         String<char> key;
 
         Digit::NumberToString(key, i);
-        helper.Equal(numbers1[key], i, __LINE__);
+        helper.IsEqual(numbers1[key], i, __LINE__);
     }
 
     value = numbers1.GetValue("10", 2);
     helper.IsNotNull(value, __LINE__);
-    helper.Equal(*value, 10U, __LINE__);
+    helper.IsEqual(*value, 10U, __LINE__);
 
     for (SizeT i = 1; i <= 10; i++) {
         String<char> key;
@@ -527,7 +527,7 @@ static void TestHArray5(QTest &helper) {
     }
 
     numbers1.Compress();
-    helper.Equal(numbers1.Size(), 110U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 110U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 110U), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
 
@@ -546,7 +546,7 @@ static void TestHArray5(QTest &helper) {
     }
 
     numbers1.Compress();
-    helper.Equal(numbers1.Size(), 20U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 20U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 20), __LINE__);
 
     for (SizeT i = 100; i <= 105; i++) {
@@ -563,7 +563,7 @@ static void TestHArray5(QTest &helper) {
         helper.IsNull(numbers1.GetValue(key), __LINE__);
     }
 
-    helper.Equal(numbers1.ActualSize(), 15U, __LINE__);
+    helper.IsEqual(numbers1.ActualSize(), 15U, __LINE__);
     helper.IsTrue((numbers1.Capacity() >= 20U), __LINE__);
 
     for (SizeT i = 0; i <= 120; i++) {
@@ -581,12 +581,12 @@ static void TestHArray5(QTest &helper) {
     }
 
     numbers1.Compress();
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
 
     numbers1.Reserve(16);
     numbers1["a"] = 1;
     numbers1.Compress();
-    helper.Equal(numbers1.Size(), 1U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 1U, __LINE__);
     helper.IsTrue(numbers1.Capacity() >= 1U, __LINE__);
 }
 
@@ -610,70 +610,70 @@ static void TestHArray6(QTest &helper) {
     strings1[Memory::Move(key1)] = Memory::Move(str1);
     strings1[Memory::Move(key2)] = Memory::Move(str2);
 
-    helper.Equal(strings1.Size(), 2U, __LINE__);
+    helper.IsEqual(strings1.Size(), 2U, __LINE__);
     helper.IsNotNull(strings1.First(), __LINE__);
     helper.IsNotNull(strings1.GetKey(0), __LINE__);
-    helper.Equal(strings1.GetKey(0)->First(), k_str1, __LINE__);
-    helper.Equal(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsEqual(strings1.GetKey(0)->First(), k_str1, __LINE__);
+    helper.IsEqual(*(strings1.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
     helper.IsNotNull(strings1.GetKey(1), __LINE__);
-    helper.Equal(strings1.GetKey(1)->First(), k_str2, __LINE__);
-    helper.Equal(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsEqual(strings1.GetKey(1)->First(), k_str2, __LINE__);
+    helper.IsEqual(*(strings1.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    helper.Equal(strings1.GetValue(id)->First(), c_str1, __LINE__);
-    helper.Equal(strings1.GetValue(++id)->First(), c_str2, __LINE__);
+    helper.IsEqual(strings1.GetValue(id)->First(), c_str1, __LINE__);
+    helper.IsEqual(strings1.GetValue(++id)->First(), c_str2, __LINE__);
 
     strings2 += strings1;
-    helper.Equal(strings2.Size(), 2U, __LINE__);
+    helper.IsEqual(strings2.Size(), 2U, __LINE__);
     helper.IsNotNull(strings2.First(), __LINE__);
     helper.IsNotNull(strings2.GetKey(0), __LINE__);
-    helper.NotEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
-    helper.Equal(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsNotEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
+    helper.IsEqual(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
     helper.IsNotNull(strings2.GetKey(1), __LINE__);
-    helper.NotEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
-    helper.Equal(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsNotEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
+    helper.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    helper.NotEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
-    helper.NotEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
+    helper.IsNotEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
+    helper.IsNotEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
 
     strings2.Reserve(2);
     storage = strings1.First();
     strings2 += Memory::Move(strings1);
-    helper.Equal(strings2.Size(), 2U, __LINE__);
-    helper.Equal(strings2.Capacity(), 2U, __LINE__);
+    helper.IsEqual(strings2.Size(), 2U, __LINE__);
+    helper.IsEqual(strings2.Capacity(), 2U, __LINE__);
     helper.IsNotNull(strings2.First(), __LINE__);
-    helper.NotEqual(strings2.First(), storage, __LINE__);
+    helper.IsNotEqual(strings2.First(), storage, __LINE__);
     helper.IsNotNull(strings2.GetKey(0), __LINE__);
-    helper.Equal(strings2.GetKey(0)->First(), k_str1, __LINE__);
-    helper.Equal(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
+    helper.IsEqual(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
     helper.IsNotNull(strings2.GetKey(1), __LINE__);
-    helper.Equal(strings2.GetKey(1)->First(), k_str2, __LINE__);
-    helper.Equal(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
+    helper.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    helper.Equal(strings2.GetValue(id)->First(), c_str1, __LINE__);
-    helper.Equal(strings2.GetValue(++id)->First(), c_str2, __LINE__);
+    helper.IsEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
+    helper.IsEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
 
     strings1 += Memory::Move(strings2);
     strings1.Resize(10);
     storage = strings1.First();
     strings2.Reset();
     strings2 += Memory::Move(strings1);
-    helper.Equal(strings2.Size(), 2U, __LINE__);
-    helper.Equal(strings2.Capacity(), 2U, __LINE__);
+    helper.IsEqual(strings2.Size(), 2U, __LINE__);
+    helper.IsEqual(strings2.Capacity(), 2U, __LINE__);
     helper.IsNotNull(strings2.First(), __LINE__);
-    helper.NotEqual(strings2.First(), storage, __LINE__);
+    helper.IsNotEqual(strings2.First(), storage, __LINE__);
     helper.IsNotNull(strings2.GetKey(0), __LINE__);
-    helper.Equal(strings2.GetKey(0)->First(), k_str1, __LINE__);
-    helper.Equal(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsEqual(strings2.GetKey(0)->First(), k_str1, __LINE__);
+    helper.IsEqual(*(strings2.GetKey(0)), "k-1-ABCDEF0123456789ABCDEF0123456789", __LINE__);
     helper.IsNotNull(strings2.GetKey(1), __LINE__);
-    helper.Equal(strings2.GetKey(1)->First(), k_str2, __LINE__);
-    helper.Equal(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
+    helper.IsEqual(strings2.GetKey(1)->First(), k_str2, __LINE__);
+    helper.IsEqual(*(strings2.GetKey(1)), "k-2-ABCDEF0123456789ABCDEF0123456789", __LINE__);
 
     id = 0;
-    helper.Equal(strings2.GetValue(id)->First(), c_str1, __LINE__);
-    helper.Equal(strings2.GetValue(++id)->First(), c_str2, __LINE__);
+    helper.IsEqual(strings2.GetValue(id)->First(), c_str1, __LINE__);
+    helper.IsEqual(strings2.GetValue(++id)->First(), c_str2, __LINE__);
 }
 
 static void TestHArray7(QTest &helper) {
@@ -697,7 +697,7 @@ static void TestHArray7(QTest &helper) {
     }
 
     numbers1.Resize((id + 1));
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
 
     numbers1.Reserve(id);
     for (SizeT y = 0; y < id; y++) {
@@ -717,7 +717,7 @@ static void TestHArray7(QTest &helper) {
     } while (id > 0);
 
     numbers1.Resize((id + 1));
-    helper.Equal(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
 }
 
 static void TestHArray8(QTest &helper) {
@@ -751,7 +751,7 @@ static void TestHArray8(QTest &helper) {
             w = *y;
         }
 
-        helper.Equal(w, i, __LINE__);
+        helper.IsEqual(w, i, __LINE__);
     }
 
     SizeT j = id;
@@ -778,7 +778,7 @@ static void TestHArray8(QTest &helper) {
             w = *y;
         }
 
-        helper.Equal(w, i, __LINE__);
+        helper.IsEqual(w, i, __LINE__);
     }
 
     for (SizeT i = 0; i < id; i++) {
@@ -810,12 +810,12 @@ static void TestHArray9(QTest &helper) {
         value     = list.GetValue(item->Key.First(), item->Key.Length(), item->Hash);
 
         helper.IsNotNull(item, __LINE__);
-        helper.Equal(item->Key, key, __LINE__);
-        helper.Equal(item->Value, i, __LINE__);
+        helper.IsEqual(item->Key, key, __LINE__);
+        helper.IsEqual(item->Value, i, __LINE__);
         helper.IsNotNull(item2, __LINE__);
-        helper.Equal(item, item2, __LINE__);
+        helper.IsEqual(item, item2, __LINE__);
         helper.IsNotNull(value, __LINE__);
-        helper.Equal(item2->Value, *value, __LINE__);
+        helper.IsEqual(item2->Value, *value, __LINE__);
 
         item2 = list.GetItem(item->Key.First(), item->Key.Length(), i);
         value = list.GetValue(item->Key.First(), item->Key.Length(), i);
@@ -891,7 +891,7 @@ static void TestHArray10(QTest &helper) {
         const Qentem::HAItem_T<SizeT, char> *item = list.GetItem(key);
 
         helper.IsNotNull(item, __LINE__);
-        helper.Equal(item->Value, i, __LINE__);
+        helper.IsEqual(item->Value, i, __LINE__);
     }
 
     String<char> key1("k-");
@@ -914,37 +914,37 @@ static void TestHArraySort(QTest &helper) {
     strings.Sort();
 
     helper.IsNotNull(strings.GetValue(0), __LINE__);
-    helper.Equal(*(strings.GetValue(0)), 2016U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(0)), 2016U, __LINE__);
     helper.IsNotNull(strings.GetValue(1), __LINE__);
-    helper.Equal(*(strings.GetValue(1)), 2017U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(1)), 2017U, __LINE__);
     helper.IsNotNull(strings.GetValue(2), __LINE__);
-    helper.Equal(*(strings.GetValue(2)), 2018U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(2)), 2018U, __LINE__);
     helper.IsNotNull(strings.GetValue(3), __LINE__);
-    helper.Equal(*(strings.GetValue(3)), 2019U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(3)), 2019U, __LINE__);
     helper.IsNotNull(strings.GetValue(4), __LINE__);
-    helper.Equal(*(strings.GetValue(4)), 2020U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(4)), 2020U, __LINE__);
     helper.IsNotNull(strings.GetValue(5), __LINE__);
-    helper.Equal(*(strings.GetValue(5)), 2021U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(5)), 2021U, __LINE__);
     helper.IsNotNull(strings.GetValue(6), __LINE__);
-    helper.Equal(*(strings.GetValue(6)), 2022U, __LINE__);
+    helper.IsEqual(*(strings.GetValue(6)), 2022U, __LINE__);
 
-    helper.Equal(strings["2016"], 2016U, __LINE__);
-    helper.Equal(strings["2017"], 2017U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2019"], 2019U, __LINE__);
-    helper.Equal(strings["2020"], 2020U, __LINE__);
-    helper.Equal(strings["2021"], 2021U, __LINE__);
-    helper.Equal(strings["2022"], 2022U, __LINE__);
+    helper.IsEqual(strings["2016"], 2016U, __LINE__);
+    helper.IsEqual(strings["2017"], 2017U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2019"], 2019U, __LINE__);
+    helper.IsEqual(strings["2020"], 2020U, __LINE__);
+    helper.IsEqual(strings["2021"], 2021U, __LINE__);
+    helper.IsEqual(strings["2022"], 2022U, __LINE__);
 
     strings.Sort(false);
 
-    helper.Equal(strings["2022"], 2022U, __LINE__);
-    helper.Equal(strings["2021"], 2021U, __LINE__);
-    helper.Equal(strings["2020"], 2020U, __LINE__);
-    helper.Equal(strings["2019"], 2019U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2017"], 2017U, __LINE__);
-    helper.Equal(strings["2016"], 2016U, __LINE__);
+    helper.IsEqual(strings["2022"], 2022U, __LINE__);
+    helper.IsEqual(strings["2021"], 2021U, __LINE__);
+    helper.IsEqual(strings["2020"], 2020U, __LINE__);
+    helper.IsEqual(strings["2019"], 2019U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2017"], 2017U, __LINE__);
+    helper.IsEqual(strings["2016"], 2016U, __LINE__);
 
     strings.Reset();
 
@@ -957,21 +957,21 @@ static void TestHArraySort(QTest &helper) {
 
     strings.Sort();
 
-    helper.Equal(strings["2017"], 2017U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2019"], 2019U, __LINE__);
-    helper.Equal(strings["2020"], 2020U, __LINE__);
-    helper.Equal(strings["2021"], 2021U, __LINE__);
+    helper.IsEqual(strings["2017"], 2017U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2019"], 2019U, __LINE__);
+    helper.IsEqual(strings["2020"], 2020U, __LINE__);
+    helper.IsEqual(strings["2021"], 2021U, __LINE__);
 
     strings.Sort(false);
 
-    helper.Equal(strings["2021"], 2021U, __LINE__);
-    helper.Equal(strings["2020"], 2020U, __LINE__);
-    helper.Equal(strings["2019"], 2019U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2017"], 2017U, __LINE__);
+    helper.IsEqual(strings["2021"], 2021U, __LINE__);
+    helper.IsEqual(strings["2020"], 2020U, __LINE__);
+    helper.IsEqual(strings["2019"], 2019U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2017"], 2017U, __LINE__);
 
     strings.Reset();
 
@@ -984,12 +984,12 @@ static void TestHArraySort(QTest &helper) {
 
     strings.Sort(false);
 
-    helper.Equal(strings["2021"], 2021U, __LINE__);
-    helper.Equal(strings["2020"], 2020U, __LINE__);
-    helper.Equal(strings["2019"], 2019U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2018"], 2018U, __LINE__);
-    helper.Equal(strings["2017"], 2017U, __LINE__);
+    helper.IsEqual(strings["2021"], 2021U, __LINE__);
+    helper.IsEqual(strings["2020"], 2020U, __LINE__);
+    helper.IsEqual(strings["2019"], 2019U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2018"], 2018U, __LINE__);
+    helper.IsEqual(strings["2017"], 2017U, __LINE__);
 
     SizeT total = 0;
 
@@ -997,18 +997,18 @@ static void TestHArraySort(QTest &helper) {
         total = SizeT(total + item.Value);
     }
 
-    helper.Equal(total, 10095U, __LINE__);
+    helper.IsEqual(total, 10095U, __LINE__);
 
     for (auto &item : strings) {
         item.Value += 5;
     }
 
-    helper.Equal(strings["2021"], 2026U, __LINE__);
-    helper.Equal(strings["2020"], 2025U, __LINE__);
-    helper.Equal(strings["2019"], 2024U, __LINE__);
-    helper.Equal(strings["2018"], 2023U, __LINE__);
-    helper.Equal(strings["2018"], 2023U, __LINE__);
-    helper.Equal(strings["2017"], 2022U, __LINE__);
+    helper.IsEqual(strings["2021"], 2026U, __LINE__);
+    helper.IsEqual(strings["2020"], 2025U, __LINE__);
+    helper.IsEqual(strings["2019"], 2024U, __LINE__);
+    helper.IsEqual(strings["2018"], 2023U, __LINE__);
+    helper.IsEqual(strings["2018"], 2023U, __LINE__);
+    helper.IsEqual(strings["2017"], 2022U, __LINE__);
 }
 
 static int RunHArrayTests() {

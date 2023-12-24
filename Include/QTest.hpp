@@ -265,14 +265,14 @@ struct QTest {
     QENTEM_NOINLINE void IsTrue(bool value, unsigned long line) {
         if ((!_error || _continue_on_error) && !value) {
             _error = true;
-            QTest::PrintErrorMessage(false, value, "true", line);
+            QTest::PrintErrorMessage(false, "false", "true", line);
         }
     }
 
     QENTEM_NOINLINE void IsFalse(bool value, unsigned long line) {
         if ((!_error || _continue_on_error) && value) {
             _error = true;
-            QTest::PrintErrorMessage(false, value, "false", line);
+            QTest::PrintErrorMessage(false, "true", "false", line);
         }
     }
 
@@ -286,12 +286,12 @@ struct QTest {
     QENTEM_NOINLINE void IsNotNull(const void *value, unsigned long line) {
         if ((!_error || _continue_on_error) && (value == nullptr)) {
             _error = true;
-            QTest::PrintErrorMessage(true, value, "null", line);
+            QTest::PrintErrorMessage(true, "null", "null", line);
         }
     }
 
     template <typename Value1_T, typename Value2_T>
-    QENTEM_NOINLINE void Equal(const Value1_T &left, const Value2_T &right, unsigned long line) {
+    QENTEM_NOINLINE void IsEqual(const Value1_T &left, const Value2_T &right, unsigned long line) {
         if ((!_error || _continue_on_error) && (left != right)) {
             _error = true;
             QTest::PrintErrorMessage(false, left, right, line);
@@ -299,7 +299,7 @@ struct QTest {
     }
 
     template <typename Value1_T, typename Value2_T>
-    QENTEM_NOINLINE void NotEqual(const Value1_T &left, const Value2_T &right, unsigned long line) {
+    QENTEM_NOINLINE void IsNotEqual(const Value1_T &left, const Value2_T &right, unsigned long line) {
         if ((!_error || _continue_on_error) && (left == right)) {
             _error = true;
             QTest::PrintErrorMessage(true, left, right, line);
@@ -312,7 +312,7 @@ struct QTest {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ": ", _part_name, '\n');
         TestOutPut::Print(_file_fullname, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
-                          "`\n Returned Value: `", value1, "`\n\n");
+                          "`\n Returned: `", value1, "`\n\n");
     }
 
     inline void ContinueOnError(bool continue_on_error) noexcept {
