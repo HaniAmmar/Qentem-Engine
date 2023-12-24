@@ -1246,6 +1246,11 @@ static void TestParse3(QTest &helper) {
                                                                                                           ])");
     helper.IsEqual(value.Stringify(stream), R"([1,2])", __LINE__);
     stream.Clear();
+
+    content = R"([0xAAAA, 0xFFFFFFFFFFFFFFFF, 0Xabcdef])";
+    value   = JSON::Parse(stream, content, StringUtils::Count(content));
+    helper.IsEqual(value.Stringify(), R"([43690,18446744073709551615,11259375])", __LINE__);
+    stream.Clear();
 }
 
 static void TestParse4(QTest &helper) {

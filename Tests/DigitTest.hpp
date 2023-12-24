@@ -2046,60 +2046,60 @@ static void TestStringToNumber7(QTest &helper) {
     helper.IsEqual(d_number, 4.45014771701440227211481959342e-308, __LINE__);
 }
 
-static void TestHexStringToNumber(QTest &helper) {
+static void TestHexStringToNumber1(QTest &helper) {
     SizeT64     number;
     const char *hex = "";
 
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 0U, __LINE__);
+    helper.IsEqual(number, 0ULL, __LINE__);
 
     hex    = "0000";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 0U, __LINE__);
+    helper.IsEqual(number, 0ULL, __LINE__);
 
     hex    = "AAAA";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 43690U, __LINE__);
+    helper.IsEqual(number, 43690ULL, __LINE__);
 
     hex    = "000A";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 10U, __LINE__);
+    helper.IsEqual(number, 10ULL, __LINE__);
 
     hex    = "A000";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 40960U, __LINE__);
+    helper.IsEqual(number, 40960ULL, __LINE__);
 
     hex    = "ABCDEF";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 11259375U, __LINE__);
+    helper.IsEqual(number, 11259375ULL, __LINE__);
 
     hex    = "FEDCBA";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 16702650U, __LINE__);
+    helper.IsEqual(number, 16702650ULL, __LINE__);
 
     hex    = "abcdef";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 11259375U, __LINE__);
+    helper.IsEqual(number, 11259375ULL, __LINE__);
 
     hex    = "fedcba";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 16702650U, __LINE__);
+    helper.IsEqual(number, 16702650ULL, __LINE__);
 
     hex    = "12345";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 74565U, __LINE__);
+    helper.IsEqual(number, 74565ULL, __LINE__);
 
     hex    = "6789";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 26505U, __LINE__);
+    helper.IsEqual(number, 26505ULL, __LINE__);
 
     hex    = "FFFF";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 65535U, __LINE__);
+    helper.IsEqual(number, 65535ULL, __LINE__);
 
     hex    = "9999";
     number = HexStringToNumber(hex);
-    helper.IsEqual(number, 39321U, __LINE__);
+    helper.IsEqual(number, 39321ULL, __LINE__);
 
     hex    = "FFFFFFFFFFFFFFFF";
     number = HexStringToNumber(hex);
@@ -2107,6 +2107,86 @@ static void TestHexStringToNumber(QTest &helper) {
 
     hex    = "8888888881111111";
     number = HexStringToNumber(hex);
+    helper.IsEqual(number, 9838263505853157649ULL, __LINE__);
+}
+
+static void TestHexStringToNumber2(QTest &helper) {
+    SizeT64     number;
+    const char *hex = "";
+    bool        valid;
+
+    valid = StringToNumber(helper, number, hex);
+    helper.IsFalse(valid, __LINE__);
+    helper.IsEqual(number, 0ULL, __LINE__);
+
+    hex   = "0x0000";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 0ULL, __LINE__);
+
+    hex   = "0xAAAA";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 43690ULL, __LINE__);
+
+    hex   = "0x000A";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 10ULL, __LINE__);
+
+    hex   = "0XA000";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 40960ULL, __LINE__);
+
+    hex   = "0xABCDEF";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 11259375ULL, __LINE__);
+
+    hex   = "0xFEDCBA";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 16702650ULL, __LINE__);
+
+    hex   = "0xabcdef";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 11259375ULL, __LINE__);
+
+    hex   = "0xfedcba";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 16702650ULL, __LINE__);
+
+    hex   = "0X12345";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 74565ULL, __LINE__);
+
+    hex   = "0x6789";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 26505ULL, __LINE__);
+
+    hex   = "0xFFFF";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 65535ULL, __LINE__);
+
+    hex   = "0X9999";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 39321ULL, __LINE__);
+
+    hex   = "0xFFFFFFFFFFFFFFFF";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
+    helper.IsEqual(number, 18446744073709551615ULL, __LINE__);
+
+    hex   = "0x8888888881111111";
+    valid = StringToNumber(helper, number, hex);
+    helper.IsTrue(valid, __LINE__);
     helper.IsEqual(number, 9838263505853157649ULL, __LINE__);
 }
 
@@ -3935,7 +4015,8 @@ static int RunDigitTests() {
     helper.Test("StringToNumber Test 6", TestStringToNumber6);
     helper.Test("StringToNumber Test 7", TestStringToNumber7);
 
-    helper.Test("HexStringToNumber Test", TestHexStringToNumber);
+    helper.Test("HexStringToNumber Test 1", TestHexStringToNumber1);
+    helper.Test("HexStringToNumber Test 2", TestHexStringToNumber2);
 
     SStream stream{8};
 
