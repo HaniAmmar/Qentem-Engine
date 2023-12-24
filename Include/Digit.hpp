@@ -79,7 +79,7 @@ struct Digit {
             if (!IsUnsigned<Number_T>()) {
                 if (number < Number_T{0}) {
                     qn.Integer = -qn.Integer;
-                    stream += DigitUtils::DigitChars::NegativeChar;
+                    stream += DigitUtils::DigitChar::Negative;
                 }
             }
 
@@ -101,14 +101,13 @@ struct Digit {
             const Char_T digit = value[offset];
             number <<= 4U;
 
-            if ((digit >= DigitUtils::DigitChars::OneChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
+            if ((digit >= DigitUtils::DigitChar::One) && (digit <= DigitUtils::DigitChar::Nine)) {
                 // No need for 0
-                number |= Number_T(digit - DigitUtils::DigitChars::ZeroChar); // 1-9
-            } else if ((digit >= DigitUtils::DigitChars::UA_Char) &&
-                       (digit <= DigitUtils::DigitChars::UF_Char)) { // A-F
-                number |= Number_T(digit - DigitUtils::DigitChars::SevenChar);
-            } else if ((digit >= DigitUtils::DigitChars::A_Char) && (digit <= DigitUtils::DigitChars::F_Char)) { // a-f
-                number |= Number_T(digit - DigitUtils::DigitChars::UW_Char);
+                number |= Number_T(digit - DigitUtils::DigitChar::Zero);                               // 1-9
+            } else if ((digit >= DigitUtils::DigitChar::UA) && (digit <= DigitUtils::DigitChar::UF)) { // A-F
+                number |= Number_T(digit - DigitUtils::DigitChar::Seven);
+            } else if ((digit >= DigitUtils::DigitChar::A) && (digit <= DigitUtils::DigitChar::F)) { // a-f
+                number |= Number_T(digit - DigitUtils::DigitChar::UW);
             }
 
             ++offset;
@@ -124,13 +123,13 @@ struct Digit {
 
         if (offset < length) {
             number += Number_T(content[offset]);
-            number -= Number_T{DigitUtils::DigitChars::ZeroChar};
+            number -= Number_T{DigitUtils::DigitChar::Zero};
             ++offset;
 
             while (offset < length) {
                 number *= Number_T{10};
                 number += Number_T(content[offset]);
-                number -= Number_T{DigitUtils::DigitChars::ZeroChar};
+                number -= Number_T{DigitUtils::DigitChar::Zero};
                 ++offset;
             }
         }
@@ -169,10 +168,10 @@ struct Digit {
             bool   has_dot       = false;
             bool   fraction_only = false;
             ///////////////////////////////////////////////////////////
-            if (digit == DigitUtils::DigitChars::NegativeChar) {
+            if (digit == DigitUtils::DigitChar::Negative) {
                 ++offset;
                 is_negative = true;
-            } else if (digit == DigitUtils::DigitChars::PositiveChar) {
+            } else if (digit == DigitUtils::DigitChar::Positive) {
                 ++offset;
             }
 
@@ -181,26 +180,25 @@ struct Digit {
             if (offset < end_offset) {
                 digit = content[offset];
 
-                if ((digit > DigitUtils::DigitChars::ZeroChar) && (digit <= DigitUtils::DigitChars::NineChar)) {
+                if ((digit > DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                     // 123456789
                     number.Natural += Number_T(digit);
-                    number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
+                    number.Natural -= Number_T{DigitUtils::DigitChar::Zero};
                     tmp_offset   = (((end_offset - offset) < max_length) ? end_offset : (offset + max_length));
                     start_offset = offset;
                     ++offset;
-                } else if ((digit == DigitUtils::DigitChars::ZeroChar) || (digit == DigitUtils::DigitChars::DotChar)) {
-                    if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + SizeT{1}) < end_offset) {
+                } else if ((digit == DigitUtils::DigitChar::Zero) || (digit == DigitUtils::DigitChar::Dot)) {
+                    if ((digit == DigitUtils::DigitChar::Zero) && (offset + SizeT{1}) < end_offset) {
                         ++offset;
                         digit = content[offset];
 
-                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                        if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                             // 0000xxxx
                             return QNumberType::NotANumber; // Leading zero.
                         }
                     }
 
-                    if (digit == DigitUtils::DigitChars::DotChar) {
+                    if (digit == DigitUtils::DigitChar::Dot) {
                         // 0.xxxxxxxx
                         dot_offset = offset;
                         ++offset;
@@ -213,7 +211,7 @@ struct Digit {
                             // 0.000000000x
                             digit = content[offset];
 
-                            if (digit == DigitUtils::DigitChars::ZeroChar) {
+                            if (digit == DigitUtils::DigitChar::Zero) {
                                 ++offset;
                                 continue;
                             }
@@ -222,8 +220,7 @@ struct Digit {
                         }
                         ///////////////////////////////////////////////////////////
                         if ((start_offset == offset) && (dot_offset == tmp_offset) &&
-                            ((digit < DigitUtils::DigitChars::ZeroChar) ||
-                             (digit > DigitUtils::DigitChars::NineChar))) {
+                            ((digit < DigitUtils::DigitChar::Zero) || (digit > DigitUtils::DigitChar::Nine))) {
                             return QNumberType::NotANumber; // Just a dot.
                         }
                         ///////////////////////////////////////////////////////////
@@ -241,11 +238,10 @@ struct Digit {
                     while (offset < max_end_offset) {
                         digit = content[offset];
 
-                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                        if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                             number.Natural *= Number_T{10};
                             number.Natural += Number_T(digit);
-                            number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
+                            number.Natural -= Number_T{DigitUtils::DigitChar::Zero};
                             ++offset;
                             continue;
                         }
@@ -253,7 +249,7 @@ struct Digit {
                         break;
                     }
 
-                    if (digit == DigitUtils::DigitChars::DotChar) {
+                    if (digit == DigitUtils::DigitChar::Dot) {
                         if (!has_dot) {
                             dot_offset = offset;
                             ++offset;
@@ -263,16 +259,15 @@ struct Digit {
                             if (offset < max_end_offset) {
                                 digit = content[offset];
 
-                                if ((digit > DigitUtils::DigitChars::ZeroChar) &&
-                                    (digit <= DigitUtils::DigitChars::NineChar)) {
+                                if ((digit > DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                                     continue;
                                 }
 
-                                if ((digit == DigitUtils::DigitChars::ZeroChar) && (offset + 1U) < max_end_offset) {
+                                if ((digit == DigitUtils::DigitChar::Zero) && (offset + 1U) < max_end_offset) {
                                     digit = content[offset + SizeT{1}];
 
-                                    if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                                        (digit <= DigitUtils::DigitChars::NineChar)) {
+                                    if ((digit >= DigitUtils::DigitChar::Zero) &&
+                                        (digit <= DigitUtils::DigitChar::Nine)) {
                                         continue;
                                     }
                                 }
@@ -294,26 +289,25 @@ struct Digit {
                     digit = content[offset];
 
                     switch (digit) {
-                        case DigitUtils::DigitChars::DotChar:
-                        case DigitUtils::DigitChars::E_Char:
-                        case DigitUtils::DigitChars::UE_Char: {
+                        case DigitUtils::DigitChar::Dot:
+                        case DigitUtils::DigitChar::E:
+                        case DigitUtils::DigitChar::UE: {
                             is_real = true;
                             break;
                         }
 
                         default: {
-                            if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                                (digit <= DigitUtils::DigitChars::NineChar)) {
+                            if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                                 if ((number.Natural > 0x1999999999999999ULL) ||
                                     ((number.Natural == 0x1999999999999999ULL) &&
-                                     (digit > DigitUtils::DigitChars::FiveChar))) {
+                                     (digit > DigitUtils::DigitChar::Five))) {
                                     is_real = true;
                                     break;
                                 }
 
                                 number.Natural *= Number_T{10};
                                 number.Natural += Number_T(digit);
-                                number.Natural -= Number_T{DigitUtils::DigitChars::ZeroChar};
+                                number.Natural -= Number_T{DigitUtils::DigitChar::Zero};
                                 ++offset;
                                 ++tmp_offset;
 
@@ -321,16 +315,16 @@ struct Digit {
                                     digit = content[offset];
 
                                     switch (digit) {
-                                        case DigitUtils::DigitChars::DotChar:
-                                        case DigitUtils::DigitChars::E_Char:
-                                        case DigitUtils::DigitChars::UE_Char: {
+                                        case DigitUtils::DigitChar::Dot:
+                                        case DigitUtils::DigitChar::E:
+                                        case DigitUtils::DigitChar::UE: {
                                             is_real = true;
                                             break;
                                         }
 
                                         default: {
-                                            if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                                                (digit <= DigitUtils::DigitChars::NineChar)) {
+                                            if ((digit >= DigitUtils::DigitChar::Zero) &&
+                                                (digit <= DigitUtils::DigitChar::Nine)) {
                                                 is_real = true;
                                             }
                                         }
@@ -380,15 +374,14 @@ struct Digit {
                     while (keep_going) {
                         digit = content[offset];
 
-                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                        if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                             ++offset;
                             keep_going = (offset < end_offset);
                             continue;
                         }
 
                         switch (content[offset]) {
-                            case DigitUtils::DigitChars::DotChar: {
+                            case DigitUtils::DigitChar::Dot: {
                                 if (!has_dot) {
                                     dot_offset = offset;
                                     ++offset;
@@ -400,8 +393,8 @@ struct Digit {
                                 return QNumberType::NotANumber;
                             }
 
-                            case DigitUtils::DigitChars::E_Char:
-                            case DigitUtils::DigitChars::UE_Char: {
+                            case DigitUtils::DigitChar::E:
+                            case DigitUtils::DigitChar::UE: {
                                 exp_offset = offset;
                                 ++offset;
 
@@ -475,7 +468,7 @@ struct Digit {
     template <typename Number_T>
     static void powerOfNegativeTen(Number_T &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SizeT64;
-        using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
+        using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
@@ -486,35 +479,35 @@ struct Digit {
         //////////////////////////////////////////////////////////////
         constexpr bool is_size_8 = (sizeof(UNumber_T) == 8U);
         if (is_size_8) {
-            while (exponent >= DigitLimit::MaxPowerOfFive) {
+            while (exponent >= DigitConst::MaxPowerOfFive) {
                 // 2**126 = 85070591730234615865843651857942052864
                 // 5**27 = 7450580596923828125 (MaxPowerOfFive)
                 // 2**126 / 5**27 = 11417981541647679048.4
                 // 126-64=62; See 2**126 and 64 shift
 
-                bint *= DigitLimit::GetPowerOfOneOverFive(DigitLimit::MaxPowerOfFive);
-                bint >>= DigitLimit::MaxShift;
-                shifted += DigitLimit::GetPowerOfOneOverFiveShift(DigitLimit::MaxPowerOfFive);
-                exponent -= DigitLimit::MaxPowerOfFive;
+                bint *= DigitConst::GetPowerOfOneOverFive(DigitConst::MaxPowerOfFive);
+                bint >>= DigitConst::MaxShift;
+                shifted += DigitConst::GetPowerOfOneOverFiveShift(DigitConst::MaxPowerOfFive);
+                exponent -= DigitConst::MaxPowerOfFive;
             }
 
             if (exponent != SizeT32{0}) {
-                bint *= DigitLimit::GetPowerOfOneOverFive(exponent);
-                bint >>= DigitLimit::MaxShift;
-                shifted += DigitLimit::GetPowerOfOneOverFiveShift(exponent);
+                bint *= DigitConst::GetPowerOfOneOverFive(exponent);
+                bint >>= DigitConst::MaxShift;
+                shifted += DigitConst::GetPowerOfOneOverFiveShift(exponent);
             }
         } else {
-            while (exponent >= DigitLimit::MaxPowerOfFive) {
-                bint <<= DigitLimit::MaxShift;
-                bint /= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
-                shifted += DigitLimit::MaxShift;
-                exponent -= DigitLimit::MaxPowerOfFive;
+            while (exponent >= DigitConst::MaxPowerOfFive) {
+                bint <<= DigitConst::MaxShift;
+                bint /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+                shifted += DigitConst::MaxShift;
+                exponent -= DigitConst::MaxPowerOfFive;
             }
 
             if (exponent != SizeT32{0}) {
-                bint <<= DigitLimit::MaxShift;
-                bint /= DigitLimit::GetPowerOfFive(exponent);
-                shifted += DigitLimit::MaxShift;
+                bint <<= DigitConst::MaxShift;
+                bint /= DigitConst::GetPowerOfFive(exponent);
+                shifted += DigitConst::MaxShift;
             }
         }
         //////////////////////////////////////////////////////////////
@@ -561,26 +554,26 @@ struct Digit {
     template <typename Number_T>
     static void powerOfPositiveTen(Number_T &number, SizeT32 exponent) noexcept {
         using UNumber_T  = SystemIntType;
-        using DigitLimit = DigitUtils::DigitLimit<sizeof(UNumber_T)>;
+        using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
         BigInt<UNumber_T, 192U> bint{number};
         //////////////////////////////////////////////////////////////
         constexpr SizeT32 bint_limit{2U};
         SizeT32           shifted{exponent};
         //////////////////////////////////////////////////////////////
-        while (exponent >= DigitLimit::MaxPowerOfFive) {
-            bint *= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
+        while (exponent >= DigitConst::MaxPowerOfFive) {
+            bint *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
 
             if (bint.Index() > bint_limit) {
-                bint >>= DigitLimit::MaxShift;
-                shifted += DigitLimit::MaxShift;
+                bint >>= DigitConst::MaxShift;
+                shifted += DigitConst::MaxShift;
             }
 
-            exponent -= DigitLimit::MaxPowerOfFive;
+            exponent -= DigitConst::MaxPowerOfFive;
         }
 
         if (exponent != SizeT32{0}) {
-            bint *= DigitLimit::GetPowerOfFive(exponent);
+            bint *= DigitConst::GetPowerOfFive(exponent);
         }
         //////////////////////////////////////////////////////////////
         const SizeT32 bit = bint.FindLastBit();
@@ -611,7 +604,7 @@ struct Digit {
 
         while (offset < end_offset) {
             switch (content[offset]) {
-                case DigitUtils::DigitChars::PositiveChar: {
+                case DigitUtils::DigitChar::Positive: {
                     if (!sign_set) {
                         ++offset;
                         sign_set = true;
@@ -620,7 +613,7 @@ struct Digit {
 
                     return false;
                 }
-                case DigitUtils::DigitChars::NegativeChar: {
+                case DigitUtils::DigitChar::Negative: {
                     if (!sign_set) {
                         ++offset;
                         is_negative_exp = true;
@@ -637,10 +630,9 @@ struct Digit {
                     while (offset < end_offset) {
                         const Char_T digit = content[offset];
 
-                        if ((digit >= DigitUtils::DigitChars::ZeroChar) &&
-                            (digit <= DigitUtils::DigitChars::NineChar)) {
+                        if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                             exponent *= SizeT32{10};
-                            exponent += SizeT32(digit - DigitUtils::DigitChars::ZeroChar);
+                            exponent += SizeT32(digit - DigitUtils::DigitChar::Zero);
                             ++offset;
                             continue;
                         }
@@ -706,7 +698,7 @@ struct Digit {
 
         if (bias != Info_T::ExponentMask) {
             if ((number & Info_T::SignMask) != Number_T{0}) {
-                stream += DigitUtils::DigitChars::NegativeChar;
+                stream += DigitUtils::DigitChar::Negative;
             }
 
             Number_T mantissa = (number & Info_T::MantissaMask);
@@ -719,7 +711,7 @@ struct Digit {
                 }
 
                 BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(Number_T) * 8U * 3U))> bint{mantissa};
-                using DigitLimit = DigitUtils::DigitLimit<bint.SizeOfType()>;
+                using DigitConst = DigitUtils::DigitConst<bint.SizeOfType()>;
                 /////////////////////////////////////
                 const SizeT32 first_shift      = Platform::FindFirstBit(mantissa);
                 const int     exponent         = (int)((bias >> Info_T::MantissaSize) - Info_T::Bias);
@@ -773,25 +765,25 @@ struct Digit {
 
                     SizeT32 times = fraction_length;
 
-                    if (times >= DigitLimit::MaxPowerOfFive) {
+                    if (times >= DigitConst::MaxPowerOfFive) {
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
-                                                      ? ((format.Precision / DigitLimit::MaxPowerOfTen) + SizeT32{2})
+                                                      ? ((format.Precision / DigitConst::MaxPowerOfTen) + SizeT32{2})
                                                       : bint.MaxIndex();
 
                         do {
-                            bint *= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
+                            bint *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
 
-                            if ((bint.Index() >= max_index) && (shift >= DigitLimit::MaxShift)) {
-                                bint >>= DigitLimit::MaxShift;
-                                shift -= DigitLimit::MaxShift;
+                            if ((bint.Index() >= max_index) && (shift >= DigitConst::MaxShift)) {
+                                bint >>= DigitConst::MaxShift;
+                                shift -= DigitConst::MaxShift;
                             }
 
-                            times -= DigitLimit::MaxPowerOfFive;
-                        } while (times >= DigitLimit::MaxPowerOfFive);
+                            times -= DigitConst::MaxPowerOfFive;
+                        } while (times >= DigitConst::MaxPowerOfFive);
                     }
 
                     if (times != SizeT32{0}) {
-                        bint *= DigitLimit::GetPowerOfFive(times);
+                        bint *= DigitConst::GetPowerOfFive(times);
                     }
 
                     bint >>= shift;
@@ -804,37 +796,37 @@ struct Digit {
                 formatStringNumber(stream, start_at, format.Precision, digits, fraction_length, is_positive_exp,
                                    round_up);
             } else {
-                stream += DigitUtils::DigitChars::ZeroChar;
+                stream += DigitUtils::DigitChar::Zero;
             }
         } else {
             constexpr SizeT32 size = sizeof(Char_T);
 
             if ((number & Info_T::MantissaMask) == Number_T{0}) {
                 if ((number & Info_T::SignMask) != Number_T{0}) {
-                    stream += DigitUtils::DigitChars::NegativeChar;
+                    stream += DigitUtils::DigitChar::Negative;
                 }
 
-                // stream.Write(DigitUtils::DigitStrings<Char_T, size>::InfinityString,
-                //              StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T, size>::InfinityString));
+                // stream.Write(DigitUtils::DigitString<Char_T, size>::Infinity,
+                //              StringUtils::ConstCount(DigitUtils::DigitString<Char_T, size>::Infinity));
 
-                stream.Write(DigitUtils::DigitStrings<Char_T, size>::InfinityString, SizeT{3});
+                stream.Write(DigitUtils::DigitString<Char_T, size>::Infinity, SizeT{3});
             } else {
-                // stream.Write(DigitUtils::DigitStrings<Char_T, size>::NANString,
-                //              StringUtils::ConstCount(DigitUtils::DigitStrings<Char_T, size>::NANString));
+                // stream.Write(DigitUtils::DigitString<Char_T, size>::NAN,
+                //              StringUtils::ConstCount(DigitUtils::DigitString<Char_T, size>::NAN));
 
-                stream.Write(DigitUtils::DigitStrings<Char_T, size>::NANString, SizeT{3});
+                stream.Write(DigitUtils::DigitString<Char_T, size>::NAN, SizeT{3});
             }
         }
     }
 
     template <typename Stream_T, typename Number_T>
     static void insertPowerOfTen(Stream_T &stream, Number_T power_of_ten, bool positive) {
-        stream += DigitUtils::DigitChars::E_Char;
-        stream += (positive ? DigitUtils::DigitChars::PositiveChar : DigitUtils::DigitChars::NegativeChar);
+        stream += DigitUtils::DigitChar::E;
+        stream += (positive ? DigitUtils::DigitChar::Positive : DigitUtils::DigitChar::Negative);
 
         if (power_of_ten < Number_T{10}) {
             // e+01,e+09
-            stream += DigitUtils::DigitChars::ZeroChar;
+            stream += DigitUtils::DigitChar::Zero;
         }
 
         NumberToString(stream, power_of_ten);
@@ -844,19 +836,19 @@ struct Digit {
     inline static void insertZeros(Stream_T &stream, const SizeT length) {
         using Char_T           = typename Stream_T::CharType;
         constexpr SizeT32 size = sizeof(Char_T);
-        stream.Write(DigitUtils::DigitStrings<Char_T, size>::ZeroesString, length);
+        stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
     }
 
     template <typename Stream_T, typename BigInt_T>
     static void bigIntToString(Stream_T &stream, BigInt_T &bint) {
-        using DigitLimit = DigitUtils::DigitLimit<BigInt_T::SizeOfType()>;
+        using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
 
         while (bint.IsBig()) {
             const SizeT length = stream.Length();
-            NumberToString<true>(stream, bint.Divide(DigitLimit::MaxPowerOfTenValue));
+            NumberToString<true>(stream, bint.Divide(DigitConst::MaxPowerOfTenValue));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
-            insertZeros(stream, (DigitLimit::MaxPowerOfTen - SizeT(stream.Length() - length)));
+            insertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
         }
 
         if (bint.NotZero()) {
@@ -866,15 +858,15 @@ struct Digit {
 
     template <typename BigInt_T>
     inline static void bigIntDropDigits(BigInt_T &bint, SizeT32 drop) noexcept {
-        using DigitLimit = DigitUtils::DigitLimit<BigInt_T::SizeOfType()>;
+        using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
 
-        while (drop >= DigitLimit::MaxPowerOfFive) {
-            bint /= DigitLimit::GetPowerOfFive(DigitLimit::MaxPowerOfFive);
-            drop -= DigitLimit::MaxPowerOfFive;
+        while (drop >= DigitConst::MaxPowerOfFive) {
+            bint /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+            drop -= DigitConst::MaxPowerOfFive;
         }
 
         if (drop != 0U) {
-            bint /= DigitLimit::GetPowerOfFive(drop);
+            bint /= DigitConst::GetPowerOfFive(drop);
         }
     }
 
@@ -910,7 +902,7 @@ struct Digit {
             roundStringNumber(stream, index, is_power_increased, round_up);
 
             if (is_power_increased) {
-                stream.Storage()[index] = DigitUtils::DigitChars::OneChar;
+                stream.Storage()[index] = DigitUtils::DigitChar::One;
 
                 if (is_positive_exp) {
                     fraction_length = SizeT32{0};
@@ -921,7 +913,7 @@ struct Digit {
 
                         do {
                             --index;
-                            stream.Storage()[index] = DigitUtils::DigitChars::ZeroChar;
+                            stream.Storage()[index] = DigitUtils::DigitChar::Zero;
                         } while (--power_index != SizeT32{0});
                     }
                 } else {
@@ -937,7 +929,7 @@ struct Digit {
         const Char_T *last   = stream.Last();
 
         if (display_exp || (fraction_length != SizeT32{0})) {
-            while ((number < last) && (*number == DigitUtils::DigitChars::ZeroChar)) {
+            while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
                 ++number;
                 ++index;
             }
@@ -949,14 +941,14 @@ struct Digit {
             if ((fraction_length != SizeT32{0}) && (fraction_length > index2)) {
                 if (!is_positive_exp && (power != SizeT{0})) {
                     insertZeros(stream, SizeT(power - SizeT{1}));
-                    stream += DigitUtils::DigitChars::DotChar;
-                    stream += DigitUtils::DigitChars::ZeroChar;
+                    stream += DigitUtils::DigitChar::Dot;
+                    stream += DigitUtils::DigitChar::Zero;
                 } else if ((stream_length - SizeT{1}) != index2) {
-                    stream.InsertAt(DigitUtils::DigitChars::DotChar, SizeT(fraction_length + started_at));
+                    stream.InsertAt(DigitUtils::DigitChar::Dot, SizeT(fraction_length + started_at));
                 }
             }
         } else if ((stream_length - SizeT{1}) != index2) {
-            stream.InsertAt(DigitUtils::DigitChars::DotChar, (stream.Length() - SizeT{1}));
+            stream.InsertAt(DigitUtils::DigitChar::Dot, (stream.Length() - SizeT{1}));
         }
 
         stream.Reverse(started_at);
@@ -980,17 +972,17 @@ struct Digit {
         ++index;
 
         const bool round =
-            ((number < last) && ((*number > DigitUtils::DigitChars::FiveChar) ||
-                                 ((*number == DigitUtils::DigitChars::FiveChar) &&
-                                  (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChars::ZeroChar) &
+            ((number < last) && ((*number > DigitUtils::DigitChar::Five) ||
+                                 ((*number == DigitUtils::DigitChar::Five) &&
+                                  (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChar::Zero) &
                                                  SizeT32{1}) == SizeT32{1})))));
 
         if (round) {
-            while ((++number < last) && (*number == DigitUtils::DigitChars::NineChar)) {
+            while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {
                 ++index;
             }
 
-            if ((number != last) || (*number != DigitUtils::DigitChars::NineChar)) {
+            if ((number != last) || (*number != DigitUtils::DigitChar::Nine)) {
                 ++(*number);
             } else {
                 is_power_increased = true;

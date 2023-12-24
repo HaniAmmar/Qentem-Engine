@@ -29,64 +29,64 @@ namespace Qentem {
 namespace DigitUtils {
 
 template <typename, SizeT32>
-struct DigitStrings {};
+struct DigitString {};
 
 // char
 template <typename Char_T>
-struct DigitStrings<Char_T, 1U> {
-    static constexpr const Char_T *InfinityString = "inf";
-    static constexpr const Char_T *NANString      = "nan";
-    static constexpr const Char_T *ZeroesString   = "0000000000000000000";
+struct DigitString<Char_T, 1U> {
+    static constexpr const Char_T *Infinity = "inf";
+    static constexpr const Char_T *NAN      = "nan";
+    static constexpr const Char_T *Zeros    = "0000000000000000000";
 };
 
 // char16_t
 template <typename Char_T>
-struct DigitStrings<Char_T, 2U> {
-    static constexpr const Char_T *InfinityString = u"inf";
-    static constexpr const Char_T *NANString      = u"nan";
-    static constexpr const Char_T *ZeroesString   = u"0000000000000000000";
+struct DigitString<Char_T, 2U> {
+    static constexpr const Char_T *Infinity = u"inf";
+    static constexpr const Char_T *NAN      = u"nan";
+    static constexpr const Char_T *Zeros    = u"0000000000000000000";
 };
 
 // char32_t
 template <typename Char_T>
-struct DigitStrings<Char_T, 4U> {
-    static constexpr const Char_T *InfinityString = U"inf";
-    static constexpr const Char_T *NANString      = U"nan";
-    static constexpr const Char_T *ZeroesString   = U"0000000000000000000";
+struct DigitString<Char_T, 4U> {
+    static constexpr const Char_T *Infinity = U"inf";
+    static constexpr const Char_T *NAN      = U"nan";
+    static constexpr const Char_T *Zeros    = U"0000000000000000000";
 };
 
 // wchar_t size = 4
 template <>
-struct DigitStrings<wchar_t, 4U> {
-    static constexpr const wchar_t *InfinityString = L"inf";
-    static constexpr const wchar_t *NANString      = L"nan";
-    static constexpr const wchar_t *ZeroesString   = L"0000000000000000000";
+struct DigitString<wchar_t, 4U> {
+    static constexpr const wchar_t *Infinity = L"inf";
+    static constexpr const wchar_t *NAN      = L"nan";
+    static constexpr const wchar_t *Zeros    = L"0000000000000000000";
 };
 
 // wchar_t size = 2
 template <>
-struct DigitStrings<wchar_t, 2U> {
-    static constexpr const wchar_t *InfinityString = L"inf";
-    static constexpr const wchar_t *NANString      = L"nan";
-    static constexpr const wchar_t *ZeroesString   = L"0000000000000000000";
+struct DigitString<wchar_t, 2U> {
+    static constexpr const wchar_t *Infinity = L"inf";
+    static constexpr const wchar_t *NAN      = L"nan";
+    static constexpr const wchar_t *Zeros    = L"0000000000000000000";
 };
 
-struct DigitChars {
-    static constexpr char ZeroChar     = '0';
-    static constexpr char OneChar      = '1';
-    static constexpr char FiveChar     = '5';
-    static constexpr char SevenChar    = '7';
-    static constexpr char NineChar     = '9';
-    static constexpr char E_Char       = 'e';
-    static constexpr char UE_Char      = 'E';
-    static constexpr char DotChar      = '.';
-    static constexpr char PositiveChar = '+';
-    static constexpr char NegativeChar = '-';
-    static constexpr char UA_Char      = 'A';
-    static constexpr char UF_Char      = 'F';
-    static constexpr char A_Char       = 'a';
-    static constexpr char F_Char       = 'f';
-    static constexpr char UW_Char      = 'W';
+struct DigitChar {
+    static constexpr char Zero     = '0';
+    static constexpr char One      = '1';
+    static constexpr char Five     = '5';
+    static constexpr char Seven    = '7';
+    static constexpr char Nine     = '9';
+    static constexpr char E        = 'e';
+    static constexpr char UE       = 'E';
+    static constexpr char Dot      = '.';
+    static constexpr char Positive = '+';
+    static constexpr char Negative = '-';
+    static constexpr char UA       = 'A';
+    static constexpr char UF       = 'F';
+    static constexpr char A        = 'a';
+    static constexpr char F        = 'f';
+    static constexpr char UW       = 'W';
 };
 ///////////////////////////////////////////////////
 static const char DigitTable1[] = {"000102030405060708091011121314151617181920212223242526272829"
@@ -96,11 +96,11 @@ static const char DigitTable1[] = {"00010203040506070809101112131415161718192021
 static const char DigitTable2[] = {"0123456789"};
 ///////////////////////////////////////////////////
 template <SizeT32>
-struct DigitLimit {};
+struct DigitConst {};
 
 // uint16_t
 template <>
-struct DigitLimit<2U> {
+struct DigitConst<2U> {
     static constexpr const SizeT32 MaxShift           = 16U;
     static constexpr const SizeT32 MaxPowerOfFive     = 6U;
     static constexpr const SizeT32 MaxPowerOfTen      = 4U;
@@ -139,7 +139,7 @@ struct DigitLimit<2U> {
 
 // uint32_t
 template <>
-struct DigitLimit<4U> {
+struct DigitConst<4U> {
     static constexpr const SizeT32 MaxShift           = 32U;
     static constexpr const SizeT32 MaxPowerOfFive     = 13U;
     static constexpr const SizeT32 MaxPowerOfTen      = 9U;
@@ -184,7 +184,7 @@ struct DigitLimit<4U> {
 
 // uint64_t
 template <>
-struct DigitLimit<8U> {
+struct DigitConst<8U> {
     static constexpr const SizeT32 MaxShift           = 64U;
     static constexpr const SizeT32 MaxPowerOfFive     = 27U;
     static constexpr const SizeT32 MaxPowerOfTen      = 19U;
