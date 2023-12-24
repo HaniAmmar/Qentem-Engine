@@ -219,8 +219,7 @@ struct Template {
 
     template <typename Char_T, typename Value_T, typename StringStream_T>
     inline static StringStream_T &Render(const Char_T *content, const Value_T &value, StringStream_T &stream) {
-        Array<Tags::TagBit> tags_cache;
-        Render(content, StringUtils::Count(content), value, stream, tags_cache);
+        Render(content, StringUtils::Count(content), value, stream);
         return stream;
     }
 
