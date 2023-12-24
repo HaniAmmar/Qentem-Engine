@@ -55,87 +55,87 @@ static void TestToUTF8(QTest &helper) {
     StringStream<QChar> stream;
 
     Unicode::ToUTF<QChar>(0x0000, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{'\0'}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{'\0'}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x003D, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{'='}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{'='}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x007F, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{127}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{127}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x0080, stream);
-    helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{194}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{128}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{194}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{128}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x00A1, stream);
-    helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{194}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{161}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{194}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{161}, __LINE__);
     const QChar v00A1[] = "¡";
-    helper.Equal(stream, &(v00A1[0]), "stream == v00A1", __LINE__);
+    helper.Equal(stream, &(v00A1[0]), __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x07FF, stream);
-    helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{223}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{191}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{223}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{191}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x0800, stream);
-    helper.Equal(stream.Length(), SizeT{3}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{224}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{160}, "*(stream.First()+1)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 2U) == QChar{128}, "*(stream.First() + 2)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{3}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{224}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{160}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 2U) == QChar{128}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x08A7, stream);
-    helper.Equal(stream.Length(), SizeT{3}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{224}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{162}, "*(stream.First()+1)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 2U) == QChar{167}, "*(stream.First() + 2)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{3}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{224}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{162}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 2U) == QChar{167}, __LINE__);
     const QChar v08A7[] = "ࢧ";
-    helper.Equal(stream, &(v08A7[0]), "stream == v08A7", __LINE__);
+    helper.Equal(stream, &(v08A7[0]), __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xFFFF, stream);
-    helper.Equal(stream.Length(), SizeT{3}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{239}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{191}, "*(stream.First()+1)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 2U) == QChar{191}, "*(stream.First() + 2)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{3}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{239}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{191}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 2U) == QChar{191}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10000, stream);
-    helper.Equal(stream.Length(), SizeT{4}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{240}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{144}, "*(stream.First()+1)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 2U) == QChar{128}, "*(stream.First() + 2)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 3U) == QChar{128}, "*(stream.First() + 3)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{4}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{240}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{144}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 2U) == QChar{128}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 3U) == QChar{128}, __LINE__);
     const QChar v10000[] = "𐀀";
-    helper.Equal(stream, &(v10000[0]), "stream == v10000", __LINE__);
+    helper.Equal(stream, &(v10000[0]), __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10A7B, stream);
-    helper.Equal(stream.Length(), SizeT{4}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{240}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{144}, "*(stream.First()+1)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 2U) == QChar{169}, "*(stream.First() + 2)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 3U) == QChar{187}, "*(stream.First() + 3)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{4}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{240}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{144}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 2U) == QChar{169}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 3U) == QChar{187}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xE01EF, stream);
-    helper.Equal(stream.Length(), SizeT{4}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{243}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{160}, "*(stream.First()+1)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 2U) == QChar{135}, "*(stream.First() + 2)", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 3U) == QChar{175}, "*(stream.First() + 3)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{4}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{243}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{160}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 2U) == QChar{135}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 3U) == QChar{175}, __LINE__);
     stream.Clear();
 }
 
@@ -145,66 +145,66 @@ static void TestToUTF16(QTest &helper) {
     StringStream<QChar> stream;
 
     Unicode::ToUTF<QChar>(0x0000, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{u'\0'}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{u'\0'}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x003D, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{u'='}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{u'='}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x007F, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{127}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{127}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x0080, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{128}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{128}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x00A1, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{161}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{161}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x07FF, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{2047}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{2047}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x0800, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{2048}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{2048}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x08A7, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{2215}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{2215}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xFFFF, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{65535}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{65535}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10000, stream);
-    helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{55296}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{56320}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{55296}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{56320}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10A7B, stream);
-    helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{55298}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{56955}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{55298}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{56955}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xE01EF, stream);
-    helper.Equal(stream.Length(), SizeT{2}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{56128}, "stream.First()", __LINE__);
-    helper.EqualsTrue(*(stream.First() + 1U) == QChar{56815}, "*(stream.First()+1)", __LINE__);
+    helper.Equal(stream.Length(), SizeT{2}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{56128}, __LINE__);
+    helper.EqualsTrue(*(stream.First() + 1U) == QChar{56815}, __LINE__);
     stream.Clear();
 }
 
@@ -214,63 +214,63 @@ static void TestToUTF32(QTest &helper) {
     StringStream<char32_t> stream;
 
     Unicode::ToUTF<QChar>(0x0000, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{U'\0'}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{U'\0'}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x003D, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{U'='}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{U'='}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x007F, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{127}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{127}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x0080, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{128}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{128}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x00A1, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{161}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{161}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x07FF, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{2047}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{2047}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x0800, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{2048}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{2048}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x08A7, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{2215}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{2215}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xFFFF, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{65535}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{65535}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10000, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{65536}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{65536}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0x10A7B, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{68219}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{68219}, __LINE__);
     stream.Clear();
 
     Unicode::ToUTF<QChar>(0xE01EF, stream);
-    helper.Equal(stream.Length(), SizeT{1}, "stream.Length()", __LINE__);
-    helper.EqualsTrue(*(stream.First()) == QChar{917999}, "stream.First()", __LINE__);
+    helper.Equal(stream.Length(), SizeT{1}, __LINE__);
+    helper.EqualsTrue(*(stream.First()) == QChar{917999}, __LINE__);
     stream.Clear();
 }
 
