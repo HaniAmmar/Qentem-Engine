@@ -69,6 +69,11 @@ static void SelfTestLeak(QTest &helper, char *&ptr) {
     helper.IsNotNull(nptr, 1);
     helper.IsEqual(true, false, 4);
     helper.IsNotEqual(true, true, 5);
+    helper.IsNotEqual(u'a', u'a', 7);
+    helper.IsNotEqual(U'a', U'a', 6);
+
+    TestOutPut::Print(u"a");
+    TestOutPut::Print(U"a");
 }
 
 static void SelfTest() {
