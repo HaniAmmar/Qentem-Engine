@@ -2104,8 +2104,9 @@ static void TestHexStringToNumber(QTest &helper) {
 
 template <typename Stream_T>
 static void TestIntToString1(QTest &helper, Stream_T &stream) {
+    IntToStreamEqual(helper, stream, char{100}, "100", __LINE__);
     IntToStreamEqual(helper, stream, SizeT8{255}, "255", __LINE__);
-    IntToStreamEqual(helper, stream, (signed char)(-100), "-100", __LINE__);
+    IntToStreamEqual(helper, stream, SizeT8I(-100), "-100", __LINE__);
 
     IntToStreamEqual(helper, stream, SizeT16{65535}, "65535", __LINE__);
     IntToStreamEqual(helper, stream, short{-32767}, "-32767", __LINE__);

@@ -27,6 +27,7 @@ namespace Qentem {
 
 using NullType = decltype(nullptr);
 using SizeT8   = unsigned char;
+using SizeT8I  = signed char;
 using SizeT16  = unsigned short;
 using SizeT32  = unsigned int;
 using SizeT32I = int;

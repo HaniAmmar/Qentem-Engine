@@ -222,27 +222,13 @@ union QNumber8 {
     QNumber8 &operator=(const QNumber8 &) noexcept = default;
     ~QNumber8() noexcept                           = default;
 
-    inline explicit QNumber8(const SizeT8 num) noexcept : Natural{num} {
-    }
-
-    inline explicit QNumber8(const char num) noexcept : Integer{num} {
-    }
-
     template <typename Number_T>
     inline explicit QNumber8(const Number_T num) noexcept {
         if (IsUnsigned<Number_T>()) {
             Natural = SizeT8(num);
         } else {
-            Integer = char(num);
+            Integer = SizeT8I(num);
         }
-    }
-
-    inline void operator=(const SizeT8 num) noexcept {
-        Natural = num;
-    }
-
-    inline void operator=(const char num) noexcept {
-        Integer = num;
     }
 
     template <typename Number_T>
@@ -250,7 +236,7 @@ union QNumber8 {
         if (IsUnsigned<Number_T>()) {
             Natural = SizeT8(num);
         } else {
-            Integer = char(num);
+            Integer = SizeT8I(num);
         }
     }
 
