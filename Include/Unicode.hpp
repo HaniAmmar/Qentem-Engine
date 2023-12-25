@@ -29,7 +29,14 @@ namespace Qentem {
 namespace Unicode {
 
 template <typename, typename, SizeT32>
-struct UnicodeToUTF {};
+struct UnicodeToUTF;
+
+/*
+ * ToUTF(0xC3D, stream);
+ * ToUTF(0x00A1, stream);
+ * ToUTF(0x08A7, stream);
+ * ToUTF(0x10A7B, stream);
+ */
 
 template <typename Char_T, typename Stream_T>
 static void ToUTF(SizeT32 unicode, Stream_T &stream) {
@@ -40,13 +47,6 @@ static void ToUTF(SizeT32 unicode, Stream_T &stream) {
 template <typename Char_T, typename Stream_T>
 struct UnicodeToUTF<Char_T, Stream_T, 1U> {
     static void ToUTF(SizeT32 unicode, Stream_T &stream) {
-        /*
-         * ToUTF(0xC3D, stream);
-         * ToUTF(0x00A1, stream);
-         * ToUTF(0x08A7, stream);
-         * ToUTF(0x10A7B, stream);
-         */
-
         if (unicode < 0x80U) {
             stream += Char_T(unicode);
         } else {
