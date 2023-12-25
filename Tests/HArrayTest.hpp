@@ -728,12 +728,14 @@ static void TestHArray7(QTest &helper) {
         numbers1[key] = y;
     }
 
+    const HAItem_T<SizeT, char> *storage = numbers1.Storage();
     numbers1.Clear();
     helper.IsEqual(numbers1.Size(), 0U, __LINE__);
     helper.IsEqual(numbers1.ActualSize(), 0U, __LINE__);
     helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
     helper.IsNull(numbers1.Last(), __LINE__);
+    helper.IsEqual(numbers1.Storage(), storage, __LINE__);
 
     for (SizeT y = 0; y < 16; y++) {
         String<char> key;
@@ -752,6 +754,7 @@ static void TestHArray7(QTest &helper) {
     helper.IsEqual(numbers1.Size(), 0U, __LINE__);
     helper.IsEqual(numbers1.ActualSize(), 0U, __LINE__);
     helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
+    helper.IsEqual(numbers1.Storage(), storage, __LINE__);
 
     numbers1.Reset();
     helper.IsEqual(numbers1.Size(), 0U, __LINE__);

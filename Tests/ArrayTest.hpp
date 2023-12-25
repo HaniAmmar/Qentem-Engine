@@ -157,10 +157,12 @@ static void TestArray1(QTest &helper) {
     helper.IsEqual(numbers2.Capacity(), 0U, __LINE__);
     helper.IsNull(numbers2.First(), __LINE__);
 
+    storage = numbers1.First();
     numbers1.Clear();
     helper.IsEqual(numbers1.Size(), 0U, __LINE__);
     helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
+    helper.IsEqual(numbers1.First(), storage, __LINE__);
 
     numbers1.ResizeAndInitialize(3);
     numbers2.ResizeAndInitialize(5);
@@ -286,9 +288,11 @@ static void TestArray3(QTest &helper) {
     helper.IsEqual(numbers2.Size(), 8U, __LINE__);
     helper.IsEqual(numbers2.Capacity(), 8U, __LINE__);
 
+    storage2 = numbers2.Storage();
     numbers2.Clear();
     helper.IsEqual(numbers2.Size(), 0U, __LINE__);
     helper.IsEqual(numbers2.Capacity(), 8U, __LINE__);
+    helper.IsEqual(numbers2.Storage(), storage2, __LINE__);
 
     numbers2.Reset();
     helper.IsEqual(numbers2.Size(), 0U, __LINE__);
