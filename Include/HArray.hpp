@@ -152,8 +152,8 @@ struct HArray {
 
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
-            HAItem     *storage = Storage();
             SizeT      *ht      = _data.GetHashTable();
+            HAItem     *storage = _data.GetStorage(ht);
             const SizeT size    = Size();
 
             _data.HashTable.MovePointerOnly(src._data.HashTable);
@@ -172,8 +172,8 @@ struct HArray {
 
     HArray &operator=(const HArray &src) {
         if (this != &src) {
-            HAItem     *storage = Storage();
             SizeT      *ht      = _data.GetHashTable();
+            HAItem     *storage = _data.GetStorage(ht);
             const SizeT size    = Size();
 
             setHashTable(nullptr);
@@ -487,6 +487,15 @@ struct HArray {
         if (size != SizeT{0}) {
             allocate(size);
         }
+    }
+
+    void Clear() noexcept {
+        constexpr SizeT32 size    = sizeof(SizeT);
+        SizeT            *ht      = _data.GetHashTable();
+        HAItem           *storage = _data.GetStorage(ht);
+        Memory::SetToZero(ht, (size * Capacity()));
+        Memory::Dispose(storage, (storage + Size()));
+        setSize(SizeT{0});
     }
 
     void Reset() noexcept {
