@@ -3,43 +3,38 @@
 
 #include <iostream>
 
-using Qentem::Array;
-using Qentem::HArray;
 using Qentem::JSON;
 using Qentem::SizeT;
-using Qentem::SizeT32;
 using Qentem::StringStream;
 using Qentem::StringUtils;
-using Qentem::Template;
-using Qentem::TemplateSub;
-using Qentem::Value;
 
 template <typename Char_T, typename Value_T, typename StringStream_T>
 inline static void CachedRender(const Char_T *content, const SizeT length, const Value_T &value, StringStream_T &stream,
                                 const Char_T *name, const SizeT name_length) {
-    // This is not a thread safe function, and its here to show how to cache processed tags.
-    // Can be used in a single threaded process to build on. One easy way is to Parse() all templates
-    // before starting multi-threading process.
+    // This is not a thread-safe function, and it's here to show how to cache processed tags. Can be used in a
+    // single-threaded process to build on. One lazy way to make it safe is to Parse() all templates before starting the
+    // multi-threading process.
 
-    using TemplateSubCV = TemplateSub<Char_T, Value_T, StringStream_T>;
+    using TemplateSubCV = Qentem::TemplateSub<Char_T, Value_T, StringStream_T>;
+    using Tag           = Qentem::Tags::TagBit;
+    using Qentem::Array;
+    using Qentem::HArray;
 
-    const TemplateSubCV temp{content, length, &stream, &value};
-
-    static HArray<Array<Qentem::Tags::TagBit>, Char_T> cache;
-
-    Array<Qentem::Tags::TagBit> &tags = cache.Get(name, name_length);
+    static HArray<Array<Tag>, Char_T> cache;
+    const TemplateSubCV               temp{content, length, &stream, &value};
+    Array<Tag>                       &tags = cache.Get(name, name_length);
 
     if (tags.IsEmpty()) {
         temp.Parse(tags);
     }
 
-    const Qentem::Tags::TagBit *tag = tags.First();
-    const Qentem::Tags::TagBit *end = (tag + tags.Size());
+    const Tag *tag = tags.First();
+    const Tag *end = (tag + tags.Size()); // Or tags.End()
     temp.Render(tag, end);
 }
 
 int main() {
-    auto value = JSON::Parse(R"(
+    Qentem::Value<char> value = JSON::Parse(R"(
 [
     {
         "major": "Computer Science",
@@ -89,12 +84,15 @@ int main() {
 </html>
 )";
 
-    const SizeT        content_length = StringUtils::Count(content);
+    // Qentem::Template can use any stream if it has Write(const char_type *, length) function.
     StringStream<char> stream;
+    const char        *template_name        = "page1";
+    const SizeT        template_name_length = 5U;
+    const SizeT        content_length       = StringUtils::Count(content);
 
-    for (SizeT32 i = 0; i < 10000U; i++) {
+    for (unsigned int i = 0; i < 10000U; i++) {
         stream.Clear();
-        CachedRender(content, content_length, value, stream, "page1", 5);
+        CachedRender(content, content_length, value, stream, template_name, template_name_length);
     }
 
     std::cout << stream << '\n';
