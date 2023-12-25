@@ -900,6 +900,7 @@ struct Digit {
                                    const SizeT32 calculated_digits, SizeT32 fraction_length, const bool is_positive_exp,
                                    const bool round_up) {
         using Char_T                     = typename Stream_T::CharType;
+        Char_T       *storage            = stream.Storage();
         const SizeT   stream_length      = (stream.Length() - started_at);
         SizeT         index              = started_at;
         const SizeT32 precision_plus_one = (precision + 1U);
@@ -926,7 +927,7 @@ struct Digit {
             roundStringNumber(stream, index, is_power_increased, round_up);
 
             if (is_power_increased) {
-                stream.Storage()[index] = DigitUtils::DigitChar::One;
+                storage[index] = DigitUtils::DigitChar::One;
 
                 if (is_positive_exp) {
                     fraction_length = 0U;
@@ -937,7 +938,7 @@ struct Digit {
 
                         do {
                             --index;
-                            stream.Storage()[index] = DigitUtils::DigitChar::Zero;
+                            storage[index] = DigitUtils::DigitChar::Zero;
                         } while (--power_index != 0U);
                     }
                 } else {
@@ -949,7 +950,7 @@ struct Digit {
         const bool display_exp =
             ((is_positive_exp && ((power + SizeT{1}) > precision)) || (!is_positive_exp && (power > SizeT{4})));
         /////////////////////////////////////////////////////
-        Char_T       *number = (stream.Storage() + index);
+        Char_T       *number = (storage + index);
         const Char_T *last   = stream.Last();
 
         if (display_exp || (fraction_length != 0U)) {
@@ -976,10 +977,7 @@ struct Digit {
         }
 
         stream.Reverse(started_at);
-
-        if (index != started_at) {
-            stream.StepBack(index - started_at);
-        }
+        stream.StepBack(index - started_at);
 
         if (display_exp) {
             insertPowerOfTen(stream, power, is_positive_exp);
@@ -1006,10 +1004,10 @@ struct Digit {
                 ++index;
             }
 
-            if ((number != last) || (*number != DigitUtils::DigitChar::Nine)) {
+            is_power_increased = !((number != last) || (*number != DigitUtils::DigitChar::Nine));
+
+            if (!is_power_increased) {
                 ++(*number);
-            } else {
-                is_power_increased = true;
             }
         }
     }
