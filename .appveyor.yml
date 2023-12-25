@@ -10,20 +10,18 @@ environment:
   matrix:
 
   - job_name: Windows x64
-    appveyor_build_worker_image: Visual Studio 2019
+    appveyor_build_worker_image: Visual Studio 2022
     platform: x64
 
   # - job_name: Windows ARM
   #   appveyor_build_worker_image: Visual Studio 2022
   #   platform: ARM
 
-  # - job_name: Windows x86
-  #   appveyor_build_worker_image: Visual Studio 2019
-  #   platform: x86
+  - job_name: Windows x86
+    appveyor_build_worker_image: Visual Studio 2019
 
   - job_name: Linux x64
     appveyor_build_worker_image: Ubuntu2204
-    platform: x64
 
   - job_name: Linux x86
     appveyor_build_worker_image: Ubuntu2204
@@ -46,7 +44,7 @@ for:
     build_script:
     - cmd: mkdir Build
     - cmd: cd Build
-    - cmd: cmake ..
+    - cmd: cmake -A x64 ..
     - cmd: cmake --build .
 
     test_script:
@@ -66,19 +64,19 @@ for:
   #   test_script:
   #   - cmd: ctest -C Debug
 
-  # -
-  #   matrix:
-  #     only:
-  #       - job_name: Windows x86
+  -
+    matrix:
+      only:
+        - job_name: Windows x86
 
-  #   build_script:
-  #   - cmd: mkdir Build
-  #   - cmd: cd Build
-  #   - cmd: cmake ..
-  #   - cmd: cmake --build .
+    build_script:
+    - cmd: mkdir Build
+    - cmd: cd Build
+    - cmd: cmake -A Win32 ..
+    - cmd: cmake --build .
 
-  #   test_script:
-  #   - cmd: ctest -C Debug
+    test_script:
+    - cmd: ctest -C Debug
 
   -
     matrix:
