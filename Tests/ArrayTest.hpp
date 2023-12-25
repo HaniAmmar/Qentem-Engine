@@ -257,7 +257,7 @@ static void TestArray3(QTest &helper) {
     const SizeT *storage2 = numbers1.Storage();
 
     helper.IsEqual(numbers1.Size(), 8U, __LINE__);
-    helper.IsTrue((numbers1.Capacity() >= 8), __LINE__);
+    helper.IsTrue((numbers1.Capacity() >= 8U), __LINE__);
     helper.IsNotNull(numbers1.First(), __LINE__);
 
     SizeT sum = 0;
@@ -285,6 +285,14 @@ static void TestArray3(QTest &helper) {
     numbers2.Compress();
     helper.IsEqual(numbers2.Size(), 8U, __LINE__);
     helper.IsEqual(numbers2.Capacity(), 8U, __LINE__);
+
+    numbers2.Clear();
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Capacity(), 8U, __LINE__);
+
+    numbers2.Reset();
+    helper.IsEqual(numbers2.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers2.Capacity(), 0U, __LINE__);
 
     // Checking move
     String<char> str1("val--------------------------------1");

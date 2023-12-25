@@ -718,6 +718,45 @@ static void TestHArray7(QTest &helper) {
 
     numbers1.Resize((id + 1));
     helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    ////////////////////////////
+    numbers1.Reset();
+    numbers1.Reserve(16);
+    for (SizeT y = 0; y < 16; y++) {
+        String<char> key;
+
+        Digit::NumberToString(key, y);
+        numbers1[key] = y;
+    }
+
+    numbers1.Clear();
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.ActualSize(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
+    helper.IsNull(numbers1.Last(), __LINE__);
+
+    for (SizeT y = 0; y < 16; y++) {
+        String<char> key;
+
+        Digit::NumberToString(key, y);
+        numbers1[key] = y;
+    }
+
+    helper.IsEqual(numbers1.Size(), 16U, __LINE__);
+    helper.IsEqual(numbers1.ActualSize(), 16U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
+    helper.IsNotNull(numbers1.First(), __LINE__);
+    helper.IsNotNull(numbers1.Last(), __LINE__);
+
+    numbers1.Clear();
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.ActualSize(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 16U, __LINE__);
+
+    numbers1.Reset();
+    helper.IsEqual(numbers1.Size(), 0U, __LINE__);
+    helper.IsEqual(numbers1.ActualSize(), 0U, __LINE__);
+    helper.IsEqual(numbers1.Capacity(), 0U, __LINE__);
 }
 
 static void TestHArray8(QTest &helper) {
