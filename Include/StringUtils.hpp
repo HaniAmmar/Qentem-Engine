@@ -140,7 +140,7 @@ struct StringUtils {
             ++offset;
         }
 
-        return (orEqual && (left_length == right_length));
+        return (orEqual & (left_length == right_length));
     }
 
     template <typename Char_T>
@@ -160,7 +160,7 @@ struct StringUtils {
             ++offset;
         }
 
-        return (orEqual && (left_length == right_length));
+        return (orEqual & (left_length == right_length));
     }
 
     template <typename Char_T>

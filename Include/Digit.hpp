@@ -381,8 +381,8 @@ struct Digit {
                         (SizeT32(tmp_offset - start_offset) - SizeT32(!fraction_only && has_dot));
 
                     const SizeT32 e_n10_power =
-                        (fraction_only ? (e_p10_power + (SizeT32(start_offset - dot_offset) - SizeT32{1}))
-                                       : (has_dot ? (SizeT32(offset - dot_offset) - SizeT32{1}) : SizeT32{0}));
+                        (fraction_only ? (e_p10_power + (SizeT32(start_offset - dot_offset) - 1U))
+                                       : (has_dot ? (SizeT32(offset - dot_offset) - 1U) : 0U));
 
                     // const SizeT32 e_n10_power =
                     //     (fraction_only
@@ -441,8 +441,8 @@ struct Digit {
 
                     if (!fraction_only && (start_offset != offset)) {
                         if (!has_dot) {
-                            e_extra_p10_power = SizeT32((exp_offset == SizeT32{0}) ? (offset - start_offset)
-                                                                                   : (exp_offset - start_offset));
+                            e_extra_p10_power =
+                                SizeT32((exp_offset == 0U) ? (offset - start_offset) : (exp_offset - start_offset));
                         } else if (dot_offset != tmp_offset) {
                             e_extra_p10_power = SizeT32(dot_offset - start_offset);
                         }
@@ -516,7 +516,7 @@ struct Digit {
                 exponent -= DigitConst::MaxPowerOfFive;
             }
 
-            if (exponent != SizeT32{0}) {
+            if (exponent != 0U) {
                 bint *= DigitConst::GetPowerOfOneOverFive(exponent);
                 bint >>= DigitConst::MaxShift;
                 shifted += DigitConst::GetPowerOfOneOverFiveShift(exponent);
@@ -529,7 +529,7 @@ struct Digit {
                 exponent -= DigitConst::MaxPowerOfFive;
             }
 
-            if (exponent != SizeT32{0}) {
+            if (exponent != 0U) {
                 bint <<= DigitConst::MaxShift;
                 bint /= DigitConst::GetPowerOfFive(exponent);
                 shifted += DigitConst::MaxShift;
@@ -597,7 +597,7 @@ struct Digit {
             exponent -= DigitConst::MaxPowerOfFive;
         }
 
-        if (exponent != SizeT32{0}) {
+        if (exponent != 0U) {
             bint *= DigitConst::GetPowerOfFive(exponent);
         }
         //////////////////////////////////////////////////////////////
@@ -749,10 +749,10 @@ struct Digit {
                 const bool    extra_digits     = (digits > format.Precision);
                 bool          round_up         = false;
                 const bool    big_offset       = (positive_exp >= first_bit);
-                const bool    no_fraction      = (is_positive_exp && (big_offset || extra_digits));
+                const bool    no_fraction      = (is_positive_exp & (big_offset | extra_digits));
                 /////////////////////////////////////
                 if (no_fraction) {
-                    const SizeT32 drop    = ((!extra_digits) ? SizeT32{0} : (digits - (format.Precision + SizeT32{1})));
+                    const SizeT32 drop    = ((!extra_digits) ? 0U : (digits - (format.Precision + 1U)));
                     const SizeT32 m_shift = (Info_T::MantissaSize + drop);
 
                     if (m_shift < positive_exp) {
@@ -792,7 +792,7 @@ struct Digit {
 
                     if (times >= DigitConst::MaxPowerOfFive) {
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
-                                                      ? ((format.Precision / DigitConst::MaxPowerOfTen) + SizeT32{2})
+                                                      ? ((format.Precision / DigitConst::MaxPowerOfTen) + 2U)
                                                       : bint.MaxIndex();
 
                         do {
@@ -807,7 +807,7 @@ struct Digit {
                         } while (times >= DigitConst::MaxPowerOfFive);
                     }
 
-                    if (times != SizeT32{0}) {
+                    if (times != 0U) {
                         bint *= DigitConst::GetPowerOfFive(times);
                     }
 
@@ -902,7 +902,7 @@ struct Digit {
         using Char_T                     = typename Stream_T::CharType;
         const SizeT   stream_length      = (stream.Length() - started_at);
         SizeT         index              = started_at;
-        const SizeT32 precision_plus_one = (precision + SizeT32{1});
+        const SizeT32 precision_plus_one = (precision + 1U);
         SizeT32       length;
         SizeT32       power;
 
@@ -911,11 +911,10 @@ struct Digit {
                 stream_length +
                 ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
                 fraction_length);
-            power = (length - SizeT32{1});
+            power = (length - 1U);
         } else {
             length = SizeT32(stream_length);
-            power  = SizeT32(((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT32{0}) +
-                             SizeT32{1});
+            power  = SizeT32(((fraction_length > stream_length) ? (fraction_length - stream_length) : 0U) + 1U);
         }
 
         if (stream_length > precision_plus_one) {
@@ -930,7 +929,7 @@ struct Digit {
                 stream.Storage()[index] = DigitUtils::DigitChar::One;
 
                 if (is_positive_exp) {
-                    fraction_length = SizeT32{0};
+                    fraction_length = 0U;
                     ++power;
 
                     if (power < precision) {
@@ -939,7 +938,7 @@ struct Digit {
                         do {
                             --index;
                             stream.Storage()[index] = DigitUtils::DigitChar::Zero;
-                        } while (--power_index != SizeT32{0});
+                        } while (--power_index != 0U);
                     }
                 } else {
                     --power;
@@ -953,7 +952,7 @@ struct Digit {
         Char_T       *number = (stream.Storage() + index);
         const Char_T *last   = stream.Last();
 
-        if (display_exp || (fraction_length != SizeT32{0})) {
+        if (display_exp || (fraction_length != 0U)) {
             while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
                 ++number;
                 ++index;
@@ -963,7 +962,7 @@ struct Digit {
         const SizeT index2 = (index - started_at);
 
         if (!display_exp) {
-            if ((fraction_length != SizeT32{0}) && (fraction_length > index2)) {
+            if ((fraction_length != 0U) && (fraction_length > index2)) {
                 if (!is_positive_exp && (power != SizeT{0})) {
                     insertZeros(stream, SizeT(power - SizeT{1}));
                     stream += DigitUtils::DigitChar::Dot;
@@ -997,10 +996,10 @@ struct Digit {
         ++index;
 
         const bool round =
-            ((number < last) && ((*number > DigitUtils::DigitChar::Five) ||
-                                 ((*number == DigitUtils::DigitChar::Five) &&
-                                  (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChar::Zero) &
-                                                 SizeT32{1}) == SizeT32{1})))));
+            ((number < last) &&
+             ((*number > DigitUtils::DigitChar::Five) ||
+              ((*number == DigitUtils::DigitChar::Five) &&
+               (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
 
         if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {

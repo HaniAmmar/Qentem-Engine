@@ -87,7 +87,7 @@ struct BigInt {
             N_Number_T num   = 0;
             SizeT32    count = (n_width / TypeWidth());
 
-            while ((--count != SizeT32{0}) && (count >= _index)) {
+            while ((--count != 0U) && (count >= _index)) {
                 num |= _storage[1];
                 num <<= TypeWidth();
             }
@@ -342,9 +342,8 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
-        return (((TypeWidth() * (TotalBits() / TypeWidth())) == TotalBits())
-                    ? (TotalBits() / TypeWidth())
-                    : ((TotalBits() / TypeWidth()) + SizeT32{1}));
+        return (((TypeWidth() * (TotalBits() / TypeWidth())) == TotalBits()) ? (TotalBits() / TypeWidth())
+                                                                             : ((TotalBits() / TypeWidth()) + 1U));
     }
 
     inline static constexpr SizeT32 TypeWidth() noexcept {
