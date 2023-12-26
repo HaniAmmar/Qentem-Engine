@@ -27,6 +27,8 @@
 
 namespace Qentem {
 
+// For TRUE arbitrary-precision arithmetic.
+
 // Width_T is the needed number of bits:
 // 2 64bit int = 128 bits
 // 6 64bit int = 384 bits
