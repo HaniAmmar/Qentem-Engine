@@ -5,26 +5,26 @@
 using Qentem::BigInt;
 ///////////////////////////////////////
 template <typename BigInt_T>
-static void StreamDigits(char *bits, unsigned int &index, BigInt_T &bint) {
+static void StreamDigits(char *storage, unsigned int &index, BigInt_T &bint) {
     index = 0;
 
     while (bint != 0) {
-        bits[index] = (static_cast<char>(bint.Divide(10)) + '0');
+        storage[index] = (static_cast<char>(bint.Divide(10)) + '0');
         ++index;
     }
 }
 
 template <typename BigInt_T>
 static void PrintDigits(BigInt_T bint) {
-    constexpr unsigned int max   = 309U;
+    constexpr unsigned int max = (((bint.TotalBits() * 30103U) / 100000U) + 1U);
+    char                   storage[max]{0};
     unsigned int           index = 0;
-    static char            bits[max]{0};
 
-    StreamDigits(&(bits[0]), index, bint);
+    StreamDigits(&(storage[0]), index, bint);
 
     while (index != 0) {
         --index;
-        std::cout << bits[index];
+        std::cout << storage[index];
     }
 
     std::cout << "\n\n";
