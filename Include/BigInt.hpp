@@ -579,9 +579,7 @@ struct DoubleSize<Number_T, 8U> {
     static constexpr SizeT32 shift = 8U;
 
     inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              const SizeT32 initial_shift) noexcept {
-        (void)initial_shift;
-
+                              SizeT32) noexcept {
         SizeT16 dividend16 = dividend_high;
         dividend16 <<= shift;
         dividend16 |= dividend_low;
@@ -604,9 +602,7 @@ struct DoubleSize<Number_T, 16U> {
     static constexpr SizeT32 shift = 16U;
 
     inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              const SizeT32 initial_shift) noexcept {
-        (void)initial_shift;
-
+                              SizeT32) noexcept {
         SizeT32 dividend32 = dividend_high;
         dividend32 <<= shift;
         dividend32 |= dividend_low;
@@ -629,9 +625,7 @@ struct DoubleSize<Number_T, 32U> {
     static constexpr SizeT32 shift = 32U;
 
     inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
-                              const SizeT32 initial_shift) noexcept {
-        (void)initial_shift;
-
+                              SizeT32) noexcept {
         SizeT64 dividend64 = dividend_high;
         dividend64 <<= shift;
         dividend64 |= dividend_low;
