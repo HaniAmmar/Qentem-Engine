@@ -60,17 +60,18 @@ struct BigInt {
 
     template <typename N_Number_T>
     inline BigInt(const N_Number_T number) noexcept {
-        multiOperation<BigIntOperation::Set>(number);
+        doOperation<BigIntOperation::Set>(number);
     }
 
     template <typename N_Number_T>
     inline BigInt &operator=(const N_Number_T number) noexcept {
-        while (_index != 0U) {
-            _storage[_index] = Number_T{0};
-            --_index;
-        }
+        SizeT32 index = _index;
+        doOperation<BigIntOperation::Set>(number);
 
-        multiOperation<BigIntOperation::Set>(number);
+        while (index > _index) {
+            _storage[index] = Number_T{0};
+            --index;
+        }
 
         return *this;
     }
@@ -158,22 +159,22 @@ struct BigInt {
 
     template <typename N_Number_T>
     inline void operator|=(const N_Number_T number) noexcept {
-        multiOperation<BigIntOperation::Or>(number);
+        doOperation<BigIntOperation::Or>(number);
     }
 
     template <typename N_Number_T>
     inline void operator&=(const N_Number_T number) noexcept {
-        multiOperation<BigIntOperation::And>(number);
+        doOperation<BigIntOperation::And>(number);
     }
 
     template <typename N_Number_T>
     inline void operator+=(const N_Number_T number) noexcept {
-        multiOperation<BigIntOperation::Add>(number);
+        doOperation<BigIntOperation::Add>(number);
     }
 
     template <typename N_Number_T>
     inline void operator-=(const N_Number_T number) noexcept {
-        multiOperation<BigIntOperation::Subtract>(number);
+        doOperation<BigIntOperation::Subtract>(number);
     }
 
     inline void operator*=(const Number_T number) noexcept {
@@ -257,9 +258,9 @@ struct BigInt {
     }
     ////////////////////////////////////////////////////
     inline void ShiftRight(SizeT32 offset) noexcept {
-        SizeT32 index = 0U;
-
         while (offset >= TypeWidth()) {
+            SizeT32 index = 0U;
+
             while (index < _index) {
                 _storage[index] = _storage[index + 1U];
                 ++index;
@@ -268,11 +269,11 @@ struct BigInt {
             _storage[_index] = Number_T{0};
             _index -= SizeT32(_index != 0U);
 
-            index = 0U;
             offset -= TypeWidth();
         }
 
         if (offset != 0U) {
+            SizeT32       index      = 0U;
             const SizeT32 shift_size = (TypeWidth() - offset);
 
             _storage[0U] >>= offset;
@@ -398,7 +399,7 @@ struct BigInt {
     SizeT32  _index{0};
 
     template <BigIntOperation Operation>
-    inline void multiOperation(Number_T number) noexcept {
+    inline void doOperation(Number_T number) noexcept {
         switch (Operation) {
             case BigIntOperation::Add: {
                 Add(number);
@@ -417,19 +418,20 @@ struct BigInt {
 
             case BigIntOperation::And: {
                 _storage[0U] &= number;
+                _index = 0U;
                 break;
             }
 
             default: {
                 _storage[0U] = number;
+                _index       = 0U;
             }
         }
     }
 
     template <BigIntOperation Operation, typename N_Number_T>
-    inline void multiOperation(N_Number_T number) noexcept {
-        constexpr SizeT32 n_size         = ((sizeof(N_Number_T) * 8U) / TypeWidth());
-        constexpr bool    is_bigger_size = (n_size > 1U);
+    inline void doOperation(N_Number_T number) noexcept {
+        constexpr bool is_bigger_size = (((sizeof(N_Number_T) * 8U) / TypeWidth()) > 1U);
 
         switch (Operation) {
             case BigIntOperation::Add: {
@@ -449,47 +451,60 @@ struct BigInt {
 
             case BigIntOperation::And: {
                 _storage[0U] &= Number_T(number);
+                _index = 0U;
                 break;
             }
 
             default: {
                 _storage[0U] = Number_T(number);
+                _index       = 0U;
             }
         }
 
         if (is_bigger_size) {
+            SizeT32 index = 1U;
             number >>= TypeWidth();
 
             while (number != N_Number_T{0}) {
-                ++_index;
-
                 switch (Operation) {
                     case BigIntOperation::Add: {
-                        Add(Number_T(number), _index);
+                        Add(Number_T(number), index);
                         break;
                     }
 
                     case BigIntOperation::Subtract: {
-                        Subtract(Number_T(number), _index);
+                        Subtract(Number_T(number), index);
                         break;
                     }
 
                     case BigIntOperation::Or: {
-                        _storage[_index] |= Number_T(number);
+                        _storage[index] |= Number_T(number);
+
+                        if (index > _index) {
+                            _index = index;
+                        }
+
                         break;
                     }
 
                     case BigIntOperation::And: {
-                        _storage[_index] &= Number_T(number);
+                        _storage[index] &= Number_T(number);
+
+                        if (_storage[index] != Number_T(0)) {
+                            _index = index;
+                        }
+
                         break;
                     }
 
                     default: {
-                        _storage[_index] = Number_T(number);
+                        _storage[index] = Number_T(number);
+                        ++_index;
                     }
                 }
 
                 number >>= TypeWidth();
+                ++index;
             }
         }
     }
