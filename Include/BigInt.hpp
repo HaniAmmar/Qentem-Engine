@@ -344,8 +344,8 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
-        return (((TypeWidth() * (TotalBits() / TypeWidth())) == TotalBits()) ? (TotalBits() / TypeWidth())
-                                                                             : ((TotalBits() / TypeWidth()) + 1U));
+        return (((TypeWidth() * (TotalBits() / TypeWidth())) == TotalBits()) ? ((TotalBits() / TypeWidth()) - 1U)
+                                                                             : (TotalBits() / TypeWidth()));
     }
 
     inline static constexpr SizeT32 TypeWidth() noexcept {

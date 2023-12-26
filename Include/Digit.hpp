@@ -497,7 +497,7 @@ struct Digit {
         using UNumber_T  = SizeT64;
         using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 192U> bint{number};
+        BigInt<UNumber_T, 256U> bint{number};
         //////////////////////////////////////////////////////////////
         SizeT32 shifted{exponent};
         //////////////////////////////////////////////////////////////
@@ -583,7 +583,7 @@ struct Digit {
         using UNumber_T  = SystemIntType;
         using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 192U> bint{number};
+        BigInt<UNumber_T, 256U> bint{number};
         //////////////////////////////////////////////////////////////
         constexpr SizeT32 bint_limit{2U};
         SizeT32           shifted{exponent};
