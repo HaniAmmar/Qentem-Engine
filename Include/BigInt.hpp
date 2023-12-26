@@ -339,6 +339,15 @@ struct BigInt {
         return _storage[0U];
     }
 
+    inline void Clear() noexcept {
+        _storage[0U] = Number_T{0};
+
+        while (_index != 0U) {
+            _storage[_index] = Number_T{0};
+            --_index;
+        }
+    }
+
     inline SizeT32 Index() const noexcept {
         return _index;
     }
