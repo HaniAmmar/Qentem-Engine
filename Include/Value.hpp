@@ -86,12 +86,12 @@ struct VNumberData<false, true> {
 template <>
 struct VNumberData<true, true> {
     // Big-Endian
-    VNumberData()                               = default;
-    VNumberData(VNumberData &&)                 = default;
-    VNumberData(const VNumberData &)            = default;
-    VNumberData &operator=(VNumberData &&)      = default;
-    VNumberData &operator=(const VNumberData &) = default;
-    ~VNumberData()                              = default;
+    VNumberData() noexcept                          = default;
+    VNumberData(VNumberData &&) noexcept            = default;
+    VNumberData(const VNumberData &)                = default;
+    VNumberData &operator=(VNumberData &&) noexcept = default;
+    VNumberData &operator=(const VNumberData &)     = default;
+    ~VNumberData()                                  = default;
 
     template <typename Number_T>
     inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
@@ -122,12 +122,12 @@ struct VNumberData<true, true> {
 template <bool Endian_T>
 struct VNumberData<Endian_T, false> {
     // 32-bit only
-    VNumberData()                               = default;
-    VNumberData(VNumberData &&)                 = default;
-    VNumberData(const VNumberData &)            = default;
-    VNumberData &operator=(VNumberData &&)      = default;
-    VNumberData &operator=(const VNumberData &) = default;
-    ~VNumberData()                              = default;
+    VNumberData() noexcept                          = default;
+    VNumberData(VNumberData &&) noexcept            = default;
+    VNumberData(const VNumberData &)                = default;
+    VNumberData &operator=(VNumberData &&) noexcept = default;
+    VNumberData &operator=(const VNumberData &)     = default;
+    ~VNumberData()                                  = default;
 
     template <typename Number_T>
     inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
@@ -159,8 +159,9 @@ struct VNumberT {
     }
 
     template <typename Number_T>
-    inline void operator=(Number_T num) noexcept {
+    VNumberT &operator=(Number_T num) noexcept {
         _data.Number = num;
+        return *this;
     }
 
     inline SizeT64 GetUInt64() const noexcept {
@@ -478,72 +479,83 @@ struct Value {
         return *this;
     }
 
-    inline void operator=(ValueType type) noexcept {
+    Value &operator=(ValueType type) noexcept {
         setType(type);
+        return *this;
     }
 
-    inline void operator=(VObjectT &&obj) noexcept {
+    Value &operator=(VObjectT &&obj) noexcept {
         reset();
         _data.VObject = Memory::Move(obj);
         setTypeToObject();
+        return *this;
     }
 
-    inline void operator=(const VObjectT &obj) {
+    Value &operator=(const VObjectT &obj) {
         reset();
         _data.VObject = obj;
         setTypeToObject();
+        return *this;
     }
 
-    inline void operator=(VArrayT &&arr) noexcept {
+    Value &operator=(VArrayT &&arr) noexcept {
         reset();
         _data.VArray = Memory::Move(arr);
         setTypeToArray();
+        return *this;
     }
 
-    inline void operator=(const VArrayT &arr) {
+    Value &operator=(const VArrayT &arr) {
         reset();
         _data.VArray = arr;
         setTypeToArray();
+        return *this;
     }
 
-    inline void operator=(VStringT &&str) noexcept {
+    Value &operator=(VStringT &&str) noexcept {
         reset();
         _data.VString = Memory::Move(str);
         setTypeToString();
+        return *this;
     }
 
-    inline void operator=(const VStringT &str) {
+    Value &operator=(const VStringT &str) {
         reset();
         _data.VString = str;
         setTypeToString();
+        return *this;
     }
 
-    inline void operator=(const Char_T *str) {
+    Value &operator=(const Char_T *str) {
         reset();
         _data.VString = VStringT{str};
         setTypeToString();
+        return *this;
     }
 
-    inline void operator=(SizeT64 num) noexcept {
+    Value &operator=(SizeT64 num) noexcept {
         reset();
         _data.VNumber = num;
         setTypeToUInt64();
+        return *this;
     }
 
-    inline void operator=(SizeT64I num) noexcept {
+    Value &operator=(SizeT64I num) noexcept {
         reset();
         _data.VNumber = num;
         setTypeToInt64();
+        return *this;
     }
 
-    inline void operator=(double num) noexcept {
+    Value &operator=(double num) noexcept {
         reset();
         _data.VNumber = num;
         setTypeToDouble();
+        return *this;
     }
 
     template <typename Number_T>
-    inline void operator=(Number_T num) noexcept {
+    Value &operator=(Number_T num) noexcept {
         reset();
         _data.VNumber = num;
 
@@ -554,14 +566,16 @@ struct Value {
         } else {
             setTypeToInt64();
         }
+        return *this;
     }
 
-    inline void operator=(NullType) noexcept {
+    Value &operator=(NullType) noexcept {
         reset();
         setTypeToNull();
+        return *this;
     }
 
-    inline void operator=(bool is_true) noexcept {
+    Value &operator=(bool is_true) noexcept {
         reset();
 
         if (is_true) {
@@ -569,6 +583,7 @@ struct Value {
         } else {
             setTypeToFalse();
         }
+        return *this;
     }
 
     inline void operator+=(Value &&val) {

@@ -266,7 +266,7 @@ struct BigInt {
             }
 
             _storage[_index] = Number_T{0};
-            _index -= (_index != 0U);
+            _index -= SizeT32(_index != 0U);
 
             index = 0U;
             offset -= TypeWidth();

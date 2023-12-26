@@ -72,20 +72,23 @@ union QNumber64 {
         }
     }
 
-    inline void operator=(const SizeT64 num) noexcept {
+    inline QNumber64 &operator=(const SizeT64 num) noexcept {
         Natural = num;
+        return *this;
     }
 
-    inline void operator=(const SizeT64I num) noexcept {
+    inline QNumber64 &operator=(const SizeT64I num) noexcept {
         Integer = num;
+        return *this;
     }
 
-    inline void operator=(const double num) noexcept {
+    inline QNumber64 &operator=(const double num) noexcept {
         Real = num;
+        return *this;
     }
 
     template <typename Number_T>
-    inline void operator=(const Number_T num) noexcept {
+    inline QNumber64 &operator=(const Number_T num) noexcept {
         if (IsFloat<Number_T>()) {
             Real = double(num);
         } else if (IsUnsigned<Number_T>()) {
@@ -93,6 +96,8 @@ union QNumber64 {
         } else {
             Integer = SizeT64I(num);
         }
+
+        return *this;
     }
 
     SizeT64  Natural{0};
@@ -128,20 +133,23 @@ union QNumber32 {
         }
     }
 
-    inline void operator=(const SizeT32 num) noexcept {
+    inline QNumber32 &operator=(const SizeT32 num) noexcept {
         Natural = num;
+        return *this;
     }
 
-    inline void operator=(const SizeT32I num) noexcept {
+    inline QNumber32 &operator=(const SizeT32I num) noexcept {
         Integer = num;
+        return *this;
     }
 
-    inline void operator=(const float num) noexcept {
+    inline QNumber32 &operator=(const float num) noexcept {
         Real = num;
+        return *this;
     }
 
     template <typename Number_T>
-    inline void operator=(const Number_T num) noexcept {
+    inline QNumber32 &operator=(const Number_T num) noexcept {
         if (IsFloat<Number_T>()) {
             Real = float(num);
         } else if (IsUnsigned<Number_T>()) {
@@ -149,6 +157,8 @@ union QNumber32 {
         } else {
             Integer = SizeT32I(num);
         }
+
+        return *this;
     }
 
     SizeT32  Natural{0};
@@ -186,16 +196,18 @@ union QNumber16 {
         }
     }
 
-    inline void operator=(const SizeT16 num) noexcept {
+    inline QNumber16 &operator=(const SizeT16 num) noexcept {
         Natural = num;
+        return *this;
     }
 
-    inline void operator=(const short num) noexcept {
+    inline QNumber16 &operator=(const short num) noexcept {
         Integer = num;
+        return *this;
     }
 
     template <typename Number2_T>
-    inline void operator=(const Number2_T num) noexcept {
+    inline QNumber16 &operator=(const Number2_T num) noexcept {
 #if (defined(QENTEM_ENABLE_FLOAT_16) && (QENTEM_ENABLE_FLOAT_16 == 1)) ||                                              \
     (defined(QENTEM_ENABLE_BFLOAT_16) && (QENTEM_ENABLE_BFLOAT_16 == 1))
         if (IsFloat<Number2_T>()) {
@@ -207,6 +219,8 @@ union QNumber16 {
         } else {
             Integer = short(num);
         }
+
+        return *this;
     }
 
     SizeT16  Natural{0};
@@ -232,12 +246,14 @@ union QNumber8 {
     }
 
     template <typename Number_T>
-    inline void operator=(const Number_T num) noexcept {
+    inline QNumber8 &operator=(const Number_T num) noexcept {
         if (IsUnsigned<Number_T>()) {
             Natural = SizeT8(num);
         } else {
             Integer = SizeT8I(num);
         }
+
+        return *this;
     }
 
     SizeT8 Natural{0};

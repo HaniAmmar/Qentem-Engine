@@ -217,7 +217,9 @@ struct Digit {
 
                             number.Natural = HexStringToNumber<decltype(number.Natural)>(content, offset, end_offset);
                             return QNumberType::Natural;
-                        } else if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
+                        }
+
+                        if ((digit >= DigitUtils::DigitChar::Zero) && (digit <= DigitUtils::DigitChar::Nine)) {
                             // 0000xxxx
                             return QNumberType::NotANumber; // Leading zero.
                         }
