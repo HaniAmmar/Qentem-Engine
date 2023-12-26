@@ -258,18 +258,43 @@ struct BigInt {
     }
     ////////////////////////////////////////////////////
     inline void ShiftRight(SizeT32 offset) noexcept {
-        while (offset >= TypeWidth()) {
-            SizeT32 index = 0U;
+        // while (offset >= TypeWidth()) {
+        //     SizeT32 index = 0U;
 
-            while (index < _index) {
-                _storage[index] = _storage[index + 1U];
-                ++index;
+        //     while (index < _index) {
+        //         _storage[index] = _storage[index + 1U];
+        //         ++index;
+        //     }
+
+        //     _storage[_index] = Number_T{0};
+        //     _index -= SizeT32(_index != 0U);
+
+        //     offset -= TypeWidth();
+        // }
+
+        if (offset >= TypeWidth()) {
+            SizeT32 move = (offset / TypeWidth());
+            offset -= (move * TypeWidth());
+
+            if (move > _index) {
+                Clear();
+                return;
             }
 
-            _storage[_index] = Number_T{0};
-            _index -= SizeT32(_index != 0U);
+            SizeT32 index = 0U;
+            SizeT32 next  = (index + move);
 
-            offset -= TypeWidth();
+            do {
+                _storage[index] = _storage[next];
+                ++index;
+                ++next;
+            } while (next <= _index);
+
+            do {
+                _storage[_index] = Number_T{0};
+                --_index;
+                --move;
+            } while (move != 0U);
         }
 
         if (offset != 0U) {
@@ -289,23 +314,62 @@ struct BigInt {
     }
 
     inline void ShiftLeft(SizeT32 offset) noexcept {
-        SizeT32 index = _index;
+        if (offset >= TypeWidth()) {
+            SizeT32 move = (offset / TypeWidth());
+            offset -= (move * TypeWidth());
 
-        while (offset >= TypeWidth()) {
-            _index += SizeT32((_storage[index] != 0U) && (_index < MaxIndex()));
-            _storage[_index] = _storage[index];
+            SizeT32 index = _index;
+            index += move;
 
-            while (index != 0U) {
-                _storage[index] = _storage[index - 1U];
+            if (index > MaxIndex()) {
+                SizeT32 diff = (index - MaxIndex());
+
+                if (diff <= _index) {
+                    _index -= diff;
+                    index = MaxIndex();
+                } else {
+                    Clear();
+                    return;
+                }
+            }
+
+            _storage[_index + move] = _storage[_index];
+
+            while (_index != 0U) {
+                --_index;
+                _storage[_index + move] = _storage[_index];
+            }
+
+            do {
+                --move;
+                _storage[move] = Number_T{0};
+            } while (move != 0U);
+
+            while (_storage[index] == Number_T{0}) {
                 --index;
             }
 
-            _storage[0U] = Number_T{0};
-            index        = _index;
-            offset -= TypeWidth();
+            _index = index;
         }
 
+        // SizeT32 index = _index;
+
+        // while (offset >= TypeWidth()) {
+        //     _index += SizeT32((_storage[index] != 0U) && (_index < MaxIndex()));
+        //     _storage[_index] = _storage[index];
+
+        //     while (index != 0U) {
+        //         _storage[index] = _storage[index - 1U];
+        //         --index;
+        //     }
+
+        //     _storage[0U] = Number_T{0};
+        //     index        = _index;
+        //     offset -= TypeWidth();
+        // }
+
         if (offset != 0U) {
+            SizeT32       index      = _index;
             const SizeT32 shift_size = (TypeWidth() - offset);
 
             const Number_T carry = (_storage[index] >> shift_size);
