@@ -594,12 +594,10 @@ struct BigInt {
 ////////////////////////////////////////////////////
 template <typename Number_T>
 struct DoubleSize<Number_T, 8U> {
-    static constexpr SizeT32 shift = 8U;
-
     inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                               SizeT32) noexcept {
-        SizeT16 dividend16 = dividend_high;
-        dividend16 <<= shift;
+        SizeT16 dividend16{dividend_high};
+        dividend16 <<= _shift;
         dividend16 |= dividend_low;
         dividend_high = Number_T(dividend16 % divisor);
         dividend16 /= divisor;
@@ -607,22 +605,23 @@ struct DoubleSize<Number_T, 8U> {
     }
 
     inline static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
-        SizeT16 number16 = number;
+        SizeT16 number16{number};
         number16 *= multiplier;
         number = Number_T(number16);
 
-        return Number_T(number16 >> shift);
+        return Number_T(number16 >> _shift);
     }
+
+  private:
+    static constexpr SizeT32 _shift = 8U;
 };
 ////////////////////////////////////////////////////
 template <typename Number_T>
 struct DoubleSize<Number_T, 16U> {
-    static constexpr SizeT32 shift = 16U;
-
     inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                               SizeT32) noexcept {
-        SizeT32 dividend32 = dividend_high;
-        dividend32 <<= shift;
+        SizeT32 dividend32{dividend_high};
+        dividend32 <<= _shift;
         dividend32 |= dividend_low;
         dividend_high = Number_T(dividend32 % divisor);
         dividend32 /= divisor;
@@ -630,22 +629,23 @@ struct DoubleSize<Number_T, 16U> {
     }
 
     inline static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
-        SizeT32 number32 = number;
+        SizeT32 number32{number};
         number32 *= multiplier;
         number = Number_T(number32);
 
-        return Number_T(number32 >> shift);
+        return Number_T(number32 >> _shift);
     }
+
+  private:
+    static constexpr SizeT32 _shift = 16U;
 };
 ////////////////////////////////////////////////////
 template <typename Number_T>
 struct DoubleSize<Number_T, 32U> {
-    static constexpr SizeT32 shift = 32U;
-
     inline static void Divide(Number_T &dividend_high, Number_T &dividend_low, const Number_T divisor,
                               SizeT32) noexcept {
-        SizeT64 dividend64 = dividend_high;
-        dividend64 <<= shift;
+        SizeT64 dividend64{dividend_high};
+        dividend64 <<= _shift;
         dividend64 |= dividend_low;
         dividend_high = Number_T(dividend64 % divisor);
         dividend64 /= divisor;
@@ -653,12 +653,15 @@ struct DoubleSize<Number_T, 32U> {
     }
 
     inline static Number_T Multiply(Number_T &number, const Number_T multiplier) noexcept {
-        SizeT64 number64 = number;
+        SizeT64 number64{number};
         number64 *= multiplier;
         number = Number_T(number64);
 
-        return Number_T(number64 >> shift);
+        return Number_T(number64 >> _shift);
     }
+
+  private:
+    static constexpr SizeT32 _shift = 32U;
 };
 ////////////////////////////////////////////////////
 template <typename Number_T>
@@ -670,8 +673,8 @@ struct DoubleSize<Number_T, 64U> {
         // -----------------------
         const Number_T divisor_shifted = (divisor << initial_shift);
         // -----------------------
-        const Number_T divisor_low  = (divisor_shifted >> shift);
-        const Number_T divisor_high = (divisor_shifted & mask);
+        const Number_T divisor_low  = (divisor_shifted >> _shift);
+        const Number_T divisor_high = (divisor_shifted & _mask);
         // -----------------------
         dividend_high <<= initial_shift;
         // -----------------------
@@ -679,7 +682,7 @@ struct DoubleSize<Number_T, 64U> {
         dividend_high %= divisor_low;
         Number_T reminder = (quotient * divisor_high);
 
-        dividend_high <<= shift;
+        dividend_high <<= _shift;
 
         if (dividend_high < reminder) {
             --quotient;
@@ -694,14 +697,14 @@ struct DoubleSize<Number_T, 64U> {
 
         dividend_high -= reminder;
         // -----------------------
-        quotient <<= shift;
+        quotient <<= _shift;
         dividend_low += quotient;
         // -----------------------
         quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
         reminder = (quotient * divisor_high);
 
-        dividend_high <<= shift;
+        dividend_high <<= _shift;
 
         if (dividend_high < reminder) {
             --quotient;
@@ -725,7 +728,7 @@ struct DoubleSize<Number_T, 64U> {
         // -----------------------
         if (original_dividend_high > dividend_high) {
             // Overflow
-            constexpr Number_T overflow_dividend = (Number_T{1} << (width - 1U));
+            constexpr Number_T overflow_dividend = (Number_T{1} << (_width - 1U));
 
             dividend_high += ((overflow_dividend % (divisor >> 1U)) << 1U);
             ++dividend_low;
@@ -738,35 +741,35 @@ struct DoubleSize<Number_T, 64U> {
     }
 
     inline static Number_T Multiply(Number_T &number, Number_T multiplier) noexcept {
-        const Number_T number_low     = (number & mask);
+        const Number_T number_low     = (number & _mask);
         Number_T       number_high    = number;
-        Number_T       multiplier_low = (multiplier & mask);
+        Number_T       multiplier_low = (multiplier & _mask);
 
         number = (number_low * multiplier_low);
 
-        number_high >>= shift;
+        number_high >>= _shift;
         multiplier_low *= number_high;
-        multiplier_low += (number >> shift);
-        number &= mask;
+        multiplier_low += (number >> _shift);
+        number &= _mask;
 
-        multiplier >>= shift;
+        multiplier >>= _shift;
         number_high *= multiplier;
-        number_high += (multiplier_low >> shift);
+        number_high += (multiplier_low >> _shift);
 
-        multiplier_low &= mask;
+        multiplier_low &= _mask;
         multiplier_low += (number_low * multiplier);
 
-        number |= (multiplier_low << shift);
-        multiplier_low >>= shift;
+        number |= (multiplier_low << _shift);
+        multiplier_low >>= _shift;
         number_high += multiplier_low;
 
         return number_high;
     }
 
   private:
-    static constexpr SizeT32  width = (sizeof(Number_T) * 8U);
-    static constexpr SizeT32  shift = (width / 2U);
-    static constexpr Number_T mask  = (~(Number_T{0}) >> shift);
+    static constexpr SizeT32  _width = (sizeof(Number_T) * 8U);
+    static constexpr SizeT32  _shift = (_width / 2U);
+    static constexpr Number_T _mask  = (~(Number_T{0}) >> _shift);
 };
 
 } // namespace Qentem
