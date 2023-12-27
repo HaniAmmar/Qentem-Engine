@@ -54,9 +54,27 @@ struct BigInt {
     BigInt() noexcept                          = default;
     BigInt(BigInt &&) noexcept                 = default;
     BigInt(const BigInt &) noexcept            = default;
-    BigInt &operator=(BigInt &&) noexcept      = default;
     BigInt &operator=(const BigInt &) noexcept = default;
     ~BigInt() noexcept                         = default;
+
+    BigInt &operator=(BigInt &&bint) noexcept {
+        SizeT32 index = 0U;
+
+        while (index <= bint._index) {
+            _storage[index] = bint._storage[index];
+            ++index;
+        }
+
+        while (_index > index) {
+            _storage[_index] = Number_T{0};
+            --_index;
+        }
+
+        _index = bint._index;
+        bint.Clear();
+
+        return *this;
+    }
 
     template <typename N_Number_T>
     inline BigInt(const N_Number_T number) noexcept {
