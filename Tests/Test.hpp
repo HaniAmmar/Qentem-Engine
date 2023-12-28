@@ -59,18 +59,18 @@ static int PrintResult(int passed, int failed) {
     return 1;
 }
 
-static void SelfTestLeak(QTest &helper, char *&ptr) {
+static void SelfTestLeak(QTest &test, char *&ptr) {
     ptr        = Memory::Allocate<char>(8U);
     char *nptr = nullptr;
 
-    helper.IsTrue(false, 1);
-    helper.IsFalse(true, 2);
-    helper.IsNull(ptr, 2);
-    helper.IsNotNull(nptr, 1);
-    helper.IsEqual(true, false, 4);
-    helper.IsNotEqual(true, true, 5);
-    helper.IsNotEqual(u'a', u'a', 7);
-    helper.IsNotEqual(U'a', U'a', 6);
+    test.IsTrue(false, 1);
+    test.IsFalse(true, 2);
+    test.IsNull(ptr, 2);
+    test.IsNotNull(nptr, 1);
+    test.IsEqual(true, false, 4);
+    test.IsNotEqual(true, true, 5);
+    test.IsNotEqual(u'a', u'a', 7);
+    test.IsNotEqual(U'a', U'a', 6);
 
     TestOutPut::Print(u"a");
     TestOutPut::Print(U"a");
@@ -82,20 +82,20 @@ static void SelfTest() {
 
     const bool is_colored = TestOutPut::IsColored();
 
-    QTest helper{"Test.hpp", __FILE__};
+    QTest test{"Test.hpp", __FILE__};
 
-    helper.ContinueOnError(true);
+    test.ContinueOnError(true);
 
     char *ptr = nullptr;
-    helper.Test("SelfTestLeak", SelfTestLeak, true, ptr);
+    test.Test("SelfTestLeak", SelfTestLeak, true, ptr);
     Qentem::MemoryRecord::PrintMemoryStatus();
     Memory::Deallocate(ptr);
     MemoryRecord::ResetSubMemory();
     TestOutPut::IsColored() = false;
 
-    helper.EndTests();
+    test.EndTests();
 
-    if (helper.IsContinueOnError()) {
+    if (test.IsContinueOnError()) {
         PrintResult(10, 5);
         // const wchar_t *failed_message = L"Not good! 5 out of 15 failed.\n";
     }
