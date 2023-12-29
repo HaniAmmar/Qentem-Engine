@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
-
 #ifndef QENTEM_Q_POINTER_H
 #define QENTEM_Q_POINTER_H
+
+#include "Common.hpp"
 
 namespace Qentem {
 

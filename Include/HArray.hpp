@@ -20,15 +20,14 @@
  * SOFTWARE.
  */
 
-#include "String.hpp"
-
 #ifndef QENTEM_HARRAY_H
 #define QENTEM_HARRAY_H
 
-namespace Qentem {
+#include "String.hpp"
 
+namespace Qentem {
 /*
- * A data structure that looks like an ordered array and behaves like a hash
+ * A data structure that looks like an ordered array but behaves like a hash
  * table. Any value can be accessed by its index or its name. It preserves
  * the elements' order and uses one memory block. Therefore, it has an initial
  * size, and collisions do not cause new allocations. When resized, it drops

@@ -20,7 +20,8 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
+#ifndef QENTEM_Q_TEST_H
+#define QENTEM_Q_TEST_H
 
 #include <iostream>
 #include <sstream>
@@ -33,8 +34,7 @@
 #include <malloc.h>
 #endif
 
-#ifndef QENTEM_Q_TEST_H
-#define QENTEM_Q_TEST_H
+#include "Common.hpp"
 
 namespace Qentem {
 

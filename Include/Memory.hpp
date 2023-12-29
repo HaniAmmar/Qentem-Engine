@@ -20,14 +20,13 @@
  * SOFTWARE.
  */
 
-#include "Platform.hpp"
-
 #ifndef QENTEM_MEMORY_H
 #define QENTEM_MEMORY_H
 
+#include "Platform.hpp"
+
 namespace Qentem {
 namespace Memory {
-
 // size = the number of bytes
 template <typename Number_T>
 inline static void SetToZero(void *pointer, Number_T size) noexcept {

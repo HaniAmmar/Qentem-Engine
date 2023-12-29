@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#include "Digit.hpp"
-#include "Unicode.hpp"
-
 #ifndef QENTEM_JSON_UTILS_H
 #define QENTEM_JSON_UTILS_H
+
+#include "Digit.hpp"
+#include "Unicode.hpp"
 
 namespace Qentem {
 

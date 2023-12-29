@@ -19,15 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#ifndef QENTEM_VALUE_H
+#define QENTEM_VALUE_H
+
 #include "StringStream.hpp"
 
 #include "QNumber.hpp"
 #include "Array.hpp"
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
-
-#ifndef QENTEM_VALUE_H
-#define QENTEM_VALUE_H
 
 namespace Qentem {
 

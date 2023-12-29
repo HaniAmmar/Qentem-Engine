@@ -20,14 +20,15 @@
  * SOFTWARE.
  */
 
-#include "Platform.hpp"
-
 #ifndef QENTEM_BIG_INT_H
 #define QENTEM_BIG_INT_H
 
-namespace Qentem {
+#include "Platform.hpp"
 
-// For TRUE arbitrary-precision arithmetic.
+namespace Qentem {
+/*
+ * For TRUE arbitrary-precision arithmetic.
+ */
 
 // Width_T is the needed number of bits:
 // 2 64bit int = 128 bits

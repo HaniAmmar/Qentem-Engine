@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_TEMPLATE_U_TESTS_H
+#define QENTEM_TEMPLATE_U_TESTS_H
+
 #include "QTest.hpp"
 #include "StringStream.hpp"
 #include "JSON.hpp"
 #include "Template.hpp"
-
-#ifndef QENTEM_TEMPLATE_U_TESTS_H
-#define QENTEM_TEMPLATE_U_TESTS_H
 
 namespace Qentem {
 namespace Test {

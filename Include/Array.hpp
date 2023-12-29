@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#include "Memory.hpp"
-#include "QPointer.hpp"
-
 #ifndef QENTEM_ARRAY_H
 #define QENTEM_ARRAY_H
+
+#include "Memory.hpp"
+#include "QPointer.hpp"
 
 namespace Qentem {
 /*

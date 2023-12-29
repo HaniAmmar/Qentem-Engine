@@ -20,12 +20,13 @@
  * SOFTWARE.
  */
 
-#include "Value.hpp"
-
 #ifndef QENTEM_JSON_H
 #define QENTEM_JSON_H
 
+#include "Value.hpp"
+
 namespace Qentem {
+
 struct JSON {
     template <typename, typename>
     struct JSONParser;

@@ -20,15 +20,14 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_ENGINE_H
+#define QENTEM_ENGINE_H
+
 #include "Memory.hpp"
 #include "Platform.hpp"
 #include "StringUtils.hpp"
 
-#ifndef QENTEM_ENGINE_H
-#define QENTEM_ENGINE_H
-
 namespace Qentem {
-
 /*
  * A fast search for nest/sub-matching.
  */

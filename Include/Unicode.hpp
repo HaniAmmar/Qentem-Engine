@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
-
 #ifndef QENTEM_UNICODE_H
 #define QENTEM_UNICODE_H
+
+#include "Common.hpp"
 
 namespace Qentem {
 namespace Unicode {

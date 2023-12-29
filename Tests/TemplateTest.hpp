@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_TEMPLATE_TESTS_H
+#define QENTEM_TEMPLATE_TESTS_H
+
 #include "QTest.hpp"
 #include "StringStream.hpp"
 #include "JSON.hpp"
 #include "Template.hpp"
-
-#ifndef QENTEM_TEMPLATE_TESTS_H
-#define QENTEM_TEMPLATE_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -797,18 +797,17 @@ static void TestVariableTag4(QTest &test) {
         ss.Clear();
 
         test.IsEqual(Template::Render(R"({var:50})", value, ss),
-                       R"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)", __LINE__);
+                     R"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)", __LINE__);
         ss.Clear();
 
-        test.IsEqual(Template::Render(R"({var:51})", value, ss), R"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)",
-                       __LINE__);
+        test.IsEqual(Template::Render(R"({var:51})", value, ss), R"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)", __LINE__);
         ss.Clear();
 
         test.IsEqual(Template::Render(R"({var:52})", value, ss), R"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", __LINE__);
         ss.Clear();
 
         test.IsEqual(Template::Render(R"({var:53})", value, ss),
-                       R"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", __LINE__);
+                     R"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", __LINE__);
         ss.Clear();
 
     } else {
@@ -1843,19 +1842,19 @@ static void TestMathTag1(QTest &test) {
     ss.Clear();
 
     test.IsEqual(Template::Render(R"({math:{var:a1}+{var:a7}}{math:{var:a1}+{var:a7}})", value, ss), R"(1111)",
-                   __LINE__);
+                 __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(R"({math:{var:a1}+{var:a7}}*{math:{var:a1}+{var:a7}})", value, ss), R"(11*11)",
-                   __LINE__);
+                 __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(R"({math:{var:a1}+{var:a7}}##{math:{var:a1}+{var:a7}})", value, ss), R"(11##11)",
-                   __LINE__);
+                 __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(R"({math:{var:a1}+{var:a7}}&&&%%^^&&*{math:{var:a1}+{var:a7}})", value, ss),
-                   R"(11&&&%%^^&&*11)", __LINE__);
+                 R"(11&&&%%^^&&*11)", __LINE__);
     ss.Clear();
 
     ///////////////////
@@ -2589,7 +2588,7 @@ static void TestLoopTag1(QTest &test) {
 
     content = R"(<loop value="loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
     test.IsEqual(Template::Render(content, value1, ss),
-                   R"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", __LINE__);
+                 R"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", __LINE__);
     ss.Clear();
 
     ////////////////
@@ -2606,7 +2605,7 @@ static void TestLoopTag1(QTest &test) {
     content = R"(<loop value="loop1-value"><loop value="loop2-value"><loop
                  value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
     test.IsEqual(Template::Render(content, value1, ss),
-                   R"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", __LINE__);
+                 R"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", __LINE__);
     ss.Clear();
 
     content = R"(<loop value="loop1-value"><loop value="loop2-value"><loop
@@ -2692,7 +2691,7 @@ static void TestLoopTag1(QTest &test) {
 
     content = R"(<loop set="0[k2][0]"value="loop1-value">{var:loop1-value}, {var:loop1-value}, </loop>)";
     test.IsEqual(Template::Render(content, value3, ss),
-                   R"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )", __LINE__);
+                 R"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )", __LINE__);
     ss.Clear();
 
     value3 = JSON::Parse(R"({"group":[[10],[20],[30]]})");
@@ -2835,13 +2834,13 @@ static void TestLoopTag2(QTest &test) {
     content =
         R"(<loop set="object" value="item">{var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]}</loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
+                 R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
     ss.Clear();
 
     content =
         R"(<loop set="array" value="item">{var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]}</loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
+                 R"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
     ss.Clear();
 
     value.RemoveIndex(0);
@@ -2970,7 +2969,7 @@ static void TestLoopTag3(QTest &test) {
         R"(<loop value="_val1" group="year" sort="descend"><loop set="_val1" value="_val2"><loop set="_val2" value="_val3">{var:_val3}</loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss),
-                   R"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)", __LINE__);
+                 R"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)", __LINE__);
     ss.Clear();
 
     content =
@@ -3409,14 +3408,13 @@ static void TestRender2(QTest &test) {
 
     content = R"(<loop value="loop1_val">{var:~loop1_val[0 </loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   R"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
-                   __LINE__);
+                 R"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
+                 __LINE__);
     ss.Clear();
 
     content = R"(<loop value="loop1_val">{var:loop1_val[]}</loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   R"({var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]})",
-                   __LINE__);
+                 R"({var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]})", __LINE__);
     ss.Clear();
 
     content = R"(<loop set="numbers" value="_val">{var:_val}</loop>)";

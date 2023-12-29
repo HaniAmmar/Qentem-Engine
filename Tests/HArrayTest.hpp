@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_HARRAY_TESTS_H
+#define QENTEM_HARRAY_TESTS_H
+
 #include "QTest.hpp"
 #include "Digit.hpp"
 #include "HArray.hpp"
-
-#ifndef QENTEM_HARRAY_TESTS_H
-#define QENTEM_HARRAY_TESTS_H
 
 namespace Qentem {
 namespace Test {

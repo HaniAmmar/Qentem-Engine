@@ -19,18 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#ifndef QENTEM_DIGIT_H
+#define QENTEM_DIGIT_H
+
 #include "QNumber.hpp"
 #include "BigInt.hpp"
 #include "DigitUtils.hpp"
 #include "StringUtils.hpp"
 
-#ifndef QENTEM_DIGIT_H
-#define QENTEM_DIGIT_H
-
+namespace Qentem {
 /*
  * For converting numbers from and to strings.
  */
-namespace Qentem {
 struct Digit {
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, Scientific = 2 };
 

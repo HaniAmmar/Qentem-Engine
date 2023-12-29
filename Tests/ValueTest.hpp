@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#include "QTest.hpp"
-#include "Value.hpp"
-
 #ifndef QENTEM_VALUE_TESTS_H
 #define QENTEM_VALUE_TESTS_H
+
+#include "QTest.hpp"
+#include "Value.hpp"
 
 namespace Qentem {
 namespace Test {
@@ -1329,8 +1329,7 @@ static void TestObjectValue2(QTest &test) {
     test.IsEqual(value3["w2"].GetNumber(), 20.0, __LINE__);
     test.IsEqual(value3["w3"].GetNumber(), 30.0, __LINE__);
     test.IsNotEqual(value3["w4"].StringStorage(), c_str_var, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value3["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     test.IsNull(value3.GetValue("k5", 2), __LINE__);
     test.IsNull(value3.GetValue(4), __LINE__);
     ////////////////////
@@ -4160,8 +4159,7 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["k1"].GetNumber(), 11.0, __LINE__);
     test.IsEqual(value2["k2"].GetNumber(), 22.0, __LINE__);
     test.IsNotEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
     value2 = VHArray{};  // Clearing and  Setting to object type.
     value2 += h_arr_var; // Copy
@@ -4172,8 +4170,7 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["w2"].GetNumber(), 20.0, __LINE__);
     test.IsEqual(value2["w3"].GetNumber(), 30.0, __LINE__);
     test.IsNotEqual(value2["w4"].StringStorage(), str_c2, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     test.IsNull(value2.GetValue(4), __LINE__);
 
     ////
@@ -4187,8 +4184,7 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["k1"].GetNumber(), 11.0, __LINE__);
     test.IsEqual(value2["k2"].GetNumber(), 22.0, __LINE__);
     test.IsEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
     value1 = value2; // Copying back the values.
     str_c1 = value1["k3"].StringStorage();
@@ -4203,8 +4199,7 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["w2"].GetNumber(), 20.0, __LINE__);
     test.IsEqual(value2["w3"].GetNumber(), 30.0, __LINE__);
     test.IsEqual(value2["w4"].StringStorage(), str_c2, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     test.IsNull(value2.GetValue(4), __LINE__);
 
     if (value2.GetObject() != nullptr) {
@@ -4221,13 +4216,11 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["w2"].GetNumber(), 20.0, __LINE__);
     test.IsEqual(value2["w3"].GetNumber(), 30.0, __LINE__);
     test.IsNotEqual(value2["w4"].StringStorage(), str_c2, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     test.IsEqual(value2["k1"].GetNumber(), 11.0, __LINE__);
     test.IsEqual(value2["k2"].GetNumber(), 22.0, __LINE__);
     test.IsNotEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
     ////
     value2       = VHArray{}; // Clearing and  Setting to object type.
@@ -4245,15 +4238,13 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["w2"].GetNumber(), 20.0, __LINE__);
     test.IsEqual(value2["w3"].GetNumber(), 30.0, __LINE__);
     test.IsNotEqual(value2["w4"].StringStorage(), str_c2, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     test.IsEqual(value2["w5"].GetNumber(), 500.0, __LINE__);
     test.IsEqual(value2["w6"].GetNumber(), 600.0, __LINE__);
     test.IsEqual(value2["k1"].GetNumber(), 11.0, __LINE__);
     test.IsEqual(value2["k2"].GetNumber(), 22.0, __LINE__);
     test.IsNotEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
 
     value2       = VHArray{}; // Clearing and  Setting to object type.
     value2["w0"] = 5;
@@ -4269,15 +4260,13 @@ static void TestAddition6(QTest &test) {
     test.IsEqual(value2["w2"].GetNumber(), 20.0, __LINE__);
     test.IsEqual(value2["w3"].GetNumber(), 30.0, __LINE__);
     test.IsEqual(value2["w4"].StringStorage(), str_c2, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["w4"].StringStorage(), "-ABCDEF0123456789ABCDEF0123456789-", 34), __LINE__);
     test.IsEqual(value2["w5"].GetNumber(), 500.0, __LINE__);
     test.IsEqual(value2["w6"].GetNumber(), 600.0, __LINE__);
     test.IsEqual(value2["k1"].GetNumber(), 11.0, __LINE__);
     test.IsEqual(value2["k2"].GetNumber(), 22.0, __LINE__);
     test.IsEqual(value2["k3"].StringStorage(), str_c1, __LINE__);
-    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34),
-                  __LINE__);
+    test.IsTrue(StringUtils::IsEqual(value2["k3"].StringStorage(), "*ABCDEF0123456789ABCDEF0123456789*", 34), __LINE__);
     /////////////////////////////
 
     value1.Reset();
@@ -5258,7 +5247,7 @@ static void TestStringify2(QTest &test) {
     value["FFFFFF"]  = false;
     value["GGGGGGG"] = true;
     test.IsEqual(value.Stringify(ss),
-                   R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})", __LINE__);
+                 R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})", __LINE__);
     ///////////////////////////////////////
 }
 
@@ -5661,8 +5650,7 @@ static void TestSortValue(QTest &test) {
 
     value.Sort();
 
-    test.IsEqual(value.Stringify(ss), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})",
-                   __LINE__);
+    test.IsEqual(value.Stringify(ss), R"({"2015":0,"2016":0,"2017":0,"2018":0,"2019":0,"2020":0,"2021":0})", __LINE__);
     ss.Clear();
 
     value.Reset();
@@ -5677,8 +5665,7 @@ static void TestSortValue(QTest &test) {
 
     value.Sort(false);
 
-    test.IsEqual(value.Stringify(ss), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})",
-                   __LINE__);
+    test.IsEqual(value.Stringify(ss), R"({"2021":0,"2020":0,"2019":0,"2018":0,"2017":0,"2016":0,"2015":0})", __LINE__);
     ss.Clear();
 
     value.Reset();

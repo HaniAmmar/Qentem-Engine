@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
-
 #ifndef QENTEM_Q_NUMBER_H
 #define QENTEM_Q_NUMBER_H
 
+#include "Common.hpp"
+
 namespace Qentem {
-///////////////////////////////////////////////
+
 enum struct QNumberType : SizeT8 {
     NotANumber = 0, // NAN
     Real       = 1, // double

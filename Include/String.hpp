@@ -20,15 +20,14 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_STRING_H
+#define QENTEM_STRING_H
+
 #include "Memory.hpp"
 #include "QPointer.hpp"
 #include "StringUtils.hpp"
 
-#ifndef QENTEM_STRING_H
-#define QENTEM_STRING_H
-
 namespace Qentem {
-
 /*
  * String container with null terminator and a taggable pointer.
  */

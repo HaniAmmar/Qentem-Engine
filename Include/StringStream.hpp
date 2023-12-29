@@ -20,13 +20,12 @@
  * SOFTWARE.
  */
 
-#include "String.hpp"
-
 #ifndef QENTEM_STRINGSTREAM_H
 #define QENTEM_STRINGSTREAM_H
 
-namespace Qentem {
+#include "String.hpp"
 
+namespace Qentem {
 /*
  * String Stream struct without the null terminator.
  */

@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_UNICODE_TESTS_H
+#define QENTEM_UNICODE_TESTS_H
+
 #include "QTest.hpp"
 #include "StringStream.hpp"
 #include "Unicode.hpp"
-
-#ifndef QENTEM_UNICODE_TESTS_H
-#define QENTEM_UNICODE_TESTS_H
 
 namespace Qentem {
 namespace Test {

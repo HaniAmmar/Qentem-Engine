@@ -20,14 +20,14 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_ENGINE_TESTS_H
+#define QENTEM_ENGINE_TESTS_H
+
 #include "QTest.hpp"
 #include "Array.hpp"
 #include "Digit.hpp"
 #include "Engine.hpp"
 #include "StringStream.hpp"
-
-#ifndef QENTEM_ENGINE_TESTS_H
-#define QENTEM_ENGINE_TESTS_H
 
 namespace Qentem {
 namespace Test {

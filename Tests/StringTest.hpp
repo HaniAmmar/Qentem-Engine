@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#include "QTest.hpp"
-#include "String.hpp"
-
 #ifndef QENTEM_STRING_TESTS_H
 #define QENTEM_STRING_TESTS_H
+
+#include "QTest.hpp"
+#include "String.hpp"
 
 namespace Qentem {
 namespace Test {

@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
-
 #ifndef QENTEM_STRING_UTILS_H
 #define QENTEM_STRING_UTILS_H
+
+#include "Common.hpp"
 
 namespace Qentem {
 

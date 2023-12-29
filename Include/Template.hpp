@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_TEMPLATE_H
+#define QENTEM_TEMPLATE_H
+
 #include "Engine.hpp"
 #include "Digit.hpp"
 #include "Tags.hpp"
-
-#ifndef QENTEM_TEMPLATE_H
-#define QENTEM_TEMPLATE_H
 
 namespace Qentem {
 

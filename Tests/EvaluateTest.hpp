@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_EVALUATE_TESTS_H
+#define QENTEM_EVALUATE_TESTS_H
+
 #include "QTest.hpp"
 #include "Template.hpp"
 #include "Value.hpp"
 #include "StringStream.hpp"
-
-#ifndef QENTEM_EVALUATE_TESTS_H
-#define QENTEM_EVALUATE_TESTS_H
 
 namespace Qentem {
 namespace Test {

@@ -21,14 +21,15 @@
  * SOFTWARE.
  */
 
-#include "QExpression.hpp"
-#include "VariableTag.hpp"
-
 #ifndef QENTEM_TAGS_H
 #define QENTEM_TAGS_H
 
+#include "QExpression.hpp"
+#include "VariableTag.hpp"
+
 namespace Qentem {
 namespace Tags {
+
 struct MathTag;
 struct LoopTag;
 struct InLineIfTag;

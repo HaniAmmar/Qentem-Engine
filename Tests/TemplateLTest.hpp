@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_TEMPLATE_L_TESTS_H
+#define QENTEM_TEMPLATE_L_TESTS_H
+
 #include "QTest.hpp"
 #include "StringStream.hpp"
 #include "JSON.hpp"
 #include "Template.hpp"
-
-#ifndef QENTEM_TEMPLATE_L_TESTS_H
-#define QENTEM_TEMPLATE_L_TESTS_H
 
 namespace Qentem {
 namespace Test {
@@ -797,19 +797,18 @@ static void TestVariableLTag4(QTest &test) {
         ss.Clear();
 
         test.IsEqual(Template::Render(LR"({var:50})", value, ss),
-                       LR"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)", __LINE__);
+                     LR"(&lt;A&gt;B&apos;C&quot;D&amp;E&apos;F&quot;G&lt;H&gt;I&amp;G&quot;K)", __LINE__);
         ss.Clear();
 
         test.IsEqual(Template::Render(LR"({var:51})", value, ss), LR"(AB&quot;CD&apos;EF&lt;GH&gt;IGK&apos;)",
-                       __LINE__);
+                     __LINE__);
         ss.Clear();
 
-        test.IsEqual(Template::Render(LR"({var:52})", value, ss), LR"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)",
-                       __LINE__);
+        test.IsEqual(Template::Render(LR"({var:52})", value, ss), LR"(&quot;ABC&apos;DEF&lt;GHI&gt;GK&lt;)", __LINE__);
         ss.Clear();
 
         test.IsEqual(Template::Render(LR"({var:53})", value, ss),
-                       LR"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", __LINE__);
+                     LR"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", __LINE__);
         ss.Clear();
 
     } else {
@@ -1844,19 +1843,19 @@ static void TestMathLTag1(QTest &test) {
     ss.Clear();
 
     test.IsEqual(Template::Render(LR"({math:{var:a1}+{var:a7}}{math:{var:a1}+{var:a7}})", value, ss), LR"(1111)",
-                   __LINE__);
+                 __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(LR"({math:{var:a1}+{var:a7}}*{math:{var:a1}+{var:a7}})", value, ss), LR"(11*11)",
-                   __LINE__);
+                 __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(LR"({math:{var:a1}+{var:a7}}##{math:{var:a1}+{var:a7}})", value, ss), LR"(11##11)",
-                   __LINE__);
+                 __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(LR"({math:{var:a1}+{var:a7}}&&&%%^^&&*{math:{var:a1}+{var:a7}})", value, ss),
-                   LR"(11&&&%%^^&&*11)", __LINE__);
+                 LR"(11&&&%%^^&&*11)", __LINE__);
     ss.Clear();
 
     ///////////////////
@@ -2591,7 +2590,7 @@ static void TestLoopLTag1(QTest &test) {
 
     content = LR"(<loop value="loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
     test.IsEqual(Template::Render(content, value1, ss),
-                   LR"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", __LINE__);
+                 LR"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", __LINE__);
     ss.Clear();
 
     ////////////////
@@ -2608,7 +2607,7 @@ static void TestLoopLTag1(QTest &test) {
     content = LR"(<loop value="loop1-value"><loop value="loop2-value"><loop
                  value="loop3-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}) </loop></loop></loop>)";
     test.IsEqual(Template::Render(content, value1, ss),
-                   LR"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", __LINE__);
+                 LR"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", __LINE__);
     ss.Clear();
 
     content = LR"(<loop value="loop1-value"><loop value="loop2-value"><loop
@@ -2694,7 +2693,7 @@ static void TestLoopLTag1(QTest &test) {
 
     content = LR"(<loop set="0[k2][0]"value="loop1-value">{var:loop1-value}, {var:loop1-value}, </loop>)";
     test.IsEqual(Template::Render(content, value3, ss),
-                   LR"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )", __LINE__);
+                 LR"(4, 4, 1.5, 1.5, ABC, ABC, true, true, false, false, null, null, )", __LINE__);
     ss.Clear();
 
     value3 = JSON::Parse(LR"({"group":[[10],[20],[30]]})");
@@ -2837,13 +2836,13 @@ static void TestLoopLTag2(QTest &test) {
     content =
         LR"(<loop set="object" value="item">{var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]}</loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   LR"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
+                 LR"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
     ss.Clear();
 
     content =
         LR"(<loop set="array" value="item">{var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]}</loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   LR"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
+                 LR"({var:item[var11]}{var:item[var22]}{var:item[var33]} {var:item[var44]})", __LINE__);
     ss.Clear();
 
     value.RemoveIndex(0);
@@ -2972,7 +2971,7 @@ static void TestLoopLTag3(QTest &test) {
         LR"(<loop value="_val1" group="year" sort="descend"><loop set="_val1" value="_val2"><loop set="_val2" value="_val3">{var:_val3}</loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss),
-                   LR"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)", __LINE__);
+                 LR"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)", __LINE__);
     ss.Clear();
 
     content =
@@ -3411,14 +3410,13 @@ static void TestRenderL2(QTest &test) {
 
     content = LR"(<loop value="loop1_val">{var:~loop1_val[0 </loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   LR"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
-                   __LINE__);
+                 LR"({var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 {var:~loop1_val[0 )",
+                 __LINE__);
     ss.Clear();
 
     content = LR"(<loop value="loop1_val">{var:loop1_val[]}</loop>)";
     test.IsEqual(Template::Render(content, value, ss),
-                   LR"({var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]})",
-                   __LINE__);
+                 LR"({var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]})", __LINE__);
     ss.Clear();
 
     content = LR"(<loop set="numbers" value="_val">{var:_val}</loop>)";

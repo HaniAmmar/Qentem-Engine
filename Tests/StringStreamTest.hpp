@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#include "QTest.hpp"
-#include "StringStream.hpp"
-
 #ifndef QENTEM_STRINGSTREAM_TESTS_H
 #define QENTEM_STRINGSTREAM_TESTS_H
+
+#include "QTest.hpp"
+#include "StringStream.hpp"
 
 namespace Qentem {
 namespace Test {

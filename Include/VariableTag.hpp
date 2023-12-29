@@ -21,10 +21,10 @@
  * SOFTWARE.
  */
 
-#include "Common.hpp"
-
 #ifndef QENTEM_VARIABLE_TAG_H
 #define QENTEM_VARIABLE_TAG_H
+
+#include "Common.hpp"
 
 namespace Qentem {
 namespace Tags {

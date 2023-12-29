@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#include "QTest.hpp"
-#include "JSON.hpp"
-
 #ifndef QENTEM_JSON_TESTS_H
 #define QENTEM_JSON_TESTS_H
+
+#include "QTest.hpp"
+#include "JSON.hpp"
 
 namespace Qentem {
 namespace Test {
@@ -853,14 +853,13 @@ static void TestParse2(QTest &test) {
 
     content = R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
-    test.IsEqual(value.Stringify(stream), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})",
-                   __LINE__);
+    test.IsEqual(value.Stringify(stream), R"({"A":true,"B":false,"C":null,"D":123,"E":"ABC","F":[],"G":{}})", __LINE__);
     stream.Clear();
 
     content = R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})";
     value   = JSON::Parse(stream, content, StringUtils::Count(content));
     test.IsEqual(value.Stringify(stream),
-                   R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})", __LINE__);
+                 R"({"A":{},"BB":[],"CCC":"a","DDDD":1.5,"EEEEE":null,"FFFFFF":false,"GGGGGGG":true})", __LINE__);
     stream.Clear();
 
     content = R"({"a":{"c":"}"},"b":{"d":"}"}})";

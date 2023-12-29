@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_ARRAY_TESTS_H
+#define QENTEM_ARRAY_TESTS_H
+
 #include "QTest.hpp"
 #include "Array.hpp"
 #include "String.hpp"
-
-#ifndef QENTEM_ARRAY_TESTS_H
-#define QENTEM_ARRAY_TESTS_H
 
 namespace Qentem {
 namespace Test {

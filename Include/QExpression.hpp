@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
+#ifndef QENTEM_Q_EXPRESSION_H
+#define QENTEM_Q_EXPRESSION_H
+
 #include "QNumber.hpp"
 #include "VariableTag.hpp"
 #include "Array.hpp"
-
-#ifndef QENTEM_Q_EXPRESSION_H
-#define QENTEM_Q_EXPRESSION_H
 
 namespace Qentem {
 
