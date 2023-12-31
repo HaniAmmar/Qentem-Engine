@@ -37,224 +37,224 @@ static void TestEngine1(QTest &test) {
     SizeT       content_len = 0;
     SizeT       find_len    = 3;
     const char *content     = "";
-    const char *_find       = "ABC";
+    const char *find_       = "ABC";
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, SizeT{1});
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, SizeT{1});
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "A";
     content_len = 1;
-    _find       = "A";
+    find_       = "A";
 
-    ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
     test.IsEqual(ret, 1U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "AAAAA";
     content_len = 5;
 
-    ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
     test.IsEqual(ret, 2U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, content_len, content_len);
+    ret = Engine::FindOne(*find_, content, content_len, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{4}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
     test.IsEqual(ret, 5U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{5}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "  A A        A";
     content_len = 14;
 
-    ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
     test.IsEqual(ret, 5U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{7}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{7}, content_len);
     test.IsEqual(ret, 14U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{0}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{0}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{1}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{1}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{2}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{2}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{3}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{3}, content_len);
     test.IsEqual(ret, 5U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{4}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{4}, content_len);
     test.IsEqual(ret, 5U, __LINE__);
 
-    ret = Engine::FindOne(*_find, content, SizeT{5}, content_len);
+    ret = Engine::FindOne(*find_, content, SizeT{5}, content_len);
     test.IsEqual(ret, 14U, __LINE__);
 
     content     = "A";
     content_len = 1;
-    _find       = "AB";
+    find_       = "AB";
     find_len    = 2;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content = "AA";
-    ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content = "A   A   A";
-    ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content = "  A   A   A  ";
-    ret     = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret     = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "AB";
     content_len = 2;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 2U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = " AB";
     content_len = 3;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
     content     = "AAB";
     content_len = 3;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
     content     = "AAAB";
     content_len = 4;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
     content     = "AAAAAAAAAB";
     content_len = 10;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 10U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
     test.IsEqual(ret, 10U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
     test.IsEqual(ret, 10U, __LINE__);
 
     content     = "  AB";
     content_len = 4;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{1}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{1}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{2}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{2}, content_len);
     test.IsEqual(ret, 4U, __LINE__);
 
     content     = "        AB";
     content_len = 10;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 10U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
     test.IsEqual(ret, 10U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
     test.IsEqual(ret, 10U, __LINE__);
 
     content     = "AAAAAAAAA";
     content_len = 9;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{5}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{5}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{8}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT(content_len - SizeT{1}), content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT(content_len - SizeT{1}), content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    _find       = "ABC";
+    find_       = "ABC";
     find_len    = 3;
     content     = "CBA";
     content_len = 3;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "BCBA";
     content_len = 4;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "123456789123456CBA";
     content_len = 18;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "ADC";
     content_len = 3;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "123456789123456ADC";
     content_len = 18;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0ADC0";
     content_len = 40;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 }
 
@@ -263,39 +263,39 @@ static void TestEngine2(QTest &test) {
     SizeT           content_len = 16;
     constexpr SizeT find_len    = 3;
     const char     *content     = "ABABABABABAAABAB";
-    const char     *_find       = "ABC";
+    const char     *find_       = "ABC";
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     content     = "ABABABABABAAABABC";
     content_len = 17;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 17U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{15}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{15}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::Find(_find, find_len, content, SizeT{14}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{14}, content_len);
     test.IsEqual(ret, 17U, __LINE__);
 
     content     = "ABABABABABCABAAAB";
     content_len = 17;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, SizeT{11}, __LINE__);
 
     content     = "   ABC   ";
     content_len = 9;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 6U, __LINE__);
 
     content     = "ABC   ";
     content_len = 6;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
     ret = Engine::FindOne('1', "00000001", SizeT{0}, SizeT{8});
@@ -310,7 +310,7 @@ static void TestEngine2(QTest &test) {
     content     = "ABC   ";
     content_len = 6;
 
-    ret = Engine::Find(_find, find_len, content, SizeT{0}, content_len);
+    ret = Engine::Find(find_, find_len, content, SizeT{0}, content_len);
     test.IsEqual(ret, 3U, __LINE__);
 
     content = R"(<loop value="loop1-value">loop1-value, </loop>)";
@@ -945,7 +945,7 @@ struct Item2Engine {
     Array<Item2Engine> SubItems;
     SizeT              Offset{0};
     SizeT              Length{0};
-    SizeT              _padding[2]{0};
+    SizeT              padding_[2]{0};
 };
 
 static void to_JSON(StringStream<char> &stream, const Array<Item2Engine> &items, const char *content) {

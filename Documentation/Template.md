@@ -782,7 +782,7 @@ int main() {
     value += 3;
 
     const char *content = R"(
-<loop value="_val1" sort="ascend">{var:_val1} </loop>
+<loop value="val_1" sort="ascend">{var:val_1} </loop>
     )";
 
     StringStream<char> stream;
@@ -794,7 +794,7 @@ int main() {
     */
 
     const char *content2 = R"( = R"(
-<loop value="_val1" sort="descend">{var:_val1} </loop>
+<loop value="val_1" sort="descend">{var:val_1} </loop>
     )";
 
     stream.Clear();
@@ -825,8 +825,8 @@ int main() {
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
 
     const char *content = R"(
-<loop value="_val1" group="year" sort="ascend">Year({var:_val1}):
-    <loop set="_val1" value="_val2">Month({var:_val2[month]})
+<loop value="val_1" group="year" sort="ascend">Year({var:val_1}):
+    <loop set="val_1" value="val_2">Month({var:val_2[month]})
     </loop>
 </loop>
     )";
@@ -855,8 +855,8 @@ int main() {
 
     // Without values names.
     const char *content2 = R"(
-<loop value="_val1" group="year" sort="ascend">Year({var:_val1}):
-    <loop set="_val1" value="_val2">Month(<loop set="_val2" value="_val3">{var:_val3}</loop>)
+<loop value="val_1" group="year" sort="ascend">Year({var:val_1}):
+    <loop set="val_1" value="val_2">Month(<loop set="val_2" value="val_3">{var:val_3}</loop>)
     </loop>
 </loop>
     )";

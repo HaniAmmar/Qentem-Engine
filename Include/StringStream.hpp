@@ -46,7 +46,7 @@ struct StringStream {
     }
 
     StringStream(StringStream &&stream) noexcept
-        : _storage{stream.Storage()}, _length{stream.Length()}, _capacity{stream.Capacity()} {
+        : storage_{stream.Storage()}, length_{stream.Length()}, capacity_{stream.Capacity()} {
         stream.setCapacity(SizeT{0});
         stream.setLength(SizeT{0});
         stream.clearStorage();
@@ -102,10 +102,10 @@ struct StringStream {
     inline void operator+=(Char_T one_char) {
         const SizeT len = Length();
 
-        ++_length;
+        ++length_;
 
         if (Capacity() == len) {
-            expand(_length);
+            expand(length_);
         }
 
         Storage()[len] = one_char;
@@ -211,7 +211,7 @@ struct StringStream {
 
     inline void StepBack(const SizeT len) noexcept {
         if (len <= Length()) {
-            _length -= len;
+            length_ -= len;
         }
     }
 
@@ -250,10 +250,10 @@ struct StringStream {
     // Set the needed length to write directly to the buffer,
     inline Char_T *Buffer(const SizeT len) {
         const SizeT current_offset = Length();
-        _length += len;
+        length_ += len;
 
-        if (_length > Capacity()) {
-            expand(_length);
+        if (length_ > Capacity()) {
+            expand(length_);
         }
 
         return (Storage() + current_offset);
@@ -291,15 +291,15 @@ struct StringStream {
     }
 
     inline Char_T *Storage() const noexcept {
-        return _storage;
+        return storage_;
     }
 
     inline SizeT Length() const noexcept {
-        return _length;
+        return length_;
     }
 
     inline SizeT Capacity() const noexcept {
-        return _capacity;
+        return capacity_;
     }
 
     inline const Char_T *First() const noexcept {
@@ -346,7 +346,7 @@ struct StringStream {
     //////////// Private ////////////
   private:
     void setStorage(Char_T *new_storage) noexcept {
-        _storage = new_storage;
+        storage_ = new_storage;
     }
 
     void clearStorage() noexcept {
@@ -354,11 +354,11 @@ struct StringStream {
     }
 
     void setLength(const SizeT new_length) noexcept {
-        _length = new_length;
+        length_ = new_length;
     }
 
     void setCapacity(const SizeT new_capacity) noexcept {
-        _capacity = new_capacity;
+        capacity_ = new_capacity;
     }
 
     void allocate(SizeT size) {
@@ -370,10 +370,10 @@ struct StringStream {
     inline void write(const Char_T *str, const SizeT len) {
         constexpr SizeT32 size           = sizeof(Char_T);
         const SizeT       current_offset = Length();
-        _length += len;
+        length_ += len;
 
-        if (Capacity() < _length) {
-            expand(_length);
+        if (Capacity() < length_) {
+            expand(length_);
         }
 
         Memory::Copy((Storage() + current_offset), str, (len * size));
@@ -389,9 +389,9 @@ struct StringStream {
         Memory::Deallocate(str);
     }
 
-    Char_T *_storage{nullptr};
-    SizeT   _length{0};
-    SizeT   _capacity{0};
+    Char_T *storage_{nullptr};
+    SizeT   length_{0};
+    SizeT   capacity_{0};
 };
 
 } // namespace Qentem

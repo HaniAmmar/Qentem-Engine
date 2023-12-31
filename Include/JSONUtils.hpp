@@ -206,7 +206,7 @@ struct JSONotationStrings;
 template <typename Char_T>
 struct JSONotation_T {
   private:
-    static constexpr SizeT32 _size = sizeof(Char_T);
+    static constexpr SizeT32 size_ = sizeof(Char_T);
 
   public:
     static constexpr Char_T QuoteChar    = '"';
@@ -243,13 +243,13 @@ struct JSONotation_T {
     static constexpr Char_T CU_Char = 'U';
 
     static constexpr SizeT         TrueStringLength = SizeT{4};
-    static constexpr const Char_T *TrueString       = &(JSONotationStrings<Char_T, _size>::TrueString[0]);
+    static constexpr const Char_T *TrueString       = &(JSONotationStrings<Char_T, size_>::TrueString[0]);
 
     static constexpr SizeT         FalseStringLength = SizeT{5};
-    static constexpr const Char_T *FalseString       = &(JSONotationStrings<Char_T, _size>::FalseString[0]);
+    static constexpr const Char_T *FalseString       = &(JSONotationStrings<Char_T, size_>::FalseString[0]);
 
     static constexpr SizeT         NullStringLength = SizeT{4};
-    static constexpr const Char_T *NullString       = &(JSONotationStrings<Char_T, _size>::NullString[0]);
+    static constexpr const Char_T *NullString       = &(JSONotationStrings<Char_T, size_>::NullString[0]);
 };
 
 // char

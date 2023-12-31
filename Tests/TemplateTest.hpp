@@ -2696,13 +2696,13 @@ static void TestLoopTag1(QTest &test) {
 
     value3 = JSON::Parse(R"({"group":[[10],[20],[30]]})");
 
-    content = R"(<loop set="group" value="_Val1"><loop set="_Val1" value="_Val2">{var:_Val2}</loop></loop>)";
+    content = R"(<loop set="group" value="Val_1"><loop set="Val_1" value="Val_2">{var:Val_2}</loop></loop>)";
     test.IsEqual(Template::Render(content, value3, ss), R"(102030)", __LINE__);
     ss.Clear();
 
     value3 = JSON::Parse(R"({"group":[1,2,3,4]})");
 
-    content = R"(<loop set="group" value="_Val">{var:_Val}</loop>)";
+    content = R"(<loop set="group" value="Val_">{var:Val_}</loop>)";
     test.IsEqual(Template::Render(content, value3, ss), R"(1234)", __LINE__);
     ss.Clear();
 
@@ -2960,26 +2960,26 @@ static void TestLoopTag3(QTest &test) {
     )");
 
     content =
-        R"(<loop value="_val1" group="year111" sort="descend"><loop set="_val1" value="_val2"><loop set="_val2" value="_val3">{var:_val3}</loop></loop></loop>)";
+        R"(<loop value="val_1" group="year111" sort="descend"><loop set="val_1" value="val_2"><loop set="val_2" value="val_3">{var:val_3}</loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss), "", __LINE__);
     ss.Clear();
 
     content =
-        R"(<loop value="_val1" group="year" sort="descend"><loop set="_val1" value="_val2"><loop set="_val2" value="_val3">{var:_val3}</loop></loop></loop>)";
+        R"(<loop value="val_1" group="year" sort="descend"><loop set="val_1" value="val_2"><loop set="val_2" value="val_3">{var:val_3}</loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss),
                  R"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)", __LINE__);
     ss.Clear();
 
     content =
-        R"(<loop value="_val1" group="year" sort="descend"><loop set="_val1" value="_val2" group="quarter" sort="ascend"><loop set="_val2" value="_val3"><loop set="_val3" value="_val4">{var:_val4}</loop></loop></loop></loop>)";
+        R"(<loop value="val_1" group="year" sort="descend"><loop set="val_1" value="val_2" group="quarter" sort="ascend"><loop set="val_2" value="val_3"><loop set="val_3" value="val_4">{var:val_4}</loop></loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss), R"(1400145014501100112512002300120023002300)", __LINE__);
     ss.Clear();
 
     content =
-        R"(<loop value="_val1" group="year" sort="descend">-- {var:_val1}-<loop set="_val1" value="_val2" group="quarter" sort="ascend">{var:_val2}-<loop set="_val2" value="_val3" group="week" sort="ascend">{var:_val2}:<loop set="_val3" value="_val4"><loop set="_val4" value="_val5"> {var:_val5}</loop></loop></loop></loop></loop>)";
+        R"(<loop value="val_1" group="year" sort="descend">-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter" sort="ascend">{var:val_2}-<loop set="val_2" value="val_3" group="week" sort="ascend">{var:val_2}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
 
     test.IsEqual(
         Template::Render(content, value, ss),
@@ -2988,7 +2988,7 @@ static void TestLoopTag3(QTest &test) {
     ss.Clear();
 
     content =
-        R"(<loop value="_val1" group="year">-- {var:_val1}-<loop set="_val1" value="_val2" group="quarter">{var:_val2}-<loop set="_val2" value="_val3" group="week">{var:_val2}:<loop set="_val3" value="_val4"><loop set="_val4" value="_val5"> {var:_val5}</loop></loop></loop></loop></loop>)";
+        R"(<loop value="val_1" group="year">-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter">{var:val_2}-<loop set="val_2" value="val_3" group="week">{var:val_2}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
 
     test.IsEqual(
         Template::Render(content, value, ss),
@@ -3008,12 +3008,12 @@ static void TestLoopTag3(QTest &test) {
     value += 7;
     value += 6;
 
-    content = R"(<loop value="_val1" sort="a">{var:_val1}</loop>)";
+    content = R"(<loop value="val_1" sort="a">{var:val_1}</loop>)";
 
     test.IsEqual(Template::Render(content, value, ss), R"(1234567)", __LINE__);
     ss.Clear();
 
-    content = R"(<loop value="_val1" sort="d">{var:_val1}</loop>)";
+    content = R"(<loop value="val_1" sort="d">{var:val_1}</loop>)";
 
     test.IsEqual(Template::Render(content, value, ss), R"(7654321)", __LINE__);
     ss.Clear();
@@ -3417,7 +3417,7 @@ static void TestRender2(QTest &test) {
                  R"({var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]}{var:loop1_val[]})", __LINE__);
     ss.Clear();
 
-    content = R"(<loop set="numbers" value="_val">{var:_val}</loop>)";
+    content = R"(<loop set="numbers" value="val_">{var:val_}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), "", __LINE__);
     ss.Clear();
 

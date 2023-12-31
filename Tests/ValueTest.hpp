@@ -1079,7 +1079,7 @@ static void TestObjectValue1(QTest &test) {
     bool              bool_var;
 
     for (SizeT32 i = 0; i < 5; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1121,7 +1121,7 @@ static void TestObjectValue1(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 10; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1144,7 +1144,7 @@ static void TestObjectValue1(QTest &test) {
     h_arr_var.Reset();
     // Testing empty values
     for (SizeT32 i = 0; i < 10; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key];
     }
@@ -1154,7 +1154,7 @@ static void TestObjectValue1(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT i = 0; i < 7; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1178,7 +1178,7 @@ static void TestObjectValue1(QTest &test) {
     test.IsTrue(value1.IsObject(), __LINE__);
 
     for (SizeT32 i = 0; i < 7; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1209,7 +1209,7 @@ static void TestObjectValue2(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 7; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1229,7 +1229,7 @@ static void TestObjectValue2(QTest &test) {
 
     h_arr_var.Reset();
     for (SizeT32 i = 0; i < 3; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }
@@ -1242,7 +1242,7 @@ static void TestObjectValue2(QTest &test) {
     test.IsNotEqual(value3.GetObject()->First(), storage, __LINE__);
 
     for (SizeT32 i = 0; i < 13; i++) {
-        VString key("_Key");
+        VString key("Key_");
         Digit::NumberToString(key, i);
         h_arr_var[key] = i;
     }

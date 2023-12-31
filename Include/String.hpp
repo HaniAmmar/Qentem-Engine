@@ -151,14 +151,14 @@ struct String {
             deallocate();
 
             if (Config::ShortStringOptimization) {
-                _data.Length = src._data.Length;
+                data_.Length = src.data_.Length;
                 setLength(src.Length());
-                _data.Padding = src._data.Padding;
+                data_.Padding = src.data_.Padding;
             } else {
-                _data.Length = src._data.Length;
+                data_.Length = src.data_.Length;
             }
 
-            _data.Storage.MovePointerOnly(src._data.Storage);
+            data_.Storage.MovePointerOnly(src.data_.Storage);
             src.clearLength();
         }
 
@@ -345,10 +345,10 @@ struct String {
 
     inline SizeT Length() const noexcept {
         if (Config::ShortStringOptimization) {
-            const SizeT8 len = _data.Storage.GetLowByte();
-            return ((len == _not_short_value) ? _data.Length : len);
+            const SizeT8 len = data_.Storage.GetLowByte();
+            return ((len == not__short_value) ? data_.Length : len);
         } else {
-            return _data.Length;
+            return data_.Length;
         }
     }
 
@@ -356,22 +356,22 @@ struct String {
         if (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                return _data.GetShortStorage();
+                return data_.GetShortStorage();
             }
         }
 
-        return _data.Storage.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     inline const Char_T *Storage() const noexcept {
         if (Config::ShortStringOptimization) {
             const SizeT len = Length();
             if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                return _data.GetShortStorage();
+                return data_.GetShortStorage();
             }
         }
 
-        return _data.Storage.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     static String Merge(const String &src1, const String &src2) {
@@ -391,7 +391,7 @@ struct String {
 
             if (Config::ShortStringOptimization) {
                 if (new_len <= ShortStringMax) {
-                    ns = _data.GetShortStorage();
+                    ns = data_.GetShortStorage();
 
                 } else {
                     ns = Memory::Allocate<Char_T>(new_len);
@@ -524,21 +524,21 @@ struct String {
     inline const Char_T *Storage(SizeT length) const noexcept {
         if (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return _data.GetShortStorage();
+                return data_.GetShortStorage();
             }
         }
 
-        return _data.Storage.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     inline Char_T *Storage(SizeT length) noexcept {
         if (Config::ShortStringOptimization) {
             if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return _data.GetShortStorage();
+                return data_.GetShortStorage();
             }
         }
 
-        return _data.Storage.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     inline bool IsEmpty() const noexcept {
@@ -550,11 +550,11 @@ struct String {
     }
 
     inline SizeT8 GetHighByte() const noexcept {
-        return _data.Storage.GetHighByte();
+        return data_.Storage.GetHighByte();
     }
 
     inline void SetHighByte(SizeT8 byte) noexcept {
-        _data.Storage.SetHighByte(byte);
+        data_.Storage.SetHighByte(byte);
     }
 
     // For STL
@@ -580,33 +580,33 @@ struct String {
   private:
     void clearLength() noexcept {
         if (Config::ShortStringOptimization) {
-            _data.Storage.SetLowByte(SizeT8{0});
+            data_.Storage.SetLowByte(SizeT8{0});
         }
 
-        _data.Length = SizeT{0};
+        data_.Length = SizeT{0};
     }
 
     void setLength(SizeT new_length) noexcept {
         if (Config::ShortStringOptimization) {
             if (new_length < ShortStringMax) {
-                _data.Storage.SetLowByte(SizeT8(new_length));
+                data_.Storage.SetLowByte(SizeT8(new_length));
             } else {
-                _data.Storage.SetLowByte(_not_short_value);
-                _data.Length = new_length;
+                data_.Storage.SetLowByte(not__short_value);
+                data_.Length = new_length;
             }
         } else {
-            _data.Length = new_length;
+            data_.Length = new_length;
         }
     }
 
     void setStorage(Char_T *ptr) noexcept {
-        _data.Storage.SetPointer(ptr);
+        data_.Storage.SetPointer(ptr);
     }
 
     Char_T *allocate(SizeT new_size) {
         if (Config::ShortStringOptimization) {
             if (new_size <= ShortStringMax) {
-                return _data.GetShortStorage();
+                return data_.GetShortStorage();
             }
         }
 
@@ -628,7 +628,7 @@ struct String {
     }
 
     void clearStorage() noexcept {
-        _data.Storage.Reset();
+        data_.Storage.Reset();
     }
 
     static String merge(const Char_T *str1, const SizeT len1, const Char_T *str2, const SizeT len2) {
@@ -655,9 +655,9 @@ struct String {
         setLength(len);
     }
 
-    static constexpr SizeT8 _not_short_value = 255;
+    static constexpr SizeT8 not__short_value = 255;
 
-    StringData<Char_T, Config::IsBigEndian> _data;
+    StringData<Char_T, Config::IsBigEndian> data_;
 };
 
 } // namespace Qentem

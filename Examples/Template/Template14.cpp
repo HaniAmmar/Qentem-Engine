@@ -19,7 +19,7 @@ int main() {
     value += 3;
 
     const char *content = R"(
-<loop value="_val1" sort="ascend">{var:_val1} </loop>
+<loop value="val_1" sort="ascend">{var:val_1} </loop>
     )";
 
     StringStream<char> stream;
@@ -31,7 +31,7 @@ int main() {
     */
 
     const char *content2 = R"(
-<loop value="_val1" sort="descend">{var:_val1} </loop>
+<loop value="val_1" sort="descend">{var:val_1} </loop>
     )";
 
     stream.Clear();

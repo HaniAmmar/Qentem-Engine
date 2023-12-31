@@ -95,7 +95,7 @@ struct Array {
     Array(Array &&src) noexcept = default;
     ~Array()                    = default;
 
-    explicit Array(SizeT size, bool initialize = false) : _data{size} {
+    explicit Array(SizeT size, bool initialize = false) : data_{size} {
         if (size != SizeT{0}) {
             Type_T *current = allocate();
 
@@ -106,7 +106,7 @@ struct Array {
         }
     }
 
-    Array(const Array &src) : _data{src.Size()} {
+    Array(const Array &src) : data_{src.Size()} {
         if (src.Size() != SizeT{0}) {
             setSize(src.Size());
             copyArray(src);
@@ -118,7 +118,7 @@ struct Array {
             Type_T     *storage = Storage();
             const SizeT size    = Size();
 
-            _data.Storage.MovePointerOnly(src._data.Storage);
+            data_.Storage.MovePointerOnly(src.data_.Storage);
             setCapacity(src.Capacity());
             setSize(src.Size());
             src.setSize(SizeT{0});
@@ -184,7 +184,7 @@ struct Array {
             resize(n_size);
         }
 
-        _data.Index += src.Size();
+        data_.Index += src.Size();
         Type_T       *storage  = Storage();
         const Type_T *src_item = src.First();
         const Type_T *src_end  = (src_item + src.Size());
@@ -206,7 +206,7 @@ struct Array {
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
-        ++_data.Index;
+        ++data_.Index;
     }
 
     inline void operator+=(const Type_T &item) {
@@ -324,15 +324,15 @@ struct Array {
     }
 
     inline Type_T *Storage() const noexcept {
-        return _data.Storage.GetPointer();
+        return data_.Storage.GetPointer();
     }
 
     inline SizeT Size() const noexcept {
-        return _data.Index;
+        return data_.Index;
     }
 
     inline SizeT Capacity() const noexcept {
-        return _data.Capacity;
+        return data_.Capacity;
     }
 
     inline const Type_T *First() const noexcept {
@@ -348,19 +348,19 @@ struct Array {
     }
 
     inline SizeT8 GetHighByte() const noexcept {
-        return _data.Storage.GetHighByte();
+        return data_.Storage.GetHighByte();
     }
 
     inline void SetHighByte(SizeT8 byte) noexcept {
-        _data.Storage.SetHighByte(byte);
+        data_.Storage.SetHighByte(byte);
     }
 
     inline SizeT8 GetLowByte() const noexcept {
-        return _data.Storage.GetLowByte();
+        return data_.Storage.GetLowByte();
     }
 
     inline void SetLowByte(SizeT8 byte) noexcept {
-        _data.Storage.SetLowByte(byte);
+        data_.Storage.SetLowByte(byte);
     }
 
     inline const Type_T *End() const noexcept {
@@ -396,7 +396,7 @@ struct Array {
 
   private:
     void setStorage(Type_T *ptr) noexcept {
-        _data.Storage.SetPointer(ptr);
+        data_.Storage.SetPointer(ptr);
     }
 
     Type_T *allocate() {
@@ -406,15 +406,15 @@ struct Array {
     }
 
     void clearStorage() noexcept {
-        _data.Storage.Reset();
+        data_.Storage.Reset();
     }
 
     void setSize(SizeT new_size) noexcept {
-        _data.Index = new_size;
+        data_.Index = new_size;
     }
 
     void setCapacity(SizeT new_capacity) noexcept {
-        _data.Capacity = new_capacity;
+        data_.Capacity = new_capacity;
     }
 
     void resize(SizeT new_size) {
@@ -438,7 +438,7 @@ struct Array {
         }
     }
 
-    ArrayData<Type_T, Config::IsBigEndian> _data{};
+    ArrayData<Type_T, Config::IsBigEndian> data_{};
 };
 
 } // namespace Qentem

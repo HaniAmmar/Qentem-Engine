@@ -166,52 +166,52 @@ struct QPointer {
     QPointer(const QPointer &src)            = delete;
     QPointer &operator=(const QPointer &src) = delete;
 
-    inline explicit QPointer(Type_T *pointer) noexcept : _data{pointer} {
+    inline explicit QPointer(Type_T *pointer) noexcept : data_{pointer} {
     }
 
     inline QPointer &operator=(QPointer &&src) noexcept {
         if (this != &src) {
-            _data.Pointer     = src._data.Pointer;
-            src._data.Pointer = nullptr;
+            data_.Pointer     = src.data_.Pointer;
+            src.data_.Pointer = nullptr;
         }
 
         return *this;
     }
 
     inline void SetPointer(Type_T *pointer) noexcept {
-        _data.SetPointer(pointer);
+        data_.SetPointer(pointer);
     }
 
     inline Type_T *GetPointer() const noexcept {
-        return _data.GetPointer();
+        return data_.GetPointer();
     }
 
     inline void MovePointerOnly(QPointer &src) noexcept {
-        _data.MovePointerOnly(src._data);
+        data_.MovePointerOnly(src.data_);
     }
 
     inline void SetHighByte(SizeT8 byte) noexcept {
-        _data.SetHighByte(byte);
+        data_.SetHighByte(byte);
     }
 
     inline void SetLowByte(SizeT8 byte) noexcept {
-        _data.SetLowByte(byte);
+        data_.SetLowByte(byte);
     }
 
     inline SizeT8 GetLowByte() const noexcept {
-        return _data.GetLowByte();
+        return data_.GetLowByte();
     }
 
     inline SizeT8 GetHighByte() const noexcept {
-        return _data.GetHighByte();
+        return data_.GetHighByte();
     }
 
     inline void Reset() noexcept {
-        _data.Pointer = nullptr;
+        data_.Pointer = nullptr;
     }
 
   private:
-    QPointerData<Type_T, Config::PointerTagging> _data;
+    QPointerData<Type_T, Config::PointerTagging> data_;
 };
 
 } // namespace Qentem

@@ -115,32 +115,32 @@ struct TagBit {
     TagBit(TagBit &&tag) noexcept     = default;
 
     explicit TagBit(TagType type) {
-        _data.SetType(type);
+        data_.SetType(type);
 
         switch (type) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                _data.Storage.SetPointer(Memory::AllocateInit<VariableTag>());
+                data_.Storage.SetPointer(Memory::AllocateInit<VariableTag>());
                 break;
             }
 
             case TagType::Math: {
-                _data.Storage.SetPointer(Memory::AllocateInit<MathTag>());
+                data_.Storage.SetPointer(Memory::AllocateInit<MathTag>());
                 break;
             }
 
             case TagType::Loop: {
-                _data.Storage.SetPointer(Memory::AllocateInit<LoopTag>());
+                data_.Storage.SetPointer(Memory::AllocateInit<LoopTag>());
                 break;
             }
 
             case TagType::InLineIf: {
-                _data.Storage.SetPointer(Memory::AllocateInit<InLineIfTag>());
+                data_.Storage.SetPointer(Memory::AllocateInit<InLineIfTag>());
                 break;
             }
 
             case TagType::If: {
-                _data.Storage.SetPointer(Memory::AllocateInit<IfTag>());
+                data_.Storage.SetPointer(Memory::AllocateInit<IfTag>());
                 break;
             }
 
@@ -150,36 +150,36 @@ struct TagBit {
     }
 
     ~TagBit() {
-        switch (_data.GetType()) {
+        switch (data_.GetType()) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                Memory::Deallocate(_data.GetStorage());
+                Memory::Deallocate(data_.GetStorage());
                 break;
             }
 
             case TagType::Math: {
-                MathTag *ptr = (MathTag *)(_data.GetStorage());
+                MathTag *ptr = (MathTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::Loop: {
-                LoopTag *ptr = (LoopTag *)(_data.GetStorage());
+                LoopTag *ptr = (LoopTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::InLineIf: {
-                InLineIfTag *ptr = (InLineIfTag *)(_data.GetStorage());
+                InLineIfTag *ptr = (InLineIfTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::If: {
-                IfTag *ptr = (IfTag *)(_data.GetStorage());
+                IfTag *ptr = (IfTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
@@ -191,35 +191,35 @@ struct TagBit {
     }
 
     inline VariableTag &GeVariableTag() const noexcept {
-        return *(Memory::ChangePointer<VariableTag>(_data.GetStorage()));
+        return *(Memory::ChangePointer<VariableTag>(data_.GetStorage()));
     }
 
     inline VariableTag &GeRawVariableTag() const noexcept {
-        return *(Memory::ChangePointer<VariableTag>(_data.GetStorage()));
+        return *(Memory::ChangePointer<VariableTag>(data_.GetStorage()));
     }
 
     inline MathTag &GetMathTag() const noexcept {
-        return *(Memory::ChangePointer<MathTag>(_data.GetStorage()));
+        return *(Memory::ChangePointer<MathTag>(data_.GetStorage()));
     }
 
     inline LoopTag &GetLoopTag() const noexcept {
-        return *(Memory::ChangePointer<LoopTag>(_data.GetStorage()));
+        return *(Memory::ChangePointer<LoopTag>(data_.GetStorage()));
     }
 
     inline InLineIfTag &GetInLineIfTag() const noexcept {
-        return *(Memory::ChangePointer<InLineIfTag>(_data.GetStorage()));
+        return *(Memory::ChangePointer<InLineIfTag>(data_.GetStorage()));
     }
 
     inline IfTag &GetIfTag() const noexcept {
-        return *(Memory::ChangePointer<IfTag>(_data.GetStorage()));
+        return *(Memory::ChangePointer<IfTag>(data_.GetStorage()));
     }
 
     inline TagType GetType() const noexcept {
-        return _data.GetType();
+        return data_.GetType();
     }
 
   private:
-    TagBitData<Config::PointerTagging> _data{};
+    TagBitData<Config::PointerTagging> data_{};
 };
 
 // MathTag -------------------------------------------
