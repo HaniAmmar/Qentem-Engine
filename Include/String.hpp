@@ -346,7 +346,7 @@ struct String {
     inline SizeT Length() const noexcept {
         if (Config::ShortStringOptimization) {
             const SizeT8 len = data_.Storage.GetLowByte();
-            return ((len == not__short_value) ? data_.Length : len);
+            return ((len == not_short_value_) ? data_.Length : len);
         } else {
             return data_.Length;
         }
@@ -591,7 +591,7 @@ struct String {
             if (new_length < ShortStringMax) {
                 data_.Storage.SetLowByte(SizeT8(new_length));
             } else {
-                data_.Storage.SetLowByte(not__short_value);
+                data_.Storage.SetLowByte(not_short_value_);
                 data_.Length = new_length;
             }
         } else {
@@ -655,7 +655,7 @@ struct String {
         setLength(len);
     }
 
-    static constexpr SizeT8 not__short_value = 255;
+    static constexpr SizeT8 not_short_value_ = 255;
 
     StringData<Char_T, Config::IsBigEndian> data_;
 };

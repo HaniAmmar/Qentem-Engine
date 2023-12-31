@@ -65,7 +65,7 @@ struct VNumberData<false, true> {
     inline void Clear() noexcept {
         PtrNumber = SystemIntType{0};
 
-        if (!is_8) {
+        if (!is_8_) {
             Number.Natural = SizeT64{0};
         } else {
             Padding[0] = SizeT{0};
@@ -81,7 +81,7 @@ struct VNumberData<false, true> {
     SystemIntType PtrNumber{0};
 
   private:
-    static constexpr bool is_8 = (sizeof(SizeT) == 8U);
+    static constexpr bool is_8_ = (sizeof(SizeT) == 8U);
 };
 
 template <>
@@ -99,7 +99,7 @@ struct VNumberData<true, true> {
     }
 
     inline void Clear() noexcept {
-        if (!is_8) {
+        if (!is_8_) {
             Number.Natural = SizeT64{0};
         } else {
             Padding[0] = SizeT{0};
@@ -117,7 +117,7 @@ struct VNumberData<true, true> {
     };
 
   private:
-    static constexpr bool is_8 = (sizeof(SizeT) == 8U);
+    static constexpr bool is_8_ = (sizeof(SizeT) == 8U);
 };
 
 template <bool Endian_T>

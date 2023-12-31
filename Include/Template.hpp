@@ -646,8 +646,8 @@ struct TemplateSub {
         const Value_T *value = getValue(tag);
 
         if ((value == nullptr) || !(value->CopyValueTo(*stream_, Config::TemplatePrecision, &escapeHTMLSpecialChars))) {
-            if ((loop__key != nullptr) && (tag.IsLoopValue == SizeT8{1})) {
-                escapeHTMLSpecialChars(*stream_, loop__key, loop__key_length);
+            if ((loop_key_ != nullptr) && (tag.IsLoopValue == SizeT8{1})) {
+                escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
             } else {
                 stream_->Write((content_ + t_offset), length);
             }
@@ -741,8 +741,8 @@ struct TemplateSub {
 
             // Stage 4: Render
             TemplateSub loop_template{content_, length_, stream_, value_, this, level};
-            loop_template.loop__value_offset = (tag.Offset + tag.ValueOffset);
-            loop_template.loop__value_length = tag.ValueLength;
+            loop_template.loop_value_offset_ = (tag.Offset + tag.ValueOffset);
+            loop_template.loop_value_length_ = tag.ValueLength;
 
             const TagBit *s_tag = tag.SubTags.First();
             const TagBit *s_end = (s_tag + tag.SubTags.Size());
@@ -752,10 +752,10 @@ struct TemplateSub {
 
             if (loop_set->IsObject()) {
                 while (loop_index < loop_size) {
-                    loop_set->SetValueKeyLength(loop_index, loop_template.loop__value, loop_template.loop__key,
-                                                loop_template.loop__key_length);
+                    loop_set->SetValueKeyLength(loop_index, loop_template.loop_value_, loop_template.loop_key_,
+                                                loop_template.loop_key_length_);
 
-                    if (loop_template.loop__value != nullptr) {
+                    if (loop_template.loop_value_ != nullptr) {
                         loop_template.render(s_tag, s_end, tag.ContentOffset, tag.EndOffset);
                     }
 
@@ -763,9 +763,9 @@ struct TemplateSub {
                 }
             } else {
                 while (loop_index < loop_size) {
-                    loop_template.loop__value = loop_set->GetValue(loop_index);
+                    loop_template.loop_value_ = loop_set->GetValue(loop_index);
 
-                    if (loop_template.loop__value != nullptr) {
+                    if (loop_template.loop_value_ != nullptr) {
                         loop_template.render(s_tag, s_end, tag.ContentOffset, tag.EndOffset);
                     }
 
@@ -841,7 +841,7 @@ struct TemplateSub {
         tag.Offset = offset;
         tag.Length = SizeT16((end_offset - offset) & SizeT16{0xFF}); // Limit var length to 255 meter per second.
 
-        if (loop__value_length != 0) {
+        if (loop_value_length_ != 0) {
             const TemplateSub *temp = this;
 
             SizeT l_offset;
@@ -849,8 +849,8 @@ struct TemplateSub {
             SizeT level = level_;
 
             while (level > 0) {
-                l_offset = temp->loop__value_offset;
-                length   = temp->loop__value_length;
+                l_offset = temp->loop_value_offset_;
+                length   = temp->loop_value_length_;
 
                 if (StringUtils::IsEqual((content_ + offset), (content_ + l_offset), length)) {
                     tag.IsLoopValue = 1;
@@ -927,8 +927,8 @@ struct TemplateSub {
                 case TagPatterns::ValueChar: {
                     tag.ValueOffset                  = SizeT8(last_offset - tag.Offset);
                     tag.ValueLength                  = SizeT8((offset2 - SizeT{1}) - last_offset);
-                    loop_template.loop__value_offset = last_offset;
-                    loop_template.loop__value_length = tag.ValueLength;
+                    loop_template.loop_value_offset_ = last_offset;
+                    loop_template.loop_value_length_ = tag.ValueLength;
                     offset                           = offset2;
                     offset2                          = getQuotedValue(offset, loop_content_offset);
                     last_offset                      = offset;
@@ -1154,7 +1154,7 @@ struct TemplateSub {
             {
                 const SizeT32 level    = SizeT32(level_);
                 SizeT32       iv_level = SizeT32(v_level);
-                value                  = loop__value;
+                value                  = loop_value_;
 
                 while (iv_level < level) {
                     that = that->parent_;
@@ -1162,13 +1162,13 @@ struct TemplateSub {
                 }
             }
 
-            value = that->loop__value;
+            value = that->loop_value_;
 
             if (!has_index) {
                 return value;
             }
 
-            offset += loop__value_length;
+            offset += loop_value_length_;
         }
 
         SizeT offset2;
@@ -1823,12 +1823,12 @@ struct TemplateSub {
     StringStream_T    *stream_;
     const Value_T     *value_;
     const TemplateSub *parent_;
-    const Value_T     *loop__value{nullptr};
-    const Char_T      *loop__key{nullptr};
-    SizeT              loop__key_length{0};
-    SizeT              loop__value_offset{0};
+    const Value_T     *loop_value_{nullptr};
+    const Char_T      *loop_key_{nullptr};
+    SizeT              loop_key_length_{0};
+    SizeT              loop_value_offset_{0};
     const SizeT        length_;
-    SizeT16            loop__value_length{0};
+    SizeT16            loop_value_length_{0};
     const SizeT16      level_;
 };
 
