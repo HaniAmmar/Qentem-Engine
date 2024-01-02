@@ -210,7 +210,7 @@ struct Array {
     }
 
     inline void operator+=(const Type_T &item) {
-        *this += Memory::Move(Type_T{item});
+        *this += Type_T{item};
     }
 
     inline void Insert(Array &&src) {
@@ -232,7 +232,7 @@ struct Array {
     inline Type_T &Insert(const Type_T &item) {
         const SizeT size = Size();
 
-        *this += Memory::Move(Type_T{item});
+        *this += Type_T{item};
 
         return Storage()[size];
     }

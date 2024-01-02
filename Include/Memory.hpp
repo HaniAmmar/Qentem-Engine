@@ -105,11 +105,6 @@ template <typename Type_T>
 static constexpr Type_T &&Move(Type_T &value) noexcept {
     return (Type_T &&)(value);
 }
-
-template <typename Type_T>
-static constexpr Type_T &&Move(Type_T &&value) noexcept {
-    return (Type_T &&)(value);
-}
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
 inline static void Swap(Type_T &item1, Type_T &item2) noexcept {
