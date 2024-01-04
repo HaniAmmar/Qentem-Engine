@@ -23,12 +23,12 @@
 #ifndef QENTEM_VALUE_H
 #define QENTEM_VALUE_H
 
-#include "StringStream.hpp"
-
 #include "QNumber.hpp"
+#include "String.hpp"
 #include "Array.hpp"
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
+#include "StringStream.hpp"
 
 namespace Qentem {
 
