@@ -6,7 +6,6 @@
 using Qentem::JSON;
 using Qentem::SizeT;
 using Qentem::StringStream;
-using Qentem::StringUtils;
 
 template <typename Char_T, typename Value_T, typename StringStream_T>
 inline static void CachedRender(const Char_T *content, const SizeT length, const Value_T &value, StringStream_T &stream,
@@ -88,7 +87,7 @@ int main() {
     StringStream<char> stream;
     const char        *template_name        = "page1";
     const SizeT        template_name_length = 5U;
-    const SizeT        content_length       = StringUtils::Count(content);
+    const SizeT        content_length       = Qentem::StringUtils::Count(content);
 
     for (unsigned int i = 0; i < 10000U; i++) {
         stream.Clear();

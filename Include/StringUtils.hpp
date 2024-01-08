@@ -27,50 +27,74 @@
 
 namespace Qentem {
 
-struct StringUtils {
-    template <typename Char_T>
-    struct WhiteSpaceChars_T {
-        static constexpr Char_T SpaceChar           = ' ';
-        static constexpr Char_T LineControlChar     = '\n';
-        static constexpr Char_T TabControlChar      = '\t';
-        static constexpr Char_T CarriageControlChar = '\r';
-    };
+namespace StringUtils {
+template <typename Char_T>
+struct WhiteSpaceChars_T {
+    static constexpr Char_T SpaceChar           = ' ';
+    static constexpr Char_T LineControlChar     = '\n';
+    static constexpr Char_T TabControlChar      = '\t';
+    static constexpr Char_T CarriageControlChar = '\r';
+};
 
-    template <typename Char_T, typename Number_T = SizeT>
-    static Number_T Count(const Char_T *str) noexcept {
-        Number_T len = 0;
+template <typename Char_T, typename Number_T = SizeT>
+static Number_T Count(const Char_T *str) noexcept {
+    Number_T len = 0;
 
-        if (str != nullptr) {
-            while (*str != Char_T{0}) {
-                ++str;
-                ++len;
+    if (str != nullptr) {
+        while (*str != Char_T{0}) {
+            ++str;
+            ++len;
+        }
+    }
+
+    return len;
+}
+
+// template <typename Char_T, typename Number_T = SizeT>
+// static constexpr Number_T ConstCount(const Char_T *str) noexcept {
+//     const Char_T *str_2 = str;
+//     Number_T      len   = 0;
+
+//     if (str_2 != nullptr) {
+//         while (*str_2 != Char_T{0}) {
+//             ++str_2;
+//             ++len;
+//         }
+//     }
+
+//     return len;
+// }
+
+template <typename Char_T, typename Number_T>
+static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
+    using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
+
+    while (offset < end_offset) {
+        switch (str[offset]) {
+            case WhiteSpaceChars::SpaceChar:
+            case WhiteSpaceChars::LineControlChar:
+            case WhiteSpaceChars::TabControlChar:
+            case WhiteSpaceChars::CarriageControlChar:
+                break;
+
+            default: {
+                return;
             }
         }
 
-        return len;
+        ++offset;
     }
+}
 
-    // template <typename Char_T, typename Number_T = SizeT>
-    // static constexpr Number_T ConstCount(const Char_T *str) noexcept {
-    //     const Char_T *str_2 = str;
-    //     Number_T      len   = 0;
+template <typename Char_T, typename Number_T>
+static void TrimRight(const Char_T *str, const Number_T offset, Number_T &end_offset) noexcept {
+    using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
 
-    //     if (str_2 != nullptr) {
-    //         while (*str_2 != Char_T{0}) {
-    //             ++str_2;
-    //             ++len;
-    //         }
-    //     }
+    if (end_offset > offset) {
+        do {
+            --end_offset;
 
-    //     return len;
-    // }
-
-    template <typename Char_T, typename Number_T>
-    static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
-        using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
-
-        while (offset < end_offset) {
-            switch (str[offset]) {
+            switch (str[end_offset]) {
                 case WhiteSpaceChars::SpaceChar:
                 case WhiteSpaceChars::LineControlChar:
                 case WhiteSpaceChars::TabControlChar:
@@ -78,130 +102,106 @@ struct StringUtils {
                     break;
 
                 default: {
+                    ++end_offset;
                     return;
                 }
             }
 
-            ++offset;
-        }
+        } while (end_offset > offset);
     }
+}
 
-    template <typename Char_T, typename Number_T>
-    static void TrimRight(const Char_T *str, const Number_T offset, Number_T &end_offset) noexcept {
-        using WhiteSpaceChars = WhiteSpaceChars_T<Char_T>;
-
-        if (end_offset > offset) {
-            do {
-                --end_offset;
-
-                switch (str[end_offset]) {
-                    case WhiteSpaceChars::SpaceChar:
-                    case WhiteSpaceChars::LineControlChar:
-                    case WhiteSpaceChars::TabControlChar:
-                    case WhiteSpaceChars::CarriageControlChar:
-                        break;
-
-                    default: {
-                        ++end_offset;
-                        return;
-                    }
-                }
-
-            } while (end_offset > offset);
-        }
+// offset: the starting offset
+// length: the number of characters
+template <typename Char_T, typename Number_T>
+static void Trim(const Char_T *str, Number_T &offset, Number_T &length) noexcept {
+    if (length != Number_T{0}) {
+        Number_T end_offset = (length + offset);
+        TrimLeft(str, offset, end_offset);
+        TrimRight(str, offset, end_offset);
+        length = (end_offset - offset);
     }
+}
 
-    // offset: the starting offset
-    // length: the number of characters
-    template <typename Char_T, typename Number_T>
-    static void Trim(const Char_T *str, Number_T &offset, Number_T &length) noexcept {
-        if (length != Number_T{0}) {
-            Number_T end_offset = (length + offset);
-            TrimLeft(str, offset, end_offset);
-            TrimRight(str, offset, end_offset);
-            length = (end_offset - offset);
-        }
-    }
+template <typename Char_T>
+static bool IsLess(const Char_T *left, const Char_T *right, SizeT left_length, SizeT right_length,
+                   bool orEqual) noexcept {
+    SizeT offset = 0;
 
-    template <typename Char_T>
-    static bool IsLess(const Char_T *left, const Char_T *right, SizeT left_length, SizeT right_length,
-                       bool orEqual) noexcept {
-        SizeT offset = 0;
-
-        while ((left_length > offset) && (right_length > offset)) {
-            if (left[offset] > right[offset]) {
-                return false;
-            }
-
-            if (left[offset] < right[offset]) {
-                return true;
-            }
-
-            ++offset;
+    while ((left_length > offset) && (right_length > offset)) {
+        if (left[offset] > right[offset]) {
+            return false;
         }
 
-        return (orEqual & (left_length == right_length));
-    }
-
-    template <typename Char_T>
-    static bool IsGreater(const Char_T *left, const Char_T *right, SizeT left_length, SizeT right_length,
-                          bool orEqual) noexcept {
-        SizeT offset = 0;
-
-        while ((left_length > offset) && (right_length > offset)) {
-            if (left[offset] < right[offset]) {
-                return false;
-            }
-
-            if (left[offset] > right[offset]) {
-                return true;
-            }
-
-            ++offset;
+        if (left[offset] < right[offset]) {
+            return true;
         }
 
-        return (orEqual & (left_length == right_length));
+        ++offset;
     }
 
-    template <typename Char_T>
-    static bool IsEqual(const Char_T *left, const Char_T *right, SizeT length) noexcept {
-        SizeT offset = 0;
+    return (orEqual & (left_length == right_length));
+}
 
-        // if ((left != nullptr) && (right != nullptr)) {
-        while ((length > offset) && (left[offset] == right[offset])) {
-            ++offset;
+template <typename Char_T>
+static bool IsGreater(const Char_T *left, const Char_T *right, SizeT left_length, SizeT right_length,
+                      bool orEqual) noexcept {
+    SizeT offset = 0;
+
+    while ((left_length > offset) && (right_length > offset)) {
+        if (left[offset] < right[offset]) {
+            return false;
         }
-        // }
 
-        return (length == offset);
+        if (left[offset] > right[offset]) {
+            return true;
+        }
+
+        ++offset;
     }
 
-    template <typename Char_T>
-    static SizeT Hash(const Char_T *key, SizeT length) noexcept {
-        constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
+    return (orEqual & (left_length == right_length));
+}
 
-        SizeT hash   = SizeT{11};
-        SizeT base   = SizeT{33};
-        SizeT offset = 0;
+template <typename Char_T>
+static bool IsEqual(const Char_T *left, const Char_T *right, SizeT length) noexcept {
+    SizeT offset = 0;
 
-        while (offset < length) {
-            hash = SizeT(hash + (base * offset * SizeT(key[offset])));
+    // if ((left != nullptr) && (right != nullptr)) {
+    while ((length > offset) && (left[offset] == right[offset])) {
+        ++offset;
+    }
+    // }
+
+    return (length == offset);
+}
+
+template <typename Char_T>
+static SizeT Hash(const Char_T *key, SizeT length) noexcept {
+    constexpr SizeT highest_bit = (SizeT{1} << ((sizeof(SizeT) * 8) - SizeT{1}));
+
+    SizeT hash   = SizeT{11};
+    SizeT base   = SizeT{33};
+    SizeT offset = 0;
+
+    while (offset < length) {
+        hash = SizeT(hash + (base * offset * SizeT(key[offset])));
+        base += offset;
+
+        if (offset != length) {
+            hash *= (length ^ offset);
             base += offset;
-
-            if (offset != length) {
-                hash *= (length ^ offset);
-                base += offset;
-                --length;
-                hash += SizeT(key[length]);
-            }
-
-            ++offset;
+            --length;
+            hash += SizeT(key[length]);
         }
 
-        return (hash | highest_bit);
+        ++offset;
     }
-};
 
+    return (hash | highest_bit);
+}
+
+} // namespace StringUtils
 } // namespace Qentem
 
 #endif
