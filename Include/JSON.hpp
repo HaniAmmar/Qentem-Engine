@@ -74,7 +74,7 @@ struct JSON {
         }
 
       private:
-        using JSONotation = JSONotation_T<Char_T>;
+        using JSONotation = JSONUtils::JSONotation_T<Char_T>;
 
         static ValueT parseObject(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT length) {
             StringUtils::TrimLeft(content, offset, length);
@@ -87,7 +87,7 @@ struct JSON {
                 while (offset < length && (content[offset] == JSONotation::QuoteChar)) {
                     ++offset;
                     const Char_T *str = (content + offset);
-                    SizeT         len = UnEscapeJSON(str, length, stream);
+                    SizeT         len = JSONUtils::UnEscapeJSON(str, length, stream);
 
                     if (len != SizeT{0}) {
                         offset += len;
@@ -188,7 +188,7 @@ struct JSON {
                     ++offset;
 
                     const Char_T *str = (content + offset);
-                    SizeT         len = UnEscapeJSON(str, (length - offset), stream);
+                    SizeT         len = JSONUtils::UnEscapeJSON(str, (length - offset), stream);
 
                     if (len != SizeT{0}) {
                         offset += len;

@@ -360,7 +360,7 @@ struct ValueData<Char_T, VObjectT, VArrayT, VStringT, false> {
 
 template <typename Char_T>
 struct Value {
-    using JSONotation = JSONotation_T<Char_T>;
+    using JSONotation = JSONUtils::JSONotation_T<Char_T>;
     using VObjectT    = HArray<Value, Char_T>;
     using VArrayT     = Array<Value>;
     using VStringT    = String<Char_T>;
@@ -1734,7 +1734,7 @@ struct Value {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 stream += JSONotation::QuoteChar;
                 const SizeT length = h_item->Key.Length();
-                EscapeJSON(h_item->Key.Storage(length), length, stream);
+                JSONUtils::EscapeJSON(h_item->Key.Storage(length), length, stream);
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 
@@ -1794,7 +1794,7 @@ struct Value {
 
             case ValueType::String: {
                 stream += JSONotation::QuoteChar;
-                EscapeJSON(val.data_.VString.First(), val.data_.VString.Length(), stream);
+                JSONUtils::EscapeJSON(val.data_.VString.First(), val.data_.VString.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 break;
             }

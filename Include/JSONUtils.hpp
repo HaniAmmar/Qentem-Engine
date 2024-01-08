@@ -27,6 +27,7 @@
 #include "Unicode.hpp"
 
 namespace Qentem {
+namespace JSONUtils {
 
 template <typename>
 struct JSONotation_T;
@@ -292,6 +293,7 @@ struct JSONotationStrings<wchar_t, 2U> {
     static constexpr const wchar_t *NullString  = L"null";
 };
 
+} // namespace JSONUtils
 } // namespace Qentem
 
 #endif
