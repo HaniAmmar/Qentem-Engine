@@ -758,21 +758,24 @@ struct HArray {
     }
 
     HAItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT  *ht      = data_.GetHashTable();
-        HAItem *storage = Memory::ChangePointer<HAItem>(ht + Capacity());
-        HAItem *item;
-        index = (ht + (hash & getBase()));
+        SizeT *ht = data_.GetHashTable();
 
-        while (*index != SizeT{0}) {
-            item = (storage + *index);
-            --item;
+        if (ht != nullptr) {
+            HAItem *storage = Memory::ChangePointer<HAItem>(ht + Capacity());
+            HAItem *item;
+            index = (ht + (hash & getBase()));
 
-            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
-                return item;
+            while (*index != SizeT{0}) {
+                item = (storage + *index);
+                --item;
+
+                if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
+                    return item;
+                }
+
+                index  = &(item->Next);
+                *index = *index;
             }
-
-            index  = &(item->Next);
-            *index = *index;
         }
 
         return nullptr;
