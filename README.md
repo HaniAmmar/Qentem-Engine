@@ -47,10 +47,10 @@ Qentem Engine is a self-contained lightweight library for rendering templates, d
     -   Fast stringify.
     -   Data grouping.
     -   Data sorting.
-    -   Value size: *check the table below*.
+    -   Value size: _check the table below_.
 
 | sizeof(Value) | Arch   | Type of SizeT | Pointer Tagging |
-|---------------|--------|---------------|---------------- |
+| ------------- | ------ | ------------- | --------------- |
 | 16 bytes      | 64-bit | SizeT32       | Enabled         |
 | 24 bytes      | 64-bit | SizeT32       | Disabled        |
 | 24 bytes      | 64-bit | SizeT64       | Enabled         |
@@ -61,7 +61,7 @@ Qentem Engine is a self-contained lightweight library for rendering templates, d
 ## Requirements
 
 C++ 11+ compiler.
-*Note*: `iostream` is used in tests at the moment.
+_Note_: `iostream` is used in tests at the moment.
 
 ## Documentation
 
@@ -141,13 +141,14 @@ int main() {
     std::cout << stream << '\n';
 }
 ```
-*Note*: the template does not have to be HTML.
+
+_Note_: the template does not have to be HTML.
 
 ### Modules
 
-- JavaScript: [JQen](https://github.com/HaniAmmar/JQen)
-- Python: [PiQen](https://github.com/HaniAmmar/PiQen)
-- PHP: [BQen](https://github.com/HaniAmmar/BQen)
+-   JavaScript: [JQen](https://github.com/HaniAmmar/JQen)
+-   Python: [PiQen](https://github.com/HaniAmmar/PiQen)
+-   PHP: [BQen](https://github.com/HaniAmmar/BQen)
 
 ## JSON Example
 
@@ -321,6 +322,7 @@ int main() {
 There are over 23k lines of code for testing; 5 times the library. To run the tests that take less than 0.01s to finish:
 
 -   gcc/clang
+
     ```shell
     mkdir Build
     c++ -I ./Include ./Tests/Test.cpp -o ./Build/QTest.bin
@@ -340,7 +342,7 @@ There are over 23k lines of code for testing; 5 times the library. To run the te
 
 > MIT License
 >
-> Copyright (c) 2023 Hani Ammar
+> Copyright (c) 2024 Hani Ammar
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
