@@ -93,8 +93,8 @@ struct Digit {
         }
     }
     /////////////////////////////////////////////////////////////////
-    template <typename Number_T, typename Char_T>
-    static Number_T HexStringToNumber(const Char_T *value, SizeT &offset, const SizeT end_offset) noexcept {
+    template <typename Number_T, typename Char_T, typename SizeT_Type>
+    static Number_T HexStringToNumber(const Char_T *value, SizeT_Type &offset, const SizeT_Type end_offset) noexcept {
         Number_T number{0};
 
         while (offset < end_offset) {
