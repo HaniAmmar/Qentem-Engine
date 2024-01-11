@@ -362,7 +362,7 @@ struct StringStream {
     }
 
     void allocate(SizeT size) {
-        size = Memory::AlignSize(size * SizeT{4});
+        size = Memory::AlignSize(size);
         setCapacity(size);
         setStorage(Memory::Allocate<Char_T>(size));
     }
@@ -383,7 +383,7 @@ struct StringStream {
         constexpr SizeT32 size    = sizeof(Char_T);
         const SizeT       src_cap = Capacity();
         Char_T           *str     = Storage();
-        allocate(new_capacity);
+        allocate(new_capacity * SizeT{4});
 
         Memory::Copy(Storage(), str, (src_cap * size));
         Memory::Deallocate(str);

@@ -39,7 +39,7 @@ static void TestStringStream1(QTest &test) {
     test.IsNull(ss1.First(), __LINE__);
     test.IsNull(ss1.Last(), __LINE__);
 
-    test.IsTrue((ss2.Capacity() >= SizeT{10}), __LINE__);
+    test.IsEqual(ss2.Capacity(), SizeT{16}, __LINE__);
     test.IsEqual(ss2.Length(), SizeT{0}, __LINE__);
     test.IsNotNull(ss2.First(), __LINE__);
 
