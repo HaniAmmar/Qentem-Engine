@@ -267,6 +267,14 @@ struct StringStream {
         }
     }
 
+    void Reserve(const SizeT size) {
+        Reset();
+
+        if (size != SizeT{0}) {
+            allocate(size);
+        }
+    }
+
     Char_T *Detach() noexcept {
         setCapacity(SizeT{0});
         setLength(SizeT{0});
