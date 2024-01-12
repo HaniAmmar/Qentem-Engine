@@ -261,12 +261,17 @@ struct Array {
         return tmp;
     }
 
-    void Reserve(SizeT size) {
+    void Reserve(const SizeT size, bool initialize = false) {
         Reset();
 
         if (size != SizeT{0}) {
             setCapacity(size);
-            allocate();
+            Type_T *current = allocate();
+
+            if (initialize) {
+                Memory::Initialize(current, (current + size));
+                setSize(size);
+            }
         }
     }
 
