@@ -479,9 +479,7 @@ struct HArray {
     }
 
     void Reserve(SizeT size) {
-        if (Storage() != nullptr) {
-            Reset();
-        }
+        Reset();
 
         if (size != SizeT{0}) {
             allocate(size);
