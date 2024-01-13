@@ -404,8 +404,9 @@ Zero!
 
 Evaluate uses 1 for `true`, 0 for `false`. if the operation is equal `==`, Template will try the following:
 
--   If one of the variables is a number, it will try to  convert the other one to a number: ({var:one} == 1)
+-   If one of the variables is a number, it will try to convert the other one to a number: ({var:one} == 1)
 -   If none of the variables are numbers, it will try to convert them to strings: ({var:bool} == true)
+-   However, it's better to use bool alone as it will be converted to number. `{var:bool}` is the same as `({var:bool}) == 1` and `({var:bool} == true)` but `{var:bool}` alone is faster and less writing: `{if case="{var:bool}" true="is true" false="is false"}`.
 
 To force converting the variables to numbers, use parentheses: {math:({var:bool}) == 1}
 
