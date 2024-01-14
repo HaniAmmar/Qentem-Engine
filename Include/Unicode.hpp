@@ -23,7 +23,7 @@
 #ifndef QENTEM_UNICODE_H
 #define QENTEM_UNICODE_H
 
-#include "Common.hpp"
+#include "QCommon.hpp"
 
 namespace Qentem {
 namespace Unicode {

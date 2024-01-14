@@ -23,7 +23,7 @@
 #ifndef QENTEM_STRING_UTILS_H
 #define QENTEM_STRING_UTILS_H
 
-#include "Common.hpp"
+#include "QCommon.hpp"
 
 namespace Qentem {
 

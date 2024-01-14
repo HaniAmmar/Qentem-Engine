@@ -23,7 +23,7 @@
 #ifndef QENTEM_Q_NUMBER_H
 #define QENTEM_Q_NUMBER_H
 
-#include "Common.hpp"
+#include "QCommon.hpp"
 
 namespace Qentem {
 

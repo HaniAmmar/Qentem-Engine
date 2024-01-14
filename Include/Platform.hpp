@@ -23,7 +23,7 @@
 #ifndef QENTEM_PLATFORM_H
 #define QENTEM_PLATFORM_H
 
-#include "Common.hpp"
+#include "QCommon.hpp"
 
 #if (QENTEM_AVX2 == 1) || (QENTEM_SSE2 == 1) || (QENTEM_MSIMD128 == 1)
 #if (QENTEM_MSIMD128 == 1)

@@ -34,7 +34,7 @@
 #include <malloc.h>
 #endif
 
-#include "Common.hpp"
+#include "QCommon.hpp"
 
 namespace Qentem {
 
