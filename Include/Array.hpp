@@ -206,11 +206,20 @@ struct Array {
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
-        ++data_.Index;
+        ++(data_.Index);
     }
 
     inline void operator+=(const Type_T &item) {
-        *this += Type_T{item};
+        if (Size() == Capacity()) {
+            if (Capacity() == SizeT{0}) {
+                setCapacity(1U);
+            }
+
+            resize(Capacity() * SizeT{2});
+        }
+
+        Memory::Initialize((Storage() + Size()), item);
+        ++(data_.Index);
     }
 
     inline void Insert(Array &&src) {
@@ -232,7 +241,7 @@ struct Array {
     inline Type_T &Insert(const Type_T &item) {
         const SizeT size = Size();
 
-        *this += Type_T{item};
+        *this += item;
 
         return Storage()[size];
     }
