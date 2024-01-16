@@ -126,15 +126,12 @@ struct StringStream {
 
     template <typename Stream_T>
     friend Stream_T &operator<<(Stream_T &out, const StringStream &stream) {
-        const SizeT len = stream.Length();
+        const Char_T *str = stream.First();
+        SizeT         index{0};
 
-        if (stream.Capacity() > len) {
-            stream.Storage()[len] = Char_T{0};
-            out << stream.First();
-        } else {
-            StringStream n_src = stream;
-            n_src += Char_T{0};
-            out << n_src.First();
+        while (index < stream.Length()) {
+            out << str[index];
+            ++index;
         }
 
         return out;
