@@ -274,17 +274,9 @@ static void TestStringStream1(QTest &test) {
         const SizeT32 max = 32U;
         SizeT32       index{0};
 
-        void operator<<(const char *string) noexcept {
-            for (SizeT32 i = SizeT{0}; i < max; i++) {
-                const char c = string[index];
-
-                if (c == char{0}) {
-                    break;
-                }
-
-                str[index] = c;
-                ++index;
-            }
+        void operator<<(const char ch) noexcept {
+            str[index] = ch;
+            ++index;
         }
     };
 
