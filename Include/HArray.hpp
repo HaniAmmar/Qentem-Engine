@@ -323,6 +323,14 @@ struct HArray {
         item->Value = Memory::Move(val);
     }
 
+    void Insert(Key_T &&key, const Value_T &val) {
+        Insert(Memory::Move(key), Value_T{val});
+    }
+
+    void Insert(const Key_T &key, const Value_T &val) {
+        Insert(Key_T{key}, Value_T{val});
+    }
+
     inline Value_T *GetValue(const Key_T &key) const noexcept {
         const SizeT len = key.Length();
         return GetValue(key.Storage(len), len);
