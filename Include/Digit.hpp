@@ -162,9 +162,9 @@ struct Digit {
     }
 
     template <typename Char_T>
-    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT end_offset) noexcept {
+    inline static QNumberType StringToNumber(QNumber64 &number, const Char_T *content, SizeT length) noexcept {
         SizeT offset{0};
-        return stringToNumber(number, content, offset, end_offset);
+        return stringToNumber(number, content, offset, length);
     }
 
     //////////// Private ////////////
