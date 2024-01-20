@@ -58,11 +58,11 @@ struct BigInt {
     BigInt &operator=(const BigInt &) noexcept = default;
     ~BigInt() noexcept                         = default;
 
-    BigInt &operator=(BigInt &&bint) noexcept {
+    BigInt &operator=(BigInt &&b_int) noexcept {
         SizeT32 index = 0U;
 
-        while (index <= bint.index_) {
-            storage_[index] = bint.storage_[index];
+        while (index <= b_int.index_) {
+            storage_[index] = b_int.storage_[index];
             ++index;
         }
 
@@ -71,8 +71,8 @@ struct BigInt {
             --index_;
         }
 
-        index_ = bint.index_;
-        bint.Clear();
+        index_ = b_int.index_;
+        b_int.Clear();
 
         return *this;
     }

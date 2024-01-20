@@ -410,13 +410,13 @@ struct TemplateSub {
                     }
 
                     case TagPatterns::InlineIf_2ND_Char: {
-                        static constexpr const Char_T *ii_if_prefix_p_2 = (TagPatterns::InLineIfPrefix + SizeT{2});
-                        constexpr SizeT ii_if_prefix_length_m_2 = (TagPatterns::InLineIfPrefixLength - SizeT{2});
+                        static constexpr const Char_T *i_if_prefix_p_2 = (TagPatterns::InLineIfPrefix + SizeT{2});
+                        constexpr SizeT i_if_prefix_length_m_2         = (TagPatterns::InLineIfPrefixLength - SizeT{2});
                         ++current_offset;
 
-                        if (StringUtils::IsEqual(ii_if_prefix_p_2, (content_ + current_offset),
-                                                 ii_if_prefix_length_m_2)) {
-                            current_offset += ii_if_prefix_length_m_2;
+                        if (StringUtils::IsEqual(i_if_prefix_p_2, (content_ + current_offset),
+                                                 i_if_prefix_length_m_2)) {
+                            current_offset += i_if_prefix_length_m_2;
                             current_offset =
                                 Engine::SkipInnerPatterns<Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
                                                                   content_, current_offset, end_offset, length_);

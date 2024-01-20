@@ -498,12 +498,12 @@ struct Digit {
         using UNumber_T  = SizeT64;
         using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 256U> bint{number};
+        BigInt<UNumber_T, 256U> b_int{number};
         //////////////////////////////////////////////////////////////
         SizeT32 shifted{exponent};
         //////////////////////////////////////////////////////////////
         shifted += 64U;
-        bint <<= 64U;
+        b_int <<= 64U;
         //////////////////////////////////////////////////////////////
         constexpr bool is_size_8 = (sizeof(UNumber_T) == 8U);
         if (is_size_8) {
@@ -513,41 +513,41 @@ struct Digit {
                 // 2**126 / 5**27 = 11417981541647679048.4
                 // 126-64=62; See 2**126 and 64 shift
 
-                bint *= DigitConst::GetPowerOfOneOverFive(DigitConst::MaxPowerOfFive);
-                bint >>= DigitConst::MaxShift;
+                b_int *= DigitConst::GetPowerOfOneOverFive(DigitConst::MaxPowerOfFive);
+                b_int >>= DigitConst::MaxShift;
                 shifted += DigitConst::GetPowerOfOneOverFiveShift(DigitConst::MaxPowerOfFive);
                 exponent -= DigitConst::MaxPowerOfFive;
             }
 
             if (exponent != 0U) {
-                bint *= DigitConst::GetPowerOfOneOverFive(exponent);
-                bint >>= DigitConst::MaxShift;
+                b_int *= DigitConst::GetPowerOfOneOverFive(exponent);
+                b_int >>= DigitConst::MaxShift;
                 shifted += DigitConst::GetPowerOfOneOverFiveShift(exponent);
             }
         } else {
             while (exponent >= DigitConst::MaxPowerOfFive) {
-                bint <<= DigitConst::MaxShift;
-                bint /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+                b_int <<= DigitConst::MaxShift;
+                b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
                 shifted += DigitConst::MaxShift;
                 exponent -= DigitConst::MaxPowerOfFive;
             }
 
             if (exponent != 0U) {
-                bint <<= DigitConst::MaxShift;
-                bint /= DigitConst::GetPowerOfFive(exponent);
+                b_int <<= DigitConst::MaxShift;
+                b_int /= DigitConst::GetPowerOfFive(exponent);
                 shifted += DigitConst::MaxShift;
             }
         }
         //////////////////////////////////////////////////////////////
         SizeT32       exp = DigitUtils::RealNumberInfo<double, 8U>::Bias; // double only
-        const SizeT32 bit = bint.FindLastBit();
+        const SizeT32 bit = b_int.FindLastBit();
 
         // if (bit <= 52U) {
-        //     number = SizeT64(bint);
+        //     number = SizeT64(b_int);
         //     number <<= (53U - bit);
         // } else {
-        bint >>= (bit - SizeT32{53});
-        number = SizeT64(bint);
+        b_int >>= (bit - SizeT32{53});
+        number = SizeT64(b_int);
         // }
         //////////////////////////////////////////////////////////////
         if (shifted <= bit) {
@@ -584,16 +584,16 @@ struct Digit {
         using UNumber_T  = SystemIntType;
         using DigitConst = DigitUtils::DigitConst<sizeof(UNumber_T)>;
         //////////////////////////////////////////////////////////////
-        BigInt<UNumber_T, 256U> bint{number};
+        BigInt<UNumber_T, 256U> b_int{number};
         //////////////////////////////////////////////////////////////
-        constexpr SizeT32 bint_limit{2U};
+        constexpr SizeT32 b_int_limit{2U};
         SizeT32           shifted{exponent};
         //////////////////////////////////////////////////////////////
         while (exponent >= DigitConst::MaxPowerOfFive) {
-            bint *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+            b_int *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
 
-            if (bint.Index() > bint_limit) {
-                bint >>= DigitConst::MaxShift;
+            if (b_int.Index() > b_int_limit) {
+                b_int >>= DigitConst::MaxShift;
                 shifted += DigitConst::MaxShift;
             }
 
@@ -601,17 +601,17 @@ struct Digit {
         }
 
         if (exponent != 0U) {
-            bint *= DigitConst::GetPowerOfFive(exponent);
+            b_int *= DigitConst::GetPowerOfFive(exponent);
         }
         //////////////////////////////////////////////////////////////
-        const SizeT32 bit = bint.FindLastBit();
+        const SizeT32 bit = b_int.FindLastBit();
 
         if (bit <= 52U) {
-            number = SizeT64(bint);
+            number = SizeT64(b_int);
             number <<= (52U - bit);
         } else {
-            bint >>= (bit - 53U);
-            number = SizeT64(bint);
+            b_int >>= (bit - 53U);
+            number = SizeT64(b_int);
             number += (number & Number_T{1});
             number >>= 1U;
             shifted += SizeT32(number > Number_T{0x1FFFFFFFFFFFFF});
@@ -738,8 +738,8 @@ struct Digit {
                     mantissa <<= 1U;
                 }
 
-                BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(Number_T) * 8U * 3U))> bint{mantissa};
-                using DigitConst = DigitUtils::DigitConst<bint.SizeOfType()>;
+                BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(Number_T) * 8U * 3U))> b_int{mantissa};
+                using DigitConst = DigitUtils::DigitConst<b_int.SizeOfType()>;
                 /////////////////////////////////////
                 const SizeT32 first_shift      = Platform::FindFirstBit(mantissa);
                 const int     exponent         = (int)((bias >> Info_T::MantissaSize) - Info_T::Bias);
@@ -759,14 +759,14 @@ struct Digit {
                     const SizeT32 m_shift = (Info_T::MantissaSize + drop);
 
                     if (m_shift < positive_exp) {
-                        bint <<= (positive_exp - m_shift);
+                        b_int <<= (positive_exp - m_shift);
                     } else {
-                        bint >>= (m_shift - positive_exp);
+                        b_int >>= (m_shift - positive_exp);
                     }
 
                     if (drop != 0U) {
                         round_up = true;
-                        bigIntDropDigits(bint, drop);
+                        bigIntDropDigits(b_int, drop);
                     }
                 } else {
                     SizeT32 shift   = 0U;
@@ -789,20 +789,20 @@ struct Digit {
                         round_up        = true;
                     }
 
-                    bint >>= first_shift;
+                    b_int >>= first_shift;
 
                     SizeT32 times = fraction_length;
 
                     if (times >= DigitConst::MaxPowerOfFive) {
                         const SizeT32 max_index = (format.Precision < Info_T::MaxCut)
                                                       ? ((format.Precision / DigitConst::MaxPowerOfTen) + 2U)
-                                                      : bint.MaxIndex();
+                                                      : b_int.MaxIndex();
 
                         do {
-                            bint *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+                            b_int *= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
 
-                            if ((bint.Index() >= max_index) && (shift >= DigitConst::MaxShift)) {
-                                bint >>= DigitConst::MaxShift;
+                            if ((b_int.Index() >= max_index) && (shift >= DigitConst::MaxShift)) {
+                                b_int >>= DigitConst::MaxShift;
                                 shift -= DigitConst::MaxShift;
                             }
 
@@ -811,14 +811,14 @@ struct Digit {
                     }
 
                     if (times != 0U) {
-                        bint *= DigitConst::GetPowerOfFive(times);
+                        b_int *= DigitConst::GetPowerOfFive(times);
                     }
 
-                    bint >>= shift;
+                    b_int >>= shift;
                 }
 
                 const SizeT start_at = stream.Length();
-                bigIntToString(stream, bint);
+                bigIntToString(stream, b_int);
 
                 // Only 'Default' is implemented
                 formatStringNumber(stream, start_at, format.Precision, digits, fraction_length, is_positive_exp,
@@ -868,33 +868,33 @@ struct Digit {
     }
 
     template <typename Stream_T, typename BigInt_T>
-    static void bigIntToString(Stream_T &stream, BigInt_T &bint) {
+    static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
 
-        while (bint.IsBig()) {
+        while (b_int.IsBig()) {
             const SizeT length = stream.Length();
-            NumberToString<true>(stream, bint.Divide(DigitConst::MaxPowerOfTenValue));
+            NumberToString<true>(stream, b_int.Divide(DigitConst::MaxPowerOfTenValue));
 
             // dividing '1000000000000000000' by '1000000000' yield zeros remainder
             insertZeros(stream, (DigitConst::MaxPowerOfTen - SizeT(stream.Length() - length)));
         }
 
-        if (bint.NotZero()) {
-            NumberToString<true>(stream, bint.Number());
+        if (b_int.NotZero()) {
+            NumberToString<true>(stream, b_int.Number());
         }
     }
 
     template <typename BigInt_T>
-    inline static void bigIntDropDigits(BigInt_T &bint, SizeT32 drop) noexcept {
+    inline static void bigIntDropDigits(BigInt_T &b_int, SizeT32 drop) noexcept {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
 
         while (drop >= DigitConst::MaxPowerOfFive) {
-            bint /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
+            b_int /= DigitConst::GetPowerOfFive(DigitConst::MaxPowerOfFive);
             drop -= DigitConst::MaxPowerOfFive;
         }
 
         if (drop != 0U) {
-            bint /= DigitConst::GetPowerOfFive(drop);
+            b_int /= DigitConst::GetPowerOfFive(drop);
         }
     }
 
