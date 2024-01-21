@@ -8,6 +8,12 @@ using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
+/*
+mkdir Build
+c++ -g ./Examples/Template/Template18.cpp -I ./Include -o ./Build/QTest.bin
+./Build/QTest.bin
+*/
+
 int main() {
     Value<char> value;
 
@@ -18,7 +24,7 @@ int main() {
     value["username"]    = "X";
     value["site_name"]   = "Y";
     value["points"]      = 10U;
-    value["points_html"] = R"(<span id="pid">10U</span>)";
+    value["points_html"] = R"(<span id="pid">10</span>)";
     value["time"]        = "week";
 
     const char *content =
@@ -29,7 +35,7 @@ int main() {
     Template::Render(content, value, stream);
     std::cout << stream << '\n';
     /*
-        Output: Welcome X to Y. You have <span id="pid">10U</span> points. Your points will become 20 next month. Your
+        Output: Welcome X to Y. You have <span id="pid">10</span> points. Your points will become 20 next month. Your
                 points will be here when you login to Y every week.
     */
 
