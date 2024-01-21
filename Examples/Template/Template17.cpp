@@ -7,6 +7,12 @@ using Qentem::JSON;
 using Qentem::SizeT;
 using Qentem::StringStream;
 
+/*
+mkdir Build
+c++ -g ./Examples/Template/Template17.cpp -I ./Include -o ./Build/QTest.bin
+./Build/QTest.bin
+*/
+
 template <typename Char_T, typename Value_T, typename StringStream_T>
 inline static void CachedRender(const Char_T *content, const SizeT length, const Value_T &value, StringStream_T &stream,
                                 const Char_T *name, const SizeT name_length) {

@@ -8,6 +8,12 @@ using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
+/*
+mkdir Build
+c++ -g ./Examples/Template/Template11.cpp -I ./Include -o ./Build/QTest.bin
+./Build/QTest.bin
+*/
+
 int main() {
     auto value = JSON::Parse(R"([0,1,2,3])");
 

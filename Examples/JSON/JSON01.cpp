@@ -5,6 +5,12 @@
 using Value = Qentem::Value<char>;
 using Qentem::JSON;
 
+/*
+mkdir Build
+c++ -g ./Examples/JSON/JSON01.cpp -I ./Include -o ./Build/QTest.bin
+./Build/QTest.bin
+*/
+
 int main() {
     Value abc = JSON::Parse(R"(["A","B","C"])");
 

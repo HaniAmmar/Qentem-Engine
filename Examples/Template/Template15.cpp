@@ -8,6 +8,12 @@ using Qentem::StringStream;
 using Qentem::Template;
 using Qentem::Value;
 
+/*
+mkdir Build
+c++ -g ./Examples/Template/Template15.cpp -I ./Include -o ./Build/QTest.bin
+./Build/QTest.bin
+*/
+
 int main() {
     const Value<char> value = JSON::Parse(
         R"([{"year":2019,"month":4},{"year":2020,"month":1},{"year":2017,"month":1},{"year":2020,"month":5},{"year":2018,"month":2},{"year":2020,"month":7},{"year":2018,"month":3}])");
