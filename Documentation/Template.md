@@ -57,7 +57,7 @@ Then every item can be reached using its `key`:
 {var:list1[item2][subItem1]}: 10
 ```
 
-In the case of ordered arrays, use a numeric number.
+In the case of ordered arrays, use a numeric id.
 
 ```json
 ["a", "b", 1, ["x", [true]]]
@@ -90,6 +90,8 @@ Mixed of both:
 {var:list1[1]}: true
 {var:list1[2][name]}: Qentem
 ```
+
+### Variable Example
 
 ```cpp
 #include "Template.hpp"
@@ -125,8 +127,41 @@ int main() {
 Spaces after `{var:` or before `}` are considered part of the variable's name, and any string value will be made safe to be printed to the browser; by escaping HTML special chars (>, <, ", ' , &).
 
 ## Raw Variable
-
+```txt
+{raw:name}
+{raw:version}
+```
 Raw variable tag is the same as Variable tag, except it does not escape HTML special chars (>, <, ", ' , &).
+
+### Raw Variable Example
+
+```cpp
+#include "Template.hpp"
+#include "Value.hpp"
+
+#include <iostream>
+
+using Qentem::StringStream;
+using Qentem::Template;
+using Qentem::Value;
+
+int main() {
+    Value<char> value;
+
+    value["name"]       = "<Qentem>";
+    value["version"]    = 3.0;
+    const char *content = R"({raw:name}, {raw:version})";
+
+    StringStream<char> stream;
+
+    Template::Render(content, value, stream);
+    std::cout << stream << '\n';
+
+    /*
+        Output:
+            <Qentem>, 3
+    */
+}
 
 ## Math
 
@@ -153,6 +188,8 @@ Raw variable tag is the same as Variable tag, except it does not escape HTML spe
     -   / `Division`
     -   \+ `Addition`
     -   \- `Subtraction`
+
+### Math Example
 
 ```cpp
 #include "Template.hpp"
@@ -198,7 +235,7 @@ int main() {
 ## Super Variable
 
 ```txt
-{svar:var, sub_var_0, sub_var_1, sub_var_2 ... , sub_var_9}
+{svar:var, sub_var_0, sub_var_1, sub_var_2, ... sub_var_9}
 ```
 
 Super variable tag is like a tiny template engine engineered for basic text replacement inside a phrase; it can accept a variable tag, a raw variable tag, and a math tag. The maximum number of sub-variables is 10, starting at 0 and ending at 9.
@@ -214,7 +251,7 @@ svar_value: when {5} met with {3}, he saw {2}, {1}, {4}, {0}, {6}, {7} and {8} b
 {3} and {5} were at the market when they met.
 ```
 
-### Super Variable Example 1
+### Super Variable Example
 
 ```cpp
 #include "Template.hpp"
@@ -237,7 +274,7 @@ int main() {
     value["username"]    = "X";
     value["site_name"]   = "Y";
     value["points"]      = 10U;
-    value["points_html"] = R"(<span id="pid">10U</span>)";
+    value["points_html"] = R"(<span id="pid">10</span>)";
     value["time"]        = "week";
 
     const char *content =
@@ -248,7 +285,7 @@ int main() {
     Template::Render(content, value, stream);
     std::cout << stream << '\n';
     /*
-        Output: Welcome X to Y. You have <span id="pid">10U</span> points. Your points will become 20 next month. Your
+        Output: Welcome X to Y. You have <span id="pid">10</span> points. Your points will become 20 next month. Your
                 points will be here when you login to Y every week.
     */
 
