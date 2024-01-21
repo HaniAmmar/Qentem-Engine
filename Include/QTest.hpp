@@ -326,7 +326,7 @@ struct QTest {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Failed",
                           TestOutPut::GetColor(TestOutPut::Colors::END), ": ", part_name_, '\n');
         TestOutPut::Print(file_fullname_, ":", line, ":\n Should", (equal ? " not " : " "), "equal: `", value2,
-                          "`\n Returned: `", value1, "`\n\n");
+                          "`\n     Returned: `", value1, "`\n\n");
     }
 
     inline void ContinueOnError(bool continue_on_error) noexcept {
