@@ -47,9 +47,17 @@ namespace Qentem {
  *      - var|e|n: Raw variable, Equation or Number.
  *
  *
- *  - {if case="var|s" true="rvar|var|s" false="rvar|var|s"}
+ *  - {svar:var, var|e|n, var|e|n, ... }
  *
- *      - Inline if,  rvar: Raw variable, var: Variable, s: String.
+ *      - var: variable only.
+ *      - sub variables, var|e|n: Raw variable, Equation or Number.
+ *      - max sub variables 10; (0-9).
+ *
+ *
+ *  - {if case="var|e|n" true="rvar|var|s" false="rvar|var|s"}
+ *
+ *      - case, var|e|n: Raw variable, Equation or Number.
+ *      - true and false, rvar: Raw variable, var: Variable, s: String.
  *
  *
  *  <...>
@@ -109,6 +117,22 @@ namespace Qentem {
  * {math: {var:n1} * {var:n2}}
  * {math: (5+3*(1+2)/2^2 == 7.25) || (3==((8-2)/2))}
  * {math: 0.2 + 0.3}
+ */
+
+/*
+ * Super Variable Tag:
+ *
+ * {svar:welcome_x_to_y, {var:name}, {var:site}}
+ * {svar:welcome_x_to_y_its_z_at_your_city, {var:name}, {var:site}, {math: 10+3}, {raw:city}}
+ *
+ * welcome_x_to_y: "Welcome {0} to {1}."
+ * welcome_x_to_y_its_z_at_your_city: "Welcome {0} to {1}. its {2}:am in your {3}."
+ *
+ * {svar:hello_x_your_name_was_y_now_x_y_is_better_x, {var:name2}, {var:name1}}
+ *
+ * hello_x_your_name_was_y_now_x_y_is_better_x: "Hello {1}. Your name was {0}, now it's {1}, {1} is better than {0}."
+ *
+ * Note: sub variables can be used in any order any time.
  */
 
 /*
@@ -246,19 +270,20 @@ struct TemplateSub {
     }
 
   private:
-    using TagType        = Tags::TagType;
-    using VariableTag    = Tags::VariableTag;
-    using MathTag        = Tags::MathTag;
-    using LoopTag        = Tags::LoopTag;
-    using LoopTagOptions = Tags::LoopTagOptions;
-    using InLineIfTag    = Tags::InLineIfTag;
-    using IfTagCase      = Tags::IfTagCase;
-    using IfTag          = Tags::IfTag;
-    using TagBit         = Tags::TagBit;
-    using QExpressions   = Array<QExpression>;
-    using QOperation     = QExpression::QOperation;
-    using ExpressionType = QExpression::ExpressionType;
-    using TagPatterns    = Tags::TagPatterns_T<Char_T>;
+    using TagType          = Tags::TagType;
+    using VariableTag      = Tags::VariableTag;
+    using SuperVariableTag = Tags::SuperVariableTag;
+    using MathTag          = Tags::MathTag;
+    using LoopTag          = Tags::LoopTag;
+    using LoopTagOptions   = Tags::LoopTagOptions;
+    using InLineIfTag      = Tags::InLineIfTag;
+    using IfTagCase        = Tags::IfTagCase;
+    using IfTag            = Tags::IfTag;
+    using TagBit           = Tags::TagBit;
+    using QExpressions     = Array<QExpression>;
+    using QOperation       = QExpression::QOperation;
+    using ExpressionType   = QExpression::ExpressionType;
+    using TagPatterns      = Tags::TagPatterns_T<Char_T>;
 
   public:
     void Render(const TagBit *tag, const TagBit *end) const {
@@ -299,6 +324,11 @@ struct TemplateSub {
 
                 case TagType::Math: {
                     renderMath(tag->GetMathTag(), offset);
+                    break;
+                }
+
+                case TagType::SuperVariable: {
+                    renderSuperVariable(tag->GetSuperVariableTag(), offset);
                     break;
                 }
 
@@ -401,6 +431,30 @@ struct TemplateSub {
                                 const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
 
                                 parseMathTag(offset, current_offset, tag.GetMathTag());
+                                offset = current_offset;
+                                continue;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    case TagPatterns::SuperVariable_2ND_Char: {
+                        static constexpr const Char_T *s_var_prefix_p_2 = (TagPatterns::SuperVariablePrefix + SizeT{2});
+                        constexpr SizeT s_var_prefix_length_m_2 = (TagPatterns::SuperVariablePrefixLength - SizeT{2});
+                        ++current_offset;
+
+                        if (StringUtils::IsEqual(s_var_prefix_p_2, (content_ + current_offset),
+                                                 s_var_prefix_length_m_2)) {
+                            current_offset += s_var_prefix_length_m_2;
+                            current_offset =
+                                Engine::SkipInnerPatterns<Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
+                                                                  content_, current_offset, end_offset, length_);
+
+                            if (current_offset != SizeT{0}) {
+                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::SuperVariable});
+
+                                parseSuperVariableTag(offset, current_offset, tag.GetSuperVariableTag());
                                 offset = current_offset;
                                 continue;
                             }
@@ -701,6 +755,78 @@ struct TemplateSub {
         }
     }
 
+    void renderSuperVariable(const SuperVariableTag &tag, SizeT &offset) const {
+        const Value_T *s_var   = getValue(tag.Variable);
+        const Char_T  *content = nullptr;
+        SizeT          length  = 0;
+
+        stream_->Write((content_ + offset), (tag.Offset - offset));
+        offset = tag.EndOffset;
+
+        if ((s_var != nullptr) && s_var->SetCharAndLength(content, length)) {
+            SizeT index      = 0;
+            SizeT last_index = 0;
+
+            while (index < length) {
+                if (content[index] == TagPatterns::InLinePrefix) {
+                    const SizeT start = index;
+
+                    escapeHTMLSpecialChars(*stream_, (content + last_index), (start - last_index));
+                    last_index = start;
+                    ++index;
+
+                    if (index < length) {
+                        const SizeT id = SizeT(content[index] - DigitUtils::DigitChar::Zero);
+                        ++index;
+
+                        if ((index < length) && (content[index] == TagPatterns::InLineSuffix)) {
+                            ++index;
+
+                            if (id < tag.SubTags.Size()) {
+                                const TagBit *sub_tag = (tag.SubTags.First() + id);
+                                last_index            = index;
+
+                                switch (sub_tag->GetType()) {
+                                    case TagType::Variable: {
+                                        const VariableTag &var = sub_tag->GeVariableTag();
+                                        SizeT var_offset       = (var.Offset - TagPatterns::VariablePrefixLength);
+                                        renderVariable(var, var_offset);
+                                        break;
+                                    }
+
+                                    case TagType::RawVariable: {
+                                        const VariableTag &r_var = sub_tag->GeRawVariableTag();
+                                        SizeT r_var_offset = (r_var.Offset - TagPatterns::RawVariablePrefixLength);
+                                        renderRawVariable(r_var, r_var_offset);
+                                        break;
+                                    }
+
+                                    case TagType::Math: {
+                                        const MathTag &math        = sub_tag->GetMathTag();
+                                        SizeT          math_offset = math.Offset;
+                                        renderMath(math, math_offset);
+                                        break;
+                                    }
+
+                                    default:
+                                        break;
+                                }
+
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                ++index;
+            }
+
+            escapeHTMLSpecialChars(*stream_, (content + last_index), (index - last_index));
+        } else {
+            stream_->Write((content_ + tag.Offset), (tag.EndOffset - tag.Offset));
+        }
+    }
+
     void renderLoop(const LoopTag &tag, SizeT &offset) const {
         Value_T        grouped_set;
         const Value_T *loop_set;
@@ -872,6 +998,27 @@ struct TemplateSub {
         end_offset -= TagPatterns::InLineSuffixLength;
 
         tag.Expressions = parseExpressions(offset, end_offset);
+    }
+
+    void parseSuperVariableTag(SizeT offset, SizeT end_offset, SuperVariableTag &tag) const {
+        tag.Offset    = offset;
+        tag.EndOffset = end_offset;
+
+        offset += TagPatterns::MathPrefixLength;
+        end_offset -= TagPatterns::InLineSuffixLength;
+
+        SizeT var_end_offset = offset;
+
+        while ((var_end_offset < end_offset) && (content_[var_end_offset] != TagPatterns::VariablesSeparatorChar)) {
+            ++var_end_offset;
+        }
+
+        if (var_end_offset < end_offset) {
+            parseVariableTag(offset, var_end_offset, tag.Variable);
+            ++var_end_offset;
+
+            lightParse(tag.SubTags, var_end_offset, end_offset);
+        }
     }
 
     /*

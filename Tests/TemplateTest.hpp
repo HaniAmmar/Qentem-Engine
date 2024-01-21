@@ -2214,6 +2214,168 @@ static void TestMathTag2(QTest &test) {
     ss.Clear();
 }
 
+static void TestSuperVariableTag1(QTest &test) {
+    StringStream<char> ss;
+    Value<char>        value;
+
+    value[R"(a)"]         = R"(a)";
+    value[R"(b)"]         = R"(bb)";
+    value[R"(c)"]         = R"(ccc)";
+    value[R"(d)"]         = R"(dddd)";
+    value[R"(4)"]         = R"(e)";
+    value[R"(e)"]         = R"(f)";
+    value[R"(ffffff)"]    = R"(g)";
+    value[R"(g)"]         = 10;
+    value[R"(h)"]         = true;
+    value[R"(999999999)"] = R"(8000000000007779999999)";
+
+    value[R"(x_y_z)"] = R"(the value is {0})";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:a}})", value, ss), R"(the value is a)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"(..{svar:x_y_z, {var:d}}--)", value, ss), R"(..the value is dddd--)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"(.{svar:x_y_z, {var:g}}-)", value, ss), R"(.the value is 10-)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"(.{svar:x_y_z, {var:h}})", value, ss), R"(.the value is true)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:999999999}}x)", value, ss),
+                 R"(the value is 8000000000007779999999x)", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"({0})";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:4}})", value, ss), R"(e)", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"({0}{0} {0} {0}{0}{0})";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:ffffff}})", value, ss), R"(gg g ggg)", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"({0},{1}.{2}-{3}**{4}////{5}=={6} {7} {8} {9})";
+
+    test.IsEqual(
+        Template::Render(
+            R"({svar:x_y_z, {var:ffffff}, {var:a}, {var:4}, {var:999999999}, {var:g}, {var:h}, {var:c}, {var:d}, {var:b}, {var:e}})",
+            value, ss),
+        R"(g,a.e-8000000000007779999999**10////true==ccc dddd bb f)", __LINE__);
+    ss.Clear();
+
+    value[R"(a)"] = R"('a)";
+    value[R"(b)"] = R"(<>bb)";
+
+    value[R"(x_y_z)"] = R"({0},{1}.{2}-{3}**{4}////{5}=={6} {7} {8} {9})";
+
+    if (Config::AutoEscapeHTML) {
+        test.IsEqual(
+            Template::Render(
+                R"({svar:x_y_z, {var:ffffff}, {var:a}, {var:4}, {var:999999999}, {var:g}, {var:h}, {var:c}, {var:d}, {var:b}, {var:e}})",
+                value, ss),
+            R"(g,&apos;a.e-8000000000007779999999**10////true==ccc dddd &lt;&gt;bb f)", __LINE__);
+    } else {
+        test.IsEqual(
+            Template::Render(
+                R"({svar:x_y_z, {var:ffffff}, {var:a}, {var:4}, {var:999999999}, {var:g}, {var:h}, {var:c}, {var:d}, {var:b}, {var:e}})",
+                value, ss),
+            R"(g,'a.e-8000000000007779999999**10////true==ccc dddd <>bb f)", __LINE__);
+    }
+
+    ss.Clear();
+
+    test.IsEqual(
+        Template::Render(
+            R"({svar:x_y_z, {raw:ffffff}, {raw:a}, {raw:4}, {raw:999999999}, {raw:g}, {raw:h}, {raw:c}, {raw:d}, {raw:b}, {raw:e}})",
+            value, ss),
+        R"(g,'a.e-8000000000007779999999**10////true==ccc dddd <>bb f)", __LINE__);
+    ss.Clear();
+
+    value[R"(a)"] = 10;
+    value[R"(b)"] = 5;
+    value[R"(c)"] = 3;
+
+    value[R"(x_y_z)"] = R"({0} {1} {2} {3} {4})";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {math:{var:a}+{var:b}+{var:c}},
+    {math:{var:a}*{var:b}*{var:c}},
+    {math:{var:a}-{var:b}-{var:c}},
+    {math:{var:a}+{var:b}-{var:c}},
+    {math:{var:a}/{var:b}+{var:c}}})",
+                                  value, ss),
+                 R"(18 150 2 12 5)", __LINE__);
+}
+
+static void TestSuperVariableTag2(QTest &test) {
+    StringStream<char> ss;
+    Value<char>        value;
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:a}})", value, ss), R"({svar:x_y_z, {var:a}})", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:y}, {var:z}})", value, ss),
+                 R"({svar:x_y_z, {var:x}, {var:y}, {var:z}})", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"({0})";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}})", value, ss), R"({var:x})", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"({0} {1})";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:y}})", value, ss), R"({var:x} {var:y})", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"(-{0}-{1}-{2}-)";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:y}, {var:z}})", value, ss),
+                 R"(-{var:x}-{var:y}-{var:z}-)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}})", value, ss), R"(-{var:x}-{1}-{2}-)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:x}})", value, ss), R"(-{var:x}-{var:x}-{2}-)",
+                 __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:x}})", value, ss), R"(-{var:x}-{var:x}-{2}-)",
+                 __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:x}, {var:x}})", value, ss),
+                 R"(-{var:x}-{var:x}-{var:x}-)", __LINE__);
+    ss.Clear();
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:y}, {var:z}})", value, ss),
+                 R"(-{var:x}-{var:y}-{var:z}-)", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"(-{0-{1-{2-)";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:y}, {var:z}})", value, ss), R"(-{0-{1-{2-)", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"(-{{{-)";
+
+    test.IsEqual(Template::Render(R"({svar:x_y_z, {var:x}, {var:y}, {var:z}})", value, ss), R"(-{{{-)", __LINE__);
+    ss.Clear();
+
+    value[R"(x_y_z)"] = R"({0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11})";
+    value[R"(z)"]     = 1;
+
+    test.IsEqual(
+        Template::Render(
+            R"({svar:x_y_z, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}, {var:z}})",
+            value, ss),
+        R"(1111111111{10}{11})", __LINE__);
+    ss.Clear();
+}
+
 static void TestInlineIfTag(QTest &test) {
     StringStream<char> ss;
     Value<char>        value;
@@ -3467,6 +3629,9 @@ static int RunTemplateTests() {
 
     test.Test("Math Tag Test 1", TestMathTag1);
     test.Test("Math Tag Test 2", TestMathTag2);
+
+    test.Test("Super Variable Tag Test 1", TestSuperVariableTag1);
+    test.Test("Super Variable Tag Test 2", TestSuperVariableTag2);
 
     test.Test("Inline if Tag Test", TestInlineIfTag);
 
