@@ -24,6 +24,7 @@
 #define QENTEM_STRINGSTREAM_H
 
 #include "String.hpp"
+#include "StringView.hpp"
 
 namespace Qentem {
 /*
@@ -118,6 +119,10 @@ struct StringStream {
     inline void operator+=(const String<Char_T> &string) {
         const SizeT len = string.Length();
         write(string.Storage(len), len);
+    }
+
+    inline void operator+=(const StringView<char> &string_view) {
+        write(string_view.First(), string_view.Length());
     }
 
     inline void operator+=(const Char_T *str) {
