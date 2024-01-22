@@ -294,6 +294,10 @@ struct TemplateSub {
         parse(tags_cache, 0, length_);
     }
 
+    inline void LightParse(Array<TagBit> &tags_cache) const {
+        lightParse(tags_cache, 0, length_);
+    }
+
     inline bool Evaluate(QExpression &number, const QExpressions &exprs) const noexcept {
         const QExpression *expr = exprs.First();
 

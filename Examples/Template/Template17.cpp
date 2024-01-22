@@ -31,6 +31,9 @@ inline static void CachedRender(const Char_T *content, const SizeT length, const
 
     if (tags.IsEmpty()) {
         temp.Parse(tags);
+
+        // Or
+        // temp.LightParse(tags); // for {var:} {raw:} {math:} only
     }
 
     const Tag *tag = tags.First();
