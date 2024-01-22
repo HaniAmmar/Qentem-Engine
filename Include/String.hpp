@@ -374,6 +374,26 @@ struct String {
         return data_.Storage.GetPointer();
     }
 
+    inline const Char_T *Storage(SizeT length) const noexcept {
+        if (Config::ShortStringOptimization) {
+            if ((length != SizeT{0}) && (length < ShortStringMax)) {
+                return data_.GetShortStorage();
+            }
+        }
+
+        return data_.Storage.GetPointer();
+    }
+
+    inline Char_T *Storage(SizeT length) noexcept {
+        if (Config::ShortStringOptimization) {
+            if ((length != SizeT{0}) && (length < ShortStringMax)) {
+                return data_.GetShortStorage();
+            }
+        }
+
+        return data_.Storage.GetPointer();
+    }
+
     static String Merge(const String &src1, const String &src2) {
         const SizeT len1 = src1.Length();
         const SizeT len2 = src2.Length();
@@ -519,26 +539,6 @@ struct String {
     inline const Char_T *End() const noexcept {
         const SizeT length = Length();
         return (Storage(length) + length);
-    }
-
-    inline const Char_T *Storage(SizeT length) const noexcept {
-        if (Config::ShortStringOptimization) {
-            if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return data_.GetShortStorage();
-            }
-        }
-
-        return data_.Storage.GetPointer();
-    }
-
-    inline Char_T *Storage(SizeT length) noexcept {
-        if (Config::ShortStringOptimization) {
-            if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return data_.GetShortStorage();
-            }
-        }
-
-        return data_.Storage.GetPointer();
     }
 
     inline bool IsEmpty() const noexcept {
