@@ -836,10 +836,10 @@ static void TestHArray8(QTest &test) {
 static void TestHArray9(QTest &test) {
     constexpr SizeT id = 10;
 
-    HArray<SizeT, char>                  list(id);
-    const Qentem::HAItem_T<SizeT, char> *item;
-    const Qentem::HAItem_T<SizeT, char> *item2;
-    const SizeT                         *value;
+    HArray<SizeT, char>          list(id);
+    const HAItem_T<SizeT, char> *item;
+    const HAItem_T<SizeT, char> *item2;
+    const SizeT                 *value;
 
     for (SizeT i = 0; i < id; i++) {
         String<char> key("k-");
@@ -930,7 +930,7 @@ static void TestHArray10(QTest &test) {
         Digit::NumberToString(key, i);
         list[key] = i;
 
-        const Qentem::HAItem_T<SizeT, char> *item = list.GetItem(key);
+        const HAItem_T<SizeT, char> *item = list.GetItem(key);
 
         test.IsNotNull(item, __LINE__);
         test.IsEqual(item->Value, i, __LINE__);
