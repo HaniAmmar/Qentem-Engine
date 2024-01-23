@@ -55,6 +55,18 @@ struct HAItem_T {
     inline bool operator>(const HAItem_T &item) const noexcept {
         return (Key > item.Key);
     }
+
+    inline bool operator<=(const HAItem_T &item) const noexcept {
+        return (Key <= item.Key);
+    }
+
+    inline bool operator>=(const HAItem_T &item) const noexcept {
+        return (Key >= item.Key);
+    }
+
+    inline bool operator==(const HAItem_T &item) const noexcept {
+        return (Key == item.Key);
+    }
 };
 ///////////////////////////////////////////////
 template <typename, bool BigEndian>
