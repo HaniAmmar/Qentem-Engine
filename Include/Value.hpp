@@ -383,6 +383,25 @@ struct Value {
         setType(type);
     }
 
+    inline explicit Value(ValueType type, SizeT size) noexcept {
+        setType(type);
+
+        switch (type) {
+            case ValueType::Array: {
+                data_.VArray.Reserve(size);
+                break;
+            }
+
+            case ValueType::Object: {
+                data_.VObject.Reserve(size);
+                break;
+            }
+
+            default: {
+            }
+        }
+    }
+
     inline explicit Value(VObjectT &&obj) noexcept : data_{Memory::Move(obj)} {
         setTypeToObject();
     }
