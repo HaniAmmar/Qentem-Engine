@@ -773,6 +773,15 @@ struct Value {
         return (*this)[SizeT(index)];
     }
 
+    inline Value &Insert(const Char_T *key, SizeT length) {
+        if (!IsObject()) {
+            reset();
+            setTypeToObject();
+        }
+
+        return (data_.VObject[VStringT{key, length}]);
+    }
+
     inline bool operator<(const Value &val) const noexcept {
         const ValueType type = Type();
 
