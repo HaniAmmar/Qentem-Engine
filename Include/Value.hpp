@@ -1183,6 +1183,27 @@ struct Value {
         }
     }
 
+    Value *First() const {
+        using V_item = HAItem_T<Value, Char_T>;
+
+        switch (Type()) {
+            case ValueType::Object: {
+                V_item *item = data_.VObject.First();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+            }
+
+            case ValueType::Array: {
+                return data_.VArray.First();
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
     Value *Last() const {
         using V_item = HAItem_T<Value, Char_T>;
 
@@ -1197,6 +1218,27 @@ struct Value {
 
             case ValueType::Array: {
                 return data_.VArray.Last();
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    const Value *End() const {
+        using V_item = HAItem_T<Value, Char_T>;
+
+        switch (Type()) {
+            case ValueType::Object: {
+                V_item *item = data_.VObject.End();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+            }
+
+            case ValueType::Array: {
+                return data_.VArray.End();
             }
 
             default:
