@@ -1183,6 +1183,27 @@ struct Value {
         }
     }
 
+    Value *Last() const {
+        using V_item = HAItem_T<Value, Char_T>;
+
+        switch (Type()) {
+            case ValueType::Object: {
+                V_item *item = data_.VObject.Last();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+            }
+
+            case ValueType::Array: {
+                return data_.VArray.Last();
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
     const VStringT *GetKey(SizeT index) const noexcept {
         if (IsObject()) {
             return (data_.VObject.GetKey(index));
