@@ -121,7 +121,13 @@ struct StringView {
 
     template <typename Stream_T>
     friend Stream_T &operator<<(Stream_T &out, const StringView &src) {
-        out << src.First();
+        const Char_T *str = src.First();
+        SizeT         index{0};
+
+        while (index < src.Length()) {
+            out << str[index];
+            ++index;
+        }
 
         return out;
     }
