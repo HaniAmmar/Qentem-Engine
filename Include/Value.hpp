@@ -773,13 +773,14 @@ struct Value {
         return (*this)[SizeT(index)];
     }
 
-    inline Value &Insert(const Char_T *key, SizeT length) {
+    // Will insert the key if it does not exist.
+    inline Value &Get(const Char_T *key, SizeT length) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
         }
 
-        return (data_.VObject[VStringT{key, length}]);
+        return (data_.VObject.Get(key, length));
     }
 
     inline bool operator<(const Value &val) const noexcept {
