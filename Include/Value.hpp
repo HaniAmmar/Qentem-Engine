@@ -23,12 +23,11 @@
 #ifndef QENTEM_VALUE_H
 #define QENTEM_VALUE_H
 
+#include "StringStream.hpp"
 #include "QNumber.hpp"
-#include "String.hpp"
 #include "Array.hpp"
 #include "HArray.hpp"
 #include "JSONUtils.hpp"
-#include "StringStream.hpp"
 
 namespace Qentem {
 
@@ -360,10 +359,11 @@ struct ValueData<Char_T, VObjectT, VArrayT, VStringT, false> {
 
 template <typename Char_T>
 struct Value {
-    using JSONotation = JSONUtils::JSONotation_T<Char_T>;
-    using VObjectT    = HArray<Value, Char_T>;
-    using VArrayT     = Array<Value>;
-    using VStringT    = String<Char_T>;
+    using JSONotation  = JSONUtils::JSONotation_T<Char_T>;
+    using VObjectT     = HArray<Value, Char_T>;
+    using VArrayT      = Array<Value>;
+    using VStringT     = String<Char_T>;
+    using VStringViewT = StringView<Char_T>;
 
     Value() noexcept  = default;
     ~Value() noexcept = default;
@@ -721,6 +721,15 @@ struct Value {
         return (data_.VObject[key]);
     }
 
+    inline Value &operator[](const VStringViewT &key) {
+        if (!IsObject()) {
+            reset();
+            setTypeToObject();
+        }
+
+        return (data_.VObject[key]);
+    }
+
     inline Value &operator[](VStringT &&key) {
         if (!IsObject()) {
             reset();
@@ -781,6 +790,15 @@ struct Value {
         }
 
         return (data_.VObject.Get(key, length));
+    }
+
+    inline Value &Get(const VStringViewT &key) {
+        if (!IsObject()) {
+            reset();
+            setTypeToObject();
+        }
+
+        return (data_.VObject.Get(key.First(), key.Length()));
     }
 
     inline bool operator<(const Value &val) const noexcept {
