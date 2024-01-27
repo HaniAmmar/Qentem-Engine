@@ -712,6 +712,12 @@ struct Value {
         data_.VArray += Value{is_true};
     }
 
+    template <typename Stream_T>
+    friend Stream_T &operator<<(Stream_T &out, const Value &value) {
+        out << value.Stringify();
+        return out;
+    }
+
     inline Value &operator[](const Char_T *key) {
         if (!IsObject()) {
             reset();
