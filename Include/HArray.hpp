@@ -24,6 +24,7 @@
 #define QENTEM_HARRAY_H
 
 #include "String.hpp"
+#include "StringView.hpp"
 
 namespace Qentem {
 /*
@@ -258,8 +259,33 @@ struct HArray {
         }
     }
 
+    Value_T &Get(const Char_T *key, const SizeT length) {
+        if (Size() == Capacity()) {
+            expand();
+        }
+
+        const SizeT hash = StringUtils::Hash(key, length);
+        SizeT      *index;
+        HAItem     *item = find(index, key, length, hash);
+
+        if (item != nullptr) {
+            return item->Value;
+        }
+
+        return insert(index, Key_T(key, length), hash)->Value;
+    }
+
     Value_T &operator[](const Char_T *key) {
         return Get(key, StringUtils::Count(key));
+    }
+
+    Value_T &operator[](const StringView<Char_T> &key) {
+        return Get(key.First(), key.Length());
+    }
+
+    Value_T &operator[](const Key_T &key) {
+        const SizeT length = key.Length();
+        return Get(key.Storage(length), length);
     }
 
     Value_T &operator[](Key_T &&key) {
@@ -279,41 +305,6 @@ struct HArray {
         }
 
         return insert(index, Memory::Move(key), hash)->Value;
-    }
-
-    Value_T &operator[](const Key_T &key) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT   length = key.Length();
-        const Char_T *str    = key.Storage(length);
-
-        const SizeT hash = StringUtils::Hash(str, length);
-        SizeT      *index;
-        HAItem     *item = find(index, str, length, hash);
-
-        if (item != nullptr) {
-            return item->Value;
-        }
-
-        return insert(index, Key_T(key), hash)->Value;
-    }
-
-    Value_T &Get(const Char_T *key, const SizeT length) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT hash = StringUtils::Hash(key, length);
-        SizeT      *index;
-        HAItem     *item = find(index, key, length, hash);
-
-        if (item != nullptr) {
-            return item->Value;
-        }
-
-        return insert(index, Key_T(key, length), hash)->Value;
     }
 
     void Insert(Key_T &&key, Value_T &&value) {
@@ -343,6 +334,14 @@ struct HArray {
         Insert(Key_T{key}, Value_T{value});
     }
 
+    Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
+        return GetValue(key, length, StringUtils::Hash(key, length));
+    }
+
+    Value_T *GetValue(const StringView<Char_T> &key) const noexcept {
+        return GetValue(key.First(), key.Length());
+    }
+
     inline Value_T *GetValue(const Key_T &key) const noexcept {
         const SizeT length = key.Length();
         return GetValue(key.Storage(length), length);
@@ -356,10 +355,6 @@ struct HArray {
         }
 
         return nullptr;
-    }
-
-    Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
-        return GetValue(key, length, StringUtils::Hash(key, length));
     }
 
     Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
@@ -383,13 +378,6 @@ struct HArray {
         return nullptr;
     }
 
-    inline const HAItem *GetItem(const Key_T &key) const noexcept {
-        const SizeT   length = key.Length();
-        const Char_T *str    = key.Storage(length);
-
-        return GetItem(str, length, StringUtils::Hash(str, length));
-    }
-
     const HAItem *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT        *index;
         const HAItem *item = find(index, key, length, hash);
@@ -399,6 +387,17 @@ struct HArray {
         }
 
         return nullptr;
+    }
+
+    inline const HAItem *GetItem(const StringView<Char_T> &key) const noexcept {
+        return GetItem(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
+    }
+
+    inline const HAItem *GetItem(const Key_T &key) const noexcept {
+        const SizeT   length = key.Length();
+        const Char_T *str    = key.Storage(length);
+
+        return GetItem(str, length, StringUtils::Hash(str, length));
     }
 
     const HAItem *GetItem(const SizeT index) const noexcept {
