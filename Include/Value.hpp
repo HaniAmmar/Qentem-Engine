@@ -1207,6 +1207,10 @@ struct Value {
         }
     }
 
+    Value *GetValue(const VStringViewT &key) const noexcept {
+        return GetValue(key.First(), key.Length());
+    }
+
     Value *First() const {
         using V_item = HAItem_T<Value, Char_T>;
 
