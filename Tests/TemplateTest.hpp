@@ -2465,7 +2465,7 @@ static void TestInlineIfTag(QTest &test) {
     ss.Clear();
 
     content = R"({if case="{var:6}" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), "", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), "T", __LINE__);
     ss.Clear();
 
     content = R"({if case="fas" true="T" false="F"})";
@@ -2473,11 +2473,11 @@ static void TestInlineIfTag(QTest &test) {
     ss.Clear();
 
     content = R"({if case="{var:7}" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), "", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), "F", __LINE__);
     ss.Clear();
 
     content = R"({if case="{var:20}" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), "", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), "F", __LINE__);
     ss.Clear();
 
     ////
@@ -2575,7 +2575,7 @@ static void TestInlineIfTag(QTest &test) {
 
     ///////
 
-    content = R"({if case="{var:7}" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
+    content = R"({if case="{var:7}a" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
     test.IsEqual(Template::Render(content, value, ss), R"(T)", __LINE__);
     ss.Clear();
 

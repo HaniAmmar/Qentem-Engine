@@ -143,6 +143,8 @@ namespace Qentem {
  * {if case="3 == 3" true="Yes" false="No"}
  * {if case="{var:var_five} == 5" true="5" false="no"}
  * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
+ * {if case="{var:bool1}" true="bool1 is true" false="bool1 is false"}
+ * {if case="{var:string1}" true="string1 is not empty" false="null, empty or not a string"}
  * {if case="3 == 3" true="Yes" false="No"}
  * {if case="3 == 3" true="{var:1}" false="{var:2}"}
  * {if case="3 == 3" true="{var:v1}" false="{var:v2}"}
@@ -1342,14 +1344,13 @@ struct TemplateSub {
     bool evaluate(QExpression &left, const QExpression *&expr, const QOperation previous_oper) const noexcept {
         const QExpression *next_expr;
         QExpression        right;
-        const bool not_equal = ((expr->Operation != QOperation::Equal) && (expr->Operation != QOperation::NotEqual));
 
-        if (GetExpressionValue(left, expr, not_equal)) {
+        if (GetExpressionValue(left, expr, expr->Operation)) {
             while (expr->Operation != QOperation::NoOp) {
                 next_expr = (expr + 1U);
 
                 if (expr->Operation >= next_expr->Operation) {
-                    if (GetExpressionValue(right, next_expr, not_equal) &&
+                    if (GetExpressionValue(right, next_expr, expr->Operation) &&
                         evaluateExpression(left, right, expr->Operation)) {
                         expr = next_expr;
 
@@ -1374,7 +1375,7 @@ struct TemplateSub {
         return false;
     }
 
-    bool GetExpressionValue(QExpression &result, const QExpression *expr, bool not_equal) const noexcept {
+    bool GetExpressionValue(QExpression &result, const QExpression *expr, const QOperation operation) const noexcept {
         switch (expr->Type) {
             case ExpressionType::SubOperation: {
                 const QExpression *sub_expr = expr->SubExpressions.First();
@@ -1382,7 +1383,7 @@ struct TemplateSub {
             }
 
             case ExpressionType::Variable: {
-                if (not_equal) {
+                if ((operation != QOperation::Equal) && (operation != QOperation::NotEqual)) {
                     const Value_T *val = getValue(expr->Variable);
 
                     if (val != nullptr) {
@@ -1406,6 +1407,18 @@ struct TemplateSub {
                                 break;
                             }
                         }
+                    }
+
+                    // If (case="...") contains only a variable, (true="...") content will be printed
+                    // only if the value is a string and the length of that string is not zero.
+                    // This will make it easy to use something like:
+                    //  {if case="value[some_string]" true=", value[some_string]"} or
+                    // <if case="value[some_string]"><span>value[some_string]-value[another_string]</span></if>
+                    if ((operation == QOperation::NoOp) && (expr->Operation == QOperation::NoOp)) {
+                        result.Value.Number =
+                            SizeT64((val != nullptr) && val->IsString() && (val->Length() != SizeT{0}));
+                        result.Type = ExpressionType::NaturalNumber;
+                        return true;
                     }
 
                     return false;
@@ -1752,13 +1765,15 @@ struct TemplateSub {
                 }
 
                 case QOperationSymbol::BracketStart: {
-                    if (end_offset - offset > TagPatterns::VariableFullLength) {
-                        offset += TagPatterns::VariablePrefixLength;
+                    if ((end_offset - offset) > TagPatterns::VariableFullLength) {
                         end_offset -= TagPatterns::InLineSuffixLength;
 
-                        QExpression &expr = exprs.Insert(QExpression{ExpressionType::Variable, oper});
-                        parseVariableTag(offset, end_offset, expr.Variable);
-                        return true;
+                        if (content_[end_offset] == TagPatterns::InLineSuffix) {
+                            offset += TagPatterns::VariablePrefixLength;
+                            QExpression &expr = exprs.Insert(QExpression{ExpressionType::Variable, oper});
+                            parseVariableTag(offset, end_offset, expr.Variable);
+                            return true;
+                        }
                     }
 
                     break;
