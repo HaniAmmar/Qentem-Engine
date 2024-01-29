@@ -915,24 +915,16 @@ struct TemplateSub {
 
         if (tag.Case.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
             const TagBit *s_tag = tag.SubTags.First();
-            const TagBit *s_end = (s_tag + tag.SubTags.Size());
 
             if (result > 0U) {
-                if (tag.SubTags.Size() != tag.TrueTagsSize) {
-                    s_end -= tag.TrueTagsSize;
-                }
+                const TagBit *s_end       = (s_tag + tag.TrueTagsSize);
+                const SizeT   true_offset = (tag.Offset + tag.TrueOffset);
 
-                const SizeT true_offset     = (tag.Offset + tag.TrueOffset);
-                const SizeT true_end_offset = (true_offset + tag.TrueLength);
-
-                render(s_tag, s_end, true_offset, true_end_offset);
+                render(s_tag, s_end, true_offset, (true_offset + tag.TrueLength));
             } else {
-                s_tag += tag.TrueTagsSize;
+                const SizeT false_offset = (tag.Offset + tag.FalseOffset);
 
-                const SizeT false_offset     = (tag.Offset + tag.FalseOffset);
-                const SizeT false_end_offset = (false_offset + tag.FalseLength);
-
-                render(s_tag, s_end, false_offset, false_end_offset);
+                render((s_tag + tag.TrueTagsSize), tag.SubTags.End(), false_offset, (false_offset + tag.FalseLength));
             }
         }
     }
