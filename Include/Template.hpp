@@ -1403,12 +1403,12 @@ struct TemplateSub {
                             }
 
                             default: {
-                                return false;
+                                break;
                             }
                         }
-                    } else {
-                        return false;
                     }
+
+                    return false;
                 }
 
                 break;
