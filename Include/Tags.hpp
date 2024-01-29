@@ -242,17 +242,17 @@ struct TagBit {
 
 // MathTag -------------------------------------------
 struct MathTag {
-    Array<QExpression> Expressions;
-    SizeT              Offset;
-    SizeT              EndOffset;
+    Array<QExpression> Expressions{};
+    SizeT              Offset{0};
+    SizeT              EndOffset{0};
 };
 
 // SuperVariableTag -------------------------------------------
 struct SuperVariableTag {
-    Array<TagBit> SubTags;
-    VariableTag   Variable;
-    SizeT         Offset;
-    SizeT         EndOffset;
+    Array<TagBit> SubTags{};
+    VariableTag   Variable{};
+    SizeT         Offset{0};
+    SizeT         EndOffset{0};
 };
 
 // LoopTagOptions -------------------------------------------
@@ -265,30 +265,31 @@ struct LoopTagOptions {
 
 // LoopTagOptions -------------------------------------------
 struct LoopTag {
-    Array<TagBit> SubTags;
-    SizeT         Offset;
-    SizeT         EndOffset;
-    SizeT         ContentOffset;
-    SizeT8        SetOffset;
-    SizeT8        SetLength;
-    SizeT8        SetLevel;
-    SizeT8        ValueOffset;
-    SizeT8        GroupOffset;
-    SizeT8        ValueLength;
-    SizeT8        GroupLength;
-    SizeT8        Options;
+    Array<TagBit> SubTags{};
+    SizeT         Offset{0};
+    SizeT         EndOffset{0};
+    SizeT         ContentOffset{0};
+    SizeT8        SetOffset{0};
+    SizeT8        SetLength{0};
+    SizeT8        SetLevel{0};
+    SizeT8        ValueOffset{0};
+    SizeT8        GroupOffset{0};
+    SizeT8        ValueLength{0};
+    SizeT8        GroupLength{0};
+    SizeT8        Options{0};
 };
 
 // InLineIfTag -------------------------------------------
 struct InLineIfTag {
-    Array<QExpression> Case;
-    Array<TagBit>      SubTags;
-    SizeT              Offset;
-    SizeT16            Length;
-    SizeT16            TrueOffset;
-    SizeT16            TrueLength;
-    SizeT16            FalseOffset;
-    SizeT16            FalseLength;
+    Array<QExpression> Case{};
+    Array<TagBit>      SubTags{};
+    SizeT              Offset{0};
+    SizeT16            Length{0};
+    SizeT16            TrueOffset{0};
+    SizeT16            TrueLength{0};
+    SizeT16            TrueTagsSize{0};
+    SizeT16            FalseOffset{0};
+    SizeT16            FalseLength{0};
 };
 
 // IfTag -------------------------------------------
@@ -300,9 +301,9 @@ struct IfTagCase {
 };
 
 struct IfTag {
-    Array<IfTagCase> Cases;
-    SizeT            Offset;
-    SizeT            EndOffset;
+    Array<IfTagCase> Cases{};
+    SizeT            Offset{0};
+    SizeT            EndOffset{0};
 };
 
 template <typename, SizeT32>

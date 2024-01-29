@@ -32,7 +32,7 @@ namespace Qentem {
 struct QExpression {
     // ExpressionType -------------------------------------------
     enum struct ExpressionType : SizeT8 {
-        Empty = 0,
+        Empty = 0U,
         RealNumber,
         NaturalNumber,
         IntegerNumber,
@@ -43,7 +43,7 @@ struct QExpression {
 
     // QOperation -------------------------------------------
     enum struct QOperation : SizeT8 {
-        NoOp = 0,
+        NoOp = 0U,
         Or,             // ||
         And,            // &&
         Equal,          // ==

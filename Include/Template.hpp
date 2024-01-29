@@ -906,25 +906,20 @@ struct TemplateSub {
     }
 
     void renderInLineIf(const InLineIfTag &tag, SizeT &offset) const {
-        const QExpression *expr = tag.Case.First();
         QExpression        result;
+        const QExpression *expr = tag.Case.First();
 
         stream_->Write((content_ + offset), (tag.Offset - offset));
         offset = tag.Offset;
         offset += tag.Length;
 
         if (tag.Case.IsNotEmpty() && evaluate(result, expr, QOperation::NoOp)) {
-            const TagBit *s_tag     = tag.SubTags.First();
-            const TagBit *s_end     = (s_tag + tag.SubTags.Size());
-            SizeT         true_size = 0;
-
-            if (++expr != tag.Case.End()) {
-                true_size = SizeT(expr->Value.Number.Natural);
-            }
+            const TagBit *s_tag = tag.SubTags.First();
+            const TagBit *s_end = (s_tag + tag.SubTags.Size());
 
             if (result > 0U) {
-                if (tag.SubTags.Size() != true_size) {
-                    s_end -= true_size;
+                if (tag.SubTags.Size() != tag.TrueTagsSize) {
+                    s_end -= tag.TrueTagsSize;
                 }
 
                 const SizeT true_offset     = (tag.Offset + tag.TrueOffset);
@@ -932,7 +927,7 @@ struct TemplateSub {
 
                 render(s_tag, s_end, true_offset, true_end_offset);
             } else {
-                s_tag += true_size;
+                s_tag += tag.TrueTagsSize;
 
                 const SizeT false_offset     = (tag.Offset + tag.FalseOffset);
                 const SizeT false_end_offset = (false_offset + tag.FalseLength);
@@ -1172,11 +1167,10 @@ struct TemplateSub {
         if (tag.Case.IsNotEmpty()) {
             if (true_offset != true_end_offset) {
                 lightParse(tag.SubTags, true_offset, true_end_offset);
-                QExpression &expr         = tag.Case.Insert(QExpression{});
-                expr.Value.Number.Natural = tag.SubTags.Size(); // To use one heap for true and false.
 
-                tag.TrueOffset = SizeT16(true_offset - tag.Offset);
-                tag.TrueLength = SizeT16(true_end_offset - true_offset);
+                tag.TrueTagsSize = SizeT16(tag.SubTags.Size()); // To use one heap for true and false.
+                tag.TrueOffset   = SizeT16(true_offset - tag.Offset);
+                tag.TrueLength   = SizeT16(true_end_offset - true_offset);
             }
 
             if (false_offset != false_end_offset) {
