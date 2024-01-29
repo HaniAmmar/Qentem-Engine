@@ -392,7 +392,7 @@ With variables:
 
 ### Inline If Tag Note
 
-`true` and `false` only accept Variable tags, Raw variable tags and Math tags.
+`true` and `false` only accept Variable tag, Raw variable tag and Math tag.
 
 ## If Condition
 
@@ -541,7 +541,12 @@ Evaluate uses 1 for `true`, 0 for `false`. if the operation is equal `==`, Templ
 
 -   If one of the variables is a number, it will try to convert the other one to a number: ({var:one} == 1)
 -   If none of the variables are numbers, it will try to convert them to strings: ({var:bool} == true)
--   However, it's better to use bool alone as it will be converted to number. `{var:bool}` is the same as `({var:bool}) == 1` and `({var:bool} == true)` but `{var:bool}` alone is faster and less writing: `{if case="{var:bool}" true="is true" false="is false"}`.
+-   However, it's better to use bool alone as it will be converted to number. `{var:bool}` is the same as `({var:bool}) == 1` and `({var:bool} == true)` but `{var:bool}` alone is faster and less writing: `{if case="{var:bool1}" true="bool1 is true" false="bool1 is false"}`.
+-   If `case` contains a variable only and the variable is string with length bigger than zero, the value inside `true` will be printed, otherwise, `false` content will be printed.
+
+```txt
+{if case="{var:string1}" true="string1 is not empty" false="null, empty or not a string"}
+```
 
 To force converting the variables to numbers, use parentheses: {math:({var:bool}) == 1}
 
