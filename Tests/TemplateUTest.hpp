@@ -3311,9 +3311,9 @@ static void TestIfUTag1(QTest &test) {
     ss.Clear();
 
     content = uR"(<if case="1">
-                <if case="0">Bad1!
-                <elseif case="0" />Bad2!
-                <elseif case="0" />Bad3!
+            <if case="0">Bad1!
+                <else if case="0">Bad2!
+                <else if case="0">Bad3!
                 </if>a<elseif case="1" />b
                 <if case="1">Bad1!
                 <elseif case="1"/>Bad2!
@@ -3324,7 +3324,7 @@ static void TestIfUTag1(QTest &test) {
                 <elseif case="1" />Bad2!
                 <elseif case="1" />Bad3!
                 </if>c
-            <else />d
+            <else>d
                 <if case="1">Bad1!
                 <elseif case="1" />Bad2!
                 <elseif case="1" />Bad3!

@@ -394,11 +394,6 @@ struct TagPatterns_T {
     // static constexpr SizeT          ElsePrefixLength = StringUtils::ConstCount(ElsePrefix);
     static constexpr SizeT ElsePrefixLength{5};
 
-    // />
-    static constexpr const Char_T *ElseSuffix = TPStrings::ElseSuffix;
-    // static constexpr SizeT          ElseSuffixLength = StringUtils::ConstCount(ElseSuffix);
-    static constexpr SizeT ElseSuffixLength{2};
-
     // &amp; &
     static constexpr const Char_T *HTMLAnd = TPStrings::HTMLAnd;
     // static constexpr SizeT          HTMLAndLength = StringUtils::ConstCount(HTMLAnd);
@@ -475,7 +470,6 @@ struct TPStrings_T<Char_T, 1U> {
     static constexpr const Char_T *IfPrefix            = "<if";
     static constexpr const Char_T *IfSuffix            = "</if>";
     static constexpr const Char_T *ElsePrefix          = "<else";
-    static constexpr const Char_T *ElseSuffix          = "/>";
 
     // Inline If attributes
     static constexpr const Char_T *Case  = "case";
@@ -508,7 +502,6 @@ struct TPStrings_T<Char_T, 2U> {
     static constexpr const Char_T *IfPrefix            = u"<if";
     static constexpr const Char_T *IfSuffix            = u"</if>";
     static constexpr const Char_T *ElsePrefix          = u"<else";
-    static constexpr const Char_T *ElseSuffix          = u"/>";
 
     // Inline If attributes
     static constexpr const Char_T *Case  = u"case";
@@ -541,7 +534,6 @@ struct TPStrings_T<Char_T, 4U> {
     static constexpr const Char_T *IfPrefix            = U"<if";
     static constexpr const Char_T *IfSuffix            = U"</if>";
     static constexpr const Char_T *ElsePrefix          = U"<else";
-    static constexpr const Char_T *ElseSuffix          = U"/>";
 
     // Inline If attributes
     static constexpr const Char_T *Case  = U"case";
@@ -574,7 +566,6 @@ struct TPStrings_T<wchar_t, 4U> {
     static constexpr const wchar_t *IfPrefix            = L"<if";
     static constexpr const wchar_t *IfSuffix            = L"</if>";
     static constexpr const wchar_t *ElsePrefix          = L"<else";
-    static constexpr const wchar_t *ElseSuffix          = L"/>";
 
     // Inline If attributes
     static constexpr const wchar_t *Case  = L"case";
@@ -607,7 +598,6 @@ struct TPStrings_T<wchar_t, 2U> {
     static constexpr const wchar_t *IfPrefix            = L"<if";
     static constexpr const wchar_t *IfSuffix            = L"</if>";
     static constexpr const wchar_t *ElsePrefix          = L"<else";
-    static constexpr const wchar_t *ElseSuffix          = L"/>";
 
     // Inline If attributes
     static constexpr const wchar_t *Case  = L"case";

@@ -34,9 +34,9 @@ Not {var:0} but {var:1}.
 
 <if case="{var:2} == 0">
 Zero!
-<elseif case="{var:2} == 2" />
+<else if case="{var:2} == 2">
 Two!
-<else />
+<else>
 Not zero or one.
 </if>
 

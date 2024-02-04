@@ -127,11 +127,11 @@ int main() {
                 <span>
                     <if case="{var:value[date]} == 1">
                     New
-                    <elseif case="{var:value[date]} == 2" />
+                    <else if case="{var:value[date]} == 2">
                     Yesterday
-                    <elseif case="{var:value[date]} == 3" />
+                    <else if case="{var:value[date]} == 3">
                     Two days ago
-                    <else />
+                    <else>
                     {var:value[date]}
                     </if>
                 </span>

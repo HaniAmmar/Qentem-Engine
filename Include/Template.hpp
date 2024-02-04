@@ -192,10 +192,15 @@ namespace Qentem {
  *
  * NOTE: You can use single or double quotes.
  *
- * <if case="{case}">...</if>
- * <if case="{case}">...<else />...</if>
- * <if case='{case1}'>...<elseif case="{case2}" />...</if>
- * <if case='{case}'>...<if case='{case2}' />...</if></if>
+ * <if case="...">...</if>
+ * <if case='...'>...</if>
+ * <if case="...">...<else />...</if>
+ * <if case="...">...<elseif case="..." />...</if>
+ * <if case="...">...<else if case="..." >...</if>
+ * <if case='...'>...<elseif case='...' >...<else>...</if>
+ * <if case='...'>...<else if case='...' >...<else>...</if>
+ * <if case='...'>...<elseif case='...' /> <elseif case='...' />...<else />...</if>
+ * <if case='...'>...<else if case='...' /> <else if case='...' />...<else>...</if>
  */
 
 template <typename, typename, typename>
@@ -1025,7 +1030,7 @@ struct TemplateSub {
         enum struct LoopAttributes { None = 0U, Set, Value, Sort, Group };
         const SizeT16  level = (level_ + 1);
         TemplateSub    loop_template{content_, length_, nullptr, nullptr, this, level};
-        LoopAttributes att_type;
+        LoopAttributes att_type = LoopAttributes::None;
 
         tag.Offset = offset;
         tag.ContentOffset =
@@ -1177,7 +1182,7 @@ struct TemplateSub {
         SizeT              true_end_offset{0};
         SizeT              false_offset{0};
         SizeT              false_end_offset{0};
-        InLineIfAttributes att_type;
+        InLineIfAttributes att_type = InLineIfAttributes::None;
 
         while (offset < end_offset) {
             while ((offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
