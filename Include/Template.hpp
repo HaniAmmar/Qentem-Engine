@@ -1352,6 +1352,10 @@ struct TemplateSub {
                         tag.Cases += IfTagCase{parseExpressions(att_offset, offset), Memory::Move(sub_tags),
                                                content_offset, else_end_offset};
 
+                        while ((else_offset < end_offset) && (content_[else_offset] == TagPatterns::SpaceChar)) {
+                            ++else_offset;
+                        }
+
                         if ((content_[else_offset] != TagPatterns::ElseIfChar)) {
                             else_offset = Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, else_offset,
                                                                   end_offset, length_);
