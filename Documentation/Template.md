@@ -422,11 +422,11 @@ With variables:
 <if case='...'>...</if>
 <if case="...">...<else />...</if>
 <if case="...">...<elseif case="..." />...</if>
-<if case="...">...<else if case="..." />...</if>
-<if case='...'>...<elseif case='...' />...<else />...</if>
-<if case='...'>...<else if case='...' />...<else />...</if>
+<if case="...">...<else if case="..." >...</if>
+<if case='...'>...<elseif case='...' >...<else>...</if>
+<if case='...'>...<else if case='...' >...<else>...</if>
 <if case='...'>...<elseif case='...' /> <elseif case='...' />...<else />...</if>
-<if case='...'>...<else if case='...' /> <else if case='...' />...<else />...</if>
+<if case='...'>...<else if case='...' /> <else if case='...' />...<else>...</if>
 ```
 
 Similar to `{if case="..." ...}`, but capable of branching and nesting.
@@ -464,7 +464,7 @@ Not {var:0} but {var:1}.
 
 <if case="{var:2} == 0">
 Zero!
-<elseif case="{var:2} == 2" />
+<else if case="{var:2} == 2">
 Two!
 <else />
 Not zero or one.
@@ -472,9 +472,9 @@ Not zero or one.
 
 <if case="{var:2} == 0">
 Zero!
-<elseif case="{var:2} == 5" />
+<else if case="{var:2} == 5">
 Two!
-<elseif case="{var:3} == 3" />
+<else if case="{var:3} == 3">
 {var:3}
 <else />
 Not zero or one or two.
@@ -1064,16 +1064,16 @@ int main() {
     <div>
         <h2>Students' list:</h2>
         <loop value="department_val">
-            <h3>Major: department_val[major]</h3>
+            <h3>Major: {var:department_val[major]}</h3>
             <ul>
             <loop set="department_val[students]" value="student_val">
                 <li>
-                    <span>Name: student_val[Name]</span>
+                    <span>Name: {var:student_val[Name]}</span>
                     <span>
-                        GPA: student_val[GPA]
-                        <if case="student_val[GPA] < 2.5"> (Inform adviser!)
-                        <elseif case="student_val[GPA] >= 3.5" /> (President's List!)
-                        <elseif case="student_val[GPA] >= 3.0" /> (Dean's List!)
+                        GPA: {var:student_val[GPA]}
+                        <if case="{var:student_val[GPA]} < 2.5"> (Inform adviser!)
+                        <else if case="{var:student_val[GPA]} >= 3.5"> (President's List!)
+                        <else if case="{var:student_val[GPA]} >= 3.0"> (Dean's List!)
                         </if>
                     </span>
                 </li>
@@ -1130,7 +1130,7 @@ int main() {
                 {
                     "text": "The Global Internet is now free.",
                     "date": "2",
-                    "options": "style=\"color: violet;\""
+                    "options": "v_span"
                 },
                 {
                     "text": "No more hackers after implementing NO-WAY-CRPT encryption.",
@@ -1155,7 +1155,7 @@ int main() {
                 {
                     "text": "TeraMedicine forced to shutdown.",
                     "date": "3011-1-16",
-                    "options": "style=\"font-style: italic;\""
+                    "options": "i_span"
                 }
             ]
         },
@@ -1165,7 +1165,7 @@ int main() {
                 {
                     "text": "No more Uranium.",
                     "date": "3011-1-19",
-                    "options": "style=\"color: red;\""
+                    "options": "red_span"
                 },
                 {
                     "text": "The Global Internet is now free.",
@@ -1188,13 +1188,22 @@ int main() {
 <html dir="{var:dir}">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>{var:title}</title>
     <style>
         body {
-            background-color: {var:body[bc]};
+            background-color: {raw:body[bc]};
             color: {if case="{var:dark_mode}" true="{var:body[dark_mode_color]}" false="{var:body[color]}"}
+        }
+
+        .i_span {
+            font-style: italic;
+        }
+
+        .red_span {
+            color: red;
+        }
+
+        .v_span {
+            color: violet;
         }
     </style>
 </head>
@@ -1203,20 +1212,20 @@ int main() {
     <h1>{var:body[H1]}</h1>
 
     <loop set="news" value="value_s">
-    <h2>value_s[name]</h2>
+    <h2>{var:value_s[name]}</h2>
     <div>
         <ul>
             <loop set="value_s[list]" value="value">
-            <li><span value[options]>value[text]</span> -
+            <li><span class="{var:value[options]}">{var:value[text]}</span> -
                 <span>
-                    <if case="value[date] == 1">
+                    <if case="{var:value[date]} == 1">
                     New
-                    <elseif case="value[date] == 2" />
+                    <else if case="{var:value[date]} == 2">
                     Yesterday
-                    <elseif case="value[date] == 3" />
+                    <else if case="{var:value[date]} == 3">
                     Two days ago
-                    <else />
-                    value[date]
+                    <else>
+                    {var:value[date]}
                     </if>
                 </span>
             </li>
