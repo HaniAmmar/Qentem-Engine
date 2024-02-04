@@ -353,6 +353,7 @@ int main() {
 
 ```txt
 {if case="..." true="..." false="..."}
+{if case='...' true='...' false='...'}
 ```
 
 Inline if condition uses the `case` value for evaluation, and if the returned value is a positive number, it will print the value inside `true`. Otherwise, `false`'s value is used.
@@ -418,9 +419,14 @@ With variables:
 
 ```txt
 <if case="...">...</if>
+<if case='...'>...</if>
 <if case="...">...<else />...</if>
 <if case="...">...<elseif case="..." />...</if>
-<if case="...">...<elseif case="..." />...<else />...</if>
+<if case="...">...<else if case="..." />...</if>
+<if case='...'>...<elseif case='...' />...<else />...</if>
+<if case='...'>...<else if case='...' />...<else />...</if>
+<if case='...'>...<elseif case='...' /> <elseif case='...' />...<else />...</if>
+<if case='...'>...<else if case='...' /> <else if case='...' />...<else />...</if>
 ```
 
 Similar to `{if case="..." ...}`, but capable of branching and nesting.
@@ -563,8 +569,11 @@ To force converting the variables to numbers, use parentheses: {math:({var:bool}
 
 ```txt
 <loop set="..." value="..." group="..." sort="...">...</loop>
+<loop set='...' value='...' group='...' sort='...'>...</loop>
 <loop value="...">...</loop>
+<loop value='...'>...</loop>
 <loop set="..." value="...">...</loop>
+<loop set='...' value='...'>...</loop>
 <loop set="..." value="..." group="...">...</loop>
 <loop set="..." value="..." sort="...">...</loop>
 <loop set="..." value="..." group="..." sort="...">...</loop>
