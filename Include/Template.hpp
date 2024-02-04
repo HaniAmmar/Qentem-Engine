@@ -138,28 +138,28 @@ namespace Qentem {
 /*
  * Inline If Tag:
  *
- * NOTE: No spaces before '='
+ * NOTE: You can use single or double quotes.
  *
  * {if case="3 == 3" true="Yes" false="No"}
- * {if case="{var:var_five} == 5" true="5" false="no"}
+ * {if case='{var:var_five} == 5' true='5' false='no'}
  * {if case="{var:var1}" true="{var:var_five} is equal to 5" false="no"}
- * {if case="{var:bool1}" true="bool1 is true" false="bool1 is false"}
+ * {if case='{var:bool1}' true='bool1 is true' false='bool1 is false'}
  * {if case="{var:string1}" true="string1 is not empty" false="null, empty or not a string"}
  * {if case="3 == 3" true="Yes" false="No"}
- * {if case="3 == 3" true="{var:1}" false="{var:2}"}
+ * {if case='3 == 3' true='{var:1}' false='{var:2}'}
  * {if case="3 == 3" true="{var:v1}" false="{var:v2}"}
  */
 
 /*
  * Loop Tag:
  *
- * NOTE: No spaces before '='
+ * NOTE: You can use single or double quotes.
  *
  * <loop set="..." value="..." group="..." sort="...">...</loop>
  * <loop value="...">...</loop>
- * <loop set="..." value="...">...</loop>
+ * <loop set='...' value='...'>...</loop>
  * <loop set="..." value="..." group="...">...</loop>
- * <loop set="..." value="..." sort="...">...</loop>
+ * <loop set='...' value='...' sort='...'>...</loop>
  * <loop set="..." value="..." group="..." sort="...">...</loop>
  *
  * <loop set="tree_name" value="loop1-value">
@@ -190,10 +190,12 @@ namespace Qentem {
 /*
  * If tag:
  *
+ * NOTE: You can use single or double quotes.
+ *
  * <if case="{case}">...</if>
  * <if case="{case}">...<else />...</if>
- * <if case="{case1}">...<elseif case="{case2}" />...</if>
- * <if case="{case}">...<if case="{case2}" />...</if></if>
+ * <if case='{case1}'>...<elseif case="{case2}" />...</if>
+ * <if case='{case}'>...<if case='{case2}' />...</if></if>
  */
 
 template <typename, typename, typename>
@@ -1019,95 +1021,147 @@ struct TemplateSub {
         }
     }
 
-    /*
-     * Gets everything between "..."
-     */
-    SizeT getQuotedValue(SizeT &offset, SizeT end_offset) const noexcept {
-        offset = Engine::FindOne<Char_T>(TagPatterns::QuoteChar, content_, offset, end_offset, length_);
-
-        if (offset != SizeT{0}) {
-            end_offset = Engine::FindOne<Char_T>(TagPatterns::QuoteChar, content_, offset, end_offset, length_);
-        }
-
-        return end_offset;
-    }
-
     void parseLoopTag(SizeT offset, SizeT end_offset, LoopTag &tag) const {
-        const SizeT16 level = (level_ + 1);
-        const SizeT   loop_content_offset =
-            Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, offset, end_offset, length_);
-
-        TemplateSub loop_template{content_, length_, nullptr, nullptr, this, level};
+        enum struct LoopAttributes { None = 0U, Set, Value, Sort, Group };
+        const SizeT16  level = (level_ + 1);
+        TemplateSub    loop_template{content_, length_, nullptr, nullptr, this, level};
+        LoopAttributes att_type;
 
         tag.Offset = offset;
-        offset += TagPatterns::LoopPrefixLength;
+        tag.ContentOffset =
+            Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, offset, end_offset, length_);
+
         end_offset -= TagPatterns::LoopSuffixLength;
-        tag.EndOffset     = end_offset;
-        tag.ContentOffset = loop_content_offset;
+        offset += TagPatterns::LoopPrefixLength;
+        tag.EndOffset = end_offset;
+        end_offset    = tag.ContentOffset;
 
-        SizeT offset2     = getQuotedValue(offset, loop_content_offset);
-        SizeT last_offset = offset;
-        offset = SizeT(offset - SizeT{6}); // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
+        while (offset < end_offset) {
+            while ((offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
+                ++offset;
+            }
 
-        while ((offset2 != SizeT{0}) && (offset < loop_content_offset)) {
-            switch (content_[offset]) {
-                case TagPatterns::SetChar: {
-                    const SizeT set_offset = last_offset;
-                    const SizeT set_length = SizeT((offset2 - SizeT{1}) - last_offset);
+            if (offset < end_offset) {
+                switch (content_[offset]) {
+                    case TagPatterns::SetSortChar: {
+                        att_type = LoopAttributes::None;
 
-                    VariableTag set_var{};
-                    parseVariableTag(set_offset, (set_offset + set_length), set_var);
-                    tag.SetOffset = SizeT8(set_var.Offset - tag.Offset);
-                    tag.SetLength = SizeT8(set_var.Length);
-                    tag.SetLevel  = set_var.Level;
-                    tag.Options |= set_var.IsLoopValue;
+                        const SizeT tmp_length = (end_offset - offset);
 
-                    offset      = offset2;
-                    offset2     = getQuotedValue(offset, loop_content_offset);
-                    last_offset = offset;
-                    offset -= SizeT{6};
-                    break;
+                        if ((tmp_length > TagPatterns::SetLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::Set, TagPatterns::SetLength)) {
+                            offset += TagPatterns::SetLength;
+                            att_type = LoopAttributes::Set;
+                            break;
+                        }
+
+                        if ((tmp_length > TagPatterns::SortLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::Sort, TagPatterns::SortLength)) {
+                            offset += TagPatterns::SortLength;
+                            att_type = LoopAttributes::Sort;
+                            break;
+                        }
+
+                        ++offset;
+                        break;
+                    }
+
+                    case TagPatterns::ValueChar: {
+                        att_type = LoopAttributes::None;
+
+                        if (((end_offset - offset) > TagPatterns::ValueLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::Value, TagPatterns::ValueLength)) {
+                            offset += TagPatterns::ValueLength;
+                            att_type = LoopAttributes::Value;
+                            break;
+                        }
+
+                        ++offset;
+                        break;
+                    }
+
+                    case TagPatterns::GroupChar: {
+                        att_type = LoopAttributes::None;
+
+                        if (((end_offset - offset) > TagPatterns::GroupLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::Group, TagPatterns::GroupLength)) {
+                            offset += TagPatterns::GroupLength;
+                            att_type = LoopAttributes::Group;
+                            break;
+                        }
+
+                        ++offset;
+                        break;
+                    }
+
+                    default: {
+                        ++offset;
+                        continue;
+                    }
+                }
+            }
+
+            if (att_type != LoopAttributes::None) {
+                while ((offset < end_offset) && (content_[offset] != TagPatterns::EqualChar)) {
+                    ++offset;
                 }
 
-                case TagPatterns::ValueChar: {
-                    tag.ValueOffset                  = SizeT8(last_offset - tag.Offset);
-                    tag.ValueLength                  = SizeT8((offset2 - SizeT{1}) - last_offset);
-                    loop_template.loop_value_offset_ = last_offset;
-                    loop_template.loop_value_length_ = tag.ValueLength;
-                    offset                           = offset2;
-                    offset2                          = getQuotedValue(offset, loop_content_offset);
-                    last_offset                      = offset;
-                    offset -= SizeT{6};
-                    break;
+                while ((++offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
                 }
 
-                case TagPatterns::SortChar: {
-                    tag.Options |=
-                        ((content_[last_offset] == 'a') ? LoopTagOptions::SortAscend : LoopTagOptions::SortDescend);
-                    offset      = offset2;
-                    offset2     = getQuotedValue(offset, loop_content_offset);
-                    last_offset = offset;
-                    offset -= SizeT{6};
-                    break;
-                }
+                if (offset < end_offset) {
+                    const SizeT att_offset = (offset + SizeT{1});
 
-                case TagPatterns::GroupChar: {
-                    tag.GroupOffset = SizeT8(last_offset - tag.Offset);
-                    tag.GroupLength = SizeT8((offset2 - SizeT{1}) - last_offset);
-                    offset          = offset2;
-                    offset2         = getQuotedValue(offset, loop_content_offset);
-                    last_offset     = offset;
-                    offset -= SizeT{6};
-                    break;
-                }
+                    if (content_[offset] == TagPatterns::DoubleQuoteChar) {
+                        while ((++offset < end_offset) && (content_[offset] != TagPatterns::DoubleQuoteChar)) {
+                        }
+                    } else {
+                        while ((++offset < end_offset) && (content_[offset] != TagPatterns::SingleQuoteChar)) {
+                        }
+                    }
 
-                default: {
+                    switch (att_type) {
+                        case LoopAttributes::Set: {
+                            VariableTag var{};
+                            parseVariableTag(att_offset, offset, var);
+                            tag.SetOffset = SizeT8(var.Offset - tag.Offset);
+                            tag.SetLength = SizeT8(var.Length);
+                            tag.SetLevel  = var.Level;
+                            tag.Options |= var.IsLoopValue;
+
+                            break;
+                        }
+
+                        case LoopAttributes::Value: {
+                            tag.ValueOffset                  = SizeT8(att_offset - tag.Offset);
+                            tag.ValueLength                  = SizeT8(offset - att_offset);
+                            loop_template.loop_value_offset_ = att_offset;
+                            loop_template.loop_value_length_ = tag.ValueLength;
+                            break;
+                        }
+
+                        case LoopAttributes::Sort: {
+                            tag.Options |= ((content_[att_offset] == 'a') ? LoopTagOptions::SortAscend
+                                                                          : LoopTagOptions::SortDescend);
+                            break;
+                        }
+
+                        case LoopAttributes::Group: {
+                            tag.GroupOffset = SizeT8(att_offset - tag.Offset);
+                            tag.GroupLength = SizeT8(offset - att_offset);
+                            break;
+                        }
+
+                        default: {
+                        }
+                    }
+
                     ++offset;
                 }
             }
         }
 
-        loop_template.parse(tag.SubTags, loop_content_offset, end_offset);
+        loop_template.parse(tag.SubTags, tag.ContentOffset, tag.EndOffset);
     }
 
     void parseInLineIfTag(SizeT offset, SizeT end_offset, InLineIfTag &tag) const {
@@ -1117,119 +1171,203 @@ struct TemplateSub {
         offset += TagPatterns::InLineIfPrefixLength;
         end_offset -= TagPatterns::InLineSuffixLength;
 
-        SizeT offset2          = getQuotedValue(offset, end_offset);
-        SizeT last_offset      = offset;
-        SizeT true_offset      = 0;
-        SizeT false_offset     = 0;
-        SizeT true_end_offset  = 0;
-        SizeT false_end_offset = 0;
+        enum struct InLineIfAttributes { None = 0U, Case, True, False };
 
-        offset = SizeT(offset - SizeT{5}); // (=) plus (") plus (two chars) = 4 plus (the char before them) = 5
+        SizeT              true_offset{0};
+        SizeT              true_end_offset{0};
+        SizeT              false_offset{0};
+        SizeT              false_end_offset{0};
+        InLineIfAttributes att_type;
 
-        while ((offset2 != SizeT{0}) && (offset < end_offset)) {
-            switch (content_[offset]) {
-                case TagPatterns::CaseChar: {
-                    tag.Case    = parseExpressions(last_offset, (offset2 - SizeT{1})); // 1 = (") at the end
-                    offset      = offset2;
-                    offset2     = getQuotedValue(offset, end_offset);
-                    last_offset = offset;
-                    offset      = SizeT(offset - SizeT{5});
-                    break;
+        while (offset < end_offset) {
+            while ((offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
+                ++offset;
+            }
+
+            if (offset < end_offset) {
+                switch (content_[offset]) {
+                    case TagPatterns::CaseChar: {
+                        att_type = InLineIfAttributes::None;
+
+                        if (((end_offset - offset) > TagPatterns::CaseLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::Case, TagPatterns::CaseLength)) {
+                            att_type = InLineIfAttributes::Case;
+                            offset += TagPatterns::CaseLength;
+                            break;
+                        }
+
+                        ++offset;
+                        break;
+                    }
+
+                    case TagPatterns::TrueChar: {
+                        att_type = InLineIfAttributes::None;
+
+                        if (((end_offset - offset) > TagPatterns::TrueLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::True, TagPatterns::TrueLength)) {
+                            att_type = InLineIfAttributes::True;
+                            offset += TagPatterns::TrueLength;
+                            break;
+                        }
+
+                        ++offset;
+                        break;
+                    }
+
+                    case TagPatterns::FalseChar: {
+                        att_type = InLineIfAttributes::None;
+
+                        if (((end_offset - offset) > TagPatterns::FalseLength) &&
+                            StringUtils::IsEqual((content_ + offset), TagPatterns::False, TagPatterns::FalseLength)) {
+                            att_type = InLineIfAttributes::False;
+                            offset += TagPatterns::FalseLength;
+                            break;
+                        }
+
+                        ++offset;
+                        break;
+                    }
+
+                    default: {
+                        ++offset;
+                        continue;
+                    }
+                }
+            }
+
+            if (att_type != InLineIfAttributes::None) {
+                while ((offset < end_offset) && (content_[offset] != TagPatterns::EqualChar)) {
+                    ++offset;
                 }
 
-                case TagPatterns::TrueChar: {
-                    true_offset     = last_offset;
-                    true_end_offset = (offset2 - SizeT{1});
-                    offset          = offset2;
-                    offset2         = getQuotedValue(offset, end_offset);
-                    last_offset     = offset;
-                    offset          = SizeT(offset - SizeT{5});
-                    break;
+                while ((++offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
                 }
 
-                case TagPatterns::FalseChar: {
-                    false_offset     = last_offset;
-                    false_end_offset = (offset2 - SizeT{1});
-                    offset           = offset2;
-                    offset2          = getQuotedValue(offset, end_offset);
-                    last_offset      = offset;
-                    offset           = SizeT(offset - SizeT{5});
-                    break;
-                }
+                if (offset < end_offset) {
+                    const SizeT att_offset = (offset + SizeT{1});
 
-                default: {
+                    if (content_[offset] == TagPatterns::DoubleQuoteChar) {
+                        while ((++offset < end_offset) && (content_[offset] != TagPatterns::DoubleQuoteChar)) {
+                        }
+                    } else {
+                        while ((++offset < end_offset) && (content_[offset] != TagPatterns::SingleQuoteChar)) {
+                        }
+                    }
+
+                    switch (att_type) {
+                        case InLineIfAttributes::Case: {
+                            tag.Case = parseExpressions(att_offset, offset);
+                            break;
+                        }
+
+                        case InLineIfAttributes::True: {
+                            tag.TrueLength  = SizeT16(offset - att_offset);
+                            true_offset     = att_offset;
+                            true_end_offset = offset;
+                            break;
+                        }
+
+                        case InLineIfAttributes::False: {
+                            tag.FalseLength  = SizeT16(offset - att_offset);
+                            false_offset     = att_offset;
+                            false_end_offset = offset;
+                            break;
+                        }
+
+                        default: {
+                        }
+                    }
+
                     ++offset;
                 }
             }
         }
 
         if (tag.Case.IsNotEmpty()) {
-            if (true_offset != true_end_offset) {
+            if (tag.TrueLength != 0) {
+                tag.TrueOffset = SizeT16(true_offset - tag.Offset);
                 lightParse(tag.SubTags, true_offset, true_end_offset);
-
                 tag.TrueTagsSize = SizeT16(tag.SubTags.Size()); // To use one heap for true and false.
-                tag.TrueOffset   = SizeT16(true_offset - tag.Offset);
-                tag.TrueLength   = SizeT16(true_end_offset - true_offset);
             }
 
-            if (false_offset != false_end_offset) {
-                lightParse(tag.SubTags, false_offset, false_end_offset);
-
+            if (tag.FalseLength != 0) {
                 tag.FalseOffset = SizeT16(false_offset - tag.Offset);
-                tag.FalseLength = SizeT16(false_end_offset - false_offset);
+                lightParse(tag.SubTags, false_offset, false_end_offset);
             }
         }
     }
 
     void parseIfTag(SizeT offset, SizeT end_offset, IfTag &tag) const {
+        Array<TagBit> sub_tags;
+
         tag.Offset    = offset;
         tag.EndOffset = end_offset;
 
         offset += TagPatterns::IfPrefixLength;
         end_offset -= TagPatterns::IfSuffixLength;
 
-        Array<TagBit> sub_tags;
-        SizeT         offset2 = getQuotedValue(offset, end_offset);
-        SizeT         case_end_offset;
-        SizeT         else_offset;
-        SizeT         content_offset;
+        while (offset < end_offset) {
+            while ((offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
+                ++offset;
+            }
 
-        while ((offset2 != SizeT{0}) && (offset < end_offset)) {
-            case_end_offset = (offset2 - SizeT{1});
-            content_offset =
-                Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, offset2, end_offset, length_);
+            if (((end_offset - offset) > TagPatterns::CaseLength) &&
+                StringUtils::IsEqual((content_ + offset), TagPatterns::Case, TagPatterns::CaseLength)) {
+                offset += TagPatterns::CaseLength;
 
-            if (content_offset != SizeT{0}) {
-                else_offset = nextElse(content_offset, end_offset);
-
-                if (else_offset == SizeT{0}) {
-                    parse(sub_tags, content_offset, end_offset);
-                    tag.Cases += IfTagCase{parseExpressions(offset, case_end_offset), Memory::Move(sub_tags),
-                                           content_offset, end_offset};
-
-                    break;
+                while ((offset < end_offset) && (content_[offset] != TagPatterns::EqualChar)) {
+                    ++offset;
                 }
 
-                parse(sub_tags, content_offset, (else_offset - TagPatterns::ElsePrefixLength));
-                tag.Cases += IfTagCase{parseExpressions(offset, case_end_offset), Memory::Move(sub_tags),
-                                       content_offset, SizeT(else_offset - TagPatterns::ElsePrefixLength)};
+                while ((++offset < end_offset) && (content_[offset] == TagPatterns::SpaceChar)) {
+                }
 
-                if ((content_[else_offset] != TagPatterns::ElseIfChar)) {
-                    else_offset = Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, else_offset,
-                                                          end_offset, length_);
+                if (offset < end_offset) {
+                    const SizeT att_offset = (offset + SizeT{1});
 
-                    if (else_offset != SizeT{0}) {
-                        parse(sub_tags, else_offset, end_offset);
-                        tag.Cases += IfTagCase{QExpressions{}, Memory::Move(sub_tags), else_offset,
-                                               end_offset}; // else without if
+                    if (content_[offset] == TagPatterns::DoubleQuoteChar) {
+                        while ((++offset < end_offset) && (content_[offset] != TagPatterns::DoubleQuoteChar)) {
+                        }
+                    } else {
+                        while ((++offset < end_offset) && (content_[offset] != TagPatterns::SingleQuoteChar)) {
+                        }
                     }
 
-                    break;
-                }
+                    const SizeT content_offset =
+                        Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, offset, end_offset, length_);
 
-                offset  = else_offset;
-                offset2 = getQuotedValue(offset, end_offset);
-                continue;
+                    if (content_offset != SizeT{0}) {
+                        SizeT else_offset = nextElse(content_offset, end_offset);
+
+                        if (else_offset == SizeT{0}) {
+                            parse(sub_tags, content_offset, end_offset);
+                            tag.Cases += IfTagCase{parseExpressions(att_offset, offset), Memory::Move(sub_tags),
+                                                   content_offset, end_offset};
+
+                            break;
+                        }
+
+                        const SizeT else_end_offset = (else_offset - TagPatterns::ElsePrefixLength);
+                        parse(sub_tags, content_offset, else_end_offset);
+                        tag.Cases += IfTagCase{parseExpressions(att_offset, offset), Memory::Move(sub_tags),
+                                               content_offset, else_end_offset};
+
+                        if ((content_[else_offset] != TagPatterns::ElseIfChar)) {
+                            else_offset = Engine::FindOne<Char_T>(TagPatterns::MultiLineSuffix, content_, else_offset,
+                                                                  end_offset, length_);
+
+                            if (else_offset != SizeT{0}) {
+                                parse(sub_tags, else_offset, end_offset);
+                                tag.Cases += IfTagCase{QExpressions{}, Memory::Move(sub_tags), else_offset,
+                                                       end_offset}; // else without if
+                            }
+                        }
+
+                        offset = else_offset;
+                        offset += TagPatterns::IfLength;
+                        continue;
+                    }
+                }
             }
 
             break;

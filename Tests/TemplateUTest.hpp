@@ -2397,15 +2397,15 @@ static void TestInlineIfUTag(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(F)", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="-1" true="T" false="F"})";
+    content = uR"({if case='-1' true='T' false='F'})";
     test.IsEqual(Template::Render(content, value, ss), uR"(F)", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="0.1" true="T" false="F"})";
+    content = uR"({if case='0.1' true="T" false="F"})";
     test.IsEqual(Template::Render(content, value, ss), uR"(T)", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="1" true="T" false="F"})";
+    content = uR"({if case="1" true='T' false="F"})";
     test.IsEqual(Template::Render(content, value, ss), uR"(T)", __LINE__);
     ss.Clear();
 
@@ -2429,7 +2429,7 @@ static void TestInlineIfUTag(QTest &test) {
 
     ///
 
-    content = uR"({if case="0" false="F"})";
+    content = uR"({if case="0" false='F'})";
     test.IsEqual(Template::Render(content, value, ss), uR"(F)", __LINE__);
     ss.Clear();
 
@@ -2437,11 +2437,11 @@ static void TestInlineIfUTag(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(F)", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="0.1" false="F"})";
+    content = uR"({if case='0.1' false='F'})";
     test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="1" false="F"})";
+    content = uR"({if case='1' false='F'})";
     test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
     ss.Clear();
 
@@ -2618,7 +2618,7 @@ static void TestInlineIfUTag(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
     ss.Clear();
 
-    content = uR"({if{if case="1" true="T" false="F"}}{if case="1" true="T" false="F"})";
+    content = uR"({if}{if case="1" true="T" false="F"}{if case="1" true="T" false="F"})";
 
     test.IsEqual(Template::Render(content, value, ss), uR"(TT)", __LINE__);
     ss.Clear();
@@ -2774,8 +2774,8 @@ static void TestLoopUTag1(QTest &test) {
                  uR"((0: 0: 0) (0: 0: 1) (0: 1: 0) (0: 1: 1) (1: 0: 0) (1: 0: 1) (1: 1: 0) (1: 1: 1) )", __LINE__);
     ss.Clear();
 
-    content = uR"(<loop value="loop1-value"><loop value="loop2-value"><loop
-                 value="loop3-value"><loop value="loop4-value">({var:loop1-value}: {var:loop2-value}: {var:loop3-value}: {var:loop4-value}) </loop></loop></loop></loop>)";
+    content = uR"(<loop value='loop1-value'><loop value='loop2-value'><loop
+                 value='loop3-value'><loop value='loop4-value'>({var:loop1-value}: {var:loop2-value}: {var:loop3-value}: {var:loop4-value}) </loop></loop></loop></loop>)";
     test.IsEqual(
         Template::Render(content, value1, ss),
         uR"((0: 0: 0: 0) (0: 0: 0: 1) (0: 0: 1: 0) (0: 0: 1: 1) (0: 1: 0: 0) (0: 1: 0: 1) (0: 1: 1: 0) (0: 1: 1: 1) (1: 0: 0: 0) (1: 0: 0: 1) (1: 0: 1: 0) (1: 0: 1: 1) (1: 1: 0: 0) (1: 1: 0: 1) (1: 1: 1: 0) (1: 1: 1: 1) )",
@@ -2826,7 +2826,7 @@ static void TestLoopUTag1(QTest &test) {
 
     value3[uR"(arr1)"] = value2;
 
-    content = uR"(<loop set="arr1" value="loop1-value">{var:loop1-value}, </loop>)";
+    content = uR"(<loop set='arr1' value="loop1-value">{var:loop1-value}, </loop>)";
     test.IsEqual(Template::Render(content, value3, ss), uR"(4, 1.5, ABC, true, false, null, )", __LINE__);
     ss.Clear();
 
@@ -3126,26 +3126,26 @@ static void TestLoopUTag3(QTest &test) {
     )");
 
     content =
-        uR"(<loop value="val_1" group="year111" sort="descend"><loop set="val_1" value="val_2"><loop set="val_2" value="val_3">{var:val_3}</loop></loop></loop>)";
+        uR"(<loop value='val_1' group='year111' sort='descend'><loop set='val_1' value='val_2'><loop set='val_2' value='val_3'>{var:val_3}</loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
     ss.Clear();
 
     content =
-        uR"(<loop value="val_1" group="year" sort="descend"><loop set="val_1" value="val_2"><loop set="val_2" value="val_3">{var:val_3}</loop></loop></loop>)";
+        uR"(<loop value='val_1' group="year" sort="descend"><loop set="val_1" value="val_2"><loop set="val_2" value="val_3">{var:val_3}</loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss),
                  uR"(q11400q11450q11450q11100q11125q21200q22300q21200q22300q22300)", __LINE__);
     ss.Clear();
 
     content =
-        uR"(<loop value="val_1" group="year" sort="descend"><loop set="val_1" value="val_2" group="quarter" sort="ascend"><loop set="val_2" value="val_3"><loop set="val_3" value="val_4">{var:val_4}</loop></loop></loop></loop>)";
+        uR"(<loop value="val_1" group='year' sort="descend"><loop set="val_1" value="val_2" group="quarter" sort="ascend"><loop set="val_2" value="val_3"><loop set="val_3" value="val_4">{var:val_4}</loop></loop></loop></loop>)";
 
     test.IsEqual(Template::Render(content, value, ss), uR"(1400145014501100112512002300120023002300)", __LINE__);
     ss.Clear();
 
     content =
-        uR"(<loop value="val_1" group="year" sort="descend">-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter" sort="ascend">{var:val_2}-<loop set="val_2" value="val_3" group="week" sort="ascend">{var:val_2}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
+        uR"(<loop value="val_1" group="year" sort='descend'>-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter" sort="ascend">{var:val_2}-<loop set="val_2" value="val_3" group="week" sort="ascend">{var:val_2}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
 
     test.IsEqual(
         Template::Render(content, value, ss),
@@ -3234,7 +3234,7 @@ static void TestIfUTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(Good!)", __LINE__);
     ss.Clear();
 
-    content = uR"(<if case="{var:n}">Bad!<elseif case="1" />Good!</if>#)";
+    content = uR"(<if case="{var:n}">Bad!<else if case="1" />Good!</if>#)";
     test.IsEqual(Template::Render(content, value, ss), uR"(Good!#)", __LINE__);
     ss.Clear();
 
@@ -3242,7 +3242,7 @@ static void TestIfUTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
     ss.Clear();
 
-    content = uR"(#<if case="0">Bad!<elseif case="0" />Very Bad!<else />Very Good!</if>)";
+    content = uR"(#<if case="0">Bad!<else  if case="0" />Very Bad!<else />Very Good!</if>)";
     test.IsEqual(Template::Render(content, value, ss), uR"(#Very Good!)", __LINE__);
     ss.Clear();
 
@@ -3274,11 +3274,11 @@ static void TestIfUTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(===========ab)", __LINE__);
     ss.Clear();
 
-    content = uR"(<if case="1">a<elseif case="1" />b<elseif case="1" />c<else />d</if>)";
+    content = uR"(<if case="1">a<else if case="1" />b<elseif case="1" />c<else />d</if>)";
     test.IsEqual(Template::Render(content, value, ss), uR"(a)", __LINE__);
     ss.Clear();
 
-    content = uR"(<if case="0">a<elseif case="1" />b<elseif case="1" />c<else />d</if>)";
+    content = uR"(<if case="0">a<elseif case="1" />b<else if case="1" />c<else />d</if>)";
     test.IsEqual(Template::Render(content, value, ss), uR"(b)", __LINE__);
     ss.Clear();
 
@@ -3306,7 +3306,7 @@ static void TestIfUTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(cb)", __LINE__);
     ss.Clear();
 
-    content = uR"(<if_case="1"><if case="0">Bad1!<elseif case="0" />Bad2!</if>a</if>)";
+    content = uR"(<if case="1"><if case="0">Bad1!<elseif case="0" />Bad2!</if>a</if>)";
     test.IsEqual(Template::Render(content, value, ss), uR"(a)", __LINE__);
     ss.Clear();
 
