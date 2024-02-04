@@ -120,8 +120,8 @@ int main() {
                     <span>
                         GPA: {var:student_val[GPA]}
                         <if case="{var:student_val[GPA]} < 2.5"> (Inform adviser!)
-                        <elseif case="{var:student_val[GPA]} >= 3.5" /> (President's List!)
-                        <elseif case="{var:student_val[GPA]} >= 3.0" /> (Dean's List!)
+                        <else if case="{var:student_val[GPA]} >= 3.5"> (President's List!)
+                        <else if case="{var:student_val[GPA]} >= 3.0"> (Dean's List!)
                         </if>
                     </span>
                 </li>
