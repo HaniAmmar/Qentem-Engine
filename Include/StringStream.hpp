@@ -315,6 +315,21 @@ struct StringStream {
         return str;
     }
 
+    void InsertNull() {
+        const SizeT len = Length();
+
+        if (Capacity() == Length()) {
+            expand(Length() + SizeT{1});
+        }
+
+        Storage()[len] = Char_T{0};
+    }
+
+    StringView<Char_T> GetStringView() {
+        InsertNull();
+        return StringView<Char_T>{First(), Length()};
+    }
+
     inline Char_T *Storage() const noexcept {
         return storage_;
     }
