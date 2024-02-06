@@ -359,11 +359,10 @@ struct ValueData<Char_T, VObjectT, VArrayT, VStringT, false> {
 
 template <typename Char_T>
 struct Value {
-    using JSONotation  = JSONUtils::JSONotation_T<Char_T>;
-    using VObjectT     = HArray<Value, Char_T>;
-    using VArrayT      = Array<Value>;
-    using VStringT     = String<Char_T>;
-    using VStringViewT = StringView<Char_T>;
+    using JSONotation = JSONUtils::JSONotation_T<Char_T>;
+    using VObjectT    = HArray<Value, Char_T>;
+    using VArrayT     = Array<Value>;
+    using VStringT    = String<Char_T>;
 
     Value() noexcept  = default;
     ~Value() noexcept = default;
@@ -727,7 +726,7 @@ struct Value {
         return (data_.VObject[key]);
     }
 
-    inline Value &operator[](const VStringViewT &key) {
+    inline Value &operator[](const StringView<Char_T> &key) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
@@ -798,7 +797,7 @@ struct Value {
         return (data_.VObject.Get(key, length));
     }
 
-    inline Value &Get(const VStringViewT &key) {
+    inline Value &Get(const StringView<Char_T> &key) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
@@ -1207,7 +1206,7 @@ struct Value {
         }
     }
 
-    Value *GetValue(const VStringViewT &key) const noexcept {
+    Value *GetValue(const StringView<Char_T> &key) const noexcept {
         return GetValue(key.First(), key.Length());
     }
 
