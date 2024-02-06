@@ -23,7 +23,6 @@
 #ifndef QENTEM_STRING_VIEW_H
 #define QENTEM_STRING_VIEW_H
 
-#include "QPointer.hpp"
 #include "StringUtils.hpp"
 
 namespace Qentem {
@@ -32,55 +31,20 @@ template <typename, bool>
 struct StringViewData;
 
 template <typename Char_T>
-struct StringViewData<Char_T, false> {
-    // Little-Endian
-    StringViewData() noexcept  = default;
-    ~StringViewData() noexcept = default;
-
-    StringViewData(StringViewData &&src) noexcept
-        : Length{src.Length}, Padding{src.Padding}, Storage{Memory::Move(src.Storage)} {
-        src.Length = 0;
-    }
-
-    StringViewData(const StringViewData &)            = delete;
-    StringViewData &operator=(StringViewData &&)      = delete;
-    StringViewData &operator=(const StringViewData &) = delete;
-
-    SizeT                  Length{0};
-    SizeT                  Padding{0};
-    QPointer<const Char_T> Storage{};
-};
-
-template <typename Char_T>
-struct StringViewData<Char_T, true> {
-    // Big-Endian
-    StringViewData() noexcept  = default;
-    ~StringViewData() noexcept = default;
-
-    StringViewData(StringViewData &&src) noexcept
-        : Storage{Memory::Move(src.Storage)}, Padding{src.Padding}, Length{src.Length} {
-        src.Length = SizeT{0};
-    }
-
-    StringViewData(const StringViewData &)            = delete;
-    StringViewData &operator=(StringViewData &&)      = delete;
-    StringViewData &operator=(const StringViewData &) = delete;
-
-    QPointer<const Char_T> Storage{};
-    SizeT                  Padding{0};
-    SizeT                  Length{0};
-};
-
-template <typename Char_T>
 struct StringView {
     using CharType = Char_T;
 
-    StringView() noexcept                 = default;
-    StringView(StringView &&src) noexcept = default;
-    ~StringView() noexcept                = default;
+    StringView() noexcept  = default;
+    ~StringView() noexcept = default;
+
+    StringView(StringView &&src) noexcept : length_{src.Length()}, storage_{src.First()} {
+        src.clearLength();
+        src.clearStorage();
+    }
 
     StringView(const StringView &src) {
-        data_.Length = src.data_.Length;
+        setLength(src.Length());
+        setStorage(src.First());
     }
 
     StringView(const Char_T *str, SizeT len) {
@@ -96,8 +60,9 @@ struct StringView {
     StringView &operator=(StringView &&src) noexcept {
         if (this != &src) {
             setLength(src.Length());
-            data_.Storage.MovePointerOnly(src.data_.Storage);
+            setStorage(src.First());
             src.clearLength();
+            src.clearStorage();
         }
 
         return *this;
@@ -190,11 +155,11 @@ struct StringView {
     }
 
     inline SizeT Length() const noexcept {
-        return data_.Length;
+        return length_;
     }
 
     inline const Char_T *First() const noexcept {
-        return data_.Storage.GetPointer();
+        return storage_;
     }
 
     inline const Char_T *Last() const noexcept {
@@ -217,22 +182,6 @@ struct StringView {
         return !(IsEmpty());
     }
 
-    inline SizeT8 GetHighByte() const noexcept {
-        return data_.Storage.GetHighByte();
-    }
-
-    inline void SetHighByte(SizeT8 byte) noexcept {
-        data_.Storage.SetHighByte(byte);
-    }
-
-    inline SizeT8 GetLowByte() const noexcept {
-        return data_.Storage.GetLowByte();
-    }
-
-    inline void SetLowByte(SizeT8 byte) noexcept {
-        data_.Storage.SetLowByte(byte);
-    }
-
     // For STL
     inline const Char_T *begin() const noexcept {
         return First();
@@ -246,22 +195,23 @@ struct StringView {
 
   private:
     void clearLength() noexcept {
-        data_.Length = SizeT{0};
+        length_ = SizeT{0};
     }
 
     void setLength(SizeT length) noexcept {
-        data_.Length = length;
+        length_ = length;
     }
 
     void setStorage(const Char_T *ptr) noexcept {
-        data_.Storage.SetPointer(ptr);
+        storage_ = ptr;
     }
 
     void clearStorage() noexcept {
-        data_.Storage.Reset();
+        storage_ = nullptr;
     }
 
-    StringViewData<Char_T, Config::IsBigEndian> data_;
+    SizeT         length_{0};
+    const Char_T *storage_{nullptr};
 };
 
 } // namespace Qentem
