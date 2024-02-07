@@ -106,16 +106,15 @@ struct StringStream {
         return *this;
     }
 
-    inline void operator+=(Char_T one_char) {
-        const SizeT len = Length();
+    inline void operator+=(const Char_T one_char) {
+        const SizeT new_length = (Length() + SizeT{1});
 
-        ++length_;
-
-        if (Capacity() == len) {
-            expand(length_);
+        if (Capacity() == Length()) {
+            expand(new_length);
         }
 
-        Storage()[len] = one_char;
+        Storage()[Length()] = one_char;
+        setLength(new_length);
     }
 
     inline void operator+=(const StringStream<Char_T> &stream) {
@@ -264,22 +263,24 @@ struct StringStream {
         }
     }
 
-    // Set the needed length to write directly to the buffer,
-    inline Char_T *Buffer(const SizeT len) {
-        const SizeT current_offset = Length();
-        length_ += len;
+    // Set the needed length to write directly to a returned buffer,
+    inline Char_T *Buffer(SizeT len) {
+        const SizeT new_length = (Length() + len);
 
-        if (length_ > Capacity()) {
-            expand(length_);
+        if (Capacity() < new_length) {
+            expand(new_length);
         }
 
-        return (Storage() + current_offset);
+        Char_T *str = (Storage() + Length());
+        setLength(new_length);
+
+        return str;
     }
 
     inline void Expect(SizeT len) {
         len += Length();
 
-        if (len > Capacity()) {
+        if (Capacity() < len) {
             expand(len);
         }
     }
@@ -302,32 +303,25 @@ struct StringStream {
     }
 
     String<Char_T> GetString() {
-        const SizeT len = Length();
-
-        if (Capacity() > len) {
-            Storage()[len] = Char_T{0};
+        if (Capacity() > Length()) {
+            const SizeT len     = Length();
+            Storage()[Length()] = Char_T{0};
             return String<Char_T>(Detach(), len);
         }
 
-        String<Char_T> str{First(), len};
+        String<Char_T> str{First(), Length()};
         Reset();
 
         return str;
     }
 
-    void InsertNull() {
-        const SizeT len = Length();
-
-        if (Capacity() == Length()) {
-            expand(Length() + SizeT{1});
-        }
-
-        Storage()[len] = Char_T{0};
-    }
-
     StringView<Char_T> GetStringView() {
         InsertNull();
         return StringView<Char_T>{First(), Length()};
+    }
+
+    void InsertNull() {
+        *this += Char_T{0};
     }
 
     inline Char_T *Storage() const noexcept {
@@ -401,32 +395,32 @@ struct StringStream {
         capacity_ = new_capacity;
     }
 
+    inline void write(const Char_T *str, const SizeT len) {
+        constexpr SizeT size       = sizeof(Char_T);
+        const SizeT     new_length = (Length() + len);
+
+        if (Capacity() < new_length) {
+            expand(new_length);
+        }
+
+        Memory::Copy((Storage() + Length()), str, (len * size));
+        setLength(new_length);
+    }
+
+    void expand(const SizeT new_capacity) {
+        constexpr SizeT size = sizeof(Char_T);
+        Char_T         *str  = Storage();
+
+        allocate(new_capacity * SizeT{4});
+
+        Memory::Copy(Storage(), str, (Length() * size));
+        Memory::Deallocate(str);
+    }
+
     void allocate(SizeT size) {
         size = Memory::AlignSize(size);
         setCapacity(size);
         setStorage(Memory::Allocate<Char_T>(size));
-    }
-
-    inline void write(const Char_T *str, const SizeT len) {
-        constexpr SizeT32 size           = sizeof(Char_T);
-        const SizeT       current_offset = Length();
-        length_ += len;
-
-        if (Capacity() < length_) {
-            expand(length_);
-        }
-
-        Memory::Copy((Storage() + current_offset), str, (len * size));
-    }
-
-    void expand(const SizeT new_capacity) {
-        constexpr SizeT32 size    = sizeof(Char_T);
-        const SizeT       src_cap = Capacity();
-        Char_T           *str     = Storage();
-        allocate(new_capacity * SizeT{4});
-
-        Memory::Copy(Storage(), str, (src_cap * size));
-        Memory::Deallocate(str);
     }
 
     Char_T *storage_{nullptr};
