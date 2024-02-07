@@ -78,7 +78,7 @@ using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 #endif
 
 #ifndef QENTEM_TEMPLATE_PRECISION
-#define QENTEM_TEMPLATE_PRECISION 3U
+#define QENTEM_TEMPLATE_PRECISION 6U
 #endif
 ///////////////////////////////////////////////
 struct Config {
