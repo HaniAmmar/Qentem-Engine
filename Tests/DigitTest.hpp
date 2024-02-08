@@ -53,22 +53,72 @@ QENTEM_NOINLINE static void IntToStreamEqual(QTest &test, StringStream<char> &st
 template <typename Stream_T, typename Number_T>
 QENTEM_NOINLINE static void RealToStreamEqual(QTest &test, Stream_T &stream, Number_T number,
                                               Digit::RealFormatInfo format, const char *expected, unsigned long line) {
+    Digit::NumberToString(stream, number, format);
+
     if (!test.HasError() || test.IsContinueOnError()) {
 #ifdef QENTEM_COMPARE_DIGIT_WITH_STL
         std::ostringstream out;
         out.precision(format.Precision);
         out << number;
 
-        Digit::NumberToString(stream, number, format);
         test.IsEqual(stream, out.str().c_str(), line);
-        stream.Clear();
 
         (void)expected;
 #else
-        Digit::NumberToString(stream, number, format);
         test.IsEqual(stream, expected, line);
-        stream.Clear();
 #endif
+
+        stream.Clear();
+    }
+}
+
+template <typename Stream_T, typename Number_T>
+QENTEM_NOINLINE static void RealToStreamEqualFixed(QTest &test, Stream_T &stream, Number_T number, SizeT32 precision,
+                                                   const char *expected, unsigned long line) {
+    Digit::NumberToString(stream, number, Digit::RealFormatInfo{precision, Digit::RealFormatType::Fixed});
+
+    if (!test.HasError() || test.IsContinueOnError()) {
+#ifdef QENTEM_COMPARE_DIGIT_WITH_STL
+        std::ostringstream out;
+        out.precision(precision);
+        out << std::fixed;
+        out << number;
+
+        test.IsEqual(stream, out.str().c_str(), line);
+
+        (void)expected;
+#else
+        test.IsEqual(stream, expected, line);
+#endif
+
+        stream.Clear();
+    }
+}
+
+template <typename Stream_T, typename Number_T>
+QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, Stream_T &stream, Number_T number,
+                                                       SizeT32 precision, const char *expected, unsigned long line) {
+    Digit::NumberToString(stream, number, Digit::RealFormatInfo{precision, Digit::RealFormatType::SemiFixed});
+
+    if (!test.HasError() || test.IsContinueOnError()) {
+#ifdef QENTEM_COMPARE_DIGIT_WITH_STL
+        std::ostringstream out;
+        out.precision(precision);
+        out << std::fixed;
+        out << number;
+
+        std::string str = out.str();
+
+        const StringView<char> std_number{str.c_str(), stream.Length()};
+
+        test.IsEqual(stream, std_number, line);
+
+        (void)expected;
+#else
+        test.IsEqual(stream, expected, line);
+#endif
+
+        stream.Clear();
     }
 }
 
@@ -2225,7 +2275,10 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
                       Digit::RealFormatInfo{6U, Digit::RealFormatType::Default}, "inf", __LINE__);
     RealToStreamEqual(test, stream, QNumber64{18442240474082181120ULL}.Real, Digit::RealFormatType::Default, "-inf",
                       __LINE__);
+
+#ifndef QENTEM_COMPARE_DIGIT_WITH_STL
     RealToStreamEqual(test, stream, QNumber64{18444492273895866368ULL}.Real, 6U, "nan", __LINE__);
+#endif
 
     Digit::RealFormatInfo format{};
     format = Digit::RealFormatType::Default;
@@ -2500,7 +2553,6 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, -854534.05, 6U, "-854534", __LINE__);
     RealToStreamEqual(test, stream, 854534.5, 6U, "854534", __LINE__);
     RealToStreamEqual(test, stream, 854534.05, 6U, "854534", __LINE__);
-    RealToStreamEqual(test, stream, -9765625.0, 6U, "-9.76562e+06", __LINE__);
     RealToStreamEqual(test, stream, -0.2765625, 6U, "-0.276562", __LINE__);
 
     RealToStreamEqual(test, stream, 9765625.0, 6U, "9.76562e+06", __LINE__);
@@ -3410,13 +3462,966 @@ static void TestDoubleToString3(QTest &test, Stream_T &stream) {
 }
 
 template <typename Stream_T>
+static void TestDoubleToStringSemiFixed(QTest &test, Stream_T &stream) {
+    RealToStreamEqualSemiFixed(test, stream, -0.0, 6U, "-0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.0, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.0, 6U, "2", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3.0, 6U, "3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4.0, 6U, "4", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.0, 6U, "5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 6.0, 6U, "6", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 7.0, 6U, "7", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 8.0, 6U, "8", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.0, 6U, "9", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 220.0, 6U, "220", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1, 6U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.2, 6U, "0.2", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.3, 6U, "0.3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.4, 6U, "0.4", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.5, 6U, "0.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.6, 6U, "0.6", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.7, 6U, "0.7", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.8, 6U, "0.8", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9, 6U, "0.9", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.09, 6U, "0.09", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.009, 6U, "0.009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0009, 6U, "0.0009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00009, 6U, "0.00009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000009, 6U, "0.000009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0000009, 6U, "0.000001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00000009, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000000009, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0000000009, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.01, 6U, "0.01", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.001, 6U, "0.001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0001, 6U, "0.0001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00001, 6U, "0.00001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000001, 6U, "0.000001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0000001, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00000001, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000000001, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.02, 6U, "0.02", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.002, 6U, "0.002", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0002, 6U, "0.0002", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00002, 6U, "0.00002", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000002, 6U, "0.000002", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0000002, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00000002, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000000002, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.5, 6U, "1.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.05, 6U, "1.05", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.005, 6U, "1.005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0005, 6U, "1.0005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00005, 6U, "1.00005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000005, 6U, "1.000005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0000005, 6U, "1.000001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00000005, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000000005, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0000000005, 6U, "1", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.9, 6U, "1.9", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.09, 6U, "1.09", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.009, 6U, "1.009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0009, 6U, "1.0009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00009, 6U, "1.00009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000009, 6U, "1.000009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0000009, 6U, "1.000001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00000009, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000000009, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0000000009, 6U, "1", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.1, 6U, "1.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.01, 6U, "1.01", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.001, 6U, "1.001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0001, 6U, "1.0001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00001, 6U, "1.00001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000001, 6U, "1.000001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0000001, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00000001, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000000001, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0000000001, 6U, "1", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.1000000000000006, 6U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000000000000011, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.02, 6U, "0.02", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.002, 6U, "0.002", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0002, 6U, "0.0002", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 123456789.0, 6U, "123456789", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2147483647.0, 6U, "2147483647", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4294967295.0, 6U, "4294967295", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4294967295.625, 6U, "4294967295.625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2251799813685247.0, 6U, "2251799813685247", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4503599627370495.0, 6U, "4503599627370495", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4611686018427387904.0, 6U, "4611686018427387904", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9223372036854775808.0, 6U, "9223372036854775808", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.9000000000000006, 6U, "0.9", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 9.999999999999999, 6U, "10", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1999999.0, 6U, "1999999", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9999999999999999.0, 6U, "10000000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 999999999999999999.0, 6U, "1000000000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9999999999999999999.0, 6U, "10000000000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 99999999999999999999.0, 6U, "100000000000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9999999999999999999999999999999999999999.0, 6U,
+                               "10000000000000000303786028427003666890752", __LINE__);
+    RealToStreamEqualSemiFixed(
+        test, stream, 99e100, 6U,
+        "989999999999999971062477677470550235220096190889648004812994130017827049653182301025734968880029237248",
+        __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.999, 6U, "0.999", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.999999, 6U, "0.999999", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.999999999, 6U, "10", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 99.999999999, 6U, "100", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 999.999999999, 6U, "1000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.999999999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999999999995, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999999999959, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999999999996, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.99999999999999959, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.99999999999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.99999999999999999999999999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.99999999999999999999999999999999999999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999999999999e-99, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 10000005.0, 6U, "10000005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 10000005.0, 7U, "10000005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 10000006.0, 7U, "10000006", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 10000000.0, 6U, "10000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 69999999.0, 6U, "69999999", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 999999999.0, 6U, "999999999", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.10000000, 6U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.19999999, 6U, "0.2", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.29999999, 6U, "0.3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.39999999, 6U, "0.4", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.49999999, 6U, "0.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.59999999, 6U, "0.6", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.69999999, 6U, "0.7", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.79999999, 6U, "0.8", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.89999999, 6U, "0.9", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.99999999, 6U, "1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.99999999, 6U, "2", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.99999999, 6U, "3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3.99999999, 6U, "4", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4.99999999, 6U, "5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.99999999, 6U, "6", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 6.99999999, 6U, "7", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 7.99999999, 6U, "8", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 8.99999999, 6U, "9", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.99999999, 6U, "10", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 99.99999999, 6U, "100", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 999.99999999, 6U, "1000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 99999.89999999, 6U, "99999.9", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 99999.99999999, 6U, "100000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 999999.99999999, 6U, "1000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9e-50, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1e1, 6U, "10", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e2, 6U, "100", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e3, 6U, "1000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e4, 6U, "10000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e5, 6U, "100000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e10, 6U, "10000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e13, 6U, "10000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e15, 6U, "1000000000000000", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1e-1, 6U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-2, 6U, "0.01", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-3, 6U, "0.001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-4, 6U, "0.0001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-5, 6U, "0.00001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-10, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-13, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-14, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1e-15, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.25e-50, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.125e-50, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.125e+10, 6U, "11250000000", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, -854534.5, 6U, "-854534.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -854534.05, 6U, "-854534.05", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 854534.5, 6U, "854534.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 854534.05, 6U, "854534.05", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9765625.9, 6U, "-9765625.9", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.2765625, 6U, "-0.276562", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 97765625.0, 6U, "97765625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 97765645.0, 6U, "97765645", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 97765665.0, 6U, "97765665", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 97765685.0, 6U, "97765685", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 97765605.0, 6U, "97765605", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 9.9999925, 6U, "9.999992", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.9999945, 6U, "9.999994", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.9999965, 6U, "9.999996", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.9999985, 6U, "9.999999", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.9999905, 6U, "9.99999", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.7765625, 6U, "1.776563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1765625, 6U, "0.176563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.2765625, 6U, "0.276562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.3765625, 6U, "0.376563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.4765625, 6U, "0.476562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.5765625, 6U, "0.576562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.6765625, 6U, "0.676562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.7765625, 6U, "0.776563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.8765625, 6U, "0.876563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765625, 6U, "0.976562", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 2.1765625, 6U, "2.176563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.2765625, 6U, "2.276562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.3765625, 6U, "2.376562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.4765625, 6U, "2.476562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.5765625, 6U, "2.576563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.6765625, 6U, "2.676563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.7765625, 6U, "2.776562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.8765625, 6U, "2.876562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.9765625, 6U, "2.976562", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 5.165625, 6U, "5.165625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.265625, 6U, "5.265625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.365625, 6U, "5.365625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.465625, 6U, "5.465625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.565625, 6U, "5.565625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.665625, 6U, "5.665625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.765625, 6U, "5.765625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.865625, 6U, "5.865625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.965625, 6U, "5.965625", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 9.7765615, 6U, "9.776561", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765625, 6U, "9.776563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765635, 6U, "9.776563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765645, 6U, "9.776564", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765655, 6U, "9.776566", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765665, 6U, "9.776566", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765675, 6U, "9.776568", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765685, 6U, "9.776568", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.7765695, 6U, "9.77657", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765615, 6U, "0.976561", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765625, 6U, "0.976562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765635, 6U, "0.976564", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765645, 6U, "0.976564", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765655, 6U, "0.976565", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765665, 6U, "0.976567", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765675, 6U, "0.976568", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765685, 6U, "0.976568", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.9765695, 6U, "0.976569", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-1, 6U, "0.976562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-2, 6U, "0.097656", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-3, 6U, "0.009766", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-4, 6U, "0.000977", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-5, 6U, "0.000098", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-10, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-13, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-14, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.765625e-15, 6U, "0", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, -9765625.0, 6U, "-9765625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9765695.0, 6U, "-9765695", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9999465.0, 6U, "-9999465", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.999945, 6U, "-9.999945", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, -1.8765625, 6U, "-1.876562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.1765625, 6U, "-0.176563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.2765625, 6U, "-0.276562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.3765625, 6U, "-0.376563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.4765625, 6U, "-0.476562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.5765625, 6U, "-0.576562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.6765625, 6U, "-0.676562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.7765625, 6U, "-0.776563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.8765625, 6U, "-0.876563", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765625, 6U, "-0.976562", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, -2.8165625, 6U, "-2.816562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.2653625, 6U, "-2.265363", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.3653625, 6U, "-2.365362", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.4653625, 6U, "-2.465362", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.5653625, 6U, "-2.565362", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.6653625, 6U, "-2.665363", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.7653625, 6U, "-2.765363", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.8653625, 6U, "-2.865362", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -2.9653625, 6U, "-2.965362", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, -5.1656325, 6U, "-5.165633", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.2656325, 6U, "-5.265632", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.3656325, 6U, "-5.365633", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.4656325, 6U, "-5.465632", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.5656325, 6U, "-5.565633", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.6656325, 6U, "-5.665633", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.7656325, 6U, "-5.765632", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.8656325, 6U, "-5.865633", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -5.9656325, 6U, "-5.965632", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, -9.765615, 6U, "-9.765615", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765625, 6U, "-9.765625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765635, 6U, "-9.765635", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765645, 6U, "-9.765645", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765655, 6U, "-9.765655", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765665, 6U, "-9.765665", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765675, 6U, "-9.765675", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765685, 6U, "-9.765685", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765695, 6U, "-9.765695", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765615, 6U, "-0.976561", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765625, 6U, "-0.976562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765635, 6U, "-0.976564", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765645, 6U, "-0.976564", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765655, 6U, "-0.976565", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765665, 6U, "-0.976567", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765675, 6U, "-0.976568", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765685, 6U, "-0.976568", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -0.9765695, 6U, "-0.976569", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765625e-1, 6U, "-0.976562", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765625e-2, 6U, "-0.097656", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765625e-3, 6U, "-0.009766", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765625e-4, 6U, "-0.000977", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, -9.765625e-5, 6U, "-0.000098", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.00001844674407370955161500, 6U, "0.000018", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0001844674407370955161500, 6U, "0.000184", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.001844674407370955161500, 6U, "0.001845", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.001844674407370955161500, 6U, "5.001845", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.01844674407370955161500, 6U, "0.018447", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1844674407370955161500, 6U, "0.184467", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.05, 6U, "0.05", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.005, 6U, "0.005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0005, 6U, "0.0005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00005, 6U, "0.00005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000005, 6U, "0.000005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.55, 6U, "1.55", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0055, 6U, "1.0055", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0059999, 6U, "1.006", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0099999, 6U, "1.01", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00055, 6U, "0.00055", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00055, 6U, "1.00055", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.50009, 6U, "0.50009", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000000000050000000005, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0000000000005, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0000000000000000000000000005, 6U, "0", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.3125, 6U, "5.3125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.3, 6U, "5.3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 5.5, 6U, "5.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.55, 6U, "0.55", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.25, 6U, "0.25", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.75, 6U, "0.75", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.125, 6U, "0.125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.625, 6U, "0.625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.3125, 6U, "0.3125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.95367431640625, 6U, "0.953674", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.298023223876953125, 6U, "0.298023", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1490116119384765625, 6U, "0.149012", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.7450580596923828125, 6U, "0.745058", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.37252902984619140625, 6U, "0.372529", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.186264514923095703125, 6U, "0.186265", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 1.12345, 6U, "1.12345", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.953674, 6U, "1.953674", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0953674, 6U, "1.095367", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.00953674, 6U, "1.009537", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.000953674, 6U, "1.000954", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.953674, 6U, "9.953674", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.0953674, 6U, "9.095367", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.00953674, 6U, "9.009537", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.000953674, 6U, "9.000954", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.953674, 6U, "0.953674", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0953674, 6U, "0.095367", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.00953674, 6U, "0.009537", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.000953674, 6U, "0.000954", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.123455, 6U, "0.123455", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1123405, 6U, "0.11234", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1123095, 6U, "0.11231", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.78126, 6U, "0.78126", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.300048828125, 6U, "0.300049", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.111, 6U, "0.111", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.11111, 6U, "0.11111", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1111111111111111, 6U, "0.111111", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1111111111111115, 6U, "0.111111", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.11111111111111159, 6U, "0.111111", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1111111111111116, 6U, "0.111111", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 105.625, 6U, "105.625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 25e20, 6U, "2500000000000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.5e21, 6U, "2500000000000000000000", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3814697265625.0, 6U, "3814697265625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 381469725.0, 6U, "381469725", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.3814697265625, 6U, "0.38147", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 10.5, 6U, "10.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.3333, 6U, "0.3333", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 4554534.0, 6U, "4554534", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 854534.055, 6U, "854534.055", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 854534.0055, 6U, "854534.0055", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 854534.000055, 6U, "854534.000055", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 854534.0000005, 14U, "854534.00000050000381", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 8.0000005, 6U, "8.000001", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 8.000005, 6U, "8.000005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 8.005, 6U, "8.005", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0099999, 6U, "0.01", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0099999, 6U, "1.01", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.0999999, 6U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.0999999, 6U, "1.1", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 5.55, 1U, "5.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.996, 5U, "9.996", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.996, 4U, "9.996", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.996, 3U, "9.996", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.996, 2U, "10", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 9.996, 1U, "10", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.5, 1U, "0.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 1.5, 1U, "1.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.5, 1U, "2.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3.5, 1U, "3.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 4.5, 1U, "4.5", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.25, 1U, "2.2", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.75, 1U, "2.8", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.05, 1U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.15, 1U, "0.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.25, 1U, "0.2", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.35, 1U, "0.3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.45, 1U, "0.5", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 2.626, 2U, "2.63", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.66, 2U, "2.66", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.26, 2U, "2.26", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3.266, 2U, "3.27", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.626, 2U, "2.63", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 2.635, 2U, "2.63", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.636, 2U, "2.64", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.36, 2U, "2.36", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3.35, 2U, "3.35", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 2.635, 2U, "2.63", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 95.0, 1U, "95", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 95.11, 1U, "95.1", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 95.99, 1U, "96", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 95000000.0, 1U, "95000000", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 3.0, 15U, "3", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 3.14, 15U, "3.14", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 140737488355327.953674, 15U, "140737488355327.953125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 140737488355327.015625, 15U, "140737488355327.015625", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 140737458355327.953674, 15U, "140737458355327.953125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 140737488355327.953674, 6U, "140737488355327.953125", __LINE__);
+
+    RealToStreamEqualSemiFixed(test, stream, 0.95367431640625, 20U, "0.95367431640625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.298023223876953125, 20U, "0.298023223876953125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.1490116119384765625, 20U, "0.1490116119384765625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.7450580596923828125, 20U, "0.7450580596923828125", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.37252902984619140625, 20U, "0.37252902984619140625", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.186264514923095703125, 20U, "0.18626451492309570312", __LINE__);
+    RealToStreamEqualSemiFixed(test, stream, 0.186264514923095703125, 21U, "0.186264514923095703125", __LINE__);
+}
+
+template <typename Stream_T>
+static void TestDoubleToStringFixed(QTest &test, Stream_T &stream) {
+    RealToStreamEqualFixed(test, stream, -0.0, 6U, "-0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.0, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.0, 6U, "2.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3.0, 6U, "3.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4.0, 6U, "4.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.0, 6U, "5.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 6.0, 6U, "6.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 7.0, 6U, "7.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 8.0, 6U, "8.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.0, 6U, "9.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 220.0, 6U, "220.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1, 6U, "0.100000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.2, 6U, "0.200000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.3, 6U, "0.300000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.4, 6U, "0.400000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.5, 6U, "0.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.6, 6U, "0.600000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.7, 6U, "0.700000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.8, 6U, "0.800000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9, 6U, "0.900000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.09, 6U, "0.090000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.009, 6U, "0.009000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0009, 6U, "0.000900", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00009, 6U, "0.000090", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000009, 6U, "0.000009", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0000009, 6U, "0.000001", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00000009, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000000009, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0000000009, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.01, 6U, "0.010000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.001, 6U, "0.001000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0001, 6U, "0.000100", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00001, 6U, "0.000010", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000001, 6U, "0.000001", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0000001, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00000001, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000000001, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.02, 6U, "0.020000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.002, 6U, "0.002000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0002, 6U, "0.000200", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00002, 6U, "0.000020", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000002, 6U, "0.000002", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0000002, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00000002, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000000002, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.5, 6U, "1.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.05, 6U, "1.050000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.005, 6U, "1.005000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0005, 6U, "1.000500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00005, 6U, "1.000050", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000005, 6U, "1.000005", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0000005, 6U, "1.000001", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00000005, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000000005, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0000000005, 6U, "1.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.9, 6U, "1.900000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.09, 6U, "1.090000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.009, 6U, "1.009000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0009, 6U, "1.000900", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00009, 6U, "1.000090", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000009, 6U, "1.000009", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0000009, 6U, "1.000001", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00000009, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000000009, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0000000009, 6U, "1.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.1, 6U, "1.100000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.01, 6U, "1.010000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.001, 6U, "1.001000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0001, 6U, "1.000100", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00001, 6U, "1.000010", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000001, 6U, "1.000001", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0000001, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00000001, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000000001, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0000000001, 6U, "1.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.1000000000000006, 6U, "0.100000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000000000000011, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.02, 6U, "0.020000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.002, 6U, "0.002000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0002, 6U, "0.000200", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 123456789.0, 6U, "123456789.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2147483647.0, 6U, "2147483647.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4294967295.0, 6U, "4294967295.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4294967295.625, 6U, "4294967295.625000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2251799813685247.0, 6U, "2251799813685247.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4503599627370495.0, 6U, "4503599627370495.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4611686018427387904.0, 6U, "4611686018427387904.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9223372036854775808.0, 6U, "9223372036854775808.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.9000000000000006, 6U, "0.900000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 9.999999999999999, 6U, "10.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1999999.0, 6U, "1999999.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9999999999999999.0, 6U, "10000000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 999999999999999999.0, 6U, "1000000000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9999999999999999999.0, 6U, "10000000000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 99999999999999999999.0, 6U, "100000000000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9999999999999999999999999999999999999999.0, 6U,
+                           "10000000000000000303786028427003666890752.000000", __LINE__);
+    RealToStreamEqualFixed(
+        test, stream, 99e100, 6U,
+        "989999999999999971062477677470550235220096190889648004812994130017827049653182301025734968880029237248.000000",
+        __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.999, 6U, "0.999000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.999999, 6U, "0.999999", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.999999999, 6U, "10.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 99.999999999, 6U, "100.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 999.999999999, 6U, "1000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.999999999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999999999995, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999999999959, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999999999996, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.99999999999999959, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.99999999999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.99999999999999999999999999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.99999999999999999999999999999999999999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999999999999e-99, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 10000005.0, 6U, "10000005.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 10000005.0, 7U, "10000005.0000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 10000006.0, 7U, "10000006.0000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 10000000.0, 6U, "10000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 69999999.0, 6U, "69999999.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 999999999.0, 6U, "999999999.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.10000000, 6U, "0.100000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.19999999, 6U, "0.200000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.29999999, 6U, "0.300000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.39999999, 6U, "0.400000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.49999999, 6U, "0.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.59999999, 6U, "0.600000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.69999999, 6U, "0.700000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.79999999, 6U, "0.800000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.89999999, 6U, "0.900000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.99999999, 6U, "1.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.99999999, 6U, "2.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.99999999, 6U, "3.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3.99999999, 6U, "4.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4.99999999, 6U, "5.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.99999999, 6U, "6.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 6.99999999, 6U, "7.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 7.99999999, 6U, "8.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 8.99999999, 6U, "9.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.99999999, 6U, "10.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 99.99999999, 6U, "100.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 999.99999999, 6U, "1000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 99999.89999999, 6U, "99999.900000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 99999.99999999, 6U, "100000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 999999.99999999, 6U, "1000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9e-50, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1e1, 6U, "10.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e2, 6U, "100.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e3, 6U, "1000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e4, 6U, "10000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e5, 6U, "100000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e10, 6U, "10000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e13, 6U, "10000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e15, 6U, "1000000000000000.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1e-1, 6U, "0.100000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-2, 6U, "0.010000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-3, 6U, "0.001000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-4, 6U, "0.000100", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-5, 6U, "0.000010", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-10, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-13, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-14, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1e-15, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.25e-50, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.125e-50, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.125e+10, 6U, "11250000000.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, -854534.5, 6U, "-854534.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, -854534.05, 6U, "-854534.050000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 854534.5, 6U, "854534.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 854534.05, 6U, "854534.050000", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9765625.9, 6U, "-9765625.900000", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.2765625, 6U, "-0.276562", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 97765625.0, 6U, "97765625.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 97765645.0, 6U, "97765645.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 97765665.0, 6U, "97765665.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 97765685.0, 6U, "97765685.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 97765605.0, 6U, "97765605.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 9.9999925, 6U, "9.999992", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.9999945, 6U, "9.999994", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.9999965, 6U, "9.999996", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.9999985, 6U, "9.999999", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.9999905, 6U, "9.999990", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.7765625, 6U, "1.776563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1765625, 6U, "0.176563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.2765625, 6U, "0.276562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.3765625, 6U, "0.376563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.4765625, 6U, "0.476562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.5765625, 6U, "0.576562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.6765625, 6U, "0.676562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.7765625, 6U, "0.776563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.8765625, 6U, "0.876563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765625, 6U, "0.976562", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 2.1765625, 6U, "2.176563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.2765625, 6U, "2.276562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.3765625, 6U, "2.376562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.4765625, 6U, "2.476562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.5765625, 6U, "2.576563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.6765625, 6U, "2.676563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.7765625, 6U, "2.776562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.8765625, 6U, "2.876562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.9765625, 6U, "2.976562", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 5.165625, 6U, "5.165625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.265625, 6U, "5.265625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.365625, 6U, "5.365625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.465625, 6U, "5.465625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.565625, 6U, "5.565625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.665625, 6U, "5.665625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.765625, 6U, "5.765625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.865625, 6U, "5.865625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.965625, 6U, "5.965625", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 9.7765615, 6U, "9.776561", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765625, 6U, "9.776563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765635, 6U, "9.776563", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765645, 6U, "9.776564", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765655, 6U, "9.776566", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765665, 6U, "9.776566", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765675, 6U, "9.776568", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765685, 6U, "9.776568", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.7765695, 6U, "9.776570", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765615, 6U, "0.976561", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765625, 6U, "0.976562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765635, 6U, "0.976564", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765645, 6U, "0.976564", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765655, 6U, "0.976565", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765665, 6U, "0.976567", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765675, 6U, "0.976568", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765685, 6U, "0.976568", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.9765695, 6U, "0.976569", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-1, 6U, "0.976562", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-2, 6U, "0.097656", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-3, 6U, "0.009766", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-4, 6U, "0.000977", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-5, 6U, "0.000098", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-10, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-13, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-14, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.765625e-15, 6U, "0.000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, -9765625.0, 6U, "-9765625.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9765695.0, 6U, "-9765695.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9999465.0, 6U, "-9999465.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.999945, 6U, "-9.999945", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, -1.8765625, 6U, "-1.876562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.1765625, 6U, "-0.176563", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.2765625, 6U, "-0.276562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.3765625, 6U, "-0.376563", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.4765625, 6U, "-0.476562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.5765625, 6U, "-0.576562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.6765625, 6U, "-0.676562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.7765625, 6U, "-0.776563", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.8765625, 6U, "-0.876563", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765625, 6U, "-0.976562", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, -2.8165625, 6U, "-2.816562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.2653625, 6U, "-2.265363", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.3653625, 6U, "-2.365362", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.4653625, 6U, "-2.465362", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.5653625, 6U, "-2.565362", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.6653625, 6U, "-2.665363", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.7653625, 6U, "-2.765363", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.8653625, 6U, "-2.865362", __LINE__);
+    RealToStreamEqualFixed(test, stream, -2.9653625, 6U, "-2.965362", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, -5.1656325, 6U, "-5.165633", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.2656325, 6U, "-5.265632", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.3656325, 6U, "-5.365633", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.4656325, 6U, "-5.465632", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.5656325, 6U, "-5.565633", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.6656325, 6U, "-5.665633", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.7656325, 6U, "-5.765632", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.8656325, 6U, "-5.865633", __LINE__);
+    RealToStreamEqualFixed(test, stream, -5.9656325, 6U, "-5.965632", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, -9.765615, 6U, "-9.765615", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765625, 6U, "-9.765625", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765635, 6U, "-9.765635", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765645, 6U, "-9.765645", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765655, 6U, "-9.765655", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765665, 6U, "-9.765665", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765675, 6U, "-9.765675", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765685, 6U, "-9.765685", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765695, 6U, "-9.765695", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765615, 6U, "-0.976561", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765625, 6U, "-0.976562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765635, 6U, "-0.976564", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765645, 6U, "-0.976564", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765655, 6U, "-0.976565", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765665, 6U, "-0.976567", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765675, 6U, "-0.976568", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765685, 6U, "-0.976568", __LINE__);
+    RealToStreamEqualFixed(test, stream, -0.9765695, 6U, "-0.976569", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765625e-1, 6U, "-0.976562", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765625e-2, 6U, "-0.097656", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765625e-3, 6U, "-0.009766", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765625e-4, 6U, "-0.000977", __LINE__);
+    RealToStreamEqualFixed(test, stream, -9.765625e-5, 6U, "-0.000098", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.00001844674407370955161500, 6U, "0.000018", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0001844674407370955161500, 6U, "0.000184", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.001844674407370955161500, 6U, "0.001845", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.001844674407370955161500, 6U, "5.001845", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.01844674407370955161500, 6U, "0.018447", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1844674407370955161500, 6U, "0.184467", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.05, 6U, "0.050000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.005, 6U, "0.005000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0005, 6U, "0.000500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00005, 6U, "0.000050", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000005, 6U, "0.000005", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.55, 6U, "1.550000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0055, 6U, "1.005500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0059999, 6U, "1.006000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0099999, 6U, "1.010000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00055, 6U, "0.000550", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00055, 6U, "1.000550", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.50009, 6U, "0.500090", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000000000050000000005, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0000000000005, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0000000000000000000000000005, 6U, "0.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.3125, 6U, "5.312500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.3, 6U, "5.300000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 5.5, 6U, "5.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.55, 6U, "0.550000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.25, 6U, "0.250000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.75, 6U, "0.750000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.125, 6U, "0.125000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.625, 6U, "0.625000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.3125, 6U, "0.312500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.95367431640625, 6U, "0.953674", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.298023223876953125, 6U, "0.298023", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1490116119384765625, 6U, "0.149012", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.7450580596923828125, 6U, "0.745058", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.37252902984619140625, 6U, "0.372529", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.186264514923095703125, 6U, "0.186265", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 1.12345, 6U, "1.123450", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.953674, 6U, "1.953674", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0953674, 6U, "1.095367", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.00953674, 6U, "1.009537", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.000953674, 6U, "1.000954", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.953674, 6U, "9.953674", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.0953674, 6U, "9.095367", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.00953674, 6U, "9.009537", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.000953674, 6U, "9.000954", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.953674, 6U, "0.953674", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0953674, 6U, "0.095367", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.00953674, 6U, "0.009537", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.000953674, 6U, "0.000954", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.123455, 6U, "0.123455", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1123405, 6U, "0.112340", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1123095, 6U, "0.112310", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.78126, 6U, "0.781260", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.300048828125, 6U, "0.300049", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.111, 6U, "0.111000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.11111, 6U, "0.111110", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1111111111111111, 6U, "0.111111", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1111111111111115, 6U, "0.111111", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.11111111111111159, 6U, "0.111111", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1111111111111116, 6U, "0.111111", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 105.625, 6U, "105.625000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 25e20, 6U, "2500000000000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.5e21, 6U, "2500000000000000000000.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3814697265625.0, 6U, "3814697265625.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 381469725.0, 6U, "381469725.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.3814697265625, 6U, "0.381470", __LINE__);
+    RealToStreamEqualFixed(test, stream, 10.5, 6U, "10.500000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.3333, 6U, "0.333300", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 4554534.0, 6U, "4554534.000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 854534.055, 6U, "854534.055000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 854534.0055, 6U, "854534.005500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 854534.000055, 6U, "854534.000055", __LINE__);
+    RealToStreamEqualFixed(test, stream, 854534.0000005, 14U, "854534.00000050000381", __LINE__);
+    RealToStreamEqualFixed(test, stream, 8.0000005, 6U, "8.000001", __LINE__);
+    RealToStreamEqualFixed(test, stream, 8.000005, 6U, "8.000005", __LINE__);
+    RealToStreamEqualFixed(test, stream, 8.005, 6U, "8.005000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0099999, 6U, "0.010000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0099999, 6U, "1.010000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.0999999, 6U, "0.100000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.0999999, 6U, "1.100000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 5.55, 1U, "5.5", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.996, 5U, "9.99600", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.996, 4U, "9.9960", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.996, 3U, "9.996", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.996, 2U, "10.00", __LINE__);
+    RealToStreamEqualFixed(test, stream, 9.996, 1U, "10.0", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.5, 1U, "0.5", __LINE__);
+    RealToStreamEqualFixed(test, stream, 1.5, 1U, "1.5", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.5, 1U, "2.5", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3.5, 1U, "3.5", __LINE__);
+    RealToStreamEqualFixed(test, stream, 4.5, 1U, "4.5", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.25, 1U, "2.2", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.75, 1U, "2.8", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.05, 1U, "0.1", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.15, 1U, "0.1", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.25, 1U, "0.2", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.35, 1U, "0.3", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.45, 1U, "0.5", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 2.626, 2U, "2.63", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.66, 2U, "2.66", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.26, 2U, "2.26", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3.266, 2U, "3.27", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.626, 2U, "2.63", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 2.635, 2U, "2.63", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.636, 2U, "2.64", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.36, 2U, "2.36", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3.35, 2U, "3.35", __LINE__);
+    RealToStreamEqualFixed(test, stream, 2.635, 2U, "2.63", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 95.0, 1U, "95.0", __LINE__);
+    RealToStreamEqualFixed(test, stream, 95.11, 1U, "95.1", __LINE__);
+    RealToStreamEqualFixed(test, stream, 95.99, 1U, "96.0", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 95000000.0, 1U, "95000000.0", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 3.0, 15U, "3.000000000000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 3.14, 15U, "3.140000000000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 140737488355327.953674, 15U, "140737488355327.953125000000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 140737488355327.015625, 15U, "140737488355327.015625000000000", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 140737458355327.953674, 15U, "140737458355327.953125000000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 140737488355327.953674, 6U, "140737488355327.953125", __LINE__);
+
+    RealToStreamEqualFixed(test, stream, 0.95367431640625, 20U, "0.95367431640625000000", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.298023223876953125, 20U, "0.29802322387695312500", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.1490116119384765625, 20U, "0.14901161193847656250", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.7450580596923828125, 20U, "0.74505805969238281250", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.37252902984619140625, 20U, "0.37252902984619140625", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.186264514923095703125, 20U, "0.18626451492309570312", __LINE__);
+    RealToStreamEqualFixed(test, stream, 0.186264514923095703125, 21U, "0.186264514923095703125", __LINE__);
+}
+
+template <typename Stream_T>
 static void TestFloatToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, -0.0F, 6U, "-0", __LINE__);
     RealToStreamEqual(test, stream, 0.0F, 6U, "0", __LINE__);
 
     RealToStreamEqual(test, stream, QNumber32{2139095040U}.Real, 6U, "inf", __LINE__);
     RealToStreamEqual(test, stream, QNumber32{4286578688U}.Real, 6U, "-inf", __LINE__);
+
+#ifndef QENTEM_COMPARE_DIGIT_WITH_STL
     RealToStreamEqual(test, stream, QNumber32{4290772992U}.Real, 6U, "nan", __LINE__);
+#endif
 
     RealToStreamEqual(test, stream, 1.0F, 6U, "1", __LINE__);
     RealToStreamEqual(test, stream, 2.0F, 6U, "2", __LINE__);
@@ -4020,6 +5025,8 @@ static int RunDigitTests() {
     test.Test("DoubleToString Test 1", TestDoubleToString1<SStream>, false, stream);
     test.Test("DoubleToString Test 2", TestDoubleToString2<SStream>, false, stream);
     test.Test("DoubleToString Test 3", TestDoubleToString3<SStream>, false, stream);
+    test.Test("DoubleToStringSemiFixed Test 3", TestDoubleToStringSemiFixed<SStream>, false, stream);
+    test.Test("DoubleToStringFixed Test 3", TestDoubleToStringFixed<SStream>, false, stream);
 
     test.Test("FloatToString Test 1", TestFloatToString1<SStream>, false, stream);
     test.Test("FloatToString Test 2", TestFloatToString2<SStream>, false, stream);

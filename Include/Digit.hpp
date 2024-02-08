@@ -33,7 +33,11 @@ namespace Qentem {
  * For converting numbers from and to strings.
  */
 struct Digit {
-    enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, Scientific = 2 };
+    // Default: same as std::defaultfloat.
+    // Fixed: same as std::fixed.
+    // SemiFixed: same as std::fixed, but do not insert zeros.
+    // Scientific: not implemented.
+    enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, SemiFixed = 2, Scientific = 3 };
 
     struct RealFormatInfo {
         RealFormatInfo() noexcept {
@@ -749,10 +753,12 @@ struct Digit {
                 const SizeT32 exp_actual_value = (positive_exp + ((bias == Number_T{0}) * first_bit));
                 const SizeT32 digits           = (((exp_actual_value * 30103U) / 100000U) + 1U);
                 SizeT32       fraction_length  = 0;
-                const bool    extra_digits     = (digits > format.Precision);
-                bool          round_up         = false;
-                const bool    big_offset       = (positive_exp >= first_bit);
-                const bool    no_fraction      = (is_positive_exp & (big_offset | extra_digits));
+                const bool    fixed =
+                    ((format.Type == RealFormatType::SemiFixed) | (format.Type == RealFormatType::Fixed));
+                const bool extra_digits = ((digits > format.Precision) & !fixed);
+                const bool big_offset   = (positive_exp >= first_bit);
+                const bool no_fraction  = (is_positive_exp & (big_offset | extra_digits));
+                bool       round_up     = false;
                 /////////////////////////////////////
                 if (no_fraction) {
                     const SizeT32 drop    = ((!extra_digits) ? 0U : (digits - (format.Precision + 1U)));
@@ -775,7 +781,12 @@ struct Digit {
 
                     if (is_positive_exp) {
                         fraction_length -= positive_exp;
-                        needed = (format.Precision - digits);
+
+                        if (fixed) {
+                            needed = format.Precision;
+                        } else {
+                            needed = (format.Precision - digits);
+                        }
                     } else {
                         fraction_length += positive_exp;
                         needed = (digits + format.Precision);
@@ -820,11 +831,30 @@ struct Digit {
                 const SizeT start_at = stream.Length();
                 bigIntToString(stream, b_int);
 
-                // Only 'Default' is implemented
-                formatStringNumber(stream, start_at, format.Precision, digits, fraction_length, is_positive_exp,
-                                   round_up);
+                switch (format.Type) {
+                    case RealFormatType::SemiFixed: {
+                        formatStringNumberFixed<false>(stream, start_at, format.Precision, fraction_length, round_up);
+                        break;
+                    }
+
+                    case RealFormatType::Fixed: {
+                        formatStringNumberFixed<true>(stream, start_at, format.Precision, fraction_length, round_up);
+                        break;
+                    }
+
+                    default: {
+                        formatStringNumberDefault(stream, start_at, format.Precision, digits, fraction_length,
+                                                  is_positive_exp, round_up);
+                    }
+                }
+
             } else {
                 stream += DigitUtils::DigitChar::Zero;
+
+                if (format.Type == RealFormatType::Fixed) {
+                    stream += DigitUtils::DigitChar::Dot;
+                    insertZerosLarge(stream, format.Precision);
+                }
             }
         } else {
             constexpr SizeT32 size = sizeof(Char_T);
@@ -867,6 +897,20 @@ struct Digit {
         stream.Write(DigitUtils::DigitString<Char_T, size>::Zeros, length);
     }
 
+    template <typename Stream_T>
+    inline static void insertZerosLarge(Stream_T &stream, SizeT length) {
+        using Char_T           = typename Stream_T::CharType;
+        constexpr SizeT32 size = sizeof(Char_T);
+        using DigitString      = DigitUtils::DigitString<Char_T, size>;
+
+        while (length > DigitString::ZerosLength) {
+            stream.Write(DigitString::Zeros, length);
+            length -= DigitString::ZerosLength;
+        }
+
+        stream.Write(DigitString::Zeros, length);
+    }
+
     template <typename Stream_T, typename BigInt_T>
     static void bigIntToString(Stream_T &stream, BigInt_T &b_int) {
         using DigitConst = DigitUtils::DigitConst<BigInt_T::SizeOfType()>;
@@ -898,10 +942,119 @@ struct Digit {
         }
     }
 
+    template <bool Fixed_T, typename Stream_T>
+    static void formatStringNumberFixed(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
+                                        const SizeT32 fraction_length, const bool round_up) {
+        using Char_T              = typename Stream_T::CharType;
+        Char_T     *storage       = stream.Storage();
+        const SizeT stream_length = (stream.Length() - started_at);
+        SizeT       index         = started_at;
+        const SizeT dot_index     = (started_at + fraction_length);
+        SizeT       diff          = ((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT{0});
+        bool        power_increased = false;
+        bool        fraction_only   = (stream_length <= fraction_length);
+        /////////////////////////////////////////////////////
+        if (fraction_length != 0) {
+            if (diff <= precision) {
+                Char_T       *number = (storage + index);
+                const Char_T *last   = stream.Last();
+
+                while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
+                    ++number;
+                    ++index;
+                }
+
+                const SizeT new_fraction_length = (fraction_length - (index - started_at));
+
+                if (new_fraction_length > precision) {
+                    index += (new_fraction_length - (precision + SizeT{1}));
+                    roundStringNumber2(stream, index, power_increased, (round_up | (diff != SizeT{0})));
+
+                    number = (storage + index);
+
+                    while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
+                        ++number;
+                        ++index;
+                    }
+                }
+
+                if (fraction_only) {
+                    if ((index < stream_length) || power_increased) {
+                        if (diff != SizeT{0}) {
+                            if (power_increased) {
+                                index -= SizeT(index == stream_length);
+                                storage[index] = DigitUtils::DigitChar::One;
+                            }
+
+                            diff -= SizeT(power_increased);
+                            insertZerosLarge(stream, diff);
+                            stream += DigitUtils::DigitChar::Dot;
+                            stream += DigitUtils::DigitChar::Zero;
+                        } else if (!power_increased) {
+                            stream += DigitUtils::DigitChar::Dot;
+                            stream += DigitUtils::DigitChar::Zero;
+                        } else {
+                            storage[index] = DigitUtils::DigitChar::One;
+                        }
+                    } else {
+                        --index;
+                        storage[index] = DigitUtils::DigitChar::Zero;
+                    }
+                } else if (index < dot_index) {
+                    stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
+                } else if (power_increased) {
+                    storage[index] = DigitUtils::DigitChar::One;
+                    SizeT zeros    = (stream_length - fraction_length);
+
+                    do {
+                        --index;
+                        storage[index] = DigitUtils::DigitChar::Zero;
+                    } while (--zeros != 0U);
+                }
+            } else {
+                index += (stream_length - SizeT{1});
+                storage[index] = DigitUtils::DigitChar::Zero;
+            }
+        }
+
+        stream.Reverse(started_at);
+        stream.StepBack(index - started_at);
+
+        if (Fixed_T) {
+            if (fraction_length == SizeT{0}) {
+                stream += DigitUtils::DigitChar::Dot;
+                insertZerosLarge(stream, precision);
+            } else if ((diff == SizeT{0}) && power_increased) {
+                if (fraction_only) {
+                    if ((stream.Length() - started_at) == SizeT{1}) {
+                        stream += DigitUtils::DigitChar::Dot;
+                        insertZerosLarge(stream, precision);
+                    } else {
+                        insertZerosLarge(stream, (precision - SizeT{1}));
+                    }
+                } else {
+                    stream += DigitUtils::DigitChar::Dot;
+                    insertZerosLarge(stream, precision);
+                }
+            } else if (fraction_only) {
+                if (diff > precision || ((stream.Length() - started_at) == SizeT{1})) {
+                    stream += DigitUtils::DigitChar::Dot;
+                }
+
+                insertZerosLarge(stream, (precision - (stream.Length() - (started_at + SizeT{2})))); // 2 is '0.'.
+            } else if (dot_index == index) {
+                stream += DigitUtils::DigitChar::Dot;
+                insertZerosLarge(stream, precision);
+            } else {
+                insertZerosLarge(stream, (precision - (dot_index - index)));
+            }
+        }
+    }
+
     template <typename Stream_T>
-    static void formatStringNumber(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
-                                   const SizeT32 calculated_digits, SizeT32 fraction_length, const bool is_positive_exp,
-                                   const bool round_up) {
+    static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
+                                          const SizeT32 calculated_digits, SizeT32 fraction_length,
+                                          const bool is_positive_exp, const bool round_up) {
         using Char_T                     = typename Stream_T::CharType;
         Char_T       *storage            = stream.Storage();
         const SizeT   stream_length      = (stream.Length() - started_at);
@@ -926,10 +1079,10 @@ struct Digit {
         }
 
         if (stream_length > precision) {
-            bool is_power_increased = false;
-            roundStringNumber(stream, index, is_power_increased, round_up);
+            bool power_increased = false;
+            roundStringNumber(stream, index, power_increased, round_up);
 
-            if (is_power_increased) {
+            if (power_increased) {
                 storage[index] = DigitUtils::DigitChar::One;
 
                 if (is_positive_exp) {
@@ -988,7 +1141,38 @@ struct Digit {
     }
 
     template <typename Stream_T>
-    static void roundStringNumber(Stream_T &stream, SizeT &index, bool &is_power_increased, bool round_up) noexcept {
+    static void roundStringNumber2(Stream_T &stream, SizeT &index, bool &power_increased, bool round_up) noexcept {
+        using Char_T = typename Stream_T::CharType;
+
+        const Char_T *last   = stream.Last();
+        Char_T       *number = (stream.Storage() + index);
+
+        ++index;
+
+        const bool round =
+            (((*number > DigitUtils::DigitChar::Five) ||
+              ((*number == DigitUtils::DigitChar::Five) &&
+               (round_up || ((SizeT32(stream.First()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
+
+        if (round) {
+            if (number == last) {
+                power_increased = true;
+            } else {
+                while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {
+                    ++index;
+                }
+
+                power_increased = ((number == last) && (*number == DigitUtils::DigitChar::Nine));
+
+                if (!power_increased) {
+                    ++(*number);
+                }
+            }
+        }
+    }
+
+    template <typename Stream_T>
+    static void roundStringNumber(Stream_T &stream, SizeT &index, bool &power_increased, bool round_up) noexcept {
         using Char_T = typename Stream_T::CharType;
 
         const Char_T *last   = stream.Last();
@@ -1000,16 +1184,16 @@ struct Digit {
             ((number < last) &&
              ((*number > DigitUtils::DigitChar::Five) ||
               ((*number == DigitUtils::DigitChar::Five) &&
-               (round_up || ((SizeT32(stream.Storage()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
+               (round_up || ((SizeT32(stream.First()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
 
         if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {
                 ++index;
             }
 
-            is_power_increased = !((number != last) || (*number != DigitUtils::DigitChar::Nine));
+            power_increased = ((number == last) && (*number == DigitUtils::DigitChar::Nine));
 
-            if (!is_power_increased) {
+            if (!power_increased) {
                 ++(*number);
             }
         }
