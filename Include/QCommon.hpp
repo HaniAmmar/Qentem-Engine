@@ -78,12 +78,12 @@ using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 #endif
 
 #ifndef QENTEM_TEMPLATE_PRECISION
-#define QENTEM_TEMPLATE_PRECISION 6U
+#define QENTEM_TEMPLATE_PRECISION 2U
 #endif
 
 #ifndef QENTEM_TEMPLATE_DOUBLE_FORMAT
 // Default, Fixed, SemiFixed
-#define QENTEM_TEMPLATE_DOUBLE_FORMAT Digit::RealFormatType::Default
+#define QENTEM_TEMPLATE_DOUBLE_FORMAT Digit::RealFormatType::SemiFixed
 #endif
 ///////////////////////////////////////////////
 struct Config {
