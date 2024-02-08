@@ -81,23 +81,23 @@ int main() {
 
     ////////// unsigned short 128-bit /////////////
 
-    BigInt<unsigned short, 128U> bint2 = 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
-    bint2 <<= 16U;
-    bint2 |= 0xFFFF;
+    BigInt<unsigned short, 128U> b_int2 = 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
+    b_int2 <<= 16U;
+    b_int2 |= 0xFFFF;
 
-    PrintDigits(bint2);
+    PrintDigits(b_int2);
     // Output: 340282366920938463463374607431768211455
 
     ////////// unsigned int 128-bit /////////////
