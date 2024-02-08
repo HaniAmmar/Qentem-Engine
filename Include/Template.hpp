@@ -712,7 +712,9 @@ struct TemplateSub {
 
         const Value_T *value = getValue(tag);
 
-        if ((value == nullptr) || !(value->CopyValueTo(*stream_, Config::TemplatePrecision, &escapeHTMLSpecialChars))) {
+        if ((value == nullptr) ||
+            !(value->CopyValueTo(*stream_, {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
+                                 &escapeHTMLSpecialChars))) {
             if ((loop_key_ != nullptr) && (tag.IsLoopValue == SizeT8{1})) {
                 escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
             } else {
@@ -731,7 +733,8 @@ struct TemplateSub {
 
         const Value_T *value = getValue(tag);
 
-        if ((value == nullptr) || !(value->CopyValueTo(*stream_, Config::TemplatePrecision))) {
+        if ((value == nullptr) ||
+            !(value->CopyValueTo(*stream_, {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT}))) {
             stream_->Write((content_ + t_offset), length);
         }
     }
@@ -756,7 +759,8 @@ struct TemplateSub {
                 }
 
                 case ExpressionType::RealNumber: {
-                    Digit::NumberToString(*stream_, result.Value.Number.Real, Config::TemplatePrecision);
+                    Digit::NumberToString(*stream_, result.Value.Number.Real,
+                                          {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT});
                     break;
                 }
 

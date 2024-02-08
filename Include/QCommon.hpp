@@ -80,6 +80,11 @@ using SystemIntTypeI = SystemIntType_All::NumberTypeI;
 #ifndef QENTEM_TEMPLATE_PRECISION
 #define QENTEM_TEMPLATE_PRECISION 6U
 #endif
+
+#ifndef QENTEM_TEMPLATE_DOUBLE_FORMAT
+// Default, Fixed, SemiFixed
+#define QENTEM_TEMPLATE_DOUBLE_FORMAT Digit::RealFormatType::Default
+#endif
 ///////////////////////////////////////////////
 struct Config {
     static constexpr SizeT32 DoublePrecision{QENTEM_DOUBLE_PRECISION};

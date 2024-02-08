@@ -1415,8 +1415,9 @@ struct Value {
     using CopyValueToStringFunction_T = void(StringStream_T, const Char_T *, SizeT);
 
     template <typename StringStream_T, typename StringFunction_T = CopyValueToStringFunction_T<StringStream_T>>
-    bool CopyValueTo(StringStream_T &stream, SizeT32 precision = Config::DoublePrecision,
-                     StringFunction_T *string_function = nullptr) const {
+    bool CopyValueTo(StringStream_T             &stream,
+                     const Digit::RealFormatInfo format          = Digit::RealFormatInfo{Config::DoublePrecision},
+                     StringFunction_T           *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
                 const SizeT len = data_.VString.Length();
@@ -1441,7 +1442,7 @@ struct Value {
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, data_.VNumber.GetDouble(), precision);
+                Digit::NumberToString(stream, data_.VNumber.GetDouble(), format);
                 break;
             }
 
