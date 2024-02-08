@@ -206,6 +206,10 @@ struct StringStream {
         return (!(*this == string));
     }
 
+    inline bool operator!=(const StringView<Char_T> &string) const noexcept {
+        return (!(*this == string));
+    }
+
     inline bool operator!=(const Char_T *str) const noexcept {
         return (!(*this == str));
     }
