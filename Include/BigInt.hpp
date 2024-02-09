@@ -101,9 +101,9 @@ struct BigInt {
         constexpr bool    is_same_size    = (n_width == TypeWidth());
         constexpr bool    is_smaller_size = (n_width < TypeWidth());
 
-        if (is_same_size) {
+        if QENTEM_CONST_EXPRESSION (is_same_size) {
             return storage_[0];
-        } else if (is_smaller_size) {
+        } else if QENTEM_CONST_EXPRESSION (is_smaller_size) {
             return N_Number_T(storage_[0]);
         } else {
             N_Number_T num   = 0;
@@ -544,7 +544,7 @@ struct BigInt {
             }
         }
 
-        if (is_bigger_size) {
+        if QENTEM_CONST_EXPRESSION (is_bigger_size) {
             SizeT32 index = 1U;
             number >>= TypeWidth();
 

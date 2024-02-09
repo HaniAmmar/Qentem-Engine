@@ -443,9 +443,9 @@ struct Value {
 
     template <typename Number_T>
     explicit Value(Number_T num) noexcept : data_{num} {
-        if (IsFloat<Number_T>()) {
+        if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
             setTypeToDouble();
-        } else if (IsUnsigned<Number_T>()) {
+        } else if QENTEM_CONST_EXPRESSION (IsUnsigned<Number_T>()) {
             setTypeToUInt64();
         } else {
             setTypeToInt64();
@@ -578,9 +578,9 @@ struct Value {
         reset();
         data_.VNumber = num;
 
-        if (IsFloat<Number_T>()) {
+        if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
             setTypeToDouble();
-        } else if (IsUnsigned<Number_T>()) {
+        } else if QENTEM_CONST_EXPRESSION (IsUnsigned<Number_T>()) {
             setTypeToUInt64();
         } else {
             setTypeToInt64();

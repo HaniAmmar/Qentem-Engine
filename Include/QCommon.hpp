@@ -178,6 +178,12 @@ using BFloatT16 = decltype(0.0BF16);
 #define QENTEM_INLINE __attribute__((always_inline))
 #define QENTEM_MAYBE_UNUSED __attribute__((unused))
 #endif
+
+#if (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L)) || (defined(__cplusplus) && (__cplusplus >= 201703L))
+#define QENTEM_CONST_EXPRESSION constexpr
+#else
+#define QENTEM_CONST_EXPRESSION
+#endif
 } // namespace Qentem
 
 #endif

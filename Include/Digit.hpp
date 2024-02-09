@@ -75,7 +75,7 @@ struct Digit {
 
         QNumberType_T qn{number};
 
-        if (IsFloat<Number_T>()) {
+        if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
             realToString<Number_T>(stream, QNumberType_T{number}.Natural, format);
         } else {
             constexpr SizeT32 max_number_of_digits = (((n_size * 8U * 30103U) / 100000U) + 1U);
@@ -510,7 +510,7 @@ struct Digit {
         b_int <<= 64U;
         //////////////////////////////////////////////////////////////
         constexpr bool is_size_8 = (sizeof(UNumber_T) == 8U);
-        if (is_size_8) {
+        if QENTEM_CONST_EXPRESSION (is_size_8) {
             while (exponent >= DigitConst::MaxPowerOfFive) {
                 // 2**126 = 85070591730234615865843651857942052864
                 // 5**27 = 7450580596923828125 (MaxPowerOfFive)

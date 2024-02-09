@@ -246,7 +246,7 @@ inline static SizeT32 FindFirstBit(Number_T value) noexcept {
     unsigned long  index     = 0;
 
 #ifdef _M_X64
-    if (is_size_8) {
+    if QENTEM_CONST_EXPRESSION (is_size_8) {
         _BitScanForward64(&index, SizeT64(value));
     } else {
         _BitScanForward(&index, (unsigned long)(value));
@@ -256,7 +256,7 @@ inline static SizeT32 FindFirstBit(Number_T value) noexcept {
 #else
     constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-    if (is_size_8) {
+    if QENTEM_CONST_EXPRESSION (is_size_8) {
         // 01010101 <---
         const unsigned long lower_bits = (unsigned long)(value);
 
@@ -282,7 +282,7 @@ inline static SizeT32 FindLastBit(Number_T value) noexcept {
     unsigned long  index     = 0;
 
 #ifdef _M_X64
-    if (is_size_8) {
+    if QENTEM_CONST_EXPRESSION (is_size_8) {
         _BitScanReverse64(&index, SizeT64(value));
     } else {
         _BitScanReverse(&index, (unsigned long)(value));
@@ -292,7 +292,7 @@ inline static SizeT32 FindLastBit(Number_T value) noexcept {
 #else
     constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-    if (is_size_8) {
+    if QENTEM_CONST_EXPRESSION (is_size_8) {
         // 01010101 <---
         const unsigned long lower_bits = (unsigned long)(value);
         value >>= int_size;
@@ -318,8 +318,8 @@ inline static SizeT32 FindFirstBit(Number_T value) noexcept {
     // 'value' should be bigger than zero.
     constexpr bool is_size_8 = (sizeof(Number_T) == 8U);
 
-    if (Config::Is64bit) {
-        if (is_size_8) {
+    if QENTEM_CONST_EXPRESSION (Config::Is64bit) {
+        if QENTEM_CONST_EXPRESSION (is_size_8) {
             return SizeT32(__builtin_ctzl((unsigned long)(value)));
         }
 
@@ -327,7 +327,7 @@ inline static SizeT32 FindFirstBit(Number_T value) noexcept {
     } else {
         constexpr SizeT32 int_size = (sizeof(int) * 8U);
 
-        if (is_size_8) {
+        if QENTEM_CONST_EXPRESSION (is_size_8) {
             // 01010101 <---
             const SizeT32 lower_bits = SizeT32(value);
 
@@ -351,14 +351,14 @@ inline static SizeT32 FindLastBit(Number_T value) noexcept {
     constexpr SizeT32 size        = ((sizeof(Number_T) * 8U) - 1U);
     constexpr bool    is_size_63b = (size == 63U);
 
-    if (Config::Is64bit) {
-        if (is_size_63b) {
+    if QENTEM_CONST_EXPRESSION (Config::Is64bit) {
+        if QENTEM_CONST_EXPRESSION (is_size_63b) {
             return (size - SizeT32(__builtin_clzl((unsigned long)(value))));
         }
 
         return (taken_size - SizeT32(__builtin_clz(SizeT32(value))));
     } else {
-        if (is_size_63b) {
+        if QENTEM_CONST_EXPRESSION (is_size_63b) {
             // ---> 01010101
             const SizeT32 lower_bits = SizeT32(value);
             value >>= int_size;
