@@ -325,7 +325,11 @@ struct StringStream {
     }
 
     void InsertNull() {
-        *this += Char_T{0};
+        if (Capacity() == Length()) {
+            expand(Length() + SizeT{1});
+        }
+
+        Storage()[Length()] = Char_T{0};
     }
 
     inline Char_T *Storage() const noexcept {
