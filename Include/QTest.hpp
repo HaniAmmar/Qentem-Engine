@@ -129,6 +129,30 @@ struct TestOutPut {
         GetStreamCache() = wss;
     }
 
+    static void SetDoubleFormat() noexcept {
+        std::wstringstream *wss = GetStreamCache();
+
+        if (wss == nullptr) {
+            std::wcout << std::fixed;
+            std::wcout.precision(2);
+        } else {
+            *wss << std::fixed;
+            wss->precision(2);
+        }
+    }
+
+    static void ResetDoubleFormat() noexcept {
+        std::wstringstream *wss = GetStreamCache();
+
+        if (wss == nullptr) {
+            std::wcout << std::defaultfloat;
+            std::wcout.precision(6);
+        } else {
+            *wss << std::defaultfloat;
+            wss->precision(6);
+        }
+    }
+
     static bool &IsColored() noexcept {
         static bool isColored{true};
 
@@ -209,6 +233,8 @@ struct MemoryRecord {
     QENTEM_NOINLINE static void PrintMemoryStatus() {
         static const MemoryRecordData &storage = getStorage();
 
+        TestOutPut::SetDoubleFormat();
+
         TestOutPut::Print("\nMemory: ", (double(storage.remainingSize) / 1024),
                           " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
 
@@ -221,6 +247,8 @@ struct MemoryRecord {
                               TestOutPut::GetColor(TestOutPut::Colors::END), ": ", remaining_allocations,
                               " remaining allocations.\n\n");
         }
+
+        TestOutPut::ResetDoubleFormat();
     }
 
   private:
