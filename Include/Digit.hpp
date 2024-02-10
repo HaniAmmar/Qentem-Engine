@@ -88,7 +88,7 @@ struct Digit {
                 }
             }
 
-            if (Reverse_V_T) {
+            if QENTEM_CONST_EXPRESSION (Reverse_V_T) {
                 stream.Write(&(storage[0U]), intToString<true>(&(storage[0U]), qn.Natural));
             } else {
                 const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
@@ -684,7 +684,7 @@ struct Digit {
     static SizeT intToString(Char_T *storage, Number_T number) noexcept {
         const Char_T *str = storage;
 
-        if (!Reverse_V_T) {
+        if QENTEM_CONST_EXPRESSION (!Reverse_V_T) {
             while (number >= Number_T{10}) {
                 const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
                 number /= Number_T{100};
@@ -1020,7 +1020,7 @@ struct Digit {
         stream.Reverse(started_at);
         stream.StepBack(index - started_at);
 
-        if (Fixed_T) {
+        if QENTEM_CONST_EXPRESSION (Fixed_T) {
             if (fraction_length == SizeT{0}) {
                 stream += DigitUtils::DigitChar::Dot;
                 insertZerosLarge(stream, precision);
