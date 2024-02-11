@@ -200,7 +200,7 @@ struct JSON {
                             stream.Clear();
                         }
 
-                        return ValueT{str, len};
+                        return ValueT{String<Char_T>{str, len}};
                     }
 
                     break;
