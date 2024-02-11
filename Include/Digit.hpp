@@ -877,12 +877,12 @@ struct Digit {
         }
     }
 
-    template <typename Stream_T, typename Number_T>
-    static void insertPowerOfTen(Stream_T &stream, Number_T power_of_ten, bool positive) {
+    template <typename Stream_T>
+    static void insertPowerOfTen(Stream_T &stream, SizeT power_of_ten, bool positive) {
         stream += DigitUtils::DigitChar::E;
         stream += (positive ? DigitUtils::DigitChar::Positive : DigitUtils::DigitChar::Negative);
 
-        if (power_of_ten < Number_T{10}) {
+        if (power_of_ten < SizeT{10}) {
             // e+01,e+09
             stream += DigitUtils::DigitChar::Zero;
         }
@@ -942,6 +942,97 @@ struct Digit {
         }
     }
 
+    template <typename Stream_T>
+    static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
+                                          const SizeT32 calculated_digits, SizeT32 fraction_length,
+                                          const bool is_positive_exp, const bool round_up) {
+        using Char_T                = typename Stream_T::CharType;
+        Char_T     *storage         = stream.Storage();
+        const SizeT stream_length   = (stream.Length() - started_at);
+        SizeT       index           = started_at;
+        SizeT       power           = SizeT{0};
+        bool        power_increased = false;
+        /////////////////////////////////////////////////////
+        if (stream_length > precision) {
+            --index;
+            index += (stream_length - precision);
+
+            roundStringNumber(stream, index, power_increased, round_up);
+
+            if (is_positive_exp) {
+                const SizeT precision_plus_one = precision + SizeT{1};
+                const SizeT length =
+                    stream_length +
+                    ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
+                    fraction_length;
+                const SizeT diff = ((length - SizeT{1}) + SizeT(power_increased));
+
+                if (diff >= precision) {
+                    Char_T       *number = (storage + index);
+                    const Char_T *last   = stream.Last();
+
+                    while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
+                        ++number;
+                        ++index;
+                    }
+
+                    power           = diff;
+                    fraction_length = SizeT{0};
+                }
+            }
+        }
+
+        if (fraction_length != 0) {
+            Char_T       *number        = (storage + index);
+            const Char_T *last          = stream.Last();
+            const SizeT   dot_index     = (started_at + fraction_length);
+            bool          fraction_only = (stream_length <= fraction_length);
+
+            while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
+                ++number;
+                ++index;
+            }
+
+            if (fraction_only) {
+                const SizeT diff = ((fraction_length > stream_length) ? (fraction_length - stream_length) : SizeT{0});
+
+                if (!power_increased) {
+                    if (diff < SizeT{4}) {
+                        insertZeros(stream, diff);
+                        stream += DigitUtils::DigitChar::Dot;
+                        stream += DigitUtils::DigitChar::Zero;
+                    } else {
+                        power = diff;
+                        ++power;
+                    }
+                } else if ((diff != SizeT{0}) && (diff < SizeT{5})) {
+                    insertZeros(stream, (diff - SizeT{1}));
+                    stream += DigitUtils::DigitChar::Dot;
+                    stream += DigitUtils::DigitChar::Zero;
+                } else {
+                    power = diff;
+                }
+            } else if (index < dot_index) {
+                stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
+            } else if (power_increased) {
+                SizeT zeros = (stream_length - fraction_length);
+
+                do {
+                    --index;
+                    storage[index] = DigitUtils::DigitChar::Zero;
+                } while (--zeros != 0U);
+            }
+        }
+
+        stream.Reverse(started_at);
+        stream.StepBack(index - started_at);
+
+        if (power != SizeT{0}) {
+            stream.InsertAt(DigitUtils::DigitChar::Dot, (started_at + SizeT{1}));
+            insertPowerOfTen(stream, power, is_positive_exp);
+        }
+    }
+
     template <bool Fixed_T, typename Stream_T>
     static void formatStringNumberFixed(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
                                         const SizeT32 fraction_length, const bool round_up) {
@@ -956,21 +1047,12 @@ struct Digit {
         /////////////////////////////////////////////////////
         if (fraction_length != 0) {
             if (diff <= precision) {
-                Char_T       *number = (storage + index);
-                const Char_T *last   = stream.Last();
+                if (fraction_length > precision) {
+                    index += (fraction_length - (precision + SizeT{1}));
+                    roundStringNumber(stream, index, power_increased, (round_up | (diff != SizeT{0})));
 
-                while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
-                    ++number;
-                    ++index;
-                }
-
-                const SizeT new_fraction_length = (fraction_length - (index - started_at));
-
-                if (new_fraction_length > precision) {
-                    index += (new_fraction_length - (precision + SizeT{1}));
-                    roundStringNumber2(stream, index, power_increased, (round_up | (diff != SizeT{0})));
-
-                    number = (storage + index);
+                    Char_T       *number = (storage + index);
+                    const Char_T *last   = stream.Last();
 
                     while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
                         ++number;
@@ -993,8 +1075,6 @@ struct Digit {
                         } else if (!power_increased) {
                             stream += DigitUtils::DigitChar::Dot;
                             stream += DigitUtils::DigitChar::Zero;
-                        } else {
-                            storage[index] = DigitUtils::DigitChar::One;
                         }
                     } else {
                         --index;
@@ -1003,8 +1083,7 @@ struct Digit {
                 } else if (index < dot_index) {
                     stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
                 } else if (power_increased) {
-                    storage[index] = DigitUtils::DigitChar::One;
-                    SizeT zeros    = (stream_length - fraction_length);
+                    SizeT zeros = (stream_length - fraction_length);
 
                     do {
                         --index;
@@ -1052,96 +1131,7 @@ struct Digit {
     }
 
     template <typename Stream_T>
-    static void formatStringNumberDefault(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
-                                          const SizeT32 calculated_digits, SizeT32 fraction_length,
-                                          const bool is_positive_exp, const bool round_up) {
-        using Char_T                     = typename Stream_T::CharType;
-        Char_T       *storage            = stream.Storage();
-        const SizeT   stream_length      = (stream.Length() - started_at);
-        SizeT         index              = started_at;
-        const SizeT32 precision_plus_one = (precision + 1U);
-        SizeT32       length;
-        SizeT32       power;
-
-        if (is_positive_exp) {
-            length = SizeT32(
-                stream_length +
-                ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
-                fraction_length);
-            power = (length - 1U);
-        } else {
-            length = SizeT32(stream_length);
-            power  = SizeT32(((fraction_length > stream_length) ? (fraction_length - stream_length) : 0U) + 1U);
-        }
-
-        if (stream_length > precision_plus_one) {
-            index += SizeT(stream_length - precision_plus_one);
-        }
-
-        if (stream_length > precision) {
-            bool power_increased = false;
-            roundStringNumber(stream, index, power_increased, round_up);
-
-            if (power_increased) {
-                storage[index] = DigitUtils::DigitChar::One;
-
-                if (is_positive_exp) {
-                    fraction_length = 0U;
-                    ++power;
-
-                    if (power < precision) {
-                        SizeT32 power_index = power;
-
-                        do {
-                            --index;
-                            storage[index] = DigitUtils::DigitChar::Zero;
-                        } while (--power_index != 0U);
-                    }
-                } else {
-                    --power;
-                }
-            }
-        }
-        /////////////////////////////////////////////////////
-        const bool display_exp =
-            ((is_positive_exp && ((power + SizeT{1}) > precision)) || (!is_positive_exp && (power > SizeT{4})));
-        /////////////////////////////////////////////////////
-        Char_T       *number = (storage + index);
-        const Char_T *last   = stream.Last();
-
-        if (display_exp || (fraction_length != 0U)) {
-            while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
-                ++number;
-                ++index;
-            }
-        }
-
-        const SizeT index2 = (index - started_at);
-
-        if (!display_exp) {
-            if ((fraction_length != 0U) && (fraction_length > index2)) {
-                if (!is_positive_exp && (power != SizeT{0})) {
-                    insertZeros(stream, SizeT(power - SizeT{1}));
-                    stream += DigitUtils::DigitChar::Dot;
-                    stream += DigitUtils::DigitChar::Zero;
-                } else if ((stream_length - SizeT{1}) != index2) {
-                    stream.InsertAt(DigitUtils::DigitChar::Dot, SizeT(fraction_length + started_at));
-                }
-            }
-        } else if ((stream_length - SizeT{1}) != index2) {
-            stream.InsertAt(DigitUtils::DigitChar::Dot, (stream.Length() - SizeT{1}));
-        }
-
-        stream.Reverse(started_at);
-        stream.StepBack(index - started_at);
-
-        if (display_exp) {
-            insertPowerOfTen(stream, power, is_positive_exp);
-        }
-    }
-
-    template <typename Stream_T>
-    static void roundStringNumber2(Stream_T &stream, SizeT &index, bool &power_increased, bool round_up) noexcept {
+    static void roundStringNumber(Stream_T &stream, SizeT &index, bool &power_increased, bool round_up) noexcept {
         using Char_T = typename Stream_T::CharType;
 
         const Char_T *last   = stream.Last();
@@ -1155,45 +1145,14 @@ struct Digit {
                (round_up || ((SizeT32(stream.First()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
 
         if (round) {
-            if (number == last) {
-                power_increased = true;
-            } else {
-                while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {
-                    ++index;
-                }
-
-                power_increased = ((number == last) && (*number == DigitUtils::DigitChar::Nine));
-
-                if (!power_increased) {
-                    ++(*number);
-                }
-            }
-        }
-    }
-
-    template <typename Stream_T>
-    static void roundStringNumber(Stream_T &stream, SizeT &index, bool &power_increased, bool round_up) noexcept {
-        using Char_T = typename Stream_T::CharType;
-
-        const Char_T *last   = stream.Last();
-        Char_T       *number = (stream.Storage() + index);
-
-        ++index;
-
-        const bool round =
-            ((number < last) &&
-             ((*number > DigitUtils::DigitChar::Five) ||
-              ((*number == DigitUtils::DigitChar::Five) &&
-               (round_up || ((SizeT32(stream.First()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
-
-        if (round) {
             while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {
                 ++index;
             }
 
-            power_increased = ((number == last) && (*number == DigitUtils::DigitChar::Nine));
-
-            if (!power_increased) {
+            if ((number > last) || (*number == DigitUtils::DigitChar::Nine)) {
+                power_increased         = true;
+                stream.Storage()[index] = DigitUtils::DigitChar::One;
+            } else {
                 ++(*number);
             }
         }
