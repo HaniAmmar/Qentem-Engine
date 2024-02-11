@@ -960,12 +960,10 @@ struct Digit {
             roundStringNumber(stream, index, power_increased, round_up);
 
             if (is_positive_exp) {
-                const SizeT precision_plus_one = precision + SizeT{1};
-                const SizeT length =
-                    stream_length +
-                    ((calculated_digits > precision_plus_one) ? (calculated_digits - precision_plus_one) : SizeT{0}) -
-                    fraction_length;
-                const SizeT diff = ((length - SizeT{1}) + SizeT(power_increased));
+                const SizeT diff =
+                    (((stream_length - fraction_length) +
+                      ((calculated_digits <= precision) ? SizeT{0} : (calculated_digits - (precision + SizeT{1})))) -
+                     SizeT(!power_increased));
 
                 if (diff >= precision) {
                     Char_T       *number = (storage + index);
