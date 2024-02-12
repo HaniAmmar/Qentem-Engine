@@ -2315,6 +2315,9 @@ static void TestSuperVariableUTag2(QTest &test) {
     StringStream<char16_t> ss;
     Value<char16_t>        value;
 
+    test.IsEqual(Template::Render(uR"({svar:x_y_z})", value, ss), uR"({svar:x_y_z})", __LINE__);
+    ss.Clear();
+
     test.IsEqual(Template::Render(uR"({svar:x_y_z, {var:a}})", value, ss), uR"({svar:x_y_z, {var:a}})", __LINE__);
     ss.Clear();
 

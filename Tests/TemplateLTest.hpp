@@ -2314,6 +2314,9 @@ static void TestSuperVariableLTag2(QTest &test) {
     StringStream<wchar_t> ss;
     Value<wchar_t>        value;
 
+    test.IsEqual(Template::Render(LR"({svar:x_y_z})", value, ss), LR"({svar:x_y_z})", __LINE__);
+    ss.Clear();
+
     test.IsEqual(Template::Render(LR"({svar:x_y_z, {var:a}})", value, ss), LR"({svar:x_y_z, {var:a}})", __LINE__);
     ss.Clear();
 

@@ -1424,11 +1424,11 @@ struct TemplateSub {
     }
 
     const Value_T *getValue(SizeT v_offset, SizeT16 v_length, SizeT8 v_level, SizeT8 v_is_loop_value) const noexcept {
-        const Value_T *value     = nullptr;
-        const Char_T  *id        = (content_ + v_offset);
-        const SizeT    length    = v_length;
-        SizeT          offset    = 0;
-        const bool     has_index = (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix);
+        const Value_T *value  = nullptr;
+        const Char_T  *id     = (content_ + v_offset);
+        const SizeT    length = v_length;
+        SizeT          offset = 0;
+        const bool has_index  = ((length != SizeT{0}) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
 
         if (v_is_loop_value != SizeT8{1}) {
             if (!has_index) {

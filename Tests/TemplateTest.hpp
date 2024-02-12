@@ -2313,6 +2313,9 @@ static void TestSuperVariableTag2(QTest &test) {
     StringStream<char> ss;
     Value<char>        value;
 
+    test.IsEqual(Template::Render(R"({svar:x_y_z})", value, ss), R"({svar:x_y_z})", __LINE__);
+    ss.Clear();
+
     test.IsEqual(Template::Render(R"({svar:x_y_z, {var:a}})", value, ss), R"({svar:x_y_z, {var:a}})", __LINE__);
     ss.Clear();
 
