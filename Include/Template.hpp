@@ -1623,6 +1623,16 @@ struct TemplateSub {
                 break;
             }
 
+            case QOperation::BitwiseAnd: { // &
+                left &= right;
+                break;
+            }
+
+            case QOperation::BitwiseOr: { // |
+                left |= right;
+                break;
+            }
+
             case QOperation::Less: { // <
                 left.Value.Number.Natural = SizeT64(left < right);
                 left.Type                 = ExpressionType::NaturalNumber;
@@ -1988,7 +1998,7 @@ struct TemplateSub {
                         return QOperation::Or;
                     }
 
-                    return QOperation::Error;
+                    return QOperation::BitwiseOr;
                 }
 
                 case QOperationSymbol::AndExp: { // &&
@@ -1996,7 +2006,7 @@ struct TemplateSub {
                         return QOperation::And;
                     }
 
-                    return QOperation::Error;
+                    return QOperation::BitwiseAnd;
                 }
 
                 case QOperationSymbol::GreaterExp: { // > or >=

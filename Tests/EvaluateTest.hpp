@@ -3748,10 +3748,6 @@ static void TestEvaluate16(QTest &test) {
     is_valid = TestEvaluate(number, content, value);
     test.IsFalse(is_valid, __LINE__);
 
-    content  = "{var:AB}  &  5";
-    is_valid = TestEvaluate(number, content, value);
-    test.IsFalse(is_valid, __LINE__);
-
     content  = "(3)3";
     is_valid = TestEvaluate(number, content, value);
     test.IsFalse(is_valid, __LINE__);
@@ -4694,16 +4690,1046 @@ static void TestEvaluate19(QTest &test) {
     content = "{var:4}!={var:1}";
     number  = TestEvaluate(content, value);
     test.IsEqual(number.Natural, 1ULL, __LINE__);
+}
 
-    content = "{var:4}!={var:3}";
+static void TestEvaluate20(QTest &test) {
+    Value<char> value;
+    QNumber64   number{-1};
+    const char *content;
+
+    value["1U"]  = 1U;
+    value["2U"]  = 2U;
+    value["3U"]  = 3U;
+    value["4U"]  = 4U;
+    value["5U"]  = 5U;
+    value["6U"]  = 6U;
+    value["8U"]  = 8U;
+    value["9U"]  = 9U;
+    value["16U"] = 16U;
+
+    value["1"]  = 1;
+    value["2"]  = 2;
+    value["3"]  = 3;
+    value["4"]  = 4;
+    value["5"]  = 5;
+    value["6"]  = 6;
+    value["8"]  = 8;
+    value["9"]  = 9;
+    value["16"] = 16;
+
+    value["1.0"]  = 1.0;
+    value["2.0"]  = 2.0;
+    value["3.0"]  = 3.0;
+    value["4.0"]  = 4.0;
+    value["5.0"]  = 5.0;
+    value["6.0"]  = 6.0;
+    value["8.0"]  = 8.0;
+    value["9.0"]  = 9.0;
+    value["16.0"] = 16.0;
+
+    content = "{var:1U}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2U}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6U}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20&{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20&{var:16U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4U}&{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9U}&{var:8U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2U}&{var:1U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2U}&{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8U}&{var:9U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1U}&{var:5U}";
     number  = TestEvaluate(content, value);
     test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5U}&{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6U}&{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+    /////
+
+    content = "{var:1U}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2U}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6U}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20&{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20&{var:16}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4U}&{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9U}&{var:8}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2U}&{var:1}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2U}&{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8U}&{var:9}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1U}&{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5U}&{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6U}&{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    /////
+
+    content = "{var:1}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20&{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20&{var:16}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4}&{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9}&{var:8}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2}&{var:1}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2}&{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8}&{var:9}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1}&{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5}&{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6}&{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    ///
+
+    content = "{var:1}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20&{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20&{var:16U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4}&{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9}&{var:8U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2}&{var:1U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2}&{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8}&{var:9U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1}&{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5}&{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6}&{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+    ////
+
+    content = "{var:1U}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2U}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6U}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20&{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20&{var:16.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4U}&{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9U}&{var:8.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2U}&{var:1.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2U}&{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8U}&{var:9.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1U}&{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5U}&{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6U}&{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    /////
+
+    content = "{var:1}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20&{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20&{var:16.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4}&{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9}&{var:8.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2}&{var:1.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2}&{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8}&{var:9.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1}&{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5}&{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6}&{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    /////
+    content = "{var:1.0}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2.0}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6.0}&{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20.0&{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20.0&{var:16U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4.0}&{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9.0}&{var:8U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2.0}&{var:1U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2.0}&{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8.0}&{var:9U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1.0}&{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5.0}&{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6.0}&{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    /////
+    content = "{var:1.0}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2.0}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6.0}&{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20.0&{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20.0&{var:16}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4.0}&{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9.0}&{var:8}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2.0}&{var:1}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2.0}&{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8.0}&{var:9}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1.0}&{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5.0}&{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6.0}&{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    /////
+
+    content = "{var:1.0}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2.0}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6.0}&{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "20.0&{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "20.0&{var:16.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 16ULL, __LINE__);
+
+    content = "{var:4.0}&{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+
+    content = "{var:9.0}&{var:8.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:2.0}&{var:1.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 0ULL, __LINE__);
+
+    content = "{var:2.0}&{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:8.0}&{var:9.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 8ULL, __LINE__);
+
+    content = "{var:1.0}&{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 1ULL, __LINE__);
+
+    content = "{var:5.0}&{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6.0}&{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 4ULL, __LINE__);
+}
+
+static void TestEvaluate21(QTest &test) {
+    Value<char> value;
+    QNumber64   number{-1};
+    const char *content;
+
+    value["1U"]  = 1U;
+    value["2U"]  = 2U;
+    value["3U"]  = 3U;
+    value["4U"]  = 4U;
+    value["5U"]  = 5U;
+    value["6U"]  = 6U;
+    value["8U"]  = 8U;
+    value["9U"]  = 9U;
+    value["16U"] = 16U;
+
+    value["1"]  = 1;
+    value["2"]  = 2;
+    value["3"]  = 3;
+    value["4"]  = 4;
+    value["5"]  = 5;
+    value["6"]  = 6;
+    value["8"]  = 8;
+    value["9"]  = 9;
+    value["16"] = 16;
+
+    value["1.0"]  = 1.0;
+    value["2.0"]  = 2.0;
+    value["3.0"]  = 3.0;
+    value["4.0"]  = 4.0;
+    value["5.0"]  = 5.0;
+    value["6.0"]  = 6.0;
+    value["8.0"]  = 8.0;
+    value["9.0"]  = 9.0;
+    value["16.0"] = 16.0;
+
+    content = "{var:1U}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2U}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6U}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20|{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20|{var:16U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4U}|{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9U}|{var:8U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2U}|{var:1U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2U}|{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8U}|{var:9U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1U}|{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5U}|{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6U}|{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+    /////
+
+    content = "{var:1U}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2U}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6U}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20|{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20|{var:16}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4U}|{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9U}|{var:8}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2U}|{var:1}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2U}|{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8U}|{var:9}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1U}|{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5U}|{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6U}|{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    /////
+
+    content = "{var:1}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20|{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20|{var:16}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4}|{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9}|{var:8}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2}|{var:1}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2}|{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8}|{var:9}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1}|{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5}|{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6}|{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    ///
+
+    content = "{var:1}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20|{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20|{var:16U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4}|{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9}|{var:8U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2}|{var:1U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2}|{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8}|{var:9U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1}|{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5}|{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6}|{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+    ////
+
+    content = "{var:1U}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2U}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6U}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20|{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20|{var:16.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4U}|{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9U}|{var:8.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2U}|{var:1.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2U}|{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8U}|{var:9.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1U}|{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5U}|{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6U}|{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    /////
+
+    content = "{var:1}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20|{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20|{var:16.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4}|{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9}|{var:8.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2}|{var:1.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2}|{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8}|{var:9.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1}|{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5}|{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6}|{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    /////
+    content = "{var:1.0}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2.0}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6.0}|{var:2U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20.0|{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20.0|{var:16U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4.0}|{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9.0}|{var:8U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2.0}|{var:1U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2.0}|{var:6U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8.0}|{var:9U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1.0}|{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5.0}|{var:5U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6.0}|{var:4U}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    /////
+    content = "{var:1.0}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2.0}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6.0}|{var:2}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20.0|{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20.0|{var:16}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4.0}|{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9.0}|{var:8}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2.0}|{var:1}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2.0}|{var:6}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8.0}|{var:9}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1.0}|{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5.0}|{var:5}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6.0}|{var:4}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    /////
+
+    content = "{var:1.0}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2.0}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 2ULL, __LINE__);
+
+    content = "{var:6.0}|{var:2.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "20.0|{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "20.0|{var:16.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 20ULL, __LINE__);
+
+    content = "{var:4.0}|{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:9.0}|{var:8.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:2.0}|{var:1.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 3ULL, __LINE__);
+
+    content = "{var:2.0}|{var:6.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
+
+    content = "{var:8.0}|{var:9.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 9ULL, __LINE__);
+
+    content = "{var:1.0}|{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:5.0}|{var:5.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 5ULL, __LINE__);
+
+    content = "{var:6.0}|{var:4.0}";
+    number  = TestEvaluate(content, value);
+    test.IsEqual(number.Natural, 6ULL, __LINE__);
 }
 
 static int RunEvaluateTests() {
     QTest test{"Evaluate.hpp", __FILE__};
 
     test.PrintGroupName();
+
+    test.ContinueOnError(true);
 
     test.Test("Evaluate Test 1", TestEvaluate1);
     test.Test("Evaluate Test 2", TestEvaluate2);
@@ -4724,6 +5750,8 @@ static int RunEvaluateTests() {
     test.Test("Evaluate Test 17", TestEvaluate17);
     test.Test("Evaluate Test 18", TestEvaluate18);
     test.Test("Evaluate Test 19", TestEvaluate19);
+    test.Test("Evaluate Test 19", TestEvaluate20);
+    test.Test("Evaluate Test 19", TestEvaluate21);
 
     return test.EndTests();
 }

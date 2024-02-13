@@ -52,6 +52,8 @@ struct QExpression {
         LessOrEqual,    // <=
         Greater,        // >
         Less,           // <
+        BitwiseOr,      // |
+        BitwiseAnd,     // &
         Addition,       // +
         Subtraction,    // -
         Multiplication, // *
@@ -516,6 +518,132 @@ struct QExpression {
         }
 
         return result;
+    }
+
+    void operator&=(const QExpression &right) noexcept {
+        switch (Type) {
+            case ExpressionType::NaturalNumber: {
+                switch (right.Type) {
+                    case ExpressionType::NaturalNumber: {
+                        Value.Number.Natural &= right.Value.Number.Natural;
+                        break;
+                    }
+
+                    case ExpressionType::IntegerNumber: {
+                        Value.Number.Integer &= right.Value.Number.Integer;
+                        Type = ExpressionType::IntegerNumber;
+                        break;
+                    }
+
+                    case ExpressionType::RealNumber: {
+                        Value.Number.Integer &= SizeT64I(right.Value.Number.Real);
+                        Type = ExpressionType::IntegerNumber;
+                        break;
+                    }
+
+                    default: {
+                    }
+                }
+
+                break;
+            }
+
+            case ExpressionType::IntegerNumber: {
+                if (right.Type == ExpressionType::RealNumber) {
+                    Value.Number.Integer &= SizeT64I(right.Value.Number.Real);
+                    Type = ExpressionType::IntegerNumber;
+                } else {
+                    Value.Number.Integer &= right.Value.Number.Integer;
+                }
+
+                break;
+            }
+
+            case ExpressionType::RealNumber: {
+                switch (right.Type) {
+                    case ExpressionType::NaturalNumber:
+                    case ExpressionType::IntegerNumber: {
+                        Value.Number.Integer = SizeT64I(Value.Number.Real) & right.Value.Number.Integer;
+                        Type                 = ExpressionType::IntegerNumber;
+                        break;
+                    }
+
+                    case ExpressionType::RealNumber: {
+                        Value.Number.Integer = SizeT64I(Value.Number.Real) & SizeT64I(right.Value.Number.Real);
+                        Type                 = ExpressionType::IntegerNumber;
+                    }
+
+                    default: {
+                    }
+                }
+            }
+
+            default: {
+            }
+        }
+    }
+
+    void operator|=(const QExpression &right) noexcept {
+        switch (Type) {
+            case ExpressionType::NaturalNumber: {
+                switch (right.Type) {
+                    case ExpressionType::NaturalNumber: {
+                        Value.Number.Natural |= right.Value.Number.Natural;
+                        break;
+                    }
+
+                    case ExpressionType::IntegerNumber: {
+                        Value.Number.Integer |= right.Value.Number.Integer;
+                        Type = ExpressionType::IntegerNumber;
+                        break;
+                    }
+
+                    case ExpressionType::RealNumber: {
+                        Value.Number.Integer |= SizeT64I(right.Value.Number.Real);
+                        Type = ExpressionType::IntegerNumber;
+                        break;
+                    }
+
+                    default: {
+                    }
+                }
+
+                break;
+            }
+
+            case ExpressionType::IntegerNumber: {
+                if (right.Type == ExpressionType::RealNumber) {
+                    Value.Number.Integer |= SizeT64I(right.Value.Number.Real);
+                    Type = ExpressionType::IntegerNumber;
+                } else {
+                    Value.Number.Integer |= right.Value.Number.Integer;
+                }
+
+                break;
+            }
+
+            case ExpressionType::RealNumber: {
+                switch (right.Type) {
+                    case ExpressionType::NaturalNumber:
+                    case ExpressionType::IntegerNumber: {
+                        Value.Number.Integer = SizeT64I(Value.Number.Real) | right.Value.Number.Integer;
+                        Type                 = ExpressionType::IntegerNumber;
+                        break;
+                    }
+
+                    case ExpressionType::RealNumber: {
+                        Value.Number.Integer = SizeT64I(Value.Number.Real) | SizeT64I(right.Value.Number.Real);
+                        Type                 = ExpressionType::IntegerNumber;
+                    }
+
+                    default: {
+                    }
+                }
+            }
+
+            default: {
+            }
+        }
     }
 
     template <typename Number_T>
