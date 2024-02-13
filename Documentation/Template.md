@@ -171,6 +171,8 @@ int main() {
 
 -   Logic operations:
 
+    -   & `Bitwise and`
+    -   | `Bitwise or`
     -   && `And`
     -   || `Or`
     -   == `Equal`
@@ -333,6 +335,8 @@ int main() {
 
 -   Logic operations:
 
+    -   & `Bitwise and`
+    -   | `Bitwise or`
     -   && `And`
     -   || `Or`
     -   == `Equal`
@@ -399,6 +403,8 @@ With variables:
 
 -   Logic operations:
 
+    -   & `Bitwise and`
+    -   | `Bitwise or`
     -   && `And`
     -   || `Or`
     -   == `Equal`
@@ -562,6 +568,7 @@ To force converting the variables to numbers, use parentheses: {math:({var:bool}
 -   Exponent. Remainder.
 -   Multiplication. Division.
 -   Addition. Subtraction.
+-   Bitwise and. Bitwise or.
 -   Equal. Not Equal. Less than. Greater than.
 -   And. Or.
 
