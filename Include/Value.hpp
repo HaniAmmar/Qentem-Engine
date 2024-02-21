@@ -1210,12 +1210,33 @@ struct Value {
         return GetValue(key.First(), key.Length());
     }
 
-    Value *First() const {
+    Value *Storage() {
         using V_item = HAItem_T<Value, Char_T>;
 
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = data_.VObject.First();
+                V_item *item = data_.VObject.Storage();
+
+                if (item != nullptr) {
+                    return &(item->Value);
+                }
+            }
+
+            case ValueType::Array: {
+                return data_.VArray.Storage();
+            }
+
+            default:
+                return nullptr;
+        }
+    }
+
+    const Value *First() const {
+        using V_item = HAItem_T<Value, Char_T>;
+
+        switch (Type()) {
+            case ValueType::Object: {
+                const V_item *item = data_.VObject.First();
 
                 if (item != nullptr) {
                     return &(item->Value);
