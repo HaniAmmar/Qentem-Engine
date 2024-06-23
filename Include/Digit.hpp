@@ -723,8 +723,11 @@ struct Digit {
     /////////////////////////////////////////
     template <typename Float_T, typename Stream_T, typename Number_T>
     static void realToString(Stream_T &stream, const Number_T number, const RealFormatInfo format) {
-        using Char_T = typename Stream_T::CharType;
-        using Info_T = DigitUtils::RealNumberInfo<Float_T, sizeof(number)>;
+        constexpr SizeT32 number_size = sizeof(Number_T);
+
+        using Info_T     = DigitUtils::RealNumberInfo<Float_T, number_size>;
+        using BigIntSys  = BigInt<SystemIntType, ((Info_T::Bias + 1U) + (number_size * 8U * 3U))>;
+        using DigitConst = DigitUtils::DigitConst<BigIntSys::SizeOfType()>;
 
         const Number_T bias = (number & Info_T::ExponentMask);
 
@@ -742,8 +745,7 @@ struct Digit {
                     mantissa <<= 1U;
                 }
 
-                BigInt<SystemIntType, ((Info_T::Bias + 1U) + (sizeof(Number_T) * 8U * 3U))> b_int{mantissa};
-                using DigitConst = DigitUtils::DigitConst<b_int.SizeOfType()>;
+                BigIntSys b_int{mantissa};
                 /////////////////////////////////////
                 const SizeT32 first_shift      = Platform::FindFirstBit(mantissa);
                 const int     exponent         = (int)((bias >> Info_T::MantissaSize) - Info_T::Bias);
@@ -857,6 +859,7 @@ struct Digit {
                 }
             }
         } else {
+            using Char_T           = typename Stream_T::CharType;
             constexpr SizeT32 size = sizeof(Char_T);
 
             if ((number & Info_T::MantissaMask) == Number_T{0}) {
