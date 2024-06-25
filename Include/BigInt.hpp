@@ -371,14 +371,16 @@ struct BigInt {
         }
 
         if (offset != 0U) {
-            SizeT32       index      = index_;
-            const SizeT32 shift_size = (TypeWidth() - offset);
+            SizeT32        index      = index_;
+            const SizeT32  shift_size = (TypeWidth() - offset);
+            const Number_T carry      = (storage_[index] >> shift_size);
 
-            const Number_T carry = (storage_[index] >> shift_size);
             storage_[index] <<= offset;
 
-            index_ += SizeT32((carry != Number_T{0}) && (index_ < MaxIndex()));
-            storage_[index_] |= carry;
+            if (index_ != MaxIndex()) {
+                index_ += SizeT32(carry != Number_T{0});
+                storage_[index_] |= carry;
+            }
 
             while (index != 0U) {
                 storage_[index] |= (storage_[index - 1U] >> shift_size);
