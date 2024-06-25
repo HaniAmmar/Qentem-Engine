@@ -113,9 +113,9 @@ struct BigInt {
         constexpr bool    is_smaller_size = (n_width < TypeWidth());
 
         if QENTEM_CONST_EXPRESSION (is_same_size) {
-            return storage_[0];
+            return N_Number_T(storage_[0]);
         } else if QENTEM_CONST_EXPRESSION (is_smaller_size) {
-            return N_Number_T{storage_[0]};
+            return N_Number_T(storage_[0]);
         } else {
             N_Number_T        num       = 0;
             constexpr SizeT32 max_index = ((n_width / TypeWidth()) - 1U);
