@@ -407,8 +407,7 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 MaxIndex() noexcept {
-        return (((TypeWidth() * (TotalBits() / TypeWidth())) == TotalBits()) ? ((TotalBits() / TypeWidth()) - 1U)
-                                                                             : (TotalBits() / TypeWidth()));
+        return ((TotalBits() / TypeWidth()) - 1U);
     }
 
     inline static constexpr SizeT32 TypeWidth() noexcept {
@@ -416,7 +415,11 @@ struct BigInt {
     }
 
     inline static constexpr SizeT32 TotalBits() noexcept {
-        return Width_T;
+        return (((TypeWidth() * (Width_T / TypeWidth())) == Width_T)
+                    ? Width_T
+                    : ((TypeWidth() * (Width_T / TypeWidth())) + TypeWidth()));
+
+        // "TypeWidth() * X" does not cancel "X / TypeWidth()"; Because this is computer science not math.
     }
 
     inline static constexpr SizeT32 SizeOfType() noexcept {
