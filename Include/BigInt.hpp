@@ -52,27 +52,38 @@ struct BigInt {
         Subtract // -
     };
 
-    BigInt() noexcept                          = default;
-    BigInt(BigInt &&) noexcept                 = default;
-    BigInt(const BigInt &) noexcept            = default;
-    BigInt &operator=(const BigInt &) noexcept = default;
-    ~BigInt() noexcept                         = default;
+    BigInt() noexcept  = default;
+    ~BigInt() noexcept = default;
 
-    BigInt &operator=(BigInt &&b_int) noexcept {
+    BigInt(BigInt &&src) noexcept : index_{src.index_} {
         SizeT32 index = 0U;
 
-        while (index <= b_int.index_) {
-            storage_[index] = b_int.storage_[index];
+        while (index <= index_) {
+            storage_[index] = src.storage_[index];
             ++index;
         }
 
-        while (index_ > index) {
-            storage_[index_] = Number_T{0};
-            --index_;
-        }
+        src.Clear();
+    }
 
-        index_ = b_int.index_;
-        b_int.Clear();
+    BigInt(const BigInt &src) noexcept : index_{src.index_} {
+        SizeT32 index = 0U;
+
+        while (index <= index_) {
+            storage_[index] = src.storage_[index];
+            ++index;
+        }
+    }
+
+    BigInt &operator=(BigInt &&src) noexcept {
+        copy(src);
+        src.Clear();
+
+        return *this;
+    }
+
+    BigInt &operator=(const BigInt &src) noexcept {
+        copy(src);
 
         return *this;
     }
@@ -396,12 +407,12 @@ struct BigInt {
     }
 
     inline void Clear() noexcept {
-        storage_[0U] = Number_T{0};
-
         while (index_ != 0U) {
             storage_[index_] = Number_T{0};
             --index_;
         }
+
+        storage_[0U] = Number_T{0};
     }
 
     inline SizeT32 Index() const noexcept {
@@ -455,6 +466,22 @@ struct BigInt {
   private:
     Number_T storage_[MaxIndex() + Number_T{1}]{0};
     SizeT32  index_{0};
+
+    void copy(const BigInt &src) noexcept {
+        SizeT32 index = 0U;
+
+        while (index <= src.index_) {
+            storage_[index] = src.storage_[index];
+            ++index;
+        }
+
+        while (index_ > index) {
+            storage_[index_] = Number_T{0};
+            --index_;
+        }
+
+        index_ = src.index_;
+    }
 
     template <BigIntOperation Operation>
     inline void doOperation(Number_T number) noexcept {
