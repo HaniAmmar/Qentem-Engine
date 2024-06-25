@@ -907,7 +907,7 @@ struct Digit {
         using DigitString      = DigitUtils::DigitString<Char_T, size>;
 
         while (length > DigitString::ZerosLength) {
-            stream.Write(DigitString::Zeros, length);
+            stream.Write(DigitString::Zeros, DigitString::ZerosLength);
             length -= DigitString::ZerosLength;
         }
 
