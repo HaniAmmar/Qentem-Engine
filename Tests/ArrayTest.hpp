@@ -213,6 +213,7 @@ static void TestArray2(QTest &test) {
     const SizeT *storage;
     Array<SizeT> numbers1;
     Array<SizeT> numbers2;
+    Array<SizeT> numbers3;
 
     numbers2.Reserve(4);
     numbers1.ResizeAndInitialize(4);
@@ -237,6 +238,11 @@ static void TestArray2(QTest &test) {
     test.IsEqual(numbers2.Size(), 8U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 8U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
+
+    numbers3.Reserve(8U, true);
+    test.IsEqual(numbers3.Size(), 8U, __LINE__);
+    test.IsEqual(numbers3.Capacity(), 8U, __LINE__);
+    test.IsNotNull(numbers3.First(), __LINE__);
 
     storage = numbers1.First();
     numbers2.Insert(Memory::Move(numbers1));

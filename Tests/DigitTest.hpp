@@ -3961,6 +3961,9 @@ static void TestDoubleToStringFixed(QTest &test, Stream_T &stream) {
     RealToStreamEqualFixed(test, stream, 0.8, 6U, "0.800000", __LINE__);
     RealToStreamEqualFixed(test, stream, 0.9, 6U, "0.900000", __LINE__);
 
+    RealToStreamEqualFixed(test, stream, 1.0, 60U, "1.000000000000000000000000000000000000000000000000000000000000",
+                           __LINE__);
+
     RealToStreamEqualFixed(test, stream, 0.09, 6U, "0.090000", __LINE__);
     RealToStreamEqualFixed(test, stream, 0.009, 6U, "0.009000", __LINE__);
     RealToStreamEqualFixed(test, stream, 0.0009, 6U, "0.000900", __LINE__);

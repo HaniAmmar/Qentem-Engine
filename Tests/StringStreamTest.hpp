@@ -389,6 +389,12 @@ static void TestStringStream2(QTest &test) {
     test.IsEqual(stream.Length(), SizeT{7}, __LINE__);
     test.IsEqual(stream.Capacity(), SizeT{8}, __LINE__);
     test.IsEqual(*(stream.End()), char{0}, __LINE__);
+
+    stream = "12345678";
+    stream.InsertNull();
+    test.IsEqual(*(stream.End()), char{0}, __LINE__);
+    stream.StepBack(SizeT{1});
+    test.IsEqual(*(stream.End()), '8', __LINE__);
 }
 
 static int RunStringStreamTests() {

@@ -2318,6 +2318,9 @@ static void TestSuperVariableUTag2(QTest &test) {
     test.IsEqual(Template::Render(uR"({svar:x_y_z})", value, ss), uR"({svar:x_y_z})", __LINE__);
     ss.Clear();
 
+    test.IsEqual(Template::Render(uR"({svEr:x_y_z})", value, ss), uR"({svEr:x_y_z})", __LINE__);
+    ss.Clear();
+
     test.IsEqual(Template::Render(uR"({svar:x_y_z, {var:a}})", value, ss), uR"({svar:x_y_z, {var:a}})", __LINE__);
     ss.Clear();
 
@@ -2404,11 +2407,11 @@ static void TestInlineIfUTag(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(F)", __LINE__);
     ss.Clear();
 
-    content = uR"({if case='0.1' true="T" false="F"})";
+    content = uR"({if case ='0.1' true    ="T" false        ="F"})";
     test.IsEqual(Template::Render(content, value, ss), uR"(T)", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="1" true='T' false="F"})";
+    content = uR"({if case= "1" true=   'T' false=      "F"})";
     test.IsEqual(Template::Render(content, value, ss), uR"(T)", __LINE__);
     ss.Clear();
 
@@ -2667,8 +2670,8 @@ static void TestInlineIfUTag(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"({if case="1" true="1" false="0")", __LINE__);
     ss.Clear();
 
-    content = uR"({if case="1" true="1" false="0")";
-    test.IsEqual(Template::Render(content, value, ss), uR"({if case="1" true="1" false="0")", __LINE__);
+    content = uR"({if caXe="1" trXe="1" falXe="0}-)";
+    test.IsEqual(Template::Render(content, value, ss), uR"(-)", __LINE__);
     ss.Clear();
 
     ///////
@@ -2755,7 +2758,7 @@ static void TestLoopUTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value1, ss), uR"(100, -50, Qentem, true, false, null, 3, )", __LINE__);
     ss.Clear();
 
-    content = uR"(<loop value="loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
+    content = uR"(<loop value    =    "loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
     test.IsEqual(Template::Render(content, value1, ss),
                  uR"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", __LINE__);
     ss.Clear();
@@ -2922,6 +2925,10 @@ static void TestLoopUTag2(QTest &test) {
     ss.Clear();
 
     content = uR"(<loop set="ss" value="a">{var:a}</loop>)";
+    test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
+    ss.Clear();
+
+    content = uR"(<loop sXt="ss" valXe="a" grXup='w'>{var:a}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), u"", __LINE__);
     ss.Clear();
 
@@ -3261,11 +3268,11 @@ static void TestIfUTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), uR"(b)", __LINE__);
     ss.Clear();
 
-    content = uR"(<if case="1">a<else /><if case="1">b</if></if>)";
+    content = uR"(<if case ="1">a<else /><if case="1">b</if></if>)";
     test.IsEqual(Template::Render(content, value, ss), uR"(a)", __LINE__);
     ss.Clear();
 
-    content = uR"(<if case="0">a<if case="1">b</if>c</if>Empty)";
+    content = uR"(<if case='0'>a<if case="1">b</if>c</if>Empty)";
     test.IsEqual(Template::Render(content, value, ss), uR"(Empty)", __LINE__);
     ss.Clear();
 
