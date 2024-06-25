@@ -104,14 +104,16 @@ struct BigInt {
         if QENTEM_CONST_EXPRESSION (is_same_size) {
             return storage_[0];
         } else if QENTEM_CONST_EXPRESSION (is_smaller_size) {
-            return N_Number_T(storage_[0]);
+            return N_Number_T{storage_[0]};
         } else {
-            N_Number_T num   = 0;
-            SizeT32    count = (n_width / TypeWidth());
+            N_Number_T        num       = 0;
+            constexpr SizeT32 max_index = ((n_width / TypeWidth()) - 1U);
+            SizeT32           index     = ((max_index <= index_) ? max_index : index_);
 
-            while ((--count != 0U) && (count >= index_)) {
-                num |= storage_[1];
+            while (index > 0) {
+                num |= storage_[index];
                 num <<= TypeWidth();
+                --index;
             }
 
             num |= storage_[0];
