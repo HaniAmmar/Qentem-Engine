@@ -102,28 +102,28 @@ int main() {
 
     ////////// unsigned int 128-bit /////////////
 
-    BigInt<unsigned int, 128U> bint3 = 0xFFFFFFFF;
-    bint3 <<= 32U;
-    bint3 |= 0xFFFFFFFF;
+    BigInt<unsigned int, 128U> b_int3 = 0xFFFFFFFF;
+    b_int3 <<= 32U;
+    b_int3 |= 0xFFFFFFFF;
 
-    PrintDigits(bint3);
+    PrintDigits(b_int3);
     // Output: 18446744073709551615
 
-    bint3 *= 4294967295U;
-    bint3 *= 4294967295U;
+    b_int3 *= 4294967295U;
+    b_int3 *= 4294967295U;
 
-    PrintDigits(bint3);
+    PrintDigits(b_int3);
     // Output: 340282366762482138434845932253270245375
 
-    std::cout << "Remaining: " << bint3.Divide(1000000000U) << '\n';
+    std::cout << "Remaining: " << b_int3.Divide(1000000000U) << '\n';
     // Output: Remaining: 270245375
 
-    PrintDigits(bint3);
+    PrintDigits(b_int3);
     // Output: 340282366762482138434845932253
 
     // Also
-    // bint3 += number;
-    // bint3 -= number;
-    // bint3 &= number;
-    // bint3 /= number;
+    // b_int3 += number;
+    // b_int3 -= number;
+    // b_int3 &= number;
+    // b_int3 /= number;
 }
