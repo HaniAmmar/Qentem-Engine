@@ -26,7 +26,6 @@
 #include "QNumber.hpp"
 #include "BigInt.hpp"
 #include "DigitUtils.hpp"
-#include "StringUtils.hpp"
 
 namespace Qentem {
 /*
@@ -861,21 +860,16 @@ struct Digit {
         } else {
             using Char_T           = typename Stream_T::CharType;
             constexpr SizeT32 size = sizeof(Char_T);
+            using DigitString      = DigitUtils::DigitString<Char_T, size>;
 
             if ((number & Info_T::MantissaMask) == Number_T{0}) {
                 if ((number & Info_T::SignMask) != Number_T{0}) {
                     stream += DigitUtils::DigitChar::Negative;
                 }
 
-                // stream.Write(DigitUtils::DigitString<Char_T, size>::Infinity,
-                //              StringUtils::ConstCount(DigitUtils::DigitString<Char_T, size>::Infinity));
-
-                stream.Write(DigitUtils::DigitString<Char_T, size>::Infinity, SizeT{3});
+                stream.Write(DigitString::Infinity, DigitString::InfinityLength);
             } else {
-                // stream.Write(DigitUtils::DigitString<Char_T, size>::NotANumber,
-                //              StringUtils::ConstCount(DigitUtils::DigitString<Char_T, size>::NotANumber));
-
-                stream.Write(DigitUtils::DigitString<Char_T, size>::NotANumber, SizeT{3});
+                stream.Write(DigitString::NotANumber, DigitString::NotANumberLength);
             }
         }
     }

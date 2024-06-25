@@ -277,20 +277,6 @@ struct BigInt {
     }
     ////////////////////////////////////////////////////
     inline void ShiftRight(SizeT32 offset) noexcept {
-        // while (offset >= TypeWidth()) {
-        //     SizeT32 index = 0U;
-
-        //     while (index < index_) {
-        //         storage_[index] = storage_[index + 1U];
-        //         ++index;
-        //     }
-
-        //     storage_[index_] = Number_T{0};
-        //     index_ -= SizeT32(index_ != 0U);
-
-        //     offset -= TypeWidth();
-        // }
-
         if (offset >= TypeWidth()) {
             SizeT32 move = (offset / TypeWidth());
             offset -= (move * TypeWidth());
@@ -370,22 +356,6 @@ struct BigInt {
 
             index_ = index;
         }
-
-        // SizeT32 index = index_;
-
-        // while (offset >= TypeWidth()) {
-        //     index_ += SizeT32((storage_[index] != 0U) && (index_ < MaxIndex()));
-        //     storage_[index_] = storage_[index];
-
-        //     while (index != 0U) {
-        //         storage_[index] = storage_[index - 1U];
-        //         --index;
-        //     }
-
-        //     storage_[0U] = Number_T{0};
-        //     index        = index_;
-        //     offset -= TypeWidth();
-        // }
 
         if (offset != 0U) {
             SizeT32       index      = index_;
