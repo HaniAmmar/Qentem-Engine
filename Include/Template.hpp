@@ -825,8 +825,8 @@ struct TemplateSub {
                                         break;
                                     }
 
-                                    default:
-                                        break;
+                                    default: {
+                                    }
                                 }
 
                                 continue;
