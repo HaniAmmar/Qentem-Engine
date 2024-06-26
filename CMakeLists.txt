@@ -55,6 +55,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(ArrayTest --coverage)
 endif()
 
+# BigInt
+add_executable(BigIntTest Tests/BigIntTest.cpp)
+add_test(NAME BigIntTest COMMAND BigIntTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(BigIntTest --coverage)
+endif()
+
 # Digit
 add_executable(DigitTest Tests/DigitTest.cpp)
 add_test(NAME DigitTest COMMAND DigitTest)
