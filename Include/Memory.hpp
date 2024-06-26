@@ -159,7 +159,7 @@ inline static SizeT AlignSize(SizeT n_size) noexcept {
 /////////////////////////////////////////////////////////////////////
 template <typename Type_T>
 inline static Type_T *Allocate(SizeT size) {
-    Type_T *pointer = ChangePointer<Type_T>(::operator new(size * sizeof(Type_T)));
+    Type_T *pointer = ChangePointer<Type_T>(::operator new(SystemIntType(size * sizeof(Type_T))));
 
 #ifdef QENTEM_Q_TEST_H
     MemoryRecord::AddAllocation(pointer);

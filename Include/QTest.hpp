@@ -39,6 +39,7 @@
 namespace Qentem {
 
 #if (defined(_MSVC_LANG) && (_MSVC_LANG > 201703L)) || (defined(__cplusplus) && (__cplusplus > 201703L))
+QENTEM_MAYBE_UNUSED
 static std::wostream &operator<<(std::wostream &ss, const char16_t *str) {
     if (str != nullptr) {
         while (*str != char16_t{'\0'}) {
@@ -51,6 +52,7 @@ static std::wostream &operator<<(std::wostream &ss, const char16_t *str) {
     return ss;
 }
 
+QENTEM_MAYBE_UNUSED
 static std::wostream &operator<<(std::wostream &ss, const char16_t ch) {
     // it's fine for PrintErrorMessage().
     ss << char(ch);
@@ -58,6 +60,7 @@ static std::wostream &operator<<(std::wostream &ss, const char16_t ch) {
     return ss;
 }
 
+QENTEM_MAYBE_UNUSED
 static std::wostream &operator<<(std::wostream &ss, const char32_t *str) {
     if (str != nullptr) {
         while (*str != char16_t{'\0'}) {
@@ -70,6 +73,7 @@ static std::wostream &operator<<(std::wostream &ss, const char32_t *str) {
     return ss;
 }
 
+QENTEM_MAYBE_UNUSED
 static std::wostream &operator<<(std::wostream &ss, const char32_t ch) {
     // it's fine for PrintErrorMessage().
     ss << char(ch);
