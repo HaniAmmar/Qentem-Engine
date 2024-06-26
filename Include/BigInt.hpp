@@ -232,7 +232,11 @@ struct BigInt {
                 ++index;
             }
 
-            index_ += SizeT32((index > index_) & (index <= MaxIndex()));
+            if (index <= MaxIndex()) {
+                index_ += SizeT32((index > index_) & (index <= MaxIndex()));
+            } else {
+                index_ = 0;
+            }
         }
     }
 
@@ -251,7 +255,11 @@ struct BigInt {
                 ++index;
             }
 
-            index_ -= SizeT32((index > 0U) && (storage_[index_] == Number_T{0}));
+            if (index <= MaxIndex()) {
+                index_ -= SizeT32((index > 0U) && (storage_[index_] == Number_T{0}));
+            } else {
+                index_ = MaxIndex();
+            }
         }
     }
     ////////////////////////////////////////////////////
