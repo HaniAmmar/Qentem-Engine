@@ -724,7 +724,8 @@ struct Digit {
     static void realToString(Stream_T &stream, const Number_T number, const RealFormatInfo format) {
         constexpr SizeT32 number_size = sizeof(Number_T);
 
-        using Info_T     = DigitUtils::RealNumberInfo<Float_T, number_size>;
+        using Info_T = DigitUtils::RealNumberInfo<Float_T, number_size>;
+        // 4.9406564584124654e-324 needs about 1216 bits to store all its digits.
         using BigIntSys  = BigInt<SystemIntType, ((Info_T::Bias + 1U) + (number_size * 8U * 3U))>;
         using DigitConst = DigitUtils::DigitConst<BigIntSys::SizeOfType()>;
 

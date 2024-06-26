@@ -75,19 +75,6 @@ struct BigInt {
         }
     }
 
-    BigInt &operator=(BigInt &&src) noexcept {
-        copy(src);
-        src.Clear();
-
-        return *this;
-    }
-
-    BigInt &operator=(const BigInt &src) noexcept {
-        copy(src);
-
-        return *this;
-    }
-
     template <typename N_Number_T>
     inline BigInt(const N_Number_T number) noexcept {
         doOperation<BigIntOperation::Set>(number);
@@ -102,6 +89,19 @@ struct BigInt {
             storage_[index] = Number_T{0};
             --index;
         }
+
+        return *this;
+    }
+
+    BigInt &operator=(BigInt &&src) noexcept {
+        copy(src);
+        src.Clear();
+
+        return *this;
+    }
+
+    BigInt &operator=(const BigInt &src) noexcept {
+        copy(src);
 
         return *this;
     }
