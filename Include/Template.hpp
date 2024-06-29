@@ -715,7 +715,7 @@ struct TemplateSub {
         if ((value == nullptr) ||
             !(value->CopyValueTo(*stream_, {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
                                  &escapeHTMLSpecialChars))) {
-            if ((loop_key_ != nullptr) && (tag.IsLoopValue == SizeT8{1})) {
+            if ((loop_key_ != nullptr) && (tag.Level != SizeT8{0})) {
                 escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
             } else {
                 stream_->Write((content_ + t_offset), length);
@@ -854,8 +854,7 @@ struct TemplateSub {
 
         // Set (Array|Object)
         if (tag.SetLength != 0) {
-            loop_set = getValue((tag.Offset + tag.SetOffset), tag.SetLength, tag.SetLevel,
-                                (tag.Options & LoopTagOptions::SetIsLoopValue));
+            loop_set = getValue((tag.Offset + tag.SetOffset), tag.SetLength, tag.SetLevel);
         } else {
             loop_set = value_;
         }
@@ -871,7 +870,7 @@ struct TemplateSub {
             }
 
             // Sort
-            if (tag.Options > 1) {
+            if (tag.Options > SizeT8{1}) {
                 if (tag.GroupLength == 0) {
                     grouped_set = *loop_set;
                     loop_set    = &grouped_set;
@@ -988,8 +987,7 @@ struct TemplateSub {
                 length   = temp->loop_value_length_;
 
                 if (StringUtils::IsEqual((content_ + offset), (content_ + l_offset), length)) {
-                    tag.IsLoopValue = 1;
-                    tag.Level       = SizeT8(level);
+                    tag.Level = SizeT8(level);
                     break;
                 }
 
@@ -1136,7 +1134,6 @@ struct TemplateSub {
                             tag.SetOffset = SizeT8(var.Offset - tag.Offset);
                             tag.SetLength = SizeT8(var.Length);
                             tag.SetLevel  = var.Level;
-                            tag.Options |= var.IsLoopValue;
 
                             break;
                         }
@@ -1420,17 +1417,17 @@ struct TemplateSub {
     }
 
     inline const Value_T *getValue(const VariableTag &variable) const noexcept {
-        return getValue(variable.Offset, variable.Length, variable.Level, variable.IsLoopValue);
+        return getValue(variable.Offset, variable.Length, variable.Level);
     }
 
-    const Value_T *getValue(SizeT v_offset, SizeT16 v_length, SizeT8 v_level, SizeT8 v_is_loop_value) const noexcept {
+    const Value_T *getValue(SizeT v_offset, SizeT16 v_length, SizeT8 v_level) const noexcept {
         const Value_T *value  = nullptr;
         const Char_T  *id     = (content_ + v_offset);
         const SizeT    length = v_length;
         SizeT          offset = 0;
         const bool has_index  = ((length != SizeT{0}) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
 
-        if (v_is_loop_value != SizeT8{1}) {
+        if (v_level == SizeT8{0}) {
             if (!has_index) {
                 return value_->GetValue(id, length);
             }

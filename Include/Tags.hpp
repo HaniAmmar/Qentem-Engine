@@ -258,7 +258,6 @@ struct SuperVariableTag {
 // LoopTagOptions -------------------------------------------
 struct LoopTagOptions {
     static constexpr SizeT8 None{0};
-    static constexpr SizeT8 SetIsLoopValue{1};
     static constexpr SizeT8 SortAscend{2};
     static constexpr SizeT8 SortDescend{4};
 };
