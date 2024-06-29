@@ -3151,7 +3151,7 @@ static void TestLoopTag3(QTest &test) {
     ss.Clear();
 
     content =
-        R"(<loop value="val_1" group="year" sort='descend'>-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter" sort="ascend">{var:val_2}-<loop set="val_2" value="val_3" group="week" sort="ascend">{var:val_2}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
+        R"(<loop value="val_1" group="year" sort='descend'>-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter" sort="ascend">{var:val_2}-<loop set="val_2" value="val_3" group="week" sort="ascend">{var:val_3}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
 
     test.IsEqual(
         Template::Render(content, value, ss),
@@ -3160,7 +3160,7 @@ static void TestLoopTag3(QTest &test) {
     ss.Clear();
 
     content =
-        R"(<loop value="val_1" group="year">-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter">{var:val_2}-<loop set="val_2" value="val_3" group="week">{var:val_2}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
+        R"(<loop value="val_1" group="year">-- {var:val_1}-<loop set="val_1" value="val_2" group="quarter">{var:val_2}-<loop set="val_2" value="val_3" group="week">{var:val_3}:<loop set="val_3" value="val_4"><loop set="val_4" value="val_5"> {var:val_5}</loop></loop></loop></loop></loop>)";
 
     test.IsEqual(
         Template::Render(content, value, ss),
