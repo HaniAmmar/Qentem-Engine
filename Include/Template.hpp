@@ -300,11 +300,11 @@ struct TemplateSub {
     }
 
     inline void Parse(Array<TagBit> &tags_cache) const {
-        parse(tags_cache, 0, length_);
+        parse(tags_cache, SizeT{0}, length_);
     }
 
     inline void LightParse(Array<TagBit> &tags_cache) const {
-        lightParse(tags_cache, 0, length_);
+        lightParse(tags_cache, SizeT{0}, length_);
     }
 
     inline bool Evaluate(QExpression &number, const QExpressions &exprs) const noexcept {
@@ -389,11 +389,9 @@ struct TemplateSub {
                                                                      current_offset, end_offset, length_);
 
                             if (current_offset != SizeT{0}) {
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
-
                                 offset += TagPatterns::VariablePrefixLength;
                                 parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
-                                                 tag.GeVariableTag());
+                                                 (tags_cache.Insert(TagBit{TagType::Variable})).GeVariableTag());
                                 offset = current_offset;
                                 continue;
                             }
@@ -415,11 +413,9 @@ struct TemplateSub {
                                                                      current_offset, end_offset, length_);
 
                             if (current_offset != SizeT{0}) {
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
-
                                 offset += TagPatterns::RawVariablePrefixLength;
                                 parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
-                                                 tag.GeRawVariableTag());
+                                                 (tags_cache.Insert(TagBit{TagType::RawVariable})).GeRawVariableTag());
                                 offset = current_offset;
                                 continue;
                             }
@@ -441,9 +437,8 @@ struct TemplateSub {
                                                                   content_, current_offset, end_offset, length_);
 
                             if (current_offset != SizeT{0}) {
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
-
-                                parseMathTag(offset, current_offset, tag.GetMathTag());
+                                parseMathTag(offset, current_offset,
+                                             (tags_cache.Insert(TagBit{TagType::Math})).GetMathTag());
                                 offset = current_offset;
                                 continue;
                             }
@@ -465,9 +460,9 @@ struct TemplateSub {
                                                                   content_, current_offset, end_offset, length_);
 
                             if (current_offset != SizeT{0}) {
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::SuperVariable});
-
-                                parseSuperVariableTag(offset, current_offset, tag.GetSuperVariableTag());
+                                parseSuperVariableTag(
+                                    offset, current_offset,
+                                    (tags_cache.Insert(TagBit{TagType::SuperVariable})).GetSuperVariableTag());
                                 offset = current_offset;
                                 continue;
                             }
@@ -489,9 +484,8 @@ struct TemplateSub {
                                                                   content_, current_offset, end_offset, length_);
 
                             if (current_offset != SizeT{0}) {
-                                const TagBit &tag = tags_cache.Insert(TagBit{TagType::InLineIf});
-
-                                parseInLineIfTag(offset, current_offset, tag.GetInLineIfTag());
+                                parseInLineIfTag(offset, current_offset,
+                                                 (tags_cache.Insert(TagBit{TagType::InLineIf})).GetInLineIfTag());
                                 offset = current_offset;
                                 continue;
                             }
@@ -519,9 +513,8 @@ struct TemplateSub {
                             TagPatterns::LoopSuffixLength, content_, current_offset, end_offset, length_);
 
                         if (current_offset != SizeT{0}) {
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Loop});
-
-                            parseLoopTag(offset, current_offset, tag.GetLoopTag());
+                            parseLoopTag(offset, current_offset,
+                                         (tags_cache.Insert(TagBit{TagType::Loop})).GetLoopTag());
                             offset = current_offset;
                             continue;
                         }
@@ -538,9 +531,7 @@ struct TemplateSub {
                             TagPatterns::IfSuffixLength, content_, current_offset, end_offset, length_);
 
                         if (current_offset != SizeT{0}) {
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::If});
-
-                            parseIfTag(offset, current_offset, tag.GetIfTag());
+                            parseIfTag(offset, current_offset, (tags_cache.Insert(TagBit{TagType::If})).GetIfTag());
                             offset = current_offset;
                             continue;
                         }
@@ -571,12 +562,10 @@ struct TemplateSub {
                             current_offset = Engine::FindOne<Char_T>(TagPatterns::InLineSuffix, content_,
                                                                      current_offset, end_offset, length_);
 
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Variable});
-
                             offset -= TagPatterns::InLinePrefixLength;
                             offset += TagPatterns::VariablePrefixLength;
                             parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
-                                             tag.GeVariableTag());
+                                             (tags_cache.Insert(TagBit{TagType::Variable})).GeVariableTag());
                             offset = current_offset;
                             continue;
                         }
@@ -597,12 +586,10 @@ struct TemplateSub {
                             current_offset = Engine::FindOne<Char_T>(TagPatterns::InLineSuffix, content_,
                                                                      current_offset, end_offset, length_);
 
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::RawVariable});
-
                             offset -= TagPatterns::InLinePrefixLength;
                             offset += TagPatterns::RawVariablePrefixLength;
                             parseVariableTag(offset, (current_offset - TagPatterns::InLineSuffixLength),
-                                             tag.GeRawVariableTag());
+                                             (tags_cache.Insert(TagBit{TagType::RawVariable})).GeRawVariableTag());
                             offset = current_offset;
                             continue;
                         }
@@ -623,10 +610,9 @@ struct TemplateSub {
                                 Engine::SkipInnerPatterns<Char_T>(TagPatterns::InLinePrefix, TagPatterns::InLineSuffix,
                                                                   content_, current_offset, end_offset, length_);
 
-                            const TagBit &tag = tags_cache.Insert(TagBit{TagType::Math});
-
                             offset -= TagPatterns::InLinePrefixLength;
-                            parseMathTag(offset, current_offset, tag.GetMathTag());
+                            parseMathTag(offset, current_offset,
+                                         (tags_cache.Insert(TagBit{TagType::Math})).GetMathTag());
                             offset = current_offset;
                             continue;
                         }
