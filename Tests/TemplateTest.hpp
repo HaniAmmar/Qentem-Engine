@@ -3593,6 +3593,14 @@ static void TestRender2(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), "", __LINE__);
     ss.Clear();
 
+    content = R"(<loop value="this_number"><if case="({var:this_number} & 1) != 1">{var:this_number},</if></loop>)";
+    test.IsEqual(Template::Render(content, value, ss), R"(0,2,10,)", __LINE__);
+    ss.Clear();
+
+    content = R"(<loop value="this_number"><if case="({var:this_number} & 1) == 1">{var:this_number},</if></loop>)";
+    test.IsEqual(Template::Render(content, value, ss), R"(1,5,)", __LINE__);
+    ss.Clear();
+
     content = R"(<loop value="this_number"><if case="({var:this_number} % 2) == 1">{var:this_number},</if></loop>)";
     test.IsEqual(Template::Render(content, value, ss), R"(1,5,)", __LINE__);
     ss.Clear();
