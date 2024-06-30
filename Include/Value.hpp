@@ -1397,6 +1397,20 @@ struct Value {
         }
     }
 
+    void SetValueAndKey(SizeT index, const Value *&value, StringView<Char_T> &key) const noexcept {
+        if (IsObject()) {
+            const HAItem_T<Value, Char_T> *item = data_.VObject.GetItem(index);
+
+            value = nullptr;
+
+            if ((item != nullptr) && !(item->Value.IsUndefined())) {
+                const SizeT len = item->Key.Length();
+                value           = &(item->Value);
+                key             = StringView<Char_T>{item->Key.Storage(len), len};
+            }
+        }
+    }
+
     // To get a pointer to a string value and its length.
     template <typename Number_T>
     bool SetCharAndLength(const Char_T *&key, Number_T &length) const noexcept {
