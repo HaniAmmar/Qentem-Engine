@@ -704,7 +704,7 @@ struct TemplateSub {
             if ((loop_key_ != nullptr) && (tag.Level != SizeT8{0})) {
                 escapeHTMLSpecialChars(*stream_, loop_key_, loop_key_length_);
             } else {
-                stream_->Write((content_ + t_offset), length);
+                escapeHTMLSpecialChars(*stream_, (content_ + t_offset), length);
             }
         }
     }
