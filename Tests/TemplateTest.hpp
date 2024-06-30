@@ -810,6 +810,9 @@ static void TestVariableTag4(QTest &test) {
                      R"(A&quot;&quot;BC&lt;&lt;DE&gt;&gt;FG&apos;&apos;HI&amp;&amp;GK)", __LINE__);
         ss.Clear();
 
+        test.IsEqual(Template::Render(R"({var:<"&'>})", value, ss), R"({var:&lt;&quot;&amp;&apos;&gt;})", __LINE__);
+        ss.Clear();
+
     } else {
         test.IsEqual(Template::Render(R"({var:0})", value, ss), R"(<)", __LINE__);
         ss.Clear();
@@ -971,6 +974,9 @@ static void TestVariableTag4(QTest &test) {
         ss.Clear();
 
         test.IsEqual(Template::Render(R"({var:53})", value, ss), R"(A""BC<<DE>>FG''HI&&GK)", __LINE__);
+        ss.Clear();
+
+        test.IsEqual(Template::Render(R"({var:<"&'>})", value, ss), R"({var:<"&'>})", __LINE__);
         ss.Clear();
     }
 }
