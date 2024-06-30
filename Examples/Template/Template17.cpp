@@ -26,7 +26,7 @@ inline static void CachedRender(const Char_T *content, const SizeT length, const
     using Qentem::HArray;
 
     static HArray<Array<Tag>, Char_T> cache;
-    const TemplateSubCV               temp{content, length, &stream, &value};
+    TemplateSubCV                     temp{content, length, &stream, &value};
     Array<Tag>                       &tags = cache.Get(name, name_length);
 
     if (tags.IsEmpty()) {
