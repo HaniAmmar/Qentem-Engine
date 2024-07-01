@@ -361,6 +361,16 @@ struct Array {
         return nullptr;
     }
 
+    inline void Drop(const SizeT size) noexcept {
+        if (size <= Size()) {
+            const SizeT new_size = (Size() - size);
+
+            Type_T *storage = Storage();
+            Memory::Dispose((storage + new_size), (storage + Size()));
+            setSize(new_size);
+        }
+    }
+
     inline SizeT8 GetHighByte() const noexcept {
         return data_.Storage.GetHighByte();
     }
