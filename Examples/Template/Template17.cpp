@@ -32,9 +32,6 @@ inline static void CachedRender(const StringView<Char_T> &content, const Value_T
 
     if (tags.IsEmpty()) {
         temp.Parse(tags);
-
-        // Or
-        // temp.LightParse(tags); // for {var:} {raw:} {math:} only
     }
 
     temp.Render(tags, value, stream);

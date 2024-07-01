@@ -304,10 +304,6 @@ struct TemplateCore {
         parse(tags_cache, SizeT{0}, length_, nullptr);
     }
 
-    inline void LightParse(Array<TagBit> &tags_cache) {
-        lightParse(tags_cache, SizeT{0}, length_, nullptr);
-    }
-
     void Render(const Array<Tags::TagBit> &tags_cache, const Value_T &value, StringStream_T &stream) {
         Array<LoopItem>     loops_items{};
         const Tags::TagBit *tag = tags_cache.First();
