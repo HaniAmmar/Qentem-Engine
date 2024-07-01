@@ -49,13 +49,13 @@ namespace Test {
 static int PrintResult(int passed, int failed) {
     if (failed == 0) {
         TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::PASS), "All good. (", passed, ") tests",
-                          TestOutPut::GetColor(TestOutPut::Colors::END), '\n');
+                          TestOutPut::GetColor(TestOutPut::Colors::END), "\n\n");
         return 0;
     }
 
     TestOutPut::Print(TestOutPut::GetColor(TestOutPut::Colors::ERROR), "Not good!",
                       TestOutPut::GetColor(TestOutPut::Colors::END), " ", failed, " out of ", (passed + failed),
-                      " failed.\n");
+                      " failed.\n\n");
 
     return 1;
 }

@@ -239,7 +239,7 @@ struct MemoryRecord {
 
         TestOutPut::SetDoubleFormat();
 
-        TestOutPut::Print("\nMemory: ", (double(storage.remainingSize) / 1024),
+        TestOutPut::Print("Memory: ", (double(storage.remainingSize) / 1024),
                           " KB, Peak: ", (double(storage.peakSize) / 1024), " KB.\n");
 
         TestOutPut::Print("Allocations: ", storage.allocations, ", Deallocations: ", storage.deallocations, ".\n");
