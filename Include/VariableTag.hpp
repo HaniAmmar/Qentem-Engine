@@ -32,8 +32,8 @@ namespace Tags {
 struct VariableTag {
     SizeT   Offset{0};
     SizeT16 Length{0};
+    SizeT8  IDLength{0};
     SizeT8  Level{0};
-    // SizeT8  IsLoopValue{0};
 };
 
 } // namespace Tags

@@ -265,17 +265,23 @@ struct LoopTagOptions {
 // LoopTagOptions -------------------------------------------
 struct LoopTag {
     Array<TagBit> SubTags{};
-    SizeT         Offset{0};
-    SizeT         EndOffset{0};
-    SizeT         ContentOffset{0};
-    SizeT8        SetOffset{0};
-    SizeT8        SetLength{0};
-    SizeT8        SetLevel{0};
-    SizeT8        ValueOffset{0};
-    SizeT8        GroupOffset{0};
-    SizeT8        ValueLength{0};
-    SizeT8        GroupLength{0};
-    SizeT8        Options{0};
+    VariableTag   Set{};
+
+    const LoopTag *Parent{nullptr};
+
+    SizeT Offset{0};
+    SizeT EndOffset{0};
+
+    SizeT16 ContentOffset{0};
+
+    SizeT8 ValueOffset{0};
+    SizeT8 ValueLength{0};
+
+    SizeT8 GroupOffset{0};
+    SizeT8 GroupLength{0};
+
+    SizeT8 Options{0};
+    SizeT8 Level{0};
 };
 
 // InLineIfTag -------------------------------------------

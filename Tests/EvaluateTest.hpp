@@ -32,13 +32,12 @@ namespace Qentem {
 namespace Test {
 
 QENTEM_NOINLINE static bool TestEvaluate(QNumber64 &number, const char *content, const Value<char> &value) {
-    using TemplateSubCV             = TemplateSub<char, Value<char>, StringStream<char>>;
-    const SizeT              length = StringUtils::Count(content);
-    const TemplateSubCV      temp{content, length, nullptr, &value};
-    const Array<QExpression> exprs = temp.ParseExpressions(0, length);
-    QExpression              result;
+    const SizeT                                         length = StringUtils::Count(content);
+    TemplateCore<char, Value<char>, StringStream<char>> temp{content, length};
+    const Array<QExpression>                            exprs = temp.ParseExpressions(0, length);
+    QExpression                                         result;
 
-    if (temp.Evaluate(result, exprs)) {
+    if (temp.Evaluate(result, exprs, value)) {
         number = result.Value.Number;
         return true;
     }

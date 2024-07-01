@@ -1,11 +1,11 @@
 #include "JSON.hpp"
 #include "Template.hpp"
+#include "StringView.hpp"
 
 #include <iostream>
 
-using Qentem::JSON;
-using Qentem::SizeT;
 using Qentem::StringStream;
+using Qentem::StringView;
 
 /*
 mkdir Build
@@ -14,20 +14,21 @@ c++ -g ./Examples/Template/Template17.cpp -I ./Include -o ./Build/QTest.bin
 */
 
 template <typename Char_T, typename Value_T, typename StringStream_T>
-inline static void CachedRender(const Char_T *content, const SizeT length, const Value_T &value, StringStream_T &stream,
-                                const Char_T *name, const SizeT name_length) {
+inline static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
+                                const StringView<Char_T> &template_name) {
     // This is not a thread-safe function, and it's here to show how to cache processed tags. Can be used in a
     // single-threaded process to build on. One lazy way to make it safe is to Parse() all templates before starting the
     // multi-threading process.
 
-    using TemplateSubCV = Qentem::TemplateSub<Char_T, Value_T, StringStream_T>;
-    using Tag           = Qentem::Tags::TagBit;
     using Qentem::Array;
     using Qentem::HArray;
 
-    static HArray<Array<Tag>, Char_T> cache;
-    TemplateSubCV                     temp{content, length, &stream, &value};
-    Array<Tag>                       &tags = cache.Get(name, name_length);
+    using TemplateCore = Qentem::TemplateCore<Char_T, Value_T, StringStream_T>;
+    using Tag          = Qentem::Tags::TagBit;
+
+    TemplateCore                      temp{content.First(), content.Length()};
+    static HArray<Array<Tag>, Char_T> tags_caches;
+    Array<Tag>                       &tags = tags_caches[template_name];
 
     if (tags.IsEmpty()) {
         temp.Parse(tags);
@@ -36,13 +37,11 @@ inline static void CachedRender(const Char_T *content, const SizeT length, const
         // temp.LightParse(tags); // for {var:} {raw:} {math:} only
     }
 
-    const Tag *tag = tags.First();
-    const Tag *end = (tag + tags.Size()); // Or tags.End()
-    temp.Render(tag, end);
+    temp.Render(tags, value, stream);
 }
 
 int main() {
-    Qentem::Value<char> value = JSON::Parse(R"(
+    Qentem::Value<char> value = Qentem::JSON::Parse(R"(
 [
     {
         "major": "Computer Science",
@@ -63,7 +62,7 @@ int main() {
 ]
     )");
 
-    const char *content = R"(
+    const StringView<char> content = R"(
 <html>
 
 <body>
@@ -93,14 +92,12 @@ int main() {
 )";
 
     // Qentem::Template can use any stream if it has Write(const char_type *, length) function.
-    StringStream<char> stream;
-    const char        *template_name        = "page1";
-    const SizeT        template_name_length = 5U;
-    const SizeT        content_length       = Qentem::StringUtils::Count(content);
+    StringStream<char>     stream;
+    const StringView<char> template_name{"page1"};
 
     for (unsigned int i = 0; i < 10000U; i++) {
         stream.Clear();
-        CachedRender(content, content_length, value, stream, template_name, template_name_length);
+        CachedRender(content, value, stream, template_name);
     }
 
     std::cout << stream << '\n';
