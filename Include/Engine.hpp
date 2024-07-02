@@ -40,6 +40,103 @@ struct Engine {
     ~Engine()                         = delete;
 
     /*
+     * Every word's ID is stored in 4 bits,
+     * 64bit system can store 16 IDs. 16*4 = 64 bits
+     * 32bit system can store 8 IDs. 8*4 = 32 bits
+     * bit_count = sizeof(SystemIntType) * 8 = 32 or 64
+     * blocks = bit_count / 4 = 8 or 16
+     */
+
+    static constexpr SizeT32 Bits   = 4U; // Number of bits per ID
+    static constexpr SizeT32 Blocks = ((sizeof(SystemIntType) * 8U) / Bits);
+
+    template <typename WordsList_T, typename Char_T, typename Number_T>
+    static void Find(const WordsList_T &list, SystemIntType *storage, const Char_T *content, Number_T offset,
+                     const Number_T end_offset) {
+        SizeT32 id;
+        SizeT32 group_count;
+
+        do {
+            group_count = 0;
+
+            while (offset < end_offset) {
+                id = 0;
+
+                while ((id < list.FirstCharsCount) && (content[offset] != list.GetFirstChar(id))) {
+                    ++id;
+                }
+
+                if (id < list.FirstCharsCount) {
+                    group_count = list.GetGroupedByFirstCount(id);
+
+                    break;
+                }
+
+                // Match single chars.
+                SizeT32 char_index{0U};
+
+                while (char_index < list.SingleCharGroupCount) {
+                    const SizeT32 word_id = list.GetSingleCharGroup()[char_index];
+
+                    if (content[offset] == list.GetWord(word_id)[0]) {
+                        const SizeT   storage_index = SizeT(offset / Blocks);
+                        const SizeT32 item_index    = SizeT32(offset - (storage_index * Blocks));
+
+                        storage[storage_index] |= (SystemIntType(word_id + SizeT32{1}) << (item_index * Bits));
+
+                        break;
+                    }
+
+                    ++char_index;
+                }
+
+                ++offset;
+            }
+
+            ++offset;
+
+            if ((group_count != SizeT32{0}) && (offset < end_offset)) {
+                const Number_T start_offset = offset;
+                const SizeT32 *group_list   = list.GetGroupedByFirstChar(id);
+                id                          = 0; // Reuse for 'word index'.
+
+                while (id < group_count) {
+                    const SizeT32  word_id         = group_list[id];
+                    const SizeT32  word_length     = list.GetWordLength(word_id);
+                    const Number_T word_end_offset = Number_T(offset + word_length);
+                    const char    *word            = list.GetWord(word_id);
+
+                    // Match the last char of the word.
+                    if ((word_end_offset < end_offset) && (content[word_end_offset] == word[word_length])) {
+                        Number_T word_offset{0};
+
+                        // Match chars between the first and the last char of the word.
+                        while ((offset < word_end_offset) && (content[offset] == word[word_offset])) {
+                            ++word_offset;
+                            ++offset;
+                        }
+
+                        if (offset == word_end_offset) {
+                            word_offset                 = Number_T(start_offset - Number_T{1});
+                            const SizeT   storage_index = SizeT(word_offset / Blocks);
+                            const SizeT32 item_index    = SizeT32(word_offset - (storage_index * Blocks));
+
+                            storage[storage_index] |= (SystemIntType(word_id + SizeT32{1}) << (item_index * Bits));
+                            ++offset;
+
+                            break;
+                        }
+
+                        offset = start_offset;
+                    }
+
+                    ++id;
+                }
+            }
+        } while (offset < end_offset);
+    }
+
+    /*
      * Returns the (index+1) of a given character.
      */
     template <typename Char_T, typename Number_T>
