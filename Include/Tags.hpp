@@ -120,50 +120,73 @@ struct TagBitData<false> {
 
 struct TagBit {
   public:
-    TagBit()                          = delete;
+    TagBit()                          = default;
     TagBit(const TagBit &)            = delete;
     TagBit &operator=(const TagBit &) = delete;
     TagBit &operator=(TagBit &&)      = delete;
     TagBit(TagBit &&tag) noexcept     = default;
 
-    explicit TagBit(TagType type) {
-        data_.SetType(type);
+    VariableTag *MakeVariableTag() {
+        VariableTag *tag = Memory::AllocateInit<VariableTag>();
 
-        switch (type) {
-            case TagType::Variable:
-            case TagType::RawVariable: {
-                data_.SetStorage(Memory::AllocateInit<VariableTag>());
-                break;
-            }
+        data_.SetType(TagType::Variable);
+        data_.SetStorage(tag);
 
-            case TagType::Math: {
-                data_.SetStorage(Memory::AllocateInit<MathTag>());
-                break;
-            }
+        return tag;
+    }
 
-            case TagType::SuperVariable: {
-                data_.SetStorage(Memory::AllocateInit<SuperVariableTag>());
-                break;
-            }
+    VariableTag *MakeRawVariableTag() {
+        VariableTag *tag = Memory::AllocateInit<VariableTag>();
 
-            case TagType::InLineIf: {
-                data_.SetStorage(Memory::AllocateInit<InLineIfTag>());
-                break;
-            }
+        data_.SetType(TagType::RawVariable);
+        data_.SetStorage(tag);
 
-            case TagType::Loop: {
-                data_.SetStorage(Memory::AllocateInit<LoopTag>());
-                break;
-            }
+        return tag;
+    }
 
-            case TagType::If: {
-                data_.SetStorage(Memory::AllocateInit<IfTag>());
-                break;
-            }
+    MathTag *MakeMathTag() {
+        MathTag *tag = Memory::AllocateInit<MathTag>();
 
-            default: {
-            }
-        }
+        data_.SetType(TagType::Math);
+        data_.SetStorage(tag);
+
+        return tag;
+    }
+
+    SuperVariableTag *MakeSuperVariableTag() {
+        SuperVariableTag *tag = Memory::AllocateInit<SuperVariableTag>();
+
+        data_.SetType(TagType::SuperVariable);
+        data_.SetStorage(tag);
+
+        return tag;
+    }
+
+    InLineIfTag *MakeInLineIfTag() {
+        InLineIfTag *tag = Memory::AllocateInit<InLineIfTag>();
+
+        data_.SetType(TagType::InLineIf);
+        data_.SetStorage(tag);
+
+        return tag;
+    }
+
+    LoopTag *MakeLoopTag() {
+        LoopTag *tag = Memory::AllocateInit<LoopTag>();
+
+        data_.SetType(TagType::Loop);
+        data_.SetStorage(tag);
+
+        return tag;
+    }
+
+    IfTag *MakeIfTag() {
+        IfTag *tag = Memory::AllocateInit<IfTag>();
+
+        data_.SetType(TagType::If);
+        data_.SetStorage(tag);
+
+        return tag;
     }
 
     ~TagBit() {
