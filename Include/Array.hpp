@@ -199,7 +199,7 @@ struct Array {
     void operator+=(Type_T &&item) {
         if (Size() == Capacity()) {
             if (Capacity() == SizeT{0}) {
-                setCapacity(1U);
+                setCapacity(SizeT{1});
             }
 
             resize(Capacity() * SizeT{2});

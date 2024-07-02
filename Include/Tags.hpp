@@ -30,20 +30,20 @@
 namespace Qentem {
 namespace Tags {
 
-struct SuperVariableTag;
 struct MathTag;
-struct LoopTag;
+struct SuperVariableTag;
 struct InLineIfTag;
+struct LoopTag;
 struct IfTag;
 //////////////////////
 enum struct TagType : SizeT8 {
     None = 0,
     Variable,      // {var:x}
     RawVariable,   // {raw:x}
-    SuperVariable, // {svar:x1,x2,x3}
     Math,          // {math:x}
-    Loop,          // <loop ...></loop>
+    SuperVariable, // {svar:x1,x2,x3}
     InLineIf,      // {if x}
+    Loop,          // <loop ...></loop>
     If             // <if case="..."></if>
 };
 
@@ -52,7 +52,7 @@ struct TagBitData;
 
 template <>
 struct TagBitData<true> {
-    // With tag
+    // With pointer tagging
     TagBitData() noexcept  = default;
     ~TagBitData() noexcept = default;
 
@@ -60,22 +60,27 @@ struct TagBitData<true> {
     TagBitData &operator=(TagBitData &&)      = delete;
     TagBitData &operator=(const TagBitData &) = delete;
 
-    TagBitData(TagBitData &&src) noexcept : Storage{Memory::Move(src.Storage)} {
+    TagBitData(TagBitData &&src) noexcept : storage_{Memory::Move(src.storage_)} {
     }
 
     inline void SetType(TagType type) noexcept {
-        Storage.SetHighByte(SizeT8(type));
+        storage_.SetHighByte(SizeT8(type));
     }
 
     inline TagType GetType() const noexcept {
-        return TagType(Storage.GetHighByte());
+        return TagType(storage_.GetHighByte());
+    }
+
+    inline void SetStorage(void *storage) noexcept {
+        storage_.SetPointer(storage);
     }
 
     inline void *GetStorage() const noexcept {
-        return Storage.GetPointer();
+        return storage_.GetPointer();
     }
 
-    QPointer<void> Storage{};
+  private:
+    QPointer<void> storage_{};
 };
 
 template <>
@@ -88,24 +93,29 @@ struct TagBitData<false> {
     TagBitData &operator=(TagBitData &&)      = delete;
     TagBitData &operator=(const TagBitData &) = delete;
 
-    TagBitData(TagBitData &&src) noexcept : Storage{Memory::Move(src.Storage)}, Type{src.Type} {
-        src.Type = TagType::None;
+    TagBitData(TagBitData &&src) noexcept : storage_{Memory::Move(src.storage_)}, type_{src.type_} {
+        src.type_ = TagType::None;
     }
 
     inline void SetType(TagType type) noexcept {
-        Type = type;
+        type_ = type;
     }
 
     inline TagType GetType() const noexcept {
-        return Type;
+        return type_;
+    }
+
+    inline void SetStorage(void *storage) noexcept {
+        storage_.SetPointer(storage);
     }
 
     inline void *GetStorage() const noexcept {
-        return Storage.GetPointer();
+        return storage_.GetPointer();
     }
 
-    QPointer<void> Storage{};
-    TagType        Type{TagType::None};
+  private:
+    QPointer<void> storage_{};
+    TagType        type_{TagType::None};
 };
 
 struct TagBit {
@@ -122,32 +132,32 @@ struct TagBit {
         switch (type) {
             case TagType::Variable:
             case TagType::RawVariable: {
-                data_.Storage.SetPointer(Memory::AllocateInit<VariableTag>());
-                break;
-            }
-
-            case TagType::SuperVariable: {
-                data_.Storage.SetPointer(Memory::AllocateInit<SuperVariableTag>());
+                data_.SetStorage(Memory::AllocateInit<VariableTag>());
                 break;
             }
 
             case TagType::Math: {
-                data_.Storage.SetPointer(Memory::AllocateInit<MathTag>());
+                data_.SetStorage(Memory::AllocateInit<MathTag>());
                 break;
             }
 
-            case TagType::Loop: {
-                data_.Storage.SetPointer(Memory::AllocateInit<LoopTag>());
+            case TagType::SuperVariable: {
+                data_.SetStorage(Memory::AllocateInit<SuperVariableTag>());
                 break;
             }
 
             case TagType::InLineIf: {
-                data_.Storage.SetPointer(Memory::AllocateInit<InLineIfTag>());
+                data_.SetStorage(Memory::AllocateInit<InLineIfTag>());
+                break;
+            }
+
+            case TagType::Loop: {
+                data_.SetStorage(Memory::AllocateInit<LoopTag>());
                 break;
             }
 
             case TagType::If: {
-                data_.Storage.SetPointer(Memory::AllocateInit<IfTag>());
+                data_.SetStorage(Memory::AllocateInit<IfTag>());
                 break;
             }
 
@@ -164,13 +174,6 @@ struct TagBit {
                 break;
             }
 
-            case TagType::SuperVariable: {
-                SuperVariableTag *ptr = (SuperVariableTag *)(data_.GetStorage());
-                Memory::Dispose(ptr);
-                Memory::Deallocate(ptr);
-                break;
-            }
-
             case TagType::Math: {
                 MathTag *ptr = (MathTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
@@ -178,8 +181,8 @@ struct TagBit {
                 break;
             }
 
-            case TagType::Loop: {
-                LoopTag *ptr = (LoopTag *)(data_.GetStorage());
+            case TagType::SuperVariable: {
+                SuperVariableTag *ptr = (SuperVariableTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
@@ -187,6 +190,13 @@ struct TagBit {
 
             case TagType::InLineIf: {
                 InLineIfTag *ptr = (InLineIfTag *)(data_.GetStorage());
+                Memory::Dispose(ptr);
+                Memory::Deallocate(ptr);
+                break;
+            }
+
+            case TagType::Loop: {
+                LoopTag *ptr = (LoopTag *)(data_.GetStorage());
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
@@ -212,20 +222,20 @@ struct TagBit {
         return *(Memory::ChangePointer<VariableTag>(data_.GetStorage()));
     }
 
-    inline SuperVariableTag &GetSuperVariableTag() const noexcept {
-        return *(Memory::ChangePointer<SuperVariableTag>(data_.GetStorage()));
-    }
-
     inline MathTag &GetMathTag() const noexcept {
         return *(Memory::ChangePointer<MathTag>(data_.GetStorage()));
     }
 
-    inline LoopTag &GetLoopTag() const noexcept {
-        return *(Memory::ChangePointer<LoopTag>(data_.GetStorage()));
+    inline SuperVariableTag &GetSuperVariableTag() const noexcept {
+        return *(Memory::ChangePointer<SuperVariableTag>(data_.GetStorage()));
     }
 
     inline InLineIfTag &GetInLineIfTag() const noexcept {
         return *(Memory::ChangePointer<InLineIfTag>(data_.GetStorage()));
+    }
+
+    inline LoopTag &GetLoopTag() const noexcept {
+        return *(Memory::ChangePointer<LoopTag>(data_.GetStorage()));
     }
 
     inline IfTag &GetIfTag() const noexcept {
@@ -253,6 +263,19 @@ struct SuperVariableTag {
     VariableTag   Variable{};
     SizeT         Offset{0};
     SizeT         EndOffset{0};
+};
+
+// InLineIfTag -------------------------------------------
+struct InLineIfTag {
+    Array<QExpression> Case{};
+    Array<TagBit>      SubTags{};
+    SizeT              Offset{0};
+    SizeT16            Length{0};
+    SizeT16            TrueOffset{0};
+    SizeT16            TrueLength{0};
+    SizeT16            TrueTagsSize{0};
+    SizeT16            FalseOffset{0};
+    SizeT16            FalseLength{0};
 };
 
 // LoopTagOptions -------------------------------------------
@@ -284,25 +307,12 @@ struct LoopTag {
     SizeT8 Level{0};
 };
 
-// InLineIfTag -------------------------------------------
-struct InLineIfTag {
+// IfTag -------------------------------------------
+struct IfTagCase {
     Array<QExpression> Case{};
     Array<TagBit>      SubTags{};
     SizeT              Offset{0};
-    SizeT16            Length{0};
-    SizeT16            TrueOffset{0};
-    SizeT16            TrueLength{0};
-    SizeT16            TrueTagsSize{0};
-    SizeT16            FalseOffset{0};
-    SizeT16            FalseLength{0};
-};
-
-// IfTag -------------------------------------------
-struct IfTagCase {
-    Array<QExpression> Case;
-    Array<TagBit>      SubTags;
-    SizeT              Offset;
-    SizeT              EndOffset;
+    SizeT              EndOffset{0};
 };
 
 struct IfTag {
@@ -324,14 +334,16 @@ struct TagPatterns_T {
      *InLineSuffixLength and InLinePrefixLength should not be more than 1
      */
 
-    static constexpr SizeT InLineSuffixLength{1};
     static constexpr SizeT InLinePrefixLength{1};
+    static constexpr SizeT InLineSuffixLength{1};
 
     static constexpr Char_T InLinePrefix = '{';
     static constexpr Char_T InLineSuffix = '}';
 
     static constexpr Char_T MultiLinePrefix = '<';
     static constexpr Char_T MultiLineSuffix = '>';
+
+    static constexpr SizeT MultiLineSuffixLength{1};
 
     static constexpr Char_T VariableIndexPrefix = '[';
     static constexpr Char_T VariableIndexSuffix = ']';
@@ -467,8 +479,8 @@ template <typename Char_T>
 struct TPStrings_T<Char_T, 1U> {
     static constexpr const Char_T *VariablePrefix      = "{var:";
     static constexpr const Char_T *RawVariablePrefix   = "{raw:";
-    static constexpr const Char_T *SuperVariablePrefix = "{svar:";
     static constexpr const Char_T *MathPrefix          = "{math:";
+    static constexpr const Char_T *SuperVariablePrefix = "{svar:";
     static constexpr const Char_T *InLineIfPrefix      = "{if";
     static constexpr const Char_T *LoopPrefix          = "<loop";
     static constexpr const Char_T *LoopSuffix          = "</loop>";
@@ -499,8 +511,8 @@ template <typename Char_T>
 struct TPStrings_T<Char_T, 2U> {
     static constexpr const Char_T *VariablePrefix      = u"{var:";
     static constexpr const Char_T *RawVariablePrefix   = u"{raw:";
-    static constexpr const Char_T *SuperVariablePrefix = u"{svar:";
     static constexpr const Char_T *MathPrefix          = u"{math:";
+    static constexpr const Char_T *SuperVariablePrefix = u"{svar:";
     static constexpr const Char_T *InLineIfPrefix      = u"{if";
     static constexpr const Char_T *LoopPrefix          = u"<loop";
     static constexpr const Char_T *LoopSuffix          = u"</loop>";
@@ -531,8 +543,8 @@ template <typename Char_T>
 struct TPStrings_T<Char_T, 4U> {
     static constexpr const Char_T *VariablePrefix      = U"{var:";
     static constexpr const Char_T *RawVariablePrefix   = U"{raw:";
-    static constexpr const Char_T *SuperVariablePrefix = U"{svar:";
     static constexpr const Char_T *MathPrefix          = U"{math:";
+    static constexpr const Char_T *SuperVariablePrefix = U"{svar:";
     static constexpr const Char_T *InLineIfPrefix      = U"{if";
     static constexpr const Char_T *LoopPrefix          = U"<loop";
     static constexpr const Char_T *LoopSuffix          = U"</loop>";
@@ -563,8 +575,8 @@ template <>
 struct TPStrings_T<wchar_t, 4U> {
     static constexpr const wchar_t *VariablePrefix      = L"{var:";
     static constexpr const wchar_t *RawVariablePrefix   = L"{raw:";
-    static constexpr const wchar_t *SuperVariablePrefix = L"{svar:";
     static constexpr const wchar_t *MathPrefix          = L"{math:";
+    static constexpr const wchar_t *SuperVariablePrefix = L"{svar:";
     static constexpr const wchar_t *InLineIfPrefix      = L"{if";
     static constexpr const wchar_t *LoopPrefix          = L"<loop";
     static constexpr const wchar_t *LoopSuffix          = L"</loop>";
@@ -595,8 +607,8 @@ template <>
 struct TPStrings_T<wchar_t, 2U> {
     static constexpr const wchar_t *VariablePrefix      = L"{var:";
     static constexpr const wchar_t *RawVariablePrefix   = L"{raw:";
-    static constexpr const wchar_t *SuperVariablePrefix = L"{svar:";
     static constexpr const wchar_t *MathPrefix          = L"{math:";
+    static constexpr const wchar_t *SuperVariablePrefix = L"{svar:";
     static constexpr const wchar_t *InLineIfPrefix      = L"{if";
     static constexpr const wchar_t *LoopPrefix          = L"<loop";
     static constexpr const wchar_t *LoopSuffix          = L"</loop>";
