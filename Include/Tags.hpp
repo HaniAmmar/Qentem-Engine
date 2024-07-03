@@ -241,10 +241,6 @@ struct TagBit {
         return *(Memory::ChangePointer<VariableTag>(data_.GetStorage()));
     }
 
-    inline VariableTag &GeRawVariableTag() const noexcept {
-        return *(Memory::ChangePointer<VariableTag>(data_.GetStorage()));
-    }
-
     inline MathTag &GetMathTag() const noexcept {
         return *(Memory::ChangePointer<MathTag>(data_.GetStorage()));
     }

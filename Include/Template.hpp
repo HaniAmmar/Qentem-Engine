@@ -1058,7 +1058,7 @@ struct TemplateCore {
                 }
 
                 case TagType::RawVariable: {
-                    renderRawVariable(tag->GeRawVariableTag(), offset);
+                    renderRawVariable(tag->GeVariableTag(), offset);
                     break;
                 }
 
@@ -1212,7 +1212,7 @@ struct TemplateCore {
                                     }
 
                                     case TagType::RawVariable: {
-                                        const VariableTag &r_var = sub_tag->GeRawVariableTag();
+                                        const VariableTag &r_var = sub_tag->GeVariableTag();
                                         SizeT r_var_offset = (r_var.Offset - TagPatterns::RawVariablePrefixLength);
                                         renderRawVariable(r_var, r_var_offset);
                                         break;
