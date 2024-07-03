@@ -326,14 +326,16 @@ struct LoopTag {
     SizeT8 Level{0};
 };
 
-// IfTag -------------------------------------------
+// IfTagCase --------------------------------------
 struct IfTagCase {
-    Array<QExpression> Case{};
-    Array<TagBit>      SubTags{};
-    SizeT              Offset{0};
-    SizeT              EndOffset{0};
+    // Don't add any constructor (will not work with c++11).
+    Array<QExpression> Case;
+    Array<TagBit>      SubTags;
+    SizeT              Offset;
+    SizeT              EndOffset;
 };
 
+// IfTag -------------------------------------------
 struct IfTag {
     Array<IfTagCase> Cases{};
     SizeT            Offset{0};
