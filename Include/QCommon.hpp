@@ -181,8 +181,10 @@ using BFloatT16 = decltype(0.0BF16);
 
 #if (defined(_MSVC_LANG) && (_MSVC_LANG >= 201703L)) || (defined(__cplusplus) && (__cplusplus >= 201703L))
 #define QENTEM_CONST_EXPRESSION constexpr
+#define QENTEM_FALL_THROUGH [[fallthrough]]
 #else
 #define QENTEM_CONST_EXPRESSION
+#define QENTEM_FALL_THROUGH
 #endif
 } // namespace Qentem
 
