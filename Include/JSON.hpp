@@ -144,7 +144,7 @@ struct JSON {
                 Array<ValueT> *arr = value.GetArray();
 
                 while (offset < length) {
-                    arr->Insert(parseValue(stream, content, offset, length));
+                    *arr += parseValue(stream, content, offset, length);
                     StringUtils::TrimLeft(content, offset, length);
 
                     if (offset < length) {
