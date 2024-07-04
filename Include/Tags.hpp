@@ -189,7 +189,10 @@ struct TagBit {
         return tag;
     }
 
-    ~TagBit() {
+    void Clear() const {
+        // Does not clear Type nor Storage.
+        // Use before calling Make... the second time.
+
         switch (data_.GetType()) {
             case TagType::Variable:
             case TagType::RawVariable: {
@@ -235,6 +238,10 @@ struct TagBit {
             default: {
             }
         }
+    }
+
+    ~TagBit() {
+        Clear();
     }
 
     inline VariableTag &GeVariableTag() const noexcept {
