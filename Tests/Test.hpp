@@ -38,8 +38,8 @@
 #include "ValueTest.hpp"
 #include "JSONTest.hpp"
 #include "EvaluateTest.hpp"
-#include "TemplateLTest.hpp"
 #include "TemplateTest.hpp"
+#include "TemplateLTest.hpp"
 #include "TemplateUTest.hpp"
 // clang-format on
 
