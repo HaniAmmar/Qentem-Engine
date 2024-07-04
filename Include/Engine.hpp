@@ -104,7 +104,7 @@ struct Engine {
                     const SizeT32  word_id         = group_list[id];
                     const SizeT32  word_length     = list.GetWordLength(word_id);
                     const Number_T word_end_offset = Number_T(offset + word_length);
-                    const char    *word            = list.GetWord(word_id);
+                    const Char_T  *word            = list.GetWord(word_id);
 
                     // Match the last char of the word.
                     if ((word_end_offset < end_offset) && (content[word_end_offset] == word[word_length])) {
