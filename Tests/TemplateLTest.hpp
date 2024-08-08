@@ -437,7 +437,7 @@ static void TestVariableLTag3(QTest &test) {
     ////
 
     content = LR"({var:0{var:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({var:0{var:0})", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({var:0A)", __LINE__);
     ss.Clear();
 
     content = LR"(var:0{var:0})";
@@ -449,25 +449,25 @@ static void TestVariableLTag3(QTest &test) {
     ss.Clear();
 
     content = LR"({var:0{var:0}{var:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({var:0{var:0}A)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({var:0AA)", __LINE__);
     ss.Clear();
 
     ////
 
-    content = LR"({var:0{var:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({var:0{var:0})", __LINE__);
+    content = LR"({var:1{var:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"({var:1A)", __LINE__);
     ss.Clear();
 
-    content = LR"(var:0{var:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"(var:0A)", __LINE__);
+    content = LR"(var:1{var:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"(var:1A)", __LINE__);
     ss.Clear();
 
-    content = LR"(var:0}{var:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"(var:0}A)", __LINE__);
+    content = LR"(var:1}{var:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"(var:1}A)", __LINE__);
     ss.Clear();
 
-    content = LR"({var:0{var:0}{var:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({var:0{var:0}A)", __LINE__);
+    content = LR"({var:1{var:0}{var:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"({var:1AA)", __LINE__);
     ss.Clear();
 
     ////
@@ -813,6 +813,7 @@ static void TestVariableLTag4(QTest &test) {
 
         test.IsEqual(Template::Render(LR"({var:<"&'>})", value, ss), LR"({var:&lt;&quot;&amp;&apos;&gt;})", __LINE__);
         ss.Clear();
+
     } else {
         test.IsEqual(Template::Render(LR"({var:0})", value, ss), LR"(<)", __LINE__);
         ss.Clear();
@@ -1387,7 +1388,7 @@ static void TestRawVariableLTag3(QTest &test) {
     ////
 
     content = LR"({raw:0{raw:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({raw:0{raw:0})", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({raw:0A)", __LINE__);
     ss.Clear();
 
     content = LR"(raw:0{raw:0})";
@@ -1399,25 +1400,25 @@ static void TestRawVariableLTag3(QTest &test) {
     ss.Clear();
 
     content = LR"({raw:0{raw:0}{raw:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({raw:0{raw:0}A)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({raw:0AA)", __LINE__);
     ss.Clear();
 
     ////
 
-    content = LR"({raw:0{raw:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({raw:0{raw:0})", __LINE__);
+    content = LR"({raw:1{raw:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"({raw:1A)", __LINE__);
     ss.Clear();
 
-    content = LR"(raw:0{raw:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"(raw:0A)", __LINE__);
+    content = LR"(raw:1{raw:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"(raw:1A)", __LINE__);
     ss.Clear();
 
-    content = LR"(raw:0}{raw:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"(raw:0}A)", __LINE__);
+    content = LR"(raw:1}{raw:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"(raw:1}A)", __LINE__);
     ss.Clear();
 
-    content = LR"({raw:0{raw:0}{raw:0})";
-    test.IsEqual(Template::Render(content, value, ss), LR"({raw:0{raw:0}A)", __LINE__);
+    content = LR"({raw:1{raw:0}{raw:0})";
+    test.IsEqual(Template::Render(content, value, ss), LR"({raw:1AA)", __LINE__);
     ss.Clear();
 
     ////
@@ -2168,7 +2169,7 @@ static void TestMathLTag2(QTest &test) {
     test.IsEqual(Template::Render(LR"(math:1})", value, ss), LR"(math:1})", __LINE__);
     ss.Clear();
 
-    test.IsEqual(Template::Render(LR"({math:{var:2})", value, ss), LR"({math:5)", __LINE__);
+    test.IsEqual(Template::Render(LR"({math:{var:2})", value, ss), LR"({math:{var:2})", __LINE__);
     ss.Clear();
 
     test.IsEqual(Template::Render(LR"({{math:{var:2}+5})", value, ss), LR"({10)", __LINE__);
@@ -2422,11 +2423,11 @@ static void TestInlineIfLTag(QTest &test) {
     ////
 
     content = LR"({if case="0" true="T"})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"({if case="-1" true="T"})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"({if case="0.1" true="T"})";
@@ -2448,11 +2449,11 @@ static void TestInlineIfLTag(QTest &test) {
     ss.Clear();
 
     content = LR"({if case='0.1' false='F'})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"({if case='1' false='F'})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     /////
@@ -2477,20 +2478,24 @@ static void TestInlineIfLTag(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), LR"({F})", __LINE__);
     ss.Clear();
 
+    content = LR"({if case="{var:5}" true="{T}" false="{F}"})";
+    test.IsEqual(Template::Render(content, value, ss), LR"({F})", __LINE__);
+    ss.Clear();
+
     content = LR"({if case="{var:6}" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), L"T", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(T)", __LINE__);
     ss.Clear();
 
     content = LR"({if case="fas" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"({if case="{var:7}" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), L"F", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(F)", __LINE__);
     ss.Clear();
 
     content = LR"({if case="{var:20}" true="T" false="F"})";
-    test.IsEqual(Template::Render(content, value, ss), L"F", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(F)", __LINE__);
     ss.Clear();
 
     ////
@@ -2597,7 +2602,7 @@ static void TestInlineIfLTag(QTest &test) {
     ss.Clear();
 
     content = LR"({if case="" true="c" false="d"})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"({i)";
@@ -2609,7 +2614,7 @@ static void TestInlineIfLTag(QTest &test) {
     ss.Clear();
 
     content = LR"({if})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({if})", __LINE__);
     ss.Clear();
 
     content = LR"({{if case="{var:1}" true="T" false="F"})";
@@ -2625,12 +2630,12 @@ static void TestInlineIfLTag(QTest &test) {
     ss.Clear();
 
     content = LR"({if case="{var:1}"                    put="F"})";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({if case="{var:1}"                    put="F"})", __LINE__);
     ss.Clear();
 
     content = LR"({if}{if case="1" true="T" false="F"}{if case="1" true="T" false="F"})";
 
-    test.IsEqual(Template::Render(content, value, ss), LR"(TT)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({if}TT)", __LINE__);
     ss.Clear();
 
     content = LR"({if{if case="{raw:1}" true="T" false="F"}{if case="{var:1}" true="T" false="F"})";
@@ -2638,8 +2643,8 @@ static void TestInlineIfLTag(QTest &test) {
     ss.Clear();
 
     /////
-    content = LR"({if case="0" true="{var:3}" false="{var:4}"})";
-    test.IsEqual(Template::Render(content, value, ss), LR"(false)", __LINE__);
+    content = LR"(                     {if case="0" true="{var:3}" false="{var:4}"})";
+    test.IsEqual(Template::Render(content, value, ss), LR"(                     false)", __LINE__);
     ss.Clear();
 
     content = LR"({if case="1" true="{var:3}" false="{var:4}"})";
@@ -2675,7 +2680,7 @@ static void TestInlineIfLTag(QTest &test) {
     ss.Clear();
 
     content = LR"({if caXe="1" trXe="1" falXe="0}-)";
-    test.IsEqual(Template::Render(content, value, ss), LR"(-)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"({if caXe="1" trXe="1" falXe="0}-)", __LINE__);
     ss.Clear();
 
     ///////
@@ -2742,6 +2747,10 @@ static void TestInlineIfLTag(QTest &test) {
     content = LR"({if case="1" true="{m}" false="F"})";
     test.IsEqual(Template::Render(content, value, ss), LR"({m})", __LINE__);
     ss.Clear();
+
+    content = LR"({if case="{var:2}" , true="{var:2}"})";
+    test.IsEqual(Template::Render(content, value, ss), LR"({if case="{var:2}" , true="{var:2}"})", __LINE__);
+    ss.Clear();
 }
 
 static void TestLoopLTag1(QTest &test) {
@@ -2762,7 +2771,7 @@ static void TestLoopLTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value1, ss), LR"(100, -50, Qentem, true, false, null, 3, )", __LINE__);
     ss.Clear();
 
-    content = LR"(<loop value   =    "loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
+    content = LR"(<loop value    =    "loop1-value">{var:loop1-value}, {var:loop1-value} </loop>)";
     test.IsEqual(Template::Render(content, value1, ss),
                  LR"(100, 100 -50, -50 Qentem, Qentem true, true false, false null, null 3, 3 )", __LINE__);
     ss.Clear();
@@ -2901,11 +2910,11 @@ static void TestLoopLTag2(QTest &test) {
     const wchar_t        *content;
 
     content = LR"(<loop></loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<loop>abcd</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<l</loop>)";
@@ -2921,23 +2930,23 @@ static void TestLoopLTag2(QTest &test) {
     ss.Clear();
 
     content = LR"(<loop></loop><loop>A</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<loop value="a">{var:a}</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<loop set="ss" value="a">{var:a}</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<loop sXt="ss" valXe="a" grXup='w'>{var:a}</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<loop set="" value="a">{var:a}</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     value[LR"(in)"] = Array<Value<wchar_t>>();
@@ -3142,7 +3151,7 @@ static void TestLoopLTag3(QTest &test) {
     content =
         LR"(<loop value='val_1' group='year111' sort='descend'><loop set='val_1' value='val_2'><loop set='val_2' value='val_3'>{var:val_3}</loop></loop></loop>)";
 
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content =
@@ -3228,7 +3237,7 @@ static void TestIfLTag1(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), LR"(Qen1)", __LINE__);
     ss.Clear();
 
-    content = LR"(<if case="{var:f}">{var:name}1<else />{var:name}2</if>)";
+    content = LR"(<if case="{var:f}">{var:name}1<else >{var:name}2</if>)";
     test.IsEqual(Template::Render(content, value, ss), LR"(Qen2)", __LINE__);
     ss.Clear();
 
@@ -3253,10 +3262,10 @@ static void TestIfLTag1(QTest &test) {
     ss.Clear();
 
     content = LR"(<if case="{var:f}">Bad!<elseif case="0" />Very Bad!</if>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
-    content = LR"(#<if case="0">Bad!<else  if case="0" />Very Bad!<else />Very Good!</if>)";
+    content = LR"(#<if case="0">Bad!<else  if case="0" />Very Bad!<else/>Very Good!</if>)";
     test.IsEqual(Template::Render(content, value, ss), LR"(#Very Good!)", __LINE__);
     ss.Clear();
 
@@ -3428,31 +3437,32 @@ static void TestIfLTag2(QTest &test) {
     value[LR"(name)"] = LR"(Qentem)";
 
     content = LR"(<if case="1">{var:name})";
-    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="1">Qentem)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="1">{var:name})", __LINE__);
     ss.Clear();
 
     content = LR"(<if<if case="1">{var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), LR"(<ifQentem)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(<if<if case="1">{var:name}</if>)", __LINE__);
     ss.Clear();
 
     content = LR"(<if case="1"><if case="1">{var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="1">Qentem)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="1"><if case="1">{var:name}</if>)", __LINE__);
     ss.Clear();
 
     content = LR"(<if case="1"><if case="1"><if case="1">{var:name}</if></if>)";
-    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="1">Qentem)", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss),
+                 LR"(<if case="1"><if case="1"><if case="1">{var:name}</if></if>)", __LINE__);
     ss.Clear();
 
     content = LR"(<if case="ABC">{var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<if>{var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<if case="0"><elseif />{var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="0"><elseif />{var:name}</if>)", __LINE__);
     ss.Clear();
 
     content = LR"(<iw case="0">{var:name}</if>)";
@@ -3460,11 +3470,11 @@ static void TestIfLTag2(QTest &test) {
     ss.Clear();
 
     content = LR"(<if case="0"{var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="0"{var:name}</if>)", __LINE__);
     ss.Clear();
 
     content = LR"(<if case="0"><else {var:name}</if>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"(<if case="0"><else {var:name}</if>)", __LINE__);
     ss.Clear();
 }
 
@@ -3598,7 +3608,7 @@ static void TestRenderL2(QTest &test) {
     ss.Clear();
 
     content = LR"(<loop set="numbers" value="val_">{var:val_}</loop>)";
-    test.IsEqual(Template::Render(content, value, ss), L"", __LINE__);
+    test.IsEqual(Template::Render(content, value, ss), LR"()", __LINE__);
     ss.Clear();
 
     content = LR"(<loop value="this_number"><if case="({var:this_number} & 1) != 1">{var:this_number},</if></loop>)";
@@ -3613,11 +3623,11 @@ static void TestRenderL2(QTest &test) {
     test.IsEqual(Template::Render(content, value, ss), LR"(1,5,)", __LINE__);
     ss.Clear();
 
-    content = LR"(<loop value="loop1_val">{if case="{var:loop1_val} < 5", true="{var:loop1_val}"}</loop>)";
+    content = LR"(<loop value="loop1_val">{if case="{var:loop1_val} < 5" true="{var:loop1_val}"}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), LR"(012)", __LINE__);
     ss.Clear();
 
-    content = LR"(<loop value="loop1_val">{if case="{var:loop1_val} < 5", true="{var:4}"}</loop>)";
+    content = LR"(<loop value="loop1_val">{if case="{var:loop1_val} < 5" true="{var:4}"}</loop>)";
     test.IsEqual(Template::Render(content, value, ss), LR"(101010)", __LINE__);
     ss.Clear();
 
