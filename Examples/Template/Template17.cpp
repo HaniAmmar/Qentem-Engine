@@ -31,7 +31,7 @@ inline static void CachedRender(const StringView<Char_T> &content, const Value_T
     Array<Tag>                       &tags = tags_caches[template_name];
 
     if (tags.IsEmpty()) {
-        temp.Parse(tags);
+        TemplateCore::Parse(content.First(), content.Length(), tags);
     }
 
     temp.Render(tags, value, stream);
