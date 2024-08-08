@@ -467,7 +467,7 @@ struct Value {
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
             // val has to be cleared before setting the current one,
-            // just in case the values or have parent-child relationship.
+            // just in case the values have parent-child relationship.
 
             const VNumberT  val_VNumber = val.data_.VNumber;
             const ValueType val_type    = val.Type();

@@ -866,8 +866,6 @@ struct QOperationSymbol_T {
     static constexpr Char_T BracketEnd       = '}';
     static constexpr Char_T ExponentExp      = '^';
     static constexpr Char_T SpaceChar        = ' ';
-    static constexpr Char_T ColonChar        = ':';
-    static constexpr Char_T SlashChar        = '/';
 };
 
 } // namespace Qentem
