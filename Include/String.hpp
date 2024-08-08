@@ -108,9 +108,7 @@ struct String {
     String(String &&src) noexcept = default;
 
     String(const String &src) {
-        const SizeT length = src.Length();
-
-        copyString(src.Storage(length), length);
+        copyString(src.Storage(), src.Length());
     }
 
     explicit String(SizeT len) {
@@ -122,14 +120,6 @@ struct String {
     }
 
     String(Char_T *str, SizeT len) {
-        if (Config::ShortStringOptimization) {
-            if (len < ShortStringMax) {
-                copyString(str, len);
-                Memory::Deallocate(str);
-                return;
-            }
-        }
-
         setLength(len);
         setStorage(str);
     }
@@ -149,15 +139,7 @@ struct String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate();
-
-            if (Config::ShortStringOptimization) {
-                data_.Length = src.data_.Length;
-                setLength(src.Length());
-                data_.Padding = src.data_.Padding;
-            } else {
-                data_.Length = src.data_.Length;
-            }
-
+            setLength(src.Length());
             data_.Storage.MovePointerOnly(src.data_.Storage);
             src.clearLength();
         }
@@ -168,8 +150,7 @@ struct String {
     String &operator=(const String &src) {
         if (this != &src) {
             deallocate();
-            const SizeT len = src.Length();
-            copyString(src.Storage(len), len);
+            copyString(src.Storage(), src.Length());
         }
 
         return *this;
@@ -182,18 +163,14 @@ struct String {
     }
 
     String &operator+=(String &&src) {
-        const SizeT len = src.Length();
-
-        Write(src.Storage(len), len);
+        Write(src.Storage(), src.Length());
         src.Reset();
 
         return *this;
     }
 
     String &operator+=(const String &src) {
-        const SizeT len = src.Length();
-
-        Write(src.Storage(len), len);
+        Write(src.Storage(), src.Length());
         return *this;
     }
 
@@ -220,8 +197,7 @@ struct String {
     }
 
     String operator+(const Char_T *str) const {
-        const SizeT len = Length();
-        return merge(Storage(len), len, str, StringUtils::Count(str));
+        return merge(Storage(), Length(), str, StringUtils::Count(str));
     }
 
     template <typename Stream_T>
@@ -232,17 +208,20 @@ struct String {
     }
 
     inline bool operator==(const String &string) const noexcept {
-        const SizeT len  = Length();
-        const SizeT len2 = string.Length();
-
-        return (((len == len2)) && StringUtils::IsEqual(Storage(len), string.Storage(len2), len));
+        return (((Length() == string.Length())) && StringUtils::IsEqual(Storage(), string.Storage(), Length()));
     }
 
     inline bool operator==(const Char_T *str) const noexcept {
-        const SizeT len  = Length();
-        const SizeT len2 = StringUtils::Count(str);
+        SizeT offset{0};
 
-        return ((len == len2) && StringUtils::IsEqual(Storage(len), str, len));
+        if (str != nullptr) {
+            while ((*str != Char_T{0}) && (*str == Storage()[offset])) {
+                ++str;
+                ++offset;
+            }
+        }
+
+        return ((*str == Char_T{0}) && (Length() == offset));
     }
 
     inline bool operator!=(const String &string) const noexcept {
@@ -254,23 +233,15 @@ struct String {
     }
 
     inline bool operator<(const String &string) const noexcept {
-        const SizeT len  = Length();
-        const SizeT len2 = string.Length();
-
-        return StringUtils::IsLess(Storage(len), string.Storage(len2), len, len2, false);
+        return StringUtils::IsLess(Storage(), string.Storage(), Length(), string.Length(), false);
     }
 
     inline bool operator<(const Char_T *str) const noexcept {
-        const SizeT len = Length();
-
-        return StringUtils::IsLess(Storage(len), str, len, StringUtils::Count(str), false);
+        return StringUtils::IsLess(Storage(), str, Length(), StringUtils::Count(str), false);
     }
 
     inline bool operator<=(const String &string) const noexcept {
-        const SizeT len  = Length();
-        const SizeT len2 = string.Length();
-
-        return StringUtils::IsLess(Storage(len), string.Storage(len2), len, len2, true);
+        return StringUtils::IsLess(Storage(), string.Storage(), Length(), string.Length(), true);
     }
 
     inline bool operator<=(const Char_T *str) const noexcept {
@@ -280,10 +251,7 @@ struct String {
     }
 
     inline bool operator>(const String &string) const noexcept {
-        const SizeT len  = Length();
-        const SizeT len2 = string.Length();
-
-        return StringUtils::IsGreater(Storage(len), string.Storage(len2), len, len2, false);
+        return StringUtils::IsGreater(Storage(), string.Storage(), Length(), string.Length(), false);
     }
 
     inline bool operator>(const Char_T *str) const noexcept {
@@ -293,22 +261,15 @@ struct String {
     }
 
     inline bool operator>=(const String &string) const noexcept {
-        const SizeT len  = Length();
-        const SizeT len2 = string.Length();
-
-        return StringUtils::IsGreater(Storage(len), string.Storage(len2), len, len2, true);
+        return StringUtils::IsGreater(Storage(), string.Storage(), Length(), string.Length(), true);
     }
 
     inline bool operator>=(const Char_T *str) const noexcept {
-        const SizeT len = Length();
-
-        return StringUtils::IsGreater(Storage(len), str, len, StringUtils::Count(str), true);
+        return StringUtils::IsGreater(Storage(), str, Length(), StringUtils::Count(str), true);
     }
 
     inline bool IsEqual(const Char_T *str, SizeT length) const noexcept {
-        const SizeT len = Length();
-
-        return ((len == length) && StringUtils::IsEqual(Storage(len), str, length));
+        return ((Length() == length) && StringUtils::IsEqual(Storage(), str, length));
     }
 
     void Reset() noexcept {
@@ -318,24 +279,7 @@ struct String {
     }
 
     Char_T *Detach() {
-        Char_T *str;
-
-        if (Config::ShortStringOptimization) {
-            constexpr SizeT32 size = sizeof(Char_T);
-            const SizeT       len  = Length();
-            Char_T           *src  = Storage(len);
-
-            if (len < ShortStringMax) {
-                const SizeT len2 = (len + SizeT{1});
-                str              = Memory::Allocate<Char_T>(len2);
-                Memory::Copy(str, src, (len2 * size));
-                str[len] = Char_T{0};
-            } else {
-                str = src;
-            }
-        } else {
-            str = Storage();
-        }
+        Char_T *str = Storage();
 
         clearStorage();
         clearLength();
@@ -344,61 +288,19 @@ struct String {
     }
 
     inline SizeT Length() const noexcept {
-        if (Config::ShortStringOptimization) {
-            const SizeT8 len = data_.Storage.GetLowByte();
-            return ((len == not_short_value_) ? data_.Length : len);
-        } else {
-            return data_.Length;
-        }
+        return data_.Length;
     }
 
     inline Char_T *Storage() noexcept {
-        if (Config::ShortStringOptimization) {
-            const SizeT len = Length();
-            if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                return data_.GetShortStorage();
-            }
-        }
-
         return data_.Storage.GetPointer();
     }
 
     inline const Char_T *Storage() const noexcept {
-        if (Config::ShortStringOptimization) {
-            const SizeT len = Length();
-            if ((len != SizeT{0}) && (len < ShortStringMax)) {
-                return data_.GetShortStorage();
-            }
-        }
-
-        return data_.Storage.GetPointer();
-    }
-
-    inline const Char_T *Storage(SizeT length) const noexcept {
-        if (Config::ShortStringOptimization) {
-            if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return data_.GetShortStorage();
-            }
-        }
-
-        return data_.Storage.GetPointer();
-    }
-
-    inline Char_T *Storage(SizeT length) noexcept {
-        if (Config::ShortStringOptimization) {
-            if ((length != SizeT{0}) && (length < ShortStringMax)) {
-                return data_.GetShortStorage();
-            }
-        }
-
         return data_.Storage.GetPointer();
     }
 
     static String Merge(const String &src1, const String &src2) {
-        const SizeT len1 = src1.Length();
-        const SizeT len2 = src2.Length();
-
-        return merge(src1.Storage(len1), len1, src2.Storage(len2), len2);
+        return merge(src1.Storage(), src1.Length(), src2.Storage(), src2.Length());
     }
 
     void Write(const Char_T *str, const SizeT len) {
@@ -406,33 +308,12 @@ struct String {
             constexpr SizeT32 size    = sizeof(Char_T);
             const SizeT       src_len = Length();
             SizeT             new_len = SizeT((src_len + len) + SizeT{1});
-            Char_T           *src     = Storage(src_len);
-            Char_T           *ns;
+            Char_T           *src     = Storage();
+            Char_T           *ns      = allocate(new_len);
 
-            if (Config::ShortStringOptimization) {
-                if (new_len <= ShortStringMax) {
-                    ns = data_.GetShortStorage();
-
-                } else {
-                    ns = Memory::Allocate<Char_T>(new_len);
-
-                    if (src != nullptr) {
-                        Memory::Copy(ns, src, (src_len * size));
-
-                        if (src_len >= ShortStringMax) {
-                            Memory::Deallocate(src);
-                        }
-                    }
-
-                    setStorage(ns);
-                }
-            } else {
-                ns = allocate(new_len);
-
-                if (src != nullptr) {
-                    Memory::Copy(ns, src, (src_len * size));
-                    Memory::Deallocate(src);
-                }
+            if (src != nullptr) {
+                Memory::Copy(ns, src, (src_len * size));
+                Memory::Deallocate(src);
             }
 
             Memory::Copy((ns + src_len), str, (len * size));
@@ -445,31 +326,16 @@ struct String {
     static String Trim(const String &src) {
         SizeT         length = src.Length();
         SizeT         offset = SizeT{0};
-        const Char_T *str    = src.Storage(length);
+        const Char_T *str    = src.Storage();
 
         StringUtils::Trim(str, offset, length);
         return String((str + offset), length);
     }
 
     inline void StepBack(const SizeT len) noexcept {
-        const SizeT length = Length();
-
-        if (len <= length) {
-            Char_T     *str     = Storage(length);
-            const SizeT new_len = (length - len);
-
-            if (Config::ShortStringOptimization) {
-                if (new_len < ShortStringMax) {
-                    if (length >= ShortStringMax) {
-                        constexpr SizeT32 size = sizeof(Char_T);
-
-                        Char_T *str_s = Storage(new_len);
-                        Memory::Copy(str_s, str, (new_len * size));
-                        Memory::Deallocate(str);
-                        str = str_s;
-                    }
-                }
-            }
+        if (len <= Length()) {
+            Char_T     *str     = Storage();
+            const SizeT new_len = (Length() - len);
 
             setLength(new_len);
             str[new_len] = Char_T{0};
@@ -478,7 +344,7 @@ struct String {
 
     inline void Reverse(SizeT index = SizeT{0}) noexcept {
         SizeT   end = Length();
-        Char_T *str = Storage(end);
+        Char_T *str = Storage();
 
         while (index < end) {
             const Char_T tmp = str[index];
@@ -491,12 +357,10 @@ struct String {
     }
 
     void InsertAt(Char_T ch, SizeT index) {
-        const SizeT length = Length();
-
-        if (index < length) {
-            Char_T       *str    = Storage(length);
+        if (index < Length()) {
+            Char_T       *str    = Storage();
             Char_T       *first  = (str + index);
-            const Char_T *end    = (str + length);
+            const Char_T *end    = (str + Length());
             Char_T       *second = first;
 
             Char_T tmp = *first;
@@ -517,10 +381,8 @@ struct String {
     }
 
     inline Char_T *Last() noexcept {
-        const SizeT length = Length();
-
-        if (length != SizeT{0}) {
-            return (Storage(length) + (length - SizeT{1}));
+        if (Length() != SizeT{0}) {
+            return (Storage() + (Length() - SizeT{1}));
         }
 
         return nullptr;
@@ -571,32 +433,18 @@ struct String {
     }
 
     inline Char_T *end() noexcept {
-        const SizeT length = Length();
-        return (Storage(length) + length);
+        return (Storage() + Length());
     }
 
     //////////// Private ////////////
 
   private:
     void clearLength() noexcept {
-        if (Config::ShortStringOptimization) {
-            data_.Storage.SetLowByte(SizeT8{0});
-        }
-
         data_.Length = SizeT{0};
     }
 
     void setLength(SizeT new_length) noexcept {
-        if (Config::ShortStringOptimization) {
-            if (new_length < ShortStringMax) {
-                data_.Storage.SetLowByte(SizeT8(new_length));
-            } else {
-                data_.Storage.SetLowByte(not_short_value_);
-                data_.Length = new_length;
-            }
-        } else {
-            data_.Length = new_length;
-        }
+        data_.Length = new_length;
     }
 
     void setStorage(Char_T *ptr) noexcept {
@@ -604,27 +452,13 @@ struct String {
     }
 
     Char_T *allocate(SizeT new_size) {
-        if (Config::ShortStringOptimization) {
-            if (new_size <= ShortStringMax) {
-                return data_.GetShortStorage();
-            }
-        }
-
         Char_T *ns = Memory::Allocate<Char_T>(new_size);
         setStorage(ns);
         return ns;
     }
 
     void deallocate() noexcept {
-        if (Config::ShortStringOptimization) {
-            const SizeT length = Length();
-
-            if (length >= ShortStringMax) {
-                Memory::Deallocate(Storage(length));
-            }
-        } else {
-            Memory::Deallocate(Storage());
-        }
+        Memory::Deallocate(Storage());
     }
 
     void clearStorage() noexcept {

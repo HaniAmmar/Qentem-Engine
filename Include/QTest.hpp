@@ -393,11 +393,6 @@ struct QTest {
         if QENTEM_CONST_EXPRESSION (Config::PointerTagging) {
             TestOutPut::Print("Tagged Pointers: On\n");
         }
-
-        if QENTEM_CONST_EXPRESSION (Config::ShortStringOptimization) {
-            TestOutPut::Print("Short String Optimization: On\n");
-        }
-
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
         TestOutPut::Print("Advanced Vector Extensions: On\n");
 #endif

@@ -1406,7 +1406,7 @@ struct Value {
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
                 const SizeT len = item->Key.Length();
                 value           = &(item->Value);
-                key             = StringView<Char_T>{item->Key.Storage(len), len};
+                key             = StringView<Char_T>{item->Key.Storage(), len};
             }
         }
     }
@@ -1416,9 +1416,8 @@ struct Value {
     bool SetCharAndLength(const Char_T *&key, Number_T &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
-                const SizeT len = data_.VString.Length();
-                key             = data_.VString.Storage(len);
-                length          = Number_T{len};
+                key    = data_.VString.Storage();
+                length = Number_T{data_.VString.Length()};
                 return true;
             }
 
@@ -1455,12 +1454,10 @@ struct Value {
                      StringFunction_T           *string_function = nullptr) const {
         switch (Type()) {
             case ValueType::String: {
-                const SizeT len = data_.VString.Length();
-
                 if (string_function != nullptr) {
-                    string_function(stream, data_.VString.Storage(len), len);
+                    string_function(stream, data_.VString.Storage(), data_.VString.Length());
                 } else {
-                    stream.Write(data_.VString.Storage(len), len);
+                    stream.Write(data_.VString.Storage(), data_.VString.Length());
                 }
 
                 break;
@@ -1613,10 +1610,10 @@ struct Value {
 
             case ValueType::String: {
                 SizeT             offset = 0;
-                const SizeT       length = data_.VString.Length();
-                const QNumberType n_type = Digit::StringToNumber(number, data_.VString.Storage(length), offset, length);
+                const QNumberType n_type =
+                    Digit::StringToNumber(number, data_.VString.Storage(), offset, data_.VString.Length());
 
-                if (offset == length) {
+                if (offset == data_.VString.Length()) {
                     return n_type;
                 }
             }
@@ -1888,8 +1885,7 @@ struct Value {
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 stream += JSONotation::QuoteChar;
-                const SizeT length = h_item->Key.Length();
-                JSONUtils::EscapeJSON(h_item->Key.Storage(length), length, stream);
+                JSONUtils::EscapeJSON(h_item->Key.Storage(), h_item->Key.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 

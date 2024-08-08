@@ -211,9 +211,8 @@ struct HArray {
 
         while (src_item < src_end) {
             if (src_item->Hash != SizeT{0}) {
-                SizeT      *index;
-                const SizeT length       = src_item->Key.Length();
-                HAItem     *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
+                SizeT  *index;
+                HAItem *storage_item = find(index, src_item->Key.Storage(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Memory::Move(src_item->Key), src_item->Hash);
@@ -244,9 +243,8 @@ struct HArray {
 
         while (src_item < src_end) {
             if (src_item->Hash != SizeT{0}) {
-                const SizeT length = src_item->Key.Length();
-                SizeT      *index;
-                HAItem     *storage_item = find(index, src_item->Key.Storage(length), length, src_item->Hash);
+                SizeT  *index;
+                HAItem *storage_item = find(index, src_item->Key.Storage(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Key_T(src_item->Key), src_item->Hash);
@@ -284,8 +282,7 @@ struct HArray {
     }
 
     Value_T &operator[](const Key_T &key) {
-        const SizeT length = key.Length();
-        return Get(key.Storage(length), length);
+        return Get(key.Storage(), key.Length());
     }
 
     Value_T &operator[](Key_T &&key) {
@@ -293,12 +290,9 @@ struct HArray {
             expand();
         }
 
-        const SizeT   length = key.Length();
-        const Char_T *str    = key.Storage(length);
-
-        const SizeT hash = StringUtils::Hash(str, length);
+        const SizeT hash = StringUtils::Hash(key.Storage(), key.Length());
         SizeT      *index;
-        HAItem     *item = find(index, str, length, hash);
+        HAItem     *item = find(index, key.Storage(), key.Length(), hash);
 
         if (item != nullptr) {
             return item->Value;
@@ -312,12 +306,9 @@ struct HArray {
             expand();
         }
 
-        const SizeT   length = key.Length();
-        const Char_T *str    = key.Storage(length);
-
-        const SizeT hash = StringUtils::Hash(str, length);
+        const SizeT hash = StringUtils::Hash(key.Storage(), key.Length());
         SizeT      *index;
-        HAItem     *item = find(index, str, length, hash);
+        HAItem     *item = find(index, key.Storage(), key.Length(), hash);
 
         if (item == nullptr) {
             item = insert(index, Memory::Move(key), hash);
@@ -343,8 +334,7 @@ struct HArray {
     }
 
     inline Value_T *GetValue(const Key_T &key) const noexcept {
-        const SizeT length = key.Length();
-        return GetValue(key.Storage(length), length);
+        return GetValue(key.Storage(), key.Length());
     }
 
     Value_T *GetValue(const SizeT index) const noexcept {
@@ -394,10 +384,7 @@ struct HArray {
     }
 
     inline const HAItem *GetItem(const Key_T &key) const noexcept {
-        const SizeT   length = key.Length();
-        const Char_T *str    = key.Storage(length);
-
-        return GetItem(str, length, StringUtils::Hash(str, length));
+        return GetItem(key.Storage(), key.Length(), StringUtils::Hash(key.Storage(), key.Length()));
     }
 
     const HAItem *GetItem(const SizeT index) const noexcept {
@@ -431,10 +418,7 @@ struct HArray {
     }
 
     inline void Remove(const Key_T &key) const noexcept {
-        const SizeT   length = key.Length();
-        const Char_T *str    = key.Storage(length);
-
-        remove(str, length, StringUtils::Hash(str, length));
+        remove(key.Storage(), key.Length(), StringUtils::Hash(key.Storage(), key.Length()));
     }
 
     void RemoveIndex(const SizeT index) const noexcept {
@@ -442,8 +426,7 @@ struct HArray {
             const HAItem *item = (Storage() + index);
 
             if (item->Hash != SizeT{0}) {
-                const SizeT length = item->Key.Length();
-                remove(item->Key.Storage(length), length, item->Hash);
+                remove(item->Key.Storage(), item->Key.Length(), item->Hash);
             }
         }
     }
@@ -454,31 +437,21 @@ struct HArray {
      */
     bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         if (Size() != SizeT{0}) {
-            HAItem       *item;
-            const SizeT   from_len = from.Length();
-            SizeT         to_len;
-            const Char_T *from_str = from.Storage(from_len);
-            const Char_T *to_str;
-            SizeT        *left_index;
-            SizeT        *right_index;
-            SizeT         to_hash;
-            SizeT         offset;
+            SizeT *left_index;
+            SizeT *right_index;
 
-            find(left_index, from_str, from_len, StringUtils::Hash(from_str, from_len));
+            find(left_index, from.Storage(), from.Length(), StringUtils::Hash(from.Storage(), from.Length()));
 
             if (*left_index != SizeT{0}) {
-                to_len = to.Length();
-                to_str = to.Storage(to_len);
+                const SizeT to_hash = StringUtils::Hash(to.Storage(), to.Length());
 
-                to_hash = StringUtils::Hash(to_str, to_len);
-
-                find(right_index, to_str, to_len, to_hash);
+                find(right_index, to.Storage(), to.Length(), to_hash);
 
                 if (*right_index == SizeT{0}) {
-                    offset = *left_index;
+                    SizeT offset = *left_index;
                     --offset;
 
-                    item         = (Storage() + offset);
+                    HAItem *item = (Storage() + offset);
                     *right_index = *left_index;
                     *left_index  = item->Next;
                     item->Next   = SizeT{0};

@@ -92,10 +92,8 @@ struct StringStream {
     }
 
     StringStream &operator=(const String<Char_T> &string) {
-        const SizeT len = string.Length();
-
         Clear();
-        write(string.Storage(len), len);
+        write(string.Storage(), string.Length());
         return *this;
     }
 
@@ -122,8 +120,7 @@ struct StringStream {
     }
 
     inline void operator+=(const String<Char_T> &string) {
-        const SizeT len = string.Length();
-        write(string.Storage(len), len);
+        write(string.Storage(), string.Length());
     }
 
     inline void operator+=(const StringView<char> &string_view) {
@@ -153,9 +150,7 @@ struct StringStream {
     }
 
     inline friend StringStream &operator<<(StringStream &out, const String<Char_T> &string) {
-        const SizeT len = string.Length();
-
-        out.write(string.Storage(len), len);
+        out.write(string.Storage(), string.Length());
         return out;
     }
 
