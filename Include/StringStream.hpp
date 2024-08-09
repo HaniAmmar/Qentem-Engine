@@ -176,7 +176,7 @@ struct StringStream {
     inline bool operator==(const String<Char_T> &string) const noexcept {
         const SizeT len = string.Length();
 
-        return ((Length() == len) && StringUtils::IsEqual(First(), string.Storage(len), Length()));
+        return ((Length() == len) && StringUtils::IsEqual(First(), string.Storage(), Length()));
     }
 
     inline bool operator==(const StringView<Char_T> &string) const noexcept {

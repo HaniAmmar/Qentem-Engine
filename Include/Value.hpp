@@ -44,334 +44,62 @@ enum struct ValueType : SizeT8 {
     Null
 };
 ///////////////////////////////////////////////
-template <bool, bool>
-struct VNumberData;
-
-template <>
-struct VNumberData<false, true> {
-    // Little-Endian
-    VNumberData()                               = default;
-    VNumberData(VNumberData &&)                 = default;
-    VNumberData(const VNumberData &)            = default;
-    VNumberData &operator=(VNumberData &&)      = default;
-    VNumberData &operator=(const VNumberData &) = default;
-    ~VNumberData()                              = default;
-
-    template <typename Number_T>
-    inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
-    }
-
-    inline void Clear() noexcept {
-        PtrNumber = SystemIntType{0};
-
-        if (!is_8_) {
-            Number.Natural = SizeT64{0};
-        } else {
-            Padding[0] = SizeT{0};
-            Padding[1] = SizeT{0};
-        }
-    }
-
-    union {
-        QNumber64 Number{0};
-        SizeT     Padding[2];
-    };
-
-    SystemIntType PtrNumber{0};
-
-  private:
-    static constexpr bool is_8_ = (sizeof(SizeT) == 8U);
-};
-
-template <>
-struct VNumberData<true, true> {
-    // Big-Endian
-    VNumberData() noexcept                          = default;
-    VNumberData(VNumberData &&) noexcept            = default;
-    VNumberData(const VNumberData &)                = default;
-    VNumberData &operator=(VNumberData &&) noexcept = default;
-    VNumberData &operator=(const VNumberData &)     = default;
-    ~VNumberData()                                  = default;
-
-    template <typename Number_T>
-    inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
-    }
-
-    inline void Clear() noexcept {
-        if (!is_8_) {
-            Number.Natural = SizeT64{0};
-        } else {
-            Padding[0] = SizeT{0};
-            Padding[1] = SizeT{0};
-        }
-
-        PtrNumber = SystemIntType{0};
-    }
-
-    SystemIntType PtrNumber{0};
-
-    union {
-        QNumber64 Number{0};
-        SizeT     Padding[2];
-    };
-
-  private:
-    static constexpr bool is_8_ = (sizeof(SizeT) == 8U);
-};
-
-template <bool Endian_T>
-struct VNumberData<Endian_T, false> {
-    // 32-bit only
-    VNumberData() noexcept                          = default;
-    VNumberData(VNumberData &&) noexcept            = default;
-    VNumberData(const VNumberData &)                = default;
-    VNumberData &operator=(VNumberData &&) noexcept = default;
-    VNumberData &operator=(const VNumberData &)     = default;
-    ~VNumberData()                                  = default;
-
-    template <typename Number_T>
-    inline explicit VNumberData(const Number_T num) noexcept : Number{num} {
-    }
-
-    inline void Clear() noexcept {
-        Number.Natural = SizeT64{0};
-    }
-
-    union {
-        QNumber64 Number{0};
-        SizeT     padding_[2];
-    };
-};
-
-struct VNumberT {
-    VNumberT()                            = default;
-    VNumberT(const VNumberT &)            = default;
-    VNumberT &operator=(VNumberT &&)      = default;
-    VNumberT &operator=(const VNumberT &) = default;
-    ~VNumberT()                           = default;
-
-    VNumberT(VNumberT &&v_num) noexcept : data_{Memory::Move(v_num.data_)} {
-        v_num.Clear();
-    }
-
-    template <typename Number_T>
-    inline explicit VNumberT(const Number_T num) noexcept : data_{num} {
-    }
-
-    template <typename Number_T>
-    VNumberT &operator=(Number_T num) noexcept {
-        data_.Number = num;
-        return *this;
-    }
-
-    inline SizeT64 GetUInt64() const noexcept {
-        return data_.Number.Natural;
-    }
-
-    inline SizeT64I GetInt64() const noexcept {
-        return data_.Number.Integer;
-    }
-
-    inline double GetDouble() const noexcept {
-        return data_.Number.Real;
-    }
-
-    inline void Clear() noexcept {
-        data_.Clear();
-    }
-
-  private:
-    VNumberData<Config::IsBigEndian, (Config::Is64bit || (sizeof(SizeT) >= 4U))> data_{};
-};
-///////////////////////////////////////////////
-template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT, bool>
-struct ValueData;
-
-template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT>
-struct ValueData<Char_T, VObjectT, VArrayT, VStringT, true> {
-    ValueData() noexcept : VNumber{} {
-    }
-
-    ValueData(const ValueData &)            = delete;
-    ValueData &operator=(ValueData &&)      = delete;
-    ValueData &operator=(const ValueData &) = delete;
-
-    ValueData(ValueData &&val) noexcept : VNumber{Memory::Move(val.VNumber)} {
-    }
-
-    ~ValueData() {
-        switch (GetType()) {
-            case ValueType::Object: {
-                Memory::Dispose(&VObject);
-                break;
-            }
-
-            case ValueType::Array: {
-                Memory::Dispose(&VArray);
-                break;
-            }
-
-            case ValueType::String: {
-                Memory::Dispose(&VString);
-                break;
-            }
-
-            default: {
-            }
-        }
-    }
-
-    inline explicit ValueData(VObjectT &&obj) noexcept : VObject{Memory::Move(obj)} {
-    }
-
-    inline explicit ValueData(VArrayT &&arr) noexcept : VArray{Memory::Move(arr)} {
-    }
-
-    inline explicit ValueData(VStringT &&str) noexcept : VString{Memory::Move(str)} {
-    }
-
-    inline explicit ValueData(const VObjectT &obj) noexcept : VObject{obj} {
-    }
-
-    inline explicit ValueData(const VArrayT &arr) noexcept : VArray{arr} {
-    }
-
-    inline explicit ValueData(const VStringT &str) noexcept : VString{str} {
-    }
-
-    inline explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
-    }
-
-    inline explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
-    }
-
-    inline explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
-    }
-
-    inline explicit ValueData(double num) noexcept : VNumber{num} {
-    }
-
-    template <typename Number_T>
-    inline explicit ValueData(Number_T num) noexcept : VNumber{num} {
-    }
-
-    inline ValueType GetType() const noexcept {
-        return ValueType(VObject.GetHighByte());
-    }
-
-    inline void SetType(ValueType new_type) noexcept {
-        VObject.SetHighByte(SizeT8(new_type));
-    }
-
-    union {
-        VObjectT VObject;
-        VArrayT  VArray;
-        VStringT VString;
-        VNumberT VNumber;
-    };
-};
-
-template <typename Char_T, typename VObjectT, typename VArrayT, typename VStringT>
-struct ValueData<Char_T, VObjectT, VArrayT, VStringT, false> {
-    ValueData() noexcept : VNumber{} {
-    }
-
-    ValueData(const ValueData &)            = delete;
-    ValueData &operator=(ValueData &&)      = delete;
-    ValueData &operator=(const ValueData &) = delete;
-
-    ValueData(ValueData &&val) noexcept : VNumber{Memory::Move(val.VNumber)} {
-    }
-
-    ~ValueData() {
-        switch (GetType()) {
-            case ValueType::Object: {
-                Memory::Dispose(&VObject);
-                break;
-            }
-
-            case ValueType::Array: {
-                Memory::Dispose(&VArray);
-                break;
-            }
-
-            case ValueType::String: {
-                Memory::Dispose(&VString);
-                break;
-            }
-
-            default: {
-            }
-        }
-    }
-
-    inline explicit ValueData(VObjectT &&obj) noexcept : VObject{Memory::Move(obj)} {
-    }
-
-    inline explicit ValueData(VArrayT &&arr) noexcept : VArray{Memory::Move(arr)} {
-    }
-
-    inline explicit ValueData(VStringT &&str) noexcept : VString{Memory::Move(str)} {
-    }
-
-    inline explicit ValueData(const VObjectT &obj) noexcept : VObject{obj} {
-    }
-
-    inline explicit ValueData(const VArrayT &arr) noexcept : VArray{arr} {
-    }
-
-    inline explicit ValueData(const VStringT &str) noexcept : VString{str} {
-    }
-
-    inline explicit ValueData(const Char_T *str, SizeT length) : VString{str, length} {
-    }
-
-    inline explicit ValueData(SizeT64 num) noexcept : VNumber{num} {
-    }
-
-    inline explicit ValueData(SizeT64I num) noexcept : VNumber{num} {
-    }
-
-    inline explicit ValueData(double num) noexcept : VNumber{num} {
-    }
-
-    template <typename Number_T>
-    inline explicit ValueData(Number_T num) noexcept : VNumber{num} {
-    }
-
-    inline ValueType GetType() const noexcept {
-        return VType;
-    }
-
-    inline void SetType(ValueType new_type) noexcept {
-        VType = new_type;
-    }
-
-    union {
-        VObjectT VObject;
-        VArrayT  VArray;
-        VStringT VString;
-        VNumberT VNumber;
-    };
-
-    ValueType VType{ValueType::Undefined};
-};
-
 template <typename Char_T>
 struct Value {
     using JSONotation = JSONUtils::JSONotation_T<Char_T>;
-    using VObjectT    = HArray<Value, Char_T>;
-    using VArrayT     = Array<Value>;
-    using VStringT    = String<Char_T>;
+    using ObjectT     = HArray<Value, Char_T>;
+    using ArrayT      = Array<Value>;
+    using StringT     = String<Char_T>;
 
-    Value() noexcept  = default;
-    ~Value() noexcept = default;
+    Value() noexcept : object_{} {
+    }
 
-    Value(Value &&val) noexcept : data_{Memory::Move(val.data_)} {
-        if (!Config::PointerTagging) {
-            setType(val.Type());
-            val.setTypeToUndefined();
+    ~Value() {
+        switch (Type()) {
+            case ValueType::Object: {
+                Memory::Dispose(&object_);
+                break;
+            }
+
+            case ValueType::Array: {
+                Memory::Dispose(&array_);
+                break;
+            }
+
+            case ValueType::String: {
+                Memory::Dispose(&string_);
+                break;
+            }
+
+            default: {
+            }
         }
+    }
+
+    Value(Value &&val) noexcept {
+        switch (val.Type()) {
+            case ValueType::Object: {
+                object_ = Memory::Move(val.object_);
+                break;
+            }
+
+            case ValueType::Array: {
+                array_ = Memory::Move(val.array_);
+                break;
+            }
+
+            case ValueType::String: {
+                string_ = Memory::Move(val.string_);
+                break;
+            }
+
+            default: {
+                number_ = val.number_;
+            }
+        }
+
+        setType(val.Type());
+        val.setTypeToUndefined();
     }
 
     Value(const Value &val) {
@@ -385,12 +113,12 @@ struct Value {
     inline explicit Value(ValueType type, SizeT size) noexcept {
         switch (type) {
             case ValueType::Array: {
-                data_.VArray.Reserve(size);
+                array_.Reserve(size);
                 break;
             }
 
             case ValueType::Object: {
-                data_.VObject.Reserve(size);
+                object_.Reserve(size);
                 break;
             }
 
@@ -401,48 +129,48 @@ struct Value {
         setType(type);
     }
 
-    inline explicit Value(VObjectT &&obj) noexcept : data_{Memory::Move(obj)} {
+    inline explicit Value(ObjectT &&obj) noexcept : object_{Memory::Move(obj)} {
         setTypeToObject();
     }
 
-    inline explicit Value(VArrayT &&arr) noexcept : data_{Memory::Move(arr)} {
+    inline explicit Value(ArrayT &&arr) noexcept : array_{Memory::Move(arr)} {
         setTypeToArray();
     }
 
-    inline explicit Value(VStringT &&str) noexcept : data_{Memory::Move(str)} {
+    inline explicit Value(StringT &&str) noexcept : string_{Memory::Move(str)} {
         setTypeToString();
     }
 
-    inline explicit Value(const VObjectT &obj) noexcept : data_{obj} {
+    inline explicit Value(const ObjectT &obj) noexcept : object_{obj} {
         setTypeToObject();
     }
 
-    inline explicit Value(const VArrayT &arr) noexcept : data_{arr} {
+    inline explicit Value(const ArrayT &arr) noexcept : array_{arr} {
         setTypeToArray();
     }
 
-    inline explicit Value(const VStringT &str) noexcept : data_{str} {
+    inline explicit Value(const StringT &str) noexcept : string_{str} {
         setTypeToString();
     }
 
-    inline explicit Value(const Char_T *str, SizeT length) : data_{str, length} {
+    inline explicit Value(const Char_T *str, SizeT length) : string_{str, length} {
         setTypeToString();
     }
 
-    inline explicit Value(SizeT64 num) noexcept : data_{num} {
+    inline explicit Value(SizeT64 num) noexcept : number_{num} {
         setTypeToUInt64();
     }
 
-    inline explicit Value(SizeT64I num) noexcept : data_{num} {
+    inline explicit Value(SizeT64I num) noexcept : number_{num} {
         setTypeToInt64();
     }
 
-    inline explicit Value(double num) noexcept : data_{num} {
+    inline explicit Value(double num) noexcept : number_{num} {
         setTypeToDouble();
     }
 
     template <typename Number_T>
-    explicit Value(Number_T num) noexcept : data_{num} {
+    explicit Value(Number_T num) noexcept : number_{num} {
         if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
             setTypeToDouble();
         } else if QENTEM_CONST_EXPRESSION (IsUnsigned<Number_T>()) {
@@ -466,23 +194,32 @@ struct Value {
 
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
-            // val has to be cleared before setting the current one,
-            // just in case the values have parent-child relationship.
+            const ValueType type = val.Type();
 
-            const VNumberT  val_VNumber = val.data_.VNumber;
-            const ValueType val_type    = val.Type();
-
-            if (Config::PointerTagging) {
-                val.data_.VNumber.Clear();
-            } else {
-                val.setTypeToUndefined();
-            }
+            val.setTypeToUndefined();
 
             reset();
-            data_.VNumber = val_VNumber;
+            setType(type);
 
-            if (!Config::PointerTagging) {
-                setType(val_type);
+            switch (type) {
+                case ValueType::Object: {
+                    object_ = Memory::Move(val.object_);
+                    break;
+                }
+
+                case ValueType::Array: {
+                    array_ = Memory::Move(val.array_);
+                    break;
+                }
+
+                case ValueType::String: {
+                    string_ = Memory::Move(val.string_);
+                    break;
+                }
+
+                default: {
+                    number_ = val.number_;
+                }
             }
         }
 
@@ -503,72 +240,72 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(VObjectT &&obj) noexcept {
+    Value &operator=(ObjectT &&obj) noexcept {
         reset();
-        data_.VObject = Memory::Move(obj);
+        object_ = Memory::Move(obj);
         setTypeToObject();
         return *this;
     }
 
-    Value &operator=(const VObjectT &obj) {
+    Value &operator=(const ObjectT &obj) {
         reset();
-        data_.VObject = obj;
+        object_ = obj;
         setTypeToObject();
         return *this;
     }
 
-    Value &operator=(VArrayT &&arr) noexcept {
+    Value &operator=(ArrayT &&arr) noexcept {
         reset();
-        data_.VArray = Memory::Move(arr);
+        array_ = Memory::Move(arr);
         setTypeToArray();
         return *this;
     }
 
-    Value &operator=(const VArrayT &arr) {
+    Value &operator=(const ArrayT &arr) {
         reset();
-        data_.VArray = arr;
+        array_ = arr;
         setTypeToArray();
         return *this;
     }
 
-    Value &operator=(VStringT &&str) noexcept {
+    Value &operator=(StringT &&str) noexcept {
         reset();
-        data_.VString = Memory::Move(str);
+        string_ = Memory::Move(str);
         setTypeToString();
         return *this;
     }
 
-    Value &operator=(const VStringT &str) {
+    Value &operator=(const StringT &str) {
         reset();
-        data_.VString = str;
+        string_ = str;
         setTypeToString();
         return *this;
     }
 
     Value &operator=(const Char_T *str) {
         reset();
-        data_.VString = VStringT{str};
+        string_ = StringT{str};
         setTypeToString();
         return *this;
     }
 
     Value &operator=(SizeT64 num) noexcept {
         reset();
-        data_.VNumber = num;
+        number_ = num;
         setTypeToUInt64();
         return *this;
     }
 
     Value &operator=(SizeT64I num) noexcept {
         reset();
-        data_.VNumber = num;
+        number_ = num;
         setTypeToInt64();
         return *this;
     }
 
     Value &operator=(double num) noexcept {
         reset();
-        data_.VNumber = num;
+        number_ = num;
         setTypeToDouble();
         return *this;
     }
@@ -576,7 +313,7 @@ struct Value {
     template <typename Number_T>
     Value &operator=(Number_T num) noexcept {
         reset();
-        data_.VNumber = num;
+        number_ = num;
 
         if QENTEM_CONST_EXPRESSION (IsFloat<Number_T>()) {
             setTypeToDouble();
@@ -585,6 +322,7 @@ struct Value {
         } else {
             setTypeToInt64();
         }
+
         return *this;
     }
 
@@ -602,12 +340,13 @@ struct Value {
         } else {
             setTypeToFalse();
         }
+
         return *this;
     }
 
     inline void operator+=(Value &&val) {
         if (IsObject() && val.IsObject()) {
-            data_.VObject += Memory::Move(val.data_.VObject);
+            object_ += Memory::Move(val.object_);
             val.setTypeToUndefined();
         } else {
             if (!IsArray()) {
@@ -615,72 +354,72 @@ struct Value {
                 setTypeToArray();
             }
 
-            data_.VArray += Memory::Move(val);
+            array_ += Memory::Move(val);
         }
     }
 
     inline void operator+=(const Value &val) {
         if (IsObject() && val.IsObject()) {
-            data_.VObject += val.data_.VObject;
+            object_ += val.object_;
         } else {
             if (!IsArray()) {
                 reset();
                 setTypeToArray();
             }
 
-            data_.VArray += val;
+            array_ += val;
         }
     }
 
-    inline void operator+=(VObjectT &&obj) {
+    inline void operator+=(ObjectT &&obj) {
         if (IsObject()) {
-            data_.VObject += Memory::Move(obj);
+            object_ += Memory::Move(obj);
         } else {
             if (!IsArray()) {
                 reset();
                 setTypeToArray();
             }
 
-            data_.VArray += Value{Memory::Move(obj)};
+            array_ += Value{Memory::Move(obj)};
         }
     }
 
-    inline void operator+=(const VObjectT &obj) {
-        *this += VObjectT(obj);
+    inline void operator+=(const ObjectT &obj) {
+        *this += ObjectT(obj);
     }
 
-    inline void operator+=(VArrayT &&arr) {
+    inline void operator+=(ArrayT &&arr) {
         if (!IsArray()) {
             reset();
             setTypeToArray();
         }
 
         if (arr.Size() != SizeT{0}) {
-            data_.VArray += Memory::Move(arr);
+            array_ += Memory::Move(arr);
         } else {
-            data_.VArray += Value{Memory::Move(arr)};
+            array_ += Value{Memory::Move(arr)};
         }
     }
 
-    inline void operator+=(const VArrayT &arr) {
-        (*this) += VArrayT(arr);
+    inline void operator+=(const ArrayT &arr) {
+        (*this) += ArrayT(arr);
     }
 
-    inline void operator+=(VStringT &&str) {
+    inline void operator+=(StringT &&str) {
         if (!IsArray()) {
             reset();
             setTypeToArray();
         }
 
-        data_.VArray += Value{Memory::Move(str)};
+        array_ += Value{Memory::Move(str)};
     }
 
-    inline void operator+=(const VStringT &str) {
-        *this += VStringT(str);
+    inline void operator+=(const StringT &str) {
+        *this += StringT(str);
     }
 
     inline void operator+=(const Char_T *str) {
-        *this += VStringT(str);
+        *this += StringT(str);
     }
 
     template <typename Number_T>
@@ -690,7 +429,7 @@ struct Value {
             setTypeToArray();
         }
 
-        data_.VArray += Value{num};
+        array_ += Value{num};
     }
 
     inline void operator+=(NullType) {
@@ -699,7 +438,7 @@ struct Value {
             setTypeToArray();
         }
 
-        data_.VArray += Value{nullptr};
+        array_ += Value{nullptr};
     }
 
     inline void operator+=(bool is_true) {
@@ -708,7 +447,7 @@ struct Value {
             setTypeToArray();
         }
 
-        data_.VArray += Value{is_true};
+        array_ += Value{is_true};
     }
 
     template <typename Stream_T>
@@ -723,7 +462,7 @@ struct Value {
             setTypeToObject();
         }
 
-        return (data_.VObject[key]);
+        return (object_[key]);
     }
 
     inline Value &operator[](const StringView<Char_T> &key) {
@@ -732,37 +471,37 @@ struct Value {
             setTypeToObject();
         }
 
-        return (data_.VObject[key]);
+        return (object_[key]);
     }
 
-    inline Value &operator[](VStringT &&key) {
+    inline Value &operator[](StringT &&key) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
         }
 
-        return (data_.VObject[Memory::Move(key)]);
+        return (object_[Memory::Move(key)]);
     }
 
-    inline Value &operator[](const VStringT &key) {
+    inline Value &operator[](const StringT &key) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
         }
 
-        return (data_.VObject[key]);
+        return (object_[key]);
     }
 
     Value &operator[](SizeT index) {
         const ValueType type = Type();
 
         if (type == ValueType::Array) {
-            if (data_.VArray.Size() > index) {
-                return (data_.VArray.Storage()[index]);
+            if (array_.Size() > index) {
+                return (array_.Storage()[index]);
             }
         } else {
             if (type == ValueType::Object) {
-                Value *val = data_.VObject.GetValue(index);
+                Value *val = object_.GetValue(index);
 
                 if (val != nullptr) {
                     return *val;
@@ -773,13 +512,13 @@ struct Value {
             setTypeToArray();
         }
 
-        if (data_.VArray.Size() == index) {
-            data_.VArray += Value{};
+        if (array_.Size() == index) {
+            array_ += Value{};
         } else {
-            data_.VArray.ResizeAndInitialize(index + SizeT{1});
+            array_.ResizeAndInitialize(index + SizeT{1});
         }
 
-        return (data_.VArray.Storage()[index]);
+        return (array_.Storage()[index]);
     }
 
     template <typename Type_T>
@@ -794,7 +533,7 @@ struct Value {
             setTypeToObject();
         }
 
-        return (data_.VObject.Get(key, length));
+        return (object_.Get(key, length));
     }
 
     inline Value &Get(const StringView<Char_T> &key) {
@@ -803,7 +542,7 @@ struct Value {
             setTypeToObject();
         }
 
-        return (data_.VObject.Get(key.First(), key.Length()));
+        return (object_.Get(key.First(), key.Length()));
     }
 
     inline bool operator<(const Value &val) const noexcept {
@@ -812,27 +551,27 @@ struct Value {
         if (type == val.Type()) {
             switch (type) {
                 case ValueType::Object: {
-                    return (data_.VObject.Size() < val.data_.VObject.Size());
+                    return (object_.Size() < val.object_.Size());
                 }
 
                 case ValueType::Array: {
-                    return (data_.VArray.Size() < val.data_.VArray.Size());
+                    return (array_.Size() < val.array_.Size());
                 }
 
                 case ValueType::String: {
-                    return (data_.VString < val.data_.VString);
+                    return (string_ < val.string_);
                 }
 
                 case ValueType::UIntLong: {
-                    return (data_.VNumber.GetUInt64() < val.data_.VNumber.GetUInt64());
+                    return (number_.Natural < val.number_.Natural);
                 }
 
                 case ValueType::IntLong: {
-                    return (data_.VNumber.GetInt64() < val.data_.VNumber.GetInt64());
+                    return (number_.Integer < val.number_.Integer);
                 }
 
                 case ValueType::Double: {
-                    return (data_.VNumber.GetDouble() < val.data_.VNumber.GetDouble());
+                    return (number_.Real < val.number_.Real);
                 }
 
                 case ValueType::True:
@@ -853,27 +592,27 @@ struct Value {
         if (type == val.Type()) {
             switch (type) {
                 case ValueType::Object: {
-                    return (data_.VObject.Size() > val.data_.VObject.Size());
+                    return (object_.Size() > val.object_.Size());
                 }
 
                 case ValueType::Array: {
-                    return (data_.VArray.Size() > val.data_.VArray.Size());
+                    return (array_.Size() > val.array_.Size());
                 }
 
                 case ValueType::String: {
-                    return (data_.VString > val.data_.VString);
+                    return (string_ > val.string_);
                 }
 
                 case ValueType::UIntLong: {
-                    return (data_.VNumber.GetUInt64() > val.data_.VNumber.GetUInt64());
+                    return (number_.Natural > val.number_.Natural);
                 }
 
                 case ValueType::IntLong: {
-                    return (data_.VNumber.GetInt64() > val.data_.VNumber.GetInt64());
+                    return (number_.Integer > val.number_.Integer);
                 }
 
                 case ValueType::Double: {
-                    return (data_.VNumber.GetDouble() > val.data_.VNumber.GetDouble());
+                    return (number_.Real > val.number_.Real);
                 }
 
                 case ValueType::True:
@@ -894,27 +633,27 @@ struct Value {
         if (type == val.Type()) {
             switch (type) {
                 case ValueType::Object: {
-                    return (data_.VObject.Size() <= val.data_.VObject.Size());
+                    return (object_.Size() <= val.object_.Size());
                 }
 
                 case ValueType::Array: {
-                    return (data_.VArray.Size() <= val.data_.VArray.Size());
+                    return (array_.Size() <= val.array_.Size());
                 }
 
                 case ValueType::String: {
-                    return (data_.VString <= val.data_.VString);
+                    return (string_ <= val.string_);
                 }
 
                 case ValueType::UIntLong: {
-                    return (data_.VNumber.GetUInt64() <= val.data_.VNumber.GetUInt64());
+                    return (number_.Natural <= val.number_.Natural);
                 }
 
                 case ValueType::IntLong: {
-                    return (data_.VNumber.GetInt64() <= val.data_.VNumber.GetInt64());
+                    return (number_.Integer <= val.number_.Integer);
                 }
 
                 case ValueType::Double: {
-                    return (data_.VNumber.GetDouble() <= val.data_.VNumber.GetDouble());
+                    return (number_.Real <= val.number_.Real);
                 }
 
                 case ValueType::True:
@@ -935,27 +674,27 @@ struct Value {
         if (type == val.Type()) {
             switch (type) {
                 case ValueType::Object: {
-                    return (data_.VObject.Size() >= val.data_.VObject.Size());
+                    return (object_.Size() >= val.object_.Size());
                 }
 
                 case ValueType::Array: {
-                    return (data_.VArray.Size() >= val.data_.VArray.Size());
+                    return (array_.Size() >= val.array_.Size());
                 }
 
                 case ValueType::String: {
-                    return (data_.VString >= val.data_.VString);
+                    return (string_ >= val.string_);
                 }
 
                 case ValueType::UIntLong: {
-                    return (data_.VNumber.GetUInt64() >= val.data_.VNumber.GetUInt64());
+                    return (number_.Natural >= val.number_.Natural);
                 }
 
                 case ValueType::IntLong: {
-                    return (data_.VNumber.GetInt64() >= val.data_.VNumber.GetInt64());
+                    return (number_.Integer >= val.number_.Integer);
                 }
 
                 case ValueType::Double: {
-                    return (data_.VNumber.GetDouble() >= val.data_.VNumber.GetDouble());
+                    return (number_.Real >= val.number_.Real);
                 }
 
                 case ValueType::True:
@@ -976,27 +715,27 @@ struct Value {
         if (type == val.Type()) {
             switch (type) {
                 case ValueType::Object: {
-                    return (data_.VObject.Size() == val.data_.VObject.Size());
+                    return (object_.Size() == val.object_.Size());
                 }
 
                 case ValueType::Array: {
-                    return (data_.VArray.Size() == val.data_.VArray.Size());
+                    return (array_.Size() == val.array_.Size());
                 }
 
                 case ValueType::String: {
-                    return (data_.VString == val.data_.VString);
+                    return (string_ == val.string_);
                 }
 
                 case ValueType::UIntLong: {
-                    return (data_.VNumber.GetUInt64() == val.data_.VNumber.GetUInt64());
+                    return (number_.Natural == val.number_.Natural);
                 }
 
                 case ValueType::IntLong: {
-                    return (data_.VNumber.GetInt64() == val.data_.VNumber.GetInt64());
+                    return (number_.Integer == val.number_.Integer);
                 }
 
                 case ValueType::Double: {
-                    return (data_.VNumber.GetDouble() == val.data_.VNumber.GetDouble());
+                    return (number_.Real == val.number_.Real);
                 }
 
                 case ValueType::True:
@@ -1091,11 +830,11 @@ struct Value {
 
     SizeT Size() const noexcept {
         if (IsObject()) {
-            return (data_.VObject.Size());
+            return (object_.Size());
         }
 
         if (IsArray()) {
-            return (data_.VArray.Size());
+            return (array_.Size());
         }
 
         return SizeT{0};
@@ -1107,18 +846,18 @@ struct Value {
         }
 
         if (IsArray() && val.IsArray()) {
-            Value       *src_val = val.data_.VArray.Storage();
-            const Value *end     = (src_val + val.data_.VArray.Size());
+            Value       *src_val = val.array_.Storage();
+            const Value *end     = val.array_.End();
 
             while (src_val < end) {
                 if (!(src_val->IsUndefined())) {
-                    data_.VArray += Memory::Move(*src_val);
+                    array_ += Memory::Move(*src_val);
                 }
 
                 ++src_val;
             }
         } else if (IsObject() && val.IsObject()) {
-            data_.VObject += Memory::Move(val.data_.VObject);
+            object_ += Memory::Move(val.object_);
         }
 
         val.Reset();
@@ -1130,25 +869,25 @@ struct Value {
         }
 
         if (IsArray() && val.IsArray()) {
-            Value       *src_val = val.data_.VArray.Storage();
-            const Value *end     = (src_val + val.data_.VArray.Size());
+            Value       *src_val = val.array_.Storage();
+            const Value *end     = val.array_.End();
 
             while (src_val < end) {
                 if (!(src_val->IsUndefined())) {
-                    data_.VArray += *src_val;
+                    array_ += *src_val;
                 }
 
                 ++src_val;
             }
         } else if (IsObject() && val.IsObject()) {
-            data_.VObject += val.data_.VObject;
+            object_ += val.object_;
         }
     }
 
     Value *GetValue(SizeT index) const noexcept {
         switch (Type()) {
             case ValueType::Object: {
-                Value *val = data_.VObject.GetValue(index);
+                Value *val = object_.GetValue(index);
 
                 if ((val != nullptr) && (!(val->IsUndefined()))) {
                     return val;
@@ -1158,8 +897,8 @@ struct Value {
             }
 
             case ValueType::Array: {
-                if (index < data_.VArray.Size()) {
-                    Value *val = (data_.VArray.Storage() + index);
+                if (index < array_.Size()) {
+                    Value *val = (array_.Storage() + index);
 
                     if (!(val->IsUndefined())) {
                         return val;
@@ -1177,7 +916,7 @@ struct Value {
     Value *GetValue(const Char_T *key, SizeT length) const noexcept {
         switch (Type()) {
             case ValueType::Object: {
-                Value *val = data_.VObject.GetValue(key, length);
+                Value *val = object_.GetValue(key, length);
 
                 if ((val != nullptr) && !(val->IsUndefined())) {
                     return val;
@@ -1190,8 +929,8 @@ struct Value {
                 SizeT index;
                 Digit::FastStringToNumber(index, key, length);
 
-                if (index < data_.VArray.Size()) {
-                    Value *val = (data_.VArray.Storage() + index);
+                if (index < array_.Size()) {
+                    Value *val = (array_.Storage() + index);
 
                     if (!(val->IsUndefined())) {
                         return val;
@@ -1215,7 +954,7 @@ struct Value {
 
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = data_.VObject.Storage();
+                V_item *item = object_.Storage();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1223,7 +962,7 @@ struct Value {
             }
 
             case ValueType::Array: {
-                return data_.VArray.Storage();
+                return array_.Storage();
             }
 
             default:
@@ -1236,7 +975,7 @@ struct Value {
 
         switch (Type()) {
             case ValueType::Object: {
-                const V_item *item = data_.VObject.First();
+                const V_item *item = object_.First();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1244,7 +983,7 @@ struct Value {
             }
 
             case ValueType::Array: {
-                return data_.VArray.First();
+                return array_.First();
             }
 
             default:
@@ -1257,7 +996,7 @@ struct Value {
 
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = data_.VObject.Last();
+                V_item *item = object_.Last();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1265,7 +1004,7 @@ struct Value {
             }
 
             case ValueType::Array: {
-                return data_.VArray.Last();
+                return array_.Last();
             }
 
             default:
@@ -1278,7 +1017,7 @@ struct Value {
 
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = data_.VObject.End();
+                V_item *item = object_.End();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1286,7 +1025,7 @@ struct Value {
             }
 
             case ValueType::Array: {
-                return data_.VArray.End();
+                return array_.End();
             }
 
             default:
@@ -1294,57 +1033,57 @@ struct Value {
         }
     }
 
-    const VStringT *GetKey(SizeT index) const noexcept {
+    const StringT *GetKey(SizeT index) const noexcept {
         if (IsObject()) {
-            return (data_.VObject.GetKey(index));
+            return (object_.GetKey(index));
         }
 
         return nullptr;
     }
 
-    const VObjectT *GetObject() const noexcept {
+    const ObjectT *GetObject() const noexcept {
         if (IsObject()) {
-            return &(data_.VObject);
+            return &(object_);
         }
 
         return nullptr;
     }
 
-    VObjectT *GetObject() noexcept {
+    ObjectT *GetObject() noexcept {
         if (IsObject()) {
-            return &(data_.VObject);
+            return &(object_);
         }
 
         return nullptr;
     }
 
-    const VArrayT *GetArray() const noexcept {
+    const ArrayT *GetArray() const noexcept {
         if (IsArray()) {
-            return &(data_.VArray);
+            return &(array_);
         }
 
         return nullptr;
     }
 
-    VArrayT *GetArray() noexcept {
+    ArrayT *GetArray() noexcept {
         if (IsArray()) {
-            return &(data_.VArray);
+            return &(array_);
         }
 
         return nullptr;
     }
 
-    const VStringT *GetString() const noexcept {
+    const StringT *GetString() const noexcept {
         if (IsString()) {
-            return &(data_.VString);
+            return &(string_);
         }
 
         return nullptr;
     }
 
-    VStringT *GetString() noexcept {
+    StringT *GetString() noexcept {
         if (IsString()) {
-            return &(data_.VString);
+            return &(string_);
         }
 
         return nullptr;
@@ -1352,7 +1091,7 @@ struct Value {
 
     const Char_T *StringStorage() const noexcept {
         if (IsString()) {
-            return (data_.VString.First());
+            return (string_.First());
         }
 
         return nullptr;
@@ -1360,7 +1099,7 @@ struct Value {
 
     SizeT Length() const noexcept {
         if (IsString()) {
-            return (data_.VString.Length());
+            return (string_.Length());
         }
 
         return SizeT{0};
@@ -1369,12 +1108,11 @@ struct Value {
     // To get a pointer to a key and its length.
     template <typename Number_T>
     bool SetKeyCharAndLength(SizeT index, const Char_T *&key, Number_T &length) const noexcept {
-        const VStringT *val = GetKey(index);
+        const StringT *val = GetKey(index);
 
         if (val != nullptr) {
-            const SizeT len = val->Length();
-            key             = val->Storage(len);
-            length          = Number_T(len);
+            key    = val->Storage();
+            length = Number_T(val->Length());
             return true;
         }
 
@@ -1384,29 +1122,27 @@ struct Value {
     template <typename Number_T>
     void SetValueKeyLength(SizeT index, const Value *&value, const Char_T *&key, Number_T &length) const noexcept {
         if (IsObject()) {
-            const HAItem_T<Value, Char_T> *item = data_.VObject.GetItem(index);
+            const HAItem_T<Value, Char_T> *item = object_.GetItem(index);
 
             value = nullptr;
 
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
-                const SizeT len = item->Key.Length();
-                value           = &(item->Value);
-                key             = item->Key.Storage(len);
-                length          = Number_T(len);
+                value  = &(item->Value);
+                key    = item->Key.Storage();
+                length = Number_T(item->Key.Length());
             }
         }
     }
 
     void SetValueAndKey(SizeT index, const Value *&value, StringView<Char_T> &key) const noexcept {
         if (IsObject()) {
-            const HAItem_T<Value, Char_T> *item = data_.VObject.GetItem(index);
+            const HAItem_T<Value, Char_T> *item = object_.GetItem(index);
 
             value = nullptr;
 
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
-                const SizeT len = item->Key.Length();
-                value           = &(item->Value);
-                key             = StringView<Char_T>{item->Key.Storage(), len};
+                value = &(item->Value);
+                key   = StringView<Char_T>{item->Key.Storage(), item->Key.Length()};
             }
         }
     }
@@ -1416,8 +1152,8 @@ struct Value {
     bool SetCharAndLength(const Char_T *&key, Number_T &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
-                key    = data_.VString.Storage();
-                length = Number_T{data_.VString.Length()};
+                key    = string_.Storage();
+                length = Number_T{string_.Length()};
                 return true;
             }
 
@@ -1455,26 +1191,26 @@ struct Value {
         switch (Type()) {
             case ValueType::String: {
                 if (string_function != nullptr) {
-                    string_function(stream, data_.VString.Storage(), data_.VString.Length());
+                    string_function(stream, string_.Storage(), string_.Length());
                 } else {
-                    stream.Write(data_.VString.Storage(), data_.VString.Length());
+                    stream.Write(string_.Storage(), string_.Length());
                 }
 
                 break;
             }
 
             case ValueType::UIntLong: {
-                Digit::NumberToString(stream, data_.VNumber.GetUInt64());
+                Digit::NumberToString(stream, number_.Natural);
                 break;
             }
 
             case ValueType::IntLong: {
-                Digit::NumberToString(stream, data_.VNumber.GetInt64());
+                Digit::NumberToString(stream, number_.Integer);
                 break;
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, data_.VNumber.GetDouble(), format);
+                Digit::NumberToString(stream, number_.Real, format);
                 break;
             }
 
@@ -1504,7 +1240,7 @@ struct Value {
     template <typename StringStream_T>
     bool CopyKeyByIndexTo(StringStream_T &stream, SizeT index) const {
         if (IsObject()) {
-            const VStringT *key = data_.VObject.GetKey(index);
+            const StringT *key = object_.GetKey(index);
 
             if (key != nullptr) {
                 stream += *key;
@@ -1583,17 +1319,17 @@ struct Value {
     QNumberType SetNumber(QNumber64 &number) const noexcept {
         switch (Type()) {
             case ValueType::UIntLong: {
-                number.Natural = (data_.VNumber.GetUInt64());
+                number.Natural = (number_.Natural);
                 return QNumberType::Natural;
             }
 
             case ValueType::IntLong: {
-                number.Integer = (data_.VNumber.GetInt64());
+                number.Integer = (number_.Integer);
                 return QNumberType::Integer;
             }
 
             case ValueType::Double: {
-                number.Real = (data_.VNumber.GetDouble());
+                number.Real = (number_.Real);
                 return QNumberType::Real;
             }
 
@@ -1610,10 +1346,9 @@ struct Value {
 
             case ValueType::String: {
                 SizeT             offset = 0;
-                const QNumberType n_type =
-                    Digit::StringToNumber(number, data_.VString.Storage(), offset, data_.VString.Length());
+                const QNumberType n_type = Digit::StringToNumber(number, string_.Storage(), offset, string_.Length());
 
-                if (offset == data_.VString.Length()) {
+                if (offset == string_.Length()) {
                     return n_type;
                 }
             }
@@ -1639,27 +1374,27 @@ struct Value {
             }
 
             case ValueType::UIntLong: {
-                value = (data_.VNumber.GetUInt64() > 0);
+                value = (number_.Natural > 0);
                 return true;
             }
 
             case ValueType::IntLong: {
-                value = (data_.VNumber.GetInt64() > 0);
+                value = (number_.Integer > 0);
                 return true;
             }
 
             case ValueType::Double: {
-                value = (data_.VNumber.GetDouble() > 0);
+                value = (number_.Real > 0);
                 return true;
             }
 
             case ValueType::String: {
-                if (data_.VString.IsEqual(JSONotation::TrueString, JSONotation::TrueStringLength)) {
+                if (string_.IsEqual(JSONotation::TrueString, JSONotation::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (data_.VString.IsEqual(JSONotation::FalseString, JSONotation::FalseStringLength)) {
+                if (string_.IsEqual(JSONotation::FalseString, JSONotation::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1674,13 +1409,12 @@ struct Value {
 
     inline void Remove(const Char_T *key, SizeT length) const noexcept {
         if (IsObject()) {
-            data_.VObject.Remove(key, length);
+            object_.Remove(key, length);
         }
     }
 
-    inline void Remove(const VStringT &key) const noexcept {
-        const SizeT length = data_.VString.Length();
-        Remove(key.Storage(length), length);
+    inline void Remove(const StringT &key) const noexcept {
+        Remove(key.Storage(), string_.Length());
     }
 
     inline void Remove(const Char_T *key) const noexcept {
@@ -1689,9 +1423,9 @@ struct Value {
 
     void RemoveIndex(SizeT index) const noexcept {
         if (IsObject()) {
-            data_.VObject.RemoveIndex(index);
-        } else if (IsArray() && (index < data_.VArray.Size())) {
-            (data_.VArray.Storage() + index)->Reset();
+            object_.RemoveIndex(index);
+        } else if (IsArray() && (index < array_.Size())) {
+            (array_.Storage() + index)->Reset();
         }
     }
 
@@ -1709,8 +1443,8 @@ struct Value {
         using V_item = HAItem_T<Value, Char_T>;
 
         if (IsArray()) {
-            Value       *src_val = data_.VArray.Storage();
-            const Value *src_end = (src_val + data_.VArray.Size());
+            Value       *src_val = array_.Storage();
+            const Value *src_end = array_.End();
             SizeT        size    = 0;
 
             while (src_val < src_end) {
@@ -1721,19 +1455,14 @@ struct Value {
                 ++src_val;
             }
 
-            if (size != data_.VArray.Capacity()) {
+            if (size != array_.Capacity()) {
                 if (size == SizeT{0}) {
-                    data_.VArray.Reset();
-
-                    if (Config::PointerTagging) {
-                        setTypeToArray();
-                    }
-
+                    array_.Reset();
                     return;
                 }
 
-                VArrayT new_array{size};
-                src_val = data_.VArray.Storage();
+                ArrayT new_array{size};
+                src_val = array_.Storage();
 
                 do {
                     if (!(src_val->IsUndefined())) {
@@ -1743,11 +1472,11 @@ struct Value {
                     ++src_val;
                 } while (src_val < src_end);
 
-                data_.VArray = Memory::Move(new_array);
+                array_ = Memory::Move(new_array);
             }
 
-            src_val = data_.VArray.Storage();
-            src_end = (src_val + data_.VArray.Size());
+            src_val = array_.Storage();
+            src_end = array_.End();
 
             while (src_val < src_end) {
                 if (src_val->IsArray() || src_val->IsObject()) {
@@ -1757,10 +1486,10 @@ struct Value {
                 ++src_val;
             }
         } else if (IsObject()) {
-            data_.VObject.Compress();
+            object_.Compress();
 
-            V_item       *src_val = data_.VObject.Storage();
-            const V_item *src_end = (src_val + data_.VObject.Size());
+            V_item       *src_val = object_.Storage();
+            const V_item *src_end = (src_val + object_.Size());
 
             while (src_val < src_end) {
                 if (src_val->Value.IsArray() || src_val->Value.IsObject()) {
@@ -1773,32 +1502,31 @@ struct Value {
     }
 
     inline ValueType Type() const noexcept {
-        return data_.GetType();
+        return type_;
     }
 
     bool GroupBy(Value &groupedValue, const Char_T *key, const SizeT length) const {
         using V_item = HAItem_T<Value, Char_T>;
         StringStream<Char_T> stream;
-        VObjectT             new_sub_obj;
+        ObjectT              new_sub_obj;
         const Char_T        *str     = nullptr;
         SizeT                str_len = 0;
         SizeT                grouped_key_index;
 
         if (IsArray()) {
-            const Value *item_ = data_.VArray.First();
+            const Value *item_ = array_.First();
             groupedValue.reset();
             groupedValue.setTypeToObject();
 
-            if ((item_ != nullptr) && item_->IsObject() &&
-                item_->data_.VObject.GetKeyIndex(grouped_key_index, key, length)) {
-                const Value *end = data_.VArray.End();
+            if ((item_ != nullptr) && item_->IsObject() && item_->object_.GetKeyIndex(grouped_key_index, key, length)) {
+                const Value *end = array_.End();
 
                 while (item_ != end) {
                     if ((item_ != nullptr) && item_->IsObject()) {
                         SizeT count = 0;
 
-                        const V_item *obj_item = item_->data_.VObject.First();
-                        const V_item *obj_end  = item_->data_.VObject.End();
+                        const V_item *obj_item = item_->object_.First();
+                        const V_item *obj_end  = item_->object_.End();
 
                         while (obj_item != obj_end) {
                             if ((obj_item != nullptr) && !(obj_item->Value.IsUndefined())) {
@@ -1823,7 +1551,7 @@ struct Value {
                             return false;
                         }
 
-                        groupedValue.data_.VObject.Get(str, str_len) += Memory::Move(new_sub_obj);
+                        groupedValue.object_.Get(str, str_len) += Memory::Move(new_sub_obj);
 
                         ++item_;
                         continue;
@@ -1848,9 +1576,9 @@ struct Value {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            data_.VObject.Sort(ascend);
+            object_.Sort(ascend);
         } else if (type == ValueType::Array) {
-            data_.VArray.Sort(ascend);
+            array_.Sort(ascend);
         }
     }
 
@@ -1859,22 +1587,22 @@ struct Value {
         const ValueType type = Type();
 
         if (type == ValueType::Object) {
-            stringifyObject(data_.VObject, stream, precision);
+            stringifyObject(object_, stream, precision);
         } else if (type == ValueType::Array) {
-            stringifyArray(data_.VArray, stream, precision);
+            stringifyArray(array_, stream, precision);
         }
 
         return stream;
     }
 
-    inline VStringT Stringify(SizeT32 precision = Config::DoublePrecision) const {
+    inline StringT Stringify(SizeT32 precision = Config::DoublePrecision) const {
         StringStream<Char_T> stream;
         return Stringify(stream, precision).GetString();
     }
 
   private:
     template <typename Stream_T>
-    static void stringifyObject(const VObjectT &obj, Stream_T &stream, SizeT32 precision) {
+    static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) {
         using V_item = HAItem_T<Value, Char_T>;
 
         stream += JSONotation::SCurlyChar;
@@ -1906,11 +1634,11 @@ struct Value {
     }
 
     template <typename Stream_T>
-    static void stringifyArray(const VArrayT &arr, Stream_T &stream, SizeT32 precision) {
+    static void stringifyArray(const ArrayT &arr, Stream_T &stream, SizeT32 precision) {
         stream += JSONotation::SSquareChar;
 
         const Value *item = arr.First();
-        const Value *end  = (item + arr.Size());
+        const Value *end  = arr.End();
 
         while (item != end) {
             if (!(item->IsUndefined())) {
@@ -1934,34 +1662,34 @@ struct Value {
     static void stringifyValue(const Value &val, Stream_T &stream, SizeT32 precision) {
         switch (val.Type()) {
             case ValueType::Object: {
-                stringifyObject(val.data_.VObject, stream, precision);
+                stringifyObject(val.object_, stream, precision);
                 break;
             }
 
             case ValueType::Array: {
-                stringifyArray(val.data_.VArray, stream, precision);
+                stringifyArray(val.array_, stream, precision);
                 break;
             }
 
             case ValueType::String: {
                 stream += JSONotation::QuoteChar;
-                JSONUtils::EscapeJSON(val.data_.VString.First(), val.data_.VString.Length(), stream);
+                JSONUtils::EscapeJSON(val.string_.First(), val.string_.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 break;
             }
 
             case ValueType::UIntLong: {
-                Digit::NumberToString(stream, val.data_.VNumber.GetUInt64());
+                Digit::NumberToString(stream, val.number_.Natural);
                 break;
             }
 
             case ValueType::IntLong: {
-                Digit::NumberToString(stream, val.data_.VNumber.GetInt64());
+                Digit::NumberToString(stream, val.number_.Integer);
                 break;
             }
 
             case ValueType::Double: {
-                Digit::NumberToString(stream, val.data_.VNumber.GetDouble(), precision);
+                Digit::NumberToString(stream, val.number_.Real, precision);
                 break;
             }
 
@@ -1985,8 +1713,8 @@ struct Value {
         }
     }
 
-    inline void setType(ValueType new_type) noexcept {
-        data_.SetType(new_type);
+    inline void setType(ValueType type) noexcept {
+        type_ = type;
     }
 
     inline void setTypeToUndefined() noexcept {
@@ -2032,22 +1760,22 @@ struct Value {
     void reset() noexcept {
         switch (Type()) {
             case ValueType::Object: {
-                data_.VObject.Reset();
+                object_.Reset();
                 break;
             }
 
             case ValueType::Array: {
-                data_.VArray.Reset();
+                array_.Reset();
                 break;
             }
 
             case ValueType::String: {
-                data_.VString.Reset();
+                string_.Reset();
                 break;
             }
 
             default: {
-                data_.VNumber.Clear();
+                number_.Natural = SizeT64{0};
             }
         }
     }
@@ -2055,29 +1783,36 @@ struct Value {
     void copyValue(const Value &val) {
         switch (val.Type()) {
             case ValueType::Object: {
-                data_.VObject = val.data_.VObject;
+                object_ = val.object_;
                 break;
             }
 
             case ValueType::Array: {
-                data_.VArray = val.data_.VArray;
+                array_ = val.array_;
                 break;
             }
 
             case ValueType::String: {
-                data_.VString = val.data_.VString;
+                string_ = val.string_;
                 break;
             }
 
             default: {
-                data_.VNumber = val.data_.VNumber;
+                number_ = val.number_;
             }
         }
 
         setType(val.Type());
     }
 
-    ValueData<Char_T, VObjectT, VArrayT, VStringT, Config::PointerTagging> data_;
+    union {
+        ObjectT   object_{};
+        ArrayT    array_;
+        StringT   string_;
+        QNumber64 number_;
+    };
+
+    ValueType type_{ValueType::Undefined};
 };
 
 } // namespace Qentem

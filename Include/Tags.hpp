@@ -47,12 +47,7 @@ enum struct TagType : SizeT8 {
     If             // <if case="..."></if>
 };
 
-template <bool>
-struct TagBitData;
-
-template <>
-struct TagBitData<true> {
-    // With pointer tagging
+struct TagBitData {
     TagBitData() noexcept  = default;
     ~TagBitData() noexcept = default;
 
@@ -60,40 +55,7 @@ struct TagBitData<true> {
     TagBitData &operator=(TagBitData &&)      = delete;
     TagBitData &operator=(const TagBitData &) = delete;
 
-    TagBitData(TagBitData &&src) noexcept : storage_{Memory::Move(src.storage_)} {
-    }
-
-    inline void SetType(TagType type) noexcept {
-        storage_.SetHighByte(SizeT8(type));
-    }
-
-    inline TagType GetType() const noexcept {
-        return TagType(storage_.GetHighByte());
-    }
-
-    inline void SetStorage(void *storage) noexcept {
-        storage_.SetPointer(storage);
-    }
-
-    inline void *GetStorage() const noexcept {
-        return storage_.GetPointer();
-    }
-
-  private:
-    QPointer<void> storage_{};
-};
-
-template <>
-struct TagBitData<false> {
-    // Without tag
-    TagBitData() noexcept  = default;
-    ~TagBitData() noexcept = default;
-
-    TagBitData(const TagBitData &)            = delete;
-    TagBitData &operator=(TagBitData &&)      = delete;
-    TagBitData &operator=(const TagBitData &) = delete;
-
-    TagBitData(TagBitData &&src) noexcept : storage_{Memory::Move(src.storage_)}, type_{src.type_} {
+    TagBitData(TagBitData &&src) noexcept : storage_{src.storage_}, type_{src.type_} {
         src.type_ = TagType::None;
     }
 
@@ -106,16 +68,16 @@ struct TagBitData<false> {
     }
 
     inline void SetStorage(void *storage) noexcept {
-        storage_.SetPointer(storage);
+        storage_ = storage;
     }
 
     inline void *GetStorage() const noexcept {
-        return storage_.GetPointer();
+        return storage_;
     }
 
   private:
-    QPointer<void> storage_{};
-    TagType        type_{TagType::None};
+    void   *storage_{};
+    TagType type_{TagType::None};
 };
 
 struct TagBit {
@@ -273,7 +235,7 @@ struct TagBit {
     }
 
   private:
-    TagBitData<Config::PointerTagging> data_{};
+    TagBitData data_{};
 };
 
 // MathTag -------------------------------------------

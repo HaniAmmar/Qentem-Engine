@@ -303,15 +303,13 @@ struct TemplateCore {
     }
 
     void Render(const Array<Tags::TagBit> &tags_cache, const Value_T &value, StringStream_T &stream) {
-        Array<LoopItem>     loops_items{};
-        const Tags::TagBit *tag = tags_cache.First();
-        const Tags::TagBit *end = (tag + tags_cache.Size());
+        Array<LoopItem> loops_items{};
 
         value_       = &value;
         stream_      = &stream;
         loops_items_ = &loops_items;
 
-        render(tag, end, SizeT{0}, length_);
+        render(tags_cache.First(), tags_cache.End(), SizeT{0}, length_);
     }
 
     inline bool Evaluate(QExpression &number, const QExpressions &exprs, const Value_T &value) noexcept {
@@ -436,7 +434,7 @@ struct TemplateCore {
                                 // Set StartID
                                 if ((tag.TrueOffset != SizeT16{0}) && (tag.FalseOffset != SizeT16{0})) {
                                     const TagBit *s_tag     = tag.SubTags.First();
-                                    const TagBit *s_tag_end = (s_tag + tag.SubTags.Size());
+                                    const TagBit *s_tag_end = tag.SubTags.End();
                                     SizeT32       id{0};
                                     const SizeT   first_offset =
                                         (SizeT((tag.TrueOffset < tag.FalseOffset) ? tag.FalseOffset : tag.TrueOffset) +
@@ -1288,7 +1286,7 @@ struct TemplateCore {
                 if (tag.TrueOffset < tag.FalseOffset) {
                     s_end = (s_tag + tag.FalseTagsStartID);
                 } else {
-                    s_end = (s_tag + tag.SubTags.Size());
+                    s_end = tag.SubTags.End();
                     s_tag += tag.TrueTagsStartID;
                 }
 
@@ -1298,7 +1296,7 @@ struct TemplateCore {
                 if (tag.FalseOffset < tag.TrueOffset) {
                     s_end = (s_tag + tag.TrueTagsStartID);
                 } else {
-                    s_end = (s_tag + tag.SubTags.Size());
+                    s_end = tag.SubTags.End();
                     s_tag += tag.FalseTagsStartID;
                 }
 
@@ -1384,7 +1382,7 @@ struct TemplateCore {
 
     void renderIf(const IfTag &tag, SizeT &offset) const {
         const IfTagCase *item = tag.Cases.First();
-        const IfTagCase *end  = (item + tag.Cases.Size());
+        const IfTagCase *end  = tag.Cases.End();
         QExpression      result;
 
         stream_->Write((content_ + offset), (tag.Offset - offset));
@@ -1396,9 +1394,7 @@ struct TemplateCore {
                 const QExpression *expr = item->Case.First();
 
                 if (item->Case.IsEmpty() || (evaluate(result, expr, QOperation::NoOp) && (result > 0U))) {
-                    const TagBit *s_tag = item->SubTags.First();
-                    const TagBit *s_end = (s_tag + item->SubTags.Size());
-                    render(s_tag, s_end, item->Offset, item->EndOffset);
+                    render(item->SubTags.First(), item->SubTags.End(), item->Offset, item->EndOffset);
                     break;
                 }
 

@@ -389,10 +389,6 @@ struct QTest {
         } else {
             TestOutPut::Print("Endianness: Little-Endian\n");
         }
-
-        if QENTEM_CONST_EXPRESSION (Config::PointerTagging) {
-            TestOutPut::Print("Tagged Pointers: On\n");
-        }
 #if defined(QENTEM_AVX2) && (QENTEM_AVX2 == 1)
         TestOutPut::Print("Advanced Vector Extensions: On\n");
 #endif

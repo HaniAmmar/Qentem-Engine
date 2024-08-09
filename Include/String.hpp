@@ -24,88 +24,23 @@
 #define QENTEM_STRING_H
 
 #include "Memory.hpp"
-#include "QPointer.hpp"
 #include "StringUtils.hpp"
 
 namespace Qentem {
 /*
- * String container with null terminator and a taggable pointer.
+ * String container with null terminator.
  */
-
-template <typename, bool>
-struct StringData;
-
-template <typename Char_T>
-struct StringData<Char_T, false> {
-    // Little-Endian
-    StringData() noexcept  = default;
-    ~StringData() noexcept = default;
-
-    StringData(StringData &&src) noexcept
-        : Length{src.Length}, Padding{src.Padding}, Storage{Memory::Move(src.Storage)} {
-        src.Length = 0;
-    }
-
-    StringData(const StringData &)            = delete;
-    StringData &operator=(StringData &&)      = delete;
-    StringData &operator=(const StringData &) = delete;
-
-    inline Char_T *GetShortStorage() noexcept {
-        return Memory::ChangePointer<Char_T>(&Length);
-    }
-
-    inline const Char_T *GetShortStorage() const noexcept {
-        return Memory::ChangePointer<const Char_T>(&Length);
-    }
-
-    SizeT            Length{0};
-    SizeT            Padding{0};
-    QPointer<Char_T> Storage{};
-};
-
-template <typename Char_T>
-struct StringData<Char_T, true> {
-    // Big-Endian
-    StringData() noexcept  = default;
-    ~StringData() noexcept = default;
-
-    StringData(StringData &&src) noexcept
-        : Storage{Memory::Move(src.Storage)}, Padding{src.Padding}, Length{src.Length} {
-        src.Length = SizeT{0};
-    }
-
-    StringData(const StringData &)            = delete;
-    StringData &operator=(StringData &&)      = delete;
-    StringData &operator=(const StringData &) = delete;
-
-    inline Char_T *GetShortStorage() noexcept {
-        // Two tags at the start
-        return Memory::ChangePointer<Char_T>(Memory::ChangePointer<char>(&Storage) + 2U);
-        // return reinterpret_cast<Char_T *>(const_cast<char *>(reinterpret_cast<const char *>(&Storage) +
-        // 2));
-    }
-
-    inline const Char_T *GetShortStorage() const noexcept {
-        // Two tags at the start
-        return Memory::ChangePointer<const Char_T>(Memory::ChangePointer<const char>(&Storage) + 2U);
-        // return reinterpret_cast<Char_T *>(const_cast<char *>(reinterpret_cast<const char *>(&Storage) +
-        // 2));
-    }
-
-    QPointer<Char_T> Storage{};
-    SizeT            Padding{0};
-    SizeT            Length{0};
-};
 
 template <typename Char_T>
 struct String {
     using CharType = Char_T;
 
-    // Two numbers, and one pointer -2 for tagging bytes (see QPointer).
-    static constexpr SizeT ShortStringMax = ((sizeof(StringData<Char_T, false>) - 2U) / sizeof(Char_T));
+    String() noexcept = default;
 
-    String() noexcept             = default;
-    String(String &&src) noexcept = default;
+    String(String &&src) noexcept : length_{src.length_}, storage_{src.storage_} {
+        src.clearLength();
+        src.clearStorage();
+    }
 
     String(const String &src) {
         copyString(src.Storage(), src.Length());
@@ -139,9 +74,10 @@ struct String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate();
+            setStorage(src.Storage());
             setLength(src.Length());
-            data_.Storage.MovePointerOnly(src.data_.Storage);
             src.clearLength();
+            src.clearStorage();
         }
 
         return *this;
@@ -245,9 +181,7 @@ struct String {
     }
 
     inline bool operator<=(const Char_T *str) const noexcept {
-        const SizeT len = Length();
-
-        return StringUtils::IsLess(Storage(len), str, len, StringUtils::Count(str), true);
+        return StringUtils::IsLess(Storage(), str, Length(), StringUtils::Count(str), true);
     }
 
     inline bool operator>(const String &string) const noexcept {
@@ -255,9 +189,7 @@ struct String {
     }
 
     inline bool operator>(const Char_T *str) const noexcept {
-        const SizeT len = Length();
-
-        return StringUtils::IsGreater(Storage(len), str, len, StringUtils::Count(str), false);
+        return StringUtils::IsGreater(Storage(), str, Length(), StringUtils::Count(str), false);
     }
 
     inline bool operator>=(const String &string) const noexcept {
@@ -288,15 +220,11 @@ struct String {
     }
 
     inline SizeT Length() const noexcept {
-        return data_.Length;
+        return length_;
     }
 
-    inline Char_T *Storage() noexcept {
-        return data_.Storage.GetPointer();
-    }
-
-    inline const Char_T *Storage() const noexcept {
-        return data_.Storage.GetPointer();
+    inline Char_T *Storage() const noexcept {
+        return storage_;
     }
 
     static String Merge(const String &src1, const String &src2) {
@@ -392,15 +320,14 @@ struct String {
         const SizeT length = Length();
 
         if (length != SizeT{0}) {
-            return (Storage(length) + (length - SizeT{1}));
+            return (Storage() + (length - SizeT{1}));
         }
 
         return nullptr;
     }
 
     inline const Char_T *End() const noexcept {
-        const SizeT length = Length();
-        return (Storage(length) + length);
+        return (Storage() + Length());
     }
 
     inline bool IsEmpty() const noexcept {
@@ -409,14 +336,6 @@ struct String {
 
     inline bool IsNotEmpty() const noexcept {
         return !(IsEmpty());
-    }
-
-    inline SizeT8 GetHighByte() const noexcept {
-        return data_.Storage.GetHighByte();
-    }
-
-    inline void SetHighByte(SizeT8 byte) noexcept {
-        data_.Storage.SetHighByte(byte);
     }
 
     // For STL
@@ -440,15 +359,15 @@ struct String {
 
   private:
     void clearLength() noexcept {
-        data_.Length = SizeT{0};
+        length_ = SizeT{0};
     }
 
     void setLength(SizeT new_length) noexcept {
-        data_.Length = new_length;
+        length_ = new_length;
     }
 
     void setStorage(Char_T *ptr) noexcept {
-        data_.Storage.SetPointer(ptr);
+        storage_ = ptr;
     }
 
     Char_T *allocate(SizeT new_size) {
@@ -462,7 +381,7 @@ struct String {
     }
 
     void clearStorage() noexcept {
-        data_.Storage.Reset();
+        storage_ = nullptr;
     }
 
     static String merge(const Char_T *str1, const SizeT len1, const Char_T *str2, const SizeT len2) {
@@ -489,9 +408,9 @@ struct String {
         setLength(len);
     }
 
-    static constexpr SizeT8 not_short_value_ = 255;
-
-    StringData<Char_T, Config::IsBigEndian> data_;
+    SizeT   length_{0};
+    SizeT   padding_{0};
+    Char_T *storage_{nullptr};
 };
 
 } // namespace Qentem

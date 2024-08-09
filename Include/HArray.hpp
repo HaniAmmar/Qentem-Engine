@@ -32,7 +32,7 @@ namespace Qentem {
  * table. Any value can be accessed by its index or its name. It preserves
  * the elements' order and uses one memory block. Therefore, it has an initial
  * size, and collisions do not cause new allocations. When resized, it drops
- * deleted items and resets its hash base. Also, Its pointer is taggable.
+ * deleted items and resets its hash base.
  */
 
 /*|-------------------------------------------|*/
@@ -69,88 +69,14 @@ struct HAItem_T {
         return (Key == item.Key);
     }
 };
-///////////////////////////////////////////////
-template <typename, bool BigEndian>
-struct HArrayData;
 
-template <typename HAItem_T>
-struct HArrayData<HAItem_T, false> {
-    // Little-Endian
-    HArrayData() noexcept = default;
-
-    HArrayData(HArrayData &&src) noexcept
-        : Index{src.Index}, Capacity{src.Capacity}, HashTable{Memory::Move(src.HashTable)} {
-        src.Capacity = 0;
-        src.Index    = 0;
-    }
-
-    HArrayData(const HArrayData &)            = delete;
-    HArrayData &operator=(HArrayData &&)      = delete;
-    HArrayData &operator=(const HArrayData &) = delete;
-
-    inline SizeT *GetHashTable() const noexcept {
-        return HashTable.GetPointer();
-    }
-
-    inline HAItem_T *GetStorage(SizeT *hashTable) const noexcept {
-        return Memory::ChangePointer<HAItem_T>(hashTable + Capacity);
-    }
-
-    ~HArrayData() {
-        SizeT    *hashTable = GetHashTable();
-        HAItem_T *storage   = GetStorage(hashTable);
-        Memory::Dispose(storage, (storage + Index));
-        Memory::Deallocate(hashTable);
-    }
-
-    SizeT           Index{0};
-    SizeT           Capacity{0};
-    QPointer<SizeT> HashTable{};
-};
-
-template <typename HAItem_T>
-struct HArrayData<HAItem_T, true> {
-    // Big-Endian
-    HArrayData() noexcept = default;
-
-    HArrayData(HArrayData &&src) noexcept
-        : HashTable{Memory::Move(src.HashTable)}, Capacity{src.Capacity}, Index{src.Index} {
-        src.Index    = 0;
-        src.Capacity = 0;
-    }
-
-    HArrayData(const HArrayData &)            = delete;
-    HArrayData &operator=(HArrayData &&)      = delete;
-    HArrayData &operator=(const HArrayData &) = delete;
-
-    inline SizeT *GetHashTable() const noexcept {
-        return HashTable.GetPointer();
-    }
-
-    inline HAItem_T *GetStorage(SizeT *hashTable) const noexcept {
-        return Memory::ChangePointer<HAItem_T>(hashTable + Capacity);
-    }
-
-    ~HArrayData() {
-        SizeT    *hashTable = GetHashTable();
-        HAItem_T *storage   = GetStorage(hashTable);
-        Memory::Dispose(storage, (storage + Index));
-        Memory::Deallocate(hashTable);
-    }
-
-    QPointer<SizeT> HashTable{};
-    SizeT           Capacity{0};
-    SizeT           Index{0};
-};
 ///////////////////////////////////////////////
 template <typename Value_T, typename Char_T>
 struct HArray {
     using HAItem = HAItem_T<Value_T, Char_T>;
     using Key_T  = String<Char_T>;
 
-    HArray() noexcept             = default;
-    HArray(HArray &&src) noexcept = default;
-    ~HArray()                     = default;
+    HArray() noexcept = default;
 
     explicit HArray(SizeT size) {
         if (size != SizeT{0}) {
@@ -158,19 +84,34 @@ struct HArray {
         }
     }
 
+    HArray(HArray &&src) noexcept : index_{src.index_}, capacity_{src.capacity_}, hashTable_{src.hashTable_} {
+        src.setSize(SizeT{0});
+        src.setCapacity(SizeT{0});
+        src.clearHashTable();
+    }
+
     HArray(const HArray &src) {
         copyTable(src);
     }
 
+    ~HArray() {
+        SizeT  *hashTable = getHashTable();
+        HAItem *storage   = Storage();
+        Memory::Dispose(storage, (storage + Size()));
+        Memory::Deallocate(hashTable);
+    }
+
     HArray &operator=(HArray &&src) noexcept {
         if (this != &src) {
-            SizeT      *ht      = data_.GetHashTable();
-            HAItem     *storage = data_.GetStorage(ht);
+            SizeT      *ht      = getHashTable();
+            HAItem     *storage = Storage();
             const SizeT size    = Size();
 
-            data_.HashTable.MovePointerOnly(src.data_.HashTable);
+            setHashTable(src.getHashTable());
             setCapacity(src.Capacity());
             setSize(src.Size());
+
+            src.clearHashTable();
             src.setSize(SizeT{0});
             src.setCapacity(SizeT{0});
 
@@ -184,13 +125,13 @@ struct HArray {
 
     HArray &operator=(const HArray &src) {
         if (this != &src) {
-            SizeT      *ht      = data_.GetHashTable();
-            HAItem     *storage = data_.GetStorage(ht);
+            SizeT      *ht      = getHashTable();
+            HAItem     *storage = Storage();
             const SizeT size    = Size();
 
-            setHashTable(nullptr);
-            setCapacity(0);
-            setSize(0);
+            // clearHashTable();
+            // setCapacity(SizeT{0});
+            // setSize(SizeT{0});
             copyTable(src);
 
             Memory::Dispose(storage, (storage + size));
@@ -226,7 +167,7 @@ struct HArray {
             ++src_item;
         }
 
-        Memory::Deallocate(src.data_.GetHashTable());
+        Memory::Deallocate(src.getHashTable());
         src.clearHashTable();
         src.setCapacity(SizeT{0});
         src.setSize(SizeT{0});
@@ -480,8 +421,8 @@ struct HArray {
 
     void Clear() noexcept {
         constexpr SizeT32 size    = sizeof(SizeT);
-        SizeT            *ht      = data_.GetHashTable();
-        HAItem           *storage = data_.GetStorage(ht);
+        SizeT            *ht      = getHashTable();
+        HAItem           *storage = Storage();
         Memory::SetToZero(ht, (size * Capacity()));
         Memory::Dispose(storage, (storage + Size()));
         setSize(SizeT{0});
@@ -490,7 +431,7 @@ struct HArray {
     void Reset() noexcept {
         HAItem *storage = Storage();
         Memory::Dispose(storage, (storage + Size()));
-        Memory::Deallocate(data_.GetHashTable());
+        Memory::Deallocate(getHashTable());
         clearHashTable();
         setCapacity(SizeT{0});
         setSize(SizeT{0});
@@ -522,7 +463,7 @@ struct HArray {
             Memory::Sort<false>(Storage(), SizeT{0}, Size());
         }
 
-        Memory::SetToZero(data_.GetHashTable(), (size * Capacity()));
+        Memory::SetToZero(getHashTable(), (size * Capacity()));
         generateHash();
     }
 
@@ -559,15 +500,15 @@ struct HArray {
     }
 
     inline SizeT Size() const noexcept {
-        return data_.Index;
+        return index_;
     }
 
     inline SizeT Capacity() const noexcept {
-        return data_.Capacity;
+        return capacity_;
     }
 
     inline HAItem *Storage() const noexcept {
-        return data_.GetStorage(data_.GetHashTable());
+        return Memory::ChangePointer<HAItem>(getHashTable() + Capacity());
     }
 
     inline const HAItem *First() const noexcept {
@@ -592,22 +533,6 @@ struct HArray {
 
     inline bool IsNotEmpty() const noexcept {
         return !(IsEmpty());
-    }
-
-    inline SizeT8 GetHighByte() const noexcept {
-        return data_.HashTable.GetHighByte();
-    }
-
-    inline void SetHighByte(SizeT8 byte) noexcept {
-        data_.HashTable.SetHighByte(byte);
-    }
-
-    inline SizeT8 GetLowByte() const noexcept {
-        return data_.HashTable.GetLowByte();
-    }
-
-    inline void SetLowByte(SizeT8 byte) noexcept {
-        data_.HashTable.SetLowByte(byte);
     }
 
     // For STL
@@ -636,11 +561,6 @@ struct HArray {
 
         return base;
     }
-
-    inline void setHashTable(SizeT *ptr) noexcept {
-        data_.HashTable.SetPointer(ptr);
-    }
-
     HAItem *allocate(SizeT new_capacity) {
         constexpr SizeT32 size     = sizeof(SizeT);
         constexpr SizeT   size_sum = SizeT{size + sizeof(HAItem)};
@@ -658,16 +578,24 @@ struct HArray {
         return Memory::ChangePointer<HAItem>(ht + Capacity());
     }
 
+    inline void setHashTable(SizeT *ptr) noexcept {
+        hashTable_ = ptr;
+    }
+
+    inline SizeT *getHashTable() const noexcept {
+        return hashTable_;
+    }
+
     inline void clearHashTable() noexcept {
-        data_.HashTable.Reset();
+        hashTable_ = nullptr;
     }
 
     inline void setSize(const SizeT new_size) noexcept {
-        data_.Index = new_size;
+        index_ = new_size;
     }
 
     inline void setCapacity(const SizeT new_capacity) noexcept {
-        data_.Capacity = new_capacity;
+        capacity_ = new_capacity;
     }
 
     inline void expand() {
@@ -676,7 +604,7 @@ struct HArray {
 
     HAItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
         HAItem *item = (Storage() + Size());
-        ++(data_.Index);
+        ++index_;
         *index = Size();
 
         item->Next = SizeT{0};
@@ -726,18 +654,18 @@ struct HArray {
     }
 
     void resize(const SizeT new_size) {
-        SizeT        *ht      = data_.GetHashTable();
-        HAItem       *src     = Storage();
-        HAItem       *storage = allocate(new_size);
-        HAItem       *item    = src;
+        SizeT        *ht      = getHashTable();
+        HAItem       *item    = Storage();
         const HAItem *end     = (item + Size());
-        data_.Index           = SizeT{0};
+        HAItem       *storage = allocate(new_size);
+
+        setSize(SizeT{0});
 
         while (item < end) {
             if (item->Hash != SizeT{0}) {
                 Memory::Initialize(storage, Memory::Move(*item));
                 ++storage;
-                ++(data_.Index);
+                ++index_;
             }
 
             ++item;
@@ -748,7 +676,7 @@ struct HArray {
     }
 
     HAItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT *ht = data_.GetHashTable();
+        SizeT *ht = getHashTable();
 
         if (ht != nullptr) {
             HAItem *storage = Memory::ChangePointer<HAItem>(ht + Capacity());
@@ -772,7 +700,7 @@ struct HArray {
     }
 
     void generateHash() const noexcept {
-        SizeT        *ht   = data_.GetHashTable();
+        SizeT        *ht   = getHashTable();
         HAItem       *src  = Storage();
         HAItem       *item = src;
         const HAItem *end  = (item + Size());
@@ -794,7 +722,9 @@ struct HArray {
         }
     }
 
-    HArrayData<HAItem, Config::IsBigEndian> data_{};
+    SizeT  index_{0};
+    SizeT  capacity_{0};
+    SizeT *hashTable_{};
 };
 
 } // namespace Qentem

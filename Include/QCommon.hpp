@@ -105,19 +105,6 @@ struct Config {
     static constexpr bool IsBigEndian{false};
 #endif
 ///////////////////////////////////////////////
-#ifndef QENTEM_POINTER_TAGGING
-#define QENTEM_POINTER_TAGGING 1
-#endif
-///////////////////////////////////////////////
-#if defined(QENTEM_POINTER_TAGGING) && (QENTEM_POINTER_TAGGING == 1)
-    static constexpr bool PointerTagging{Is64bit};
-#else
-    static constexpr bool PointerTagging{false};
-#undef QENTEM_POINTER_TAGGING
-#endif
-
-    ///////////////////////////////////////////////
-
 #ifndef QENTEM_AUTO_ESCAPE_HTML
 #define QENTEM_AUTO_ESCAPE_HTML 1
 #endif
