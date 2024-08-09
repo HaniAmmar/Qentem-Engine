@@ -45,16 +45,6 @@ Qentem Engine is a self-contained lightweight library for rendering templates, d
     -   Fast stringify.
     -   Data grouping.
     -   Data sorting.
-    -   Value size: _check the table below_.
-
-| sizeof(Value) | Arch   | Type of SizeT | Pointer Tagging |
-| ------------- | ------ | ------------- | --------------- |
-| 16 bytes      | 64-bit | SizeT32       | Enabled         |
-| 24 bytes      | 64-bit | SizeT32       | Disabled        |
-| 24 bytes      | 64-bit | SizeT64       | Enabled         |
-| 32 bytes      | 64-bit | SizeT64       | Disabled        |
-| 12 bytes      | 32-bit | SizeT16       | Disabled        |
-| 16 bytes      | 32-bit | SizeT32       | Disabled        |
 
 ## Requirements
 
