@@ -432,14 +432,13 @@ struct TemplateCore {
                                 } while (++offset < end_offset);
 
                                 // Set StartID
-                                if ((tag.TrueOffset != SizeT16{0}) && (tag.FalseOffset != SizeT16{0})) {
+                                if ((tag.TrueOffset != SizeT16{0}) || (tag.FalseOffset != SizeT16{0})) {
                                     const TagBit *s_tag     = tag.SubTags.First();
                                     const TagBit *s_tag_end = tag.SubTags.End();
                                     SizeT32       id{0};
                                     const SizeT   first_offset =
                                         (SizeT((tag.TrueOffset < tag.FalseOffset) ? tag.FalseOffset : tag.TrueOffset) +
                                          tag.Offset);
-                                    offset = SizeT{0};
 
                                     while ((s_tag < s_tag_end)) {
                                         switch (s_tag->GetType()) {
@@ -456,8 +455,7 @@ struct TemplateCore {
 
                                             default: {
                                                 storage->Drop(SizeT{1});
-                                                offset = SizeT{0};
-                                                s_tag  = s_tag_end;
+                                                s_tag = s_tag_end;
                                             }
                                         }
 
@@ -469,12 +467,10 @@ struct TemplateCore {
                                         ++s_tag;
                                     }
 
-                                    if (offset != SizeT{0}) {
-                                        if (tag.TrueOffset < tag.FalseOffset) {
-                                            tag.FalseTagsStartID = SizeT8(id);
-                                        } else {
-                                            tag.TrueTagsStartID = SizeT8(id);
-                                        }
+                                    if (tag.TrueOffset < tag.FalseOffset) {
+                                        tag.FalseTagsStartID = SizeT8(id);
+                                    } else {
+                                        tag.TrueTagsStartID = SizeT8(id);
                                     }
                                 } else if ((tag.TrueOffset == SizeT16{0}) && (tag.FalseOffset == SizeT16{0})) {
                                     storage->Drop(SizeT{1});
@@ -550,7 +546,6 @@ struct TemplateCore {
                     while (true) {
                         match = finder.GetMatch();
 
-                        // TODO: Improve!
                         if ((match < TagPatterns::MathID) && (match != TagPatterns::LineEndID)) {
                             finder.Next();
                             match = finder.GetMatch();
@@ -689,7 +684,7 @@ struct TemplateCore {
                     const SizeT end_offset = finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] != TagPatterns::MultiLineLastChar)) {
-                        ++offset; // TODO: Don't.
+                        ++offset;
                     }
 
                     if (offset < end_offset) {
