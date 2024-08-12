@@ -396,8 +396,9 @@ struct TemplateCore {
                                             ++offset;
                                         }
 
-                                        while ((++offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
-                                        }
+                                        do {
+                                            ++offset;
+                                        } while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar));
 
                                         if (offset < end_offset) {
                                             const Char_T quote_char = content[offset];
@@ -626,8 +627,9 @@ struct TemplateCore {
                             ++offset;
                         }
 
-                        while ((++offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
-                        }
+                        do {
+                            ++offset;
+                        } while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar));
 
                         if (offset < end_offset) {
                             const Char_T quote_char = content[offset];
@@ -855,7 +857,7 @@ struct TemplateCore {
     }
 
     inline static void parseLoopAttributes(const Char_T *content, const SizeT end_offset, LoopTag &tag) noexcept {
-        enum struct LoopAttributes { None = 0U, Set, Value, Sort, Group };
+        enum struct LoopAttributes : SizeT8 { None = 0, Set, Value, Sort, Group };
         SizeT offset = (tag.Offset + TagPatterns::LoopPrefixLength);
 
         LoopAttributes att_type = LoopAttributes::None;
@@ -923,15 +925,17 @@ struct TemplateCore {
                 ++offset;
             }
 
-            while ((++offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
-            }
+            do {
+                ++offset;
+            } while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar));
 
             if (offset < end_offset) {
                 const SizeT  att_offset = (offset + SizeT{1});
                 const Char_T quote_char = content[offset];
 
-                while ((++offset < end_offset) && (content[offset] != quote_char)) {
-                }
+                do {
+                    ++offset;
+                } while ((offset < end_offset) && (content[offset] != quote_char));
 
                 switch (att_type) {
                     case LoopAttributes::Set: {
@@ -982,8 +986,9 @@ struct TemplateCore {
                 ++offset;
             }
 
-            while ((++offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
-            }
+            do {
+                ++offset;
+            } while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar));
 
             if (offset < end_offset) {
                 const Char_T quote_char = content[offset];
@@ -1516,7 +1521,6 @@ struct TemplateCore {
                             }
 
                             default: {
-                                break;
                             }
                         }
                     }
@@ -2065,8 +2069,9 @@ struct TemplateCore {
                 }
 
                 case QOperationSymbol::BracketStart: {
-                    while ((++offset < end_offset) && (content[offset] != QOperationSymbol::BracketEnd)) {
-                    }
+                    do {
+                        ++offset;
+                    } while ((offset < end_offset) && (content[offset] != QOperationSymbol::BracketEnd));
 
                     if (offset < end_offset) {
                         continue;

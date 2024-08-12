@@ -37,6 +37,7 @@ struct Finder {
     Finder(const Finder &)            = delete;
     Finder &operator=(Finder &&)      = delete;
     Finder &operator=(const Finder &) = delete;
+    ~Finder()                         = default;
 
     static constexpr SizeT32 Bits   = 4U; // Number of bits per ID
     static constexpr SizeT32 Blocks = ((sizeof(SystemIntType) * 8U) / Bits);

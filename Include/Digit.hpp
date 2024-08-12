@@ -437,9 +437,9 @@ struct Digit {
                                 return QNumberType::NotANumber;
                             }
 
-                            default:
+                            default: {
                                 keep_going = false;
-                                break;
+                            }
                         }
                     }
                     ///////////////////////////////////////
@@ -982,7 +982,7 @@ struct Digit {
             Char_T       *number        = (storage + index);
             const Char_T *last          = stream.Last();
             const SizeT   dot_index     = SizeT(started_at + fraction_length);
-            bool          fraction_only = (stream_length <= fraction_length);
+            const bool    fraction_only = (stream_length <= fraction_length);
 
             while ((number < last) && (*number == DigitUtils::DigitChar::Zero)) {
                 ++number;
@@ -1040,7 +1040,7 @@ struct Digit {
         const SizeT dot_index     = SizeT(started_at + fraction_length);
         SizeT       diff = ((fraction_length > stream_length) ? SizeT(fraction_length - stream_length) : SizeT{0});
         bool        power_increased = false;
-        bool        fraction_only   = (stream_length <= fraction_length);
+        const bool  fraction_only   = (stream_length <= fraction_length);
         /////////////////////////////////////////////////////
         if (fraction_length != 0) {
             if (diff <= precision) {
@@ -1061,7 +1061,7 @@ struct Digit {
                     if ((index < stream_length) || power_increased) {
                         if (diff != SizeT{0}) {
                             if (power_increased) {
-                                index          = SizeT(index - SizeT(index == stream_length));
+                                index          = index - SizeT(index == stream_length);
                                 storage[index] = DigitUtils::DigitChar::One;
                             }
 
@@ -1088,7 +1088,7 @@ struct Digit {
                     } while (--zeros != 0U);
                 }
             } else {
-                index          = SizeT(index + (stream_length - SizeT{1}));
+                index          = index + (stream_length - SizeT{1});
                 storage[index] = DigitUtils::DigitChar::Zero;
             }
         }
@@ -1143,8 +1143,11 @@ struct Digit {
                (round_up || ((SizeT32(stream.First()[index] - DigitUtils::DigitChar::Zero) & 1U) == 1U)))));
 
         if (round) {
-            while ((++number < last) && (*number == DigitUtils::DigitChar::Nine)) {
+            ++number;
+
+            while ((number < last) && (*number == DigitUtils::DigitChar::Nine)) {
                 ++index;
+                ++number;
             }
 
             if ((number > last) || (*number == DigitUtils::DigitChar::Nine)) {

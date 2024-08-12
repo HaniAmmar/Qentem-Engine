@@ -110,18 +110,18 @@ struct TestOutPut {
         }
     }
 
-    enum Colors { TITLE, ERROR, PASS, END };
+    enum struct Colors : SizeT8 { TITLE, ERROR, PASS, END };
 
     QENTEM_NOINLINE static const char *GetColor(Colors color) noexcept {
         if (IsColored()) {
             switch (color) {
-                case TITLE:
+                case Colors::TITLE:
                     return "\x1B[36m";
-                case ERROR:
+                case Colors::ERROR:
                     return "\x1B[31m";
-                case PASS:
+                case Colors::PASS:
                     return "\x1B[32m";
-                case END:
+                case Colors::END:
                     return "\x1B[0m";
             }
         }

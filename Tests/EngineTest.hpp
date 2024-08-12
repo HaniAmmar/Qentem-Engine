@@ -216,7 +216,7 @@ static void TestEngine1(QTest &test) {
     ret = Engine::Find(find_, find_len, content, SizeT{8}, content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
-    ret = Engine::Find(find_, find_len, content, SizeT(content_len - SizeT{1}), content_len);
+    ret = Engine::Find(find_, find_len, content, (content_len - SizeT{1}), content_len);
     test.IsEqual(ret, 0U, __LINE__);
 
     find_       = "ABC";

@@ -235,19 +235,19 @@ struct TagBit {
     }
 
   private:
-    TagBitData data_{};
+    TagBitData data_;
 };
 
 // MathTag -------------------------------------------
 struct MathTag {
-    Array<QExpression> Expressions{};
+    Array<QExpression> Expressions;
     SizeT              Offset{0};
     SizeT              EndOffset{0};
 };
 
 // SuperVariableTag -------------------------------------------
 struct SuperVariableTag {
-    Array<TagBit> SubTags{};
+    Array<TagBit> SubTags;
     VariableTag   Variable{};
     SizeT         Offset{0};
     SizeT         EndOffset{0};
@@ -255,8 +255,8 @@ struct SuperVariableTag {
 
 // InLineIfTag -------------------------------------------
 struct InLineIfTag {
-    Array<QExpression> Case{};
-    Array<TagBit>      SubTags{};
+    Array<QExpression> Case;
+    Array<TagBit>      SubTags;
     SizeT              Offset{0};
     SizeT16            Length{0};
     SizeT16            TrueOffset{0};
@@ -276,7 +276,7 @@ struct LoopTagOptions {
 
 // LoopTagOptions -------------------------------------------
 struct LoopTag {
-    Array<TagBit> SubTags{};
+    Array<TagBit> SubTags;
     VariableTag   Set{};
 
     const LoopTag *Parent{nullptr};
@@ -298,15 +298,15 @@ struct LoopTag {
 
 // IfTagCase --------------------------------------
 struct IfTagCase {
-    Array<QExpression> Case{};
-    Array<TagBit>      SubTags{};
+    Array<QExpression> Case;
+    Array<TagBit>      SubTags;
     SizeT              Offset{0};
     SizeT              EndOffset{0};
 };
 
 // IfTag -------------------------------------------
 struct IfTag {
-    Array<IfTagCase> Cases{};
+    Array<IfTagCase> Cases;
     SizeT            Offset{0};
     SizeT            EndOffset{0};
 };

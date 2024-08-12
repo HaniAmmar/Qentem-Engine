@@ -235,7 +235,7 @@ struct String {
         if ((str != nullptr) && (len != SizeT{0})) {
             constexpr SizeT32 size    = sizeof(Char_T);
             const SizeT       src_len = Length();
-            SizeT             new_len = SizeT((src_len + len) + SizeT{1});
+            SizeT             new_len = (src_len + len + SizeT{1});
             Char_T           *src     = Storage();
             Char_T           *ns      = allocate(new_len);
 

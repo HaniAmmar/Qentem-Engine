@@ -112,12 +112,11 @@ struct BigInt {
         constexpr bool    is_same_size    = (n_width == TypeWidth());
         constexpr bool    is_smaller_size = (n_width < TypeWidth());
 
-        if QENTEM_CONST_EXPRESSION (is_same_size) {
-            return N_Number_T(storage_[0]);
-        } else if QENTEM_CONST_EXPRESSION (is_smaller_size) {
-            return N_Number_T(storage_[0]);
+        N_Number_T num{0};
+
+        if QENTEM_CONST_EXPRESSION (is_smaller_size || is_same_size) {
+            num = N_Number_T(storage_[0]);
         } else {
-            N_Number_T        num       = 0;
             constexpr SizeT32 max_index = ((n_width / TypeWidth()) - 1U);
             SizeT32           index     = ((max_index <= index_) ? max_index : index_);
 
@@ -128,9 +127,9 @@ struct BigInt {
             }
 
             num |= storage_[0];
-
-            return num;
         }
+
+        return num;
     }
 
     inline friend bool operator<(const BigInt &out, const Number_T number) noexcept {
@@ -284,9 +283,9 @@ struct BigInt {
         const SizeT32 initial_shift = [=]() noexcept -> SizeT32 {
             if (is_size_64b) {
                 return ((TypeWidth() - 1U) - Platform::FindLastBit(divisor));
-            } else {
-                return 0U;
             }
+
+            return 0U;
         }();
 
         while (index != 0U) {
@@ -350,7 +349,7 @@ struct BigInt {
             index += move;
 
             if (index > MaxIndex()) {
-                SizeT32 diff = (index - MaxIndex());
+                const SizeT32 diff = (index - MaxIndex());
 
                 if (diff <= index_) {
                     index_ -= diff;

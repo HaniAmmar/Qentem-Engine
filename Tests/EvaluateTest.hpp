@@ -55,7 +55,7 @@ QENTEM_NOINLINE static QNumber64 TestEvaluate(const char *content, const Value<c
 }
 
 static void TestEvaluate1(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number;
     const char       *content;
     bool              is_valid;
@@ -254,7 +254,7 @@ static void TestEvaluate1(QTest &test) {
 }
 
 static void TestEvaluate2(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-99};
     const char       *content;
     bool              is_valid;
@@ -423,7 +423,7 @@ static void TestEvaluate2(QTest &test) {
 }
 
 static void TestEvaluate3(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number;
     const char       *content;
     bool              is_valid;
@@ -691,7 +691,7 @@ static void TestEvaluate3(QTest &test) {
 }
 
 static void TestEvaluate4(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number;
     const char       *content;
     bool              is_valid;
@@ -936,7 +936,7 @@ static void TestEvaluate4(QTest &test) {
 }
 
 static void TestEvaluate5(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number;
     const char       *content;
     bool              is_valid;
@@ -1182,7 +1182,7 @@ static void TestEvaluate5(QTest &test) {
 }
 
 static void TestEvaluate6(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -1388,7 +1388,7 @@ static void TestEvaluate6(QTest &test) {
 }
 
 static void TestEvaluate7(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -1663,7 +1663,7 @@ static void TestEvaluate7(QTest &test) {
 }
 
 static void TestEvaluate8(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -1940,7 +1940,7 @@ static void TestEvaluate8(QTest &test) {
 }
 
 static void TestEvaluate9(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -2213,7 +2213,7 @@ static void TestEvaluate9(QTest &test) {
 }
 
 static void TestEvaluate10(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -2486,7 +2486,7 @@ static void TestEvaluate10(QTest &test) {
 }
 
 static void TestEvaluate11(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -2847,7 +2847,7 @@ static void TestEvaluate11(QTest &test) {
 }
 
 static void TestEvaluate12(QTest &test) {
-    const Value<char> value;
+    const Value<char> value{};
     QNumber64         number{-1};
     const char       *content;
     bool              is_valid;
@@ -3948,7 +3948,7 @@ static void TestEvaluate17(QTest &test) {
     value += -3;
     value += 5U;
     value += 8.5;
-    value += int{3};
+    value += 3;
 
     content = "{var:0}+{var:0}";
     number  = TestEvaluate(content, value);
@@ -4609,7 +4609,7 @@ static void TestEvaluate19(QTest &test) {
     value += 2U;
     value += 3U;
     value += -2;
-    value += int{2};
+    value += 2;
     value += 4.0F;
     value += -4.0F;
     value += 0.25F;
