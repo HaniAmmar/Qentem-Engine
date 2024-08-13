@@ -855,7 +855,7 @@ struct Digit {
 
                 if (format.Type == RealFormatType::Fixed) {
                     stream += DigitUtils::DigitChar::Dot;
-                    insertZerosLarge(stream, SizeT(format.Precision));
+                    insertZerosLarge(stream, format.Precision);
                 }
             }
         } else {
@@ -896,17 +896,17 @@ struct Digit {
     }
 
     template <typename Stream_T>
-    inline static void insertZerosLarge(Stream_T &stream, SizeT length) {
+    inline static void insertZerosLarge(Stream_T &stream, SizeT32 length) {
         using Char_T           = typename Stream_T::CharType;
         constexpr SizeT32 size = sizeof(Char_T);
         using DigitString      = DigitUtils::DigitString<Char_T, size>;
 
         while (length > DigitString::ZerosLength) {
-            stream.Write(DigitString::Zeros, DigitString::ZerosLength);
+            stream.Write(DigitString::Zeros, SizeT(DigitString::ZerosLength));
             length -= DigitString::ZerosLength;
         }
 
-        stream.Write(DigitString::Zeros, length);
+        stream.Write(DigitString::Zeros, SizeT(length));
     }
 
     template <typename Stream_T, typename BigInt_T>
@@ -1038,15 +1038,15 @@ struct Digit {
         const SizeT stream_length = (stream.Length() - started_at);
         SizeT       index         = started_at;
         const SizeT dot_index     = SizeT(started_at + fraction_length);
-        SizeT       diff = ((fraction_length > stream_length) ? SizeT(fraction_length - stream_length) : SizeT{0});
+        SizeT32     diff          = ((fraction_length > stream_length) ? SizeT32(fraction_length - stream_length) : 0U);
         bool        power_increased = false;
         const bool  fraction_only   = (stream_length <= fraction_length);
         /////////////////////////////////////////////////////
-        if (fraction_length != 0) {
+        if (fraction_length != 0U) {
             if (diff <= precision) {
                 if (fraction_length > precision) {
                     index += SizeT(fraction_length - (precision + SizeT{1}));
-                    roundStringNumber(stream, index, power_increased, (round_up | (diff != SizeT{0})));
+                    roundStringNumber(stream, index, power_increased, (round_up | (diff != 0U)));
 
                     Char_T       *number = (storage + index);
                     const Char_T *last   = stream.Last();
@@ -1059,13 +1059,13 @@ struct Digit {
 
                 if (fraction_only) {
                     if ((index < stream_length) || power_increased) {
-                        if (diff != SizeT{0}) {
+                        if (diff != 0U) {
                             if (power_increased) {
                                 index          = index - SizeT(index == stream_length);
                                 storage[index] = DigitUtils::DigitChar::One;
                             }
 
-                            diff -= SizeT(power_increased);
+                            diff -= SizeT32(power_increased);
                             insertZerosLarge(stream, diff);
                             stream += DigitUtils::DigitChar::Dot;
                             stream += DigitUtils::DigitChar::Zero;
@@ -1097,33 +1097,16 @@ struct Digit {
         stream.StepBack(index - started_at);
 
         if QENTEM_CONST_EXPRESSION (Fixed_T) {
-            if (fraction_length == SizeT{0}) {
+            if ((dot_index == index) || ((stream.Length() - started_at) == SizeT{1}) ||
+                (!fraction_only && power_increased)) {
                 stream += DigitUtils::DigitChar::Dot;
-                insertZerosLarge(stream, SizeT(precision));
-            } else if ((diff == SizeT{0}) && power_increased) {
-                if (fraction_only) {
-                    if ((stream.Length() - started_at) == SizeT{1}) {
-                        stream += DigitUtils::DigitChar::Dot;
-                        insertZerosLarge(stream, SizeT(precision));
-                    } else {
-                        insertZerosLarge(stream, SizeT(precision - SizeT{1}));
-                    }
-                } else {
-                    stream += DigitUtils::DigitChar::Dot;
-                    insertZerosLarge(stream, SizeT(precision));
-                }
+                insertZerosLarge(stream, precision);
             } else if (fraction_only) {
-                if (diff > precision || ((stream.Length() - started_at) == SizeT{1})) {
-                    stream += DigitUtils::DigitChar::Dot;
-                }
-
-                insertZerosLarge(stream, SizeT(precision - SizeT(stream.Length() -
-                                                                 (started_at + SizeT{2})))); // 2 is the length of '0.'.
-            } else if (dot_index == index) {
-                stream += DigitUtils::DigitChar::Dot;
-                insertZerosLarge(stream, SizeT(precision));
+                insertZerosLarge(
+                    stream, SizeT32(precision -
+                                    SizeT32(stream.Length() - (started_at + SizeT{2})))); // 2 is the length of '0.'.
             } else {
-                insertZerosLarge(stream, SizeT(precision - (dot_index - index)));
+                insertZerosLarge(stream, SizeT32(precision - (dot_index - index)));
             }
         }
     }

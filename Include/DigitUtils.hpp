@@ -39,7 +39,7 @@ struct DigitString<Char_T, 1U> {
     static constexpr const SizeT   InfinityLength   = 3U;
     static constexpr const SizeT   NotANumberLength = 3U;
     static constexpr const Char_T *Zeros            = "0000000000000000000";
-    static constexpr SizeT         ZerosLength      = 19U;
+    static constexpr SizeT32       ZerosLength      = 19U;
 };
 
 // char16_t
@@ -50,7 +50,7 @@ struct DigitString<Char_T, 2U> {
     static constexpr const SizeT   InfinityLength   = 3U;
     static constexpr const SizeT   NotANumberLength = 3U;
     static constexpr const Char_T *Zeros            = u"0000000000000000000";
-    static constexpr SizeT         ZerosLength      = 19U;
+    static constexpr SizeT32       ZerosLength      = 19U;
 };
 
 // char32_t
@@ -61,7 +61,7 @@ struct DigitString<Char_T, 4U> {
     static constexpr const SizeT   InfinityLength   = 3U;
     static constexpr const SizeT   NotANumberLength = 3U;
     static constexpr const Char_T *Zeros            = U"0000000000000000000";
-    static constexpr SizeT         ZerosLength      = 19U;
+    static constexpr SizeT32       ZerosLength      = 19U;
 };
 
 // wchar_t size = 4
@@ -72,7 +72,7 @@ struct DigitString<wchar_t, 4U> {
     static constexpr const SizeT    InfinityLength   = 3U;
     static constexpr const SizeT    NotANumberLength = 3U;
     static constexpr const wchar_t *Zeros            = L"0000000000000000000";
-    static constexpr SizeT          ZerosLength      = 19U;
+    static constexpr SizeT32        ZerosLength      = 19U;
 };
 
 // wchar_t size = 2
@@ -83,7 +83,7 @@ struct DigitString<wchar_t, 2U> {
     static constexpr const SizeT    InfinityLength   = 3U;
     static constexpr const SizeT    NotANumberLength = 3U;
     static constexpr const wchar_t *Zeros            = L"0000000000000000000";
-    static constexpr SizeT          ZerosLength      = 19U;
+    static constexpr SizeT32        ZerosLength      = 19U;
 };
 
 struct DigitChar {

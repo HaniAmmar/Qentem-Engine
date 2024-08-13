@@ -116,13 +116,12 @@ struct BigInt {
         constexpr bool    is_same_size    = (n_width == TypeWidth());
         constexpr bool    is_smaller_size = (n_width < TypeWidth());
 
-        N_Number_T num{0};
-
         if QENTEM_CONST_EXPRESSION (is_smaller_size || is_same_size) {
-            num = N_Number_T(storage_[0]);
+            return N_Number_T(storage_[0]);
         } else {
             constexpr SizeT32 max_index = ((n_width / TypeWidth()) - 1U);
             SizeT32           index     = ((max_index <= index_) ? max_index : index_);
+            N_Number_T        num{0};
 
             while (index > 0) {
                 num |= storage_[index];
@@ -131,9 +130,8 @@ struct BigInt {
             }
 
             num |= storage_[0];
+            return num;
         }
-
-        return num;
     }
 
     inline friend bool operator<(const BigInt &out, const Number_T number) noexcept {

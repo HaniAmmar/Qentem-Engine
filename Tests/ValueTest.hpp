@@ -366,7 +366,7 @@ static void TestNumberValue1(QTest &test) {
     test.IsTrue(value2.GetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
 
-    value2 = int{-8};
+    value2 = -8;
     test.IsTrue(value2.GetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
 
@@ -476,7 +476,7 @@ static void TestNumberValue3(QTest &test) {
     test.IsEqual(ss_var, "10", __LINE__);
     value1.Reset();
 
-    value1 = ValueC{int{-10}};
+    value1 = ValueC{-10};
     test.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
     test.IsTrue(value1.IsInt64(), __LINE__);
     test.IsEqual(value1.GetNumber(), -10.0, __LINE__);
@@ -486,7 +486,7 @@ static void TestNumberValue3(QTest &test) {
     test.IsEqual(num_var.Integer, -10, __LINE__);
     value1.Reset();
 
-    value1 = ValueC{int{10}};
+    value1 = ValueC{10};
     test.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
     test.IsTrue(value1.IsInt64(), __LINE__);
     test.IsEqual(value1.GetNumber(), 10.0, __LINE__);
@@ -685,7 +685,7 @@ static void TestNumberValue5(QTest &test) {
     test.IsTrue(value1.IsDouble(), __LINE__);
     test.IsEqual(value1.GetNumber(), 10.0, __LINE__);
 
-    value1 = int{10};
+    value1 = 10;
     test.IsTrue(value1.GetNumberType() == QNumberType::Integer, __LINE__);
     test.IsTrue(value1.IsInt64(), __LINE__);
     test.IsEqual(value1.GetNumber(), 10.0, __LINE__);
@@ -3344,7 +3344,7 @@ static void TestIndexOperator1(QTest &test) {
     value[0]          = 50;
     value[1]          = 100;
     value[2]          = 200;
-    value[int{3}]     = 300;
+    value[3]          = 300;
     value[SizeT64{4}] = 400;
     value[SizeT32{5}] = 500;
 
@@ -3514,7 +3514,7 @@ static void TestAddition1(QTest &test) {
 
     value[0] = 50;
     value[1] = 100;
-    value += int{200};
+    value += 200;
     value += SizeT32{300};
     value += SizeT64{400};
     value += double{500};
@@ -5316,7 +5316,7 @@ static void TestDeleteValue(QTest &test) {
     ValueC             value;
 
     value[0] = 1;
-    value.RemoveIndex(int{0});
+    value.RemoveIndex(0);
     test.IsNull(value.GetValue(0), __LINE__);
     test.IsEqual(value.Stringify(ss), R"([])", __LINE__);
     ss.Clear();
