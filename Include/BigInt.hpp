@@ -94,14 +94,18 @@ struct BigInt {
     }
 
     BigInt &operator=(BigInt &&src) noexcept {
-        copy(src);
-        src.Clear();
+        if (this != &src) {
+            copy(src);
+            src.Clear();
+        }
 
         return *this;
     }
 
     BigInt &operator=(const BigInt &src) noexcept {
-        copy(src);
+        if (this != &src) {
+            copy(src);
+        }
 
         return *this;
     }
