@@ -136,6 +136,18 @@ struct String {
         return merge(Storage(), Length(), str, StringUtils::Count(str));
     }
 
+    friend String &operator<<(String &out, const Char_T *str) {
+        out.Write(str, StringUtils::Count(str));
+
+        return out;
+    }
+
+    friend String &operator<<(String &out, const String &src) {
+        out += src;
+
+        return out;
+    }
+
     template <typename Stream_T>
     friend Stream_T &operator<<(Stream_T &out, const String &src) {
         out << src.First();
