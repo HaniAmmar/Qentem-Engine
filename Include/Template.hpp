@@ -1012,90 +1012,6 @@ struct TemplateCore {
         }
     }
 
-    static void escapeHTMLSpecialChars(StringStream_T &stream, const Char_T *str, SizeT length) {
-        if (Config::AutoEscapeHTML) {
-            SizeT offset = 0;
-            SizeT index  = 0;
-
-            while (index < length) {
-                switch (str[index]) {
-                    case '&': {
-                        const SizeT   rem_length = (length - index);
-                        const Char_T *n_str      = (str + index);
-
-                        if ((rem_length > SizeT{5}) && (n_str[SizeT{5}] == TagPatterns::SemicolonChar)) {
-                            if (StringUtils::IsEqual(n_str, TagPatterns::HTMLQuote, SizeT{5}) ||
-                                StringUtils::IsEqual(n_str, TagPatterns::HTMLSingleQuote, SizeT{5})) {
-                                index += SizeT{6};
-                                break;
-                            }
-                        }
-
-                        if ((rem_length > SizeT{4}) && (n_str[SizeT{4}] == TagPatterns::SemicolonChar) &&
-                            StringUtils::IsEqual(n_str, TagPatterns::HTMLAnd, SizeT{4})) {
-                            index += SizeT{5};
-                            break;
-                        }
-
-                        if ((rem_length > SizeT{3}) && (n_str[SizeT{3}] == TagPatterns::SemicolonChar)) {
-                            if (StringUtils::IsEqual(n_str, TagPatterns::HTMLLess, SizeT{3}) ||
-                                StringUtils::IsEqual(n_str, TagPatterns::HTMLGreater, SizeT{3})) {
-                                index += SizeT{4};
-                                break;
-                            }
-                        }
-
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(TagPatterns::HTMLAnd, TagPatterns::HTMLAndLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    case '<': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(TagPatterns::HTMLLess, TagPatterns::HTMLLessLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    case '>': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(TagPatterns::HTMLGreater, TagPatterns::HTMLGreaterLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    case '"': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(TagPatterns::HTMLQuote, TagPatterns::HTMLQuoteLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    case '\'': {
-                        stream.Write((str + offset), (index - offset));
-                        stream.Write(TagPatterns::HTMLSingleQuote, TagPatterns::HTMLSingleQuoteLength);
-                        ++index;
-                        offset = index;
-                        break;
-                    }
-
-                    default: {
-                        ++index;
-                    }
-                }
-            }
-
-            stream.Write((str + offset), (length - offset));
-        } else {
-            stream.Write(str, length);
-        }
-    }
-
     // Render
     void render(const TagBit *tag, const TagBit *end, SizeT offset, SizeT end_offset) const {
         while (tag < end) {
@@ -1157,17 +1073,17 @@ struct TemplateCore {
 
         if ((value == nullptr) ||
             !(value->CopyValueTo(*stream_, {Config::TemplatePrecision, QENTEM_TEMPLATE_DOUBLE_FORMAT},
-                                 &escapeHTMLSpecialChars))) {
+                                 &(StringUtils::EscapeHTMLSpecialChars<StringStream_T, Char_T>)))) {
             if (tag.IDLength != SizeT8{0}) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
 
                 if (key.Length() != SizeT{0}) {
-                    escapeHTMLSpecialChars(*stream_, key.First(), key.Length());
+                    StringUtils::EscapeHTMLSpecialChars(*stream_, key.First(), key.Length());
                     return;
                 }
             }
 
-            escapeHTMLSpecialChars(*stream_, (content_ + t_offset), length);
+            StringUtils::EscapeHTMLSpecialChars(*stream_, (content_ + t_offset), length);
         }
     }
 
@@ -1236,7 +1152,7 @@ struct TemplateCore {
                 if (content[index] == TagPatterns::InLineFirstChar) {
                     const SizeT start = index;
 
-                    escapeHTMLSpecialChars(*stream_, (content + last_index), (start - last_index));
+                    StringUtils::EscapeHTMLSpecialChars(*stream_, (content + last_index), (start - last_index));
                     last_index = start;
                     ++index;
 
@@ -1286,7 +1202,7 @@ struct TemplateCore {
                 ++index;
             }
 
-            escapeHTMLSpecialChars(*stream_, (content + last_index), (index - last_index));
+            StringUtils::EscapeHTMLSpecialChars(*stream_, (content + last_index), (index - last_index));
         } else {
             stream_->Write((content_ + tag.Offset), (tag.EndOffset - tag.Offset));
         }

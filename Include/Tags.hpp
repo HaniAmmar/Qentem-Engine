@@ -410,34 +410,6 @@ struct TagPatterns_T {
     // static constexpr SizeT          ElsePrefixLength = StringUtils::ConstCount(ElsePrefix);
     static constexpr SizeT ElsePrefixLength{5};
 
-    // &amp; &
-    static constexpr const Char_T *HTMLAnd = TPStrings::HTMLAnd;
-    // static constexpr SizeT          HTMLAndLength = StringUtils::ConstCount(HTMLAnd);
-    static constexpr SizeT HTMLAndLength{5};
-
-    // &lt; <
-    static constexpr const Char_T *HTMLLess = TPStrings::HTMLLess;
-    // static constexpr SizeT          HTMLLessLength = StringUtils::ConstCount(HTMLLess);
-    static constexpr SizeT HTMLLessLength{4};
-
-    // &gt; >
-    static constexpr const Char_T *HTMLGreater = TPStrings::HTMLGreater;
-    // static constexpr SizeT          HTMLGreaterLength = StringUtils::ConstCount(HTMLGreater);
-    static constexpr SizeT HTMLGreaterLength{4};
-
-    // &quot; "
-    static constexpr const Char_T *HTMLQuote = TPStrings::HTMLQuote;
-    // static constexpr SizeT          HTMLQuoteLength = StringUtils::ConstCount(HTMLQuote);
-    static constexpr SizeT HTMLQuoteLength{6};
-
-    // &apos; ' (HTML5)
-    static constexpr const Char_T *HTMLSingleQuote = TPStrings::HTMLSingleQuote;
-    // static constexpr SizeT          HTMLSingleQuoteLength = StringUtils::ConstCount(HTMLSingleQuote);
-    static constexpr SizeT HTMLSingleQuoteLength{6};
-
-    // ;
-    static constexpr const Char_T SemicolonChar = TPStrings::SemicolonChar;
-
     static constexpr Char_T EqualChar              = '=';
     static constexpr Char_T SpaceChar              = ' ';
     static constexpr Char_T VariablesSeparatorChar = ',';
@@ -503,13 +475,6 @@ struct TPStrings_T<Char_T, 1U> {
     static constexpr const Char_T *Value = "value";
     static constexpr const Char_T *Sort  = "sort";
     static constexpr const Char_T *Group = "group";
-
-    static constexpr const Char_T *HTMLAnd         = "&amp;";
-    static constexpr const Char_T *HTMLLess        = "&lt;";
-    static constexpr const Char_T *HTMLGreater     = "&gt;";
-    static constexpr const Char_T *HTMLQuote       = "&quot;";
-    static constexpr const Char_T *HTMLSingleQuote = "&apos;";
-    static constexpr const Char_T  SemicolonChar   = ';';
 };
 
 // char16_t
@@ -541,13 +506,6 @@ struct TPStrings_T<Char_T, 2U> {
     static constexpr const Char_T *Value = u"value";
     static constexpr const Char_T *Sort  = u"sort";
     static constexpr const Char_T *Group = u"group";
-
-    static constexpr const Char_T *HTMLAnd         = u"&amp;";
-    static constexpr const Char_T *HTMLLess        = u"&lt;";
-    static constexpr const Char_T *HTMLGreater     = u"&gt;";
-    static constexpr const Char_T *HTMLQuote       = u"&quot;";
-    static constexpr const Char_T *HTMLSingleQuote = u"&apos;";
-    static constexpr const Char_T  SemicolonChar   = u';';
 };
 
 // char32_t
@@ -579,13 +537,6 @@ struct TPStrings_T<Char_T, 4U> {
     static constexpr const Char_T *Value = U"value";
     static constexpr const Char_T *Sort  = U"sort";
     static constexpr const Char_T *Group = U"group";
-
-    static constexpr const Char_T *HTMLAnd         = U"&amp;";
-    static constexpr const Char_T *HTMLLess        = U"&lt;";
-    static constexpr const Char_T *HTMLGreater     = U"&gt;";
-    static constexpr const Char_T *HTMLQuote       = U"&quot;";
-    static constexpr const Char_T *HTMLSingleQuote = U"&apos;";
-    static constexpr const Char_T  SemicolonChar   = U';';
 };
 
 // wchar_t size = 4
@@ -616,13 +567,6 @@ struct TPStrings_T<wchar_t, 4U> {
     static constexpr const wchar_t *Value = L"value";
     static constexpr const wchar_t *Sort  = L"sort";
     static constexpr const wchar_t *Group = L"group";
-
-    static constexpr const wchar_t *HTMLAnd         = L"&amp;";
-    static constexpr const wchar_t *HTMLLess        = L"&lt;";
-    static constexpr const wchar_t *HTMLGreater     = L"&gt;";
-    static constexpr const wchar_t *HTMLQuote       = L"&quot;";
-    static constexpr const wchar_t *HTMLSingleQuote = L"&apos;";
-    static constexpr const wchar_t  SemicolonChar   = L';';
 };
 
 // wchar_t size = 2
@@ -655,13 +599,6 @@ struct TPStrings_T<wchar_t, 2U> {
     static constexpr const wchar_t *Value = L"value";
     static constexpr const wchar_t *Sort  = L"sort";
     static constexpr const wchar_t *Group = L"group";
-
-    static constexpr const wchar_t *HTMLAnd         = L"&amp;";
-    static constexpr const wchar_t *HTMLLess        = L"&lt;";
-    static constexpr const wchar_t *HTMLGreater     = L"&gt;";
-    static constexpr const wchar_t *HTMLQuote       = L"&quot;";
-    static constexpr const wchar_t *HTMLSingleQuote = L"&apos;";
-    static constexpr const wchar_t  SemicolonChar   = L';';
 };
 
 template <typename Char_T>

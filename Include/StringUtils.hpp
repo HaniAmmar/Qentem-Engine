@@ -201,6 +201,201 @@ static SizeT Hash(const Char_T *key, SizeT length) noexcept {
     return (hash | highest_bit);
 }
 
+template <typename, SizeT32>
+struct HTMLSpecialChars_T {};
+
+template <typename StringStream_T, typename Char_T>
+static void EscapeHTMLSpecialChars(StringStream_T &stream, const Char_T *str, SizeT length) {
+    using HTMLSpecialChars = HTMLSpecialChars_T<Char_T, sizeof(Char_T)>;
+
+    if (Config::AutoEscapeHTML) {
+        SizeT offset = 0;
+        SizeT index  = 0;
+
+        while (index < length) {
+            switch (str[index]) {
+                case '&': {
+                    const SizeT   rem_length = (length - index);
+                    const Char_T *n_str      = (str + index);
+
+                    if ((rem_length > SizeT{5}) && (n_str[SizeT{5}] == HTMLSpecialChars::SemicolonChar)) {
+                        if (StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLQuote, SizeT{5}) ||
+                            StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLSingleQuote, SizeT{5})) {
+                            index += SizeT{6};
+                            break;
+                        }
+                    }
+
+                    if ((rem_length > SizeT{4}) && (n_str[SizeT{4}] == HTMLSpecialChars::SemicolonChar) &&
+                        StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLAnd, SizeT{4})) {
+                        index += SizeT{5};
+                        break;
+                    }
+
+                    if ((rem_length > SizeT{3}) && (n_str[SizeT{3}] == HTMLSpecialChars::SemicolonChar)) {
+                        if (StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLLess, SizeT{3}) ||
+                            StringUtils::IsEqual(n_str, HTMLSpecialChars::HTMLGreater, SizeT{3})) {
+                            index += SizeT{4};
+                            break;
+                        }
+                    }
+
+                    stream.Write((str + offset), (index - offset));
+                    stream.Write(HTMLSpecialChars::HTMLAnd, HTMLSpecialChars::HTMLAndLength);
+                    ++index;
+                    offset = index;
+                    break;
+                }
+
+                case '<': {
+                    stream.Write((str + offset), (index - offset));
+                    stream.Write(HTMLSpecialChars::HTMLLess, HTMLSpecialChars::HTMLLessLength);
+                    ++index;
+                    offset = index;
+                    break;
+                }
+
+                case '>': {
+                    stream.Write((str + offset), (index - offset));
+                    stream.Write(HTMLSpecialChars::HTMLGreater, HTMLSpecialChars::HTMLGreaterLength);
+                    ++index;
+                    offset = index;
+                    break;
+                }
+
+                case '"': {
+                    stream.Write((str + offset), (index - offset));
+                    stream.Write(HTMLSpecialChars::HTMLQuote, HTMLSpecialChars::HTMLQuoteLength);
+                    ++index;
+                    offset = index;
+                    break;
+                }
+
+                case '\'': {
+                    stream.Write((str + offset), (index - offset));
+                    stream.Write(HTMLSpecialChars::HTMLSingleQuote, HTMLSpecialChars::HTMLSingleQuoteLength);
+                    ++index;
+                    offset = index;
+                    break;
+                }
+
+                default: {
+                    ++index;
+                }
+            }
+        }
+
+        stream.Write((str + offset), (length - offset));
+    } else {
+        stream.Write(str, length);
+    }
+}
+
+// char
+template <typename Char_T>
+struct HTMLSpecialChars_T<Char_T, 1U> {
+    static constexpr const Char_T *HTMLAnd = "&amp;"; // &
+    static constexpr SizeT         HTMLAndLength{5};
+
+    static constexpr const Char_T *HTMLLess = "&lt;"; // <
+    static constexpr SizeT         HTMLLessLength{4};
+
+    static constexpr const Char_T *HTMLGreater = "&gt;"; //  >
+    static constexpr SizeT         HTMLGreaterLength{4};
+
+    static constexpr const Char_T *HTMLQuote = "&quot;"; // "
+    static constexpr SizeT         HTMLQuoteLength{6};
+
+    static constexpr const Char_T *HTMLSingleQuote = "&apos;"; // ' (HTML5)
+    static constexpr SizeT         HTMLSingleQuoteLength{6};
+
+    static constexpr const Char_T SemicolonChar = ';';
+};
+
+// char16_t
+template <typename Char_T>
+struct HTMLSpecialChars_T<Char_T, 2U> {
+    static constexpr const Char_T *HTMLAnd = u"&amp;"; // &
+    static constexpr SizeT         HTMLAndLength{5};
+
+    static constexpr const Char_T *HTMLLess = u"&lt;"; // <
+    static constexpr SizeT         HTMLLessLength{4};
+
+    static constexpr const Char_T *HTMLGreater = u"&gt;"; //  >
+    static constexpr SizeT         HTMLGreaterLength{4};
+
+    static constexpr const Char_T *HTMLQuote = u"&quot;"; // "
+    static constexpr SizeT         HTMLQuoteLength{6};
+
+    static constexpr const Char_T *HTMLSingleQuote = u"&apos;"; // ' (HTML5)
+    static constexpr SizeT         HTMLSingleQuoteLength{6};
+
+    static constexpr const Char_T SemicolonChar = u';';
+};
+
+// char32_t
+template <typename Char_T>
+struct HTMLSpecialChars_T<Char_T, 4U> {
+    static constexpr const Char_T *HTMLAnd = U"&amp;"; // &
+    static constexpr SizeT         HTMLAndLength{5};
+
+    static constexpr const Char_T *HTMLLess = U"&lt;"; // <
+    static constexpr SizeT         HTMLLessLength{4};
+
+    static constexpr const Char_T *HTMLGreater = U"&gt;"; //  >
+    static constexpr SizeT         HTMLGreaterLength{4};
+
+    static constexpr const Char_T *HTMLQuote = U"&quot;"; // "
+    static constexpr SizeT         HTMLQuoteLength{6};
+
+    static constexpr const Char_T *HTMLSingleQuote = U"&apos;"; // ' (HTML5)
+    static constexpr SizeT         HTMLSingleQuoteLength{6};
+
+    static constexpr const Char_T SemicolonChar = U';';
+};
+
+// wchar_t size = 4
+template <>
+struct HTMLSpecialChars_T<wchar_t, 4U> {
+    static constexpr const wchar_t *HTMLAnd = L"&amp;"; // &
+    static constexpr SizeT          HTMLAndLength{5};
+
+    static constexpr const wchar_t *HTMLLess = L"&lt;"; // <
+    static constexpr SizeT          HTMLLessLength{4};
+
+    static constexpr const wchar_t *HTMLGreater = L"&gt;"; //  >
+    static constexpr SizeT          HTMLGreaterLength{4};
+
+    static constexpr const wchar_t *HTMLQuote = L"&quot;"; // "
+    static constexpr SizeT          HTMLQuoteLength{6};
+
+    static constexpr const wchar_t *HTMLSingleQuote = L"&apos;"; // ' (HTML5)
+    static constexpr SizeT          HTMLSingleQuoteLength{6};
+
+    static constexpr const wchar_t SemicolonChar = L';';
+};
+
+// wchar_t size = 2
+template <>
+struct HTMLSpecialChars_T<wchar_t, 2U> {
+    static constexpr const wchar_t *HTMLAnd = L"&amp;"; // &
+    static constexpr SizeT          HTMLAndLength{5};
+
+    static constexpr const wchar_t *HTMLLess = L"&lt;"; // <
+    static constexpr SizeT          HTMLLessLength{4};
+
+    static constexpr const wchar_t *HTMLGreater = L"&gt;"; //  >
+    static constexpr SizeT          HTMLGreaterLength{4};
+
+    static constexpr const wchar_t *HTMLQuote = L"&quot;"; // "
+    static constexpr SizeT          HTMLQuoteLength{6};
+
+    static constexpr const wchar_t *HTMLSingleQuote = L"&apos;"; // ' (HTML5)
+    static constexpr SizeT          HTMLSingleQuoteLength{6};
+
+    static constexpr const wchar_t SemicolonChar = L';';
+};
+
 } // namespace StringUtils
 } // namespace Qentem
 
