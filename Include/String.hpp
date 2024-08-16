@@ -409,7 +409,6 @@ struct String {
     }
 
     SizeT   length_{0};
-    SizeT   padding_{0};
     Char_T *storage_{nullptr};
 };
 
