@@ -27,9 +27,6 @@
 
 namespace Qentem {
 
-template <typename, bool>
-struct StringViewData;
-
 template <typename Char_T>
 struct StringView {
     using CharType = Char_T;
