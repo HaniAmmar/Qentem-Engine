@@ -812,7 +812,6 @@ static void TestVariableTag4(QTest &test) {
 
         test.IsEqual(Template::Render(R"({var:<"&'>})", value, ss), R"({var:&lt;&quot;&amp;&apos;&gt;})", __LINE__);
         ss.Clear();
-
     } else {
         test.IsEqual(Template::Render(R"({var:0})", value, ss), R"(<)", __LINE__);
         ss.Clear();
@@ -977,6 +976,16 @@ static void TestVariableTag4(QTest &test) {
         ss.Clear();
 
         test.IsEqual(Template::Render(R"({var:<"&'>})", value, ss), R"({var:<"&'>})", __LINE__);
+        ss.Clear();
+    }
+
+    if (Config::AutoEscapeHTML) {
+        value.Reset();
+
+        value[R"(abcd)"] = R"( &lt; < &gt; > &amp; & &quot; " &apos; ')";
+
+        test.IsEqual(Template::Render(R"({var:abcd})", value, ss),
+                     R"( &lt; &lt; &gt; &gt; &amp; &amp; &quot; &quot; &apos; &apos;)", __LINE__);
         ss.Clear();
     }
 }

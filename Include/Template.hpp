@@ -1020,7 +1020,31 @@ struct TemplateCore {
             while (index < length) {
                 switch (str[index]) {
                     case '&': {
-                        // TODO: check for double escape.
+                        const SizeT   rem_length = (length - index);
+                        const Char_T *n_str      = (str + index);
+
+                        if ((rem_length > SizeT{5}) && (n_str[SizeT{5}] == TagPatterns::SemicolonChar)) {
+                            if (StringUtils::IsEqual(n_str, TagPatterns::HTMLQuote, SizeT{5}) ||
+                                StringUtils::IsEqual(n_str, TagPatterns::HTMLSingleQuote, SizeT{5})) {
+                                index += SizeT{6};
+                                break;
+                            }
+                        }
+
+                        if ((rem_length > SizeT{4}) && (n_str[SizeT{4}] == TagPatterns::SemicolonChar) &&
+                            StringUtils::IsEqual(n_str, TagPatterns::HTMLAnd, SizeT{4})) {
+                            index += SizeT{5};
+                            break;
+                        }
+
+                        if ((rem_length > SizeT{3}) && (n_str[SizeT{3}] == TagPatterns::SemicolonChar)) {
+                            if (StringUtils::IsEqual(n_str, TagPatterns::HTMLLess, SizeT{3}) ||
+                                StringUtils::IsEqual(n_str, TagPatterns::HTMLGreater, SizeT{3})) {
+                                index += SizeT{4};
+                                break;
+                            }
+                        }
+
                         stream.Write((str + offset), (index - offset));
                         stream.Write(TagPatterns::HTMLAnd, TagPatterns::HTMLAndLength);
                         ++index;

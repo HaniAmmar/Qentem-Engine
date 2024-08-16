@@ -435,6 +435,9 @@ struct TagPatterns_T {
     // static constexpr SizeT          HTMLSingleQuoteLength = StringUtils::ConstCount(HTMLSingleQuote);
     static constexpr SizeT HTMLSingleQuoteLength{6};
 
+    // ;
+    static constexpr const Char_T SemicolonChar = TPStrings::SemicolonChar;
+
     static constexpr Char_T EqualChar              = '=';
     static constexpr Char_T SpaceChar              = ' ';
     static constexpr Char_T VariablesSeparatorChar = ',';
@@ -506,6 +509,7 @@ struct TPStrings_T<Char_T, 1U> {
     static constexpr const Char_T *HTMLGreater     = "&gt;";
     static constexpr const Char_T *HTMLQuote       = "&quot;";
     static constexpr const Char_T *HTMLSingleQuote = "&apos;";
+    static constexpr const Char_T  SemicolonChar   = ';';
 };
 
 // char16_t
@@ -543,6 +547,7 @@ struct TPStrings_T<Char_T, 2U> {
     static constexpr const Char_T *HTMLGreater     = u"&gt;";
     static constexpr const Char_T *HTMLQuote       = u"&quot;";
     static constexpr const Char_T *HTMLSingleQuote = u"&apos;";
+    static constexpr const Char_T  SemicolonChar   = u';';
 };
 
 // char32_t
@@ -580,6 +585,7 @@ struct TPStrings_T<Char_T, 4U> {
     static constexpr const Char_T *HTMLGreater     = U"&gt;";
     static constexpr const Char_T *HTMLQuote       = U"&quot;";
     static constexpr const Char_T *HTMLSingleQuote = U"&apos;";
+    static constexpr const Char_T  SemicolonChar   = U';';
 };
 
 // wchar_t size = 4
@@ -616,6 +622,7 @@ struct TPStrings_T<wchar_t, 4U> {
     static constexpr const wchar_t *HTMLGreater     = L"&gt;";
     static constexpr const wchar_t *HTMLQuote       = L"&quot;";
     static constexpr const wchar_t *HTMLSingleQuote = L"&apos;";
+    static constexpr const wchar_t  SemicolonChar   = L';';
 };
 
 // wchar_t size = 2
@@ -654,6 +661,7 @@ struct TPStrings_T<wchar_t, 2U> {
     static constexpr const wchar_t *HTMLGreater     = L"&gt;";
     static constexpr const wchar_t *HTMLQuote       = L"&quot;";
     static constexpr const wchar_t *HTMLSingleQuote = L"&apos;";
+    static constexpr const wchar_t  SemicolonChar   = L';';
 };
 
 template <typename Char_T>
