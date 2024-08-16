@@ -50,12 +50,72 @@ enum struct TagType : SizeT8 {
 struct TagBit {
   public:
     TagBit()                          = default;
-    TagBit(const TagBit &)            = delete;
     TagBit &operator=(const TagBit &) = delete;
-    TagBit &operator=(TagBit &&)      = delete;
 
     TagBit(TagBit &&src) noexcept : storage_{src.storage_}, type_{src.type_} {
         src.type_ = TagType::None;
+    }
+
+    TagBit(const TagBit &src) : type_{src.type_} {
+        switch (src.type_) {
+            case TagType::Variable:
+            case TagType::RawVariable: {
+                const VariableTag &tag = src.GetVariableTag();
+
+                storage_ = Memory::AllocateInit<VariableTag>(tag);
+                break;
+            }
+
+            case TagType::Math: {
+                const MathTag &tag = src.GetMathTag();
+
+                storage_ = Memory::AllocateInit<MathTag>(tag);
+                break;
+            }
+
+            case TagType::SuperVariable: {
+                const SuperVariableTag &tag = src.GetSuperVariableTag();
+
+                storage_ = Memory::AllocateInit<SuperVariableTag>(tag);
+                break;
+            }
+
+            case TagType::InLineIf: {
+                const InLineIfTag &tag = src.GetInLineIfTag();
+
+                storage_ = Memory::AllocateInit<InLineIfTag>(tag);
+                break;
+            }
+
+            case TagType::Loop: {
+                const LoopTag &tag = src.GetLoopTag();
+
+                storage_ = Memory::AllocateInit<LoopTag>(tag);
+                break;
+            }
+
+            case TagType::If: {
+                const IfTag &tag = src.GetIfTag();
+
+                storage_ = Memory::AllocateInit<IfTag>(tag);
+                break;
+            }
+
+            default: {
+            }
+        }
+    }
+
+    TagBit &operator=(TagBit &&src) noexcept {
+        if (this != &src) {
+            Clear();
+
+            storage_  = src.storage_;
+            type_     = src.type_;
+            src.type_ = TagType::None;
+        }
+
+        return *this;
     }
 
     VariableTag *MakeVariableTag() {
@@ -133,35 +193,35 @@ struct TagBit {
             }
 
             case TagType::Math: {
-                MathTag *ptr = (MathTag *)(storage_);
+                MathTag *ptr = &GetMathTag();
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::SuperVariable: {
-                SuperVariableTag *ptr = (SuperVariableTag *)(storage_);
+                SuperVariableTag *ptr = &GetSuperVariableTag();
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::InLineIf: {
-                InLineIfTag *ptr = (InLineIfTag *)(storage_);
+                InLineIfTag *ptr = &GetInLineIfTag();
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::Loop: {
-                LoopTag *ptr = (LoopTag *)(storage_);
+                LoopTag *ptr = &GetLoopTag();
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;
             }
 
             case TagType::If: {
-                IfTag *ptr = (IfTag *)(storage_);
+                IfTag *ptr = &GetIfTag();
                 Memory::Dispose(ptr);
                 Memory::Deallocate(ptr);
                 break;

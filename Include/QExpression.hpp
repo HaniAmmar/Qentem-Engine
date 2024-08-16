@@ -66,13 +66,11 @@ struct QExpression {
     // QExpression -------------------------------------------
     struct ExpressionValue {
         QNumber64 Number{0};
-        SizeT     Offset{0}; // String for use in ==
+        SizeT     Offset{0}; // For use in (string == string) op
         SizeT     Length{0};
     };
 
-    QExpression(const QExpression &)            = delete;
     QExpression &operator=(const QExpression &) = delete;
-    QExpression &operator=(QExpression &&)      = delete;
 
     QExpression() noexcept : Value{}, Operation{QOperation::NoOp}, Type{ExpressionType::Empty} {};
 
@@ -89,9 +87,76 @@ struct QExpression {
         }
     }
 
-    QExpression(QExpression &&expr) noexcept : Value{expr.Value}, Operation{expr.Operation}, Type{expr.Type} {
-        expr.Type = ExpressionType::Empty;
-        // expr.Value  = QExpression{};
+    QExpression(QExpression &&src) noexcept : Operation{src.Operation}, Type{src.Type} {
+        switch (src.Type) {
+            case ExpressionType::Variable: {
+                Variable = src.Variable;
+                break;
+            }
+
+            case ExpressionType::SubOperation: {
+                SubExpressions = Memory::Move(src.SubExpressions);
+                break;
+            }
+
+            default: {
+                Value = src.Value;
+                break;
+            }
+        }
+
+        src.Type = ExpressionType::Empty;
+    }
+
+    QExpression(const QExpression &src) noexcept : Operation{src.Operation}, Type{src.Type} {
+        switch (src.Type) {
+            case ExpressionType::Variable: {
+                Variable = src.Variable;
+                break;
+            }
+
+            case ExpressionType::SubOperation: {
+                SubExpressions = src.SubExpressions;
+                break;
+            }
+
+            default: {
+                Value = src.Value;
+                break;
+            }
+        }
+    }
+
+    QExpression &operator=(QExpression &&src) {
+        if (this != &src) {
+            if (Type == ExpressionType::SubOperation) {
+                Memory::Dispose(&SubExpressions);
+            }
+
+            Operation = src.Operation;
+            Type      = src.Type;
+
+            switch (src.Type) {
+                case ExpressionType::Variable: {
+                    Variable = src.Variable;
+                    break;
+                }
+
+                case ExpressionType::SubOperation: {
+                    SubExpressions = Memory::Move(src.SubExpressions);
+                    break;
+                }
+
+                default: {
+                    Value = src.Value;
+                    break;
+                }
+            }
+
+            src.Type = ExpressionType::Empty;
+        }
+
+        return *this;
     }
 
     void operator+=(const QExpression &right) noexcept {
