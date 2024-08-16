@@ -441,7 +441,9 @@ struct TemplateCore {
                                         (SizeT((tag.TrueOffset < tag.FalseOffset) ? tag.FalseOffset : tag.TrueOffset) +
                                          tag.Offset);
 
-                                    while ((s_tag < s_tag_end)) {
+                                    bool skip = false;
+
+                                    while (s_tag < s_tag_end) {
                                         switch (s_tag->GetType()) {
                                             case TagType::Variable:
                                             case TagType::RawVariable: {
@@ -457,6 +459,7 @@ struct TemplateCore {
                                             default: {
                                                 storage->Drop(SizeT{1});
                                                 s_tag = s_tag_end;
+                                                skip  = true;
                                             }
                                         }
 
@@ -468,10 +471,12 @@ struct TemplateCore {
                                         ++s_tag;
                                     }
 
-                                    if (tag.TrueOffset < tag.FalseOffset) {
-                                        tag.FalseTagsStartID = SizeT8(id);
-                                    } else {
-                                        tag.TrueTagsStartID = SizeT8(id);
+                                    if (!skip) {
+                                        if (tag.TrueOffset < tag.FalseOffset) {
+                                            tag.FalseTagsStartID = SizeT8(id);
+                                        } else {
+                                            tag.TrueTagsStartID = SizeT8(id);
+                                        }
                                     }
                                 } else if ((tag.TrueOffset == SizeT16{0}) && (tag.FalseOffset == SizeT16{0})) {
                                     storage->Drop(SizeT{1});
