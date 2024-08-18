@@ -22,8 +22,8 @@ environment:
         - job_name: Linux x64
           appveyor_build_worker_image: Ubuntu2204
 
-        - job_name: Linux x86
-          appveyor_build_worker_image: Ubuntu2204
+        # - job_name: Linux x86
+        #   appveyor_build_worker_image: Ubuntu2204
 
         - job_name: macOS Monterey
           appveyor_build_worker_image: macos-monterey
