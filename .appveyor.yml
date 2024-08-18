@@ -88,7 +88,7 @@ for:
 
       install:
           - sudo apt update
-          - sudo apt -y install g++-multilib
+          - sudo apt -y install gcc-multilib g++-multilib
 
       build_script:
           - sh: mkdir Build
