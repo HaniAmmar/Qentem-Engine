@@ -980,6 +980,8 @@ struct Value {
                 if (item != nullptr) {
                     return &(item->Value);
                 }
+
+                return nullptr;
             }
 
             case ValueType::Array: {
@@ -1001,6 +1003,8 @@ struct Value {
                 if (item != nullptr) {
                     return &(item->Value);
                 }
+
+                return nullptr;
             }
 
             case ValueType::Array: {
