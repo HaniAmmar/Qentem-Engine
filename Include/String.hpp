@@ -43,7 +43,7 @@ struct String {
     }
 
     String(const String &src) {
-        copyString(src.Storage(), src.Length());
+        copyString(src.First(), src.Length());
     }
 
     explicit String(SizeT len) {
@@ -86,7 +86,7 @@ struct String {
     String &operator=(const String &src) {
         if (this != &src) {
             deallocate();
-            copyString(src.Storage(), src.Length());
+            copyString(src.First(), src.Length());
         }
 
         return *this;
@@ -99,14 +99,14 @@ struct String {
     }
 
     String &operator+=(String &&src) {
-        Write(src.Storage(), src.Length());
+        Write(src.First(), src.Length());
         src.Reset();
 
         return *this;
     }
 
     String &operator+=(const String &src) {
-        Write(src.Storage(), src.Length());
+        Write(src.First(), src.Length());
         return *this;
     }
 
@@ -133,7 +133,7 @@ struct String {
     }
 
     String operator+(const Char_T *str) const {
-        return merge(Storage(), Length(), str, StringUtils::Count(str));
+        return merge(First(), Length(), str, StringUtils::Count(str));
     }
 
     friend String &operator<<(String &out, const Char_T *str) {
@@ -156,14 +156,14 @@ struct String {
     }
 
     inline bool operator==(const String &string) const noexcept {
-        return (((Length() == string.Length())) && StringUtils::IsEqual(Storage(), string.Storage(), Length()));
+        return (((Length() == string.Length())) && StringUtils::IsEqual(First(), string.First(), Length()));
     }
 
     inline bool operator==(const Char_T *str) const noexcept {
         SizeT offset{0};
 
         if (str != nullptr) {
-            while ((*str != Char_T{0}) && (*str == Storage()[offset])) {
+            while ((*str != Char_T{0}) && (*str == First()[offset])) {
                 ++str;
                 ++offset;
             }
@@ -181,39 +181,39 @@ struct String {
     }
 
     inline bool operator<(const String &string) const noexcept {
-        return StringUtils::IsLess(Storage(), string.Storage(), Length(), string.Length(), false);
+        return StringUtils::IsLess(First(), string.First(), Length(), string.Length(), false);
     }
 
     inline bool operator<(const Char_T *str) const noexcept {
-        return StringUtils::IsLess(Storage(), str, Length(), StringUtils::Count(str), false);
+        return StringUtils::IsLess(First(), str, Length(), StringUtils::Count(str), false);
     }
 
     inline bool operator<=(const String &string) const noexcept {
-        return StringUtils::IsLess(Storage(), string.Storage(), Length(), string.Length(), true);
+        return StringUtils::IsLess(First(), string.First(), Length(), string.Length(), true);
     }
 
     inline bool operator<=(const Char_T *str) const noexcept {
-        return StringUtils::IsLess(Storage(), str, Length(), StringUtils::Count(str), true);
+        return StringUtils::IsLess(First(), str, Length(), StringUtils::Count(str), true);
     }
 
     inline bool operator>(const String &string) const noexcept {
-        return StringUtils::IsGreater(Storage(), string.Storage(), Length(), string.Length(), false);
+        return StringUtils::IsGreater(First(), string.First(), Length(), string.Length(), false);
     }
 
     inline bool operator>(const Char_T *str) const noexcept {
-        return StringUtils::IsGreater(Storage(), str, Length(), StringUtils::Count(str), false);
+        return StringUtils::IsGreater(First(), str, Length(), StringUtils::Count(str), false);
     }
 
     inline bool operator>=(const String &string) const noexcept {
-        return StringUtils::IsGreater(Storage(), string.Storage(), Length(), string.Length(), true);
+        return StringUtils::IsGreater(First(), string.First(), Length(), string.Length(), true);
     }
 
     inline bool operator>=(const Char_T *str) const noexcept {
-        return StringUtils::IsGreater(Storage(), str, Length(), StringUtils::Count(str), true);
+        return StringUtils::IsGreater(First(), str, Length(), StringUtils::Count(str), true);
     }
 
     inline bool IsEqual(const Char_T *str, SizeT length) const noexcept {
-        return ((Length() == length) && StringUtils::IsEqual(Storage(), str, length));
+        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
     }
 
     void Reset() noexcept {
@@ -240,7 +240,7 @@ struct String {
     }
 
     static String Merge(const String &src1, const String &src2) {
-        return merge(src1.Storage(), src1.Length(), src2.Storage(), src2.Length());
+        return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
 
     void Write(const Char_T *str, const SizeT len) {
@@ -266,7 +266,7 @@ struct String {
     static String Trim(const String &src) {
         SizeT         length = src.Length();
         SizeT         offset = SizeT{0};
-        const Char_T *str    = src.Storage();
+        const Char_T *str    = src.First();
 
         StringUtils::Trim(str, offset, length);
         return String((str + offset), length);
@@ -332,14 +332,14 @@ struct String {
         const SizeT length = Length();
 
         if (length != SizeT{0}) {
-            return (Storage() + (length - SizeT{1}));
+            return (First() + (length - SizeT{1}));
         }
 
         return nullptr;
     }
 
     inline const Char_T *End() const noexcept {
-        return (Storage() + Length());
+        return (First() + Length());
     }
 
     inline bool IsEmpty() const noexcept {

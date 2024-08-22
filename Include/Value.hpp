@@ -1115,7 +1115,7 @@ struct Value {
         const StringT *val = GetKey(index);
 
         if (val != nullptr) {
-            key    = val->Storage();
+            key    = val->First();
             length = Number_T(val->Length());
             return true;
         }
@@ -1132,7 +1132,7 @@ struct Value {
 
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
                 value  = &(item->Value);
-                key    = item->Key.Storage();
+                key    = item->Key.First();
                 length = Number_T(item->Key.Length());
             }
         }
@@ -1146,7 +1146,7 @@ struct Value {
 
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
                 value = &(item->Value);
-                key   = StringView<Char_T>{item->Key.Storage(), item->Key.Length()};
+                key   = StringView<Char_T>{item->Key.First(), item->Key.Length()};
             }
         }
     }
@@ -1156,7 +1156,7 @@ struct Value {
     bool SetCharAndLength(const Char_T *&key, Number_T &length) const noexcept {
         switch (Type()) {
             case ValueType::String: {
-                key    = string_.Storage();
+                key    = string_.First();
                 length = Number_T{string_.Length()};
                 return true;
             }
@@ -1195,9 +1195,9 @@ struct Value {
         switch (Type()) {
             case ValueType::String: {
                 if (string_function != nullptr) {
-                    string_function(stream, string_.Storage(), string_.Length());
+                    string_function(stream, string_.First(), string_.Length());
                 } else {
-                    stream.Write(string_.Storage(), string_.Length());
+                    stream.Write(string_.First(), string_.Length());
                 }
 
                 break;
@@ -1350,7 +1350,7 @@ struct Value {
 
             case ValueType::String: {
                 SizeT             offset = 0;
-                const QNumberType n_type = Digit::StringToNumber(number, string_.Storage(), offset, string_.Length());
+                const QNumberType n_type = Digit::StringToNumber(number, string_.First(), offset, string_.Length());
 
                 if (offset == string_.Length()) {
                     return n_type;
@@ -1418,7 +1418,7 @@ struct Value {
     }
 
     inline void Remove(const StringT &key) const noexcept {
-        Remove(key.Storage(), string_.Length());
+        Remove(key.First(), string_.Length());
     }
 
     inline void Remove(const Char_T *key) const noexcept {
@@ -1617,7 +1617,7 @@ struct Value {
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
                 stream += JSONotation::QuoteChar;
-                JSONUtils::EscapeJSON(h_item->Key.Storage(), h_item->Key.Length(), stream);
+                JSONUtils::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 
