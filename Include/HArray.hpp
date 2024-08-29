@@ -316,6 +316,7 @@ struct HArray {
 
     bool GetKeyIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
         SizeT *sub_index;
+
         if (find(sub_index, str, length, StringUtils::Hash(str, length)) != nullptr) {
             index = *sub_index;
             --index;
@@ -324,6 +325,10 @@ struct HArray {
         }
 
         return false;
+    }
+
+    bool GetKeyIndex(SizeT &index, const Key_T &key) const noexcept {
+        return GetKeyIndex(index, key.First(), key.Length());
     }
 
     inline void Remove(const Char_T *key) const noexcept {
