@@ -471,7 +471,7 @@ struct Value {
             setTypeToObject();
         }
 
-        return (object_[key]);
+        return (object_.Get(key.First(), key.Length()));
     }
 
     inline Value &operator[](StringT &&key) {

@@ -2074,11 +2074,14 @@ static void TestMathTag1(QTest &test) {
 }
 
 static void TestMathTag2(QTest &test) {
+    using ArrayT  = typename Value<char>::ArrayT;
+    using ObjectT = typename Value<char>::ObjectT;
+
     StringStream<char> ss;
     Value<char>        value;
 
-    value += Array<Value<char>>();
-    value += HArray<Value<char>, char>();
+    value += ArrayT{};
+    value += ObjectT{};
     value += 5;
 
     test.IsEqual(Template::Render(R"({math:{var:0}+8})", value, ss), R"({math:{var:0}+8})", __LINE__);

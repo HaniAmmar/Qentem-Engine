@@ -77,12 +77,14 @@ struct JSON {
         using JSONotation = JSONUtils::JSONotation_T<Char_T>;
 
         static ValueT parseObject(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT length) {
+            using ObjectT = typename ValueT::ObjectT;
+
             StringUtils::TrimLeft(content, offset, length);
 
             ValueT value{ValueType::Object};
 
             if (content[offset] != JSONotation::ECurlyChar) {
-                HArray<ValueT, Char_T> *obj = value.GetObject();
+                ObjectT *obj = value.GetObject();
 
                 while (offset < length && (content[offset] == JSONotation::QuoteChar)) {
                     ++offset;

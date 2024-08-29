@@ -23,8 +23,8 @@
 #ifndef QENTEM_HARRAY_H
 #define QENTEM_HARRAY_H
 
-#include "String.hpp"
-#include "StringView.hpp"
+#include "Memory.hpp"
+#include "StringUtils.hpp"
 
 namespace Qentem {
 /*
@@ -218,10 +218,6 @@ struct HArray {
         return Get(key, StringUtils::Count(key));
     }
 
-    Value_T &operator[](const StringView<Char_T> &key) {
-        return Get(key.First(), key.Length());
-    }
-
     Value_T &operator[](const Key_T &key) {
         return Get(key.First(), key.Length());
     }
@@ -243,35 +239,19 @@ struct HArray {
     }
 
     void Insert(Key_T &&key, Value_T &&value) {
-        if (Size() == Capacity()) {
-            expand();
-        }
-
-        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
-        SizeT      *index;
-        HAItem     *item = find(index, key.First(), key.Length(), hash);
-
-        if (item == nullptr) {
-            item = insert(index, Memory::Move(key), hash);
-        }
-
-        item->Value = Memory::Move(value);
+        operator[](Memory::Move(key)) = Memory::Move(value);
     }
 
     void Insert(Key_T &&key, const Value_T &value) {
-        Insert(Memory::Move(key), Value_T{value});
+        operator[](Memory::Move(key)) = value;
     }
 
     void Insert(const Key_T &key, const Value_T &value) {
-        Insert(Key_T{key}, Value_T{value});
+        Get(key.First(), key.Length()) = value;
     }
 
     Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
         return GetValue(key, length, StringUtils::Hash(key, length));
-    }
-
-    Value_T *GetValue(const StringView<Char_T> &key) const noexcept {
-        return GetValue(key.First(), key.Length());
     }
 
     inline Value_T *GetValue(const Key_T &key) const noexcept {
@@ -318,10 +298,6 @@ struct HArray {
         }
 
         return nullptr;
-    }
-
-    inline const HAItem *GetItem(const StringView<Char_T> &key) const noexcept {
-        return GetItem(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
     }
 
     inline const HAItem *GetItem(const Key_T &key) const noexcept {
@@ -374,7 +350,7 @@ struct HArray {
 
     /*
      * This function renames a key to a nonexisting one without changing the
-     * order of the item, and returns true if successful.
+     * order of its item, and returns true if successful.
      */
     bool Rename(const Key_T &from, Key_T &&to) const noexcept {
         if (Size() != SizeT{0}) {
@@ -724,7 +700,7 @@ struct HArray {
 
     SizeT  index_{0};
     SizeT  capacity_{0};
-    SizeT *hashTable_{};
+    SizeT *hashTable_{nullptr};
 };
 
 } // namespace Qentem
