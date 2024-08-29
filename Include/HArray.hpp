@@ -552,9 +552,7 @@ struct HArray {
         constexpr SizeT32 size     = sizeof(SizeT);
         constexpr SizeT   size_sum = SizeT{size + sizeof(HAItem)};
 
-        if (new_capacity < SizeT{2}) {
-            new_capacity = SizeT{2};
-        }
+        new_capacity = ((new_capacity == 0) | new_capacity);
 
         new_capacity = Memory::AlignSize(new_capacity);
         setCapacity(new_capacity);
