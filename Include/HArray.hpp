@@ -672,8 +672,7 @@ struct HArray {
                     return item;
                 }
 
-                index  = &(item->Next);
-                *index = *index;
+                index = &(item->Next);
             }
         }
 
