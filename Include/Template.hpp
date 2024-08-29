@@ -343,7 +343,7 @@ struct TemplateCore {
         while ((match = finder.GetMatch()) != 0U) {
             switch (match) {
                 case TagPatterns::LineEndID: {
-                    if (is_child) {
+                    if (is_child && parent_storage.IsNotEmpty()) {
                         is_child = false;
                         storage  = *(parent_storage.Last());
                         parent_storage.Drop(SizeT{1});
