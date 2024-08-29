@@ -269,11 +269,13 @@ struct HArray {
     }
 
     Value_T *GetValue(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT  *index;
-        HAItem *item = find(index, key, length, hash);
+        if (IsNotEmpty()) {
+            SizeT  *index;
+            HAItem *item = find(index, key, length, hash);
 
-        if (item != nullptr) {
-            return &(item->Value);
+            if (item != nullptr) {
+                return &(item->Value);
+            }
         }
 
         return nullptr;
@@ -290,11 +292,13 @@ struct HArray {
     }
 
     const HAItem *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT        *index;
-        const HAItem *item = find(index, key, length, hash);
+        if (IsNotEmpty()) {
+            SizeT        *index;
+            const HAItem *item = find(index, key, length, hash);
 
-        if (item != nullptr) {
-            return item;
+            if (item != nullptr) {
+                return item;
+            }
         }
 
         return nullptr;
@@ -315,13 +319,15 @@ struct HArray {
     }
 
     bool GetKeyIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
-        SizeT *sub_index;
+        if (IsNotEmpty()) {
+            SizeT *tmp;
 
-        if (find(sub_index, str, length, StringUtils::Hash(str, length)) != nullptr) {
-            index = *sub_index;
-            --index;
+            if (find(tmp, str, length, StringUtils::Hash(str, length)) != nullptr) {
+                index = *tmp;
+                --index;
 
-            return true;
+                return true;
+            }
         }
 
         return false;
@@ -358,7 +364,7 @@ struct HArray {
      * order of its item, and returns true if successful.
      */
     bool Rename(const Key_T &from, Key_T &&to) const noexcept {
-        if (Size() != SizeT{0}) {
+        if (IsNotEmpty()) {
             SizeT *left_index;
             SizeT *right_index;
 
@@ -597,7 +603,7 @@ struct HArray {
     }
 
     void remove(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        if (Size() != SizeT{0}) {
+        if (IsNotEmpty()) {
             SizeT  *index;
             HAItem *item = find(index, key, length, hash);
 
@@ -613,23 +619,23 @@ struct HArray {
     }
 
     void copyTable(const HArray &src) {
-        if (src.Size() != SizeT{0}) {
+        if (src.IsNotEmpty()) {
             const HAItem *src_item = src.First();
             const HAItem *src_end  = (src_item + src.Size());
             HAItem       *storage  = allocate(src.Size());
-            SizeT         length   = 0;
+            SizeT         index{0};
 
             do {
                 if (src_item->Hash != SizeT{0}) {
                     Memory::Initialize(storage, *src_item);
                     ++storage;
-                    ++length;
+                    ++index;
                 }
 
                 ++src_item;
             } while (src_item < src_end);
 
-            setSize(length);
+            setSize(index);
             generateHash();
         }
     }
@@ -659,21 +665,19 @@ struct HArray {
     HAItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
         SizeT *ht = getHashTable();
 
-        if (ht != nullptr) {
-            HAItem *storage = Memory::ChangePointer<HAItem>(ht + Capacity());
-            HAItem *item;
-            index = (ht + (hash & getBase()));
+        HAItem *storage = Memory::ChangePointer<HAItem>(ht + Capacity());
+        HAItem *item;
+        index = (ht + (hash & getBase()));
 
-            while (*index != SizeT{0}) {
-                item = (storage + *index);
-                --item;
+        while (*index != SizeT{0}) {
+            item = (storage + *index);
+            --item;
 
-                if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
-                    return item;
-                }
-
-                index = &(item->Next);
+            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
+                return item;
             }
+
+            index = &(item->Next);
         }
 
         return nullptr;
