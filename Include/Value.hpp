@@ -47,9 +47,11 @@ enum struct ValueType : SizeT8 {
 template <typename Char_T>
 struct Value {
     using JSONotation = JSONUtils::JSONotation_T<Char_T>;
-    using ObjectT     = HArray<Value, Char_T>;
-    using ArrayT      = Array<Value>;
-    using StringT     = String<Char_T>;
+    using VItem       = HAItem_T<String<Char_T>, Value>;
+
+    using ObjectT = HArray<String<Char_T>, Value>;
+    using ArrayT  = Array<Value>;
+    using StringT = String<Char_T>;
 
     Value() noexcept : object_{} {
     }
@@ -950,11 +952,9 @@ struct Value {
     }
 
     Value *Storage() {
-        using V_item = HAItem_T<Value, Char_T>;
-
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = object_.Storage();
+                VItem *item = object_.Storage();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -971,11 +971,9 @@ struct Value {
     }
 
     const Value *First() const {
-        using V_item = HAItem_T<Value, Char_T>;
-
         switch (Type()) {
             case ValueType::Object: {
-                const V_item *item = object_.First();
+                const VItem *item = object_.First();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -994,11 +992,9 @@ struct Value {
     }
 
     Value *Last() const {
-        using V_item = HAItem_T<Value, Char_T>;
-
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = object_.Last();
+                VItem *item = object_.Last();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1017,11 +1013,9 @@ struct Value {
     }
 
     const Value *End() const {
-        using V_item = HAItem_T<Value, Char_T>;
-
         switch (Type()) {
             case ValueType::Object: {
-                V_item *item = object_.End();
+                VItem *item = object_.End();
 
                 if (item != nullptr) {
                     return &(item->Value);
@@ -1126,7 +1120,7 @@ struct Value {
     template <typename Number_T>
     void SetValueKeyLength(SizeT index, const Value *&value, const Char_T *&key, Number_T &length) const noexcept {
         if (IsObject()) {
-            const HAItem_T<Value, Char_T> *item = object_.GetItem(index);
+            const VItem *item = object_.GetItem(index);
 
             value = nullptr;
 
@@ -1140,7 +1134,7 @@ struct Value {
 
     void SetValueAndKey(SizeT index, const Value *&value, StringView<Char_T> &key) const noexcept {
         if (IsObject()) {
-            const HAItem_T<Value, Char_T> *item = object_.GetItem(index);
+            const VItem *item = object_.GetItem(index);
 
             value = nullptr;
 
@@ -1444,8 +1438,6 @@ struct Value {
     }
 
     void Compress() {
-        using V_item = HAItem_T<Value, Char_T>;
-
         if (IsArray()) {
             Value       *src_val = array_.Storage();
             const Value *src_end = array_.End();
@@ -1492,8 +1484,8 @@ struct Value {
         } else if (IsObject()) {
             object_.Compress();
 
-            V_item       *src_val = object_.Storage();
-            const V_item *src_end = (src_val + object_.Size());
+            VItem       *src_val = object_.Storage();
+            const VItem *src_end = (src_val + object_.Size());
 
             while (src_val < src_end) {
                 if (src_val->Value.IsArray() || src_val->Value.IsObject()) {
@@ -1510,7 +1502,6 @@ struct Value {
     }
 
     bool GroupBy(Value &groupedValue, const Char_T *key, const SizeT length) const {
-        using V_item = HAItem_T<Value, Char_T>;
         StringStream<Char_T> stream;
         ObjectT              new_sub_obj;
         const Char_T        *str     = nullptr;
@@ -1529,8 +1520,8 @@ struct Value {
                     if ((item_ != nullptr) && item_->IsObject()) {
                         SizeT count = 0;
 
-                        const V_item *obj_item = item_->object_.First();
-                        const V_item *obj_end  = item_->object_.End();
+                        const VItem *obj_item = item_->object_.First();
+                        const VItem *obj_end  = item_->object_.End();
 
                         while (obj_item != obj_end) {
                             if ((obj_item != nullptr) && !(obj_item->Value.IsUndefined())) {
@@ -1607,12 +1598,10 @@ struct Value {
   private:
     template <typename Stream_T>
     static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) {
-        using V_item = HAItem_T<Value, Char_T>;
-
         stream += JSONotation::SCurlyChar;
 
-        const V_item *h_item = obj.First();
-        const V_item *end    = (h_item + obj.Size());
+        const VItem *h_item = obj.First();
+        const VItem *end    = (h_item + obj.Size());
 
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {

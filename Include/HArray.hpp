@@ -42,12 +42,12 @@ namespace Qentem {
 /*| 0, 1 , 2, ... n-1  | item 0, item 1, ...  |*/
 /*|____________________|______________________|*/
 
-template <typename Value_T, typename Char_T>
+template <typename Key_T, typename Value_T>
 struct HAItem_T {
-    SizeT          Hash;
-    SizeT          Next;
-    String<Char_T> Key;
-    Value_T        Value;
+    SizeT   Hash;
+    SizeT   Next;
+    Key_T   Key;
+    Value_T Value;
 
     inline bool operator<(const HAItem_T &item) const noexcept {
         return (Key < item.Key);
@@ -71,10 +71,10 @@ struct HAItem_T {
 };
 
 ///////////////////////////////////////////////
-template <typename Value_T, typename Char_T>
+template <typename Key_T, typename Value_T>
 struct HArray {
-    using HAItem = HAItem_T<Value_T, Char_T>;
-    using Key_T  = String<Char_T>;
+    using Char_T = typename Key_T::CharType;
+    using HAItem = HAItem_T<Key_T, Value_T>;
 
     HArray() noexcept = default;
 

@@ -32,8 +32,9 @@ namespace Test {
 using VString       = String<char>;
 using ValueC        = Value<char>;
 using VStringStream = StringStream<char>;
-using VHArray       = HArray<ValueC, char>;
+using VHArray       = HArray<String<char>, ValueC>;
 using VArray        = Array<ValueC>;
+using ObjectItem    = HAItem_T<String<char>, ValueC>;
 
 static void TestEmptyValue(QTest &test) {
     ValueC value1;
@@ -1068,8 +1069,6 @@ static void TestObjectValue1(QTest &test) {
     ValueC value1;
     ValueC value2;
 
-    using ObjectItem = HAItem_T<ValueC, char>;
-
     VHArray           h_arr_var;
     const ObjectItem *storage;
     VStringStream     ss_var;
@@ -1198,10 +1197,7 @@ static void TestObjectValue1(QTest &test) {
 }
 
 static void TestObjectValue2(QTest &test) {
-    ValueC value1;
-
-    using ObjectItem = HAItem_T<ValueC, char>;
-
+    ValueC            value1;
     VHArray           h_arr_var;
     const ObjectItem *storage;
     VString           str_var;
@@ -1361,8 +1357,8 @@ static void TestMoveValue1(QTest &test) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -1782,8 +1778,8 @@ static void TestMoveValue3(QTest &test) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2245,8 +2241,8 @@ static void TestCopyValue1(QTest &test) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -2520,8 +2516,8 @@ static void TestCopyValue2(QTest &test) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
     value1 = VString{"-ABCDEF0123456789ABCDEF0123456789-"};
@@ -2667,8 +2663,8 @@ static void TestCopyValue3(QTest &test) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -3070,8 +3066,8 @@ static void TestCopyValue4(QTest &test) {
     VArray        arr_var;
     const ValueC *arr_storage; // = arr_var.First();
 
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage; // = h_arr_var.First();
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage; // = h_arr_var.First();
 
     ////////////////////////////////////////////
 
@@ -4124,14 +4120,14 @@ static void TestAddition5(QTest &test) {
 }
 
 static void TestAddition6(QTest &test) {
-    ValueC                        value1;
-    ValueC                        value2;
-    VString                       str_var;
-    const char                   *str_c1;
-    const char                   *str_c2;
-    VHArray                       h_arr_var;
-    const HAItem_T<ValueC, char> *h_arr_storage1 = nullptr;
-    const HAItem_T<ValueC, char> *h_arr_storage2 = nullptr;
+    ValueC            value1;
+    ValueC            value2;
+    VString           str_var;
+    const char       *str_c1;
+    const char       *str_c2;
+    VHArray           h_arr_var;
+    const ObjectItem *h_arr_storage1 = nullptr;
+    const ObjectItem *h_arr_storage2 = nullptr;
 
     value1["k1"] = 11;
     value1["k2"] = 22;

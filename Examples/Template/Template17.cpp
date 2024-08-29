@@ -16,19 +16,24 @@ c++ -g ./Examples/Template/Template17.cpp -I ./Include -o ./Build/QTest.bin
 template <typename Char_T, typename Value_T, typename StringStream_T>
 inline static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
                                 const StringView<Char_T> &template_name) {
-    // This is not a thread-safe function, and it's here to show how to cache processed tags. Can be used in a
-    // single-threaded process to build on. One lazy way to make it safe is to Parse() all templates before starting the
-    // multi-threading process.
+    // This is not a thread-safe function, and it's here to show how to cache processed tags.
+    // One lazy way to make it thread-safe is to Parse() all templates before
+    // starting a multi-threading process.
 
     using Qentem::Array;
     using Qentem::HArray;
+    using Qentem::String;
 
     using TemplateCore = Qentem::TemplateCore<Char_T, Value_T, StringStream_T>;
-    using Tag          = Qentem::Tags::TagBit;
+    using TagBit       = Qentem::Tags::TagBit;
 
-    TemplateCore                      temp{content.First(), content.Length()};
-    static HArray<Array<Tag>, Char_T> tags_caches;
-    Array<Tag>                       &tags = tags_caches[template_name];
+    TemplateCore                                 temp{content.First(), content.Length()};
+    static HArray<String<Char_T>, Array<TagBit>> tags_caches;
+
+    // Or StringView<Char_T>
+    // static HArray<StringView<Char_T>, Array<TagBit>> tags_caches;
+
+    Array<TagBit> &tags = tags_caches[template_name];
 
     if (tags.IsEmpty()) {
         TemplateCore::Parse(content.First(), content.Length(), tags);
@@ -36,6 +41,8 @@ inline static void CachedRender(const StringView<Char_T> &content, const Value_T
 
     temp.Render(tags, value, stream);
 }
+
+////////////////////////////////////////////////////////////////////
 
 int main() {
     Qentem::Value<char> value = Qentem::JSON::Parse(R"(
@@ -58,6 +65,8 @@ int main() {
     }
 ]
     )");
+
+    ////////////////////////////////////////////////////////////////////
 
     const StringView<char> content = R"(
 <html>
@@ -88,7 +97,8 @@ int main() {
 </html>
 )";
 
-    // Qentem::Template can use any stream if it has Write(const char_type *, length) function.
+    ////////////////////////////////////////////////////////////////////
+
     StringStream<char>     stream;
     const StringView<char> template_name{"page1"};
 
