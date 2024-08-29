@@ -423,19 +423,19 @@ static void TestArray4(QTest &test) {
     test.IsEqual(strings2.Capacity(), 2U, __LINE__);
 
     strings2.Expect(3);
-    test.IsEqual(strings2.Capacity(), 4U, __LINE__);
+    test.IsEqual(strings2.Capacity(), 3U, __LINE__);
 
     strings2.Expect(4);
     test.IsEqual(strings2.Capacity(), 4U, __LINE__);
 
     strings2.Expect(5);
-    test.IsEqual(strings2.Capacity(), 8U, __LINE__);
+    test.IsEqual(strings2.Capacity(), 5U, __LINE__);
 
     strings2.Expect(10);
-    test.IsEqual(strings2.Capacity(), 16U, __LINE__);
+    test.IsEqual(strings2.Capacity(), 10U, __LINE__);
 
     strings2.Expect(11);
-    test.IsEqual(strings2.Capacity(), 16U, __LINE__);
+    test.IsEqual(strings2.Capacity(), 11U, __LINE__);
 }
 
 static void TestArraySort(QTest &test) {
