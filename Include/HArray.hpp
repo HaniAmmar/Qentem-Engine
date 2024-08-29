@@ -129,9 +129,9 @@ struct HArray {
             HAItem     *storage = Storage();
             const SizeT size    = Size();
 
-            // clearHashTable();
-            // setCapacity(SizeT{0});
-            // setSize(SizeT{0});
+            clearHashTable();
+            setCapacity(SizeT{0});
+            setSize(SizeT{0});
             copyTable(src);
 
             Memory::Dispose(storage, (storage + size));
