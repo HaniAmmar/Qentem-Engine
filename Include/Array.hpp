@@ -52,7 +52,7 @@ struct Array {
     }
 
     Array(const Array &src) : capacity_{src.Size()} {
-        if (src.Size() != SizeT{0}) {
+        if (src.IsNotEmpty()) {
             setSize(src.Size());
             copyArray(src);
         }
@@ -93,7 +93,7 @@ struct Array {
             setCapacity(src.Size());
             setSize(src.Size());
 
-            if (Size() != SizeT{0}) {
+            if (IsNotEmpty()) {
                 copyArray(src);
             }
 
@@ -150,11 +150,7 @@ struct Array {
 
     void operator+=(Type_T &&item) {
         if (Size() == Capacity()) {
-            if (Capacity() == SizeT{0}) {
-                setCapacity(SizeT{1});
-            }
-
-            resize(Capacity() * SizeT{2});
+            resize((Capacity() | (Capacity() == SizeT{0})) * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
@@ -163,11 +159,7 @@ struct Array {
 
     inline void operator+=(const Type_T &item) {
         if (Size() == Capacity()) {
-            if (Capacity() == SizeT{0}) {
-                setCapacity(1U);
-            }
-
-            resize(Capacity() * SizeT{2});
+            resize((Capacity() | (Capacity() == SizeT{0})) * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), item);
@@ -264,7 +256,7 @@ struct Array {
         const SizeT n_size = (size + Size());
 
         if (n_size > Capacity()) {
-            resize(Memory::AlignSize(n_size));
+            resize(n_size);
         }
     }
 
