@@ -191,7 +191,7 @@ struct HArray {
                     storage_item = insert(index, Key_T(src_item->Key), src_item->Hash);
                 }
 
-                storage_item->Value = Value_T(src_item->Value);
+                storage_item->Value = src_item->Value;
             }
 
             ++src_item;
@@ -370,10 +370,10 @@ struct HArray {
                 find(right_index, to.First(), to.Length(), to_hash);
 
                 if (*right_index == SizeT{0}) {
-                    SizeT offset = *left_index;
-                    --offset;
+                    SizeT index = *left_index;
+                    --index;
 
-                    HAItem *item = (Storage() + offset);
+                    HAItem *item = (Storage() + index);
                     *right_index = *left_index;
                     *left_index  = item->Next;
                     item->Next   = SizeT{0};
