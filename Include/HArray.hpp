@@ -78,7 +78,7 @@ struct HArray {
 
     HArray() noexcept = default;
 
-    explicit HArray(SizeT size) {
+    explicit HArray(const SizeT size) {
         if (size != SizeT{0}) {
             allocate(size);
         }
@@ -460,7 +460,7 @@ struct HArray {
 
         if (size != SizeT{0}) {
             if (size < Size()) {
-                resize(Memory::AlignSize(size));
+                resize(size);
             }
 
             return;
@@ -552,9 +552,10 @@ struct HArray {
         constexpr SizeT32 size     = sizeof(SizeT);
         constexpr SizeT   size_sum = SizeT{size + sizeof(HAItem)};
 
-        new_capacity = ((new_capacity == 0) | new_capacity);
-
+        // Making sure 'size' is not odd.
+        new_capacity += SizeT(new_capacity & SizeT{1});
         new_capacity = Memory::AlignSize(new_capacity);
+
         setCapacity(new_capacity);
         SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
         setHashTable(ht);
@@ -584,7 +585,8 @@ struct HArray {
     }
 
     inline void expand() {
-        resize(((Capacity() != SizeT{0}) ? (Capacity() * SizeT{2}) : SizeT{2}));
+        SizeT capacity = SizeT(Capacity() == 0) + Capacity();
+        resize(capacity * SizeT{2});
     }
 
     HAItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
