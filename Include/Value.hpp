@@ -156,6 +156,10 @@ struct Value {
         setTypeToString();
     }
 
+    inline explicit Value(const StringViewT &str) noexcept : string_{str.First(), str.Length()} {
+        setTypeToString();
+    }
+
     inline explicit Value(const Char_T *str, SizeT length) : string_{str, length} {
         setTypeToString();
     }
@@ -281,6 +285,13 @@ struct Value {
     Value &operator=(const StringT &str) {
         reset();
         string_ = str;
+        setTypeToString();
+        return *this;
+    }
+
+    Value &operator=(const StringViewT &str) {
+        reset();
+        string_ = StringT{str.First(), str.Length()};
         setTypeToString();
         return *this;
     }
