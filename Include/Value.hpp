@@ -49,9 +49,10 @@ struct Value {
     using JSONotation = JSONUtils::JSONotation_T<Char_T>;
     using VItem       = HAItem_T<String<Char_T>, Value>;
 
-    using ObjectT = HArray<String<Char_T>, Value>;
-    using ArrayT  = Array<Value>;
-    using StringT = String<Char_T>;
+    using ObjectT     = HArray<String<Char_T>, Value>;
+    using ArrayT      = Array<Value>;
+    using StringT     = String<Char_T>;
+    using StringViewT = StringView<Char_T>;
 
     Value() noexcept : object_{} {
     }
@@ -420,6 +421,10 @@ struct Value {
         *this += StringT(str);
     }
 
+    inline void operator+=(const StringViewT &str) {
+        *this += StringT(str.First(), str.Length());
+    }
+
     inline void operator+=(const Char_T *str) {
         *this += StringT(str);
     }
@@ -467,7 +472,7 @@ struct Value {
         return (object_[key]);
     }
 
-    inline Value &operator[](const StringView<Char_T> &key) {
+    inline Value &operator[](const StringViewT &key) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
@@ -538,7 +543,7 @@ struct Value {
         return (object_.Get(key, length));
     }
 
-    inline Value &Get(const StringView<Char_T> &key) {
+    inline Value &Get(const StringViewT &key) {
         if (!IsObject()) {
             reset();
             setTypeToObject();
@@ -947,7 +952,7 @@ struct Value {
         }
     }
 
-    Value *GetValue(const StringView<Char_T> &key) const noexcept {
+    Value *GetValue(const StringViewT &key) const noexcept {
         return GetValue(key.First(), key.Length());
     }
 
@@ -1132,7 +1137,7 @@ struct Value {
         }
     }
 
-    void SetValueAndKey(SizeT index, const Value *&value, StringView<Char_T> &key) const noexcept {
+    void SetValueAndKey(SizeT index, const Value *&value, StringViewT &key) const noexcept {
         if (IsObject()) {
             const VItem *item = object_.GetItem(index);
 
@@ -1140,7 +1145,7 @@ struct Value {
 
             if ((item != nullptr) && !(item->Value.IsUndefined())) {
                 value = &(item->Value);
-                key   = StringView<Char_T>{item->Key.First(), item->Key.Length()};
+                key   = StringViewT{item->Key.First(), item->Key.Length()};
             }
         }
     }
