@@ -26,6 +26,7 @@
 #include "QTest.hpp"
 #include "Digit.hpp"
 #include "HArray.hpp"
+#include "String.hpp"
 
 namespace Qentem {
 namespace Test {
