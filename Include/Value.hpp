@@ -199,6 +199,11 @@ struct Value {
         }
     }
 
+    Value &operator=(ValueType type) noexcept {
+        setType(type);
+        return *this;
+    }
+
     Value &operator=(Value &&val) noexcept {
         if (this != &val) {
             const ValueType type = val.Type();
@@ -242,8 +247,12 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(ValueType type) noexcept {
-        setType(type);
+    Value &operator=(const Value *val) {
+        if ((val != nullptr) && (this != val)) {
+            reset();
+            copyValue(*val);
+        }
+
         return *this;
     }
 
@@ -251,13 +260,17 @@ struct Value {
         reset();
         object_ = Memory::Move(obj);
         setTypeToObject();
+
         return *this;
     }
 
     Value &operator=(const ObjectT &obj) {
+        ObjectT n_obj{obj};
+
         reset();
-        object_ = obj;
+        object_ = Memory::Move(n_obj);
         setTypeToObject();
+
         return *this;
     }
 
@@ -265,13 +278,17 @@ struct Value {
         reset();
         array_ = Memory::Move(arr);
         setTypeToArray();
+
         return *this;
     }
 
     Value &operator=(const ArrayT &arr) {
+        ArrayT n_arr{arr};
+
         reset();
-        array_ = arr;
+        array_ = Memory::Move(n_arr);
         setTypeToArray();
+
         return *this;
     }
 
@@ -279,20 +296,39 @@ struct Value {
         reset();
         string_ = Memory::Move(str);
         setTypeToString();
+
         return *this;
     }
 
     Value &operator=(const StringT &str) {
+        StringT n_str{str};
+
         reset();
-        string_ = str;
+        string_ = Memory::Move(n_str);
         setTypeToString();
+
         return *this;
     }
 
-    Value &operator=(const StringViewT &str) {
+    Value &operator=(const StringT *str) {
+        if (str != nullptr) {
+            StringT n_str{*str};
+
+            reset();
+            string_ = Memory::Move(n_str);
+            setTypeToString();
+        }
+
+        return *this;
+    }
+
+    Value &operator=(const StringViewT &str_v) {
+        StringT str{str_v.First(), str_v.Length()};
+
         reset();
-        string_ = StringT{str.First(), str.Length()};
+        string_ = Memory::Move(str);
         setTypeToString();
+
         return *this;
     }
 
@@ -300,6 +336,7 @@ struct Value {
         reset();
         string_ = StringT{str};
         setTypeToString();
+
         return *this;
     }
 
@@ -307,6 +344,7 @@ struct Value {
         reset();
         number_ = num;
         setTypeToUInt64();
+
         return *this;
     }
 
@@ -314,6 +352,7 @@ struct Value {
         reset();
         number_ = num;
         setTypeToInt64();
+
         return *this;
     }
 
@@ -321,6 +360,7 @@ struct Value {
         reset();
         number_ = num;
         setTypeToDouble();
+
         return *this;
     }
 
