@@ -425,6 +425,36 @@ struct Value {
         }
     }
 
+    inline void operator+=(const Value *val) {
+        if (val != nullptr) {
+            if (IsObject() && val->IsObject()) {
+                object_ += val->object_;
+            } else {
+                if (!IsArray()) {
+                    reset();
+                    setTypeToArray();
+                }
+
+                array_ += *val;
+            }
+        }
+    }
+
+    inline void operator+=(Value *val) {
+        if (val != nullptr) {
+            if (IsObject() && val->IsObject()) {
+                object_ += val->object_;
+            } else {
+                if (!IsArray()) {
+                    reset();
+                    setTypeToArray();
+                }
+
+                array_ += *val;
+            }
+        }
+    }
+
     inline void operator+=(ObjectT &&obj) {
         if (IsObject()) {
             object_ += Memory::Move(obj);
