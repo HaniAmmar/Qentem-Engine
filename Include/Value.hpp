@@ -247,6 +247,15 @@ struct Value {
         return *this;
     }
 
+    Value &operator=(Value *val) {
+        if ((val != nullptr) && (this != val)) {
+            reset();
+            copyValue(*val);
+        }
+
+        return *this;
+    }
+
     Value &operator=(const Value *val) {
         if ((val != nullptr) && (this != val)) {
             reset();
@@ -311,6 +320,18 @@ struct Value {
     }
 
     Value &operator=(const StringT *str) {
+        if (str != nullptr) {
+            StringT n_str{*str};
+
+            reset();
+            string_ = Memory::Move(n_str);
+            setTypeToString();
+        }
+
+        return *this;
+    }
+
+    Value &operator=(StringT *str) {
         if (str != nullptr) {
             StringT n_str{*str};
 
