@@ -1143,6 +1143,14 @@ struct Value {
         return nullptr;
     }
 
+    const StringViewT GetStringView() const noexcept {
+        if (IsString()) {
+            return StringViewT{string_.First(), string_.Length()};
+        }
+
+        return StringViewT{};
+    }
+
     const Char_T *StringStorage() const noexcept {
         if (IsString()) {
             return (string_.First());
