@@ -1473,7 +1473,7 @@ struct Value {
         return QNumberType::NotANumber;
     }
 
-    bool GetBool(bool &value) const noexcept {
+    bool SetBool(bool &value) const noexcept {
         switch (Type()) {
             case ValueType::True: {
                 value = true;

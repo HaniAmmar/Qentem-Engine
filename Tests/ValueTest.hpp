@@ -71,7 +71,7 @@ static void TestEmptyValue(QTest &test) {
     test.IsFalse(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(value1.GetNumber(), 0.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    test.IsFalse(value1.GetBool(bool_var), __LINE__);
+    test.IsFalse(value1.SetBool(bool_var), __LINE__);
     test.IsEqual(value1.Stringify(), "", __LINE__);
 
     value1 = ValueC{ValueType::Object};
@@ -126,7 +126,7 @@ static void TestTrueValue(QTest &test) {
     test.IsEqual(value1.GetNumber(), 1.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     test.IsEqual(num_var.Natural, 1U, __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
     test.IsEqual(value1.Stringify(), "", __LINE__);
     ss_var.Reset();
@@ -192,7 +192,7 @@ static void TestFalseValue(QTest &test) {
     test.IsEqual(value1.GetNumber(), 0.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     test.IsEqual(num_var.Natural, 0U, __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
     test.IsEqual(value1.Stringify(), "", __LINE__);
     ss_var.Reset();
@@ -258,7 +258,7 @@ static void TestNullValue(QTest &test) {
     test.IsEqual(value1.GetNumber(), 0.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     test.IsEqual(num_var.Natural, 0U, __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
     test.IsEqual(value1.Stringify(), "", __LINE__);
     ss_var.Reset();
@@ -322,7 +322,7 @@ static void TestNumberValue1(QTest &test) {
     test.IsEqual(value1.GetNumber(), 33.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     test.IsEqual(num_var.Integer, 33, __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
     test.IsEqual(value1.Stringify(), "", __LINE__);
 
@@ -340,7 +340,7 @@ static void TestNumberValue1(QTest &test) {
     test.IsEqual(value2.GetNumber(), 45.0, __LINE__);
     test.IsTrue(value2.SetNumber(num_var) == QNumberType::Integer, __LINE__);
     test.IsEqual(num_var.Integer, 45, __LINE__);
-    test.IsTrue(value2.GetBool(bool_var), __LINE__);
+    test.IsTrue(value2.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
     test.IsEqual(value1.GetNumber(), 45U, __LINE__);
 
@@ -364,11 +364,11 @@ static void TestNumberValue1(QTest &test) {
     test.IsEqual(value2.GetNumber(), 785.0, __LINE__);
 
     value2 = SizeT32{0};
-    test.IsTrue(value2.GetBool(bool_var), __LINE__);
+    test.IsTrue(value2.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
 
     value2 = -8;
-    test.IsTrue(value2.GetBool(bool_var), __LINE__);
+    test.IsTrue(value2.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
 
     value2 = ValueC{double{3.75}};
@@ -400,7 +400,7 @@ static void TestNumberValue2(QTest &test) {
     test.IsEqual(num_var.Natural, 10U, __LINE__);
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "10", __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
     value1.Reset();
 
@@ -459,7 +459,7 @@ static void TestNumberValue3(QTest &test) {
     test.IsEqual(num_var.Integer, -10, __LINE__);
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "-10", __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
     value1.Reset();
 
@@ -563,7 +563,7 @@ static void TestNumberValue4(QTest &test) {
     test.IsEqual(num_var.Real, 10.5, __LINE__);
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "10.5", __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
     value1.Reset();
 
@@ -578,7 +578,7 @@ static void TestNumberValue4(QTest &test) {
     ss_var.Clear();
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "-10.5", __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
     value1.Reset();
 
@@ -636,7 +636,7 @@ static void TestNumberValue4(QTest &test) {
     ss_var.Clear();
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "10", __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
     value1.Reset();
 
@@ -651,7 +651,7 @@ static void TestNumberValue4(QTest &test) {
     ss_var.Clear();
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "-10", __LINE__);
-    test.IsTrue(value1.GetBool(bool_var), __LINE__);
+    test.IsTrue(value1.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
     value1.Reset();
 }
@@ -732,7 +732,8 @@ static void TestStringValue(QTest &test) {
     test.IsTrue(value1.IsString(), __LINE__);
     test.IsTrue(value1.GetNumberType() == QNumberType::NotANumber, __LINE__);
     test.IsTrue(value1.Type() == ValueType::String, __LINE__);
-    test.IsEqual(value1.Size(), 0U, __LINE__);
+    test.IsEqual(value1.Size(), SizeT{0}, __LINE__);
+    test.IsEqual(value1.Length(), SizeT{34}, __LINE__);
     test.IsNull(value1.GetValue(0), __LINE__);
     test.IsNull(value1.GetKey(0), __LINE__);
     test.IsFalse(value1.CopyKeyByIndexTo(ss_var, 0), __LINE__);
@@ -756,7 +757,7 @@ static void TestStringValue(QTest &test) {
     test.IsEqual(ss_var, "-ABCDEF0123456789ABCDEF0123456789-", __LINE__);
     test.IsEqual(value1.GetNumber(), 0.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    test.IsFalse(value1.GetBool(bool_var), __LINE__);
+    test.IsFalse(value1.SetBool(bool_var), __LINE__);
     test.IsEqual(value1.Stringify(), "", __LINE__);
 
     value1.Reset();
@@ -781,7 +782,7 @@ static void TestStringValue(QTest &test) {
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::Natural, __LINE__);
     test.IsEqual(num_var.Natural, 45U, __LINE__);
     test.IsEqual(value1.GetNumber(), 45.0, __LINE__);
-    test.IsFalse(value1.GetBool(bool_var), __LINE__);
+    test.IsFalse(value1.SetBool(bool_var), __LINE__);
     ss_var.Clear();
     test.IsTrue(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "45", __LINE__);
@@ -793,7 +794,7 @@ static void TestStringValue(QTest &test) {
     test.IsEqual(ss_var, "true", __LINE__);
     test.IsEqual(value2.GetNumber(), 0.0, __LINE__);
     bool_var = false;
-    test.IsTrue(value2.GetBool(bool_var), __LINE__);
+    test.IsTrue(value2.SetBool(bool_var), __LINE__);
     test.IsTrue(bool_var, __LINE__);
 
     ss_var.Clear();
@@ -815,7 +816,7 @@ static void TestStringValue(QTest &test) {
     test.IsTrue(value3.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(ss_var, "false", __LINE__);
     bool_var = true;
-    test.IsTrue(value3.GetBool(bool_var), __LINE__);
+    test.IsTrue(value3.SetBool(bool_var), __LINE__);
     test.IsFalse(bool_var, __LINE__);
 
     str_var           = "qen";
@@ -880,7 +881,7 @@ static void TestArrayValue(QTest &test) {
     test.IsFalse(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(value1.GetNumber(), 0.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    test.IsFalse(value1.GetBool(bool_var), __LINE__);
+    test.IsFalse(value1.SetBool(bool_var), __LINE__);
     test.IsEqual(value1.Stringify(), "[]", __LINE__);
 
     arr_var.Reset();
@@ -1107,7 +1108,7 @@ static void TestObjectValue1(QTest &test) {
     test.IsFalse(value1.CopyValueTo(ss_var), __LINE__);
     test.IsEqual(value1.GetNumber(), 0.0, __LINE__);
     test.IsTrue(value1.SetNumber(num_var) == QNumberType::NotANumber, __LINE__);
-    test.IsFalse(value1.GetBool(bool_var), __LINE__);
+    test.IsFalse(value1.SetBool(bool_var), __LINE__);
 
     h_arr_var.Reset();
     value1 = h_arr_var;
