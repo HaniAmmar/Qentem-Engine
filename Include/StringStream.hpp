@@ -262,6 +262,14 @@ struct StringStream {
         }
     }
 
+    inline void SetLength(SizeT len) {
+        if (Capacity() < len) {
+            expand(len);
+        }
+
+        setLength(len);
+    }
+
     // Set the needed length to write directly to a returned buffer,
     inline Char_T *Buffer(SizeT len) {
         const SizeT new_length = (Length() + len);

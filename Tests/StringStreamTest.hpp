@@ -208,12 +208,12 @@ static void TestStringStream1(QTest &test) {
     ss1.Reset();
     ss2.Reset();
 
-    char *buffer = ss1.Buffer(2);
-
+    ss1.SetLength(2);
     test.IsEqual(ss1.Length(), SizeT{2}, __LINE__);
 
-    buffer[0] = 'a';
-    buffer[1] = 'b';
+    char *buffer = ss1.Storage();
+    buffer[0]    = 'a';
+    buffer[1]    = 'b';
 
     const char *ab = "ab";
 
