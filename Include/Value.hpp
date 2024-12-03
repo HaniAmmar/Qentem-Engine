@@ -33,6 +33,7 @@ namespace Qentem {
 
 enum struct ValueType : SizeT8 {
     Undefined = 0,
+    ValuePtr,
     Object,
     Array,
     String,
@@ -247,22 +248,13 @@ struct Value {
         return *this;
     }
 
-    Value &operator=(Value *val) {
-        if ((val != nullptr) && (this != val)) {
-            reset();
-            copyValue(*val);
+    void SetPointerToValue(const Value *val_ptr) {
+        reset();
+
+        if (val_ptr != nullptr) {
+            setTypeToPtrValue();
+            value_ = val_ptr;
         }
-
-        return *this;
-    }
-
-    Value &operator=(const Value *val) {
-        if ((val != nullptr) && (this != val)) {
-            reset();
-            copyValue(*val);
-        }
-
-        return *this;
     }
 
     Value &operator=(ObjectT &&obj) noexcept {
@@ -420,11 +412,11 @@ struct Value {
     }
 
     inline void operator+=(Value &&val) {
-        if (IsObject() && val.IsObject()) {
+        if (isObject() && val.isObject()) {
             object_ += Memory::Move(val.object_);
             val.setTypeToUndefined();
         } else {
-            if (!IsArray()) {
+            if (!isArray()) {
                 reset();
                 setTypeToArray();
             }
@@ -434,10 +426,10 @@ struct Value {
     }
 
     inline void operator+=(const Value &val) {
-        if (IsObject() && val.IsObject()) {
+        if (isObject() && val.isObject()) {
             object_ += val.object_;
         } else {
-            if (!IsArray()) {
+            if (!isArray()) {
                 reset();
                 setTypeToArray();
             }
@@ -446,41 +438,11 @@ struct Value {
         }
     }
 
-    inline void operator+=(const Value *val) {
-        if (val != nullptr) {
-            if (IsObject() && val->IsObject()) {
-                object_ += val->object_;
-            } else {
-                if (!IsArray()) {
-                    reset();
-                    setTypeToArray();
-                }
-
-                array_ += *val;
-            }
-        }
-    }
-
-    inline void operator+=(Value *val) {
-        if (val != nullptr) {
-            if (IsObject() && val->IsObject()) {
-                object_ += val->object_;
-            } else {
-                if (!IsArray()) {
-                    reset();
-                    setTypeToArray();
-                }
-
-                array_ += *val;
-            }
-        }
-    }
-
     inline void operator+=(ObjectT &&obj) {
-        if (IsObject()) {
+        if (isObject()) {
             object_ += Memory::Move(obj);
         } else {
-            if (!IsArray()) {
+            if (!isArray()) {
                 reset();
                 setTypeToArray();
             }
@@ -494,7 +456,7 @@ struct Value {
     }
 
     inline void operator+=(ArrayT &&arr) {
-        if (!IsArray()) {
+        if (!isArray()) {
             reset();
             setTypeToArray();
         }
@@ -511,7 +473,7 @@ struct Value {
     }
 
     inline void operator+=(StringT &&str) {
-        if (!IsArray()) {
+        if (!isArray()) {
             reset();
             setTypeToArray();
         }
@@ -533,7 +495,7 @@ struct Value {
 
     template <typename Number_T>
     inline void operator+=(Number_T num) {
-        if (!IsArray()) {
+        if (!isArray()) {
             reset();
             setTypeToArray();
         }
@@ -542,7 +504,7 @@ struct Value {
     }
 
     inline void operator+=(NullType) {
-        if (!IsArray()) {
+        if (!isArray()) {
             reset();
             setTypeToArray();
         }
@@ -551,7 +513,7 @@ struct Value {
     }
 
     inline void operator+=(bool is_true) {
-        if (!IsArray()) {
+        if (!isArray()) {
             reset();
             setTypeToArray();
         }
@@ -566,7 +528,7 @@ struct Value {
     }
 
     inline Value &operator[](const Char_T *key) {
-        if (!IsObject()) {
+        if (!isObject()) {
             reset();
             setTypeToObject();
         }
@@ -575,7 +537,7 @@ struct Value {
     }
 
     inline Value &operator[](const StringViewT &key) {
-        if (!IsObject()) {
+        if (!isObject()) {
             reset();
             setTypeToObject();
         }
@@ -584,7 +546,7 @@ struct Value {
     }
 
     inline Value &operator[](StringT &&key) {
-        if (!IsObject()) {
+        if (!isObject()) {
             reset();
             setTypeToObject();
         }
@@ -593,7 +555,7 @@ struct Value {
     }
 
     inline Value &operator[](const StringT &key) {
-        if (!IsObject()) {
+        if (!isObject()) {
             reset();
             setTypeToObject();
         }
@@ -637,7 +599,7 @@ struct Value {
 
     // Will insert the key if it does not exist.
     inline Value &Get(const Char_T *key, SizeT length) {
-        if (!IsObject()) {
+        if (!isObject()) {
             reset();
             setTypeToObject();
         }
@@ -646,7 +608,7 @@ struct Value {
     }
 
     inline Value &Get(const StringViewT &key) {
-        if (!IsObject()) {
+        if (!isObject()) {
             reset();
             setTypeToObject();
         }
@@ -683,6 +645,10 @@ struct Value {
                     return (number_.Real < val.number_.Real);
                 }
 
+                case ValueType::ValuePtr: {
+                    return (*value_ < *(val.value_));
+                }
+
                 case ValueType::True:
                 case ValueType::False:
                 case ValueType::Null:
@@ -690,6 +656,8 @@ struct Value {
                     return false;
                 }
             }
+        } else if (type == ValueType::ValuePtr) {
+            return value_->operator<(val);
         }
 
         return (type < val.Type());
@@ -724,6 +692,10 @@ struct Value {
                     return (number_.Real > val.number_.Real);
                 }
 
+                case ValueType::ValuePtr: {
+                    return (*value_ > *(val.value_));
+                }
+
                 case ValueType::True:
                 case ValueType::False:
                 case ValueType::Null:
@@ -731,6 +703,8 @@ struct Value {
                     return false;
                 }
             }
+        } else if (type == ValueType::ValuePtr) {
+            return value_->operator>(val);
         }
 
         return (type > val.Type());
@@ -765,6 +739,10 @@ struct Value {
                     return (number_.Real <= val.number_.Real);
                 }
 
+                case ValueType::ValuePtr: {
+                    return (*value_ <= *(val.value_));
+                }
+
                 case ValueType::True:
                 case ValueType::False:
                 case ValueType::Null:
@@ -772,6 +750,8 @@ struct Value {
                     return true;
                 }
             }
+        } else if (type == ValueType::ValuePtr) {
+            return value_->operator<=(val);
         }
 
         return (type < val.Type());
@@ -806,6 +786,10 @@ struct Value {
                     return (number_.Real >= val.number_.Real);
                 }
 
+                case ValueType::ValuePtr: {
+                    return (*value_ >= *(val.value_));
+                }
+
                 case ValueType::True:
                 case ValueType::False:
                 case ValueType::Null:
@@ -813,6 +797,8 @@ struct Value {
                     return true;
                 }
             }
+        } else if (type == ValueType::ValuePtr) {
+            return value_->operator>=(val);
         }
 
         return (type > val.Type());
@@ -847,6 +833,10 @@ struct Value {
                     return (number_.Real == val.number_.Real);
                 }
 
+                case ValueType::ValuePtr: {
+                    return (*value_ == *(val.value_));
+                }
+
                 case ValueType::True:
                 case ValueType::False:
                 case ValueType::Null:
@@ -854,9 +844,55 @@ struct Value {
                     return true;
                 }
             }
+        } else if (type == ValueType::ValuePtr) {
+            return value_->operator==(val);
         }
 
         return (type > val.Type());
+    }
+
+    void Merge(Value &&val) {
+        if (isUndefined()) {
+            setTypeToArray();
+        }
+
+        if (isArray() && val.isArray()) {
+            Value       *src_val = val.array_.Storage();
+            const Value *end     = val.array_.End();
+
+            while (src_val < end) {
+                if (!(src_val->isUndefined())) {
+                    array_ += Memory::Move(*src_val);
+                }
+
+                ++src_val;
+            }
+        } else if (isObject() && val.isObject()) {
+            object_ += Memory::Move(val.object_);
+        }
+
+        val.Reset();
+    }
+
+    void Merge(const Value &val) {
+        if (isUndefined()) {
+            setTypeToArray();
+        }
+
+        if (isArray() && val.isArray()) {
+            Value       *src_val = val.array_.Storage();
+            const Value *end     = val.array_.End();
+
+            while (src_val < end) {
+                if (!(src_val->isUndefined())) {
+                    array_ += *src_val;
+                }
+
+                ++src_val;
+            }
+        } else if (isObject() && val.isObject()) {
+            object_ += val.object_;
+        }
     }
 
     inline bool IsNumber() const noexcept {
@@ -867,10 +903,158 @@ struct Value {
                 return true;
             }
 
+            case ValueType::ValuePtr: {
+                return value_->IsNumber();
+            }
+
             default: {
                 return false;
             }
         }
+    }
+
+    inline bool IsUndefined() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::Undefined) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isUndefined();
+        }
+
+        return false;
+    }
+
+    inline bool IsObject() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isObject();
+        }
+
+        return false;
+    }
+
+    inline bool IsArray() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::Array) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isArray();
+        }
+
+        return false;
+    }
+
+    inline bool IsString() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::String) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isString();
+        }
+
+        return false;
+    }
+
+    inline bool IsUInt64() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::UIntLong) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isUInt64();
+        }
+
+        return false;
+    }
+
+    inline bool IsInt64() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::IntLong) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isInt64();
+        }
+
+        return false;
+    }
+
+    inline bool IsDouble() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::Double) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isDouble();
+        }
+
+        return false;
+    }
+
+    inline bool IsTrue() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::True) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isTrue();
+        }
+
+        return false;
+    }
+
+    inline bool IsFalse() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::False) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isFalse();
+        }
+
+        return false;
+    }
+
+    inline bool IsNull() const noexcept {
+        const ValueType type = Type();
+
+        if (type == ValueType::Null) {
+            return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->isNull();
+        }
+
+        return false;
+    }
+
+    inline bool IsPointerToValue() const noexcept {
+        return isPtrValue();
     }
 
     inline QNumberType GetNumberType() const noexcept {
@@ -890,6 +1074,10 @@ struct Value {
                 return QNumberType::Real;
             }
 
+            case ValueType::ValuePtr: {
+                return value_->GetNumberType();
+            }
+
             default: {
                 // NAN: Not A Number
                 return QNumberType::NotANumber;
@@ -897,100 +1085,22 @@ struct Value {
         }
     }
 
-    inline bool IsUndefined() const noexcept {
-        return (Type() == ValueType::Undefined);
-    }
-
-    inline bool IsObject() const noexcept {
-        return (Type() == ValueType::Object);
-    }
-
-    inline bool IsArray() const noexcept {
-        return (Type() == ValueType::Array);
-    }
-
-    inline bool IsString() const noexcept {
-        return (Type() == ValueType::String);
-    }
-
-    inline bool IsUInt64() const noexcept {
-        return (Type() == ValueType::UIntLong);
-    }
-
-    inline bool IsInt64() const noexcept {
-        return (Type() == ValueType::IntLong);
-    }
-
-    inline bool IsDouble() const noexcept {
-        return (Type() == ValueType::Double);
-    }
-
-    inline bool IsTrue() const noexcept {
-        return (Type() == ValueType::True);
-    }
-
-    inline bool IsFalse() const noexcept {
-        return (Type() == ValueType::False);
-    }
-
-    inline bool IsNull() const noexcept {
-        return (Type() == ValueType::Null);
-    }
-
     SizeT Size() const noexcept {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             return (object_.Size());
         }
 
-        if (IsArray()) {
+        if (type == ValueType::Array) {
             return (array_.Size());
         }
 
+        if (type == ValueType::ValuePtr) {
+            return (value_->Size());
+        }
+
         return SizeT{0};
-    }
-
-    void Merge(Value &&val) {
-        if (IsUndefined()) {
-            setTypeToArray();
-        }
-
-        if (IsArray() && val.IsArray()) {
-            Value       *src_val = val.array_.Storage();
-            const Value *end     = val.array_.End();
-
-            while (src_val < end) {
-                if (!(src_val->IsUndefined())) {
-                    array_ += Memory::Move(*src_val);
-                }
-
-                ++src_val;
-            }
-        } else if (IsObject() && val.IsObject()) {
-            object_ += Memory::Move(val.object_);
-        }
-
-        val.Reset();
-    }
-
-    void Merge(const Value &val) {
-        if (IsUndefined()) {
-            setTypeToArray();
-        }
-
-        if (IsArray() && val.IsArray()) {
-            Value       *src_val = val.array_.Storage();
-            const Value *end     = val.array_.End();
-
-            while (src_val < end) {
-                if (!(src_val->IsUndefined())) {
-                    array_ += *src_val;
-                }
-
-                ++src_val;
-            }
-        } else if (IsObject() && val.IsObject()) {
-            object_ += val.object_;
-        }
     }
 
     Value *GetValue(SizeT index) const noexcept {
@@ -998,7 +1108,7 @@ struct Value {
             case ValueType::Object: {
                 Value *val = object_.GetValue(index);
 
-                if ((val != nullptr) && (!(val->IsUndefined()))) {
+                if ((val != nullptr) && (!(val->isUndefined()))) {
                     return val;
                 }
 
@@ -1009,12 +1119,16 @@ struct Value {
                 if (index < array_.Size()) {
                     Value *val = (array_.Storage() + index);
 
-                    if (!(val->IsUndefined())) {
+                    if (!(val->isUndefined())) {
                         return val;
                     }
                 }
 
                 return nullptr;
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->GetValue(index);
             }
 
             default:
@@ -1027,7 +1141,7 @@ struct Value {
             case ValueType::Object: {
                 Value *val = object_.GetValue(key, length);
 
-                if ((val != nullptr) && !(val->IsUndefined())) {
+                if ((val != nullptr) && !(val->isUndefined())) {
                     return val;
                 }
 
@@ -1041,12 +1155,16 @@ struct Value {
                 if (index < array_.Size()) {
                     Value *val = (array_.Storage() + index);
 
-                    if (!(val->IsUndefined())) {
+                    if (!(val->isUndefined())) {
                         return val;
                     }
                 }
 
                 return nullptr;
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->GetValue(key, length);
             }
 
             default:
@@ -1072,6 +1190,10 @@ struct Value {
                 return array_.Storage();
             }
 
+            case ValueType::ValuePtr: {
+                return value_->Storage();
+            }
+
             default:
                 return nullptr;
         }
@@ -1091,6 +1213,10 @@ struct Value {
 
             case ValueType::Array: {
                 return array_.First();
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->First();
             }
 
             default:
@@ -1114,6 +1240,10 @@ struct Value {
                 return array_.Last();
             }
 
+            case ValueType::ValuePtr: {
+                return value_->Last();
+            }
+
             default:
                 return nullptr;
         }
@@ -1133,29 +1263,45 @@ struct Value {
                 return array_.End();
             }
 
+            case ValueType::ValuePtr: {
+                return value_->End();
+            }
+
             default:
                 return nullptr;
         }
     }
 
     const StringT *GetKey(SizeT index) const noexcept {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             return (object_.GetKey(index));
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return (value_->GetKey(index));
         }
 
         return nullptr;
     }
 
     const ObjectT *GetObject() const noexcept {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             return &(object_);
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return (value_->GetObject());
         }
 
         return nullptr;
     }
 
     ObjectT *GetObject() noexcept {
-        if (IsObject()) {
+        if (isObject()) {
             return &(object_);
         }
 
@@ -1163,15 +1309,21 @@ struct Value {
     }
 
     const ArrayT *GetArray() const noexcept {
-        if (IsArray()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Array) {
             return &(array_);
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->GetArray();
         }
 
         return nullptr;
     }
 
     ArrayT *GetArray() noexcept {
-        if (IsArray()) {
+        if (isArray()) {
             return &(array_);
         }
 
@@ -1179,15 +1331,21 @@ struct Value {
     }
 
     const StringT *GetString() const noexcept {
-        if (IsString()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::String) {
             return &(string_);
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->GetString();
         }
 
         return nullptr;
     }
 
     StringT *GetString() noexcept {
-        if (IsString()) {
+        if (isString()) {
             return &(string_);
         }
 
@@ -1195,24 +1353,42 @@ struct Value {
     }
 
     const StringViewT GetStringView() const noexcept {
-        if (IsString()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::String) {
             return StringViewT{string_.First(), string_.Length()};
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->GetStringView();
         }
 
         return StringViewT{};
     }
 
     const Char_T *StringStorage() const noexcept {
-        if (IsString()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::String) {
             return (string_.First());
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->StringStorage();
         }
 
         return nullptr;
     }
 
     SizeT Length() const noexcept {
-        if (IsString()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::String) {
             return (string_.Length());
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return (value_->Length());
         }
 
         return SizeT{0};
@@ -1234,29 +1410,37 @@ struct Value {
 
     template <typename Number_T>
     void SetValueKeyLength(SizeT index, const Value *&value, const Char_T *&key, Number_T &length) const noexcept {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             const VItem *item = object_.GetItem(index);
 
             value = nullptr;
 
-            if ((item != nullptr) && !(item->Value.IsUndefined())) {
+            if ((item != nullptr) && !(item->Value.isUndefined())) {
                 value  = &(item->Value);
                 key    = item->Key.First();
                 length = Number_T(item->Key.Length());
             }
+        } else if (type == ValueType::ValuePtr) {
+            value_->SetValueKeyLength(index, value, key, length);
         }
     }
 
     void SetValueAndKey(SizeT index, const Value *&value, StringViewT &key) const noexcept {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             const VItem *item = object_.GetItem(index);
 
             value = nullptr;
 
-            if ((item != nullptr) && !(item->Value.IsUndefined())) {
+            if ((item != nullptr) && !(item->Value.isUndefined())) {
                 value = &(item->Value);
                 key   = StringViewT{item->Key.First(), item->Key.Length()};
             }
+        } else if (type == ValueType::ValuePtr) {
+            value_->SetValueAndKey(index, value, key);
         }
     }
 
@@ -1286,6 +1470,10 @@ struct Value {
                 key    = JSONotation::NullString;
                 length = JSONotation::NullStringLength;
                 return true;
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->SetCharAndLength(key, length);
             }
 
             default: {
@@ -1342,6 +1530,10 @@ struct Value {
                 break;
             }
 
+            case ValueType::ValuePtr: {
+                return value_->CopyValueTo(stream, format, string_function);
+            }
+
             default: {
                 return false;
             }
@@ -1352,7 +1544,9 @@ struct Value {
 
     template <typename StringStream_T>
     bool CopyKeyByIndexTo(StringStream_T &stream, SizeT index) const {
-        if (IsObject()) {
+        const ValueType type = Type();
+
+        if (type == ValueType::Object) {
             const StringT *key = object_.GetKey(index);
 
             if (key != nullptr) {
@@ -1360,6 +1554,10 @@ struct Value {
             }
 
             return true;
+        }
+
+        if (type == ValueType::ValuePtr) {
+            return value_->CopyKeyByIndexTo(stream, index);
         }
 
         return false;
@@ -1464,6 +1662,12 @@ struct Value {
                 if (offset == string_.Length()) {
                     return n_type;
                 }
+
+                break;
+            }
+
+            case ValueType::ValuePtr: {
+                return value_->SetNumber(number);
             }
 
             default: {
@@ -1501,6 +1705,10 @@ struct Value {
                 return true;
             }
 
+            case ValueType::ValuePtr: {
+                return value_->SetBool(value);
+            }
+
             case ValueType::String: {
                 if (string_.IsEqual(JSONotation::TrueString, JSONotation::TrueStringLength)) {
                     value = true;
@@ -1521,7 +1729,7 @@ struct Value {
     }
 
     inline void Remove(const Char_T *key, SizeT length) const noexcept {
-        if (IsObject()) {
+        if (isObject()) {
             object_.Remove(key, length);
         }
     }
@@ -1535,9 +1743,9 @@ struct Value {
     }
 
     void RemoveIndex(SizeT index) const noexcept {
-        if (IsObject()) {
+        if (isObject()) {
             object_.RemoveIndex(index);
-        } else if (IsArray() && (index < array_.Size())) {
+        } else if (isArray() && (index < array_.Size())) {
             (array_.Storage() + index)->Reset();
         }
     }
@@ -1553,13 +1761,13 @@ struct Value {
     }
 
     void Compress() {
-        if (IsArray()) {
+        if (isArray()) {
             Value       *src_val = array_.Storage();
             const Value *src_end = array_.End();
             SizeT        size    = 0;
 
             while (src_val < src_end) {
-                if (!(src_val->IsUndefined())) {
+                if (!(src_val->isUndefined())) {
                     ++size;
                 }
 
@@ -1576,7 +1784,7 @@ struct Value {
                 src_val = array_.Storage();
 
                 do {
-                    if (!(src_val->IsUndefined())) {
+                    if (!(src_val->isUndefined())) {
                         new_array += Memory::Move(*src_val);
                     }
 
@@ -1590,20 +1798,20 @@ struct Value {
             src_end = array_.End();
 
             while (src_val < src_end) {
-                if (src_val->IsArray() || src_val->IsObject()) {
+                if (src_val->isArray() || src_val->isObject()) {
                     src_val->Compress();
                 }
 
                 ++src_val;
             }
-        } else if (IsObject()) {
+        } else if (isObject()) {
             object_.Compress();
 
             VItem       *src_val = object_.Storage();
             const VItem *src_end = (src_val + object_.Size());
 
             while (src_val < src_end) {
-                if (src_val->Value.IsArray() || src_val->Value.IsObject()) {
+                if (src_val->Value.isArray() || src_val->Value.isObject()) {
                     src_val->Value.Compress();
                 }
 
@@ -1617,29 +1825,31 @@ struct Value {
     }
 
     bool GroupBy(Value &groupedValue, const Char_T *key, const SizeT length) const {
-        StringStream<Char_T> stream;
-        ObjectT              new_sub_obj;
-        const Char_T        *str     = nullptr;
-        SizeT                str_len = 0;
-        SizeT                grouped_key_index;
+        const ValueType type = Type();
 
-        if (IsArray()) {
-            const Value *item_ = array_.First();
+        if (type == ValueType::Array) {
+            StringStream<Char_T> stream;
+            ObjectT              new_sub_obj;
+            const Value         *item_   = array_.First();
+            const Char_T        *str     = nullptr;
+            SizeT                str_len = 0;
+            SizeT                grouped_key_index;
+
             groupedValue.reset();
             groupedValue.setTypeToObject();
 
-            if ((item_ != nullptr) && item_->IsObject() && item_->object_.GetKeyIndex(grouped_key_index, key, length)) {
+            if ((item_ != nullptr) && item_->isObject() && item_->object_.GetKeyIndex(grouped_key_index, key, length)) {
                 const Value *end = array_.End();
 
                 while (item_ != end) {
-                    if ((item_ != nullptr) && item_->IsObject()) {
+                    if ((item_ != nullptr) && item_->isObject()) {
                         SizeT count = 0;
 
                         const VItem *obj_item = item_->object_.First();
                         const VItem *obj_end  = item_->object_.End();
 
                         while (obj_item != obj_end) {
-                            if ((obj_item != nullptr) && !(obj_item->Value.IsUndefined())) {
+                            if ((obj_item != nullptr) && !(obj_item->Value.isUndefined())) {
                                 if (count != grouped_key_index) {
                                     new_sub_obj[obj_item->Key] = obj_item->Value;
                                 } else if (!(obj_item->Value.SetCharAndLength(str, str_len))) {
@@ -1672,6 +1882,8 @@ struct Value {
 
                 return true;
             }
+        } else if (type == ValueType::ValuePtr) {
+            return value_->GroupBy(groupedValue, key, length);
         }
 
         return false;
@@ -1696,10 +1908,24 @@ struct Value {
     inline Stream_T &Stringify(Stream_T &stream, SizeT32 precision = Config::DoublePrecision) const {
         const ValueType type = Type();
 
-        if (type == ValueType::Object) {
-            stringifyObject(object_, stream, precision);
-        } else if (type == ValueType::Array) {
-            stringifyArray(array_, stream, precision);
+        switch (type) {
+            case ValueType::Object: {
+                stringifyObject(object_, stream, precision);
+                break;
+            }
+
+            case ValueType::Array: {
+                stringifyArray(array_, stream, precision);
+                break;
+            }
+
+            case ValueType::ValuePtr: {
+                value_->Stringify(stream, precision);
+                break;
+            }
+
+            default: {
+            }
         }
 
         return stream;
@@ -1719,7 +1945,7 @@ struct Value {
         const VItem *end    = (h_item + obj.Size());
 
         while (h_item != end) {
-            if ((h_item != nullptr) && !(h_item->Value.IsUndefined())) {
+            if ((h_item != nullptr) && !(h_item->Value.isUndefined())) {
                 stream += JSONotation::QuoteChar;
                 JSONUtils::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
                 stream += JSONotation::QuoteChar;
@@ -1749,7 +1975,7 @@ struct Value {
         const Value *end  = arr.End();
 
         while (item != end) {
-            if (!(item->IsUndefined())) {
+            if (!(item->isUndefined())) {
                 stringifyValue(*item, stream, precision);
                 stream += JSONotation::CommaChar;
             }
@@ -1816,9 +2042,58 @@ struct Value {
                 break;
             }
 
+            case ValueType::ValuePtr: {
+                val.Stringify(stream, precision);
+                break;
+            }
+
             default: {
             }
         }
+    }
+
+    inline bool isUndefined() const noexcept {
+        return (Type() == ValueType::Undefined);
+    }
+
+    inline bool isObject() const noexcept {
+        return (Type() == ValueType::Object);
+    }
+
+    inline bool isArray() const noexcept {
+        return (Type() == ValueType::Array);
+    }
+
+    inline bool isString() const noexcept {
+        return (Type() == ValueType::String);
+    }
+
+    inline bool isUInt64() const noexcept {
+        return (Type() == ValueType::UIntLong);
+    }
+
+    inline bool isInt64() const noexcept {
+        return (Type() == ValueType::IntLong);
+    }
+
+    inline bool isDouble() const noexcept {
+        return (Type() == ValueType::Double);
+    }
+
+    inline bool isTrue() const noexcept {
+        return (Type() == ValueType::True);
+    }
+
+    inline bool isFalse() const noexcept {
+        return (Type() == ValueType::False);
+    }
+
+    inline bool isNull() const noexcept {
+        return (Type() == ValueType::Null);
+    }
+
+    inline void isPtrValue() noexcept {
+        return (Type() == ValueType::ValuePtr);
     }
 
     inline void setType(ValueType type) noexcept {
@@ -1863,6 +2138,10 @@ struct Value {
 
     inline void setTypeToNull() noexcept {
         setType(ValueType::Null);
+    }
+
+    inline void setTypeToPtrValue() noexcept {
+        setType(ValueType::ValuePtr);
     }
 
     void reset() noexcept {
@@ -1914,10 +2193,11 @@ struct Value {
     }
 
     union {
-        ObjectT   object_{};
-        ArrayT    array_;
-        StringT   string_;
-        QNumber64 number_;
+        ObjectT      object_{};
+        ArrayT       array_;
+        StringT      string_;
+        QNumber64    number_;
+        const Value *value_;
     };
 
     ValueType type_{ValueType::Undefined};
