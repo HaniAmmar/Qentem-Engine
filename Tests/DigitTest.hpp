@@ -98,26 +98,16 @@ QENTEM_NOINLINE static void RealToStreamEqualFixed(QTest &test, Stream_T &stream
 template <typename Stream_T, typename Number_T>
 QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, Stream_T &stream, Number_T number,
                                                        SizeT32 precision, const char *expected, unsigned long line) {
+    constexpr SizeT offset{10};
+
+    stream.SetLength(offset);
     Digit::NumberToString(stream, number, Digit::RealFormatInfo{precision, Digit::RealFormatType::SemiFixed});
 
+    stream.InsertNull();
+    const StringView<char> str_number{(stream.First() + offset), (stream.Length() - offset)};
+
     if (!test.HasError() || test.IsContinueOnError()) {
-#ifdef QENTEM_COMPARE_DIGIT_WITH_STL
-        std::ostringstream out;
-        out.precision(precision);
-        out << std::fixed;
-        out << number;
-
-        std::string str = out.str();
-
-        const StringView<char> std_number{str.c_str(), stream.Length()};
-
-        test.IsEqual(stream, std_number, line);
-
-        (void)expected;
-#else
-        test.IsEqual(stream, expected, line);
-#endif
-
+        test.IsEqual(str_number, expected, line);
         stream.Clear();
     }
 }
