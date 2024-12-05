@@ -1058,10 +1058,12 @@ struct Digit {
                 }
 
                 if (fraction_only) {
-                    if (((index - started_at) < number_length) || power_increased) {
+                    const SizeT zeroed_index = (index - started_at);
+
+                    if ((zeroed_index < number_length) || power_increased) {
                         if (diff != 0U) {
                             if (power_increased) {
-                                index          = index - SizeT((index - started_at) == number_length);
+                                index          = (index - SizeT(zeroed_index == number_length));
                                 storage[index] = DigitUtils::DigitChar::One;
                             }
 
