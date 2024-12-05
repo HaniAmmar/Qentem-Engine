@@ -1058,10 +1058,10 @@ struct Digit {
                 }
 
                 if (fraction_only) {
-                    if ((index < stream_length) || power_increased) {
+                    if (((index - started_at) < stream_length) || power_increased) {
                         if (diff != 0U) {
                             if (power_increased) {
-                                index          = index - SizeT(index == stream_length);
+                                index          = index - SizeT((index - started_at) == stream_length);
                                 storage[index] = DigitUtils::DigitChar::One;
                             }
 
