@@ -835,12 +835,14 @@ struct Digit {
 
                 switch (format.Type) {
                     case RealFormatType::SemiFixed: {
-                        formatStringNumberFixed<false>(stream, start_at, format.Precision, fraction_length, round_up);
+                        formatStringNumberFixed<false>(stream, start_at, format.Precision, digits, fraction_length,
+                                                       round_up);
                         break;
                     }
 
                     case RealFormatType::Fixed: {
-                        formatStringNumberFixed<true>(stream, start_at, format.Precision, fraction_length, round_up);
+                        formatStringNumberFixed<true>(stream, start_at, format.Precision, digits, fraction_length,
+                                                      round_up);
                         break;
                     }
 
@@ -1011,13 +1013,24 @@ struct Digit {
                 }
             } else if (index < dot_index) {
                 stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
-            } else if (power_increased) {
-                SizeT zeros = SizeT(number_length - fraction_length);
+            } else {
+                SizeT zeros = 0;
 
-                do {
+                if (power_increased) {
+                    zeros = SizeT(number_length - fraction_length);
+                } else {
+                    const SizeT rem    = (index - started_at);
+                    const SizeT needed = (number_length - calculated_digits);
+
+                    if (rem > needed)
+                        zeros = (rem - needed);
+                }
+
+                while (zeros != 0) {
                     --index;
                     storage[index] = DigitUtils::DigitChar::Zero;
-                } while (--zeros != 0);
+                    --zeros;
+                }
             }
         }
 
@@ -1032,7 +1045,8 @@ struct Digit {
 
     template <bool Fixed_T, typename Stream_T>
     static void formatStringNumberFixed(Stream_T &stream, const SizeT started_at, const SizeT32 precision,
-                                        const SizeT32 fraction_length, const bool round_up) {
+                                        const SizeT32 calculated_digits, const SizeT32 fraction_length,
+                                        const bool round_up) {
         using Char_T              = typename Stream_T::CharType;
         Char_T     *storage       = stream.Storage();
         const SizeT number_length = (stream.Length() - started_at);
@@ -1079,13 +1093,24 @@ struct Digit {
                     }
                 } else if (index < dot_index) {
                     stream.InsertAt(DigitUtils::DigitChar::Dot, dot_index);
-                } else if (power_increased) {
-                    SizeT zeros = SizeT(number_length - fraction_length);
+                } else {
+                    SizeT zeros = 0;
 
-                    do {
+                    if (power_increased) {
+                        zeros = SizeT(number_length - fraction_length);
+                    } else {
+                        const SizeT rem    = (index - started_at);
+                        const SizeT needed = (number_length - calculated_digits);
+
+                        if (rem > needed)
+                            zeros = (rem - needed);
+                    }
+
+                    while (zeros != 0) {
                         --index;
                         storage[index] = DigitUtils::DigitChar::Zero;
-                    } while (--zeros != 0);
+                        --zeros;
+                    }
                 }
             } else {
                 index          = index + (number_length - SizeT{1});
