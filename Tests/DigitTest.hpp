@@ -2436,6 +2436,11 @@ static void TestDoubleToString1(QTest &test, Stream_T &stream) {
     RealToStreamEqual(test, stream, 9999999999999999999999999999999999999999.0, 6U, "1e+40", __LINE__);
     RealToStreamEqual(test, stream, 99e100, 6U, "9.9e+101", __LINE__);
 
+    RealToStreamEqual(test, stream, 599.9999, 6U, "600", __LINE__);
+    RealToStreamEqual(test, stream, 6999.999, 6U, "7000", __LINE__);
+    RealToStreamEqual(test, stream, 79999.999, 6U, "80000", __LINE__);
+    RealToStreamEqual(test, stream, 899999.999, 6U, "900000", __LINE__);
+
     RealToStreamEqual(test, stream, 0.999, 6U, "0.999", __LINE__);
     RealToStreamEqual(test, stream, 0.999999, 6U, "0.999999", __LINE__);
     RealToStreamEqual(test, stream, 0.999999999, 6U, "1", __LINE__);
@@ -3568,6 +3573,11 @@ static void TestDoubleToStringSemiFixed(QTest &test, Stream_T &stream) {
         "989999999999999971062477677470550235220096190889648004812994130017827049653182301025734968880029237248",
         __LINE__);
 
+    RealToStreamEqual(test, stream, 599.9999, 6U, "600", __LINE__);
+    RealToStreamEqual(test, stream, 6999.999, 6U, "7000", __LINE__);
+    RealToStreamEqual(test, stream, 79999.999, 6U, "80000", __LINE__);
+    RealToStreamEqual(test, stream, 899999.999, 6U, "900000", __LINE__);
+
     RealToStreamEqualSemiFixed(test, stream, 0.999, 6U, "0.999", __LINE__);
     RealToStreamEqualSemiFixed(test, stream, 0.999999, 6U, "0.999999", __LINE__);
     RealToStreamEqualSemiFixed(test, stream, 0.999999999, 6U, "1", __LINE__);
@@ -4045,6 +4055,11 @@ static void TestDoubleToStringFixed(QTest &test, Stream_T &stream) {
         test, stream, 99e100, 6U,
         "989999999999999971062477677470550235220096190889648004812994130017827049653182301025734968880029237248.000000",
         __LINE__);
+
+    RealToStreamEqual(test, stream, 599.9999, 6U, "600", __LINE__);
+    RealToStreamEqual(test, stream, 6999.999, 6U, "7000", __LINE__);
+    RealToStreamEqual(test, stream, 79999.999, 6U, "80000", __LINE__);
+    RealToStreamEqual(test, stream, 899999.999, 6U, "900000", __LINE__);
 
     RealToStreamEqualFixed(test, stream, 0.999, 6U, "0.999000", __LINE__);
     RealToStreamEqualFixed(test, stream, 0.999999, 6U, "0.999999", __LINE__);
