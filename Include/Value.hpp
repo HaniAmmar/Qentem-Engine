@@ -438,6 +438,19 @@ struct Value {
         }
     }
 
+    // Only to value of type array
+    void AddPointerToValue(const Value *val_ptr) {
+        if (!isArray()) {
+            reset();
+            setTypeToArray();
+        }
+
+        Value val;
+        val.SetPointerToValue(val_ptr);
+
+        array_ += Memory::Move(val);
+    }
+
     inline void operator+=(ObjectT &&obj) {
         if (isObject()) {
             object_ += Memory::Move(obj);
