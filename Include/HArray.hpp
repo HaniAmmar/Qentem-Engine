@@ -156,12 +156,11 @@ struct HArray {
                 HAItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
-                    storage_item = insert(index, Memory::Move(src_item->Key), src_item->Hash);
+                    insert(index, Memory::Move(src_item->Key), src_item->Hash, Memory::Move(src_item->Value));
                 } else {
+                    storage_item->Value = Memory::Move(src_item->Value);
                     Memory::Dispose(&(src_item->Key));
                 }
-
-                storage_item->Value = Memory::Move(src_item->Value);
             }
 
             ++src_item;
@@ -188,10 +187,10 @@ struct HArray {
                 HAItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
-                    storage_item = insert(index, Key_T(src_item->Key), src_item->Hash);
+                    insert(index, Key_T{src_item->Key}, src_item->Hash, Value_T{src_item->Value});
+                } else {
+                    storage_item->Value = src_item->Value;
                 }
-
-                storage_item->Value = src_item->Value;
             }
 
             ++src_item;
@@ -211,7 +210,7 @@ struct HArray {
             return item->Value;
         }
 
-        return insert(index, Key_T(key, length), hash)->Value;
+        return insert(index, Key_T{key, length}, hash)->Value;
     }
 
     Value_T &operator[](const Char_T *key) {
@@ -239,15 +238,32 @@ struct HArray {
     }
 
     void Insert(Key_T &&key, Value_T &&value) {
-        operator[](Memory::Move(key)) = Memory::Move(value);
+        if (Size() == Capacity()) {
+            expand();
+        }
+
+        const SizeT hash = StringUtils::Hash(key.First(), key.Length());
+        SizeT      *index;
+        HAItem     *item = find(index, key.First(), key.Length(), hash);
+
+        if (item == nullptr) {
+            insert(index, Memory::Move(key), hash, Memory::Move(value));
+        } else {
+            Memory::Dispose(&(item->Value));
+            Memory::Initialize(&(item->Value), Memory::Move(value));
+        }
+    }
+
+    void Insert(const Key_T &key, Value_T &&value) {
+        Insert(Key_T{key}, Memory::Move(value));
     }
 
     void Insert(Key_T &&key, const Value_T &value) {
-        operator[](Memory::Move(key)) = value;
+        Insert(Memory::Move(key), Value_T{value});
     }
 
     void Insert(const Key_T &key, const Value_T &value) {
-        Get(key.First(), key.Length()) = value;
+        Insert(Key_T{key}, Value_T{value});
     }
 
     Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
@@ -395,7 +411,7 @@ struct HArray {
     }
 
     bool Rename(const Key_T &from, const Key_T &to) const {
-        return Rename(from, Key_T(to));
+        return Rename(from, Key_T{to});
     }
 
     void Reserve(SizeT size) {
@@ -594,12 +610,25 @@ struct HArray {
         ++index_;
         *index = Size();
 
-        item->Next = SizeT{0};
         item->Hash = hash;
+        item->Next = SizeT{0};
+
         Memory::Initialize(&(item->Key), Memory::Move(key));
         Memory::Initialize(&(item->Value));
 
         return item;
+    }
+
+    void insert(SizeT *index, Key_T &&key, const SizeT hash, Value_T &&value) noexcept {
+        HAItem *item = (Storage() + Size());
+        ++index_;
+        *index = Size();
+
+        item->Hash = hash;
+        item->Next = SizeT{0};
+
+        Memory::Initialize(&(item->Key), Memory::Move(key));
+        Memory::Initialize(&(item->Value), Memory::Move(value));
     }
 
     void remove(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
