@@ -2056,7 +2056,7 @@ struct Value {
             }
 
             case ValueType::ValuePtr: {
-                val.Stringify(stream, precision);
+                stringifyValue(*(val.value_), stream, precision);
                 break;
             }
 
