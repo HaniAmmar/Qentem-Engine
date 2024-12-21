@@ -187,10 +187,10 @@ struct HArray {
                 HAItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
                 if (storage_item == nullptr) {
-                    insert(index, Key_T{src_item->Key}, src_item->Hash, Value_T{src_item->Value});
-                } else {
-                    storage_item->Value = src_item->Value;
+                    storage_item = insert(index, Key_T{src_item->Key}, src_item->Hash);
                 }
+
+                storage_item->Value = src_item->Value;
             }
 
             ++src_item;
