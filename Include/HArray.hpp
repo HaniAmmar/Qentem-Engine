@@ -266,6 +266,10 @@ struct HArray {
         Insert(Key_T{key}, Value_T{value});
     }
 
+    void Insert(const Char_T *key, const SizeT length, Value_T &&value) {
+        Insert(Key_T{key, length}, Memory::Move(value));
+    }
+
     Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
         return GetValue(key, length, StringUtils::Hash(key, length));
     }
