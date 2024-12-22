@@ -629,6 +629,15 @@ struct Value {
         return (object_.Get(key.First(), key.Length()));
     }
 
+    inline void Insert(const StringViewT &key, Value &&val) {
+        if (!isObject()) {
+            reset();
+            setTypeToObject();
+        }
+
+        object_.Insert(key.First(), key.Length(), Memory::Move(val));
+    }
+
     inline bool operator<(const Value &val) const noexcept {
         const ValueType type = Type();
 
