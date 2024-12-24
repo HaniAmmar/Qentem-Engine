@@ -89,7 +89,7 @@ struct JSON {
                 while (offset < length && (content[offset] == JSONotation::QuoteChar)) {
                     ++offset;
                     const Char_T *str = (content + offset);
-                    SizeT         len = JSONUtils::UnEscapeJSON(str, length, stream);
+                    SizeT         len = JSONUtils::UnEscape(str, length, stream);
 
                     if (len != SizeT{0}) {
                         offset += len;
@@ -190,7 +190,7 @@ struct JSON {
                     ++offset;
 
                     const Char_T *str = (content + offset);
-                    SizeT         len = JSONUtils::UnEscapeJSON(str, (length - offset), stream);
+                    SizeT         len = JSONUtils::UnEscape(str, (length - offset), stream);
 
                     if (len != SizeT{0}) {
                         offset += len;

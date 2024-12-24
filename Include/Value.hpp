@@ -1969,7 +1969,7 @@ struct Value {
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.isUndefined())) {
                 stream += JSONotation::QuoteChar;
-                JSONUtils::EscapeJSON(h_item->Key.First(), h_item->Key.Length(), stream);
+                JSONUtils::Escape(h_item->Key.First(), h_item->Key.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 stream += JSONotation::ColonChar;
 
@@ -2029,7 +2029,7 @@ struct Value {
 
             case ValueType::String: {
                 stream += JSONotation::QuoteChar;
-                JSONUtils::EscapeJSON(val.string_.First(), val.string_.Length(), stream);
+                JSONUtils::Escape(val.string_.First(), val.string_.Length(), stream);
                 stream += JSONotation::QuoteChar;
                 break;
             }
