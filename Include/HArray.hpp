@@ -247,11 +247,10 @@ struct HArray {
         HAItem     *item = find(index, key.First(), key.Length(), hash);
 
         if (item == nullptr) {
-            insert(index, Memory::Move(key), hash, Memory::Move(value));
-        } else {
-            Memory::Dispose(&(item->Value));
-            Memory::Initialize(&(item->Value), Memory::Move(value));
+            item = insert(index, Memory::Move(key), hash);
         }
+
+        item->Value = Memory::Move(value);
     }
 
     void Insert(const Key_T &key, Value_T &&value) {
