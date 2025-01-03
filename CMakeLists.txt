@@ -79,14 +79,6 @@ if (ENABLE_COVERAGE)
     target_link_libraries(HArrayTest --coverage)
 endif()
 
-# Engine
-add_executable(EngineTest Tests/EngineTest.cpp)
-add_test(NAME EngineTest COMMAND EngineTest)
-
-if (ENABLE_COVERAGE)
-    target_link_libraries(EngineTest --coverage)
-endif()
-
 # Unicode
 add_executable(UnicodeTest Tests/UnicodeTest.cpp)
 add_test(NAME UnicodeTest COMMAND UnicodeTest)

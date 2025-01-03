@@ -23,7 +23,7 @@
 #ifndef QENTEM_TEMPLATE_H
 #define QENTEM_TEMPLATE_H
 
-#include "Engine.hpp"
+#include "Finder.hpp"
 #include "Digit.hpp"
 #include "Tags.hpp"
 #include "StringView.hpp"
@@ -329,7 +329,7 @@ struct TemplateCore {
 
   private:
     static void parse(const Char_T *content, SizeT length, Array<TagBit> &tags_cache) {
-        Engine::Finder<Tags::List<Char_T>, Char_T, SizeT> finder{content, length};
+        Finder<Tags::List<Char_T>, Char_T, SizeT> finder{content, length};
 
         Array<Array<TagBit> *> parent_storage{SizeT{8}};
         Array<TagBit>         *storage{&tags_cache};
