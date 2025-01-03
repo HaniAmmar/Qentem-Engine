@@ -27,6 +27,50 @@
 #include "Unicode.hpp"
 
 namespace Qentem {
+
+template <typename, SizeT32>
+struct JSONotationStrings;
+
+// char
+template <typename Char_T>
+struct JSONotationStrings<Char_T, 1U> {
+    static constexpr const Char_T *FalseString = "false";
+    static constexpr const Char_T *TrueString  = "true";
+    static constexpr const Char_T *NullString  = "null";
+};
+
+// char16_t
+template <typename Char_T>
+struct JSONotationStrings<Char_T, 2U> {
+    static constexpr const Char_T *FalseString = u"false";
+    static constexpr const Char_T *TrueString  = u"true";
+    static constexpr const Char_T *NullString  = u"null";
+};
+
+// char32_t
+template <typename Char_T>
+struct JSONotationStrings<Char_T, 4U> {
+    static constexpr const Char_T *FalseString = U"false";
+    static constexpr const Char_T *TrueString  = U"true";
+    static constexpr const Char_T *NullString  = U"null";
+};
+
+// wchar_t size = 4
+template <>
+struct JSONotationStrings<wchar_t, 4U> {
+    static constexpr const wchar_t *FalseString = L"false";
+    static constexpr const wchar_t *TrueString  = L"true";
+    static constexpr const wchar_t *NullString  = L"null";
+};
+
+// wchar_t size = 2
+template <>
+struct JSONotationStrings<wchar_t, 2U> {
+    static constexpr const wchar_t *FalseString = L"false";
+    static constexpr const wchar_t *TrueString  = L"true";
+    static constexpr const wchar_t *NullString  = L"null";
+};
+
 struct JSONUtils {
     template <typename>
     struct JSONotation_T;
@@ -200,9 +244,6 @@ struct JSONUtils {
         stream.Write((content + offset2), (offset - offset2));
     }
 
-    template <typename, SizeT32>
-    struct JSONotationStrings;
-
     template <typename Char_T>
     struct JSONotation_T {
       private:
@@ -250,46 +291,6 @@ struct JSONUtils {
 
         static constexpr SizeT         NullStringLength = SizeT{4};
         static constexpr const Char_T *NullString       = &(JSONotationStrings<Char_T, size_>::NullString[0]);
-    };
-
-    // char
-    template <typename Char_T>
-    struct JSONotationStrings<Char_T, 1U> {
-        static constexpr const Char_T *FalseString = "false";
-        static constexpr const Char_T *TrueString  = "true";
-        static constexpr const Char_T *NullString  = "null";
-    };
-
-    // char16_t
-    template <typename Char_T>
-    struct JSONotationStrings<Char_T, 2U> {
-        static constexpr const Char_T *FalseString = u"false";
-        static constexpr const Char_T *TrueString  = u"true";
-        static constexpr const Char_T *NullString  = u"null";
-    };
-
-    // char32_t
-    template <typename Char_T>
-    struct JSONotationStrings<Char_T, 4U> {
-        static constexpr const Char_T *FalseString = U"false";
-        static constexpr const Char_T *TrueString  = U"true";
-        static constexpr const Char_T *NullString  = U"null";
-    };
-
-    // wchar_t size = 4
-    template <>
-    struct JSONotationStrings<wchar_t, 4U> {
-        static constexpr const wchar_t *FalseString = L"false";
-        static constexpr const wchar_t *TrueString  = L"true";
-        static constexpr const wchar_t *NullString  = L"null";
-    };
-
-    // wchar_t size = 2
-    template <>
-    struct JSONotationStrings<wchar_t, 2U> {
-        static constexpr const wchar_t *FalseString = L"false";
-        static constexpr const wchar_t *TrueString  = L"true";
-        static constexpr const wchar_t *NullString  = L"null";
     };
 };
 
