@@ -269,6 +269,22 @@ struct HArray {
         Insert(Key_T{key, length}, Memory::Move(value));
     }
 
+    bool Has(const Char_T *key, const SizeT length) const noexcept {
+        if (IsNotEmpty()) {
+            const SizeT hash = StringUtils::Hash(key, length);
+            SizeT      *index;
+            HItem      *item = find(index, key, length, hash);
+
+            return (item != nullptr);
+        }
+
+        return false;
+    }
+
+    bool Has(const Key_T &key) const noexcept {
+        return Has(key.First(), key.Length());
+    }
+
     Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
         return GetValue(key, length, StringUtils::Hash(key, length));
     }
