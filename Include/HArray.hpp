@@ -426,21 +426,25 @@ struct HArray {
     }
 
     void Clear() noexcept {
-        constexpr SizeT32 size    = sizeof(SizeT);
-        SizeT            *ht      = getHashTable();
-        HAItem           *storage = Storage();
-        Memory::SetToZero(ht, (size * Capacity()));
-        Memory::Dispose(storage, (storage + Size()));
-        setSize(SizeT{0});
+        if (IsNotEmpty()) {
+            constexpr SizeT32 size    = sizeof(SizeT);
+            SizeT            *ht      = getHashTable();
+            HAItem           *storage = Storage();
+            Memory::SetToZero(ht, (size * Capacity()));
+            Memory::Dispose(storage, (storage + Size()));
+            setSize(SizeT{0});
+        }
     }
 
     void Reset() noexcept {
-        HAItem *storage = Storage();
-        Memory::Dispose(storage, (storage + Size()));
-        Memory::Deallocate(getHashTable());
-        clearHashTable();
-        setCapacity(SizeT{0});
-        setSize(SizeT{0});
+        if (Capacity() != 0) {
+            HAItem *storage = Storage();
+            Memory::Dispose(storage, (storage + Size()));
+            Memory::Deallocate(getHashTable());
+            clearHashTable();
+            setCapacity(SizeT{0});
+            setSize(SizeT{0});
+        }
     }
 
     void Resize(const SizeT new_size) {
