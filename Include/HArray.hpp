@@ -463,6 +463,14 @@ struct HArray {
         resize(new_size);
     }
 
+    void Expect(const SizeT count) {
+        const SizeT new_size = (count + Size());
+
+        if (new_size > Capacity()) {
+            resize(new_size);
+        }
+    }
+
     // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
     void Sort(const bool ascend = true) noexcept {
         constexpr SizeT32 size = sizeof(SizeT);
