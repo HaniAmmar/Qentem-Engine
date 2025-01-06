@@ -35,9 +35,9 @@ using HashArray1 = HArray<String<char>, SizeT32>;
 using HashArray2 = HArray<String<char>, SizeT>;
 using HashArray3 = HArray<String<char>, String<char>>;
 
-using HAItem1 = typename HashArray1::HAItem;
-using HAItem2 = typename HashArray2::HAItem;
-using HAItem3 = typename HashArray3::HAItem;
+using HAItem1 = typename HashArray1::HItem;
+using HAItem2 = typename HashArray2::HItem;
+using HAItem3 = typename HashArray3::HItem;
 
 static void TestHArray1(QTest &test) {
     HashArray1 numbers1;
