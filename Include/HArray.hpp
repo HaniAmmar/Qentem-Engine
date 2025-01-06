@@ -68,13 +68,18 @@ struct HAItem_T {
     inline bool operator==(const HAItem_T &item) const noexcept {
         return (Key == item.Key);
     }
+
+    void Clear() {
+        Key   = Key_T{};
+        Value = Value_T{};
+    }
 };
 
 ///////////////////////////////////////////////
 template <typename Key_T, typename Value_T>
 struct HArray {
-    using Char_T = typename Key_T::CharType;
     using HItem  = HAItem_T<Key_T, Value_T>;
+    using Char_T = typename Key_T::CharType;
 
     HArray() noexcept = default;
 
@@ -651,14 +656,7 @@ struct HArray {
     }
 
     void insert(SizeT *index, Key_T &&key, const SizeT hash, Value_T &&value) noexcept {
-        HItem *item = (Storage() + Size());
-        ++index_;
-        *index = Size();
-
-        item->Hash = hash;
-        item->Next = SizeT{0};
-
-        Memory::Initialize(&(item->Key), Memory::Move(key));
+        HItem *item = insert(index, Memory::Move(key), hash);
         Memory::Initialize(&(item->Value), Memory::Move(value));
     }
 
@@ -672,8 +670,7 @@ struct HArray {
                 item->Next = SizeT{0};
                 item->Hash = SizeT{0};
 
-                item->Key   = Key_T{};
-                item->Value = Value_T{};
+                item->Clear();
             }
         }
     }

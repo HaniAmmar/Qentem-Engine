@@ -2215,8 +2215,8 @@ struct Value {
     }
 
     union {
-        ObjectT      object_{};
-        ArrayT       array_;
+        ArrayT       array_{};
+        ObjectT      object_;
         StringT      string_;
         QNumber64    number_;
         const Value *value_;
