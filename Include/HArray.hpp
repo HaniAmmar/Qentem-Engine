@@ -23,8 +23,7 @@
 #ifndef QENTEM_HARRAY_H
 #define QENTEM_HARRAY_H
 
-#include "Memory.hpp"
-#include "StringUtils.hpp"
+#include "HashTable.hpp"
 
 namespace Qentem {
 /*
@@ -75,76 +74,26 @@ struct HAItem_T {
     }
 };
 
-///////////////////////////////////////////////
 template <typename Key_T, typename Value_T>
-struct HArray {
+struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
     using HItem  = HAItem_T<Key_T, Value_T>;
+    using BaseT  = HashTable<Key_T, HItem>;
     using Char_T = typename Key_T::CharType;
 
-    HArray() noexcept = default;
+    using BaseT::BaseT;
 
-    explicit HArray(const SizeT size) {
-        if (size != SizeT{0}) {
-            allocate(size);
-        }
-    }
-
-    HArray(HArray &&src) noexcept : index_{src.index_}, capacity_{src.capacity_}, hashTable_{src.hashTable_} {
-        src.setSize(SizeT{0});
-        src.setCapacity(SizeT{0});
-        src.clearHashTable();
-    }
-
-    HArray(const HArray &src) {
-        copyTable(src);
-    }
-
-    ~HArray() {
-        SizeT *hashTable = getHashTable();
-        HItem *storage   = Storage();
-        Memory::Dispose(storage, (storage + Size()));
-        Memory::Deallocate(hashTable);
-    }
-
-    HArray &operator=(HArray &&src) noexcept {
-        if (this != &src) {
-            SizeT      *ht      = getHashTable();
-            HItem      *storage = Storage();
-            const SizeT size    = Size();
-
-            setHashTable(src.getHashTable());
-            setCapacity(src.Capacity());
-            setSize(src.Size());
-
-            src.clearHashTable();
-            src.setSize(SizeT{0});
-            src.setCapacity(SizeT{0});
-
-            // Just in case the copied array is not a child array, do this last.
-            Memory::Dispose(storage, (storage + size));
-            Memory::Deallocate(ht);
-        }
-
-        return *this;
-    }
-
-    HArray &operator=(const HArray &src) {
-        if (this != &src) {
-            SizeT      *ht      = getHashTable();
-            HItem      *storage = Storage();
-            const SizeT size    = Size();
-
-            clearHashTable();
-            setCapacity(SizeT{0});
-            setSize(SizeT{0});
-            copyTable(src);
-
-            Memory::Dispose(storage, (storage + size));
-            Memory::Deallocate(ht);
-        }
-
-        return *this;
-    }
+    using BaseT::Capacity;
+    using BaseT::clearHashTable;
+    using BaseT::expand;
+    using BaseT::find;
+    using BaseT::getHashTable;
+    using BaseT::insert;
+    using BaseT::IsNotEmpty;
+    using BaseT::resize;
+    using BaseT::setCapacity;
+    using BaseT::setSize;
+    using BaseT::Size;
+    using BaseT::Storage;
 
     void operator+=(HArray &&src) {
         const SizeT  n_size   = (Size() + src.Size());
@@ -193,6 +142,7 @@ struct HArray {
 
                 if (storage_item == nullptr) {
                     storage_item = insert(index, Key_T{src_item->Key}, src_item->Hash);
+                    Memory::Initialize(&(storage_item->Value));
                 }
 
                 storage_item->Value = src_item->Value;
@@ -215,7 +165,10 @@ struct HArray {
             return item->Value;
         }
 
-        return insert(index, Key_T{key, length}, hash)->Value;
+        item = insert(index, Key_T{key, length}, hash);
+        Memory::Initialize(&(item->Value));
+
+        return item->Value;
     }
 
     Value_T &operator[](const Char_T *key) {
@@ -235,11 +188,12 @@ struct HArray {
         SizeT      *index;
         HItem      *item = find(index, key.First(), key.Length(), hash);
 
-        if (item != nullptr) {
-            return item->Value;
+        if (item == nullptr) {
+            item = insert(index, Memory::Move(key), hash);
+            Memory::Initialize(&(item->Value));
         }
 
-        return insert(index, Memory::Move(key), hash)->Value;
+        return item->Value;
     }
 
     void Insert(Key_T &&key, Value_T &&value) {
@@ -253,9 +207,10 @@ struct HArray {
 
         if (item == nullptr) {
             item = insert(index, Memory::Move(key), hash);
+            Memory::Initialize(&(item->Value), Memory::Move(value));
+        } else {
+            item->Value = Memory::Move(value);
         }
-
-        item->Value = Memory::Move(value);
     }
 
     void Insert(const Key_T &key, Value_T &&value) {
@@ -272,22 +227,6 @@ struct HArray {
 
     void Insert(const Char_T *key, const SizeT length, Value_T &&value) {
         Insert(Key_T{key, length}, Memory::Move(value));
-    }
-
-    bool Has(const Char_T *key, const SizeT length) const noexcept {
-        if (IsNotEmpty()) {
-            const SizeT hash = StringUtils::Hash(key, length);
-            SizeT      *index;
-            HItem      *item = find(index, key, length, hash);
-
-            return (item != nullptr);
-        }
-
-        return false;
-    }
-
-    bool Has(const Key_T &key) const noexcept {
-        return Has(key.First(), key.Length());
     }
 
     Value_T *GetValue(const Char_T *key, const SizeT length) const noexcept {
@@ -321,451 +260,11 @@ struct HArray {
         return nullptr;
     }
 
-    const Key_T *GetKey(const SizeT index) const noexcept {
-        const HItem *src = Storage();
-
-        if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
-            return &((src + index)->Key);
-        }
-
-        return nullptr;
-    }
-
-    const HItem *GetItem(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        if (IsNotEmpty()) {
-            SizeT       *index;
-            const HItem *item = find(index, key, length, hash);
-
-            if (item != nullptr) {
-                return item;
-            }
-        }
-
-        return nullptr;
-    }
-
-    inline const HItem *GetItem(const Key_T &key) const noexcept {
-        return GetItem(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
-    }
-
-    const HItem *GetItem(const SizeT index) const noexcept {
-        const HItem *src = Storage();
-
-        if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
-            return (src + index);
-        }
-
-        return nullptr;
-    }
-
-    bool GetKeyIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
-        if (IsNotEmpty()) {
-            SizeT *tmp;
-
-            if (find(tmp, str, length, StringUtils::Hash(str, length)) != nullptr) {
-                index = *tmp;
-                --index;
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    bool GetKeyIndex(SizeT &index, const Key_T &key) const noexcept {
-        return GetKeyIndex(index, key.First(), key.Length());
-    }
-
-    inline void Remove(const Char_T *key) const noexcept {
-        Remove(key, StringUtils::Count(key));
-    }
-
-    inline void Remove(const Char_T *key, SizeT length) const noexcept {
-        remove(key, length, StringUtils::Hash(key, length));
-    }
-
-    inline void Remove(const Key_T &key) const noexcept {
-        remove(key.First(), key.Length(), StringUtils::Hash(key.First(), key.Length()));
-    }
-
-    void RemoveIndex(const SizeT index) const noexcept {
-        if (index < Size()) {
-            const HItem *item = (Storage() + index);
-
-            if (item->Hash != SizeT{0}) {
-                remove(item->Key.First(), item->Key.Length(), item->Hash);
-            }
-        }
-    }
-
-    /*
-     * This function renames a key to a nonexisting one without changing the
-     * order of its item, and returns true if successful.
-     */
-    bool Rename(const Key_T &from, Key_T &&to) const noexcept {
-        if (IsNotEmpty()) {
-            SizeT *left_index;
-            SizeT *right_index;
-
-            find(left_index, from.First(), from.Length(), StringUtils::Hash(from.First(), from.Length()));
-
-            if (*left_index != SizeT{0}) {
-                const SizeT to_hash = StringUtils::Hash(to.First(), to.Length());
-
-                find(right_index, to.First(), to.Length(), to_hash);
-
-                if (*right_index == SizeT{0}) {
-                    SizeT index = *left_index;
-                    --index;
-
-                    HItem *item  = (Storage() + index);
-                    *right_index = *left_index;
-                    *left_index  = item->Next;
-                    item->Next   = SizeT{0};
-                    item->Hash   = to_hash;
-
-                    item->Key = Memory::Move(to);
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    bool Rename(const Key_T &from, const Key_T &to) const {
-        return Rename(from, Key_T{to});
-    }
-
-    void Reserve(SizeT size) {
-        Reset();
-
-        if (size != SizeT{0}) {
-            allocate(size);
-        }
-    }
-
-    void Clear() noexcept {
-        if (IsNotEmpty()) {
-            constexpr SizeT32 size    = sizeof(SizeT);
-            SizeT            *ht      = getHashTable();
-            HItem            *storage = Storage();
-            Memory::SetToZero(ht, (size * Capacity()));
-            Memory::Dispose(storage, (storage + Size()));
-            setSize(SizeT{0});
-        }
-    }
-
-    void Reset() noexcept {
-        if (Capacity() != 0) {
-            HItem *storage = Storage();
-            Memory::Dispose(storage, (storage + Size()));
-            Memory::Deallocate(getHashTable());
-            clearHashTable();
-            setCapacity(SizeT{0});
-            setSize(SizeT{0});
-        }
-    }
-
-    void Resize(const SizeT new_size) {
-        if (new_size == SizeT{0}) {
-            Reset();
-            return;
-        }
-
-        if (Size() > new_size) {
-            // Shrink
-            HItem *storage = Storage();
-            Memory::Dispose((storage + new_size), (storage + Size()));
-            setSize(new_size);
-        }
-
-        resize(new_size);
-    }
-
-    void Expect(const SizeT count) {
-        const SizeT new_size = (count + Size());
-
-        if (new_size > Capacity()) {
-            resize(new_size);
-        }
-    }
-
-    // Set ascend to (false) for descend (ascend: 1,2,3; descend: 3,2,1 )
-    void Sort(const bool ascend = true) noexcept {
-        constexpr SizeT32 size = sizeof(SizeT);
-
-        if (ascend) {
-            Memory::Sort<true>(Storage(), SizeT{0}, Size());
-        } else {
-            Memory::Sort<false>(Storage(), SizeT{0}, Size());
-        }
-
-        Memory::SetToZero(getHashTable(), (size * Capacity()));
-        generateHash();
-    }
-
-    // Removes excess storage.
-    void Compress() {
-        const SizeT size = ActualSize();
-
-        if (size != SizeT{0}) {
-            if (size < Size()) {
-                resize(size);
-            }
-
-            return;
-        }
-
-        Reset();
-    }
-
-    // Returns the actual number of items.
-    SizeT ActualSize() const noexcept {
-        const HItem *item = Storage();
-        const HItem *end  = (item + Size());
-        SizeT        size = 0;
-
-        while (item < end) {
-            if (item->Hash != SizeT{0}) {
-                ++size;
-            }
-
-            ++item;
-        }
-
-        return size;
-    }
-
-    inline SizeT Size() const noexcept {
-        return index_;
-    }
-
-    inline SizeT Capacity() const noexcept {
-        return capacity_;
-    }
-
-    inline HItem *Storage() const noexcept {
-        return Memory::ChangePointer<HItem>(getHashTable() + Capacity());
-    }
-
-    inline const HItem *First() const noexcept {
-        return Storage();
-    }
-
-    inline HItem *Last() const noexcept {
-        if (IsNotEmpty()) {
-            return (Storage() + (Size() - SizeT{1}));
-        }
-
-        return nullptr;
-    }
-
-    inline const HItem *End() const noexcept {
-        return (First() + Size());
-    }
-
-    inline bool IsEmpty() const noexcept {
-        return (Size() == SizeT{0});
-    }
-
-    inline bool IsNotEmpty() const noexcept {
-        return !(IsEmpty());
-    }
-
-    // For STL
-    inline const HItem *begin() const noexcept {
-        return First();
-    }
-
-    inline const HItem *end() const noexcept {
-        return End();
-    }
-
-    inline HItem *begin() noexcept {
-        return Storage();
-    }
-
-    inline HItem *end() noexcept {
-        return (Storage() + Size());
-    }
-
-    //////////// Private ////////////
   private:
-    inline SizeT getBase() const noexcept {
-        SizeT base = Capacity();
-        --base;
-
-        return base;
-    }
-
-    HItem *allocate(SizeT new_capacity) {
-        constexpr SizeT32 size     = sizeof(SizeT);
-        constexpr SizeT   size_sum = SizeT{size + sizeof(HItem)};
-
-        // Making sure 'size' is not odd.
-        new_capacity += SizeT(new_capacity & SizeT{1});
-        new_capacity = Memory::AlignSize(new_capacity);
-
-        setCapacity(new_capacity);
-        SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
-        setHashTable(ht);
-        Memory::SetToZero(ht, (size * new_capacity));
-
-        return Memory::ChangePointer<HItem>(ht + Capacity());
-    }
-
-    inline void setHashTable(SizeT *ptr) noexcept {
-        hashTable_ = ptr;
-    }
-
-    inline SizeT *getHashTable() const noexcept {
-        return hashTable_;
-    }
-
-    inline void clearHashTable() noexcept {
-        hashTable_ = nullptr;
-    }
-
-    inline void setSize(const SizeT new_size) noexcept {
-        index_ = new_size;
-    }
-
-    inline void setCapacity(const SizeT new_capacity) noexcept {
-        capacity_ = new_capacity;
-    }
-
-    inline void expand() {
-        SizeT capacity = SizeT(Capacity() == 0) + Capacity();
-        resize(capacity * SizeT{2});
-    }
-
-    HItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {
-        HItem *item = (Storage() + Size());
-        ++index_;
-        *index = Size();
-
-        item->Hash = hash;
-        item->Next = SizeT{0};
-
-        Memory::Initialize(&(item->Key), Memory::Move(key));
-        Memory::Initialize(&(item->Value));
-
-        return item;
-    }
-
     void insert(SizeT *index, Key_T &&key, const SizeT hash, Value_T &&value) noexcept {
         HItem *item = insert(index, Memory::Move(key), hash);
         Memory::Initialize(&(item->Value), Memory::Move(value));
     }
-
-    void remove(const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        if (IsNotEmpty()) {
-            SizeT *index;
-            HItem *item = find(index, key, length, hash);
-
-            if (item != nullptr) {
-                *index     = item->Next;
-                item->Next = SizeT{0};
-                item->Hash = SizeT{0};
-
-                item->Clear();
-            }
-        }
-    }
-
-    void copyTable(const HArray &src) {
-        if (src.IsNotEmpty()) {
-            const HItem *src_item = src.First();
-            const HItem *src_end  = (src_item + src.Size());
-            HItem       *storage  = allocate(src.Size());
-            SizeT        index{0};
-
-            do {
-                if (src_item->Hash != SizeT{0}) {
-                    Memory::Initialize(storage, *src_item);
-                    ++storage;
-                    ++index;
-                }
-
-                ++src_item;
-            } while (src_item < src_end);
-
-            setSize(index);
-            generateHash();
-        }
-    }
-
-    void resize(const SizeT new_size) {
-        SizeT       *ht      = getHashTable();
-        HItem       *item    = Storage();
-        const HItem *end     = (item + Size());
-        HItem       *storage = allocate(new_size);
-
-        setSize(SizeT{0});
-
-        while (item < end) {
-            if (item->Hash != SizeT{0}) {
-                Memory::Initialize(storage, Memory::Move(*item));
-                ++storage;
-                ++index_;
-            }
-
-            ++item;
-        }
-
-        Memory::Deallocate(ht);
-        generateHash();
-    }
-
-    HItem *find(SizeT *&index, const Char_T *key, const SizeT length, const SizeT hash) const noexcept {
-        SizeT *ht = getHashTable();
-
-        HItem *storage = Memory::ChangePointer<HItem>(ht + Capacity());
-        HItem *item;
-        index = (ht + (hash & getBase()));
-
-        while (*index != SizeT{0}) {
-            item = (storage + *index);
-            --item;
-
-            if ((item->Hash == hash) && item->Key.IsEqual(key, length)) {
-                return item;
-            }
-
-            index = &(item->Next);
-        }
-
-        return nullptr;
-    }
-
-    void generateHash() const noexcept {
-        SizeT       *ht   = getHashTable();
-        HItem       *src  = Storage();
-        HItem       *item = src;
-        const HItem *end  = (item + Size());
-        SizeT       *index;
-        SizeT        i    = SizeT{1};
-        const SizeT  base = getBase();
-
-        while (item < end) {
-            item->Next = SizeT{0};
-            index      = (ht + (item->Hash & base));
-
-            while (*index != SizeT{0}) {
-                index = &((src + (*index - SizeT{1}))->Next);
-            }
-
-            *index = i;
-            ++i;
-            ++item;
-        }
-    }
-
-    SizeT  index_{0};
-    SizeT  capacity_{0};
-    SizeT *hashTable_{nullptr};
 };
 
 } // namespace Qentem
