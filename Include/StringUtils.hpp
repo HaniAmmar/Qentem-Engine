@@ -201,6 +201,19 @@ static SizeT Hash(const Char_T *key, SizeT length) noexcept {
     return (hash | highest_bit);
 }
 
+template <typename Char_T>
+static void ToLowerCase(Char_T *str, SizeT length) noexcept {
+    const Char_T *end = (str + length);
+
+    while (str < end) {
+        if ((*str >= 'A') && (*str <= 'Z')) {
+            *str += ' ';
+        }
+
+        ++str;
+    }
+}
+
 template <typename, SizeT32>
 struct HTMLSpecialChars_T {};
 
