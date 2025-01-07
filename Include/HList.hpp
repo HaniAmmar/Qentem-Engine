@@ -90,7 +90,7 @@ struct HList : public HashTable<Key_T, HLItem_T<Key_T>> {
         }
 
         while (src_item < src_end) {
-            if (src_item->Hash != SizeT{0}) {
+            if (src_item->Hash != 0) {
                 SizeT *index;
                 HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
@@ -105,9 +105,10 @@ struct HList : public HashTable<Key_T, HLItem_T<Key_T>> {
         }
 
         Memory::Deallocate(src.getHashTable());
+
         src.clearHashTable();
-        src.setCapacity(SizeT{0});
-        src.setSize(SizeT{0});
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
     void operator+=(const HList &src) {
@@ -120,7 +121,7 @@ struct HList : public HashTable<Key_T, HLItem_T<Key_T>> {
         }
 
         while (src_item < src_end) {
-            if (src_item->Hash != SizeT{0}) {
+            if (src_item->Hash != 0) {
                 SizeT *index;
                 HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 

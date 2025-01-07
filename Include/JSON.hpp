@@ -59,7 +59,7 @@ struct JSON {
         ~JSONParser()                             = delete;
 
         static ValueT Parse(Stream_T &stream, const Char_T *content, SizeT length) {
-            if (length != SizeT{0}) {
+            if (length != 0) {
                 SizeT offset = 0;
                 StringUtils::TrimLeft(content, offset, length);
                 ValueT value = parseValue(stream, content, offset, length);
@@ -91,7 +91,7 @@ struct JSON {
                     const Char_T *str = (content + offset);
                     SizeT         len = JSONUtils::UnEscape(str, length, stream);
 
-                    if (len != SizeT{0}) {
+                    if (len != 0) {
                         offset += len;
                         --len;
 
@@ -192,7 +192,7 @@ struct JSON {
                     const Char_T *str = (content + offset);
                     SizeT         len = JSONUtils::UnEscape(str, (length - offset), stream);
 
-                    if (len != SizeT{0}) {
+                    if (len != 0) {
                         offset += len;
                         --len;
 

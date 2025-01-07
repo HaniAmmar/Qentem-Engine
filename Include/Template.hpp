@@ -309,7 +309,7 @@ struct TemplateCore {
         stream_      = &stream;
         loops_items_ = &loops_items;
 
-        render(tags_cache.First(), tags_cache.End(), SizeT{0}, length_);
+        render(tags_cache.First(), tags_cache.End(), 0, length_);
     }
 
     inline bool Evaluate(QExpression &number, const QExpressions &exprs, const Value_T &value) noexcept {
@@ -324,7 +324,7 @@ struct TemplateCore {
     }
 
     inline static QExpressions ParseExpressions(const Char_T *content, SizeT length) {
-        return parseExpressions(content, SizeT{0}, length, nullptr);
+        return parseExpressions(content, 0, length, nullptr);
     }
 
   private:
@@ -365,7 +365,7 @@ struct TemplateCore {
 
                                 SizeT offset = tag.Offset;
                                 offset += true_offset;
-                                tag.TrueOffset = SizeT{0};
+                                tag.TrueOffset = 0;
 
                                 bool is_true{false};
                                 tag.Length = SizeT16(end_offset - tag.Offset);
@@ -504,7 +504,7 @@ struct TemplateCore {
                                                   // Limit var length to 255 meter per second.;
                                                   & SizeT{0xFF});
 
-                        if (var_length != SizeT{0}) {
+                        if (var_length != 0) {
                             VariableTag *tag = (storage->Insert(TagBit{})).MakeVariableTag();
                             tag->Offset      = offset;
                             tag->Length      = SizeT16(var_length);
@@ -528,7 +528,7 @@ struct TemplateCore {
                                                   // Limit var length to 255 meter per second.;
                                                   & SizeT{0xFF});
 
-                        if (var_length != SizeT{0}) {
+                        if (var_length != 0) {
                             VariableTag *tag = (storage->Insert(TagBit{})).MakeRawVariableTag();
                             tag->Offset      = offset;
                             tag->Length      = SizeT16(var_length);
@@ -572,7 +572,7 @@ struct TemplateCore {
                         break;
                     }
 
-                    if (match != SizeT{0}) {
+                    if (match != 0) {
                         MathTag *tag   = (storage->Insert(TagBit{})).MakeMathTag();
                         tag->Offset    = (offset - TagPatterns::MathPrefixLength);
                         tag->EndOffset = end_offset;
@@ -664,7 +664,7 @@ struct TemplateCore {
                                 break;
                             }
 
-                            if (match != SizeT{0}) {
+                            if (match != 0) {
                                 InLineIfTag *tag = (storage->Insert(TagBit{})).MakeInLineIfTag();
                                 tag->Offset      = iif_offset;
                                 tag->Case        = parseExpressions(content, case_offset, offset, loop_tag);
@@ -806,7 +806,7 @@ struct TemplateCore {
                                 finder.SetOffset(offset);
                                 finder.Next();
 
-                                if ((offset < length) && (case_end_offset != SizeT{0})) {
+                                if ((offset < length) && (case_end_offset != 0)) {
                                     if_case.Offset = offset;
                                     if_case.Case   = parseExpressions(content, case_offset, case_end_offset, loop_tag);
 
@@ -838,7 +838,7 @@ struct TemplateCore {
             }
         }
 
-        while (parent_storage.Size() != SizeT{0}) {
+        while (parent_storage.Size() != 0) {
             storage = *(parent_storage.Last());
             storage->Drop(SizeT{1});
             parent_storage.Drop(SizeT{1});
@@ -1082,7 +1082,7 @@ struct TemplateCore {
             if (tag.IDLength != SizeT8{0}) {
                 const StringView<Char_T> &key = loops_items_->Storage()[tag.Level].Key;
 
-                if (key.Length() != SizeT{0}) {
+                if (key.Length() != 0) {
                     StringUtils::EscapeHTMLSpecialChars(*stream_, key.First(), key.Length());
                     return;
                 }
@@ -1353,7 +1353,7 @@ struct TemplateCore {
         const Char_T  *id     = (content_ + variable.Offset);
         const SizeT    length = variable.Length;
         SizeT          offset = 0;
-        const bool has_index  = ((length != SizeT{0}) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
+        const bool has_index  = ((length != 0) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
 
         if (variable.IDLength == SizeT8{0}) {
             if (!has_index) {
@@ -1364,7 +1364,7 @@ struct TemplateCore {
                 ++offset;
             }
 
-            if (offset != SizeT{0}) {
+            if (offset != 0) {
                 // {var:abc[...]}
                 // if offset == 0 then it's {var:[...]}
                 value = value_->GetValue(id, offset);
@@ -1477,7 +1477,7 @@ struct TemplateCore {
                     // <if case="value[some_string]"><span>value[some_string]-value[another_string]</span></if>
                     if ((operation == QOperation::NoOp) && (expr->Operation == QOperation::NoOp)) {
                         result.Value.Number =
-                            SizeT64((val != nullptr) && val->IsString() && (val->Length() != SizeT{0}));
+                            SizeT64((val != nullptr) && val->IsString() && (val->Length() != 0));
                         result.Type = ExpressionType::NaturalNumber;
                         return true;
                     }
@@ -1830,12 +1830,12 @@ struct TemplateCore {
                     if ((last_oper != oper) || (oper != QOperation::NoOp)) {
                         const QExpression &expr =
                             exprs.Insert(QExpression{parseExpressions(content, offset, end_offset, loop_tag), oper});
-                        return (expr.SubExpressions.Size() != SizeT{0});
+                        return (expr.SubExpressions.Size() != 0);
                     }
 
                     // The entire expression is inside (...)
                     exprs = parseExpressions(content, offset, end_offset, loop_tag);
-                    return (exprs.Size() != SizeT{0});
+                    return (exprs.Size() != 0);
                 }
 
                 case QOperationSymbol::BracketStart: {
@@ -2039,7 +2039,7 @@ struct TemplateCore {
     static bool isExpression(const Char_T *content, SizeT offset) noexcept {
         using QOperationSymbol = QOperationSymbol_T<Char_T>;
 
-        while (offset != SizeT{0}) {
+        while (offset != 0) {
             --offset;
 
             switch (content[offset]) {

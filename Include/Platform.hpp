@@ -297,7 +297,7 @@ inline static SizeT32 FindLastBit(Number_T value) noexcept {
         const unsigned long lower_bits = (unsigned long)(value);
         value >>= int_size;
 
-        if (value == Number_T{0}) {
+        if (value == 0) {
             _BitScanReverse(&index, lower_bits);
             return SizeT32(index);
         }
@@ -363,7 +363,7 @@ inline static SizeT32 FindLastBit(Number_T value) noexcept {
             const SizeT32 lower_bits = SizeT32(value);
             value >>= int_size;
 
-            if (value == Number_T{0}) {
+            if (value == 0) {
                 return (taken_size - SizeT32(__builtin_clz(lower_bits)));
             }
 

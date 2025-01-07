@@ -34,32 +34,33 @@ struct StringView {
     StringView() noexcept  = default;
     ~StringView() noexcept = default;
 
-    StringView(StringView &&src) noexcept : length_{src.Length()}, storage_{src.First()} {
-        src.clearLength();
+    StringView(StringView &&src) noexcept : storage_{src.First()}, length_{src.Length()} {
         src.clearStorage();
+        src.clearLength();
     }
 
     StringView(const StringView &src) {
-        setLength(src.Length());
         setStorage(src.First());
+        setLength(src.Length());
     }
 
     StringView(const Char_T *str, SizeT len) {
-        setLength(len);
         setStorage(str);
+        setLength(len);
     }
 
     StringView(const Char_T *str) {
-        setLength(StringUtils::Count(str));
         setStorage(str);
+        setLength(StringUtils::Count(str));
     }
 
     StringView &operator=(StringView &&src) noexcept {
         if (this != &src) {
-            setLength(src.Length());
             setStorage(src.First());
-            src.clearLength();
+            setLength(src.Length());
+
             src.clearStorage();
+            src.clearLength();
         }
 
         return *this;
@@ -67,16 +68,16 @@ struct StringView {
 
     StringView &operator=(const StringView &src) {
         if (this != &src) {
-            setLength(src.Length());
             setStorage(src.First());
+            setLength(src.Length());
         }
 
         return *this;
     }
 
     StringView &operator=(const Char_T *str) {
-        setLength(StringUtils::Count(str));
         setStorage(str);
+        setLength(StringUtils::Count(str));
 
         return *this;
     }
@@ -160,7 +161,7 @@ struct StringView {
     }
 
     inline const Char_T *Last() const noexcept {
-        if (Length() != SizeT{0}) {
+        if (Length() != 0) {
             return (First() + (Length() - SizeT{1}));
         }
 
@@ -172,7 +173,7 @@ struct StringView {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Length() == SizeT{0});
+        return (Length() == 0);
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -192,7 +193,7 @@ struct StringView {
 
   private:
     void clearLength() noexcept {
-        length_ = SizeT{0};
+        length_ = 0;
     }
 
     void setLength(SizeT length) noexcept {
@@ -207,8 +208,8 @@ struct StringView {
         storage_ = nullptr;
     }
 
-    SizeT         length_{0};
     const Char_T *storage_{nullptr};
+    SizeT         length_{0};
 };
 
 } // namespace Qentem

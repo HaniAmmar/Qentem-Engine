@@ -115,7 +115,7 @@ static void TrimRight(const Char_T *str, const Number_T offset, Number_T &end_of
 // length: the number of characters
 template <typename Char_T, typename Number_T>
 static void Trim(const Char_T *str, Number_T &offset, Number_T &length) noexcept {
-    if (length != Number_T{0}) {
+    if (length != 0) {
         Number_T end_offset = (length + offset);
         TrimLeft(str, offset, end_offset);
         TrimRight(str, offset, end_offset);

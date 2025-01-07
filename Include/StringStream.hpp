@@ -41,20 +41,20 @@ struct StringStream {
     }
 
     inline explicit StringStream(SizeT size) {
-        if (size != SizeT{0}) {
+        if (size != 0) {
             allocate(size);
         }
     }
 
     StringStream(StringStream &&stream) noexcept
         : storage_{stream.Storage()}, length_{stream.Length()}, capacity_{stream.Capacity()} {
-        stream.setCapacity(SizeT{0});
-        stream.setLength(SizeT{0});
         stream.clearStorage();
+        stream.setLength(0);
+        stream.setCapacity(0);
     }
 
     StringStream(const StringStream &stream) {
-        if (stream.Length() != SizeT{0}) {
+        if (stream.Length() != 0) {
             allocate(stream.Length());
             write(stream.First(), stream.Length());
         }
@@ -63,13 +63,14 @@ struct StringStream {
     StringStream &operator=(StringStream &&stream) noexcept {
         if (this != &stream) {
             Memory::Deallocate(Storage());
+
+            setCapacity(stream.Capacity());
             setStorage(stream.Storage());
             setLength(stream.Length());
-            setCapacity(stream.Capacity());
 
-            stream.setCapacity(SizeT{0});
-            stream.setLength(SizeT{0});
             stream.clearStorage();
+            stream.setCapacity(0);
+            stream.setLength(0);
         }
 
         return *this;
@@ -214,14 +215,15 @@ struct StringStream {
     }
 
     inline void Clear() noexcept {
-        setLength(SizeT{0});
+        setLength(0);
     }
 
     void Reset() noexcept {
-        setCapacity(SizeT{0});
-        setLength(SizeT{0});
         Memory::Deallocate(Storage());
+
         clearStorage();
+        setLength(0);
+        setCapacity(0);
     }
 
     inline void StepBack(const SizeT len) noexcept {
@@ -230,7 +232,7 @@ struct StringStream {
         }
     }
 
-    inline void Reverse(SizeT index = SizeT{0}) noexcept {
+    inline void Reverse(SizeT index = 0) noexcept {
         SizeT end = Length();
 
         while (index < end) {
@@ -279,6 +281,7 @@ struct StringStream {
         }
 
         Char_T *str = (Storage() + Length());
+
         setLength(new_length);
 
         return str;
@@ -295,16 +298,17 @@ struct StringStream {
     void Reserve(const SizeT size) {
         Reset();
 
-        if (size != SizeT{0}) {
+        if (size != 0) {
             allocate(size);
         }
     }
 
     Char_T *Detach() noexcept {
-        setCapacity(SizeT{0});
-        setLength(SizeT{0});
         Char_T *str = Storage();
         clearStorage();
+
+        setLength(0);
+        setCapacity(0);
 
         return str;
     }
@@ -317,6 +321,7 @@ struct StringStream {
         }
 
         String<Char_T> str{First(), Length()};
+
         Reset();
 
         return str;
@@ -364,7 +369,7 @@ struct StringStream {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Length() == SizeT{0});
+        return (Length() == 0);
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -415,6 +420,7 @@ struct StringStream {
         }
 
         Memory::Copy((Storage() + Length()), str, (len * size));
+
         setLength(new_length);
     }
 
@@ -430,8 +436,10 @@ struct StringStream {
 
     void allocate(SizeT size) {
         size = Memory::AlignSize(size);
-        setCapacity(size);
+
         setStorage(Memory::Allocate<Char_T>(size));
+
+        setCapacity(size);
     }
 
     Char_T *storage_{nullptr};

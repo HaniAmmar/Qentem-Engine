@@ -81,7 +81,7 @@ struct Digit {
             Char_T            storage[max_number_of_digits];
 
             if (!IsUnsigned<Number_T>()) {
-                if (number < Number_T{0}) {
+                if (number < 0) {
                     qn.Integer = -qn.Integer;
                     stream += DigitUtils::DigitChar::Negative;
                 }
@@ -371,7 +371,7 @@ struct Digit {
                         return QNumberType::Natural;
                     }
 
-                    if (number.Natural == Number_T{0}) {
+                    if (number.Natural == 0) {
                         number.Natural |= 0x8000000000000000LL;
                         return QNumberType::Real;
                     }
@@ -382,7 +382,7 @@ struct Digit {
                     }
                 }
                 ///////////////////////////////////////////////////////////
-                if (number.Natural != Number_T{0}) {
+                if (number.Natural != 0) {
                     const SizeT32 e_p10_power =
                         (SizeT32(tmp_offset - start_offset) - SizeT32(!fraction_only && has_dot));
 
@@ -694,7 +694,7 @@ struct Digit {
                 *storage = Char_T(DigitUtils::DigitTable1[index]);
             }
 
-            if ((number != Number_T{0}) || (str == storage)) {
+            if ((number != 0) || (str == storage)) {
                 --storage;
                 *storage = Char_T(DigitUtils::DigitTable2[number]);
             }
@@ -711,7 +711,7 @@ struct Digit {
                 ++storage;
             }
 
-            if ((number != Number_T{0}) || (str == storage)) {
+            if ((number != 0) || (str == storage)) {
                 *storage = Char_T(DigitUtils::DigitTable2[number]);
                 ++storage;
             }
@@ -732,14 +732,14 @@ struct Digit {
         const Number_T bias = (number & Info_T::ExponentMask);
 
         if (bias != Info_T::ExponentMask) {
-            if ((number & Info_T::SignMask) != Number_T{0}) {
+            if ((number & Info_T::SignMask) != 0) {
                 stream += DigitUtils::DigitChar::Negative;
             }
 
             Number_T mantissa = (number & Info_T::MantissaMask);
 
-            if ((mantissa != Number_T{0}) || (bias != Number_T{0})) {
-                if (bias != Number_T{0}) {
+            if ((mantissa != 0) || (bias != 0)) {
+                if (bias != 0) {
                     mantissa |= Info_T::LeadingBit;
                 } else {
                     mantissa <<= 1U;
@@ -752,7 +752,7 @@ struct Digit {
                 const bool    is_positive_exp  = (exponent >= 0);
                 const SizeT32 positive_exp     = SizeT32(is_positive_exp ? exponent : -exponent);
                 const SizeT32 first_bit        = (Info_T::MantissaSize - first_shift);
-                const SizeT32 exp_actual_value = (positive_exp + ((bias == Number_T{0}) * first_bit));
+                const SizeT32 exp_actual_value = (positive_exp + ((bias == 0) * first_bit));
                 const SizeT32 digits           = (((exp_actual_value * 30103U) / 100000) + 1U);
                 SizeT32       fraction_length  = 0;
                 const bool    fixed =
@@ -865,8 +865,8 @@ struct Digit {
             constexpr SizeT32 size = sizeof(Char_T);
             using DigitString      = DigitUtils::DigitString<Char_T, size>;
 
-            if ((number & Info_T::MantissaMask) == Number_T{0}) {
-                if ((number & Info_T::SignMask) != Number_T{0}) {
+            if ((number & Info_T::MantissaMask) == 0) {
+                if ((number & Info_T::SignMask) != 0) {
                     stream += DigitUtils::DigitChar::Negative;
                 }
 
@@ -950,7 +950,7 @@ struct Digit {
         Char_T     *storage         = stream.Storage();
         const SizeT number_length   = (stream.Length() - started_at);
         SizeT       index           = started_at;
-        SizeT       power           = SizeT{0};
+        SizeT       power           = 0;
         bool        power_increased = false;
         /////////////////////////////////////////////////////
         if (number_length > precision) {
@@ -962,7 +962,7 @@ struct Digit {
             if (is_positive_exp) {
                 const SizeT diff = SizeT(
                     ((number_length - fraction_length) +
-                     ((calculated_digits <= precision) ? SizeT{0} : (calculated_digits - (precision + SizeT{1})))) -
+                     ((calculated_digits <= precision) ? 0 : (calculated_digits - (precision + SizeT{1})))) -
                     SizeT(!power_increased));
 
                 if (diff >= precision) {
@@ -975,7 +975,7 @@ struct Digit {
                     }
 
                     power           = diff;
-                    fraction_length = SizeT{0};
+                    fraction_length = 0;
                 }
             }
         }
@@ -993,7 +993,7 @@ struct Digit {
 
             if (fraction_only) {
                 const SizeT diff =
-                    SizeT((fraction_length > number_length) ? (fraction_length - number_length) : SizeT{0});
+                    SizeT((fraction_length > number_length) ? (fraction_length - number_length) : 0);
 
                 if (!power_increased) {
                     if (diff < SizeT{4}) {
@@ -1004,7 +1004,7 @@ struct Digit {
                         power = diff;
                         ++power;
                     }
-                } else if ((diff != SizeT{0}) && (diff < SizeT{5})) {
+                } else if ((diff != 0) && (diff < SizeT{5})) {
                     insertZeros(stream, (diff - SizeT{1}));
                     stream += DigitUtils::DigitChar::Dot;
                     stream += DigitUtils::DigitChar::Zero;
@@ -1037,7 +1037,7 @@ struct Digit {
         stream.Reverse(started_at);
         stream.StepBack(index - started_at);
 
-        if (power != SizeT{0}) {
+        if (power != 0) {
             stream.InsertAt(DigitUtils::DigitChar::Dot, (started_at + SizeT{1}));
             insertPowerOfTen(stream, power, is_positive_exp);
         }

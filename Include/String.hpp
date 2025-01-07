@@ -37,7 +37,7 @@ struct String {
 
     String() noexcept = default;
 
-    String(String &&src) noexcept : length_{src.length_}, storage_{src.storage_} {
+    String(String &&src) noexcept : storage_{src.storage_}, length_{src.length_} {
         src.clearLength();
         src.clearStorage();
     }
@@ -47,7 +47,7 @@ struct String {
     }
 
     explicit String(SizeT len) {
-        if (len != SizeT{0}) {
+        if (len != 0) {
             Char_T *ns = allocate(len + SizeT{1});
             ns[len]    = Char_T{0};
             setLength(len);
@@ -74,10 +74,12 @@ struct String {
     String &operator=(String &&src) noexcept {
         if (this != &src) {
             deallocate();
+
             setStorage(src.Storage());
             setLength(src.Length());
-            src.clearLength();
+
             src.clearStorage();
+            src.clearLength();
         }
 
         return *this;
@@ -244,7 +246,7 @@ struct String {
     }
 
     void Write(const Char_T *str, const SizeT len) {
-        if ((str != nullptr) && (len != SizeT{0})) {
+        if ((str != nullptr) && (len != 0)) {
             constexpr SizeT32 size    = sizeof(Char_T);
             const SizeT       src_len = Length();
             SizeT             new_len = (src_len + len + SizeT{1});
@@ -265,7 +267,7 @@ struct String {
 
     static String Trim(const String &src) {
         SizeT         length = src.Length();
-        SizeT         offset = SizeT{0};
+        SizeT         offset = 0;
         const Char_T *str    = src.First();
 
         StringUtils::Trim(str, offset, length);
@@ -282,7 +284,7 @@ struct String {
         }
     }
 
-    inline void Reverse(SizeT index = SizeT{0}) noexcept {
+    inline void Reverse(SizeT index = 0) noexcept {
         SizeT   end = Length();
         Char_T *str = Storage();
 
@@ -321,7 +323,7 @@ struct String {
     }
 
     inline Char_T *Last() noexcept {
-        if (Length() != SizeT{0}) {
+        if (Length() != 0) {
             return (Storage() + (Length() - SizeT{1}));
         }
 
@@ -331,7 +333,7 @@ struct String {
     inline const Char_T *Last() const noexcept {
         const SizeT length = Length();
 
-        if (length != SizeT{0}) {
+        if (length != 0) {
             return (First() + (length - SizeT{1}));
         }
 
@@ -343,7 +345,7 @@ struct String {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Length() == SizeT{0});
+        return (Length() == 0);
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -371,7 +373,7 @@ struct String {
 
   private:
     void clearLength() noexcept {
-        length_ = SizeT{0};
+        length_ = 0;
     }
 
     void setLength(SizeT new_length) noexcept {
@@ -384,7 +386,9 @@ struct String {
 
     Char_T *allocate(SizeT new_size) {
         Char_T *ns = Memory::Allocate<Char_T>(new_size);
+
         setStorage(ns);
+
         return ns;
     }
 
@@ -401,11 +405,11 @@ struct String {
         String            ns   = String{SizeT(len1 + len2)};
         Char_T           *des  = ns.Storage();
 
-        if (len1 != SizeT{0}) {
+        if (len1 != 0) {
             Memory::Copy(des, str1, (len1 * size));
         }
 
-        if (len2 != SizeT{0}) {
+        if (len2 != 0) {
             Memory::Copy((des + len1), str2, (len2 * size));
         }
 
@@ -415,13 +419,16 @@ struct String {
     void copyString(const Char_T *str, const SizeT len) {
         constexpr SizeT32 size = sizeof(Char_T);
         Char_T           *ns   = allocate(len + SizeT{1});
+
         Memory::Copy(ns, str, (len * size));
+
         ns[len] = Char_T{0};
+
         setLength(len);
     }
 
-    SizeT   length_{0};
     Char_T *storage_{nullptr};
+    SizeT   length_{0};
 };
 
 } // namespace Qentem

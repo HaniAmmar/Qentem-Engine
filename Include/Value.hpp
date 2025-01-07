@@ -474,7 +474,7 @@ struct Value {
             setTypeToArray();
         }
 
-        if (arr.Size() != SizeT{0}) {
+        if (arr.Size() != 0) {
             array_ += Memory::Move(arr);
         } else {
             array_ += Value{Memory::Move(arr)};
@@ -1122,7 +1122,7 @@ struct Value {
             return (value_->Size());
         }
 
-        return SizeT{0};
+        return 0;
     }
 
     Value *GetValue(SizeT index) const noexcept {
@@ -1413,7 +1413,7 @@ struct Value {
             return (value_->Length());
         }
 
-        return SizeT{0};
+        return 0;
     }
 
     // To get a pointer to a key and its length.
@@ -1797,7 +1797,7 @@ struct Value {
             }
 
             if (size != array_.Capacity()) {
-                if (size == SizeT{0}) {
+                if (size == 0) {
                     array_.Reset();
                     return;
                 }

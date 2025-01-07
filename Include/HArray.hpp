@@ -105,7 +105,7 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
         }
 
         while (src_item < src_end) {
-            if (src_item->Hash != SizeT{0}) {
+            if (src_item->Hash != 0) {
                 SizeT *index;
                 HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
@@ -122,8 +122,8 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
 
         Memory::Deallocate(src.getHashTable());
         src.clearHashTable();
-        src.setCapacity(SizeT{0});
-        src.setSize(SizeT{0});
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
     void operator+=(const HArray &src) {
@@ -136,7 +136,7 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
         }
 
         while (src_item < src_end) {
-            if (src_item->Hash != SizeT{0}) {
+            if (src_item->Hash != 0) {
                 SizeT *index;
                 HItem *storage_item = find(index, src_item->Key.First(), src_item->Key.Length(), src_item->Hash);
 
@@ -240,7 +240,7 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
     Value_T *GetValue(const SizeT index) const noexcept {
         HItem *src = Storage();
 
-        if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
             return &((src + index)->Value);
         }
 

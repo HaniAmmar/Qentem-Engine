@@ -43,14 +43,14 @@ struct HashTable {
     HashTable() noexcept = default;
 
     explicit HashTable(const SizeT size) {
-        if (size != SizeT{0}) {
+        if (size != 0) {
             allocate(size);
         }
     }
 
-    HashTable(HashTable &&src) noexcept : index_{src.index_}, capacity_{src.capacity_}, hashTable_{src.hashTable_} {
-        src.setSize(SizeT{0});
-        src.setCapacity(SizeT{0});
+    HashTable(HashTable &&src) noexcept : hashTable_{src.hashTable_}, index_{src.index_}, capacity_{src.capacity_} {
+        src.setSize(0);
+        src.setCapacity(0);
         src.clearHashTable();
     }
 
@@ -72,12 +72,12 @@ struct HashTable {
             const SizeT size    = Size();
 
             setHashTable(src.getHashTable());
-            setCapacity(src.Capacity());
             setSize(src.Size());
+            setCapacity(src.Capacity());
 
             src.clearHashTable();
-            src.setSize(SizeT{0});
-            src.setCapacity(SizeT{0});
+            src.setSize(0);
+            src.setCapacity(0);
 
             // Just in case the copied array is not a child array, do this last.
             Memory::Dispose(storage, (storage + size));
@@ -94,8 +94,9 @@ struct HashTable {
             const SizeT size    = Size();
 
             clearHashTable();
-            setCapacity(SizeT{0});
-            setSize(SizeT{0});
+            setSize(0);
+            setCapacity(0);
+
             copyTable(src);
 
             Memory::Dispose(storage, (storage + size));
@@ -124,7 +125,7 @@ struct HashTable {
     const Key_T *GetKey(const SizeT index) const noexcept {
         const HItem *src = Storage();
 
-        if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
             return &((src + index)->Key);
         }
 
@@ -151,7 +152,7 @@ struct HashTable {
     const HItem *GetItem(const SizeT index) const noexcept {
         const HItem *src = Storage();
 
-        if ((index < Size()) && ((src + index)->Hash != SizeT{0})) {
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
             return (src + index);
         }
 
@@ -193,7 +194,7 @@ struct HashTable {
         if (index < Size()) {
             const HItem *item = (Storage() + index);
 
-            if (item->Hash != SizeT{0}) {
+            if (item->Hash != 0) {
                 remove(item->Key.First(), item->Key.Length(), item->Hash);
             }
         }
@@ -210,19 +211,19 @@ struct HashTable {
 
             find(left_index, from.First(), from.Length(), StringUtils::Hash(from.First(), from.Length()));
 
-            if (*left_index != SizeT{0}) {
+            if (*left_index != 0) {
                 const SizeT to_hash = StringUtils::Hash(to.First(), to.Length());
 
                 find(right_index, to.First(), to.Length(), to_hash);
 
-                if (*right_index == SizeT{0}) {
+                if (*right_index == 0) {
                     SizeT index = *left_index;
                     --index;
 
                     HItem *item  = (Storage() + index);
                     *right_index = *left_index;
                     *left_index  = item->Next;
-                    item->Next   = SizeT{0};
+                    item->Next   = 0;
                     item->Hash   = to_hash;
 
                     item->Key = Memory::Move(to);
@@ -241,7 +242,7 @@ struct HashTable {
     void Reserve(SizeT size) {
         Reset();
 
-        if (size != SizeT{0}) {
+        if (size != 0) {
             allocate(size);
         }
     }
@@ -253,23 +254,25 @@ struct HashTable {
             HItem            *storage = Storage();
             Memory::SetToZero(ht, (size * Capacity()));
             Memory::Dispose(storage, (storage + Size()));
-            setSize(SizeT{0});
+            setSize(0);
         }
     }
 
     void Reset() noexcept {
         if (Capacity() != 0) {
             HItem *storage = Storage();
+
             Memory::Dispose(storage, (storage + Size()));
             Memory::Deallocate(getHashTable());
+
             clearHashTable();
-            setCapacity(SizeT{0});
-            setSize(SizeT{0});
+            setSize(0);
+            setCapacity(0);
         }
     }
 
     void Resize(const SizeT new_size) {
-        if (new_size == SizeT{0}) {
+        if (new_size == 0) {
             Reset();
             return;
         }
@@ -278,6 +281,7 @@ struct HashTable {
             // Shrink
             HItem *storage = Storage();
             Memory::Dispose((storage + new_size), (storage + Size()));
+
             setSize(new_size);
         }
 
@@ -310,7 +314,7 @@ struct HashTable {
     void Compress() {
         const SizeT size = ActualSize();
 
-        if (size != SizeT{0}) {
+        if (size != 0) {
             if (size < Size()) {
                 resize(size);
             }
@@ -328,7 +332,7 @@ struct HashTable {
         SizeT        size = 0;
 
         while (item < end) {
-            if (item->Hash != SizeT{0}) {
+            if (item->Hash != 0) {
                 ++size;
             }
 
@@ -367,7 +371,7 @@ struct HashTable {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Size() == SizeT{0});
+        return (Size() == 0);
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -409,8 +413,11 @@ struct HashTable {
         new_capacity = Memory::AlignSize(new_capacity);
 
         setCapacity(new_capacity);
+
         SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
+
         setHashTable(ht);
+
         Memory::SetToZero(ht, (size * new_capacity));
 
         return Memory::ChangePointer<HItem>(ht + Capacity());
@@ -438,6 +445,7 @@ struct HashTable {
 
     inline void expand() {
         SizeT capacity = SizeT(Capacity() == 0) + Capacity();
+
         resize(capacity * SizeT{2});
     }
 
@@ -447,7 +455,7 @@ struct HashTable {
         *index = Size();
 
         item->Hash = hash;
-        item->Next = SizeT{0};
+        item->Next = 0;
 
         Memory::Initialize(&(item->Key), Memory::Move(key));
 
@@ -461,8 +469,8 @@ struct HashTable {
 
             if (item != nullptr) {
                 *index     = item->Next;
-                item->Next = SizeT{0};
-                item->Hash = SizeT{0};
+                item->Next = 0;
+                item->Hash = 0;
 
                 item->Clear();
             }
@@ -477,7 +485,7 @@ struct HashTable {
             SizeT        index{0};
 
             do {
-                if (src_item->Hash != SizeT{0}) {
+                if (src_item->Hash != 0) {
                     Memory::Initialize(storage, *src_item);
                     ++storage;
                     ++index;
@@ -497,10 +505,10 @@ struct HashTable {
         const HItem *end     = (item + Size());
         HItem       *storage = allocate(new_size);
 
-        setSize(SizeT{0});
+        setSize(0);
 
         while (item < end) {
-            if (item->Hash != SizeT{0}) {
+            if (item->Hash != 0) {
                 Memory::Initialize(storage, Memory::Move(*item));
                 ++storage;
                 ++index_;
@@ -520,7 +528,7 @@ struct HashTable {
         HItem *item;
         index = (ht + (hash & getBase()));
 
-        while (*index != SizeT{0}) {
+        while (*index != 0) {
             item = (storage + *index);
             --item;
 
@@ -544,10 +552,10 @@ struct HashTable {
         const SizeT  base = getBase();
 
         while (item < end) {
-            item->Next = SizeT{0};
+            item->Next = 0;
             index      = (ht + (item->Hash & base));
 
-            while (*index != SizeT{0}) {
+            while (*index != 0) {
                 index = &((src + (*index - SizeT{1}))->Next);
             }
 
@@ -563,9 +571,9 @@ struct HashTable {
     template <typename>
     friend struct HList;
 
+    SizeT *hashTable_{nullptr};
     SizeT  index_{0};
     SizeT  capacity_{0};
-    SizeT *hashTable_{nullptr};
 };
 
 } // namespace Qentem

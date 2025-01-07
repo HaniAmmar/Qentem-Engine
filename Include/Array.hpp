@@ -34,14 +34,14 @@ template <typename Type_T>
 struct Array {
     Array() noexcept = default;
 
-    Array(Array &&src) noexcept : index_{src.index_}, capacity_{src.capacity_}, storage_{src.storage_} {
-        src.setSize(SizeT{0});
-        src.setCapacity(SizeT{0});
+    Array(Array &&src) noexcept : storage_{src.storage_}, index_{src.index_}, capacity_{src.capacity_} {
         src.clearStorage();
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
     explicit Array(SizeT size, bool initialize = false) : capacity_{size} {
-        if (size != SizeT{0}) {
+        if (size != 0) {
             Type_T *current = allocate();
 
             if (initialize) {
@@ -69,12 +69,12 @@ struct Array {
             const SizeT size    = Size();
 
             setStorage(src.Storage());
-            setCapacity(src.Capacity());
             setSize(src.Size());
+            setCapacity(src.Capacity());
 
             src.clearStorage();
-            src.setSize(SizeT{0});
-            src.setCapacity(SizeT{0});
+            src.setSize(0);
+            src.setCapacity(0);
 
             // Just in case the copied array is not a child array, do this last.
             Memory::Dispose(storage, (storage + size));
@@ -90,8 +90,8 @@ struct Array {
             const SizeT size    = Size();
 
             clearStorage();
-            setCapacity(src.Size());
             setSize(src.Size());
+            setCapacity(src.Size());
 
             if (IsNotEmpty()) {
                 copyArray(src);
@@ -106,10 +106,10 @@ struct Array {
     }
 
     void operator+=(Array &&src) {
-        if (Capacity() == SizeT{0}) {
+        if (Capacity() == 0) {
             setStorage(src.Storage());
-            setCapacity(src.Capacity());
             setSize(src.Size());
+            setCapacity(src.Capacity());
         } else {
             constexpr SizeT32 type_size = sizeof(Type_T);
             const SizeT       n_size    = (Size() + src.Size());
@@ -124,8 +124,8 @@ struct Array {
         }
 
         src.clearStorage();
-        src.setCapacity(SizeT{0});
-        src.setSize(SizeT{0});
+        src.setSize(0);
+        src.setCapacity(0);
     }
 
     void operator+=(const Array &src) {
@@ -150,7 +150,7 @@ struct Array {
 
     void operator+=(Type_T &&item) {
         if (Size() == Capacity()) {
-            resize((Capacity() | (Capacity() == SizeT{0})) * SizeT{2});
+            resize((Capacity() | (Capacity() == 0)) * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), Memory::Move(item));
@@ -159,7 +159,7 @@ struct Array {
 
     inline void operator+=(const Type_T &item) {
         if (Size() == Capacity()) {
-            resize((Capacity() | (Capacity() == SizeT{0})) * SizeT{2});
+            resize((Capacity() | (Capacity() == 0)) * SizeT{2});
         }
 
         Memory::Initialize((Storage() + Size()), item);
@@ -192,22 +192,25 @@ struct Array {
 
     void Clear() noexcept {
         Memory::Dispose(Storage(), End());
-        setSize(SizeT{0});
+
+        setSize(0);
     }
 
     void Reset() noexcept {
         Memory::Dispose(Storage(), End());
         Memory::Deallocate(Storage());
+
         clearStorage();
-        setCapacity(SizeT{0});
-        setSize(SizeT{0});
+        setSize(0);
+        setCapacity(0);
     }
 
     Type_T *Detach() noexcept {
         Type_T *tmp = Storage();
-        setCapacity(SizeT{0});
+
         clearStorage();
-        setSize(SizeT{0});
+        setSize(0);
+        setCapacity(0);
 
         return tmp;
     }
@@ -215,7 +218,7 @@ struct Array {
     void Reserve(const SizeT size, bool initialize = false) {
         Reset();
 
-        if (size != SizeT{0}) {
+        if (size != 0) {
             setCapacity(size);
             Type_T *current = allocate();
 
@@ -227,7 +230,7 @@ struct Array {
     }
 
     void Resize(SizeT new_size) {
-        if (new_size != SizeT{0}) {
+        if (new_size != 0) {
             if (Size() > new_size) {
                 // Shrink
                 Memory::Dispose((Storage() + new_size), End());
@@ -316,7 +319,7 @@ struct Array {
     }
 
     inline bool IsEmpty() const noexcept {
-        return (Size() == SizeT{0});
+        return (Size() == 0);
     }
 
     inline bool IsNotEmpty() const noexcept {
@@ -368,7 +371,9 @@ struct Array {
     void resize(SizeT new_size) {
         constexpr SizeT32 type_size = sizeof(Type_T);
         Type_T           *src       = Storage();
+
         setCapacity(new_size);
+
         Type_T *des = allocate();
         Memory::Copy(des, src, (Size() * type_size));
         Memory::Deallocate(src);
@@ -386,9 +391,9 @@ struct Array {
         }
     }
 
+    Type_T *storage_{nullptr};
     SizeT   index_{0};
     SizeT   capacity_{0};
-    Type_T *storage_{nullptr};
 };
 
 } // namespace Qentem

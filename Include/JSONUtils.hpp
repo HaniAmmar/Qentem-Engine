@@ -164,11 +164,11 @@ struct JSONUtils {
                                 }
                             }
 
-                            return SizeT{0};
+                            return 0;
                         }
 
                         default: {
-                            return SizeT{0};
+                            return 0;
                         }
                     }
 
@@ -178,7 +178,7 @@ struct JSONUtils {
                 case JSONotation::LineControlChar:
                 case JSONotation::TabControlChar:
                 case JSONotation::CarriageControlChar: {
-                    return SizeT{0};
+                    return 0;
                 }
 
                 default: {
