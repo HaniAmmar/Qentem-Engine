@@ -104,7 +104,7 @@ QENTEM_NOINLINE static void RealToStreamEqualSemiFixed(QTest &test, Stream_T &st
     Digit::NumberToString(stream, number, Digit::RealFormatInfo{precision, Digit::RealFormatType::SemiFixed});
 
     stream.InsertNull();
-    const StringView<char> str_number{(stream.First() + offset), (stream.Length() - offset)};
+    const StringView<char> str_number{(stream.First() + offset), SizeT(stream.Length() - offset)};
 
     if (!test.HasError() || test.IsContinueOnError()) {
         test.IsEqual(str_number, expected, line);

@@ -960,10 +960,10 @@ struct Digit {
             roundStringNumber(stream, index, power_increased, round_up);
 
             if (is_positive_exp) {
-                const SizeT diff = SizeT(
-                    ((number_length - fraction_length) +
-                     ((calculated_digits <= precision) ? 0 : (calculated_digits - (precision + SizeT{1})))) -
-                    SizeT(!power_increased));
+                const SizeT diff =
+                    SizeT(((number_length - fraction_length) +
+                           ((calculated_digits <= precision) ? 0 : (calculated_digits - (precision + SizeT{1})))) -
+                          SizeT(!power_increased));
 
                 if (diff >= precision) {
                     Char_T       *number = (storage + index);
@@ -992,8 +992,7 @@ struct Digit {
             }
 
             if (fraction_only) {
-                const SizeT diff =
-                    SizeT((fraction_length > number_length) ? (fraction_length - number_length) : 0);
+                const SizeT diff = SizeT((fraction_length > number_length) ? (fraction_length - number_length) : 0);
 
                 if (!power_increased) {
                     if (diff < SizeT{4}) {
@@ -1020,7 +1019,7 @@ struct Digit {
                     zeros = SizeT(number_length - fraction_length);
                 } else {
                     const SizeT rem    = (index - started_at);
-                    const SizeT needed = (number_length - calculated_digits);
+                    const SizeT needed = SizeT(number_length - calculated_digits);
 
                     if (rem > needed)
                         zeros = (rem - needed);
@@ -1075,7 +1074,7 @@ struct Digit {
                     if ((index < stream.Length()) || power_increased) {
                         if (diff != 0) {
                             if (power_increased) {
-                                index          = (index - SizeT(index == stream.Length()));
+                                index -= SizeT(index == stream.Length());
                                 storage[index] = DigitUtils::DigitChar::One;
                             }
 
@@ -1100,7 +1099,7 @@ struct Digit {
                         zeros = SizeT(number_length - fraction_length);
                     } else {
                         const SizeT rem    = (index - started_at);
-                        const SizeT needed = (number_length - calculated_digits);
+                        const SizeT needed = SizeT(number_length - calculated_digits);
 
                         if (rem > needed)
                             zeros = (rem - needed);
@@ -1113,7 +1112,7 @@ struct Digit {
                     }
                 }
             } else {
-                index          = index + (number_length - SizeT{1});
+                index += (number_length - SizeT{1});
                 storage[index] = DigitUtils::DigitChar::Zero;
             }
         }
