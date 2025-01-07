@@ -133,6 +133,10 @@ struct HList : public HashTable<Key_T, HLItem_T<Key_T>> {
         }
     }
 
+    void Insert(const Char_T *key, const SizeT length) {
+        Insert(Key_T{key, length});
+    }
+
     void Insert(const Key_T &key) {
         Insert(Key_T{key});
     }
