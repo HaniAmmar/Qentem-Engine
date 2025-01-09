@@ -88,11 +88,53 @@ struct Digit {
             }
 
             if QENTEM_CONST_EXPRESSION (Reverse_V_T) {
-                stream.Write(&(storage[0]), intToString<true>(&(storage[0]), qn.Natural));
+                stream.Write(&(storage[0]), IntToString<true>(&(storage[0]), qn.Natural));
             } else {
-                const SizeT offset = intToString(&(storage[max_number_of_digits]), qn.Natural);
+                const SizeT offset = IntToString(&(storage[max_number_of_digits]), qn.Natural);
                 stream.Write(&(storage[max_number_of_digits - offset]), offset);
             }
+        }
+    }
+
+    /////////////////////////////////////////
+    template <bool Reverse_V_T = false, typename Char_T, typename Number_T>
+    static SizeT IntToString(Char_T *storage, Number_T number) noexcept {
+        const Char_T *str = storage;
+
+        if QENTEM_CONST_EXPRESSION (!Reverse_V_T) {
+            while (number >= Number_T{10}) {
+                const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
+                number /= Number_T{100};
+
+                --storage;
+                *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
+                --storage;
+                *storage = Char_T(DigitUtils::DigitTable1[index]);
+            }
+
+            if ((number != 0) || (str == storage)) {
+                --storage;
+                *storage = Char_T(DigitUtils::DigitTable2[number]);
+            }
+
+            return SizeT(str - storage);
+        } else {
+            while (number >= Number_T{10}) {
+                const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
+                number /= Number_T{100};
+
+                *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
+                ++storage;
+                *storage = Char_T(DigitUtils::DigitTable1[index]);
+                ++storage;
+            }
+
+            if ((number != 0) || (str == storage)) {
+                *storage = Char_T(DigitUtils::DigitTable2[number]);
+                ++storage;
+            }
+
+            return SizeT(storage - str);
         }
     }
     /////////////////////////////////////////////////////////////////
@@ -677,47 +719,6 @@ struct Digit {
         }
 
         return false;
-    }
-    /////////////////////////////////////////
-    template <bool Reverse_V_T = false, typename Char_T, typename Number_T>
-    static SizeT intToString(Char_T *storage, Number_T number) noexcept {
-        const Char_T *str = storage;
-
-        if QENTEM_CONST_EXPRESSION (!Reverse_V_T) {
-            while (number >= Number_T{10}) {
-                const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
-                number /= Number_T{100};
-
-                --storage;
-                *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
-                --storage;
-                *storage = Char_T(DigitUtils::DigitTable1[index]);
-            }
-
-            if ((number != 0) || (str == storage)) {
-                --storage;
-                *storage = Char_T(DigitUtils::DigitTable2[number]);
-            }
-
-            return SizeT(str - storage);
-        } else {
-            while (number >= Number_T{10}) {
-                const SizeT index = (SizeT(number % Number_T{100}) * SizeT{2});
-                number /= Number_T{100};
-
-                *storage = Char_T(DigitUtils::DigitTable1[index + SizeT{1}]);
-                ++storage;
-                *storage = Char_T(DigitUtils::DigitTable1[index]);
-                ++storage;
-            }
-
-            if ((number != 0) || (str == storage)) {
-                *storage = Char_T(DigitUtils::DigitTable2[number]);
-                ++storage;
-            }
-
-            return SizeT(storage - str);
-        }
     }
     /////////////////////////////////////////
     template <typename Float_T, typename Stream_T, typename Number_T>
