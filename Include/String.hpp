@@ -253,15 +253,15 @@ struct String {
             Char_T           *src     = Storage();
             Char_T           *ns      = allocate(new_len);
 
-            if (src != nullptr) {
-                Memory::Copy(ns, src, (src_len * size));
-                Memory::Deallocate(src);
-            }
-
             Memory::Copy((ns + src_len), str, (len * size));
             --new_len;
             ns[new_len] = Char_T{0};
             setLength(new_len);
+
+            if (src != nullptr) {
+                Memory::Copy(ns, src, (src_len * size));
+                Memory::Deallocate(src);
+            }
         }
     }
 
