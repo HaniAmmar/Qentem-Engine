@@ -37,7 +37,7 @@ struct WhiteSpaceChars_T {
 };
 
 template <typename Char_T, typename Number_T = SizeT>
-static Number_T Count(const Char_T *str) noexcept {
+static QENTEM_CONST_EXPRESSION Number_T Count(const Char_T *str) noexcept {
     Number_T len = 0;
 
     if (str != nullptr) {
@@ -49,21 +49,6 @@ static Number_T Count(const Char_T *str) noexcept {
 
     return len;
 }
-
-// template <typename Char_T, typename Number_T = SizeT>
-// static constexpr Number_T ConstCount(const Char_T *str) noexcept {
-//     const Char_T *str_2 = str;
-//     Number_T      len   = 0;
-
-//     if (str_2 != nullptr) {
-//         while (*str_2 != Char_T{0}) {
-//             ++str_2;
-//             ++len;
-//         }
-//     }
-
-//     return len;
-// }
 
 template <typename Char_T, typename Number_T>
 static void TrimLeft(const Char_T *str, Number_T &offset, const Number_T end_offset) noexcept {
