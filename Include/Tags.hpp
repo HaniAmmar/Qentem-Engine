@@ -382,64 +382,54 @@ struct TagPatterns_T {
     // {var:
     static constexpr const Char_T *VariablePrefix = TPStrings::VariablePrefix;
     static constexpr Char_T        Var_2ND_Char   = VariablePrefix[1U]; // Second character
-    // static constexpr SizeT          VariablePrefixLength = StringUtils::ConstCount(VariablePrefix);
-    static constexpr SizeT VariablePrefixLength{5};
-    static constexpr SizeT VariableFullLength = (VariablePrefixLength + InLineSuffixLength);
+    static constexpr SizeT         VariablePrefixLength{5};
+    static constexpr SizeT         VariableFullLength = (VariablePrefixLength + InLineSuffixLength);
 
     // {raw:
     static constexpr const Char_T *RawVariablePrefix = TPStrings::RawVariablePrefix;
     static constexpr Char_T        Raw_2ND_Char      = RawVariablePrefix[1U]; // Second character
-    // static constexpr SizeT          RawVariablePrefixLength = StringUtils::ConstCount(RawVariablePrefix);
-    static constexpr SizeT RawVariablePrefixLength{5};
-    static constexpr SizeT RawVariableFullLength = (RawVariablePrefixLength + InLineSuffixLength);
+    static constexpr SizeT         RawVariablePrefixLength{5};
+    static constexpr SizeT         RawVariableFullLength = (RawVariablePrefixLength + InLineSuffixLength);
 
     // {math:
     static constexpr const Char_T *MathPrefix    = TPStrings::MathPrefix;
     static constexpr Char_T        Math_2ND_Char = MathPrefix[1U]; // Second character
-    // static constexpr SizeT          MathPrefixLength = StringUtils::ConstCount(MathPrefix);
-    static constexpr SizeT MathPrefixLength{6};
+    static constexpr SizeT         MathPrefixLength{6};
 
     // {svar:
     static constexpr const Char_T *SuperVariablePrefix    = TPStrings::SuperVariablePrefix;
     static constexpr Char_T        SuperVariable_2ND_Char = SuperVariablePrefix[1U]; // Second character
-    // static constexpr SizeT          MathPrefixLength = StringUtils::ConstCount(MathPrefix);
-    static constexpr SizeT SuperVariablePrefixLength{6};
+    static constexpr SizeT         SuperVariablePrefixLength{6};
 
     // {if
     static constexpr const Char_T *InLineIfPrefix    = TPStrings::InLineIfPrefix;
     static constexpr Char_T        InlineIf_2ND_Char = InLineIfPrefix[1U]; // Second character
-    // static constexpr SizeT          InLineIfPrefixLength = StringUtils::ConstCount(InLineIfPrefix);
-    static constexpr SizeT InLineIfPrefixLength{3};
+    static constexpr SizeT         InLineIfPrefixLength{3};
 
     // <loop
     static constexpr const Char_T *LoopPrefix    = TPStrings::LoopPrefix;
     static constexpr Char_T        Loop_2ND_Char = LoopPrefix[1U]; // Second character
-    // static constexpr SizeT          LoopPrefixLength = StringUtils::ConstCount(LoopPrefix);
-    static constexpr SizeT LoopPrefixLength{5};
+    static constexpr SizeT         LoopPrefixLength{5};
 
     // </loop>
     static constexpr const Char_T *LoopSuffix = TPStrings::LoopSuffix;
-    // static constexpr SizeT          LoopSuffixLength = StringUtils::ConstCount(LoopSuffix);
-    static constexpr SizeT LoopSuffixLength{7};
+    static constexpr SizeT         LoopSuffixLength{7};
 
     // <if
     static constexpr const Char_T *IfPrefix    = TPStrings::IfPrefix;
     static constexpr Char_T        If_2ND_Char = IfPrefix[1U]; // Second character
-    // static constexpr SizeT          IfPrefixLength = StringUtils::ConstCount(IfPrefix);
-    static constexpr SizeT IfPrefixLength{3};
+    static constexpr SizeT         IfPrefixLength{3};
 
     static constexpr SizeT IfAfterElseLength{2}; // else[if]
 
     // </if>
     static constexpr const Char_T *IfSuffix = TPStrings::IfSuffix;
-    // static constexpr SizeT          IfSuffixLength = StringUtils::ConstCount(IfSuffix);
-    static constexpr SizeT IfSuffixLength{5};
+    static constexpr SizeT         IfSuffixLength{5};
 
     // <else
     static constexpr Char_T        ElseIfChar = 'i'; // else[i]f
     static constexpr const Char_T *ElsePrefix = TPStrings::ElsePrefix;
-    // static constexpr SizeT          ElsePrefixLength = StringUtils::ConstCount(ElsePrefix);
-    static constexpr SizeT ElsePrefixLength{5};
+    static constexpr SizeT         ElsePrefixLength{5};
 
     static constexpr Char_T EqualChar              = '=';
     static constexpr Char_T SpaceChar              = ' ';
