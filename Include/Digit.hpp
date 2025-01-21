@@ -39,16 +39,17 @@ struct Digit {
     enum struct RealFormatType : SizeT8 { Default = 0, Fixed = 1, SemiFixed = 2, Scientific = 3 };
 
     struct RealFormatInfo {
-        RealFormatInfo() noexcept {
+        QENTEM_CONST_EXPRESSION RealFormatInfo() noexcept {
         }
 
-        RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
+        QENTEM_CONST_EXPRESSION RealFormatInfo(SizeT32 precision) noexcept : Precision{precision} {
         }
 
-        RealFormatInfo(RealFormatType type) noexcept : Type{type} {
+        QENTEM_CONST_EXPRESSION RealFormatInfo(RealFormatType type) noexcept : Type{type} {
         }
 
-        RealFormatInfo(SizeT32 precision, RealFormatType type) noexcept : Precision{precision}, Type{type} {
+        QENTEM_CONST_EXPRESSION RealFormatInfo(SizeT32 precision, RealFormatType type) noexcept
+            : Precision{precision}, Type{type} {
         }
 
         RealFormatInfo &operator=(SizeT32 precision) noexcept {
