@@ -49,7 +49,7 @@ struct StringView {
         setLength(len);
     }
 
-    StringView(const Char_T *str) {
+    QENTEM_CONST_EXPRESSION StringView(const Char_T *str) {
         setStorage(str);
         setLength(StringUtils::Count(str));
     }
@@ -192,20 +192,20 @@ struct StringView {
     //////////// Private ////////////
 
   private:
-    void clearLength() noexcept {
-        length_ = 0;
-    }
-
-    void setLength(SizeT length) noexcept {
+    QENTEM_CONST_EXPRESSION void setLength(SizeT length) noexcept {
         length_ = length;
     }
 
-    void setStorage(const Char_T *ptr) noexcept {
+    QENTEM_CONST_EXPRESSION void setStorage(const Char_T *ptr) noexcept {
         storage_ = ptr;
     }
 
     void clearStorage() noexcept {
         storage_ = nullptr;
+    }
+
+    void clearLength() noexcept {
+        length_ = 0;
     }
 
     const Char_T *storage_{nullptr};
