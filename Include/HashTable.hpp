@@ -408,8 +408,8 @@ struct HashTable {
         constexpr SizeT32 size     = sizeof(SizeT);
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem)};
 
-        // Making sure 'size' is not odd.
-        new_capacity += SizeT(new_capacity & SizeT{1});
+        // Making sure 'size' is not an odd number.
+        new_capacity += (new_capacity & SizeT{1});
         new_capacity = Memory::AlignSize(new_capacity);
 
         setCapacity(new_capacity);
@@ -444,9 +444,7 @@ struct HashTable {
     }
 
     inline void expand() {
-        SizeT capacity = SizeT(Capacity() == 0) + Capacity();
-
-        resize(capacity * SizeT{2});
+        resize((SizeT(Capacity() == 0) + Capacity()) * SizeT{2});
     }
 
     HItem *insert(SizeT *index, Key_T &&key, const SizeT hash) noexcept {

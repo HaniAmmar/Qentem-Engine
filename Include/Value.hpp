@@ -1374,7 +1374,7 @@ struct Value {
         return nullptr;
     }
 
-    const StringViewT GetStringView() const noexcept {
+    StringViewT GetStringView() const noexcept {
         const ValueType type = Type();
 
         if (type == ValueType::String) {

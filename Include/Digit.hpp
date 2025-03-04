@@ -1023,8 +1023,9 @@ struct Digit {
                     const SizeT rem    = (index - started_at);
                     const SizeT needed = SizeT(number_length - calculated_digits);
 
-                    if (rem > needed)
+                    if (rem > needed) {
                         zeros = (rem - needed);
+                    }
                 }
 
                 while (zeros != 0) {
@@ -1103,8 +1104,9 @@ struct Digit {
                         const SizeT rem    = (index - started_at);
                         const SizeT needed = SizeT(number_length - calculated_digits);
 
-                        if (rem > needed)
+                        if (rem > needed) {
                             zeros = (rem - needed);
+                        }
                     }
 
                     while (zeros != 0) {

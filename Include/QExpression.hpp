@@ -127,7 +127,7 @@ struct QExpression {
         }
     }
 
-    QExpression &operator=(QExpression &&src) {
+    QExpression &operator=(QExpression &&src) noexcept {
         if (this != &src) {
             if (Type == ExpressionType::SubOperation) {
                 Memory::Dispose(&SubExpressions);
