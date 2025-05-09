@@ -175,9 +175,7 @@ struct StringStream {
     }
 
     inline bool operator==(const String<Char_T> &string) const noexcept {
-        const SizeT len = string.Length();
-
-        return ((Length() == len) && StringUtils::IsEqual(First(), string.First(), Length()));
+        return ((Length() == string.Length()) && StringUtils::IsEqual(First(), string.First(), Length()));
     }
 
     inline bool operator==(const StringView<Char_T> &string) const noexcept {
@@ -185,9 +183,9 @@ struct StringStream {
     }
 
     inline bool operator==(const Char_T *str) const noexcept {
-        const SizeT len = StringUtils::Count(str);
+        const SizeT length = StringUtils::Count(str);
 
-        return ((Length() == len) && StringUtils::IsEqual(First(), str, len));
+        return ((Length() == length) && StringUtils::IsEqual(First(), str, length));
     }
 
     inline bool IsEqual(const Char_T *str, const SizeT length) const noexcept {
@@ -226,9 +224,9 @@ struct StringStream {
         setCapacity(0);
     }
 
-    inline void StepBack(const SizeT len) noexcept {
-        if (len <= Length()) {
-            length_ -= len;
+    inline void StepBack(const SizeT length) noexcept {
+        if (length <= Length()) {
+            length_ -= length;
         }
     }
 
@@ -264,17 +262,17 @@ struct StringStream {
         }
     }
 
-    inline void SetLength(SizeT len) {
-        if (Capacity() < len) {
-            expand(len);
+    inline void SetLength(SizeT length) {
+        if (Capacity() < length) {
+            expand(length);
         }
 
-        setLength(len);
+        setLength(length);
     }
 
     // Set the needed length to write directly to a returned buffer,
-    inline Char_T *Buffer(SizeT len) {
-        const SizeT new_length = (Length() + len);
+    inline Char_T *Buffer(SizeT length) {
+        const SizeT new_length = (Length() + length);
 
         if (Capacity() < new_length) {
             expand(new_length);
@@ -287,11 +285,11 @@ struct StringStream {
         return str;
     }
 
-    inline void Expect(SizeT len) {
-        len += Length();
+    inline void Expect(SizeT length) {
+        length += Length();
 
-        if (Capacity() < len) {
-            expand(len);
+        if (Capacity() < length) {
+            expand(length);
         }
     }
 
@@ -315,9 +313,8 @@ struct StringStream {
 
     String<Char_T> GetString() {
         if (Capacity() > Length()) {
-            const SizeT len     = Length();
             Storage()[Length()] = Char_T{0};
-            return String<Char_T>(Detach(), len);
+            return String<Char_T>(Detach(), Length());
         }
 
         String<Char_T> str{First(), Length()};
@@ -411,15 +408,15 @@ struct StringStream {
         capacity_ = new_capacity;
     }
 
-    inline void write(const Char_T *str, const SizeT len) {
+    inline void write(const Char_T *str, const SizeT length) {
         constexpr SizeT size       = sizeof(Char_T);
-        const SizeT     new_length = (Length() + len);
+        const SizeT     new_length = (Length() + length);
 
         if (Capacity() < new_length) {
             expand(new_length);
         }
 
-        Memory::Copy((Storage() + Length()), str, (len * size));
+        Memory::Copy((Storage() + Length()), str, (length * size));
 
         setLength(new_length);
     }

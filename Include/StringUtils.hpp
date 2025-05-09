@@ -38,16 +38,16 @@ struct WhiteSpaceChars_T {
 
 template <typename Char_T, typename Number_T = SizeT>
 static QENTEM_CONST_EXPRESSION Number_T Count(const Char_T *str) noexcept {
-    Number_T len = 0;
+    Number_T length = 0;
 
     if (str != nullptr) {
         while (*str != Char_T{0}) {
             ++str;
-            ++len;
+            ++length;
         }
     }
 
-    return len;
+    return length;
 }
 
 template <typename Char_T, typename Number_T>

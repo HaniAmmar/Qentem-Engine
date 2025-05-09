@@ -46,21 +46,21 @@ struct String {
         copyString(src.First(), src.Length());
     }
 
-    explicit String(SizeT len) {
-        if (len != 0) {
-            Char_T *ns = allocate(len + SizeT{1});
-            ns[len]    = Char_T{0};
-            setLength(len);
+    explicit String(SizeT length) {
+        if (length != 0) {
+            Char_T *ns = allocate(length + SizeT{1});
+            ns[length] = Char_T{0};
+            setLength(length);
         }
     }
 
-    String(Char_T *str, SizeT len) {
-        setLength(len);
+    String(Char_T *str, SizeT length) {
+        setLength(length);
         setStorage(str);
     }
 
-    String(const Char_T *str, SizeT len) {
-        copyString(str, len);
+    String(const Char_T *str, SizeT length) {
+        copyString(str, length);
     }
 
     String(const Char_T *str) {
@@ -245,15 +245,15 @@ struct String {
         return merge(src1.First(), src1.Length(), src2.First(), src2.Length());
     }
 
-    void Write(const Char_T *str, const SizeT len) {
-        if ((str != nullptr) && (len != 0)) {
+    void Write(const Char_T *str, const SizeT length) {
+        if ((str != nullptr) && (length != 0)) {
             constexpr SizeT32 size    = sizeof(Char_T);
             const SizeT       src_len = Length();
-            SizeT             new_len = (src_len + len + SizeT{1});
+            SizeT             new_len = (src_len + length + SizeT{1});
             Char_T           *src     = Storage();
             Char_T           *ns      = allocate(new_len);
 
-            Memory::Copy((ns + src_len), str, (len * size));
+            Memory::Copy((ns + src_len), str, (length * size));
             --new_len;
             ns[new_len] = Char_T{0};
             setLength(new_len);
@@ -274,10 +274,10 @@ struct String {
         return String((str + offset), length);
     }
 
-    inline void StepBack(const SizeT len) noexcept {
-        if (len <= Length()) {
+    inline void StepBack(const SizeT length) noexcept {
+        if (length <= Length()) {
             Char_T     *str     = Storage();
-            const SizeT new_len = (Length() - len);
+            const SizeT new_len = (Length() - length);
 
             setLength(new_len);
             str[new_len] = Char_T{0};
@@ -416,15 +416,15 @@ struct String {
         return ns;
     }
 
-    void copyString(const Char_T *str, const SizeT len) {
+    void copyString(const Char_T *str, const SizeT length) {
         constexpr SizeT32 size = sizeof(Char_T);
-        Char_T           *ns   = allocate(len + SizeT{1});
+        Char_T           *ns   = allocate(length + SizeT{1});
 
-        Memory::Copy(ns, str, (len * size));
+        Memory::Copy(ns, str, (length * size));
 
-        ns[len] = Char_T{0};
+        ns[length] = Char_T{0};
 
-        setLength(len);
+        setLength(length);
     }
 
     Char_T *storage_{nullptr};

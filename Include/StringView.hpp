@@ -44,9 +44,9 @@ struct StringView {
         setLength(src.Length());
     }
 
-    StringView(const Char_T *str, SizeT len) {
+    StringView(const Char_T *str, SizeT length) {
         setStorage(str);
-        setLength(len);
+        setLength(length);
     }
 
     QENTEM_CONST_EXPRESSION StringView(const Char_T *str) {
