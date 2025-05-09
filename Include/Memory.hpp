@@ -63,24 +63,24 @@ template <typename Number_T>
 QENTEM_NOINLINE static void Copy(void *to, const void *from, Number_T size) noexcept {
     Number_T offset = 0;
 
-    if (Config::IsSIMDEnabled) {
-        const Number_T m_size = (size >> Platform::SIMD::Shift);
+    // if (Config::IsSIMDEnabled) {
+    //     const Number_T m_size = (size >> Platform::SIMD::Shift);
 
-        if (m_size != 0) {
-            offset = m_size;
-            offset <<= Platform::SIMD::Shift;
+    //     if (m_size != 0) {
+    //         offset = m_size;
+    //         offset <<= Platform::SIMD::Shift;
 
-            Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
-            const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
-            const Platform::SIMD::VAR_T *end    = (m_form + m_size);
+    //         Platform::SIMD::VAR_T       *m_to   = (Platform::SIMD::VAR_T *)(to);
+    //         const Platform::SIMD::VAR_T *m_form = (const Platform::SIMD::VAR_T *)(from);
+    //         const Platform::SIMD::VAR_T *end    = (m_form + m_size);
 
-            do {
-                Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
-                ++m_form;
-                ++m_to;
-            } while (m_form < end);
-        }
-    }
+    //         do {
+    //             Platform::SIMD::Store(m_to, Platform::SIMD::Load(m_form));
+    //             ++m_form;
+    //             ++m_to;
+    //         } while (m_form < end);
+    //     }
+    // }
 
     char       *des = (char *)(to);
     const char *src = (const char *)(from);
