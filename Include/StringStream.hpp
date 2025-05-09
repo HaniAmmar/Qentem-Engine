@@ -313,7 +313,7 @@ struct StringStream {
 
     String<Char_T> GetString() {
         if (Capacity() > Length()) {
-            const SizeT length  = Length();
+            const SizeT length  = Length(); // Detach() resets the length.
             Storage()[Length()] = Char_T{0};
             return String<Char_T>(Detach(), length);
         }
