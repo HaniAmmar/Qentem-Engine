@@ -44,7 +44,7 @@ struct StringView {
         setLength(src.Length());
     }
 
-    StringView(const Char_T *str, SizeT length) {
+    QENTEM_CONST_EXPRESSION StringView(const Char_T *str, SizeT length) {
         setStorage(str);
         setLength(length);
     }
@@ -75,7 +75,7 @@ struct StringView {
         return *this;
     }
 
-    StringView &operator=(const Char_T *str) {
+    QENTEM_CONST_EXPRESSION StringView &operator=(const Char_T *str) {
         setStorage(str);
         setLength(StringUtils::Count(str));
 
