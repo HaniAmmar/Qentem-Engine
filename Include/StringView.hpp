@@ -34,12 +34,12 @@ struct StringView {
     StringView() noexcept  = default;
     ~StringView() noexcept = default;
 
-    StringView(StringView &&src) noexcept : storage_{src.First()}, length_{src.Length()} {
+    QENTEM_CONST_EXPRESSION StringView(StringView &&src) noexcept : storage_{src.First()}, length_{src.Length()} {
         src.clearStorage();
         src.clearLength();
     }
 
-    StringView(const StringView &src) {
+    QENTEM_CONST_EXPRESSION StringView(const StringView &src) {
         setStorage(src.First());
         setLength(src.Length());
     }
@@ -54,7 +54,7 @@ struct StringView {
         setLength(StringUtils::Count(str));
     }
 
-    StringView &operator=(StringView &&src) noexcept {
+    QENTEM_CONST_EXPRESSION StringView &operator=(StringView &&src) noexcept {
         if (this != &src) {
             setStorage(src.First());
             setLength(src.Length());
@@ -66,7 +66,7 @@ struct StringView {
         return *this;
     }
 
-    StringView &operator=(const StringView &src) {
+    QENTEM_CONST_EXPRESSION StringView &operator=(const StringView &src) {
         if (this != &src) {
             setStorage(src.First());
             setLength(src.Length());
