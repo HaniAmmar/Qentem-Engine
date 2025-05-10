@@ -25,7 +25,6 @@
 // #define QENTEM_OUTPUT_STREAM test_ss
 
 #include "Test.hpp"
-#include "QTest.hpp"
 
 int main() {
     Qentem::Test::SelfTest();
