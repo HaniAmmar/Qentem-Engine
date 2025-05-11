@@ -22,7 +22,7 @@ Qentem Engine is a self-contained lightweight library for rendering templates, d
 -   General
 
     -   Cross-platform, header-only and self-contained; no external libraries are needed (including STL).
-    -   Fast string to number and number to string (does not use CPU FPU).
+    -   High-Performance numeric conversion without FPU dependency.
     -   Supports 32-bit and 64-bit architectures, little and big-endian.
     -   No exceptions (try-catch and throw).
     -   Supports UTF-8, UTF-16 and UTF-32.
@@ -30,7 +30,7 @@ Qentem Engine is a self-contained lightweight library for rendering templates, d
 
 -   Template engine
 
-    -   Fast template rendering.
+    -   Ultra-fast, lightweight template rendering.
     -   Safe evaluation.
     -   Variable replacement with HTML auto-escape (optional: on by default).
     -   Raw variable replacement **without** HTML auto-escape.
