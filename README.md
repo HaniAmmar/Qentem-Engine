@@ -8,48 +8,43 @@
 -   [Documentation](#documentation)
 -   [Live Testing](#live-testing)
 -   [Template Example](#template-example)
-    -   [Modules](#modules)
+-   [Modules](#modules)
 -   [JSON Example](#json-example)
 -   [Tests](#tests)
 -   [License](#license)
 
 ## Introduction
-
-Qentem Engine is a self-contained lightweight library for rendering templates, designed to work in the back-end or the font-end, and because it has no specific requirements and is easy to use, it can be easily included in C++/C projects or even Java. There are modules made for PHP, Python, and Javascript, in case rendering templates in C++ is not the norm. The library has a fast JSON parser and its own logic and arithmetic evaluator for evaluating `if`, or calculating long algorithms. Also, it can be compiled to `WASM`, and tested directly in the browser, with all of its features like nested loops, nested if conditions, inline if, and variable replacement with auto-escape for HTML special characters.
+Qentem Engine is a C++ library offering high-performance template rendering and a fast, built-in JSON parser. It is lightweight, STL-free, dependency-free, and supports deployment on native backends as well as frontend environments such as web browsers via WebAssembly.
 
 ## Features
 
--   General
+### General
 
-    -   Cross-platform, header-only and self-contained; no external libraries are needed (including STL).
-    -   High-Performance numeric conversion without FPU dependency.
-    -   Supports 32-bit and 64-bit architectures, little and big-endian.
-    -   No exceptions (try-catch and throw).
-    -   Supports UTF-8, UTF-16 and UTF-32.
-    -   Low memory usage.
+* Header-only, cross-platform, and fully self-contained — STL-free and with no external dependencies.
+* High-performance numeric parsing and formatting without relying on floating-point hardware (FPU-free).
+* Supports both 32-bit and 64-bit systems, with little-endian and big-endian architectures.
+* Exception-free design — no `try`, `catch`, or `throw`.
+* Full Unicode support: UTF-8, UTF-16, and UTF-32.
+* Low memory footprint — ideal for resource-constrained environments.
 
--   Template engine
+### Template Rendering
 
-    -   Ultra-fast, lightweight template rendering.
-    -   Safe evaluation.
-    -   Variable replacement with HTML auto-escape (optional: on by default).
-    -   Raw variable replacement **without** HTML auto-escape.
-    -   Nested loops (with data grouping and sorting).
-    -   Nested if conditions.
-    -   Inline if.
-    -   Math tag.
+* Ultra-fast and lightweight template rendering.
+* Safe expression evaluation with automatic HTML escaping (enabled by default).
+* Raw variable output (no escaping) when needed.
+* Nested loops with support for data sorting and grouping.
+* Conditional expressions with support for nesting and inline evaluation.
+* Fast and secure arithmetic evaluation.
 
--   JSON
+### JSON
 
-    -   Fast parser.
-    -   Fast stringify.
-    -   Data grouping.
-    -   Data sorting.
+* Fast and efficient parsing and serialization.
+* Supports merging, sorting, and grouping of values.
 
 ## Requirements
 
-C++ 11+ compiler.
-_Note_: `iostream` is used in tests at the moment.
+A C++11 or later compiler.
+_Note_: `iostream` is currently used in tests.
 
 ## Documentation
 
@@ -57,7 +52,7 @@ Usage and examples @ [Documentation](https://github.com/HaniAmmar/Qentem-Engine/
 
 ## Live Testing
 
-Templates can be tested live @ [JQen Tool](https://haniammar.github.io/JQen-Tool).
+Test templates directly in your browser: [JQen Tool Live Demo](https://haniammar.github.io/JQen-Tool).
 
 ## Template Example
 
@@ -307,7 +302,7 @@ int main() {
 
 ## Tests
 
-There are over 23k lines of code for testing; 5 times the library. To run the tests that take less than 0.01s to finish:
+The test suite includes over 23k lines of code, more than five times the size of the library itself, and completes in less than 0.01 seconds.
 
 -   gcc/clang
 
@@ -330,7 +325,7 @@ There are over 23k lines of code for testing; 5 times the library. To run the te
 
 > MIT License
 >
-> Copyright (c) 2024 Hani Ammar
+> Copyright (c) 2025 Hani Ammar
 >
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
