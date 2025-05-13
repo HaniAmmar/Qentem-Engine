@@ -9,10 +9,11 @@ using Qentem::StringView;
 
 /*
 mkdir Build
-c++ -g ./Examples/Template/Template17.cpp -I ./Include -o ./Build/QTest.bin
+c++ -O3 ./Examples/Template/Template17.cpp -I ./Include -o ./Build/QTest.bin
 ./Build/QTest.bin
 */
 
+// -- Cached Render Function (Pre-parses template once) --
 template <typename Char_T, typename Value_T, typename StringStream_T>
 inline static void CachedRender(const StringView<Char_T> &content, const Value_T &value, StringStream_T &stream,
                                 const StringView<Char_T> &template_name) {
@@ -28,12 +29,9 @@ inline static void CachedRender(const StringView<Char_T> &content, const Value_T
     using TagBit       = Qentem::Tags::TagBit;
 
     TemplateCore                                 temp{content.First(), content.Length()};
-    static HArray<String<Char_T>, Array<TagBit>> tags_caches;
+    static HArray<String<Char_T>, Array<TagBit>> tags_cache;
 
-    // Or StringView<Char_T>
-    // static HArray<StringView<Char_T>, Array<TagBit>> tags_caches;
-
-    Array<TagBit> &tags = tags_caches[template_name];
+    Array<TagBit> &tags = tags_cache.Get(template_name.First(), template_name.Length());
 
     if (tags.IsEmpty()) {
         TemplateCore::Parse(content.First(), content.Length(), tags);
