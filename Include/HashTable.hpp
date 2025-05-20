@@ -55,7 +55,7 @@ struct HashTable {
     }
 
     HashTable(const HashTable &src) {
-        copyTable(src);
+        copyTableWithHash(src);
     }
 
     ~HashTable() {
@@ -404,23 +404,31 @@ struct HashTable {
         return base;
     }
 
-    HItem *allocate(SizeT new_capacity) {
+    inline HItem *allocate(SizeT capacity) {
+        constexpr SizeT32 size = sizeof(SizeT);
+
+        SizeT *ht = allocateOnly(capacity);
+
+        Memory::SetToZero(ht, (size * Capacity()));
+
+        return Memory::ChangePointer<HItem>(ht + Capacity());
+    }
+
+    inline SizeT *allocateOnly(SizeT capacity) {
         constexpr SizeT32 size     = sizeof(SizeT);
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem)};
 
         // Making sure 'size' is not an odd number.
-        new_capacity += (new_capacity & SizeT{1});
-        new_capacity = Memory::AlignSize(new_capacity);
+        capacity += (capacity & SizeT{1});
+        capacity = Memory::AlignSize(capacity);
 
-        setCapacity(new_capacity);
+        setCapacity(capacity);
 
-        SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * new_capacity)));
+        SizeT *ht = Memory::ChangePointer<SizeT>(Memory::Allocate<char>((size_sum * capacity)));
 
         setHashTable(ht);
 
-        Memory::SetToZero(ht, (size * new_capacity));
-
-        return Memory::ChangePointer<HItem>(ht + Capacity());
+        return ht;
     }
 
     inline void setHashTable(SizeT *ptr) noexcept {
@@ -439,8 +447,8 @@ struct HashTable {
         index_ = new_size;
     }
 
-    inline void setCapacity(const SizeT new_capacity) noexcept {
-        capacity_ = new_capacity;
+    inline void setCapacity(const SizeT capacity) noexcept {
+        capacity_ = capacity;
     }
 
     inline void expand() {
@@ -494,6 +502,35 @@ struct HashTable {
 
             setSize(index);
             generateHash();
+        }
+    }
+
+    void copyTableWithHash(const HashTable &src) {
+        constexpr SizeT32 size = sizeof(SizeT);
+
+        if (src.IsNotEmpty()) {
+            setCapacity(src.Capacity());
+
+            const HItem *src_item = src.First();
+            const HItem *src_end  = (src_item + src.Size());
+            const SizeT *src_ht   = src.getHashTable();
+            SizeT       *ht       = allocateOnly(Capacity());
+            HItem       *storage  = Memory::ChangePointer<HItem>(ht + Capacity());
+            SizeT        index{0};
+
+            Memory::Copy(ht, src_ht, (size * Capacity()));
+
+            do {
+                if (src_item->Hash != 0) {
+                    Memory::Initialize(storage, *src_item);
+                    ++storage;
+                    ++index;
+                }
+
+                ++src_item;
+            } while (src_item < src_end);
+
+            setSize(index);
         }
     }
 
