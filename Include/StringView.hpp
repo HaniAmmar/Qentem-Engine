@@ -152,7 +152,7 @@ struct StringView {
         clearLength();
     }
 
-    inline SizeT Length() const noexcept {
+    inline QENTEM_CONST_EXPRESSION SizeT Length() const noexcept {
         return length_;
     }
 
