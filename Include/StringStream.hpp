@@ -212,6 +212,12 @@ struct StringStream {
         write(str, length);
     }
 
+    inline void WriteAt(const SizeT index, const Char_T *str, const SizeT length) {
+        if ((index + length) <= Length()) {
+            Memory::Copy((Storage() + index), str, length);
+        }
+    }
+
     inline void Clear() noexcept {
         setLength(0);
     }
@@ -298,6 +304,26 @@ struct StringStream {
 
         if (size != 0) {
             allocate(size);
+        }
+    }
+
+    void ShiftRight(SizeT length) {
+        length += Length();
+        SizeT start = Length();
+
+        if (Capacity() < length) {
+            expand(length);
+        }
+
+        setLength(length);
+
+        Char_T *from = (Storage() + start);
+        Char_T *to   = (Storage() + length);
+
+        while (from != Storage()) {
+            --from;
+            --to;
+            *to = *from;
         }
     }
 

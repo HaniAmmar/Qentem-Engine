@@ -395,6 +395,35 @@ static void TestStringStream2(QTest &test) {
     test.IsEqual(*(stream.End()), char{0}, __LINE__);
     stream.StepBack(SizeT{1});
     test.IsEqual(*(stream.End()), '8', __LINE__);
+
+    stream = "56789";
+    stream.ShiftRight(5);
+
+    test.IsEqual(stream.Length(), SizeT{10}, __LINE__);
+    test.IsEqual(stream, "5678956789", __LINE__);
+
+    char *str = stream.Storage();
+    str[0]    = '0';
+    str[1]    = '1';
+    str[2]    = '2';
+    str[3]    = '3';
+    str[4]    = '4';
+
+    test.IsEqual(stream, "0123456789", __LINE__);
+
+    stream.WriteAt(0, "56789", 5);
+    test.IsEqual(stream, "5678956789", __LINE__);
+
+    stream.WriteAt(5, "01234", 5);
+    test.IsEqual(stream, "5678901234", __LINE__);
+
+    stream.WriteAt(6, "01234", 5);
+    stream.WriteAt(9, "01234", 5);
+    stream.WriteAt(40, "01234", 5);
+    test.IsEqual(stream, "5678901234", __LINE__);
+
+    stream.WriteAt(0, "A-B-C-D-E-", 10);
+    test.IsEqual(stream, "A-B-C-D-E-", __LINE__);
 }
 
 static int RunStringStreamTests() {
