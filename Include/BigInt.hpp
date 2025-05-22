@@ -696,44 +696,44 @@ struct DoubleSize<Number_T, 64U> {
         // -----------------------
         Number_T quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
-        Number_T reminder = (quotient * divisor_high);
+        Number_T remainder = (quotient * divisor_high);
 
         dividend_high <<= shift_;
 
-        if (dividend_high < reminder) {
+        if (dividend_high < remainder) {
             --quotient;
 
-            if ((reminder - dividend_high) > divisor_shifted) {
+            if ((remainder - dividend_high) > divisor_shifted) {
                 --quotient;
-                reminder -= divisor_shifted;
+                remainder -= divisor_shifted;
             }
 
-            reminder -= divisor_shifted;
+            remainder -= divisor_shifted;
         }
 
-        dividend_high -= reminder;
+        dividend_high -= remainder;
         // -----------------------
         quotient <<= shift_;
         dividend_low += quotient;
         // -----------------------
         quotient = (dividend_high / divisor_low);
         dividend_high %= divisor_low;
-        reminder = (quotient * divisor_high);
+        remainder = (quotient * divisor_high);
 
         dividend_high <<= shift_;
 
-        if (dividend_high < reminder) {
+        if (dividend_high < remainder) {
             --quotient;
 
-            if ((reminder - dividend_high) > divisor_shifted) {
+            if ((remainder - dividend_high) > divisor_shifted) {
                 --quotient;
-                reminder -= divisor_shifted;
+                remainder -= divisor_shifted;
             }
 
-            reminder -= divisor_shifted;
+            remainder -= divisor_shifted;
         }
 
-        dividend_high -= reminder;
+        dividend_high -= remainder;
         // -----------------------
         dividend_low += quotient;
         // -----------------------
