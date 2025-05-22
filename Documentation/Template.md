@@ -119,7 +119,7 @@ Supports complex logic branching using `case`, `else`, and `else if`. Blocks may
 Iterates over arrays or objects.
 
 **Optional attributes:**
-- `group="field"`: Groups items by subkey
+- `group="field"`: Groups items by sub-key
 - `sort="ascend|descend"`: Sorts items before rendering
 
 **Nested loop example:**
