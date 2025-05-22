@@ -281,6 +281,15 @@ struct Array {
         Resize(Size());
     }
 
+    inline void Drop(const SizeT size) noexcept {
+        if (size <= Size()) {
+            const SizeT new_size = (Size() - size);
+
+            Memory::Dispose((Storage() + new_size), End());
+            setSize(new_size);
+        }
+    }
+
     inline Type_T *Storage() const noexcept {
         return storage_;
     }
@@ -303,15 +312,6 @@ struct Array {
         }
 
         return nullptr;
-    }
-
-    inline void Drop(const SizeT size) noexcept {
-        if (size <= Size()) {
-            const SizeT new_size = (Size() - size);
-
-            Memory::Dispose((Storage() + new_size), End());
-            setSize(new_size);
-        }
     }
 
     inline const Type_T *End() const noexcept {
@@ -368,11 +368,11 @@ struct Array {
         capacity_ = new_capacity;
     }
 
-    void resize(SizeT new_size) {
+    void resize(SizeT new_capacity) {
         constexpr SizeT32 type_size = sizeof(Type_T);
         Type_T           *src       = Storage();
 
-        setCapacity(new_size);
+        setCapacity(new_capacity);
 
         Type_T *des = allocate();
         Memory::Copy(des, src, (Size() * type_size));
@@ -380,13 +380,13 @@ struct Array {
     }
 
     void copyArray(const Array &src) {
-        Type_T       *storage  = allocate();
-        const Type_T *src_item = src.First();
-        const Type_T *src_end  = (src_item + src.Size());
+        Type_T       *new_storage = allocate();
+        const Type_T *src_item    = src.First();
+        const Type_T *src_end     = (src_item + src.Size());
 
         while (src_item < src_end) {
-            Memory::Initialize(storage, *src_item);
-            ++storage;
+            Memory::Initialize(new_storage, *src_item);
+            ++new_storage;
             ++src_item;
         }
     }
