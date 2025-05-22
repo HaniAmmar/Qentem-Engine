@@ -858,7 +858,7 @@ static void TestArrayValue(QTest &test) {
     SizeT         c_str_len;
     bool          bool_var;
 
-    arr_var.ResizeAndInitialize(5);
+    arr_var.ResizeWithDefaultInit(5);
     storage = arr_var.First();
 
     value1 = arr_var; // Copy.
@@ -892,11 +892,11 @@ static void TestArrayValue(QTest &test) {
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     arr_var.Reset();
-    arr_var.ResizeAndInitialize(10);
+    arr_var.ResizeWithDefaultInit(10);
     storage = arr_var.First();
 
     VArray arr_var2;
-    arr_var2.ResizeAndInitialize(10);
+    arr_var2.ResizeWithDefaultInit(10);
 
     value1 = Memory::Move(arr_var); // Move
     value2 = Memory::Move(arr_var2);
@@ -915,7 +915,7 @@ static void TestArrayValue(QTest &test) {
     test.IsNotEqual(value2.GetArray()->First(), storage, __LINE__);
 
     arr_var.Reset();
-    arr_var.ResizeAndInitialize(7);
+    arr_var.ResizeWithDefaultInit(7);
     storage = arr_var.First();
     value1  = Memory::Move(arr_var);
 
@@ -938,7 +938,7 @@ static void TestArrayValue(QTest &test) {
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     arr_var.Reset();
-    arr_var.ResizeAndInitialize(7);
+    arr_var.ResizeWithDefaultInit(7);
     storage = arr_var.First();
     value1  = Memory::Move(arr_var);
 
@@ -949,7 +949,7 @@ static void TestArrayValue(QTest &test) {
     test.IsTrue(value1.IsUndefined(), __LINE__);
 
     arr_var.Reset();
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     storage = arr_var.First();
     value3  = arr_var; // Copy
     test.IsEqual(value3.Size(), 3U, __LINE__);
@@ -957,7 +957,7 @@ static void TestArrayValue(QTest &test) {
     test.IsNotEqual(value3.GetArray()->First(), storage, __LINE__);
 
     arr_var.Reset();
-    arr_var.ResizeAndInitialize(13);
+    arr_var.ResizeWithDefaultInit(13);
     storage = arr_var.First();
     value3  = Memory::Move(arr_var); // Move
     test.IsNotNull(value3.GetArray(), __LINE__);
@@ -1025,7 +1025,7 @@ static void TestArrayValue(QTest &test) {
     str_var   = "-ABCDEF0123456789ABCDEF0123456789-";
     c_str_var = str_var.First();
 
-    arr_var.ResizeAndInitialize(4);
+    arr_var.ResizeWithDefaultInit(4);
     ValueC *val_ptr = arr_var.Storage();
 
     val_ptr[0] = 10;
@@ -2270,7 +2270,7 @@ static void TestCopyValue1(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2334,7 +2334,7 @@ static void TestCopyValue1(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2398,7 +2398,7 @@ static void TestCopyValue1(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2462,7 +2462,7 @@ static void TestCopyValue1(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2534,7 +2534,7 @@ static void TestCopyValue2(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2639,7 +2639,7 @@ static void TestCopyValue2(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value1      = arr_var;
     test.IsTrue(value1.IsArray(), __LINE__);
@@ -2719,7 +2719,7 @@ static void TestCopyValue3(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = value2;
@@ -2815,7 +2815,7 @@ static void TestCopyValue3(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = value2;
@@ -2911,7 +2911,7 @@ static void TestCopyValue3(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = value2;
@@ -3006,7 +3006,7 @@ static void TestCopyValue3(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = value2;
@@ -3119,7 +3119,7 @@ static void TestCopyValue4(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = value2;
@@ -3301,7 +3301,7 @@ static void TestCopyValue4(QTest &test) {
 
     // Has values
     arr_var = VArray{};
-    arr_var.ResizeAndInitialize(3);
+    arr_var.ResizeWithDefaultInit(3);
     arr_storage = arr_var.First();
     value2      = Memory::Move(arr_var);
     value1      = value2;

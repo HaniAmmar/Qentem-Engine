@@ -599,7 +599,7 @@ struct Value {
         if (array_.Size() == index) {
             array_ += Value{};
         } else {
-            array_.ResizeAndInitialize(index + SizeT{1});
+            array_.ResizeWithDefaultInit(index + SizeT{1});
         }
 
         return (array_.Storage()[index]);

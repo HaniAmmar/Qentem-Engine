@@ -96,7 +96,7 @@ static void TestArray1(QTest &test) {
     numbers1.Reset();
     numbers2.Reset();
 
-    numbers1.ResizeAndInitialize(8);
+    numbers1.ResizeWithDefaultInit(8);
     storage = numbers1.First();
     test.IsEqual(numbers1.Size(), 8U, __LINE__);
     test.IsFalse(numbers1.IsEmpty(), __LINE__);
@@ -104,7 +104,7 @@ static void TestArray1(QTest &test) {
     test.IsEqual(numbers1.Capacity(), 8U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
 
-    numbers1.ResizeAndInitialize(4);
+    numbers1.ResizeWithDefaultInit(4);
     test.IsNotEqual(numbers1.First(), storage, __LINE__);
 
     storage  = numbers1.First();
@@ -117,7 +117,7 @@ static void TestArray1(QTest &test) {
     test.IsNotNull(numbers2.First(), __LINE__);
     test.IsNotEqual(numbers2.First(), storage, __LINE__);
 
-    numbers1.ResizeAndInitialize(16);
+    numbers1.ResizeWithDefaultInit(16);
     test.IsEqual(numbers1.Size(), 16U, __LINE__);
     test.IsEqual(numbers1.Capacity(), 16U, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -164,8 +164,8 @@ static void TestArray1(QTest &test) {
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsEqual(numbers1.First(), storage, __LINE__);
 
-    numbers1.ResizeAndInitialize(3);
-    numbers2.ResizeAndInitialize(5);
+    numbers1.ResizeWithDefaultInit(3);
+    numbers2.ResizeWithDefaultInit(5);
     storage = numbers2.First();
 
     numbers1 += numbers2;
@@ -184,7 +184,7 @@ static void TestArray1(QTest &test) {
     test.IsEqual(numbers2.Capacity(), 0U, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
 
-    numbers2.ResizeAndInitialize(5);
+    numbers2.ResizeWithDefaultInit(5);
     numbers1.Resize(18);
     storage = numbers1.First();
     numbers1 += Memory::Move(numbers2);
@@ -216,7 +216,7 @@ static void TestArray2(QTest &test) {
     Array<SizeT> numbers3;
 
     numbers2.Reserve(4);
-    numbers1.ResizeAndInitialize(4);
+    numbers1.ResizeWithDefaultInit(4);
     storage = numbers2.First();
     numbers2.Insert(numbers1);
     test.IsEqual(numbers2.Size(), 4U, __LINE__);
@@ -227,13 +227,13 @@ static void TestArray2(QTest &test) {
     test.IsNotNull(numbers1.Last(), __LINE__);
 
     numbers1.Reserve(10);
-    numbers2.ResizeAndInitialize(4);
+    numbers2.ResizeWithDefaultInit(4);
     numbers2.Insert(numbers1);
     test.IsEqual(numbers2.Size(), 4U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 4U, __LINE__);
     test.IsNotNull(numbers2.First(), __LINE__);
 
-    numbers1.ResizeAndInitialize(4);
+    numbers1.ResizeWithDefaultInit(4);
     numbers2.Insert(numbers1);
     test.IsEqual(numbers2.Size(), 8U, __LINE__);
     test.IsEqual(numbers2.Capacity(), 8U, __LINE__);

@@ -244,7 +244,7 @@ struct Array {
         Reset();
     }
 
-    void ResizeAndInitialize(SizeT new_size) {
+    void ResizeWithDefaultInit(SizeT new_size) {
         Resize(new_size);
 
         if (new_size > Size()) {
