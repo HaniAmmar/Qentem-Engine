@@ -47,8 +47,8 @@ enum struct ValueType : SizeT8 {
 ///////////////////////////////////////////////
 template <typename Char_T>
 struct Value {
-    using JSONotation = JSONUtils::JSONotation_T<Char_T>;
-    using VItem       = HAItem_T<String<Char_T>, Value>;
+    using JSONNotation = JSONUtils::Notation_T<Char_T>;
+    using VItem        = HAItem_T<String<Char_T>, Value>;
 
     using ObjectT     = HArray<String<Char_T>, Value>;
     using ArrayT      = Array<Value>;
@@ -1477,20 +1477,20 @@ struct Value {
             }
 
             case ValueType::True: {
-                key    = JSONotation::TrueString;
-                length = JSONotation::TrueStringLength;
+                key    = JSONNotation::TrueString;
+                length = JSONNotation::TrueStringLength;
                 return true;
             }
 
             case ValueType::False: {
-                key    = JSONotation::FalseString;
-                length = JSONotation::FalseStringLength;
+                key    = JSONNotation::FalseString;
+                length = JSONNotation::FalseStringLength;
                 return true;
             }
 
             case ValueType::Null: {
-                key    = JSONotation::NullString;
-                length = JSONotation::NullStringLength;
+                key    = JSONNotation::NullString;
+                length = JSONNotation::NullStringLength;
                 return true;
             }
 
@@ -1538,17 +1538,17 @@ struct Value {
             }
 
             case ValueType::True: {
-                stream.Write(JSONotation::TrueString, JSONotation::TrueStringLength);
+                stream.Write(JSONNotation::TrueString, JSONNotation::TrueStringLength);
                 break;
             }
 
             case ValueType::False: {
-                stream.Write(JSONotation::FalseString, JSONotation::FalseStringLength);
+                stream.Write(JSONNotation::FalseString, JSONNotation::FalseStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Write(JSONotation::NullString, JSONotation::NullStringLength);
+                stream.Write(JSONNotation::NullString, JSONNotation::NullStringLength);
                 break;
             }
 
@@ -1732,12 +1732,12 @@ struct Value {
             }
 
             case ValueType::String: {
-                if (string_.IsEqual(JSONotation::TrueString, JSONotation::TrueStringLength)) {
+                if (string_.IsEqual(JSONNotation::TrueString, JSONNotation::TrueStringLength)) {
                     value = true;
                     return true;
                 }
 
-                if (string_.IsEqual(JSONotation::FalseString, JSONotation::FalseStringLength)) {
+                if (string_.IsEqual(JSONNotation::FalseString, JSONNotation::FalseStringLength)) {
                     value = false;
                     return true;
                 }
@@ -1961,20 +1961,20 @@ struct Value {
   private:
     template <typename Stream_T>
     static void stringifyObject(const ObjectT &obj, Stream_T &stream, SizeT32 precision) {
-        stream += JSONotation::SCurlyChar;
+        stream += JSONNotation::SCurlyChar;
 
         const VItem *h_item = obj.First();
         const VItem *end    = (h_item + obj.Size());
 
         while (h_item != end) {
             if ((h_item != nullptr) && !(h_item->Value.isUndefined())) {
-                stream += JSONotation::QuoteChar;
+                stream += JSONNotation::QuoteChar;
                 JSONUtils::Escape(h_item->Key.First(), h_item->Key.Length(), stream);
-                stream += JSONotation::QuoteChar;
-                stream += JSONotation::ColonChar;
+                stream += JSONNotation::QuoteChar;
+                stream += JSONNotation::ColonChar;
 
                 stringifyValue(h_item->Value, stream, precision);
-                stream += JSONotation::CommaChar;
+                stream += JSONNotation::CommaChar;
             }
 
             ++h_item;
@@ -1982,16 +1982,16 @@ struct Value {
 
         Char_T *last = stream.Last();
 
-        if ((last != nullptr) && (*last == JSONotation::CommaChar)) {
-            *last = JSONotation::ECurlyChar;
+        if ((last != nullptr) && (*last == JSONNotation::CommaChar)) {
+            *last = JSONNotation::ECurlyChar;
         } else {
-            stream += JSONotation::ECurlyChar;
+            stream += JSONNotation::ECurlyChar;
         }
     }
 
     template <typename Stream_T>
     static void stringifyArray(const ArrayT &arr, Stream_T &stream, SizeT32 precision) {
-        stream += JSONotation::SSquareChar;
+        stream += JSONNotation::SSquareChar;
 
         const Value *item = arr.First();
         const Value *end  = arr.End();
@@ -1999,7 +1999,7 @@ struct Value {
         while (item != end) {
             if (!(item->isUndefined())) {
                 stringifyValue(*item, stream, precision);
-                stream += JSONotation::CommaChar;
+                stream += JSONNotation::CommaChar;
             }
 
             ++item;
@@ -2007,10 +2007,10 @@ struct Value {
 
         Char_T *last = stream.Last();
 
-        if ((last != nullptr) && (*last == JSONotation::CommaChar)) {
-            *last = JSONotation::ESquareChar;
+        if ((last != nullptr) && (*last == JSONNotation::CommaChar)) {
+            *last = JSONNotation::ESquareChar;
         } else {
-            stream += JSONotation::ESquareChar;
+            stream += JSONNotation::ESquareChar;
         }
     }
 
@@ -2028,9 +2028,9 @@ struct Value {
             }
 
             case ValueType::String: {
-                stream += JSONotation::QuoteChar;
+                stream += JSONNotation::QuoteChar;
                 JSONUtils::Escape(val.string_.First(), val.string_.Length(), stream);
-                stream += JSONotation::QuoteChar;
+                stream += JSONNotation::QuoteChar;
                 break;
             }
 
@@ -2050,17 +2050,17 @@ struct Value {
             }
 
             case ValueType::False: {
-                stream.Write(JSONotation::FalseString, JSONotation::FalseStringLength);
+                stream.Write(JSONNotation::FalseString, JSONNotation::FalseStringLength);
                 break;
             }
 
             case ValueType::True: {
-                stream.Write(JSONotation::TrueString, JSONotation::TrueStringLength);
+                stream.Write(JSONNotation::TrueString, JSONNotation::TrueStringLength);
                 break;
             }
 
             case ValueType::Null: {
-                stream.Write(JSONotation::NullString, JSONotation::NullStringLength);
+                stream.Write(JSONNotation::NullString, JSONNotation::NullStringLength);
                 break;
             }
 

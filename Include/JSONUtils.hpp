@@ -73,11 +73,11 @@ struct JSONotationStrings<wchar_t, 2U> {
 
 struct JSONUtils {
     template <typename>
-    struct JSONotation_T;
+    struct Notation_T;
 
     template <typename Char_T, typename Stream_T>
     static SizeT UnEscape(const Char_T *content, SizeT length, Stream_T &stream) {
-        using JSONotation = JSONotation_T<Char_T>;
+        using JSONotation = Notation_T<Char_T>;
 
         SizeT offset  = 0;
         SizeT offset2 = 0;
@@ -197,7 +197,7 @@ struct JSONUtils {
 
     template <typename Char_T, typename Stream_T>
     static void Escape(const Char_T *content, SizeT length, Stream_T &stream) {
-        using JSONotation = JSONotation_T<Char_T>;
+        using JSONotation = Notation_T<Char_T>;
 
         SizeT offset  = 0;
         SizeT offset2 = 0;
@@ -245,7 +245,7 @@ struct JSONUtils {
     }
 
     template <typename Char_T>
-    struct JSONotation_T {
+    struct Notation_T {
       private:
         static constexpr SizeT32 size_ = sizeof(Char_T);
 
