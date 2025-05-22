@@ -42,7 +42,7 @@ struct Finder {
     Finder(const Char_T *content, Number_T length) noexcept : content_{content}, length_{length} {
     }
 
-    inline void Next() noexcept {
+    inline void NextSegment() noexcept {
         match_ = 0U;
 
         while (offset_ < length_) {
@@ -125,7 +125,7 @@ struct Finder {
     }
 
     inline SizeT32 GetMatch() const noexcept {
-        // Call 'Next()' before calling 'GetMatch()'.
+        // Call 'NextSegment()' before calling 'GetMatch()'.
         return match_;
     }
 

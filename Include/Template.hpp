@@ -338,7 +338,7 @@ struct TemplateCore {
         SizeT32 match;
         bool    is_child{false};
 
-        finder.Next();
+        finder.NextSegment();
 
         while ((match = finder.GetMatch()) != 0U) {
             switch (match) {
@@ -490,14 +490,14 @@ struct TemplateCore {
                         }
                     }
 
-                    finder.Next();
+                    finder.NextSegment();
                     break;
                 }
 
                 case TagPatterns::VariableID: {
                     const SizeT offset = finder.GetOffset();
 
-                    finder.Next();
+                    finder.NextSegment();
 
                     if (finder.GetMatch() == TagPatterns::LineEndID) {
                         const SizeT var_length = (((finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
@@ -512,7 +512,7 @@ struct TemplateCore {
                             checkLoopVariable(content, *tag, loop_tag);
                         }
 
-                        finder.Next();
+                        finder.NextSegment();
                     }
 
                     break;
@@ -521,7 +521,7 @@ struct TemplateCore {
                 case TagPatterns::RawVariableID: {
                     const SizeT offset = finder.GetOffset();
 
-                    finder.Next();
+                    finder.NextSegment();
 
                     if (finder.GetMatch() == TagPatterns::LineEndID) {
                         const SizeT var_length = (((finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
@@ -536,7 +536,7 @@ struct TemplateCore {
                             checkLoopVariable(content, *tag, loop_tag);
                         }
 
-                        finder.Next();
+                        finder.NextSegment();
                     }
 
                     break;
@@ -547,26 +547,26 @@ struct TemplateCore {
                     SizeT       end_offset{0};
                     SizeT32     skip_var{0};
 
-                    finder.Next();
+                    finder.NextSegment();
 
                     while (true) {
                         match = finder.GetMatch();
 
                         if ((match < TagPatterns::MathID) && (match != TagPatterns::LineEndID)) {
-                            finder.Next();
+                            finder.NextSegment();
                             match = finder.GetMatch();
                             ++skip_var;
                         }
 
                         if (match == TagPatterns::LineEndID) {
                             if (skip_var != 0U) {
-                                finder.Next();
+                                finder.NextSegment();
                                 --skip_var;
                                 continue;
                             }
 
                             end_offset = finder.GetOffset();
-                            finder.Next();
+                            finder.NextSegment();
                         }
 
                         break;
@@ -588,7 +588,7 @@ struct TemplateCore {
                     const SizeT svar_id_offset = offset;
                     const SizeT svar_offset    = (offset - TagPatterns::SuperVariablePrefixLength);
 
-                    finder.Next();
+                    finder.NextSegment();
                     const SizeT end_offset = finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] != TagPatterns::VariablesSeparatorChar)) {
@@ -617,7 +617,7 @@ struct TemplateCore {
                     SizeT       offset     = finder.GetOffset();
                     const SizeT iif_offset = (offset - TagPatterns::InLineIfPrefixLength);
 
-                    finder.Next();
+                    finder.NextSegment();
                     SizeT end_offset = finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] == TagPatterns::SpaceChar)) {
@@ -652,11 +652,11 @@ struct TemplateCore {
                                     break;
                                 }
 
-                                finder.Next();
+                                finder.NextSegment();
                                 match = finder.GetMatch();
 
                                 if (match == TagPatterns::LineEndID) {
-                                    finder.Next();
+                                    finder.NextSegment();
                                     end_offset = finder.GetOffset();
                                     continue;
                                 }
@@ -687,7 +687,7 @@ struct TemplateCore {
                     SizeT       offset      = finder.GetOffset();
                     const SizeT loop_offset = (offset - TagPatterns::LoopPrefixLength);
 
-                    finder.Next();
+                    finder.NextSegment();
                     const SizeT end_offset = finder.GetOffset();
 
                     while ((offset < end_offset) && (content[offset] != TagPatterns::MultiLineLastChar)) {
@@ -723,7 +723,7 @@ struct TemplateCore {
                         loop_tag      = tag.Parent;
                     }
 
-                    finder.Next();
+                    finder.NextSegment();
                     break;
                 }
 
@@ -749,7 +749,7 @@ struct TemplateCore {
                         storage = &(if_case.SubTags);
                     }
 
-                    finder.Next();
+                    finder.NextSegment();
                     break;
                 }
 
@@ -770,7 +770,7 @@ struct TemplateCore {
                         }
                     }
 
-                    finder.Next();
+                    finder.NextSegment();
                     break;
                 }
 
@@ -804,7 +804,7 @@ struct TemplateCore {
 
                                 parseIfCase(content, offset, length, case_offset, case_end_offset);
                                 finder.SetOffset(offset);
-                                finder.Next();
+                                finder.NextSegment();
 
                                 if ((offset < length) && (case_end_offset != 0)) {
                                     if_case.Offset = offset;
@@ -818,7 +818,7 @@ struct TemplateCore {
                                 if_case.Offset = offset;
                                 storage        = &(if_case.SubTags);
                                 finder.SetOffset(offset);
-                                finder.Next();
+                                finder.NextSegment();
                                 break;
                             }
 
@@ -829,7 +829,7 @@ struct TemplateCore {
                         }
                     }
 
-                    finder.Next();
+                    finder.NextSegment();
                     break;
                 }
 
@@ -1349,11 +1349,11 @@ struct TemplateCore {
     }
 
     inline const Value_T *getValue(const VariableTag &variable) const noexcept {
-        const Value_T *value  = nullptr;
-        const Char_T  *id     = (content_ + variable.Offset);
-        const SizeT    length = variable.Length;
-        SizeT          offset = 0;
-        const bool has_index  = ((length != 0) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
+        const Value_T *value     = nullptr;
+        const Char_T  *id        = (content_ + variable.Offset);
+        const SizeT    length    = variable.Length;
+        SizeT          offset    = 0;
+        const bool     has_index = ((length != 0) && (id[(length - SizeT{1})] == TagPatterns::VariableIndexSuffix));
 
         if (variable.IDLength == SizeT8{0}) {
             if (!has_index) {
@@ -1476,9 +1476,8 @@ struct TemplateCore {
                     //  {if case="value[some_string]" true=", value[some_string]"} or
                     // <if case="value[some_string]"><span>value[some_string]-value[another_string]</span></if>
                     if ((operation == QOperation::NoOp) && (expr->Operation == QOperation::NoOp)) {
-                        result.Value.Number =
-                            SizeT64((val != nullptr) && val->IsString() && (val->Length() != 0));
-                        result.Type = ExpressionType::NaturalNumber;
+                        result.Value.Number = SizeT64((val != nullptr) && val->IsString() && (val->Length() != 0));
+                        result.Type         = ExpressionType::NaturalNumber;
                         return true;
                     }
 
