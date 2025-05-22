@@ -76,20 +76,20 @@ struct JSON {
       private:
         using notation = JSONUtils::Notation_T<Char_T>;
 
-        static ValueT parseObject(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT length) {
+        static ValueT parseObject(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
             using ObjectT = typename ValueT::ObjectT;
 
-            StringUtils::TrimLeft(content, offset, length);
+            StringUtils::TrimLeft(content, offset, end);
 
             ValueT value{ValueType::Object};
 
             if (content[offset] != notation::ECurlyChar) {
                 ObjectT *obj = value.GetObject();
 
-                while (offset < length && (content[offset] == notation::QuoteChar)) {
+                while (offset < end && (content[offset] == notation::QuoteChar)) {
                     ++offset;
                     const Char_T *str = (content + offset);
-                    SizeT         len = JSONUtils::UnEscape(str, length, stream);
+                    SizeT         len = JSONUtils::UnEscape(str, end, stream);
 
                     if (len != 0) {
                         offset += len;
@@ -101,21 +101,21 @@ struct JSON {
                             stream.Clear();
                         }
 
-                        StringUtils::TrimLeft(content, offset, length);
+                        StringUtils::TrimLeft(content, offset, end);
 
                         if (content[offset] == notation::ColonChar) {
                             ++offset;
-                            StringUtils::TrimLeft(content, offset, length);
+                            StringUtils::TrimLeft(content, offset, end);
                             String<Char_T> key{str, len};
-                            obj->Insert(Memory::Move(key), parseValue(stream, content, offset, length));
-                            StringUtils::TrimLeft(content, offset, length);
+                            obj->Insert(Memory::Move(key), parseValue(stream, content, offset, end));
+                            StringUtils::TrimLeft(content, offset, end);
 
-                            if (offset < length) {
+                            if (offset < end) {
                                 const Char_T c = content[offset];
 
                                 if (c == notation::CommaChar) {
                                     ++offset;
-                                    StringUtils::TrimLeft(content, offset, length);
+                                    StringUtils::TrimLeft(content, offset, end);
                                     continue;
                                 }
 
@@ -137,24 +137,24 @@ struct JSON {
             return value;
         }
 
-        static ValueT parseArray(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT length) {
-            StringUtils::TrimLeft(content, offset, length);
+        static ValueT parseArray(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
+            StringUtils::TrimLeft(content, offset, end);
 
             ValueT value{ValueType::Array};
 
             if (content[offset] != notation::ESquareChar) {
                 Array<ValueT> *arr = value.GetArray();
 
-                while (offset < length) {
-                    *arr += parseValue(stream, content, offset, length);
-                    StringUtils::TrimLeft(content, offset, length);
+                while (offset < end) {
+                    *arr += parseValue(stream, content, offset, end);
+                    StringUtils::TrimLeft(content, offset, end);
 
-                    if (offset < length) {
+                    if (offset < end) {
                         const Char_T ch = content[offset];
 
                         if (ch == notation::CommaChar) {
                             ++offset;
-                            StringUtils::TrimLeft(content, offset, length);
+                            StringUtils::TrimLeft(content, offset, end);
                             continue;
                         }
 
@@ -174,23 +174,23 @@ struct JSON {
             return value;
         }
 
-        static ValueT parseValue(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT length) {
+        static ValueT parseValue(Stream_T &stream, const Char_T *content, SizeT &offset, const SizeT end) {
             switch (content[offset]) {
                 case notation::SCurlyChar: {
                     ++offset;
-                    return parseObject(stream, content, offset, length);
+                    return parseObject(stream, content, offset, end);
                 }
 
                 case notation::SSquareChar: {
                     ++offset;
-                    return parseArray(stream, content, offset, length);
+                    return parseArray(stream, content, offset, end);
                 }
 
                 case notation::QuoteChar: {
                     ++offset;
 
                     const Char_T *str = (content + offset);
-                    SizeT         len = JSONUtils::UnEscape(str, (length - offset), stream);
+                    SizeT         len = JSONUtils::UnEscape(str, (end - offset), stream);
 
                     if (len != 0) {
                         offset += len;
@@ -213,7 +213,7 @@ struct JSON {
 
                     ++offset;
 
-                    while ((offset < length) && (content[offset] == *true_string)) {
+                    while ((offset < end) && (content[offset] == *true_string)) {
                         ++true_string;
                         ++offset;
                     }
@@ -230,7 +230,7 @@ struct JSON {
 
                     ++offset;
 
-                    while ((offset < length) && (content[offset] == *false_string)) {
+                    while ((offset < end) && (content[offset] == *false_string)) {
                         ++false_string;
                         ++offset;
                     }
@@ -247,7 +247,7 @@ struct JSON {
 
                     ++offset;
 
-                    while ((offset < length) && (content[offset] == *null_string)) {
+                    while ((offset < end) && (content[offset] == *null_string)) {
                         ++null_string;
                         ++offset;
                     }
@@ -262,7 +262,7 @@ struct JSON {
                 default: {
                     QNumber64 number;
 
-                    switch (Digit::StringToNumber(number, content, offset, length)) {
+                    switch (Digit::StringToNumber(number, content, offset, end)) {
                         case QNumberType::Natural: {
                             return ValueT{number.Natural};
                         }
@@ -281,7 +281,7 @@ struct JSON {
                 }
             }
 
-            offset = length;
+            offset = end;
             return ValueT{};
         }
     };
