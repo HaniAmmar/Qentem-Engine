@@ -27,7 +27,7 @@
 
 namespace Qentem {
 /*
- * Simple resizable array, with pointer tagging.
+ * Simple resizable array,
  */
 
 template <typename Type_T>
