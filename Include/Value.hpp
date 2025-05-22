@@ -1860,7 +1860,7 @@ struct Value {
             groupedValue.reset();
             groupedValue.setTypeToObject();
 
-            if ((item_ != nullptr) && item_->isObject() && item_->object_.GetKeyIndex(grouped_key_index, key, length)) {
+            if ((item_ != nullptr) && item_->isObject() && item_->object_.GetIndex(grouped_key_index, key, length)) {
                 const Value *end = array_.End();
 
                 while (item_ != end) {

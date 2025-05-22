@@ -159,7 +159,7 @@ struct HashTable {
         return nullptr;
     }
 
-    bool GetKeyIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
+    bool GetIndex(SizeT &index, const Char_T *str, const SizeT length) const noexcept {
         if (IsNotEmpty()) {
             SizeT *tmp;
 
@@ -174,8 +174,8 @@ struct HashTable {
         return false;
     }
 
-    bool GetKeyIndex(SizeT &index, const Key_T &key) const noexcept {
-        return GetKeyIndex(index, key.First(), key.Length());
+    bool GetIndex(SizeT &index, const Key_T &key) const noexcept {
+        return GetIndex(index, key.First(), key.Length());
     }
 
     inline void Remove(const Char_T *key) const noexcept {

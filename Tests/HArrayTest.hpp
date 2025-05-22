@@ -327,21 +327,21 @@ static void TestHArray4(QTest &test) {
 
     SizeT key_index = 100;
 
-    numbers1.GetKeyIndex(key_index, "key1", 4);
+    numbers1.GetIndex(key_index, "key1", 4);
     test.IsEqual(key_index, 0U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key2", 4);
+    numbers1.GetIndex(key_index, "key2", 4);
     test.IsEqual(key_index, 1U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key3", 4);
+    numbers1.GetIndex(key_index, "key3", 4);
     test.IsEqual(key_index, 2U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key4", 4);
+    numbers1.GetIndex(key_index, "key4", 4);
     test.IsEqual(key_index, 3U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key5", 4);
+    numbers1.GetIndex(key_index, "key5", 4);
     test.IsEqual(key_index, 4U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key6", 4);
+    numbers1.GetIndex(key_index, "key6", 4);
     test.IsEqual(key_index, 5U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key7", 4);
+    numbers1.GetIndex(key_index, "key7", 4);
     test.IsEqual(key_index, 6U, __LINE__);
-    numbers1.GetKeyIndex(key_index, "key8", 4);
+    numbers1.GetIndex(key_index, "key8", 4);
     test.IsEqual(key_index, 7U, __LINE__);
 
     numbers2["key1"]  = 100;
