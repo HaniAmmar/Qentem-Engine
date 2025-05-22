@@ -36,9 +36,6 @@ struct Finder {
     Finder &operator=(const Finder &) = delete;
     ~Finder()                         = default;
 
-    static constexpr SizeT32 Bits   = 4U; // Number of bits per ID
-    static constexpr SizeT32 Blocks = ((sizeof(SystemIntType) * 8U) / Bits);
-
     Finder(const Char_T *content, Number_T length) noexcept : content_{content}, length_{length} {
     }
 
