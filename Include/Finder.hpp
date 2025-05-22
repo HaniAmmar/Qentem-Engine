@@ -124,7 +124,7 @@ struct Finder {
         return length_;
     }
 
-    inline SizeT32 GetMatch() const noexcept {
+    inline SizeT32 CurrentMatch() const noexcept {
         // Call 'NextSegment()' before calling 'GetMatch()'.
         return match_;
     }

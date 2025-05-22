@@ -340,7 +340,7 @@ struct TemplateCore {
 
         finder.NextSegment();
 
-        while ((match = finder.GetMatch()) != 0U) {
+        while ((match = finder.CurrentMatch()) != 0U) {
             switch (match) {
                 case TagPatterns::LineEndID: {
                     if (is_child && parent_storage.IsNotEmpty()) {
@@ -499,7 +499,7 @@ struct TemplateCore {
 
                     finder.NextSegment();
 
-                    if (finder.GetMatch() == TagPatterns::LineEndID) {
+                    if (finder.CurrentMatch() == TagPatterns::LineEndID) {
                         const SizeT var_length = (((finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
                                                   // Limit var length to 255 meter per second.;
                                                   & SizeT{0xFF});
@@ -523,7 +523,7 @@ struct TemplateCore {
 
                     finder.NextSegment();
 
-                    if (finder.GetMatch() == TagPatterns::LineEndID) {
+                    if (finder.CurrentMatch() == TagPatterns::LineEndID) {
                         const SizeT var_length = (((finder.GetOffset() - offset) - TagPatterns::InLineSuffixLength)
                                                   // Limit var length to 255 meter per second.;
                                                   & SizeT{0xFF});
@@ -550,11 +550,11 @@ struct TemplateCore {
                     finder.NextSegment();
 
                     while (true) {
-                        match = finder.GetMatch();
+                        match = finder.CurrentMatch();
 
                         if ((match < TagPatterns::MathID) && (match != TagPatterns::LineEndID)) {
                             finder.NextSegment();
-                            match = finder.GetMatch();
+                            match = finder.CurrentMatch();
                             ++skip_var;
                         }
 
@@ -643,7 +643,7 @@ struct TemplateCore {
 
                             const SizeT case_offset = offset;
 
-                            while ((match = finder.GetMatch()) != 0U) {
+                            while ((match = finder.CurrentMatch()) != 0U) {
                                 while ((offset < end_offset) && (content[offset] != quote_char)) {
                                     ++offset;
                                 }
@@ -653,7 +653,7 @@ struct TemplateCore {
                                 }
 
                                 finder.NextSegment();
-                                match = finder.GetMatch();
+                                match = finder.CurrentMatch();
 
                                 if (match == TagPatterns::LineEndID) {
                                     finder.NextSegment();
