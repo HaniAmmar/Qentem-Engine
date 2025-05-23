@@ -237,8 +237,18 @@ struct HArray : public HashTable<Key_T, HAItem_T<Key_T, Value_T>> {
         return GetValue(key.First(), key.Length());
     }
 
-    Value_T *GetValue(const SizeT index) const noexcept {
+    Value_T *GetValue(const SizeT index) noexcept {
         HItem *src = Storage();
+
+        if ((index < Size()) && ((src + index)->Hash != 0)) {
+            return &((src + index)->Value);
+        }
+
+        return nullptr;
+    }
+
+    const Value_T *GetValue(const SizeT index) const noexcept {
+        const HItem *src = BaseT::First();
 
         if ((index < Size()) && ((src + index)->Hash != 0)) {
             return &((src + index)->Value);
