@@ -418,8 +418,6 @@ struct HashTable {
         constexpr SizeT32 size     = sizeof(SizeT);
         constexpr SizeT   size_sum = SizeT{size + sizeof(HItem)};
 
-        // Making sure 'size' is not an odd number.
-        capacity += (capacity & SizeT{1});
         capacity = Memory::AlignSize(capacity);
 
         setCapacity(capacity);

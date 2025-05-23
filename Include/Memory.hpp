@@ -148,8 +148,10 @@ inline static void Sort(Type_T *arr, Number_T start, Number_T end) noexcept {
 
 /////////////////////////////////////////////////////////////////////
 inline static SizeT AlignSize(SizeT n_size) noexcept {
-    SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size));
+    // Ensure scanned n_size is >= 2, so msb >= 1.
+    SizeT size = SizeT(SizeT{1} << Platform::FindLastBit(n_size | 2));
 
+    // If n_size wasn’t already exactly that power-of-two, bump up:
     if (size < n_size) {
         size <<= 1U;
     }
