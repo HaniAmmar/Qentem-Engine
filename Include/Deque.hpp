@@ -327,9 +327,6 @@ struct Deque {
      *
      * @param index Zero-based offset from the front of the deque.
      * @return Pointer to the element at that index, or nullptr if index ≥ Size().
-     *
-     * @complexity O(1)
-     * @note noexcept: no allocations or exceptions are thrown.
      */
     inline void Expect(SizeT additional) {
         SizeT needed = (additional + Size());
@@ -418,8 +415,10 @@ struct Deque {
      * and frees the excess memory.
      */
     void Compress() {
-        if (Size() < Capacity()) {
-            Resize(Size());
+        const SizeT n_size = Memory::AlignSize(Size());
+
+        if (Memory::AlignSize(n_size) < Capacity()) {
+            Resize(n_size);
         }
     }
 
@@ -465,7 +464,6 @@ struct Deque {
      * instance.
      *
      * @complexity O(n) for element destruction plus O(1) for deallocation.
-     * @note noexcept: only destructors and deallocation are invoked.
      */
     void Reset() {
         dispose();
