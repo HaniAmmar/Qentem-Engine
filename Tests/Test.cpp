@@ -31,6 +31,8 @@ int main() {
     //     Qentem::Test::RunStringTests();
     //     Qentem::Test::RunStringStreamTests();
     //     Qentem::Test::RunArrayTests();
+    //     Qentem::Test::RunDequeTests();
+    //     Qentem::Test::RunBigIntTests();
     //     Qentem::Test::RunDigitTests();
     //     Qentem::Test::RunHArrayTests();
     //     Qentem::Test::RunUnicodeTests();

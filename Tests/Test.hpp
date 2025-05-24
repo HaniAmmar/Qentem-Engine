@@ -29,6 +29,7 @@
 #include "StringTest.hpp"
 #include "StringStreamTest.hpp"
 #include "ArrayTest.hpp"
+#include "DequeTest.hpp"
 #include "BigIntTest.hpp"
 #include "DigitTest.hpp"
 #include "HArrayTest.hpp"
@@ -112,6 +113,7 @@ static int RunTests() {
     ((Qentem::Test::RunStringTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunStringStreamTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunArrayTests() == 0) ? ++passed : ++failed);
+    ((Qentem::Test::RunDequeTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunBigIntTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunDigitTests() == 0) ? ++passed : ++failed);
     ((Qentem::Test::RunHArrayTests() == 0) ? ++passed : ++failed);

@@ -55,6 +55,14 @@ if (ENABLE_COVERAGE)
     target_link_libraries(ArrayTest --coverage)
 endif()
 
+# Deque
+add_executable(DequeTest Tests/DequeTest.cpp)
+add_test(NAME DequeTest COMMAND DequeTest)
+
+if (ENABLE_COVERAGE)
+    target_link_libraries(DequeTest --coverage)
+endif()
+
 # BigInt
 add_executable(BigIntTest Tests/BigIntTest.cpp)
 add_test(NAME BigIntTest COMMAND BigIntTest)
