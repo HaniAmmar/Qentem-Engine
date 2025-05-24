@@ -929,6 +929,28 @@ static void TestDeque5(QTest &test) {
     test.IsEqual(*(numbers1.Get(5)), SizeT{0}, __LINE__);
     test.IsEqual(*(numbers1.Get(6)), SizeT{0}, __LINE__);
     test.IsEqual(*(numbers1.Get(7)), SizeT{0}, __LINE__);
+
+    numbers1.Compress();
+
+    test.IsEqual(numbers1.Size(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+
+    numbers1.Dequeue();
+    numbers1.Dequeue();
+    numbers1.Dequeue();
+    numbers1.Dequeue();
+
+    numbers1.Compress();
+
+    test.IsEqual(numbers1.Size(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+
+    numbers1.Dequeue();
+
+    numbers1.Compress();
+
+    test.IsEqual(numbers1.Size(), SizeT{3}, __LINE__);
+    test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
 }
 
 static int RunDequeTests() {
