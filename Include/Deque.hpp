@@ -410,6 +410,20 @@ struct Deque {
     }
 
     /**
+     * @brief Shrinks the internal buffer to match the current element count.
+     *
+     * If the allocated capacity exceeds the number of stored elements,
+     * this method reallocates the buffer to the exact size, copies
+     * all elements into the new storage (resetting head to zero),
+     * and frees the excess memory.
+     */
+    void Compress() {
+        if (Size() < Capacity()) {
+            Resize(Size());
+        }
+    }
+
+    /**
      * @brief Reserves a fresh buffer of exactly `cap` capacity, discarding existing data.
      *
      * This operation resets the deque to empty, deallocates any prior storage,
