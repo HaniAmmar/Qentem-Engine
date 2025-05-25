@@ -39,58 +39,69 @@ static void TestDeque1(QTest &test) {
     test.IsTrue(numbers1.IsEmpty(), __LINE__);
     test.IsFalse(numbers1.IsNotEmpty(), __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{0}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
     test.IsNull(numbers1.Last(), __LINE__);
 
     test.IsEqual(numbers2.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers2.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
 
     numbers2.Reset();
     test.IsEqual(numbers2.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers2.Capacity(), SizeT{0}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(5);
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
 
     numbers1.Reserve(10);
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{16}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
 
     numbers1.Resize(18);
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{32}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
 
     storage = numbers1.First();
     numbers1.Resize(4);
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
     test.IsNotEqual(numbers1.Storage(), storage, __LINE__);
 
     numbers2.Resize(5);
     test.IsEqual(numbers2.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers2.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(2);
     test.IsEqual(numbers2.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers2.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
 
     numbers2.Resize(0);
     test.IsEqual(numbers2.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers2.Capacity(), SizeT{0}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers2.First(), __LINE__);
 
     numbers1.Reserve(0);
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
 
     numbers1.Reset();
@@ -154,6 +165,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{1}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{10}, __LINE__);
@@ -167,6 +179,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{2}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{10}, __LINE__);
@@ -182,6 +195,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{3}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{10}, __LINE__);
@@ -203,6 +217,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{8}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{10}, __LINE__);
@@ -219,8 +234,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(7)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{7}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{1}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{20}, __LINE__);
@@ -235,8 +252,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(6)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{6}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{2}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{30}, __LINE__);
@@ -250,8 +269,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(5)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{5}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{3}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{40}, __LINE__);
@@ -264,8 +285,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(4)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{4}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{4}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{50}, __LINE__);
@@ -277,8 +300,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(3)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{3}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{5}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{60}, __LINE__);
@@ -289,8 +314,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(2)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{2}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{6}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{70}, __LINE__);
@@ -300,8 +327,10 @@ static void TestDeque2(QTest &test) {
     test.IsEqual(*(numbers1.Get(1)), SizeT{80}, __LINE__);
 
     numbers1.Dequeue();
+
     test.IsEqual(numbers1.Size(), SizeT{1}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{7}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{80}, __LINE__);
@@ -312,6 +341,7 @@ static void TestDeque2(QTest &test) {
     numbers1.Dequeue();
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{8}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
     test.IsNull(numbers1.Last(), __LINE__);
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
@@ -328,6 +358,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{4}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{10}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{30}, __LINE__);
@@ -349,6 +380,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{1}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{14}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{5}, __LINE__);
@@ -376,12 +408,15 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{9}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{16}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{10}, __LINE__);
     test.IsEqual(*(numbers1.Last()), SizeT{90}, __LINE__);
 
     numbers1.Reset();
+
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
 
     numbers1 += SizeT{10};
     numbers1 += SizeT{20};
@@ -396,6 +431,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{2}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{3}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{40}, __LINE__);
@@ -438,6 +474,7 @@ static void TestDeque2(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{0}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
     test.IsNull(numbers1.Last(), __LINE__);
 }
@@ -473,6 +510,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(6)), SizeT{70}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{6}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -488,6 +526,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(5)), SizeT{60}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{5}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -502,6 +541,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(4)), SizeT{50}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{4}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -515,6 +555,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(3)), SizeT{40}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{3}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -527,6 +568,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(2)), SizeT{30}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{2}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -538,6 +580,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(1)), SizeT{20}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{1}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
@@ -548,6 +591,7 @@ static void TestDeque3(QTest &test) {
     test.IsEqual(*(numbers1.Get(0)), SizeT{10}, __LINE__);
 
     numbers1.DequeueBack();
+
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
@@ -562,6 +606,7 @@ static void TestDeque3(QTest &test) {
 
     numbers1.DequeueBack();
     numbers1.DequeueBack();
+
     numbers1 += SizeT{40};
 
     test.IsEqual(numbers1.Size(), SizeT{4}, __LINE__);
@@ -776,6 +821,7 @@ static void TestDeque4(QTest &test) {
 
     for (SizeT i = 0; i < size; i++) {
         SizeT *item = numbers1.First();
+
         numbers1.Dequeue();
 
         if (item != nullptr) {
@@ -804,6 +850,7 @@ static void TestDeque5(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNull(numbers1.First(), __LINE__);
     test.IsNull(numbers1.Last(), __LINE__);
 
@@ -816,6 +863,7 @@ static void TestDeque5(QTest &test) {
 
     numbers1.Dequeue();
 
+    test.IsEqual(numbers1.PopCount(), SizeT{1}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{2}, __LINE__);
@@ -827,6 +875,7 @@ static void TestDeque5(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{1}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{2}, __LINE__);
@@ -837,6 +886,7 @@ static void TestDeque5(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
 
     numbers1 += SizeT{1};
     numbers1 += SizeT{2};
@@ -847,6 +897,7 @@ static void TestDeque5(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{3}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{1}, __LINE__);
@@ -856,6 +907,7 @@ static void TestDeque5(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{2}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{1}, __LINE__);
@@ -867,6 +919,7 @@ static void TestDeque5(QTest &test) {
 
     test.IsEqual(numbers1.Size(), SizeT{2}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{2}, __LINE__);
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsNotNull(numbers1.First(), __LINE__);
     test.IsNotNull(numbers1.Last(), __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{0}, __LINE__);
@@ -913,10 +966,12 @@ static void TestDeque5(QTest &test) {
     numbers1 += SizeT{4};
 
     numbers1.Dequeue();
+
     numbers1 += SizeT{5};
 
     numbers1.ResizeWithDefaultInit(8);
 
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Size(), SizeT{8}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
     test.IsEqual(*(numbers1.First()), SizeT{2}, __LINE__);
@@ -932,6 +987,7 @@ static void TestDeque5(QTest &test) {
 
     numbers1.Compress();
 
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Size(), SizeT{8}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{8}, __LINE__);
 
@@ -942,6 +998,7 @@ static void TestDeque5(QTest &test) {
 
     numbers1.Compress();
 
+    test.IsEqual(numbers1.PopCount(), SizeT{0}, __LINE__);
     test.IsEqual(numbers1.Size(), SizeT{4}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
 
@@ -949,6 +1006,7 @@ static void TestDeque5(QTest &test) {
 
     numbers1.Compress();
 
+    test.IsEqual(numbers1.PopCount(), SizeT{1}, __LINE__);
     test.IsEqual(numbers1.Size(), SizeT{3}, __LINE__);
     test.IsEqual(numbers1.Capacity(), SizeT{4}, __LINE__);
 }

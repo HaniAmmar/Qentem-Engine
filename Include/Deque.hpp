@@ -30,8 +30,22 @@ namespace Qentem {
 /**
  * @brief Double-ended queue with power-of-two capacity, backed by a ring buffer.
  *
- * Supports amortized O(1) insertion/removal at both front and back using
- * bitmask wraparound. Capacity is always a power of two.
+ * This Deque implements the usual front/back push and pop in O(1) time via
+ * power-of-two ring buffering. In scenarios where you must store “absolute”
+ * indices (e.g. for a name→index map) and still have them remain valid after
+ * arbitrary front-pops, you can enable the built-in pop-count biasing:
+ *
+ *   - pop_count_ tracks the total number of times Dequeue() has been called
+ *     since the last buffer reallocation or reset.
+ *   - To record an element’s absolute index on insertion, compute:
+ *         absolute = current_size + PopCount();
+ *   - To recover its current logical index for Get(), compute:
+ *         logical = absolute - PopCount();
+ *
+ * Because pop_count_ is reset to zero whenever the underlying storage moves
+ * (in allocate(), resize(), or reset()), all biased indices stay consistent
+ * without needing any full rebuild of stored mappings. This pattern yields
+ * true O(1) insertion, eviction, and index lookup in dynamic table scenarios.
  *
  * @tparam Type_T The element type stored in the deque.
  */
@@ -65,10 +79,12 @@ struct Deque {
      * @param src Source deque to move from.
      */
     Deque(Deque &&src) noexcept
-        : storage_{src.storage_}, index_{src.index_}, head_{src.head_}, capacity_{src.capacity_} {
+        : storage_{src.storage_}, index_{src.index_}, head_{src.head_}, pop_count_{src.pop_count_},
+          capacity_{src.capacity_} {
         src.clearStorage();
         src.setSize(0);
         src.setHead(0);
+        src.setPopCount(0);
         src.setCapacity(0);
     }
 
@@ -83,11 +99,13 @@ struct Deque {
             setStorage(src.Storage());
             setSize(src.Size());
             setHead(src.head());
+            setPopCount(src.PopCount());
             setCapacity(src.Capacity());
 
             src.clearStorage();
             src.setSize(0);
             src.setHead(0);
+            src.setPopCount(0);
             src.setCapacity(0);
         }
         return *this;
@@ -191,6 +209,7 @@ struct Deque {
 
             setHead((head() + SizeT{1}) & (Capacity() - SizeT{1}));
             setSize(Size() - SizeT{1});
+            ++pop_count_;
         }
     }
 
@@ -452,6 +471,7 @@ struct Deque {
     void Clear() {
         clear();
         setSize(0);
+        setPopCount(0);
         setHead(0);
     }
 
@@ -470,6 +490,7 @@ struct Deque {
         clearStorage();
         setSize(0);
         setHead(0);
+        setPopCount(0);
         setCapacity(0);
     }
 
@@ -484,6 +505,19 @@ struct Deque {
 
     SizeT Size() const noexcept {
         return index_;
+    }
+
+    /**
+     * @brief Get the number of times elements have been dequeued since the last buffer change.
+     *
+     * This pop-count can be used to bias stored absolute indices so that they remain
+     * valid even after front-pop operations. It is reset to zero whenever the underlying
+     * storage is reallocated, resized, or fully reset, ensuring index consistency.
+     *
+     * @return The current pop_count_ value.
+     */
+    inline SizeT PopCount() const noexcept {
+        return pop_count_;
     }
 
     bool IsEmpty() const noexcept {
@@ -518,6 +552,10 @@ struct Deque {
         head_ = new_head;
     }
 
+    inline void setPopCount(SizeT new_pop_count) noexcept {
+        pop_count_ = new_pop_count;
+    }
+
     inline void setCapacity(SizeT new_cap) noexcept {
         capacity_ = new_cap;
     }
@@ -536,6 +574,7 @@ struct Deque {
     void allocate(SizeT new_cap) {
         setCapacity(Memory::AlignSize(new_cap));
         setStorage(Memory::Allocate<Type_T>(Capacity()));
+        setPopCount(0);
     }
 
     /**
@@ -600,6 +639,7 @@ struct Deque {
     Type_T *storage_{nullptr};
     SizeT   index_{0};
     SizeT   head_{0};
+    SizeT   pop_count_{0};
     SizeT   capacity_{0};
 };
 
